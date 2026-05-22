@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { useStationStore } from '@/store/useStationStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { useI18n } from 'vue-i18n'
+import type { SavedModule } from '@/types/x4'
+import type { WareAmount } from '@/types/saveArchive'
 import PriceSlider from '@/components/common/PriceSlider.vue'
 import StationModuleDetail from './StationModuleDetail.vue'
 import X4NumberInput from '@/components/common/X4NumberInput.vue'
@@ -11,19 +12,40 @@ import VolumeControlSlider from '@/components/common/VolumeControlSlider.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 import ViewTabUi from '@/components/common/ViewTabUI.vue'
 import { analyzeStation } from '@/store/logic/analyzeStation'
-import type { SavedModule } from '@/types/x4'
+import { getPriceByMultiplier } from '@/store/logic/calculatorUtils'
 
-const store = useStationStore()
-const gameDataStore = useGameDataStore()
-const { translateModule, translateWare, translate } = useX4I18n()
-const { t } = useI18n()
-const props = withDefaults(defineProps<{
-  plannedModulesOverride?: SavedModule[] | null
+const props = defineProps<{
+  displayModules: SavedModule[]
+  workerModules?: SavedModule[]
+  buildingCargo?: WareAmount[]
+  buildingReservation?: WareAmount[]
+  buildingScopeModules?: SavedModule[]
+  isBuildingScope?: boolean
+  buildingInProgress?: SavedModule
   hideWorkersView?: boolean
-}>(), {
-  plannedModulesOverride: null,
-  hideWorkersView: false
-})
+  settings: {
+    transportShipCapacity: number
+    workforceAuto: boolean
+    manualWorkforce: number
+    useHQ: boolean
+  }
+  currentEfficiency: number
+  actualWorkforce: number
+  buildPriceMultiplier: number
+  forceWorkforceAuto?: boolean
+}>()
+
+const emit = defineEmits<{
+  updateTransportShipCapacity: [value: number]
+  updateBuildPriceMultiplier: [value: number]
+  updateManualWorkforce: [value: number]
+  updateWorkforceAuto: [value: boolean]
+  updateUseHq: [value: boolean]
+}>()
+
+const gameDataStore = useGameDataStore()
+const { translateModule, translateWare } = useX4I18n()
+const { t } = useI18n()
 
 const viewMode = ref<'materials' | 'time' | 'workers' | 'volume'>('materials')
 const views = computed(() => [
@@ -37,76 +59,190 @@ watch(views, (nextViews) => {
     viewMode.value = 'materials'
   }
 }, { immediate: true })
+
 const transportShipCapacity = computed({
-  get: () => store.settings.transportShipCapacity,
-  set: (val) => store.updateSetting('transportShipCapacity', val)
+  get: () => props.settings.transportShipCapacity,
+  set: (val) => emit('updateTransportShipCapacity', val)
 })
 const buildPriceMultiplier = computed({
-  get: () => store.buildPriceMultiplier,
-  set: (val) => store.buildPriceMultiplier = val
+  get: () => props.buildPriceMultiplier,
+  set: (val) => emit('updateBuildPriceMultiplier', val)
 })
 
-const workforceEfficiencyText = computed(() => {
-  return `${Math.round(store.currentEfficiency * 100)}%`
+const clampedManualWorkforce = computed(() => {
+  const currentAnalysis = workersAnalysis.value
+  const capacity = currentAnalysis.totalCapacity || 0
+  return Math.max(0, Math.min(props.settings.manualWorkforce, capacity))
 })
 
-const workforceEfficiencyColor = computed(() => {
-  const eff = store.currentEfficiency
-  if (eff >= 1) return 'text-emerald-400'
-  if (eff >= 0.5) return 'text-amber-400'
-  return 'text-red-400'
-})
-
-const analysis = computed(() => {
-  if (!props.plannedModulesOverride) return store.stationAnalysis
+const costAnalysis = computed(() => {
   return analyzeStation(
-    props.plannedModulesOverride,
+    props.displayModules,
     gameDataStore.modulesMap,
     gameDataStore.waresMap,
     buildPriceMultiplier.value,
-    useHQ.value
+    props.settings.useHQ
   )
 })
 
+const workersAnalysis = computed(() => {
+  return analyzeStation(
+    props.workerModules ?? props.displayModules,
+    gameDataStore.modulesMap,
+    gameDataStore.waresMap,
+    buildPriceMultiplier.value,
+    props.settings.useHQ
+  )
+})
+
+interface BuildingProgressItem {
+  id: string
+  displayName: string
+  required: number
+  cargo: number
+  reservation: number
+  hasReservation: boolean
+}
+
+const buildingProgressItems = computed(() => {
+  if (!props.buildingScopeModules?.length) return []
+  const buildingAnalysis = analyzeStation(
+    props.buildingScopeModules,
+    gameDataStore.modulesMap,
+    gameDataStore.waresMap,
+    buildPriceMultiplier.value,
+    props.settings.useHQ
+  )
+  const cargoMap = new Map((props.buildingCargo || []).map(c => [c.ware, c.amount]))
+  const reservationMap = new Map((props.buildingReservation || []).map(r => [r.ware, r.amount]))
+
+  const wareIds = new Set<string>()
+  for (const item of (buildingAnalysis.summaryItems || [])) wareIds.add(item.id)
+  for (const c of (props.buildingCargo || [])) wareIds.add(c.ware)
+  for (const r of (props.buildingReservation || [])) wareIds.add(r.ware)
+
+  const reqMap = new Map<string, number>()
+  for (const item of (buildingAnalysis.summaryItems || [])) reqMap.set(item.id, item.count)
+
+  return [...wareIds]
+    .map(id => {
+      const required = reqMap.get(id) || 0
+      const cargo = cargoMap.get(id) || 0
+      const reservation = reservationMap.get(id) || 0
+      if (required === 0 && cargo === 0 && reservation === 0) return null
+      const ware = gameDataStore.waresMap[id]
+      return {
+        id,
+        displayName: ware ? translateWare(ware) : id,
+        required,
+        cargo,
+        reservation,
+        hasReservation: reservation > 0,
+      }
+    })
+    .filter(Boolean) as BuildingProgressItem[]
+})
+
+function buildingCargoPercent(item: BuildingProgressItem): number {
+  const scale = item.required > 0 ? item.required : (item.cargo + item.reservation)
+  if (scale === 0) return 0
+  return Math.min((item.cargo / scale) * 100, 100)
+}
+
+function buildingTransitPercent(item: BuildingProgressItem): number {
+  const scale = item.required > 0 ? item.required : (item.cargo + item.reservation)
+  if (scale === 0) return 0
+  const cargoW = Math.min((item.cargo / scale) * 100, 100)
+  return Math.min((item.reservation / scale) * 100, 100 - cargoW)
+}
+
 const maxAllowedWorkforce = computed(() => {
-  const currentAnalysis = analysis.value
+  const currentAnalysis = workersAnalysis.value
   const needed = currentAnalysis.totalNeeded || 0;
   const capacity = currentAnalysis.totalCapacity || 0;
   return Math.min(needed, capacity);
 });
 
+const displayedActualWorkforce = computed(() => {
+  if (props.forceWorkforceAuto) {
+    return props.actualWorkforce
+  }
+  if (props.settings.workforceAuto) return maxAllowedWorkforce.value
+  return clampedManualWorkforce.value
+})
+
+const displayedEfficiency = computed(() => {
+  if (props.forceWorkforceAuto) {
+    return props.currentEfficiency
+  }
+  const needed = workersAnalysis.value.totalNeeded || 0
+  if (needed === 0) return 1
+  return Math.min(1, displayedActualWorkforce.value / needed)
+})
+
+const workforceEfficiencyText = computed(() => {
+  return `${Math.round(displayedEfficiency.value * 100)}%`
+})
+
+const workforceEfficiencyColor = computed(() => {
+  const eff = displayedEfficiency.value
+  if (eff >= 1) return 'text-emerald-400'
+  if (eff >= 0.5) return 'text-amber-400'
+  return 'text-red-400'
+})
+const manualWorkforce = computed({
+  get: () => props.settings.manualWorkforce,
+  set: (val: number) => emit('updateManualWorkforce', val)
+})
+const workforceAuto = computed({
+  get: () => props.forceWorkforceAuto || props.settings.workforceAuto,
+  set: (val: boolean) => {
+    if (props.forceWorkforceAuto) return
+    emit('updateWorkforceAuto', val)
+  }
+})
+const useHQ = computed({
+  get: () => props.settings.useHQ,
+  set: (val: boolean) => emit('updateUseHq', val)
+})
+
 const saturationPercent = computed({
   get: () => {
-    const currentAnalysis = analysis.value
+    if (props.forceWorkforceAuto) {
+      return Math.round(props.currentEfficiency * 100)
+    }
+    const currentAnalysis = workersAnalysis.value
     const capacity = currentAnalysis.totalCapacity || 0;
     if (capacity === 0) return 0;
-    const currentVal = store.settings.workforceAuto ? store.actualWorkforce : store.settings.manualWorkforce;
+    const currentVal = displayedActualWorkforce.value
     return Math.round((currentVal / capacity) * 100);
   },
   set: (val: number) => {
-    if (store.settings.workforceAuto) return;
-    const currentAnalysis = analysis.value
+    if (props.forceWorkforceAuto || props.settings.workforceAuto) return;
+    const currentAnalysis = workersAnalysis.value
     const capacity = currentAnalysis.totalCapacity || 0;
-    store.updateSetting('manualWorkforce', Math.min(Math.round((val / 100) * capacity), capacity));
+    emit('updateManualWorkforce', Math.min(Math.round((val / 100) * capacity), capacity));
   }
 })
-const manualWorkforce = computed({
-  get: () => store.settings.manualWorkforce,
-  set: (val: number) => store.updateSetting('manualWorkforce', val)
-})
-const workforceAuto = computed({
-  get: () => store.settings.workforceAuto,
-  set: (val: boolean) => store.updateSetting('workforceAuto', val)
-})
-const useHQ = computed({
-  get: () => store.settings.useHQ,
-  set: (val: boolean) => store.updateSetting('useHQ', val)
-})
+
+const workforceSliderDraft = ref(0)
+
+watch(saturationPercent, (value) => {
+  workforceSliderDraft.value = value
+}, { immediate: true })
+
+const handleWorkforceSliderInput = (event: Event) => {
+  workforceSliderDraft.value = Number((event.target as HTMLInputElement).value)
+}
+
+const handleWorkforceSliderCommit = () => {
+  if (props.forceWorkforceAuto || props.settings.workforceAuto) return
+  saturationPercent.value = workforceSliderDraft.value
+}
 
 const formatLargeNum = (n: number) => {
   if (n >= 1_000_000) {
     const val = n / 1_000_000
-    // 如果是整数或者小数位为0，则不显示小数
     return `${parseFloat(val.toFixed(2))}M`
   }
   if (n >= 1_000) {
@@ -131,21 +267,20 @@ const formatTime = (seconds: number) => {
     return `${d}D ${timeStr}`
   }
   
-  // 如果超过24小时但不到2天，HH会显示为 24-47
   const totalHours = Math.floor(seconds / 3600)
   const totalTimeStr = `${String(totalHours).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
   return totalTimeStr
 }
 
 const data = computed(() => {
-  const currentAnalysis = analysis.value
+  const currentAnalysis = viewMode.value === 'workers' ? workersAnalysis.value : costAnalysis.value
   
   if (viewMode.value === 'time') {
     return {
       totalValue: currentAnalysis.totalTime,
       unit: '',
       isTime: true,
-      summaryItems: [], // 时间视图不需要汇总行明细
+      summaryItems: [],
       moduleGroups: currentAnalysis.moduleGroups.map((group: any) => {
         const moduleData = gameDataStore.modulesMap[group.id]
         return {
@@ -157,7 +292,7 @@ const data = computed(() => {
               id: 'build_time', 
               displayName: t('station.item_build_time'), 
               count: 1, 
-              price: group.unitTime // 传递给 displayValue 渲染
+              price: group.unitTime
             }
           ]
         }
@@ -170,7 +305,6 @@ const data = computed(() => {
       { id: 'cap', displayName: t('station.total_capacity'), count: currentAnalysis.totalCapacity, price: 0 }
     ]
 
-    // 如果有 PHQ，拆分总需求
     if (currentAnalysis.playerHQNeeded > 0) {
       summaryItems.push({ 
         id: 'need', 
@@ -180,7 +314,7 @@ const data = computed(() => {
       })
       summaryItems.push({ 
         id: 'need', 
-        displayName: translate('player_hq', '{20102,2011}', 'module'), 
+        displayName: 'Player HQ', 
         count: currentAnalysis.playerHQNeeded, 
         price: 0 
       })
@@ -261,7 +395,6 @@ const data = computed(() => {
     }
   }
 
-  // Default: materials
   return {
     totalValue: currentAnalysis.totalCost,
     unit: 'Cr',
@@ -289,6 +422,7 @@ const data = computed(() => {
     })
   }
 })
+
 const getSummaryTitle = () => {
   if (viewMode.value === 'workers') return t('station.summary_workforce')
   if (viewMode.value === 'volume') return t('station.summary_volume')
@@ -303,13 +437,124 @@ const headerTitle = computed(() => {
 })
 
 const hasDashboardData = computed(() => {
-  return data.value.moduleGroups.length > 0 || (viewMode.value === 'workers' && store.settings.useHQ)
+  return data.value.moduleGroups.length > 0 || (viewMode.value === 'workers' && props.settings.useHQ)
+})
+
+const buildingCargoItems = computed(() => {
+  if (!props.buildingCargo?.length) return []
+  return props.buildingCargo.map(c => {
+    const ware = gameDataStore.waresMap[c.ware]
+    const price = ware ? getPriceByMultiplier(ware, buildPriceMultiplier.value) : 0
+    const volume = (ware?.volume || 0) * c.amount
+    return {
+      id: c.ware,
+      count: c.amount,
+      price: c.amount * price,
+      volume,
+      displayName: ware ? translateWare(ware) : c.ware
+    }
+  })
+})
+
+const buildingCargoTotal = computed(() => {
+  if (viewMode.value === 'volume') return buildingCargoItems.value.reduce((sum, item) => sum + item.volume, 0)
+  return buildingCargoItems.value.reduce((sum, item) => sum + item.price, 0)
+})
+
+const buildingReservationItems = computed(() => {
+  if (!props.buildingReservation?.length) return []
+  return props.buildingReservation.map(r => {
+    const ware = gameDataStore.waresMap[r.ware]
+    const price = ware ? getPriceByMultiplier(ware, buildPriceMultiplier.value) : 0
+    const volume = (ware?.volume || 0) * r.amount
+    return {
+      id: r.ware,
+      count: r.amount,
+      price: r.amount * price,
+      volume,
+      displayName: ware ? translateWare(ware) : r.ware
+    }
+  })
+})
+
+const buildingReservationTotal = computed(() => {
+  if (viewMode.value === 'volume') return buildingReservationItems.value.reduce((sum, item) => sum + item.volume, 0)
+  return buildingReservationItems.value.reduce((sum, item) => sum + item.price, 0)
+})
+
+const materialGapItems = computed(() => {
+  if (!props.isBuildingScope) return []
+  const cargoMap = Object.fromEntries((props.buildingCargo || []).map(c => [c.ware, c.amount]))
+  const reservationMap = Object.fromEntries((props.buildingReservation || []).map(r => [r.ware, r.amount]))
+  return costAnalysis.value.summaryItems
+    .map((item: any) => {
+      const cargo = cargoMap[item.id] || 0
+      const reservation = reservationMap[item.id] || 0
+      const gap = item.count - cargo - reservation
+      if (gap <= 0) return null
+      const ware = gameDataStore.waresMap[item.id]
+      const price = ware ? getPriceByMultiplier(ware, buildPriceMultiplier.value) : 0
+      return {
+        id: item.id,
+        count: gap,
+        price: gap * price,
+        volume: gap * (ware?.volume || 0),
+        displayName: ware ? translateWare(ware) : item.id
+      }
+    })
+    .filter(Boolean) as Array<{ id: string; count: number; price: number; volume: number; displayName: string }>
+})
+
+const materialGapTotal = computed(() => {
+  if (viewMode.value === 'volume') return materialGapItems.value.reduce((sum, item) => sum + item.volume, 0)
+  return materialGapItems.value.reduce((sum, item) => sum + item.price, 0)
+})
+
+const inProgressAnalysis = computed(() => {
+  if (!props.buildingInProgress) return null
+  return analyzeStation(
+    [props.buildingInProgress],
+    gameDataStore.modulesMap,
+    gameDataStore.waresMap,
+    buildPriceMultiplier.value,
+    props.settings.useHQ
+  )
+})
+
+const inProgressModuleEntry = computed(() => {
+  const ip = props.buildingInProgress
+  const analysis = inProgressAnalysis.value
+  if (!ip || !analysis) return null
+  const moduleData = gameDataStore.modulesMap[ip.id]
+  const isTime = viewMode.value === 'time'
+  const isVolume = viewMode.value === 'volume'
+  return {
+    id: ip.id,
+    count: ip.count,
+    displayName: moduleData ? translateModule(moduleData) : ip.id,
+    value: isTime ? analysis.totalTime : (isVolume ? analysis.totalVolume : analysis.totalCost),
+    unit: isTime ? '' : (isVolume ? 'm³' : 'Cr'),
+    isTime,
+    isVolume,
+    items: isTime
+      ? [{ id: 'build_time', displayName: t('station.item_build_time'), count: 1, price: analysis.totalTime, displayValue: analysis.totalTime }]
+      : analysis.summaryItems.map((item: any) => {
+          const ware = gameDataStore.waresMap[item.id]
+          const price = ware ? getPriceByMultiplier(ware, buildPriceMultiplier.value) : 0
+          return {
+            id: item.id,
+            count: item.count,
+            price: item.count * price,
+            volume: item.count * (ware?.volume || 0),
+            displayName: ware ? translateWare(ware) : item.id
+          }
+        })
+  }
 })
 </script>
 
 <template>
-  <div class="dashboard-container">
-    <!-- Header with View Mode Switcher -->
+  <div class="dashboard-container" data-testid="station-dashboard">
     <div class="dashboard-header">
       <h3 class="header-title">{{ headerTitle }}</h3>
       
@@ -318,31 +563,28 @@ const hasDashboardData = computed(() => {
       </div>
     </div>
 
-    <!-- Stats Bar -->
-    <div class="stats-bar" v-if="analysis.moduleGroups.length > 0">
-      <!-- Row 1: Cost, Volume, Workers Needed -->
-      <div class="stat-item">
+    <div class="stats-bar" v-if="costAnalysis.moduleGroups.length > 0">
+      <div class="stat-item" data-testid="cost-stat">
         <span class="stat-label">{{ t('station.summary_cost') }}</span>
-        <span class="stat-value text-red-400">{{ formatLargeNum(analysis.totalCost) }} <small>Cr</small></span>
+        <span class="stat-value text-red-400">{{ formatLargeNum(costAnalysis.totalCost) }} <small>Cr</small></span>
       </div>
       <div class="stat-item">
         <span class="stat-label">{{ t('station.summary_volume') }}</span>
-        <span class="stat-value text-blue-400">{{ formatLargeNum(analysis.totalVolume) }} <small>m³</small></span>
+        <span class="stat-value text-blue-400">{{ formatLargeNum(costAnalysis.totalVolume) }} <small>m³</small></span>
       </div>
       <div class="stat-item">
         <span class="stat-label">{{ t('station.summary_workers_needed') }}</span>
-        <span class="stat-value text-emerald-400">{{ formatNum(analysis.totalNeeded) }}</span>
+        <span class="stat-value text-emerald-400">{{ formatNum(workersAnalysis.totalNeeded) }}</span>
       </div>
 
-      <!-- Row 2: Time, Ships, Efficiency -->
       <div class="stat-item">
         <span class="stat-label">{{ t('station.summary_time') }}</span>
-        <span class="stat-value text-red-400">{{ formatTime(analysis.totalTime) }}</span>
+        <span class="stat-value text-red-400">{{ formatTime(costAnalysis.totalTime) }}</span>
       </div>
       <div class="stat-item">
         <span class="stat-label">{{ t('station.summary_transport_trips') }}</span>
         <span class="stat-value text-blue-400">
-          {{ Math.ceil(analysis.totalVolume / transportShipCapacity) }}
+          {{ Math.ceil(costAnalysis.totalVolume / transportShipCapacity) }}
           <small class="text-xs text-slate-500 font-normal">({{ formatLargeNum(transportShipCapacity) }})</small>
         </span>
       </div>
@@ -354,10 +596,56 @@ const hasDashboardData = computed(() => {
       </div>
     </div>
 
-    <!-- Scrollable Content Area -->
+    <div class="building-progress-panel" v-if="buildingProgressItems.length > 0">
+      <div v-for="item in buildingProgressItems" :key="item.id" class="building-progress-row">
+        <span class="building-ware-name" :title="item.displayName">{{ item.displayName }}</span>
+        <div class="bar-shell">
+          <div class="bar-fill-cargo" :style="{ width: `${buildingCargoPercent(item)}%` }"></div>
+          <div class="bar-fill-transit" :style="{ left: `${buildingCargoPercent(item)}%`, width: `${buildingTransitPercent(item)}%` }"></div>
+          <div class="bar-text">
+            <template v-if="item.hasReservation">
+              {{ formatNum(item.cargo) }}+{{ formatNum(item.reservation) }} / {{ formatNum(item.required) }}
+            </template>
+            <template v-else>
+              {{ formatNum(item.cargo) }} / {{ formatNum(item.required) }}
+            </template>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="dashboard-content custom-scrollbar">
       <div v-if="hasDashboardData">
-        <!-- Summary Group -->
+        <template v-if="viewMode === 'materials' || viewMode === 'volume'">
+          <StationModuleDetail
+            v-if="materialGapItems.length > 0"
+            variant="summary"
+            :title="t('station.material_gap')"
+            :value="materialGapTotal"
+            :items="materialGapItems"
+            :unit="viewMode === 'volume' ? 'm³' : 'Cr'"
+            :is-volume="viewMode === 'volume'"
+          />
+          <StationModuleDetail
+            v-if="buildingReservationItems.length > 0"
+            variant="summary"
+            :title="t('station.in_transit_materials')"
+            :value="buildingReservationTotal"
+            :items="buildingReservationItems"
+            :unit="viewMode === 'volume' ? 'm³' : 'Cr'"
+            :is-volume="viewMode === 'volume'"
+          />
+          <StationModuleDetail
+            v-if="buildingCargoItems.length > 0"
+            variant="summary"
+            :title="t('station.build_storage_materials')"
+            :value="buildingCargoTotal"
+            :items="buildingCargoItems"
+            :unit="viewMode === 'volume' ? 'm³' : 'Cr'"
+            :is-volume="viewMode === 'volume'"
+          />
+        </template>
+
         <StationModuleDetail 
           v-if="viewMode !== 'time'"
           variant="summary"
@@ -369,7 +657,19 @@ const hasDashboardData = computed(() => {
           :is-volume="data.isVolume"
         />
 
-        <!-- Individual Module Groups -->
+        <StationModuleDetail
+          v-if="inProgressModuleEntry && isBuildingScope"
+          variant="module"
+          :count="inProgressModuleEntry.count"
+          :title="inProgressModuleEntry.displayName"
+          :value="inProgressModuleEntry.value"
+          :items="inProgressModuleEntry.items"
+          :badge="t('station.badge_in_progress')"
+          :unit="inProgressModuleEntry.unit"
+          :is-time="inProgressModuleEntry.isTime"
+          :is-volume="inProgressModuleEntry.isVolume"
+        />
+
         <StationModuleDetail 
           v-for="group in data.moduleGroups" 
           :key="group.id"
@@ -385,12 +685,10 @@ const hasDashboardData = computed(() => {
         />
       </div>
       
-      <!-- Empty State -->
       <EmptyState v-else class="empty-state" />
     </div>
 
-    <!-- Footer with Controls -->
-    <div class="dashboard-footer" v-if="hasDashboardData && (viewMode === 'materials' || (!props.hideWorkersView && viewMode === 'workers') || viewMode === 'volume')">
+    <div class="dashboard-footer" v-if="hasDashboardData && (viewMode === 'materials' || (!hideWorkersView && viewMode === 'workers') || viewMode === 'volume')">
       <div v-if="viewMode === 'materials'" class="simulation-controls">
         <PriceSlider 
           v-model="buildPriceMultiplier" 
@@ -411,37 +709,37 @@ const hasDashboardData = computed(() => {
         />
       </div>
 
-      <div v-if="!props.hideWorkersView && viewMode === 'workers'" class="workforce-control-panel">
+      <div v-if="!hideWorkersView && viewMode === 'workers'" class="workforce-control-panel">
         <div class="control-header">
           <div class="flex items-center gap-2">
             <span class="text-[10px] text-slate-500 font-bold uppercase">{{ t('station.control_actual_workforce') }}</span>
 
-            <X4NumberInput v-if="!store.settings.workforceAuto" v-model="manualWorkforce"
-              :max="analysis.totalCapacity" width-class="w-24" />
+            <X4NumberInput v-if="!workforceAuto" v-model="manualWorkforce"
+              :max="workersAnalysis.totalCapacity" width-class="w-24" />
             <span v-else class="val-text-display">
-              {{ store.actualWorkforce }}
+              {{ displayedActualWorkforce }}
             </span>
           </div>
-          <span class="percent-display">{{ Math.round((store.actualWorkforce / (analysis.totalCapacity || 1)) * 100)
-            }}%</span>
+          <span class="percent-display">{{ saturationPercent }}%</span>
         </div>
 
         <div class="slider-container">
-          <input type="range" v-model.number="saturationPercent" min="0" max="100"
-            :disabled="store.settings.workforceAuto" class="range-slider">
+          <input type="range" :value="workforceSliderDraft" min="0" max="100"
+            @input="handleWorkforceSliderInput" @change="handleWorkforceSliderCommit"
+            :disabled="workforceAuto" class="range-slider">
           <div class="slider-track-bg">
-            <div class="slider-fill" :style="{ width: `${saturationPercent}%` }"></div>
+            <div class="slider-fill" :style="{ width: `${workforceSliderDraft}%` }"></div>
           </div>
         </div>
 
         <div class="flex items-center justify-between mt-2">
           <label class="auto-toggle group">
-            <input type="checkbox" v-model="workforceAuto" class="hidden">
-            <div class="cb" :class="{ 'cb-active': store.settings.workforceAuto }">
-              <div v-if="store.settings.workforceAuto" class="cb-inner"></div>
+            <input type="checkbox" v-model="workforceAuto" class="hidden" :disabled="props.forceWorkforceAuto">
+            <div class="cb" :class="{ 'cb-active': workforceAuto }">
+              <div v-if="workforceAuto" class="cb-inner"></div>
             </div>
             <span class="text-[11px] font-bold italic uppercase"
-              :class="store.settings.workforceAuto ? 'text-sky-400' : 'text-slate-500'">
+              :class="workforceAuto ? 'text-sky-400' : 'text-slate-500'">
               {{ t('station.auto_calc') }} ({{ t('station.limit') }}: {{ formatNum(maxAllowedWorkforce) }})
             </span>
           </label>
@@ -552,19 +850,6 @@ const hasDashboardData = computed(() => {
   @apply w-3 h-3 rounded bg-slate-900 border-slate-700 accent-sky-500;
 }
 
-.total-time-summary {
-  @apply flex justify-between items-center px-4 py-3 mb-2 bg-slate-800/40 rounded-lg border border-slate-700/30;
-}
-
-.total-time-summary .label {
-  @apply text-sm font-bold text-slate-300;
-}
-
-.total-time-summary .value {
-  @apply text-sm font-bold text-sky-400 font-mono;
-}
-
-/* Custom Scrollbar Style */
 .custom-scrollbar::-webkit-scrollbar {
   width: 4px;
 }
@@ -573,5 +858,34 @@ const hasDashboardData = computed(() => {
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
   @apply bg-slate-700/50 rounded-full hover:bg-slate-600;
+}
+
+.building-progress-panel {
+  @apply bg-slate-800/60 p-2 mx-2 mt-2 rounded border border-slate-700/50 backdrop-blur-md space-y-1.5;
+}
+
+.building-progress-row {
+  @apply flex items-center gap-3 px-2 h-7;
+}
+
+.building-ware-name {
+  @apply text-[11px] text-slate-300 truncate shrink-0 font-medium;
+  width: 7em;
+}
+
+.bar-shell {
+  @apply relative h-4 rounded bg-slate-950/80 border border-slate-700/40 overflow-hidden flex-1;
+}
+
+.bar-fill-cargo {
+  @apply absolute left-0 top-0 h-full bg-emerald-500/70;
+}
+
+.bar-fill-transit {
+  @apply absolute top-0 h-full bg-amber-500/60;
+}
+
+.bar-text {
+  @apply absolute inset-0 flex items-center justify-center text-[11px] font-mono leading-none text-slate-200 pointer-events-none;
 }
 </style>

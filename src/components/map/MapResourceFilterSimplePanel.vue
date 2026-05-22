@@ -2,6 +2,7 @@
 import { computed, ref, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGameDataStore } from '@/store/useGameDataStore'
+import { useMapStore } from '@/store/useMapStore'
 import {
   sortResourcesByPriority,
   buildFixedYieldEntries,
@@ -61,6 +62,7 @@ const emit = defineEmits<{
 
 const { t, locale } = useI18n()
 const gameData = useGameDataStore()
+const mapStore = useMapStore()
 
 const availableResourceIds = computed(() =>
   ((gameData.res || []) as Array<{ id: string }>).map((entry) => entry.id).filter((id) => id !== 'energycells')
@@ -161,7 +163,10 @@ const sectorDataById = computed<Record<string, { resources: SectorResourceEntry[
       const sector = sectors[sectorId] as any
       if (!sector) return
       out[sector.id] = {
-        resources: Array.isArray(sector.resources) ? sector.resources : [],
+        resources: mapStore.getSectorResources(sector.id).map((entry) => ({
+          ware: entry.ware,
+          rating: entry.rating || 0
+        })),
         sunlight: Math.round(Number(sector.area?.sunlight || 0) * 100)
       }
     })

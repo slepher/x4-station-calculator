@@ -98,6 +98,34 @@ pub(crate) struct Vector3 {
     pub(crate) z: f64,
 }
 
+#[derive(Clone, Serialize, Deserialize)]
+pub(crate) struct WareAmount {
+    pub(crate) ware: String,
+    pub(crate) amount: i64,
+}
+
+#[derive(Clone, Serialize, Deserialize)]
+pub(crate) struct StationTradeOverrides {
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub(crate) max: Vec<WareAmount>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub(crate) buy: Vec<WareAmount>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub(crate) sell: Vec<WareAmount>,
+}
+
+impl StationTradeOverrides {
+    pub(crate) fn is_empty(&self) -> bool {
+        self.max.is_empty() && self.buy.is_empty() && self.sell.is_empty()
+    }
+}
+
+#[derive(Clone, Serialize, Deserialize)]
+pub(crate) struct WorkforceEntry {
+    pub(crate) race: String,
+    pub(crate) amount: i64,
+}
+
 #[derive(Clone, Serialize, Deserialize, Default)]
 pub(crate) struct Meta {
     pub(crate) guid: String,
@@ -109,8 +137,9 @@ pub(crate) struct Meta {
 }
 
 #[derive(Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub(crate) struct PlayerStationConstruction {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) id: Option<String>,
     pub(crate) index: i64,
     #[serde(rename = "ref")]
     pub(crate) ref_field: String,
@@ -155,15 +184,55 @@ pub(crate) struct StationBaseEntry {
 }
 
 #[derive(Clone, Serialize, Deserialize)]
+pub(crate) struct BuildProgress {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) start: Option<f64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) end: Option<f64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) sequenceindex: Option<i64>,
+}
+
+#[derive(Clone, Serialize, Deserialize)]
+pub(crate) struct BuildStorageEntry {
+    pub(crate) component_id: String,
+    pub(crate) code: String,
+    pub(crate) owner: String,
+    pub(crate) relative_position: Vector3,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) zone_id: Option<String>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub(crate) cargo: Vec<WareAmount>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub(crate) reservation: Vec<WareAmount>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) station_code: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) target_station_component_id: Option<String>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub(crate) constructions: Vec<PlayerStationConstruction>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) progress: Option<BuildProgress>,
+}
+
+#[derive(Clone, Serialize, Deserialize)]
 pub(crate) struct PlayerStationEntry {
     #[serde(flatten)]
     pub(crate) base: StationBaseEntry,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) component_id: Option<String>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub(crate) constructions: Vec<PlayerStationConstruction>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    pub(crate) modules: Vec<AggregatedStationModule>,
+    pub(crate) cargo: Vec<WareAmount>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    pub(crate) equipments: Vec<AggregatedEquipment>,
+    pub(crate) reservation: Vec<WareAmount>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) overrides: Option<StationTradeOverrides>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) buildstorage_code: Option<String>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub(crate) workforces: Vec<WorkforceEntry>,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -236,22 +305,22 @@ pub(crate) struct SectorData {
     pub(crate) is_known: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) owner: Option<String>,
-    #[serde(rename = "playerStations", skip_serializing_if = "Vec::is_empty")]
-    pub(crate) player_stations: Vec<PlayerStationEntry>,
-    #[serde(rename = "xenonStations", skip_serializing_if = "Vec::is_empty")]
-    pub(crate) xenon_stations: Vec<FactionStationEntry>,
-    #[serde(rename = "khaakStations", skip_serializing_if = "Vec::is_empty")]
-    pub(crate) khaak_stations: Vec<FactionStationEntry>,
-    #[serde(rename = "npcStations", skip_serializing_if = "Vec::is_empty")]
-    pub(crate) npc_stations: Vec<NpcStationEntry>,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    pub(crate) datavaults: Vec<DatavaultEntry>,
-    #[serde(rename = "erlkingVaults")]
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    pub(crate) erlking_vaults: Vec<DatavaultEntry>,
-    #[serde(rename = "abandonedShips")]
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    pub(crate) abandoned_ships: Vec<AbandonedShipEntry>,
+    #[serde(skip_serializing_if = "HashMap::is_empty")]
+    pub(crate) player_stations: HashMap<String, PlayerStationEntry>,
+    #[serde(skip_serializing_if = "HashMap::is_empty")]
+    pub(crate) xenon_stations: HashMap<String, FactionStationEntry>,
+    #[serde(skip_serializing_if = "HashMap::is_empty")]
+    pub(crate) khaak_stations: HashMap<String, FactionStationEntry>,
+    #[serde(skip_serializing_if = "HashMap::is_empty")]
+    pub(crate) npc_stations: HashMap<String, NpcStationEntry>,
+    #[serde(skip_serializing_if = "HashMap::is_empty")]
+    pub(crate) player_buildstorages: HashMap<String, BuildStorageEntry>,
+    #[serde(skip_serializing_if = "HashMap::is_empty")]
+    pub(crate) datavaults: HashMap<String, DatavaultEntry>,
+    #[serde(skip_serializing_if = "HashMap::is_empty")]
+    pub(crate) erlking_vaults: HashMap<String, DatavaultEntry>,
+    #[serde(skip_serializing_if = "HashMap::is_empty")]
+    pub(crate) abandoned_ships: HashMap<String, AbandonedShipEntry>,
 }
 
 #[derive(Clone, Serialize)]
@@ -275,7 +344,10 @@ pub(crate) struct ArchiveMeta {
     pub(crate) filename: String,
     #[serde(rename = "parser_version")]
     pub(crate) parser_version: String,
-    #[serde(rename = "post_processor_version", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "post_processor_version",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub(crate) post_processor_version: Option<String>,
     pub(crate) source: String,
 }

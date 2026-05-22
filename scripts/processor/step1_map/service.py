@@ -23,6 +23,7 @@ from processor.shared.output_manager import (
     write_regionyields,
     write_factions,
     write_regions,
+    write_resourceareas,
     write_map,
     write_regionyield_definitions,
 )
@@ -70,6 +71,7 @@ def process_map_for_version(
     regions_output_path = Path(output_base) / "data" / "regions.json"
     regionyields_output_path = Path(output_base) / "data" / "regionyields.json"
     regionyield_definitions_output_path = Path(output_base) / "data" / "regionyield_definitions.json"
+    resourceareas_output_path = Path(output_base) / "data" / "resourceareas.json"
     maps_output_path = Path(output_base) / "data" / "maps.json"
 
     # 检测资源模型
@@ -183,8 +185,9 @@ def process_map_for_version(
         )
         print(f"📦 Regions Updated: {updated_count} regions with field definitions and yield data")
 
-        # Step 1 不输出 resourceareas.json，由 Step 2 生成
-        print(f"📦 Resourceareas Output: 跳过 (由 Step 2 生成)")
+        resourceareas_rows = result.get("resourceareas", [])
+        write_resourceareas(resourceareas_rows, resourceareas_output_path)
+        print(f"📦 Resourceareas Output: {resourceareas_output_path} count={len(resourceareas_rows)}")
 
         # 输出 maps.json
         payload = result.get("payload", {})

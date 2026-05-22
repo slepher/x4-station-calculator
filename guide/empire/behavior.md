@@ -27,3 +27,20 @@
 - `guide.empire.station-module-search-linkage`
   - `action`: 在模块输入框中输入/修改搜索词。
   - `expected`: 候选框内容随输入实时更新（空输入展示默认候选，命中时收敛为匹配项，无命中时候选为空）。
+- `guide.empire.build-plan-fleet-search`
+  - `action`: 在 BuildPlan 约束面板的下拉框中切换到 Fleet 类别。
+  - `expected`: 搜索框切换为 FleetGoalSearchBox，展示有已保存蓝图的舰船分组列表。
+  - `testid`: `fleet-search-input`, `fleet-search-popover`
+- `guide.empire.build-plan-fleet-card`
+  - `action`: 添加至少一个 Fleet entry 后。
+  - `expected`: Goal 区顶部出现 FleetGoalCard，含标题、可编辑建造时间、条目列表、派生 Rate 汇总。
+  - `testid`: `fleet-goal-card`, `fleet-build-time-input`, `fleet-rates`, `fleet-entry-qty-{blueprintId}`, `fleet-entry-remove-{blueprintId}`
+- `guide.empire.build-plan-fleet-add-entry`
+  - `action`: 在 FleetGoalSearchBox 中点击一个蓝图项。
+  - `expected`: 对应的 FleetEntry 追加到 Fleet goal 中（首次创建 fleet goal，后续追加 entries），触发 preview 重算。
+- `guide.empire.build-plan-fleet-remove-entry`
+  - `action`: 点击某个 FleetEntry 的 ✕ 按钮。
+  - `expected`: 该 entry 被移除；entries 为空时自动移除整个 Fleet goal。
+- `guide.empire.build-plan-fleet-adjust-time`
+  - `action`: 修改 FleetGoalCard 标题栏的建造时间输入框。
+  - `expected`: buildTime 更新（最小 600），触发 preview 重算。

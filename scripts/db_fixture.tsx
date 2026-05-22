@@ -1,7 +1,7 @@
 import { readFile, writeFile, mkdir, rename, readdir } from 'node:fs/promises'
 import path from 'node:path'
 import { createHash } from 'node:crypto'
-import { parse } from 'yaml'
+import { parse, stringify } from 'yaml'
 import { CURRENT_EMPIRE_VERSION, CURRENT_FLOW_VERSION, CURRENT_SHIP_BLUEPRINT_VERSION } from '../src/store/logic/storageVersions'
 
 const ROOT = process.cwd()
@@ -9,6 +9,9 @@ const SEED_DIR = path.join(ROOT, 'tests/seeds')
 const FIXTURE_DIR = path.join(ROOT, 'tests/fixtures')
 const DB_DIR = path.join(FIXTURE_DIR, 'db')
 const DB_PATH = path.join(FIXTURE_DIR, 'db.json')
+const SAVE_PATH = path.join(FIXTURE_DIR, 'save.json')
+const ANALYSIS_TMP_DIR = path.join(ROOT, 'analysis/tmp')
+const ANALYSIS_DB_PATH = path.join(ANALYSIS_TMP_DIR, 'db.json')
 
 const DATA_DIR = path.join(ROOT, 'src/assets/x4_game_data/8.0-Diplomacy/data')
 const FIXTURE_TIMESTAMP = Number(process.env.DB_FIXTURE_TIMESTAMP ?? 1772453451902)
@@ -90,7 +93,6 @@ type SavedModule = { id: string; count: number }
 type StationPlan = {
   id: string
   name: string
-  sectorId?: string | null
   type: 'industrial' | 'supply' | 'transit' | 'shipyard'
   count: number
   modules: SavedModule[]
@@ -109,15 +111,12 @@ type SectorPlan = {
 type EmpirePlan = {
   id: string
   name: string
-  sectors?: SectorPlan[]
-  sectorLinks?: string[]
   stations: StationPlan[]
 }
 
 type SavedEmpiresState = {
   version: number
   activeId: string | null
-  activeStationId: string | null
   list: EmpirePlan[]
 }
 
@@ -208,6 +207,158 @@ type SavedShipBlueprintsState = {
   list: ShipBlueprint[]
 }
 
+// ============ Binding Seed Types ============
+type SeedCoverageSectorEntry = {
+  ref: string
+  jump: number
+}
+
+type SeedTradeStation = {
+  saveStationCode?: string
+  sectorMacro?: string
+  position?: { x: number; y: number; z: number }
+}
+
+type SeedBindingGroup = {
+  name: string
+  sectorMacro: string
+  coverageSectorMacros: SeedCoverageSectorEntry[]
+  connectedGroupIds: string[]
+  tradeStation?: SeedTradeStation
+}
+
+type SeedStationPlan = {
+  name: string
+  saveStationCode?: string
+  sectorMacro?: string
+  position?: { x: number; y: number; z: number }
+  modules?: SavedModule[]
+  group?: string
+  lockedWares?: string[]
+}
+
+type SeedBinding = {
+  gameGuid: string
+  bindingName: string
+  groups: SeedBindingGroup[]
+  stationPlans: SeedStationPlan[]
+}
+
+type CoverageSectorEntry = {
+  ref: string
+  jump: number
+}
+
+type TradeStationBinding = {
+  id: string
+  name: string
+  saveStationCode?: string
+  sectorMacro?: string
+  position?: { x: number; y: number; z: number }
+}
+
+type BindingSectorGroup = {
+  id: string
+  name: string
+  order: number
+  sectorMacro: string
+  jumpRange: number
+  coverageSectorMacros: CoverageSectorEntry[]
+  connectedGroupIds: string[]
+  tradeStation?: TradeStationBinding
+}
+
+type BindingStationPlan = {
+  id: string
+  saveStationCode?: string
+  groupId: string | null
+  name: string
+  type: 'industrial'
+  count: number
+  modules: SavedModule[]
+  settings: StationSettings
+  lastUpdated: number
+  lockedWares: string[]
+  warePriority: Record<string, number>
+  sectorMacro?: string
+  position?: { x: number; y: number; z: number }
+}
+
+type SaveBindingPlan = {
+  gameGuid: string
+  bindingName?: string
+  selectedArchiveTime: number | null
+  groups: BindingSectorGroup[]
+  stationPlans: BindingStationPlan[]
+  updatedAt: number
+}
+
+type SavedSaveBindingsState = {
+  version: number
+  list: SaveBindingPlan[]
+}
+
+type PlayerStationRecord = {
+  id: string
+  archiveId: string
+  sectorMacro: string
+  code: string
+  type: 'station' | 'buildstorage'
+  data: any
+}
+
+type SaveArchive = {
+  meta: {
+    guid: string
+    time: number
+    playerName: string
+    version: string
+    filename: string
+    parser_version: string
+    post_processor_version?: string
+    source: string
+  }
+  sectors: Record<string, any>
+}
+
+type ArchiveMeta = {
+  id: string
+  guid: string
+  time: number
+  playerName: string
+  version: string
+  filename: string
+  parser_version: string
+  post_processor_version?: string
+  source: string
+  isCompatible: boolean
+  isValid: boolean
+  createdAt: string
+  sectorCount: number
+}
+
+type SavedSaveArchivesState = {
+  version: number
+  activeArchiveId: string | null
+  list: ArchiveMeta[]
+  settings: {
+    visibility: {
+      playerStation: boolean
+      npcStation: boolean
+      xenonStation: boolean
+      khaakStation: boolean
+      abandonedShip: boolean
+      datavault: boolean
+      erlkingVault: boolean
+    }
+  }
+}
+
+type SaveArchiveExportData = {
+  state: SavedSaveArchivesState
+  archives: SaveArchive[]
+}
+
 type X4ShipConnection = {
   size?: string
   count: number
@@ -230,6 +381,17 @@ type X4ShipSlot = {
 type X4Ship = {
   id: string
   slots: X4ShipSlot[]
+}
+
+type X4MapSector = {
+  raw_center_pos?: { x: number; y: number; z: number }
+  zones?: Record<string, {
+    raw_sector_pos?: { x: number; y: number; z: number }
+  }>
+}
+
+type X4Map = {
+  sectors: Record<string, X4MapSector>
 }
 
 type StationSettings = {
@@ -272,6 +434,48 @@ const DEFAULT_STATION_SETTINGS: StationSettings = {
   transportShipCapacity: 62000
 }
 
+const SECTOR_CENTER_GRID = 64000
+const snapToSectorCenterGrid = (value: number) => Math.round(value / SECTOR_CENTER_GRID) * SECTOR_CENTER_GRID
+
+const getSectorZoneBoundingCenter = (sector: X4MapSector): { x: number; z: number } => {
+  if (sector.raw_center_pos?.x !== undefined && sector.raw_center_pos?.z !== undefined) {
+    return { x: sector.raw_center_pos.x, z: sector.raw_center_pos.z }
+  }
+
+  const points: Array<{ x: number; z: number }> = []
+  for (const zone of Object.values(sector.zones || {})) {
+    if (zone.raw_sector_pos?.x !== undefined && zone.raw_sector_pos?.z !== undefined) {
+      points.push({ x: zone.raw_sector_pos.x, z: zone.raw_sector_pos.z })
+    }
+  }
+
+  if (points.length === 0) return { x: 0, z: 0 }
+
+  const minX = Math.min(...points.map((p) => p.x))
+  const maxX = Math.max(...points.map((p) => p.x))
+  const minZ = Math.min(...points.map((p) => p.z))
+  const maxZ = Math.max(...points.map((p) => p.z))
+  return {
+    x: snapToSectorCenterGrid((minX + maxX) / 2),
+    z: snapToSectorCenterGrid((minZ + maxZ) / 2)
+  }
+}
+
+const resolveMapSectorByMacro = (maps: X4Map, macro: string): X4MapSector | null => {
+  const normalizedMacro = macro.trim().toLowerCase()
+  for (const [sectorId, sector] of Object.entries(maps.sectors)) {
+    if (sectorId.toLowerCase() === normalizedMacro) return sector
+  }
+  return null
+}
+
+const getSectorCenterPosition = (maps: X4Map, sectorMacro: string): { x: number; y: number; z: number } => {
+  const sector = resolveMapSectorByMacro(maps, sectorMacro)
+  if (!sector) return { x: 0, y: 0, z: 0 }
+  const center = getSectorZoneBoundingCenter(sector)
+  return { x: center.x, y: 0, z: center.z }
+}
+
 const loadJson = async <T,>(file: string): Promise<T> => {
   const raw = await readFile(file, 'utf8')
   return JSON.parse(raw) as T
@@ -285,6 +489,123 @@ const loadYaml = async <T,>(file: string): Promise<T> => {
 const isEmpireSeed = (seed: any): seed is SeedEmpire => Boolean(seed?.empires)
 const isLogicFlowSeed = (seed: any): seed is SeedLogicFlow => Boolean(seed?.plans)
 const isShipBlueprintSeed = (seed: any): seed is SeedShipBuild => Boolean(seed?.ships)
+const isBindingSeed = (seed: any): seed is SeedBinding => Boolean(seed?.gameGuid)
+
+const buildBindingState = (seed: SeedBinding, now: number, saveData: any, maps: X4Map): SavedSaveBindingsState => {
+  const groupNameToId = new Map<string, string>()
+  const groupSectorToGroupId = new Map<string, string>()
+  
+  seed.groups.forEach((g, i) => {
+    const groupId = stableId('binding-group', seed.gameGuid, g.name, String(i))
+    groupNameToId.set(g.name, groupId)
+    groupSectorToGroupId.set(g.sectorMacro, groupId)
+    g.coverageSectorMacros.forEach(c => {
+      groupSectorToGroupId.set(c.ref, groupId)
+    })
+  })
+  
+  const groups: BindingSectorGroup[] = seed.groups.map((g, i) => {
+    const group: BindingSectorGroup = {
+      id: groupNameToId.get(g.name)!,
+      name: g.name,
+      order: i + 1,
+      sectorMacro: g.sectorMacro,
+      jumpRange: 3,
+      coverageSectorMacros: g.coverageSectorMacros,
+      connectedGroupIds: g.connectedGroupIds.map(name => groupNameToId.get(name) || name)
+    }
+    
+    // Auto-create tradestation if not specified in seed
+    if (g.tradeStation) {
+      if (g.tradeStation.saveStationCode) {
+        group.tradeStation = {
+          id: stableId('tradestation', seed.gameGuid, g.name),
+          name: `${g.name} 中转站`,
+          saveStationCode: g.tradeStation.saveStationCode,
+          sectorMacro: g.tradeStation.sectorMacro || g.sectorMacro,
+          position: g.tradeStation.position
+        }
+      } else {
+        group.tradeStation = {
+          id: stableId('tradestation', seed.gameGuid, g.name),
+          name: `${g.name} 中转站`,
+          sectorMacro: g.tradeStation.sectorMacro || g.sectorMacro,
+          position: g.tradeStation.position
+        }
+      }
+    } else {
+      // Auto-create tradestation at sector center
+      const position = getSectorCenterPosition(maps, g.sectorMacro)
+      group.tradeStation = {
+        id: stableId('tradestation', seed.gameGuid, g.name),
+        name: `${g.name} 中转站`,
+        sectorMacro: g.sectorMacro,
+        position
+      }
+    }
+    
+    return group
+  })
+  
+  const stationSectorMap = new Map<string, string>()
+  if (saveData?.sectors) {
+    for (const [sectorMacro, sectorData] of Object.entries(saveData.sectors)) {
+      if ((sectorData as any).player_stations) {
+        for (const [stationCode, stationData] of Object.entries((sectorData as any).player_stations)) {
+          stationSectorMap.set(stationCode, sectorMacro)
+        }
+      }
+    }
+  }
+  
+  const stationPlans: BindingStationPlan[] = seed.stationPlans.map((s, i) => {
+    let groupId: string | null = null
+    
+    if (s.saveStationCode) {
+      const sectorMacro = stationSectorMap.get(s.saveStationCode)
+      if (sectorMacro) {
+        groupId = groupSectorToGroupId.get(sectorMacro) || null
+      }
+    } else if (s.sectorMacro) {
+      groupId = groupSectorToGroupId.get(s.sectorMacro) || null
+    }
+    
+    const plan: BindingStationPlan = {
+      id: s.saveStationCode || stableId('binding-station', seed.gameGuid, s.name, String(i)),
+      saveStationCode: s.saveStationCode,
+      groupId,
+      name: s.name,
+      type: 'industrial',
+      count: 1,
+      modules: s.modules || [],
+      settings: DEFAULT_STATION_SETTINGS,
+      lastUpdated: now,
+      lockedWares: s.lockedWares || [],
+      warePriority: {}
+    }
+    
+    if (!s.saveStationCode) {
+      plan.sectorMacro = s.sectorMacro
+      plan.position = s.position
+    }
+    
+    return plan
+  })
+  
+  const binding: SaveBindingPlan = {
+    gameGuid: seed.gameGuid,
+    bindingName: seed.bindingName,
+    selectedArchiveTime: null,
+    groups,
+    stationPlans,
+    updatedAt: now
+  }
+  
+  return {
+    version: 1,
+    list: [binding]
+  }
+}
 
 const pickPrimaryOutput = (module: X4Module): string => {
   const keys = Object.keys(module.outputs ?? {})
@@ -346,7 +667,6 @@ const buildEmpireState = (seed: SeedEmpire, now: number): SavedEmpiresState => {
       return {
         id: `empire-${empireIndex + 1}-station-${stationIndex + 1}`,
         name: station.name,
-        sectorId: station.sectorId || null,
         type: 'industrial',
         count: 1,
         modules: station.modules.map((mod) => ({ id: mod.id, count: mod.count })),
@@ -357,26 +677,16 @@ const buildEmpireState = (seed: SeedEmpire, now: number): SavedEmpiresState => {
       }
     })
 
-    const result: EmpirePlan = {
+    return {
       id: `empire-${empireIndex + 1}`,
       name: empire.name,
       stations
     }
-
-    if (empire.sectors && empire.sectors.length > 0) {
-      result.sectors = empire.sectors
-    }
-    if (empire.sectorLinks && empire.sectorLinks.length > 0) {
-      result.sectorLinks = empire.sectorLinks
-    }
-
-    return result
   })
 
   return {
     version: CURRENT_EMPIRE_VERSION,
     activeId: empires[0]?.id ?? null,
-    activeStationId: empires[0]?.stations[0]?.id ?? null,
     list: empires
   }
 }
@@ -564,6 +874,87 @@ const readCurrentVsn = async (): Promise<number | null> => {
   }
 }
 
+const buildSaveFixturePayload = (
+  saveData: any,
+  now: number
+): {
+  saveExportData: SaveArchiveExportData
+  playerStationRecords: PlayerStationRecord[]
+} => {
+  const archiveId = `${saveData.meta.guid}_${saveData.meta.time}`
+  const sectorCount = Object.keys(saveData.sectors || {}).length
+
+  const archiveMeta: ArchiveMeta = {
+    id: archiveId,
+    guid: saveData.meta.guid,
+    time: saveData.meta.time,
+    playerName: saveData.meta.playerName,
+    version: saveData.meta.version,
+    filename: saveData.meta.filename,
+    parser_version: saveData.meta.parser_version,
+    post_processor_version: saveData.meta.post_processor_version,
+    source: saveData.meta.source,
+    isCompatible: true,
+    isValid: true,
+    createdAt: new Date(now).toISOString(),
+    sectorCount
+  }
+
+  const saveArchivesState: SavedSaveArchivesState = {
+    version: 1,
+    activeArchiveId: archiveId,
+    list: [archiveMeta],
+    settings: {
+      visibility: {
+        playerStation: true,
+        npcStation: true,
+        xenonStation: true,
+        khaakStation: true,
+        abandonedShip: true,
+        datavault: true,
+        erlkingVault: true
+      }
+    }
+  }
+
+  const playerStationRecords: PlayerStationRecord[] = []
+  for (const [sectorMacro, sectorData] of Object.entries(saveData.sectors || {})) {
+    const sector = sectorData as any
+    if (sector.player_stations) {
+      for (const [code, entry] of Object.entries(sector.player_stations)) {
+        playerStationRecords.push({
+          id: `${archiveId}:${code}`,
+          archiveId,
+          sectorMacro,
+          code,
+          type: 'station',
+          data: entry
+        })
+      }
+    }
+    if (sector.player_buildstorages) {
+      for (const [code, entry] of Object.entries(sector.player_buildstorages)) {
+        playerStationRecords.push({
+          id: `${archiveId}:${code}`,
+          archiveId,
+          sectorMacro,
+          code,
+          type: 'buildstorage',
+          data: entry
+        })
+      }
+    }
+  }
+
+  return {
+    saveExportData: {
+      state: saveArchivesState,
+      archives: [saveData]
+    },
+    playerStationRecords
+  }
+}
+
 const main = async () => {
   const args = process.argv.slice(2)
   const bump = args.includes('--bump')
@@ -573,8 +964,16 @@ const main = async () => {
   const wares = await loadJson<X4Ware[]>(path.join(DATA_DIR, 'wares.json'))
   const modules = await loadJson<X4Module[]>(path.join(DATA_DIR, 'modules.json'))
   const ships = await loadJson<X4Ship[]>(path.join(DATA_DIR, 'ships.json'))
+  const maps = await loadJson<X4Map>(path.join(DATA_DIR, 'maps.json'))
   const wareMap = new Map(wares.map((ware) => [ware.id, ware]))
   const moduleMap = new Map(modules.map((module) => [module.id, module]))
+
+  let saveData: any = null
+  try {
+    saveData = await loadJson<any>(SAVE_PATH)
+  } catch {
+    console.log('No save.json found')
+  }
 
   const dbPayload: Record<string, any> = {}
   const now = FIXTURE_TIMESTAMP
@@ -593,8 +992,11 @@ const main = async () => {
     if (isShipBlueprintSeed(seed)) {
       dbPayload.x4_ship_blueprints = buildShipBlueprintState(seed, ships, now)
     }
+    if (isBindingSeed(seed)) {
+      dbPayload.x4_save_bindings = buildBindingState(seed, now, saveData, maps)
+    }
   }
-
+  
   const currentVsn = await readCurrentVsn()
   const nextVsn = currentVsn !== null ? currentVsn + 1 : 1
   const finalVsn = bump ? nextVsn : currentVsn ?? 1
@@ -607,7 +1009,17 @@ const main = async () => {
   const output = { vsn: finalVsn, ...dbPayload }
   await mkdir(FIXTURE_DIR, { recursive: true })
   await writeFile(DB_PATH, JSON.stringify(output, null, 2), 'utf8')
-  console.log(JSON.stringify(output, null, 2))
+
+  if (saveData) {
+    const { saveExportData, playerStationRecords } = buildSaveFixturePayload(saveData, now)
+    const analysisOutput = {
+      ...output,
+      x4_save_archives: saveExportData,
+      playerStationRecords
+    }
+    await mkdir(ANALYSIS_TMP_DIR, { recursive: true })
+    await writeFile(ANALYSIS_DB_PATH, JSON.stringify(analysisOutput, null, 2), 'utf8')
+  }
 }
 
 main().catch((err) => {

@@ -1,14 +1,16 @@
 use crate::model::{
     norm_ver, AbandonedShipEntry, AggregatedEquipment, AggregatedStationModule, ArchiveMeta,
-    DatavaultEntry, DatavaultWareEntry, FactionStationEntry, Meta, NpcStationEntry, ParserError,
-    PlayerStationConstruction, PlayerStationEntry, SaveArchive, SectorData, StationBaseEntry,
-    StationEquipment, Vector3,
+    BuildProgress, BuildStorageEntry, DatavaultEntry, DatavaultWareEntry, FactionStationEntry,
+    Meta, NpcStationEntry, ParserError, PlayerStationConstruction, PlayerStationEntry, SaveArchive,
+    SectorData, StationBaseEntry, StationEquipment, StationTradeOverrides, Vector3, WareAmount,
+    WorkforceEntry,
 };
 use std::collections::{HashMap, VecDeque};
 
 #[derive(Clone, Default)]
 struct ComponentCtx {
     class: String,
+    id: Option<String>,
     code: Option<String>,
     macro_field: Option<String>,
     owner: Option<String>,
@@ -20,6 +22,22 @@ struct ComponentCtx {
     is_headquarter: bool,
     unlocked: bool,
     ware_totals: HashMap<String, i64>,
+    cargo_totals: HashMap<String, i64>,
+    reservation_totals: HashMap<String, i64>,
+    override_max_totals: HashMap<String, i64>,
+    override_buy_totals: HashMap<String, i64>,
+    override_sell_totals: HashMap<String, i64>,
+    build_target_station_component_id: Option<String>,
+    build_constructions: Vec<PlayerStationConstruction>,
+    build_progress: Option<BuildProgress>,
+    workforces: Vec<WorkforceEntry>,
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum EntryMode {
+    PlayerStation,
+    NpcStation,
+    BuildStorage,
 }
 
 fn num(s: Option<&String>, fallback: f64) -> f64 {
@@ -28,6 +46,15 @@ fn num(s: Option<&String>, fallback: f64) -> f64 {
 
 fn to_int(s: Option<&String>, fallback: i64) -> i64 {
     s.and_then(|v| v.parse::<i64>().ok()).unwrap_or(fallback)
+}
+
+fn normalize_component_id(value: Option<&String>) -> Option<String> {
+    value.map(|raw| {
+        raw.strip_prefix('[')
+            .and_then(|trimmed| trimmed.strip_suffix(']'))
+            .unwrap_or(raw.as_str())
+            .to_string()
+    })
 }
 
 fn at_tags(path: &VecDeque<String>, tags: &[&str]) -> bool {
@@ -75,6 +102,8 @@ pub(crate) struct SaveParserCore {
     player_station_constructions: Vec<PlayerStationConstruction>,
     npc_station_module_counts: HashMap<String, i64>,
     npc_station_equipment_totals: HashMap<(String, String), i64>,
+    entry_mode: Option<EntryMode>,
+    entry_id: Option<String>,
     entry_idx: Option<i64>,
     entry_ref: Option<String>,
     entry_predecessor: Option<i64>,
@@ -97,6 +126,8 @@ impl SaveParserCore {
             player_station_constructions: Vec::new(),
             npc_station_module_counts: HashMap::new(),
             npc_station_equipment_totals: HashMap::new(),
+            entry_mode: None,
+            entry_id: None,
             entry_idx: None,
             entry_ref: None,
             entry_predecessor: None,
@@ -137,6 +168,7 @@ impl SaveParserCore {
             };
             self.comp_stack.push_back(ComponentCtx {
                 class: cls.clone(),
+                id: normalize_component_id(a.get("id")),
                 code: a.get("code").cloned(),
                 macro_field: a.get("macro").cloned(),
                 owner: a.get("owner").cloned(),
@@ -151,6 +183,15 @@ impl SaveParserCore {
                     .unwrap_or(false),
                 unlocked: false,
                 ware_totals: HashMap::new(),
+                cargo_totals: HashMap::new(),
+                reservation_totals: HashMap::new(),
+                override_max_totals: HashMap::new(),
+                override_buy_totals: HashMap::new(),
+                override_sell_totals: HashMap::new(),
+                build_target_station_component_id: None,
+                build_constructions: Vec::new(),
+                build_progress: None,
+                workforces: Vec::new(),
             });
 
             if cls == "sector" {
@@ -161,13 +202,14 @@ impl SaveParserCore {
                     is_known: a.get("known") == Some(&"1".to_string())
                         || a.get("knownto") == Some(&"player".to_string()),
                     owner: a.get("owner").cloned(),
-                    player_stations: Vec::new(),
-                    xenon_stations: Vec::new(),
-                    khaak_stations: Vec::new(),
-                    npc_stations: Vec::new(),
-                    datavaults: Vec::new(),
-                    erlking_vaults: Vec::new(),
-                    abandoned_ships: Vec::new(),
+                    player_stations: HashMap::new(),
+                    xenon_stations: HashMap::new(),
+                    khaak_stations: HashMap::new(),
+                    npc_stations: HashMap::new(),
+                    player_buildstorages: HashMap::new(),
+                    datavaults: HashMap::new(),
+                    erlking_vaults: HashMap::new(),
+                    abandoned_ships: HashMap::new(),
                 });
             }
 
@@ -180,6 +222,19 @@ impl SaveParserCore {
 
             if cls == "zone" {
                 self.current_zone_macro = a.get("macro").cloned();
+            }
+        }
+
+        if at_tags(&self.path, &["component", "workforces", "workforce"]) {
+            if let Some(component) = self.comp_stack.back() {
+                if component.class == "station" && component.owner.as_deref() == Some("player") {
+                    if let Some(race) = a.get("race").cloned() {
+                        let amount = to_int(a.get("amount"), 0);
+                        if let Some(station) = self.comp_stack.back_mut() {
+                            station.workforces.push(WorkforceEntry { race, amount });
+                        }
+                    }
+                }
             }
         }
 
@@ -228,15 +283,50 @@ impl SaveParserCore {
             &["component", "construction", "sequence", "entry"],
         ) {
             if self.station_owner.as_deref() == Some("player") {
+                self.entry_mode = Some(EntryMode::PlayerStation);
+                self.entry_id = normalize_component_id(a.get("id"));
                 self.entry_idx = Some(to_int(a.get("index"), 0));
                 self.entry_ref = a.get("macro").cloned();
                 self.entry_predecessor = None;
                 self.entry_eq.clear();
             } else if self.station_owner.is_some() {
+                self.entry_mode = Some(EntryMode::NpcStation);
+                self.entry_id = normalize_component_id(a.get("id"));
                 if let Some(macro_ref) = a.get("macro").cloned() {
                     *self.npc_station_module_counts.entry(macro_ref).or_insert(0) += 1;
                 }
                 self.entry_idx = Some(to_int(a.get("index"), 0));
+                self.entry_eq.clear();
+            }
+        }
+
+        if at_tags(
+            &self.path,
+            &["component", "buildtasks", "inprogress", "build"],
+        ) {
+            if let Some(buildstorage) = self.current_buildstorage_ctx_mut() {
+                buildstorage.build_target_station_component_id =
+                    normalize_component_id(a.get("component"));
+            }
+        }
+
+        if at_tags(
+            &self.path,
+            &[
+                "component",
+                "buildtasks",
+                "inprogress",
+                "build",
+                "sequence",
+                "entry",
+            ],
+        ) {
+            if self.current_buildstorage_ctx_mut().is_some() {
+                self.entry_mode = Some(EntryMode::BuildStorage);
+                self.entry_id = normalize_component_id(a.get("id"));
+                self.entry_idx = Some(to_int(a.get("index"), 0));
+                self.entry_ref = a.get("macro").cloned();
+                self.entry_predecessor = None;
                 self.entry_eq.clear();
             }
         }
@@ -266,6 +356,104 @@ impl SaveParserCore {
                 if let Some(ware) = a.get("ware").cloned() {
                     let amount = to_int(a.get("amount"), 1);
                     *vault.ware_totals.entry(ware).or_insert(0) += amount;
+                }
+            }
+
+            if at_tags(&self.path, &["component", "overrides", "max", "ware"]) {
+                if let Some(station) = self.current_station_ctx_mut() {
+                    if let Some(ware) = a.get("ware").cloned() {
+                        let amount = to_int(a.get("amount"), 1);
+                        *station.override_max_totals.entry(ware).or_insert(0) += amount;
+                    }
+                }
+            }
+
+            if at_tags(&self.path, &["component", "overrides", "buy", "ware"]) {
+                if let Some(station) = self.current_station_ctx_mut() {
+                    if let Some(ware) = a.get("ware").cloned() {
+                        let amount = to_int(a.get("amount"), 1);
+                        *station.override_buy_totals.entry(ware).or_insert(0) += amount;
+                    }
+                }
+            }
+
+            if at_tags(&self.path, &["component", "overrides", "sell", "ware"]) {
+                if let Some(station) = self.current_station_ctx_mut() {
+                    if let Some(ware) = a.get("ware").cloned() {
+                        let amount = to_int(a.get("amount"), 1);
+                        *station.override_sell_totals.entry(ware).or_insert(0) += amount;
+                    }
+                }
+            }
+
+            let parent_is_cargo = self
+                .path
+                .get(self.path.len().saturating_sub(2))
+                .map(|tag| tag.as_str())
+                == Some("cargo");
+            if parent_is_cargo {
+                if let Some(component) = self.comp_stack.back() {
+                    if component.class == "buildstorage" {
+                        if let Some(buildstorage) = self.current_buildstorage_ctx_mut() {
+                            if let Some(ware) = a.get("ware").cloned() {
+                                let amount = to_int(a.get("amount"), 1);
+                                *buildstorage.cargo_totals.entry(ware).or_insert(0) += amount;
+                            }
+                        }
+                    } else if component.class == "storage" {
+                        if let Some(ware) = a.get("ware").cloned() {
+                            let amount = to_int(a.get("amount"), 1);
+                            if let Some(buildstorage) = self.current_buildstorage_ctx_mut() {
+                                *buildstorage.cargo_totals.entry(ware).or_insert(0) += amount;
+                            } else if let Some(station) = self.current_station_ctx_mut() {
+                                *station.cargo_totals.entry(ware).or_insert(0) += amount;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if name == "reservation"
+            && at_tags(
+                &self.path,
+                &["component", "trade", "reservations", "reservation"],
+            )
+        {
+            if let Some(ware) = a.get("ware").cloned() {
+                let amount = to_int(a.get("amount"), 1);
+                if let Some(component) = self.comp_stack.back() {
+                    if component.class == "buildstorage" {
+                        if let Some(buildstorage) = self.current_buildstorage_ctx_mut() {
+                            *buildstorage.reservation_totals.entry(ware).or_insert(0) += amount;
+                        }
+                    } else if component.class == "storage" {
+                        if let Some(buildstorage) = self.current_buildstorage_ctx_mut() {
+                            *buildstorage.reservation_totals.entry(ware).or_insert(0) += amount;
+                        } else if let Some(station) = self.current_station_ctx_mut() {
+                            *station.reservation_totals.entry(ware).or_insert(0) += amount;
+                        }
+                    } else if component.class == "station" {
+                        if let Some(station) = self.current_station_ctx_mut() {
+                            *station.reservation_totals.entry(ware).or_insert(0) += amount;
+                        }
+                    }
+                }
+            }
+        }
+
+        if name == "build" {
+            if let Some(component) = self.comp_stack.back() {
+                if component.class == "buildprocessor" {
+                    if let Some(buildstorage) = self.current_buildstorage_ctx_mut() {
+                        buildstorage.build_progress = Some(BuildProgress {
+                            start: a.get("start").and_then(|v| v.parse::<f64>().ok()),
+                            end: a.get("end").and_then(|v| v.parse::<f64>().ok()),
+                            sequenceindex: a
+                                .get("sequenceindex")
+                                .and_then(|v| v.parse::<i64>().ok()),
+                        });
+                    }
                 }
             }
         }
@@ -332,6 +520,52 @@ impl SaveParserCore {
             }
         }
 
+        if at_tags(
+            &self.path,
+            &[
+                "component",
+                "buildtasks",
+                "inprogress",
+                "build",
+                "sequence",
+                "entry",
+                "upgrades",
+                "groups",
+                "shields",
+            ],
+        ) && self.entry_mode == Some(EntryMode::BuildStorage)
+        {
+            self.entry_eq.push(StationEquipment {
+                equip_type: "shields".into(),
+                ref_field: a.get("macro").cloned().unwrap_or_default(),
+                group: a.get("group").cloned().unwrap_or_default(),
+                exact: to_int(a.get("exact"), 1),
+            });
+        }
+
+        if at_tags(
+            &self.path,
+            &[
+                "component",
+                "buildtasks",
+                "inprogress",
+                "build",
+                "sequence",
+                "entry",
+                "upgrades",
+                "groups",
+                "turrets",
+            ],
+        ) && self.entry_mode == Some(EntryMode::BuildStorage)
+        {
+            self.entry_eq.push(StationEquipment {
+                equip_type: "turrets".into(),
+                ref_field: a.get("macro").cloned().unwrap_or_default(),
+                group: a.get("group").cloned().unwrap_or_default(),
+                exact: to_int(a.get("exact"), 1),
+            });
+        }
+
         Ok(())
     }
 
@@ -353,18 +587,35 @@ impl SaveParserCore {
             )));
         }
 
-        if name == "entry"
-            && self.entry_idx.is_some()
-            && self.entry_ref.is_some()
-            && self.station_owner.as_deref() == Some("player")
-        {
-            self.player_station_constructions
-                .push(PlayerStationConstruction {
-                    index: self.entry_idx.unwrap(),
-                    ref_field: self.entry_ref.clone().unwrap(),
-                    predecessor: self.entry_predecessor,
-                    equipments: std::mem::take(&mut self.entry_eq),
-                });
+        if name == "entry" && self.entry_idx.is_some() && self.entry_ref.is_some() {
+            let construction = PlayerStationConstruction {
+                id: self.entry_id.clone(),
+                index: self.entry_idx.unwrap(),
+                ref_field: self.entry_ref.clone().unwrap(),
+                predecessor: self.entry_predecessor,
+                equipments: if self.entry_mode == Some(EntryMode::PlayerStation) {
+                    std::mem::take(&mut self.entry_eq)
+                } else {
+                    Vec::new()
+                },
+            };
+
+            match self.entry_mode {
+                Some(EntryMode::PlayerStation) => {
+                    self.player_station_constructions.push(construction);
+                }
+                Some(EntryMode::BuildStorage) => {
+                    let mut construction = construction;
+                    construction.equipments = std::mem::take(&mut self.entry_eq);
+                    if let Some(buildstorage) = self.current_buildstorage_ctx_mut() {
+                        buildstorage.build_constructions.push(construction);
+                    }
+                }
+                _ => {}
+            }
+
+            self.entry_mode = None;
+            self.entry_id = None;
             self.entry_idx = None;
             self.entry_ref = None;
             self.entry_predecessor = None;
@@ -399,16 +650,18 @@ impl SaveParserCore {
                                 Some("player") => {
                                     let constructions =
                                         std::mem::take(&mut self.player_station_constructions);
-                                    let modules =
-                                        aggregated_modules_from_constructions(&constructions);
-                                    let equipments =
-                                        aggregated_equipments_from_constructions(&constructions);
-                                    sd.player_stations.push(PlayerStationEntry {
+                                    let workforces = ctx.workforces.clone();
+                                    let entry = PlayerStationEntry {
                                         base,
+                                        component_id: ctx.id.clone(),
                                         constructions,
-                                        modules,
-                                        equipments,
-                                    })
+                                        cargo: ware_amounts(&ctx.cargo_totals),
+                                        reservation: ware_amounts(&ctx.reservation_totals),
+                                        overrides: station_trade_overrides(&ctx),
+                                        buildstorage_code: None,
+                                        workforces,
+                                    };
+                                    sd.player_stations.insert(entry.base.code.clone(), entry);
                                 }
                                 Some("xenon") => {
                                     let modules =
@@ -416,11 +669,12 @@ impl SaveParserCore {
                                     let equipments = aggregated_equipments(
                                         &mut self.npc_station_equipment_totals,
                                     );
-                                    sd.xenon_stations.push(FactionStationEntry {
+                                    let entry = FactionStationEntry {
                                         base,
                                         modules,
                                         equipments,
-                                    });
+                                    };
+                                    sd.xenon_stations.insert(entry.base.code.clone(), entry);
                                 }
                                 Some("khaak") => {
                                     let modules =
@@ -428,11 +682,12 @@ impl SaveParserCore {
                                     let equipments = aggregated_equipments(
                                         &mut self.npc_station_equipment_totals,
                                     );
-                                    sd.khaak_stations.push(FactionStationEntry {
+                                    let entry = FactionStationEntry {
                                         base,
                                         modules,
                                         equipments,
-                                    });
+                                    };
+                                    sd.khaak_stations.insert(entry.base.code.clone(), entry);
                                 }
                                 _ => {
                                     let modules =
@@ -440,20 +695,23 @@ impl SaveParserCore {
                                     let equipments = aggregated_equipments(
                                         &mut self.npc_station_equipment_totals,
                                     );
-                                    sd.npc_stations.push(NpcStationEntry {
+                                    let entry = NpcStationEntry {
                                         base,
                                         modules,
                                         equipments,
-                                    });
+                                    };
+                                    sd.npc_stations.insert(entry.base.code.clone(), entry);
                                 }
                             }
                             self.station_owner = None;
+                            self.entry_mode = None;
+                            self.entry_id = None;
                             self.entry_idx = None;
                             self.entry_ref = None;
                         }
                         "datavault" => {
                             let zone_id = self.current_zone_macro.clone();
-                            sd.datavaults.push(DatavaultEntry {
+                            let entry = DatavaultEntry {
                                 code: ctx.code.clone().unwrap_or_default(),
                                 macro_field: ctx.macro_field.clone().unwrap_or_default(),
                                 owner: ctx.owner.clone().unwrap_or_default(),
@@ -468,13 +726,39 @@ impl SaveParserCore {
                                 has_blueprints: ctx.has_blueprints,
                                 has_wares: ctx.has_wares,
                                 has_signalleak: ctx.has_signalleak,
-                            });
+                            };
+                            sd.datavaults.insert(entry.code.clone(), entry);
                         }
                         "sector" => {
                             self.sector_stack.pop_back();
                         }
                         "zone" => {
                             self.current_zone_macro = None;
+                        }
+                        "buildstorage" => {
+                            if ctx.owner.as_deref() == Some("player") {
+                                let zone_id = self.current_zone_macro.clone();
+                                let entry = BuildStorageEntry {
+                                    component_id: ctx.id.clone().unwrap_or_default(),
+                                    code: ctx.code.clone().unwrap_or_default(),
+                                    owner: ctx.owner.clone().unwrap_or_default(),
+                                    relative_position: Vector3 {
+                                        x: pos.x,
+                                        y: pos.y,
+                                        z: pos.z,
+                                    },
+                                    zone_id,
+                                    cargo: ware_amounts(&ctx.cargo_totals),
+                                    reservation: ware_amounts(&ctx.reservation_totals),
+                                    station_code: None,
+                                    target_station_component_id: ctx
+                                        .build_target_station_component_id
+                                        .clone(),
+                                    constructions: ctx.build_constructions.clone(),
+                                    progress: ctx.build_progress.clone(),
+                                };
+                                sd.player_buildstorages.insert(entry.code.clone(), entry);
+                            }
                         }
                         _ => {
                             if ctx
@@ -484,7 +768,7 @@ impl SaveParserCore {
                                 .unwrap_or(false)
                             {
                                 let zone_id = self.current_zone_macro.clone();
-                                sd.erlking_vaults.push(DatavaultEntry {
+                                let entry = DatavaultEntry {
                                     code: ctx.code.clone().unwrap_or_default(),
                                     macro_field: ctx.macro_field.clone().unwrap_or_default(),
                                     owner: ctx.owner.clone().unwrap_or_default(),
@@ -499,12 +783,13 @@ impl SaveParserCore {
                                     has_blueprints: ctx.has_blueprints,
                                     has_wares: ctx.has_wares,
                                     has_signalleak: ctx.has_signalleak,
-                                });
+                                };
+                                sd.erlking_vaults.insert(entry.code.clone(), entry);
                             } else if ctx.class.starts_with("ship_")
                                 && ctx.owner.as_deref() == Some("ownerless")
                             {
                                 let zone_id = self.current_zone_macro.clone();
-                                sd.abandoned_ships.push(AbandonedShipEntry {
+                                let entry = AbandonedShipEntry {
                                     code: ctx.code.clone().unwrap_or_default(),
                                     macro_field: ctx.macro_field.clone().unwrap_or_default(),
                                     class: ctx.class.clone(),
@@ -514,7 +799,8 @@ impl SaveParserCore {
                                         z: pos.z,
                                     },
                                     zone_id,
-                                });
+                                };
+                                sd.abandoned_ships.insert(entry.code.clone(), entry);
                             }
                         }
                     }
@@ -556,7 +842,7 @@ impl SaveParserCore {
                 player_name: self.meta.player_name.clone(),
                 version: self.meta.version.clone(),
                 filename: f,
-                parser_version: "v2".into(),
+                parser_version: "v7".into(),
                 post_processor_version: None,
                 source: "original".into(),
             },
@@ -597,6 +883,20 @@ impl SaveParserCore {
         }
         self.current_vault_ctx_mut()
     }
+
+    fn current_station_ctx_mut(&mut self) -> Option<&mut ComponentCtx> {
+        self.comp_stack
+            .iter_mut()
+            .rev()
+            .find(|ctx| ctx.class == "station")
+    }
+
+    fn current_buildstorage_ctx_mut(&mut self) -> Option<&mut ComponentCtx> {
+        self.comp_stack
+            .iter_mut()
+            .rev()
+            .find(|ctx| ctx.class == "buildstorage")
+    }
 }
 
 fn ware_entries(input: &HashMap<String, i64>) -> Vec<DatavaultWareEntry> {
@@ -612,47 +912,44 @@ fn ware_entries(input: &HashMap<String, i64>) -> Vec<DatavaultWareEntry> {
 }
 
 fn aggregated_modules(input: &mut HashMap<String, i64>) -> Vec<AggregatedStationModule> {
-    let mut modules = input
+    input
         .drain()
         .map(|(ref_field, amount)| AggregatedStationModule { ref_field, amount })
-        .collect::<Vec<_>>();
-    modules.sort_by(|a, b| a.ref_field.cmp(&b.ref_field));
-    modules
+        .collect()
 }
 
 fn aggregated_equipments(input: &mut HashMap<(String, String), i64>) -> Vec<AggregatedEquipment> {
-    let mut equipments = input
+    input
         .drain()
         .map(|((equip_type, ref_field), amount)| AggregatedEquipment {
             equip_type,
             ref_field,
             amount,
         })
+        .collect()
+}
+
+fn ware_amounts(input: &HashMap<String, i64>) -> Vec<WareAmount> {
+    let mut wares = input
+        .iter()
+        .map(|(ware, amount)| WareAmount {
+            ware: ware.clone(),
+            amount: *amount,
+        })
         .collect::<Vec<_>>();
-    equipments.sort_by(|a, b| (&a.equip_type, &a.ref_field).cmp(&(&b.equip_type, &b.ref_field)));
-    equipments
+    wares.sort_by(|a, b| a.ware.cmp(&b.ware));
+    wares
 }
 
-fn aggregated_modules_from_constructions(
-    constructions: &[PlayerStationConstruction],
-) -> Vec<AggregatedStationModule> {
-    let mut counts: HashMap<String, i64> = HashMap::new();
-    for c in constructions {
-        *counts.entry(c.ref_field.clone()).or_insert(0) += 1;
+fn station_trade_overrides(ctx: &ComponentCtx) -> Option<StationTradeOverrides> {
+    let overrides = StationTradeOverrides {
+        max: ware_amounts(&ctx.override_max_totals),
+        buy: ware_amounts(&ctx.override_buy_totals),
+        sell: ware_amounts(&ctx.override_sell_totals),
+    };
+    if overrides.is_empty() {
+        None
+    } else {
+        Some(overrides)
     }
-    aggregated_modules(&mut counts)
-}
-
-fn aggregated_equipments_from_constructions(
-    constructions: &[PlayerStationConstruction],
-) -> Vec<AggregatedEquipment> {
-    let mut totals: HashMap<(String, String), i64> = HashMap::new();
-    for c in constructions {
-        for e in &c.equipments {
-            *totals
-                .entry((e.equip_type.clone(), e.ref_field.clone()))
-                .or_insert(0) += e.exact;
-        }
-    }
-    aggregated_equipments(&mut totals)
 }

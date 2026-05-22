@@ -1,3 +1,5 @@
+import type { SavedModule } from './x4'
+
 export type SaveSource = 'original' | 'imported'
 
 export interface VersionMismatchError {
@@ -39,7 +41,7 @@ export interface SaveMeta {
   playerName: string
   version: string
   filename: string
-  parser_version: 'v1' | 'v2'
+  parser_version: string
   post_processor_version?: string
   source: SaveSource
 }
@@ -78,13 +80,53 @@ export interface StationEquipment {
   ref: string
   group: string
   exact: number
+  equipment_id?: string
 }
 
 export interface PlayerStationConstruction {
+  id?: string
   index: number
   ref: string
   predecessor?: number
   equipments?: StationEquipment[]
+}
+
+export interface WareAmount {
+  ware: string
+  amount: number
+}
+
+export interface StationTradeOverrides {
+  max?: WareAmount[]
+  buy?: WareAmount[]
+  sell?: WareAmount[]
+}
+
+export interface WorkforceEntry {
+  race: string
+  amount: number
+}
+
+export interface BuildProgress {
+  start?: number
+  end?: number
+  sequenceindex?: number
+}
+
+export interface BuildStorageEntry {
+  component_id: string
+  code: string
+  owner: string
+  relative_position: { x: number; y: number; z: number }
+  zone_id?: string
+  cargo?: WareAmount[]
+  reservation?: WareAmount[]
+  station_code?: string
+  target_station_component_id?: string
+  constructions?: PlayerStationConstruction[]
+  modules?: AggregatedStationModule[]
+  equipments?: AggregatedEquipment[]
+  progress?: BuildProgress
 }
 
 export interface AggregatedStationModule {
@@ -101,6 +143,7 @@ export interface AggregatedEquipment {
   type: 'shields' | 'turrets'
   ref: string
   amount: number
+  equipment_id?: string
 }
 
 export interface StationBaseEntry {
@@ -116,9 +159,15 @@ export interface StationBaseEntry {
 }
 
 export interface PlayerStationEntry extends StationBaseEntry {
+  component_id?: string
   constructions?: PlayerStationConstruction[]
   modules?: AggregatedStationModule[]
   equipments?: AggregatedEquipment[]
+  cargo?: WareAmount[]
+  reservation?: WareAmount[]
+  overrides?: StationTradeOverrides
+  buildstorage_code?: string
+  workforces?: WorkforceEntry[]
   isShipyard?: boolean
   isWharf?: boolean
   isEquipmentdock?: boolean
@@ -194,6 +243,36 @@ export interface AbandonedShipEntry {
   position: SaveSectorStaticPosition
 }
 
+export type CodeMap<T> = Record<string, T>
+
+export type PlayerStationType = 'station' | 'buildstorage'
+
+export interface PlayerStationRecord {
+  id: string
+  archiveId: string
+  sectorMacro: string
+  code: string
+  type: PlayerStationType
+  data: PlayerStationEntry | BuildStorageEntry
+}
+
+export interface PlayerStationsRecord {
+  id: string
+  archiveId: string
+  guid: string
+  data: {
+    player_stations: Record<string, Record<string, PlayerStationEntry>>
+    player_buildstorages: Record<string, Record<string, BuildStorageEntry>>
+  }
+}
+
+export interface ArchiveDataRecord {
+  id: string
+  archiveId: string
+  guid: string
+  data: SaveArchive
+}
+
 export interface SectorData {
   name: string
   is_known: boolean
@@ -202,13 +281,14 @@ export interface SectorData {
   clusterGates?: SaveSectorClusterGateEntry[]
   superhighwayGates?: SaveSectorSuperhighwayGateEntry[]
   highways?: SaveSectorHighwayEntry[]
-  playerStations?: PlayerStationEntry[]
-  xenonStations?: FactionStationEntry[]
-  khaakStations?: FactionStationEntry[]
-  npcStations?: NpcStationEntry[]
-  datavaults?: DatavaultEntry[]
-  erlkingVaults?: DatavaultEntry[]
-  abandonedShips?: AbandonedShipEntry[]
+  player_stations?: CodeMap<PlayerStationEntry>
+  xenon_stations?: CodeMap<FactionStationEntry>
+  khaak_stations?: CodeMap<FactionStationEntry>
+  npc_stations?: CodeMap<NpcStationEntry>
+  player_buildstorages?: CodeMap<BuildStorageEntry>
+  datavaults?: CodeMap<DatavaultEntry>
+  erlking_vaults?: CodeMap<DatavaultEntry>
+  abandoned_ships?: CodeMap<AbandonedShipEntry>
 }
 
 export interface SaveArchive {
@@ -228,8 +308,6 @@ export interface ArchiveMeta {
   parser_version: string
   post_processor_version?: string
   source: SaveSource
-  isCompatible: boolean
-  isValid: boolean
   createdAt: Date
   sectorCount: number
 }
@@ -329,4 +407,43 @@ export interface SaveParserConfig {
   strings: Record<string, Record<string, string>>
   currentVersion: string
   filename?: string
+}
+
+export interface ArchiveStationSectorData {
+  name: string
+  nameId?: string
+  resources: string[]
+  sunlight: number
+}
+
+export interface ArchiveStationBuildingData {
+  modules: SavedModule[]
+  cargo: WareAmount[]
+  reservation: WareAmount[]
+  inProgressModule?: SavedModule
+}
+
+export interface ArchiveStationPosition {
+  x: number
+  y: number
+  z: number
+}
+
+export interface ArchiveStationData {
+  code: string
+  name?: string
+  sectorMacro: string
+  sector: ArchiveStationSectorData
+  position?: ArchiveStationPosition
+  modules: SavedModule[]
+  building: ArchiveStationBuildingData
+  cargo?: WareAmount[]
+  reservation?: WareAmount[]
+  overrides?: StationTradeOverrides
+  targetCounts?: WareAmount[]
+  workforces?: WorkforceEntry[]
+  tag?: string
+  factoryGroup?: string
+  productionProfile?: string
+  profileName?: string
 }

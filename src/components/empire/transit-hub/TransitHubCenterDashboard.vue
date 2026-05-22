@@ -3,12 +3,19 @@ import { computed } from 'vue'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { useI18n } from 'vue-i18n'
-import type { EmpireGroupedFlows, SupplyStorageFlow } from '@/types/x4'
+
+import type { DerivedProductionFlow, DerivedFlowContribution } from '@/types/production-flow'
+import type { AllocationCargoOnlyItem, AllocationVolumeGroup } from '@/types/production-workbench-contract'
+import { computeGroupedFlows } from '@/components/empire/composables/useWareFlowGrouping'
 import ViewTabUi from '@/components/common/ViewTabUI.vue'
+import PriceSlider from '@/components/common/PriceSlider.vue'
+import VolumeControlSlider from '@/components/common/VolumeControlSlider.vue'
 import TransitHubQuantityView from './TransitHubQuantityView.vue'
 import TransitHubEconomyView from './TransitHubEconomyView.vue'
 import TransitHubStorageView from './TransitHubStorageView.vue'
 import TransitHubTransportView from './TransitHubTransportView.vue'
+import StationAllocationView from '../StationAllocationView.vue'
+import EmptyState from '@/components/common/EmptyState.vue'
 
 const gameData = useGameDataStore()
 const { t } = useI18n()
@@ -17,15 +24,29 @@ const { translateWare } = useX4I18n()
 type SharedViewMode = 'quantity' | 'volume' | 'economy' | 'transport'
 
 const props = withDefaults(defineProps<{
-  groupedFlows: EmpireGroupedFlows
-  storageFlows: SupplyStorageFlow[]
+  productionFlows: DerivedProductionFlow[]
   viewMode?: SharedViewMode
+  buyMultiplier?: number
+  sellMultiplier?: number
+  productBufferHours?: number
+  useAllocationVolumeView?: boolean
+  allocationVolumeGroups?: AllocationVolumeGroup[]
+  allocationCargoOnlyItems?: AllocationCargoOnlyItem[]
 }>(), {
-  viewMode: 'quantity'
+  viewMode: 'quantity',
+  buyMultiplier: 0.5,
+  sellMultiplier: 0.5,
+  productBufferHours: 12,
+  useAllocationVolumeView: false,
+  allocationVolumeGroups: () => [],
+  allocationCargoOnlyItems: () => []
 })
 
 const emit = defineEmits<{
   (e: 'update:viewMode', value: SharedViewMode): void
+  (e: 'update:buyMultiplier', value: number): void
+  (e: 'update:sellMultiplier', value: number): void
+  (e: 'update:productBufferHours', value: number): void
 }>()
 
 const viewMode = computed<SharedViewMode>({
@@ -33,15 +54,57 @@ const viewMode = computed<SharedViewMode>({
   set: (value) => emit('update:viewMode', value)
 })
 
+const localBuyMultiplier = computed({
+  get: () => props.buyMultiplier,
+  set: (value) => emit('update:buyMultiplier', value)
+})
+
+const localSellMultiplier = computed({
+  get: () => props.sellMultiplier,
+  set: (value) => emit('update:sellMultiplier', value)
+})
+
+const localProductBufferHours = computed({
+  get: () => props.productBufferHours,
+  set: (value) => emit('update:productBufferHours', value)
+})
+
+const groupedFlows = computed(() => {
+  const grouped = computeGroupedFlows({ productionFlows: props.productionFlows })
+  return {
+    flows: grouped.flows,
+    products: grouped.rateGroups.positive,
+    operations: grouped.rateGroups.operations,
+    supply: [...grouped.rateGroups.supply, ...grouped.rateGroups.resources]
+  }
+})
+const storageFlows = computed(() =>
+  props.productionFlows
+    .filter((flow) => flow.transportType === 'container')
+    .map((flow) => ({
+      wareId: flow.wareId,
+      orderIndex: flow.orderIndex,
+      tier: flow.tier,
+      contributions: (flow.contributions || []).map((c, i) => ({ ...c, sortOrder: i }) as DerivedFlowContribution),
+      totalOccupiedCount: flow.totalOccupiedCount
+    }))
+    .filter((item) => item.totalOccupiedCount > 0)
+    .sort((a, b) => {
+      if (a.orderIndex !== b.orderIndex) return a.orderIndex - b.orderIndex
+      if (a.tier !== b.tier) return b.tier - a.tier
+      return a.wareId.localeCompare(b.wareId)
+    })
+)
+
 const formatNum = (n: number) => new Intl.NumberFormat('en-US').format(Math.round(n))
 const formatSignedAbs = (n: number) => `${n >= 0 ? '+' : '-'}${formatNum(Math.abs(n))}`
 
 const wrapFlow = (flow: any) => {
   const wareInfo = gameData.waresMap?.[flow.wareId]
   return {
+    ...flow,
     id: flow.wareId,
-    name: wareInfo ? translateWare(wareInfo) : flow.wareId,
-    ...flow
+    name: wareInfo ? translateWare(wareInfo) : flow.wareId
   }
 }
 
@@ -60,16 +123,16 @@ const title = computed(() => {
 })
 
 const grouped = computed(() => {
-  const groups = props.groupedFlows.empireGroups
-  const products = groups.operations.filter(item => item.netRate > 0)
-  const operations = groups.operations.filter(item => item.netRate <= 0)
-  const supplyValue = groups.supply.reduce((sum, item) => sum + item.netValue, 0)
+  const products = groupedFlows.value.products
+  const operations = groupedFlows.value.operations
+  const supply = groupedFlows.value.supply
+  const supplyValue = supply.reduce((sum, item) => sum + item.netValue, 0)
 
   return {
     quantity: [
       { key: 'products', title: t('wareflow.products_group'), items: products.map(wrapFlow) },
       { key: 'operations', title: t('wareflow.operations_group'), items: operations.map(wrapFlow) },
-      { key: 'supply', title: t('wareflow.supply_group'), items: groups.supply.map(wrapFlow) }
+      { key: 'supply', title: t('wareflow.supply_group'), items: supply.map(wrapFlow) }
     ],
     economy: [
       {
@@ -89,7 +152,7 @@ const grouped = computed(() => {
       {
         key: 'supply',
         title: supplyValue >= 0 ? t('wareflow.supply_income_group') : t('wareflow.supply_expense_group'),
-        items: groups.supply.map(wrapFlow),
+        items: supply.map(wrapFlow),
         sumText: formatSignedAbs(supplyValue),
         sumClass: supplyValue >= 0 ? 'positive' : 'negative'
       }
@@ -97,32 +160,21 @@ const grouped = computed(() => {
   }
 })
 
-const hasFlowData = computed(() => props.groupedFlows.flows.length > 0)
+const hasFlowData = computed(() => groupedFlows.value.flows.length > 0)
 
 const storageItems = computed(() =>
-  props.storageFlows.map((flow) => ({
+  storageFlows.value.map((flow) => ({
     ...flow,
     name: wrapFlow({ wareId: flow.wareId }).name
-  })).filter((item) => item.totalRequiredStorageVolume > 0)
-)
-const storageTotalVolume = computed(() =>
-  storageItems.value.reduce((sum, item) => sum + item.totalRequiredStorageVolume, 0)
+  })).filter((item) => item.totalOccupiedCount > 0)
 )
 const hasStorageData = computed(() => storageItems.value.length > 0)
 
 const transportItems = computed(() =>
-  props.storageFlows.map((storageFlow) => {
-    const details = (storageFlow.details || [])
-      .map((detail: any) => ({
-        stationId: detail.stationId,
-        stationName: detail.stationName,
-        stationCount: detail.stationCount,
-        kind: detail.kind,
-        transportVolume: Math.abs(detail.staticRate || 0) * (storageFlow.unitVolume || 0),
-        sortOrder: detail.sortOrder
-      }))
-      .filter((detail: any) => detail.transportVolume > 0)
-    const totalTransportVolume = details.reduce((sum: number, detail: any) => sum + detail.transportVolume, 0)
+  storageFlows.value.map((storageFlow) => {
+    const details = (storageFlow.contributions || [])
+      .filter((detail) => detail.transportContribution > 0)
+    const totalTransportVolume = details.reduce((sum, detail) => sum + detail.transportContribution, 0)
 
     return {
       wareId: storageFlow.wareId,
@@ -138,10 +190,25 @@ const transportTotalVolume = computed(() =>
 const hasTransportData = computed(() =>
   transportItems.value.some((item) => item.totalTransportVolume > 0)
 )
+
+const hasAllocationData = computed(() =>
+  (props.allocationVolumeGroups?.some((g) => g.items.length > 0) || false)
+  || (props.allocationCargoOnlyItems?.length || 0) > 0
+)
+
+const isEmpty = computed(() => {
+  if (viewMode.value === 'quantity' || viewMode.value === 'economy') return !hasFlowData.value
+  if (viewMode.value === 'volume') {
+    if (props.useAllocationVolumeView) return !hasAllocationData.value
+    return !hasStorageData.value
+  }
+  return !hasTransportData.value
+})
+
 </script>
 
 <template>
-  <div class="list-wrapper">
+  <div class="list-wrapper" data-testid="transit-hub-center-dashboard">
     <div class="list-header">
       <h3 class="header-title">{{ title }}</h3>
       <div class="header-right-group">
@@ -151,27 +218,48 @@ const hasTransportData = computed(() =>
 
     <div class="list-body custom-scrollbar">
       <TransitHubQuantityView
-        v-if="viewMode === 'quantity'"
+        v-if="viewMode === 'quantity' && hasFlowData"
         :groups="grouped.quantity"
         :has-data="hasFlowData"
       />
       <TransitHubEconomyView
-        v-else-if="viewMode === 'economy'"
+        v-if="viewMode === 'economy' && hasFlowData"
         :groups="grouped.economy"
         :has-data="hasFlowData"
       />
+      <StationAllocationView
+        v-if="useAllocationVolumeView && viewMode === 'volume' && hasAllocationData"
+        :groups="allocationVolumeGroups"
+        :cargoOnlyItems="allocationCargoOnlyItems"
+        :hideActions="true"
+      />
       <TransitHubStorageView
-        v-else-if="viewMode === 'volume'"
+        v-if="!useAllocationVolumeView && viewMode === 'volume' && hasStorageData"
         :items="storageItems"
-        :total-volume="storageTotalVolume"
         :has-data="hasStorageData"
       />
       <TransitHubTransportView
-        v-else
+        v-if="viewMode === 'transport' && hasTransportData"
         :items="transportItems"
         :total-volume="transportTotalVolume"
         :has-data="hasTransportData"
       />
+      <EmptyState v-if="isEmpty" />
+    </div>
+
+    <div class="controls-section" v-if="hasFlowData"> 
+      <div v-if="viewMode === 'economy'" class="simulation-controls flex flex-row gap-4">
+        <PriceSlider v-model="localBuyMultiplier" :label="t('wareflow.buy_multiplier')" type="buy" />
+        <PriceSlider v-model="localSellMultiplier" :label="t('wareflow.sell_multiplier')" type="sell" />
+      </div>
+      <div v-if="viewMode === 'volume'" class="simulation-controls flex flex-row gap-4">
+        <VolumeControlSlider
+          v-model="localProductBufferHours"
+          :label="t('wareflow.product_buffer_hours')"
+          type="product"
+          :max="24"
+          :step="1" />
+      </div>
     </div>
   </div>
 </template>
@@ -204,5 +292,11 @@ const hasTransportData = computed(() =>
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgba(148, 163, 184, 0.7);
+}
+.controls-section {
+  @apply border-t border-slate-700/50;
+}
+.simulation-controls {
+  @apply px-4 py-3 bg-slate-800/30 border-b border-slate-700/50;
 }
 </style>

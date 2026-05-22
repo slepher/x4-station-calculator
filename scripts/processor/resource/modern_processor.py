@@ -19,6 +19,7 @@ REGION_REF_RES = (
     re.compile(r"region_cluster_(\d+)_sector_(\d+)", re.IGNORECASE),
     re.compile(r"region(\d+)_cluster_(\d+)_sector_(\d+)", re.IGNORECASE),
 )
+GAS_WARES = {"hydrogen", "helium", "methane"}
 
 
 def as_float(value: Optional[str], default: float = 0.0) -> float:
@@ -30,6 +31,84 @@ def parse_xml(path: Path) -> ET.Element:
     """解析 XML 文件并返回根元素。"""
     tree = ET.parse(str(path))
     return tree.getroot()
+
+
+def _build_definitions_from_new_regionyields_format(root: ET.Element) -> Dict[str, dict]:
+    """从 9.0 新版 XML 结构构建 definition 索引。"""
+    boundaries: Dict[str, float] = {}
+    for boundary_node in root.findall("./boundaries/boundary[@id]"):
+        boundary_id = (boundary_node.get("id") or "").strip()
+        size_node = boundary_node.find("./size")
+        if not boundary_id or size_node is None:
+            continue
+        boundaries[boundary_id] = as_float(size_node.get("r"), 0.0)
+
+    gather_speeds: Dict[str, dict] = {}
+    for gather_node in root.findall("./gatherspeeds/gatherspeed[@id]"):
+        gather_id = (gather_node.get("id") or "").strip()
+        if not gather_id:
+            continue
+        gather_speeds[gather_id] = {
+            "factor": as_float(gather_node.get("factor"), 0.0),
+            "rating": as_float(gather_node.get("rating"), 0.0),
+        }
+
+    definitions: Dict[str, dict] = {}
+    for yield_node in root.findall("./yields/yield[@id]"):
+        yield_id = (yield_node.get("id") or "").strip()
+        yield_tag = (yield_node.get("tag") or yield_id).strip()
+        if not yield_id or not yield_tag:
+            continue
+
+        scaneffect = (yield_node.get("scaneffect") or "").strip()
+        scaneffectintensity = as_float(yield_node.get("scaneffectintensity"), 0.0)
+        scaneffectcolor = (yield_node.get("scaneffectcolor") or "").strip()
+
+        for ware_node in yield_node.findall("./ware[@id]"):
+            ware = (ware_node.get("id") or "").strip()
+            if not ware:
+                continue
+
+            yield_val = as_float(ware_node.get("yield"), 0.0)
+            respawn_delay = as_float(ware_node.get("respawndelay"), 0.0)
+            sustainable_yield_per_hour = 0.0
+            if respawn_delay > 0:
+                sustainable_yield_per_hour = yield_val / respawn_delay * 60.0
+
+            for boundary_id, radius in boundaries.items():
+                if not boundary_id.startswith("sphere_"):
+                    continue
+                size = boundary_id.split("_", 1)[1].lower()
+                for gather_id, gather_data in gather_speeds.items():
+                    def_id = f"{boundary_id}_{ware}_{yield_id}_{gather_id}"
+                    definition: Dict[str, object] = {
+                        "id": def_id,
+                        "ware": ware,
+                        "tag": yield_tag,
+                        "size": size,
+                        "radius": radius,
+                        "yield": yield_val,
+                        "respawnDelay": respawn_delay,
+                        "rating": gather_data["rating"],
+                        "sustainableYieldPerHour": sustainable_yield_per_hour,
+                    }
+
+                    if scaneffect:
+                        definition["scaneffect"] = scaneffect
+                    if scaneffectintensity > 0:
+                        definition["scaneffectintensity"] = scaneffectintensity
+                    if scaneffectcolor:
+                        definition["scaneffectcolor"] = scaneffectcolor
+
+                    factor = gather_data["factor"]
+                    if ware in GAS_WARES:
+                        definition["gatherspeedfactor"] = factor
+                    else:
+                        definition["objectyieldfactor"] = factor
+
+                    definitions[def_id] = definition
+
+    return definitions
 
 
 def migrate_resourcearea_definitions(regionyields_xml_path: Path) -> Dict[str, dict]:
@@ -47,9 +126,13 @@ def migrate_resourcearea_definitions(regionyields_xml_path: Path) -> Dict[str, d
     if not regionyields_xml_path.exists():
         return {}
     root = parse_xml(regionyields_xml_path)
+    synthesized_definitions = _build_definitions_from_new_regionyields_format(root)
+    if synthesized_definitions:
+        return synthesized_definitions
+
     definitions: Dict[str, dict] = {}
 
-    for def_node in root.findall("./definition[@id]"):
+    for def_node in root.findall("./definitions/definition[@id]"):
         def_id = (def_node.get("id") or "").strip()
         if not def_id:
             continue

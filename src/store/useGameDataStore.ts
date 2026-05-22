@@ -1,20 +1,23 @@
 import { defineStore } from 'pinia'
 import { ref, watch, computed } from 'vue'
-import { useI18n } from 'vue-i18n'
+import i18n from '@/i18n'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { loadLanguageAsync, setGameFolderName } from '@/i18n'
 import type {
   X4Module,
   X4Ware,
-  RaceMedicalConsumption,
+  WorkforceConsumptionMap,
   LocalizedX4Module,
   LocalizedX4ModuleGroup,
+  LocalizedX4Ware,
+  LocalizedX4Ship,
   ModuleGroupResult,
   VersionConfig,
   VersionsFile,
   GameVersionStorage,
   X4Bullet,
   X4Map,
+  X4MapResources,
   X4RegionYield,
   X4Faction,
   X4Language,
@@ -36,17 +39,29 @@ import {
   buildModulesMap,
   buildModulesByMacroIdMap,
   buildModulesByOutputMap,
-  buildMedicalConsumptionMap,
+  buildWorkforceConsumptionMap,
   buildLocalizedModulesMap,
   buildLocalizedModuleGroupsMap,
+  buildLocalizedWaresMap,
+  buildLocalizedShipsMap,
   findModuleForWare as findModuleForWareFn,
   precomputeCandidateWares
 } from './logic/useGameData'
+import { isRawMaterialWare as isRawMaterialWareFn } from './logic/logicFlowStream'
 import type { GameDataFiles } from './logic/useGameData'
 
 export const useGameDataStore = defineStore('gameData', () => {
-  const { locale: currentLocale, t } = useI18n()
-  const { translateModule, translateModuleGroup, translateWare, translateDlc } = useX4I18n()
+  // 从 i18n.global 获取（不依赖 Vue 组件上下文）
+  // writable computed 以支持 changeLanguage() 设置
+  const currentLocale = computed({
+    get: () => i18n.global.locale.value,
+    set: (val: string) => { 
+      // Vue I18n Composition API 模式下 locale 是 WritableRef
+      (i18n.global.locale as any).value = val 
+    }
+  })
+  const t = i18n.global.t.bind(i18n.global)
+  const { translateModule, translateModuleGroup, translateWare, translateDlc, translateShip } = useX4I18n()
 
   // Version management state
   const versionsConfig = ref<VersionConfig[]>([])
@@ -64,9 +79,10 @@ export const useGameDataStore = defineStore('gameData', () => {
   const modulesByMacroId = ref<Record<string, X4Module>>({})
   const modulesByOutputMap = ref<Record<string, X4Module[]>>({})
   const localizedModulesMap = ref<Record<string, LocalizedX4Module>>({})
-  const localizedWaresMap = ref<Record<string, { id: string, localeName: string }>>({})
+  const localizedWaresMap = ref<Record<string, LocalizedX4Ware>>({})
+  const localizedShipsMap = ref<Record<string, LocalizedX4Ship>>({})
   const localizedModuleGroupsMap = ref<Record<string, LocalizedX4ModuleGroup>>({})
-  const medicalConsumptionMap = ref<RaceMedicalConsumption>({})
+  const workforceConsumptionMap = ref<WorkforceConsumptionMap>({})
   const wareSetsByIndustrialRace = ref<Record<string, Set<string>>>({})
   const wareSetsByRace = ref<Record<string, Set<string>>>({})
   const volumeCompressionMap = ref<Record<string, number>>({})
@@ -76,7 +92,15 @@ export const useGameDataStore = defineStore('gameData', () => {
   const missiles = ref<X4Missile[]>([])
   const drones = ref<X4Drone[]>([])
   const consumables = ref<X4Consumable[]>([])
+  const ships = ref<X4Ship[]>([])
+  const equipments = ref<X4Equipment[]>([])
   const maps = ref<X4Map>({ clusters: {}, sectors: {} })
+  const mapResources = ref<X4MapResources>({
+    version: '',
+    resource_model: '',
+    sectors: {},
+    regionyield_definitions: []
+  })
   const regionyields = ref<X4RegionYield[]>([])
   const res = ref<X4Res[]>([])
   const factions = ref<X4Faction[]>([])
@@ -85,8 +109,6 @@ export const useGameDataStore = defineStore('gameData', () => {
   const languages = ref<X4Language[]>([])
   const dlcs = ref<X4Dlc[]>([])
   const dlcSetting = ref<X4SettingStorage>({})
-  const ships = ref<X4Ship[]>([])
-  const equipments = ref<X4Equipment[]>([])
 
   const factionColorMap = computed<Record<string, string>>(() => {
     const map: Record<string, string> = {}
@@ -150,15 +172,21 @@ export const useGameDataStore = defineStore('gameData', () => {
     )
   })
 
-  function getStorageKey(module: 'empire' | 'logic_flow' | 'ship_blueprints' | 'setting' | 'save_archives'): string {
+  function getStorageKey(module: 'empire' | 'logic_flow' | 'ship_blueprints' | 'setting' | 'save_archives' | 'build_plan_goals'): string {
     const config = currentVersionConfig.value
     if (!config) {
       return module === 'empire' ? 'x4_empire_data' :
              module === 'logic_flow' ? 'x4_logic_flow_plans' :
              module === 'ship_blueprints' ? 'x4_ship_blueprints' :
-             module === 'save_archives' ? 'x4_save_archives' : 'x4-setting'
+             module === 'save_archives' ? 'x4_save_archives' :
+             module === 'build_plan_goals' ? 'x4_build_plan_goals' : 'x4-setting'
     }
     return config.storage_keys[module]
+  }
+
+  function getIndexedDBName(): string {
+    const config = currentVersionConfig.value
+    return config?.indexeddb_name ?? 'x4_save_archive_db'
   }
 
   function parseVersionNumber(value: string): number {
@@ -246,6 +274,10 @@ export const useGameDataStore = defineStore('gameData', () => {
     return findModuleForWareFn(wareId, lineage, modulesByOutputMap.value)
   }
 
+  function isRawMaterialWare(wareId: string): boolean {
+    return isRawMaterialWareFn(wareId, modulesByOutputMap.value)
+  }
+
   function getModuleDisplayName(moduleId: string | undefined): string {
     if (!moduleId) return ''
     return localizedModulesMap.value[moduleId]?.localeName || moduleId
@@ -267,14 +299,11 @@ export const useGameDataStore = defineStore('gameData', () => {
 
   function prepareLocalizedWares() {
     const isEn = currentLocale.value === 'en'
-    const newWareMap: Record<string, { id: string, localeName: string }> = {}
-    Object.values(waresMap.value).forEach(w => {
-      newWareMap[w.id] = {
-        id: w.id,
-        localeName: isEn ? (w.name || '') : translateWare(w)
-      }
-    })
-    localizedWaresMap.value = newWareMap
+    localizedWaresMap.value = buildLocalizedWaresMap(
+      Object.values(waresMap.value),
+      isEn,
+      translateWare
+    )
   }
 
   function buildVolumeCompressionMap() {
@@ -380,7 +409,7 @@ export const useGameDataStore = defineStore('gameData', () => {
     modulesMap.value = buildModulesMap(data.modules)
     modulesByMacroId.value = buildModulesByMacroIdMap(modulesMap.value)
     modulesByOutputMap.value = buildModulesByOutputMap(modulesMap.value)
-    medicalConsumptionMap.value = buildMedicalConsumptionMap(data.consumption)
+    workforceConsumptionMap.value = buildWorkforceConsumptionMap(data.consumption)
 
     const isEn = currentLocale.value === 'en'
     localizedModulesMap.value = buildLocalizedModulesMap(data.modules, isEn, translateModule)
@@ -402,7 +431,11 @@ export const useGameDataStore = defineStore('gameData', () => {
     missiles.value = data.missiles
     drones.value = data.drones
     consumables.value = data.consumables
+    ships.value = data.ships
+    localizedShipsMap.value = buildLocalizedShipsMap(data.ships, isEn, translateShip)
+    equipments.value = data.equipments
     maps.value = data.maps
+    mapResources.value = data.mapResources
     regionyields.value = data.regionyields
     res.value = data.res
     factions.value = data.factions
@@ -410,8 +443,6 @@ export const useGameDataStore = defineStore('gameData', () => {
     shipSlots.value = data.shipSlots
     languages.value = data.languages
     dlcs.value = data.dlcs
-    ships.value = data.ships
-    equipments.value = data.equipments
   }
 
   function setVersion(version: string, beta: boolean) {
@@ -457,6 +488,7 @@ export const useGameDataStore = defineStore('gameData', () => {
     if (gameData.value) {
       localizedModulesMap.value = buildLocalizedModulesMap(gameData.value.modules, isEn, translateModule)
       localizedModuleGroupsMap.value = buildLocalizedModuleGroupsMap(gameData.value.moduleGroups, isEn, translateModuleGroup)
+      localizedShipsMap.value = buildLocalizedShipsMap(gameData.value.ships, isEn, translateShip)
     }
 
     const { wareSetsByIndustrialRace: industrial, wareSetsByRace: race } = precomputeCandidateWares(
@@ -480,6 +512,7 @@ export const useGameDataStore = defineStore('gameData', () => {
       if (gameData.value) {
         localizedModulesMap.value = buildLocalizedModulesMap(gameData.value.modules, isEn, translateModule)
         localizedModuleGroupsMap.value = buildLocalizedModuleGroupsMap(gameData.value.moduleGroups, isEn, translateModuleGroup)
+        localizedShipsMap.value = buildLocalizedShipsMap(gameData.value.ships, isEn, translateShip)
       }
 
       const { wareSetsByIndustrialRace: industrial, wareSetsByRace: race } = precomputeCandidateWares(
@@ -518,8 +551,9 @@ export const useGameDataStore = defineStore('gameData', () => {
     modulesByOutputMap,
     localizedModulesMap,
     localizedWaresMap,
+    localizedShipsMap,
     localizedModuleGroupsMap,
-    medicalConsumptionMap,
+    workforceConsumptionMap,
     wareSetsByIndustrialRace,
     wareSetsByRace,
     volumeCompressionMap,
@@ -530,7 +564,10 @@ export const useGameDataStore = defineStore('gameData', () => {
     missiles,
     drones,
     consumables,
+    ships,
+    equipments,
     maps,
+    mapResources,
     regionyields,
     res,
     factions,
@@ -544,15 +581,15 @@ export const useGameDataStore = defineStore('gameData', () => {
     needsDlcSetup,
     enforceDlcActivation,
     factionColorMap,
-    ships,
-    equipments,
     // Methods
     getStorageKey,
+    getIndexedDBName,
     setVersion,
     getRawData,
     initialize,
     changeLanguage,
     findModuleForWare,
+    isRawMaterialWare,
     getModuleDisplayName,
     getWareDisplayName,
     getDlcDisplayName,

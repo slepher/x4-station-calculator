@@ -1,0 +1,162 @@
+# Station Dashboard Building Modules - Tasks
+
+## Task 1: Store 新增 moduleScope 状态
+
+- [x] 文件: `src/store/useLiveProductionStore.ts`
+- [x] 新增 `moduleScope` ref
+- [x] 新增 `cycleModuleScope()` 函数
+- [x] 新增 `hasBuildingModules` computed（基于 `archiveStation?.building?.modules`）
+- [x] 新增 `defaultModuleScope` computed，有 buildingModules 时默认 `'building'`
+- [x] watch `activeStationId` 和 `mode`，reset moduleScope 为默认值
+- [x] watch `hasBuildingModules`，动态切换默认值
+- [x] 暴露到 store return
+
+## Task 2: Toolbar Presenter 透传 moduleScope
+
+- [x] 文件: `src/components/empire/presenters/useProductionToolbarPresenter.ts`
+- [x] `ToolbarPresenterStore` 接口新增 `moduleScope?`, `hasBuildingModules?`, `cycleModuleScope?`
+- [x] `ToolbarPresenterProps` 接口新增 `moduleScope`, `hasBuildingModules`
+- [x] `ToolbarPresenterEmits` 接口新增 `cycleModuleScope`
+- [x] props 填充和 emits 填充
+
+## Task 3: Dashboard Presenter 新增 effectiveModules
+
+- [x] 文件: `src/components/empire/presenters/useProductionDashboardPresenter.ts`
+- [x] `DashboardPresenterStore` 接口新增 `moduleScope?`
+- [x] `DashboardPresenterProps` 接口新增 `effectiveModules`
+- [x] computed 填充：根据 moduleScope 计算 effectiveModules
+
+## Task 4: LiveStationToolbar 三态按钮
+
+- [x] 文件: `src/components/empire/context_toolbar/LiveStationToolbar.vue`
+- [x] Props 新增 `moduleScope`, `hasBuildingModules`
+- [x] Emits 新增 `cycleModuleScope`
+- [x] 计算属性 `scopeIcon`, `scopeLabel`, `scopeClass`
+- [x] 模板：条件分隔线 + toggle-chip 按钮
+- [x] 样式：`.active-amber`, `.active-sky`
+
+## Task 5: LiveProductionWorkbenchView 传递 props
+
+- [x] 文件: `src/components/empire/LiveProductionWorkbenchView.vue`
+- [x] LiveStationToolbar 新增 `:module-scope`, `:has-building-modules`, `@cycle-module-scope`
+- [x] StationDashboard (station view) 新增 `:effective-modules`
+
+## Task 6: StationDashboard 双分析
+
+- [x] 文件: `src/components/empire/StationDashboard.vue`
+- [x] Props 新增 `effectiveModules?`
+- [x] `analysis` 拆分为 `costAnalysis` + `workersAnalysis`
+- [x] `data` computed 按 viewMode 分流（workers→workersAnalysis，其余→costAnalysis）
+- [x] `stats-bar` 按字段分流（cost/volume/time/transport→costAnalysis，workers/efficiency→workersAnalysis）
+- [x] 工人相关计算用 `workersAnalysis`
+
+## Task 7: i18n（phase 1）
+
+- [x] 文件: `src/locales/zh-CN.json`, `src/locales/en.json`
+- [x] 新增 4 个 key：`toolbar.module_scope`, `toolbar.module_scope_built`, `toolbar.module_scope_building`, `toolbar.module_scope_all`
+
+## Task 8: Build 验证（phase 1）
+
+- [x] 执行 `npm run build`，确认无编译错误
+
+---
+
+## Task 9: ProductionStationState 新增 buildingCargo / buildingReservation
+
+- [x] 文件: `src/types/production-workbench-contract.ts`
+- [x] `ProductionStationState` 新增 `buildingCargo: WareAmount[]`, `buildingReservation: WareAmount[]`
+- [x] 需 import `WareAmount` from `saveArchive`
+
+## Task 10: Store 透传 buildingCargo / buildingReservation
+
+- [x] 文件: `src/store/useLiveProductionStore.ts`
+- [x] `activeStationState` live 模式下新增 `buildingCargo` 和 `buildingReservation` 透传
+- [x] `activeTransitState` 下补充空数组
+- [x] planning 模式下补充空数组
+- [x] `useBlueprintProductionStore.ts` 同步补充空数组
+
+## Task 11: Dashboard Presenter 透传 buildingCargo / buildingReservation / isBuildingScope
+
+- [x] 文件: `src/components/empire/presenters/useProductionDashboardPresenter.ts`
+- [x] `DashboardPresenterStore` 新增 `buildingCargo?`, `buildingReservation?`
+- [x] `DashboardPresenterProps` 新增 `buildingCargo`, `buildingReservation`, `isBuildingScope`
+- [x] computed 填充：`buildingCargo`, `buildingReservation`, `isBuildingScope`
+
+## Task 12: LiveProductionWorkbenchView 传递新 props
+
+- [x] 文件: `src/components/empire/LiveProductionWorkbenchView.vue`
+- [x] StationDashboard 新增 `:building-cargo`, `:building-reservation`, `:is-building-scope`
+
+## Task 13: StationDashboard 成本视图新增三条目
+
+- [x] 文件: `src/components/empire/StationDashboard.vue`
+- [x] Props 新增 `buildingCargo?`, `buildingReservation?`, `isBuildingScope?`
+- [x] Import `getPriceByMultiplier` and `WareAmount`
+- [x] 计算属性 `buildingCargoItems`, `buildingReservationItems`, `materialGapItems`
+- [x] 模板：成本视图下独立渲染三个 `StationModuleDetail variant="summary"`
+
+## Task 14: i18n（phase 2）
+
+- [x] 文件: `src/locales/zh-CN.json`, `src/locales/en.json`
+- [x] 新增 3 个 key：`station.build_storage_materials`, `station.in_transit_materials`, `station.material_gap`
+
+## Task 15: Build 验证（phase 2）
+
+- [x] 执行 `npm run build`，确认无编译错误
+
+---
+
+## Task 16: Type 层新增 inProgressModule
+
+- [x] 文件: `src/types/saveArchive.ts`
+- [x] `ArchiveStationBuildingData` 新增 `inProgressModule?: SavedModule`
+
+## Task 17: ProductionStationState 新增 buildingInProgress
+
+- [x] 文件: `src/types/production-workbench-contract.ts`
+- [x] `ProductionStationState` 新增 `buildingInProgress?: SavedModule`
+
+## Task 18: Store archiveStation 提取 inProgressModule
+
+- [x] 文件: `src/store/useLiveProductionStore.ts`
+- [x] `archiveStation` computed 中基于 `progress.end` + `sequenceindex` 提取 `inProgressModule`
+- [x] 匹配 `constructions[sequenceindex].ref` → `modules[].ref` → `module_id`
+- [x] `buildingModules` 保持不变（不含扣减）
+- [x] `activeStationState`/`activeTransitState`/`stationState` 逐层透传 `buildingInProgress`
+
+## Task 19: Presenter 透传 buildingInProgress + 修改 effectiveModules
+
+- [x] 文件: `src/components/empire/presenters/useProductionDashboardPresenter.ts`
+- [x] `DashboardPresenterStore` 新增 `buildingInProgress?`
+- [x] `DashboardPresenterProps` 新增 `buildingInProgress`
+- [x] computed: `buildingInProgress` 透传
+- [x] 修改 `effectiveModules`：`building` 范围时从 buildingModules 扣除 inProgressModule
+
+## Task 20: LiveProductionWorkbenchView 传递新 props
+
+- [x] 文件: `src/components/empire/LiveProductionWorkbenchView.vue`
+- [x] StationDashboard 新增 `:building-in-progress`
+
+## Task 21: StationModuleDetail 新增 badge prop
+
+- [x] 文件: `src/components/empire/StationModuleDetail.vue`
+- [x] Props 新增 `badge?: string`
+- [x] 模板：标题行显示 amber pill tag
+- [x] 样式：`.badge-pill`
+
+## Task 22: StationDashboard 在建模块展示
+
+- [x] 文件: `src/components/empire/StationDashboard.vue`
+- [x] Props 新增 `buildingInProgress?`
+- [x] 新增 `inProgressAnalysis` + `inProgressModuleEntry` computed（基于 analyzeStation）
+- [x] 模板：total cost summary 与 moduleGroups 之间渲染在建模块条目，支持三视图
+- [x] 在建模块仅在 `isBuildingScope` 时显示（支持材料/运输/时间三视图）
+
+## Task 23: i18n（phase 3）
+
+- [x] 文件: `src/locales/zh-CN.json`, `src/locales/en.json`
+- [x] 新增 `station.badge_in_progress`：「在建」/「Building」
+
+## Task 24: Build 验证（phase 3）
+
+- [x] 执行 `npm run build`，确认无编译错误

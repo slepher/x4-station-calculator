@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useEmpireStore } from '@/store/useEmpireStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { useStatusStore } from '@/store/useStatusStore'
 import { useToolbarWorkflowController } from '@/composables/useToolbarWorkflowController'
+import type { ToolbarStoreType } from '@/composables/useToolbarWorkflowController'
 import { buildEmpireImportTargets, buildStationImportPayload, type LogicFlowImportWarning, type StationImportPayload } from '@/store/logic/logicFlowImport'
 import { getLogicFlowGroupDisplayName } from '@/store/logic/logicFlowGroupName'
 import { parseGameComLink, parseXmlBlueprintMeta, resolveModuleId } from '@/store/logic/blueprintParser'
+import type { ImportPlanModalProps } from '@/types/production-ui'
 import TopViewSwitch from '@/components/common/TopViewSwitch.vue'
 import LogicFlowImportBody from '../logic-flow/LogicFlowImportBody.vue'
 import LogicFlowImportWarningModal from './LogicFlowImportWarningModal.vue'
@@ -18,16 +19,12 @@ import SmartSaveDialog from '../common/SmartSaveDialog.vue'
 type ImportTabKey = 'logic-flow' | 'game-blueprint' | 'x4-station'
 type BlueprintModule = { id: string; count: number }
 
-const props = withDefaults(defineProps<{
-  isOpen: boolean
-  initialTab?: ImportTabKey
-}>(), {
+const props = withDefaults(defineProps<ImportPlanModalProps>(), {
   initialTab: 'game-blueprint'
 })
 
-const emit = defineEmits(['close'])
+const emit = defineEmits<{ close: [] }>()
 const { t } = useI18n()
-const empireStore = useEmpireStore()
 const gameDataStore = useGameDataStore()
 const logicFlowStore = useLogicFlowStore()
 const statusStore = useStatusStore()
@@ -35,6 +32,10 @@ const toolbarWorkflow = useToolbarWorkflowController({
   t,
   translateShip: (ship) => ship.name || ship.id
 })
+
+const importStoreType = computed<ToolbarStoreType>(() => 
+  props.productionSource === 'save-binding' ? 'live-production' : 'blueprint-production'
+)
 
 const activeTab = ref<ImportTabKey>('game-blueprint')
 const selfClosed = ref(false)
@@ -66,7 +67,7 @@ const importTabs = computed(() => [
   { key: 'x4-station', label: 'x4-game.com', activeClass: 'bg-emerald-600 text-white shadow-lg' }
 ])
 
-const isOverview = computed(() => empireStore.activeStationId === null)
+const isOverview = computed(() => props.isOverview)
 const logicFlowImportMode = computed<'station' | 'empire'>(() => (isOverview.value ? 'empire' : 'station'))
 const hasBlueprintReady = computed(() => blueprintModules.value.length > 0 && blueprintModuleTotal.value > 0)
 
@@ -132,11 +133,10 @@ const handleImportX4StationString = () => {
       }
       applyBlueprintOverwrite(station.id, modules)
     } else {
-      const stationId = empireStore.activeStation?.id
+      const stationId = props.activeStationId
       if (!stationId) {
         throw new Error('No active station for import')
       }
-      // Unified strategy dialog for non-empty station
       if (isStationEmpty()) {
         applyBlueprintOverwrite(stationId, modules)
       } else {
@@ -161,14 +161,13 @@ const getSelectedPlan = () => {
 }
 
 const applyImportPayloadToStation = (stationId: string, payload: StationImportPayload) => {
-  const station = empireStore.getStationById(stationId)
-  if (!station) return
-  station.modules = payload.plannedModules.map((module) => ({ ...module }))
-  station.lockedWares = [...payload.lockedWares]
-  station.warePriority = {}
-  station.lastUpdated = Date.now()
-  empireStore.refreshStationFlowCache(station.id)
-}
+    const modules = payload.plannedModules.map((module) => ({ ...module }))
+    props.applyImportedStationPayload(stationId, {
+      modules,
+      lockedWares: [...payload.lockedWares],
+      warePriority: {}
+    })
+  }
 
 const executeStationImport = (mode: 'new' | 'overwrite', payload?: StationImportPayload) => {
   const selection = pendingImportSelection.value
@@ -191,7 +190,7 @@ const executeStationImport = (mode: 'new' | 'overwrite', payload?: StationImport
   if (!importPayload) return
 
   if (mode === 'overwrite') {
-    const stationId = empireStore.activeStation?.id
+    const stationId = props.activeStationId
     if (!stationId) {
       statusStore.pushMessage('warning', 'system', t('logicFlowImport.error_no_active_station'))
       showStationImportConfirm.value = false
@@ -200,7 +199,7 @@ const executeStationImport = (mode: 'new' | 'overwrite', payload?: StationImport
     }
     applyImportPayloadToStation(stationId, importPayload)
   } else {
-    const newStation = empireStore.createStation(importPayload.groupName || t('sector.new_station_name'))
+    const newStation = props.createStation(importPayload.groupName || t('sector.new_station_name'))
     if (!newStation) {
       showStationImportConfirm.value = false
       showBlueprintStrategyDialog.value = false
@@ -229,7 +228,7 @@ const executeEmpireImport = () => {
   }
 
   result.targets.forEach((target) => {
-    const station = empireStore.createStation(target.groupName || t('sector.new_station_name'))
+    const station = props.createStation(target.groupName || t('sector.new_station_name'))
     if (!station) return
     applyImportPayloadToStation(station.id, target)
   })
@@ -266,13 +265,13 @@ const handleImportSelected = (selection: { planId: string; groupId?: string }) =
     return
   }
 
-  if (toolbarWorkflow.shouldConfirmBeforeImport('station')) {
+  if (toolbarWorkflow.shouldConfirmBeforeImport(importStoreType.value)) {
     showEmpireImportConfirm.value = true
     return
   }
 
   toolbarWorkflow.runImportAction({
-    storeType: 'station',
+    storeType: importStoreType.value,
     choice: 'DISCARD_AND_IMPORT',
     defaultEmpireName: t('menu.default_sector_name'),
     importData: () => executeEmpireImport()
@@ -283,7 +282,7 @@ const handleEmpireImportSubmit = (payload: { choice: 'SAVE_AND_IMPORT' | 'DISCAR
   empireImportSubmitted.value = true
   showEmpireImportConfirm.value = false
   const result = toolbarWorkflow.runImportAction({
-    storeType: 'station',
+    storeType: importStoreType.value,
     choice: payload.choice,
     defaultEmpireName: t('menu.default_sector_name'),
     importData: () => executeEmpireImport()
@@ -353,45 +352,44 @@ const handleBlueprintFileChange = async (event: Event) => {
 }
 
 const isStationEmpty = () => {
-  const station = empireStore.activeStation
-  if (!station) return true
-  return !station.modules.some((module) => module.count > 0)
-}
+    const station = props.activeStation
+    if (!station) return true
+    return !station.modules.some((module) => module.count > 0)
+  }
 
-const applyBlueprintOverwrite = (stationId: string, modules: BlueprintModule[]) => {
-  const station = empireStore.getStationById(stationId)
-  if (!station) return
-  station.modules = modules.map((item) => ({ ...item }))
-  station.lastUpdated = Date.now()
-  empireStore.refreshStationFlowCache(station.id)
-}
+  const applyBlueprintOverwrite = (stationId: string, modules: BlueprintModule[]) => {
+    const station = props.getStationById(stationId)
+    if (!station) return
+    props.updateStationModules(station.id, modules.map((item) => ({ ...item })))
+  }
 
-const applyBlueprintAdd = (stationId: string, modules: BlueprintModule[]) => {
-  const station = empireStore.getStationById(stationId)
-  if (!station) return
+  const applyBlueprintAdd = (stationId: string, modules: BlueprintModule[]) => {
+    const station = props.getStationById(stationId)
+    if (!station) return
 
-  const merged = new Map<string, number>()
-  station.modules.forEach((module) => {
-    merged.set(module.id, (merged.get(module.id) || 0) + module.count)
-  })
-  modules.forEach((module) => {
-    merged.set(module.id, (merged.get(module.id) || 0) + module.count)
-  })
+    const merged = new Map<string, number>()
+    station.modules.forEach((module) => {
+      merged.set(module.id, (merged.get(module.id) || 0) + module.count)
+    })
+    modules.forEach((module) => {
+      merged.set(module.id, (merged.get(module.id) || 0) + module.count)
+    })
 
-  station.modules = Array.from(merged.entries()).map(([id, count]) => ({ id, count }))
-  station.lastUpdated = Date.now()
-  empireStore.refreshStationFlowCache(station.id)
-}
+    props.updateStationModules(
+      station.id,
+      Array.from(merged.entries()).map(([id, count]) => ({ id, count }))
+    )
+  }
 
-const createStationWithDefaultName = () => {
-  return empireStore.createStation(t('sector.new_station_name'), 'industrial')
-}
+  const createStationWithDefaultName = () => {
+    return props.createStation(t('sector.new_station_name'), 'industrial')
+  }
 
-const createStationAndImportBlueprint = (modules: BlueprintModule[]) => {
-  const station = empireStore.createStation(blueprintStationName.value || t('sector.new_station_name'), 'industrial')
-  if (!station) return
-  applyBlueprintOverwrite(station.id, modules)
-}
+  const createStationAndImportBlueprint = (modules: BlueprintModule[]) => {
+    const station = props.createStation(blueprintStationName.value || t('sector.new_station_name'), 'industrial')
+    if (!station) return
+    applyBlueprintOverwrite(station.id, modules)
+  }
 
 const finalizeBlueprintImport = () => {
   resetBlueprintState()
@@ -407,7 +405,7 @@ const handleImportBlueprint = () => {
     return
   }
 
-  const stationId = empireStore.activeStation?.id
+  const stationId = props.activeStationId
   if (!stationId) {
     statusStore.pushMessage('warning', 'system', t('logicFlowImport.error_no_active_station'))
     return
@@ -423,10 +421,9 @@ const handleImportBlueprint = () => {
 }
 
 const handleBlueprintActionOverwrite = () => {
-  const stationId = empireStore.activeStation?.id
+  const stationId = props.activeStationId
   if (!stationId) return
 
-  // Handle logic-flow import
   if (pendingLogicFlowModules.value) {
     applyImportPayloadToStation(stationId, pendingLogicFlowModules.value)
     warningSummary.value = pendingLogicFlowModules.value.warnings
@@ -438,7 +435,6 @@ const handleBlueprintActionOverwrite = () => {
     return
   }
 
-  // Handle x4-station import
   if (pendingX4StationModules.value.length > 0) {
     applyBlueprintOverwrite(stationId, pendingX4StationModules.value)
     pendingX4StationModules.value = []
@@ -449,17 +445,15 @@ const handleBlueprintActionOverwrite = () => {
     return
   }
 
-  // Handle game-blueprint import
   applyBlueprintOverwrite(stationId, blueprintModules.value)
   showBlueprintStrategyDialog.value = false
   finalizeBlueprintImport()
 }
 
 const handleBlueprintActionAdd = () => {
-  const stationId = empireStore.activeStation?.id
+  const stationId = props.activeStationId
   if (!stationId) return
 
-  // Handle logic-flow import
   if (pendingLogicFlowModules.value) {
     applyImportPayloadToStation(stationId, pendingLogicFlowModules.value)
     warningSummary.value = pendingLogicFlowModules.value.warnings
@@ -471,7 +465,6 @@ const handleBlueprintActionAdd = () => {
     return
   }
 
-  // Handle x4-station import
   if (pendingX4StationModules.value.length > 0) {
     applyBlueprintAdd(stationId, pendingX4StationModules.value)
     pendingX4StationModules.value = []
@@ -482,16 +475,14 @@ const handleBlueprintActionAdd = () => {
     return
   }
 
-  // Handle game-blueprint import
   applyBlueprintAdd(stationId, blueprintModules.value)
   showBlueprintStrategyDialog.value = false
   finalizeBlueprintImport()
 }
 
 const handleBlueprintActionNew = () => {
-  // Handle logic-flow import
   if (pendingLogicFlowModules.value) {
-    const newStation = empireStore.createStation(pendingStationGroupName.value || t('sector.new_station_name'))
+    const newStation = props.createStation(pendingStationGroupName.value || t('sector.new_station_name'))
     if (newStation) {
       applyImportPayloadToStation(newStation.id, pendingLogicFlowModules.value)
       warningSummary.value = pendingLogicFlowModules.value.warnings
@@ -504,7 +495,6 @@ const handleBlueprintActionNew = () => {
     return
   }
 
-  // Handle x4-station import
   if (pendingX4StationModules.value.length > 0) {
     const station = createStationWithDefaultName()
     if (station) {
@@ -518,7 +508,6 @@ const handleBlueprintActionNew = () => {
     return
   }
 
-  // Handle game-blueprint import
   createStationAndImportBlueprint(blueprintModules.value)
   showBlueprintStrategyDialog.value = false
   finalizeBlueprintImport()
@@ -650,7 +639,7 @@ const handleBlueprintActionNew = () => {
     <SmartSaveDialog
       :isOpen="showEmpireImportConfirm"
       intent="NEW"
-      storeType="station"
+      storeType="blueprint-production"
       mode="import"
       @submit-import="handleEmpireImportSubmit"
       @close="handleEmpireImportDialogClose"

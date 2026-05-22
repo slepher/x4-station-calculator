@@ -31,6 +31,10 @@ interface SaveData {
   sectors: Record<string, SectorData>
 }
 
+function hasEntries<T>(record: Record<string, T> | undefined): boolean {
+  return Boolean(record && Object.keys(record).length > 0)
+}
+
 export interface SaveParserProgressInfo {
   bytesProcessed: number
   tagCount: number
@@ -258,13 +262,14 @@ class X4SaveParser {
           name: macro,
           is_known: attrib.known === '1' || attrib.knownto === 'player',
           owner: typeof attrib.owner === 'string' ? attrib.owner : undefined,
-          playerStations: [],
-          xenonStations: [],
-          khaakStations: [],
-          npcStations: [],
-          datavaults: [],
-          erlkingVaults: [],
-          abandonedShips: []
+          player_stations: {},
+          xenon_stations: {},
+          khaak_stations: {},
+          npc_stations: {},
+          player_buildstorages: {},
+          datavaults: {},
+          erlking_vaults: {},
+          abandoned_ships: {}
         }
         this.sectorsCount++
       }
@@ -347,16 +352,20 @@ class X4SaveParser {
           if (this.currentStationModules.length > 0) {
             entry.constructions = this.currentStationModules
           }
-          sectorData.playerStations?.push(entry)
+          sectorData.player_stations ||= {}
+          sectorData.player_stations[entry.code] = entry
         } else if (owner === 'xenon') {
           const entry: FactionStationEntry = { ...base }
-          sectorData.xenonStations?.push(entry)
+          sectorData.xenon_stations ||= {}
+          sectorData.xenon_stations[entry.code] = entry
         } else if (owner === 'khaak') {
           const entry: FactionStationEntry = { ...base }
-          sectorData.khaakStations?.push(entry)
+          sectorData.khaak_stations ||= {}
+          sectorData.khaak_stations[entry.code] = entry
         } else {
           const entry: NpcStationEntry = { ...base }
-          sectorData.npcStations?.push(entry)
+          sectorData.npc_stations ||= {}
+          sectorData.npc_stations[entry.code] = entry
         }
       } else if (this.isDatavault() && sectorData) {
         const relativePosition = { x: pos.x, y: pos.y, z: pos.z }
@@ -370,7 +379,8 @@ class X4SaveParser {
           wares: [],
           ...this.buildDatavaultFlags(attrib)
         }
-        sectorData.datavaults?.push(entry)
+        sectorData.datavaults ||= {}
+        sectorData.datavaults[entry.code] = entry
       } else if (this.isErlkingVault() && sectorData) {
         const relativePosition = { x: pos.x, y: pos.y, z: pos.z }
         const entry: DatavaultEntry = {
@@ -383,7 +393,8 @@ class X4SaveParser {
           wares: [],
           ...this.buildDatavaultFlags(attrib)
         }
-        sectorData.erlkingVaults?.push(entry)
+        sectorData.erlking_vaults ||= {}
+        sectorData.erlking_vaults[entry.code] = entry
       } else if (this.isAbandonedShip() && sectorData) {
         const relativePosition = { x: pos.x, y: pos.y, z: pos.z }
         const entry: AbandonedShipEntry = {
@@ -393,7 +404,8 @@ class X4SaveParser {
           relative_position: relativePosition,
           position: relativePosition
         }
-        sectorData.abandonedShips?.push(entry)
+        sectorData.abandoned_ships ||= {}
+        sectorData.abandoned_ships[entry.code] = entry
       }
 
       if (this.isStation()) {
@@ -511,6 +523,134 @@ type XmlCaptureTreeNode = {
   selfRelevant: boolean
   hasRelevantDescendant: boolean
   children: XmlCaptureTreeNode[]
+}
+
+export interface ComponentXmlFilterRuntime {
+  feed: (text: string) => void
+  close: () => { matchCount: number }
+}
+
+export function createComponentXmlFilterRuntime(options: {
+  codeFilters: string[]
+  classFilter?: string | null
+  write: (chunk: string) => void
+}): ComponentXmlFilterRuntime {
+  const saxParser = sax.parser(false, { lowercase: true, position: false })
+  const previousMaxBufferLength = saxWithBufferConfig.MAX_BUFFER_LENGTH
+  saxWithBufferConfig.MAX_BUFFER_LENGTH = Math.min(previousMaxBufferLength, SAX_MAX_BUFFER_LENGTH)
+
+  const targetCodes = new Set(options.codeFilters)
+  const targetClass = options.classFilter ?? null
+  const pathStack: XmlCaptureNode[] = []
+  const matches: Array<{ root: XmlCaptureTreeNode; rootDepth: number }> = []
+  let activeCapture: { root: XmlCaptureTreeNode; rootDepth: number; nodeStack: XmlCaptureTreeNode[] } | null = null
+
+  const serializeTree = (node: XmlCaptureTreeNode, depth: number): string[] => {
+    const indent = '  '.repeat(depth)
+    if (node.selfClosing && node.children.length === 0) {
+      return [`${indent}<${node.name}${node.attrStr}/>`]
+    }
+    const lines = [`${indent}<${node.name}${node.attrStr}>`]
+    for (const child of node.children) {
+      lines.push(...serializeTree(child, depth + 1))
+    }
+    lines.push(`${indent}</${node.name}>`)
+    return lines
+  }
+
+  saxParser.onopentag = (node: TagNode) => {
+    const attrStr = serializeXmlAttributes(node.attributes)
+    const isSelfClosing = (node as TagNode & { isSelfClosing?: boolean }).isSelfClosing === true
+    const captureNode: XmlCaptureNode = {
+      name: node.name,
+      attrStr,
+      depth: pathStack.length + 1,
+      isSelfClosing
+    }
+    pathStack.push(captureNode)
+
+    if (activeCapture) {
+      const treeNode: XmlCaptureTreeNode = {
+        name: captureNode.name,
+        attrStr: captureNode.attrStr,
+        selfClosing: captureNode.isSelfClosing,
+        selfRelevant: true,
+        hasRelevantDescendant: false,
+        children: []
+      }
+      const parent = activeCapture.nodeStack[activeCapture.nodeStack.length - 1]
+      if (parent) {
+        parent.children.push(treeNode)
+      }
+      if (!captureNode.isSelfClosing) {
+        activeCapture.nodeStack.push(treeNode)
+      }
+    }
+
+    if (!activeCapture && node.name === 'component') {
+      const code = String(node.attributes.code || '')
+      const classAttr = String(node.attributes.class || '')
+      const codeMatch = targetCodes.has(code)
+      const classMatch = !targetClass || classAttr === targetClass
+
+      if (codeMatch && classMatch) {
+        const root: XmlCaptureTreeNode = {
+          name: captureNode.name,
+          attrStr: captureNode.attrStr,
+          selfClosing: captureNode.isSelfClosing,
+          selfRelevant: true,
+          hasRelevantDescendant: false,
+          children: []
+        }
+        activeCapture = {
+          root,
+          rootDepth: captureNode.depth,
+          nodeStack: captureNode.isSelfClosing ? [] : [root]
+        }
+        matches.push({ root, rootDepth: captureNode.depth })
+      }
+    }
+  }
+
+  saxParser.ontext = () => {}
+  saxParser.oncdata = () => {}
+  saxParser.onscript = () => {}
+  saxParser.onerror = (err: Error) => {
+    throw err
+  }
+
+  saxParser.onclosetag = () => {
+    const currentNode = pathStack[pathStack.length - 1]
+
+    if (activeCapture && currentNode) {
+      if (currentNode.depth === activeCapture.rootDepth) {
+        const lines = serializeTree(activeCapture.root, 0)
+        for (const line of lines) {
+          options.write(line + '\n')
+        }
+        activeCapture = null
+      } else if (currentNode.depth > activeCapture.rootDepth && !currentNode.isSelfClosing) {
+        activeCapture.nodeStack.pop()
+      }
+    }
+
+    pathStack.pop()
+  }
+
+  return {
+    feed(text: string) {
+      if (!text) return
+      for (let i = 0; i < text.length; i += SAX_WRITE_CHUNK_SIZE) {
+        const chunk = text.slice(i, i + SAX_WRITE_CHUNK_SIZE)
+        saxParser.write(chunk)
+      }
+    },
+    close() {
+      saxParser.close()
+      saxWithBufferConfig.MAX_BUFFER_LENGTH = previousMaxBufferLength
+      return { matchCount: matches.length }
+    }
+  }
 }
 
 export function createSaveXmlFilterRuntime(options: {
@@ -724,28 +864,13 @@ export function createSaveParserRuntime(
           ...(sector.owner ? { owner: sector.owner } : {})
         }
 
-        if (sector.playerStations?.length) nextSector.playerStations = sector.playerStations
-        if (sector.xenonStations?.length) nextSector.xenonStations = sector.xenonStations
-        if (sector.khaakStations?.length) nextSector.khaakStations = sector.khaakStations
-        if (sector.npcStations?.length) {
-          nextSector.npcStations = sector.npcStations.map((entry) => ({
-            ...entry,
-            ...(entry.modules && entry.modules.length > 0 ? { modules: entry.modules } : {})
-          }))
-        }
-        if (sector.datavaults?.length) {
-          nextSector.datavaults = sector.datavaults.map((entry) => ({
-            ...entry,
-            ...(entry.wares && entry.wares.length > 0 ? { wares: entry.wares } : {})
-          }))
-        }
-        if (sector.erlkingVaults?.length) {
-          nextSector.erlkingVaults = sector.erlkingVaults.map((entry) => ({
-            ...entry,
-            ...(entry.wares && entry.wares.length > 0 ? { wares: entry.wares } : {})
-          }))
-        }
-        if (sector.abandonedShips?.length) nextSector.abandonedShips = sector.abandonedShips
+        if (hasEntries(sector.player_stations)) nextSector.player_stations = sector.player_stations
+        if (hasEntries(sector.xenon_stations)) nextSector.xenon_stations = sector.xenon_stations
+        if (hasEntries(sector.khaak_stations)) nextSector.khaak_stations = sector.khaak_stations
+        if (hasEntries(sector.npc_stations)) nextSector.npc_stations = sector.npc_stations
+        if (hasEntries(sector.datavaults)) nextSector.datavaults = sector.datavaults
+        if (hasEntries(sector.erlking_vaults)) nextSector.erlking_vaults = sector.erlking_vaults
+        if (hasEntries(sector.abandoned_ships)) nextSector.abandoned_ships = sector.abandoned_ships
         return [sectorId, nextSector]
       })
     )
@@ -774,7 +899,7 @@ export function createSaveParserRuntime(
         meta: {
           ...parser.data.meta,
           filename: stripSaveFileExtension(filename),
-          parser_version: 'v2',
+          parser_version: 'v3',
           source: 'original'
         },
         sectors: parser.data.sectors,

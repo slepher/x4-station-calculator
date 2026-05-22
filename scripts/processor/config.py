@@ -28,6 +28,7 @@ DEFAULT_REGIONS_OUTPUT = ""
 DEFAULT_REGIONYIELDS_OUTPUT = ""
 DEFAULT_REGIONYIELD_DEFINITIONS_OUTPUT = ""
 DEFAULT_RESOURCEAREAS_OUTPUT = ""
+DEFAULT_MAP_RESOURCES_OUTPUT = ""
 
 
 def apply_runtime_config(effective_config: Dict[str, object]) -> None:
@@ -48,6 +49,7 @@ def apply_runtime_config(effective_config: Dict[str, object]) -> None:
     global DEFAULT_REGIONYIELDS_OUTPUT
     global DEFAULT_REGIONYIELD_DEFINITIONS_OUTPUT
     global DEFAULT_RESOURCEAREAS_OUTPUT
+    global DEFAULT_MAP_RESOURCES_OUTPUT
 
     base_path = os.path.join(str(effective_config["raw_assets_dir"]), str(effective_config["folder_name"]))
     X4_UNPACKED_DATA_PATH = base_path
@@ -71,6 +73,7 @@ def apply_runtime_config(effective_config: Dict[str, object]) -> None:
     DEFAULT_REGIONYIELDS_OUTPUT = output_paths["regionyields"]
     DEFAULT_REGIONYIELD_DEFINITIONS_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "regionyield_definitions.json")
     DEFAULT_RESOURCEAREAS_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "resourceareas.json")
+    DEFAULT_MAP_RESOURCES_OUTPUT = str(Path(OUTPUT_VERSION_DIR) / "data" / "map_resources.json")
 
 
 def default_version_item(config: Dict[str, object]) -> Dict[str, object]:
@@ -124,4 +127,5 @@ def resolve_runtime_paths(args: argparse.Namespace) -> dict:
         "regionyields_output_path": Path(args.regionyields_output or DEFAULT_REGIONYIELDS_OUTPUT),
         "regionyield_definitions_output_path": Path(DEFAULT_REGIONYIELD_DEFINITIONS_OUTPUT),
         "resourceareas_output_path": Path(DEFAULT_RESOURCEAREAS_OUTPUT),
+        "map_resources_output_path": Path(DEFAULT_MAP_RESOURCES_OUTPUT),
     }

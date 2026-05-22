@@ -56,7 +56,7 @@ def main():
         log_path = os.path.join(path, f'server-{domain}.log')
         
         try:
-            cmd = ['portless', domain, 'npm', 'run', 'dev']
+            cmd = ['portless', '--force', domain, 'npx', 'vite', '--base', '/', '--host', '127.0.0.1']
             
             # 打开文件用于写入日志
             log_file = open(log_path, 'w')

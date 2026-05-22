@@ -1,27 +1,23 @@
 <script setup lang="ts">
-import { useStationStore } from '@/store/useStationStore'
+import { useBlueprintProductionStore } from '@/store/useBlueprintProductionStore'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
 import StationToolbar from './StationToolbar.vue'
 import StatusMonitor from './StatusMonitor.vue'
-import ProductionWorkbenchView from './empire/ProductionWorkbenchView.vue'
+import BlueprintProductionWorkbenchView from './empire/BlueprintProductionWorkbenchView.vue'
+import LiveProductionWorkbenchView from './empire/LiveProductionWorkbenchView.vue'
 import LogicFlowWorkbenchView from './logic-flow/LogicFlowWorkbenchView.vue'
 import ShipBuildView from './ship-build/ShipBuildView.vue'
 import MapWorkbenchView from './map/MapWorkbenchView.vue'
-import SaveImportView from './save/SaveImportView.vue'
 
-const store = useStationStore()
+import { computed } from 'vue'
+
+const blueprintStore = useBlueprintProductionStore()
 const shipBuildStore = useShipBuildStore()
 
-import { watchEffect, computed } from 'vue'
-watchEffect(() => {
-  console.log('[MainWorkbench] isReady:', store.isReady, 'activeView:', shipBuildStore.activeView)
-})
-
-const isProductionView = computed(() => shipBuildStore.activeView === 'production')
+const isBlueprintProduction = computed(() => shipBuildStore.activeView === 'blueprint-production')
+const isLiveProduction = computed(() => shipBuildStore.activeView === 'live-production')
 const isShipBuildView = computed(() => shipBuildStore.activeView === 'ship-build')
 const isMapsView = computed(() => shipBuildStore.activeView === 'maps')
-const isSaveImportView = computed(() => shipBuildStore.activeView === 'save-import')
-
 </script>
 
 <template>
@@ -29,12 +25,16 @@ const isSaveImportView = computed(() => shipBuildStore.activeView === 'save-impo
     class="main-workbench w-full max-w-[1600px] mx-auto p-4 text-sm relative flex flex-col"
     :class="{ 'maps-mode': isMapsView }"
   >
-    <div id="debug-ready-marker" v-if="store.isReady" class="hidden">READY</div>
+    <div id="debug-ready-marker" v-if="blueprintStore.isReady" class="hidden">READY</div>
 
     <StationToolbar />
-    
-    <template v-if="isProductionView">
-      <ProductionWorkbenchView />
+
+    <template v-if="isBlueprintProduction">
+      <BlueprintProductionWorkbenchView />
+    </template>
+
+    <template v-else-if="isLiveProduction">
+      <LiveProductionWorkbenchView />
     </template>
 
     <template v-else-if="isShipBuildView">
@@ -43,10 +43,6 @@ const isSaveImportView = computed(() => shipBuildStore.activeView === 'save-impo
 
     <div v-else-if="isMapsView" class="maps-slot">
       <MapWorkbenchView />
-    </div>
-
-    <div v-else-if="isSaveImportView" class="save-import-slot">
-      <SaveImportView />
     </div>
 
     <div v-else class="flow-layout flex flex-col gap-6">
@@ -66,10 +62,6 @@ const isSaveImportView = computed(() => shipBuildStore.activeView === 'save-impo
 
 .maps-slot {
   @apply flex-1 min-h-0;
-}
-
-.save-import-slot {
-  @apply flex-1 min-h-0 flex flex-col;
 }
 
 .coming-soon-panel {

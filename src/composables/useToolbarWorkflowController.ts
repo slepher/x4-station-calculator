@@ -1,12 +1,13 @@
 import type { ComposerTranslation } from 'vue-i18n'
 import type { X4Ship } from '@/types/x4'
-import { useEmpireStore } from '@/store/useEmpireStore'
+import { useBlueprintProductionStore } from '@/store/useBlueprintProductionStore'
+import { useLiveProductionStore } from '@/store/useLiveProductionStore'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
 import { useStatusStore } from '@/store/useStatusStore'
 import type { SmartSaveStep } from '@/utils/smartSavePolicy'
 
-export type ToolbarStoreType = 'ship-build' | 'logicFlow' | 'station'
+export type ToolbarStoreType = 'ship-build' | 'logicFlow' | 'blueprint-production' | 'live-production'
 export type ToolbarAction = 'NEW' | 'SAVE' | 'SAVE_AS'
 export type ImportChoice = 'SAVE_AND_IMPORT' | 'DISCARD_AND_IMPORT'
 
@@ -54,7 +55,8 @@ type ImportHandler = {
 }
 
 export function useToolbarWorkflowController({ t, translateShip }: UseToolbarWorkflowControllerInput) {
-  const empireStore = useEmpireStore()
+  const blueprintStore = useBlueprintProductionStore()
+  const liveStore = useLiveProductionStore()
   const logicFlowStore = useLogicFlowStore()
   const shipBuildStore = useShipBuildStore()
   const statusStore = useStatusStore()
@@ -66,7 +68,9 @@ export function useToolbarWorkflowController({ t, translateShip }: UseToolbarWor
       const shipName = ship ? translateShip(ship) : ''
       return shipName ? `${shipName} ${t('menu.blueprint')}` : t('menu.default_blueprint_name')
     }
-    return t('sector.new_sector_name')
+    if (storeType === 'blueprint-production') return t('sector.new_sector_name')
+    if (storeType === 'live-production') return ''
+    return ''
   }
 
   const pushSaveSuccess = () => {
@@ -84,25 +88,40 @@ export function useToolbarWorkflowController({ t, translateShip }: UseToolbarWor
   const isDirtyFor = (storeType: ToolbarStoreType): boolean => {
     if (storeType === 'ship-build') return shipBuildStore.isDirty
     if (storeType === 'logicFlow') return logicFlowStore.isDirty
-    return empireStore.isDirty
+    if (storeType === 'blueprint-production') return blueprintStore.isDirty
+    if (storeType === 'live-production') return liveStore.isDirty
+    return false
   }
 
   const isEditableFor = (storeType: ToolbarStoreType): boolean => {
     if (storeType === 'ship-build') return shipBuildStore.isEditable()
     if (storeType === 'logicFlow') return logicFlowStore.isEditable()
-    return empireStore.isEditable()
+    if (storeType === 'blueprint-production') return blueprintStore.isDirty
+    if (storeType === 'live-production') return liveStore.isDirty
+    return false
+  }
+
+  const isActionSupportedFor = (storeType: ToolbarStoreType, action: ToolbarAction): boolean => {
+    if (storeType === 'live-production') {
+      if (action === 'NEW' || action === 'SAVE_AS') return false
+    }
+    return true
   }
 
   const isEmptyForSave = (storeType: ToolbarStoreType): boolean => {
     if (storeType === 'ship-build') return shipBuildStore.isEmptyForSave()
     if (storeType === 'logicFlow') return logicFlowStore.isEmptyForSave()
-    return empireStore.isEmptyForSave()
+    if (storeType === 'blueprint-production') return blueprintStore.isEmptyForSave()
+    if (storeType === 'live-production') return liveStore.isEmptyForSave()
+    return true
   }
 
   const requiresSaveAsOnSaveFor = (storeType: ToolbarStoreType): boolean => {
     if (storeType === 'ship-build') return shipBuildStore.requiresSaveAsOnSave()
     if (storeType === 'logicFlow') return logicFlowStore.requiresSaveAsOnSave()
-    return empireStore.requiresSaveAsOnSave()
+    if (storeType === 'blueprint-production') return blueprintStore.requiresSaveAsOnSave()
+    if (storeType === 'live-production') return false
+    return false
   }
 
   const executeSave = (storeType: ToolbarStoreType): boolean => {
@@ -115,8 +134,15 @@ export function useToolbarWorkflowController({ t, translateShip }: UseToolbarWor
     if (storeType === 'logicFlow') {
       return logicFlowStore.saveCurrentPlan()
     }
-    empireStore.saveEmpire()
-    return true
+    if (storeType === 'blueprint-production') {
+      blueprintStore.saveEmpire()
+      return true
+    }
+    if (storeType === 'live-production') {
+      liveStore.saveBinding()
+      return true
+    }
+    return false
   }
 
   const executeSaveAs = (storeType: ToolbarStoreType, name: string): boolean => {
@@ -128,7 +154,13 @@ export function useToolbarWorkflowController({ t, translateShip }: UseToolbarWor
     if (storeType === 'logicFlow') {
       return logicFlowStore.saveCurrentPlanAs(name.trim())
     }
-    return empireStore.saveEmpireAs(name.trim())
+    if (storeType === 'blueprint-production') {
+      return blueprintStore.saveEmpireAs(name.trim())
+    }
+    if (storeType === 'live-production') {
+      return false
+    }
+    return false
   }
 
   const executeNew = (storeType: ToolbarStoreType, _defaultEmpireName: string) => {
@@ -140,7 +172,13 @@ export function useToolbarWorkflowController({ t, translateShip }: UseToolbarWor
       logicFlowStore.clearAll()
       return
     }
-    empireStore.resetEmpireWithDefaultName('')
+    if (storeType === 'blueprint-production') {
+      blueprintStore.createEmpire('', t('sector.new_station_name'))
+      return
+    }
+    if (storeType === 'live-production') {
+      return
+    }
   }
 
   const runSmartSaveSteps = ({ storeType, steps, defaultEmpireName }: RunSmartSaveStepsInput): boolean => {
@@ -168,7 +206,8 @@ export function useToolbarWorkflowController({ t, translateShip }: UseToolbarWor
   }
 
   const runAction = ({ storeType, action, defaultEmpireName }: RunActionInput): RunActionOutcome => {
-    if (isEditableFor(storeType)) {
+    if (!isActionSupportedFor(storeType, action)) {
+      statusStore.pushMessage('warning', 'system', `Action ${action} not supported for ${storeType}`)
       return { kind: 'blocked' }
     }
 
@@ -210,14 +249,24 @@ export function useToolbarWorkflowController({ t, translateShip }: UseToolbarWor
   }
 
   const importHandlers: Record<ToolbarStoreType, ImportHandler> = {
-    station: {
+    'blueprint-production': {
       run: ({ choice, defaultEmpireName, importData }) => {
         if (choice === 'SAVE_AND_IMPORT') {
-          executeSave('station')
+          executeSave('blueprint-production')
           pushSaveSuccess()
         }
-        executeNew('station', defaultEmpireName)
-        importData({ storeType: 'station' })
+        executeNew('blueprint-production', defaultEmpireName)
+        importData({ storeType: 'blueprint-production' })
+        return { ok: true }
+      }
+    },
+    'live-production': {
+      run: ({ choice, importData }) => {
+        if (choice === 'SAVE_AND_IMPORT') {
+          executeSave('live-production')
+          pushSaveSuccess()
+        }
+        importData({ storeType: 'live-production' })
         return { ok: true }
       }
     },
@@ -230,7 +279,8 @@ export function useToolbarWorkflowController({ t, translateShip }: UseToolbarWor
   }
 
   const shouldConfirmBeforeImport = (storeType: ToolbarStoreType): boolean => {
-    if (storeType === 'station') return isDirtyFor('station')
+    if (storeType === 'blueprint-production') return isDirtyFor('blueprint-production')
+    if (storeType === 'live-production') return isDirtyFor('live-production')
     return false
   }
 
@@ -247,6 +297,7 @@ export function useToolbarWorkflowController({ t, translateShip }: UseToolbarWor
     getDefaultName,
     isDirtyFor,
     isEditableFor,
+    isActionSupportedFor,
     isEmptyForSave,
     runAction,
     runSmartSaveSteps,

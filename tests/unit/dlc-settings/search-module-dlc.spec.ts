@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { generateFilteredModulesGrouped } from '@/store/logic/searchModule'
+import { compareModulesByPickerOrder, generateFilteredModulesGrouped } from '@/store/logic/searchModule'
 import type { LocalizedX4Module, LocalizedX4ModuleGroup } from '@/types/x4'
 
 /**
@@ -301,6 +301,60 @@ describe('generateFilteredModulesGrouped - DLC 过滤', () => {
         'b_module',
         'c_module'
       ])
+    })
+
+    it('shared picker comparator should match default grouped picker order', () => {
+      const modulesWithGroups: Record<string, LocalizedX4Module> = {
+        storage_alpha: createMockModule({
+          id: 'storage_alpha',
+          name: 'Storage Alpha',
+          localeName: '仓储甲',
+          group: 'containerstorage',
+          tier: 0
+        }),
+        hightech_beta: createMockModule({
+          id: 'hightech_beta',
+          name: 'Hightech Beta',
+          localeName: '高科乙',
+          group: 'hightech',
+          tier: 1
+        }),
+        hightech_alpha: createMockModule({
+          id: 'hightech_alpha',
+          name: 'Hightech Alpha',
+          localeName: '高科甲',
+          group: 'hightech',
+          tier: 2
+        }),
+        refined_gamma: createMockModule({
+          id: 'refined_gamma',
+          name: 'Refined Gamma',
+          localeName: '精炼丙',
+          group: 'refined',
+          tier: 1
+        })
+      }
+
+      const moduleGroups: Record<string, LocalizedX4ModuleGroup> = {
+        hightech: createMockModuleGroup('hightech', 'production', '高科技'),
+        refined: createMockModuleGroup('refined', 'production', '精炼'),
+        containerstorage: createMockModuleGroup('containerstorage', 'storage', '仓储')
+      }
+
+      const grouped = generateFilteredModulesGrouped(
+        '',
+        'zh-CN',
+        modulesWithGroups,
+        moduleGroups,
+        () => true
+      )
+      const flattened = grouped.flatMap(g => g.modules).map(m => m.id)
+      const sorted = Object.values(modulesWithGroups)
+        .slice()
+        .sort((a, b) => compareModulesByPickerOrder(a, b, moduleGroups))
+        .map(m => m.id)
+
+      expect(sorted).toEqual(flattened)
     })
   })
 

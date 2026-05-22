@@ -1,0 +1,1050 @@
+{
+  "format": "x4-import-export",
+  "version": 1,
+  "exportedAt": "2026-05-13T10:37:48.128Z",
+  "game_vsn": "8.0",
+  "beta": false,
+  "data": {
+    "x4_empire_data": {
+      "version": 5,
+      "activeId": "a83e4f9a-b651-4fab-9089-5f05e2b2f7d1",
+      "list": [
+        {
+          "id": "a83e4f9a-b651-4fab-9089-5f05e2b2f7d1",
+          "name": "新建蓝图1",
+          "sectors": [],
+          "sectorLinks": [],
+          "stations": [
+            {
+              "id": "39b27b00-6b2d-4d94-8df0-4e990208c2d5",
+              "name": "新建空间站",
+              "sectorId": null,
+              "type": "industrial",
+              "count": 1,
+              "modules": [],
+              "settings": {
+                "sunlight": 100,
+                "useHQ": false,
+                "manualWorkforce": 0,
+                "workforcePercent": 100,
+                "workforceAuto": true,
+                "considerWorkforceForAutoFill": false,
+                "supplyWorkforceBonus": false,
+                "buyMultiplier": 0.5,
+                "sellMultiplier": 0.5,
+                "minersEnabled": false,
+                "internalSupply": false,
+                "showEmpireGaps": false,
+                "racePreference": "argon",
+                "resourceBufferHours": 1,
+                "primaryProductBufferHours": 12,
+                "secondaryProductBufferHours": 2,
+                "transportMinutes": 30,
+                "transportShipCapacity": 62000,
+                "enforceDlcActivation": false
+              },
+              "lastUpdated": 1778579525873,
+              "lockedWares": [],
+              "warePriority": {}
+            }
+          ]
+        }
+      ]
+    },
+    "x4_logic_flow_plans": {
+      "version": 3,
+      "activeId": "7f6f8de9-cb79-4ad3-ae19-b053b52f8b8b",
+      "list": [
+        {
+          "id": "7f6f8de9-cb79-4ad3-ae19-b053b52f8b8b",
+          "name": "我的逻辑组网",
+          "groups": [
+            {
+              "id": "6cc9a93d-fa39-4bfd-9743-d1ca6d62373e",
+              "name": "Group 1",
+              "category": "industrial",
+              "subCategory": "default",
+              "isLocked": true,
+              "lockedLineage": "default",
+              "nodes": [
+                {
+                  "module": "module_gen_prod_weaponcomponents_01"
+                },
+                {
+                  "module": "module_gen_prod_smartchips_01"
+                }
+              ]
+            },
+            {
+              "id": "0429a91d-d741-470c-8f2c-2e0e978598e3",
+              "name": "Group 2",
+              "category": "industrial",
+              "subCategory": "default",
+              "isLocked": true,
+              "lockedLineage": "default",
+              "nodes": [
+                {
+                  "module": "module_gen_prod_turretcomponents_01"
+                }
+              ]
+            },
+            {
+              "id": "f0780cbb-fc95-48cb-bec5-7f03dd14a64f",
+              "name": "建材",
+              "category": "industrial",
+              "subCategory": "default",
+              "isLocked": true,
+              "lockedLineage": "default",
+              "nodes": [
+                {
+                  "module": "module_gen_prod_claytronics_01"
+                },
+                {
+                  "module": "module_gen_prod_hullparts_01"
+                },
+                {
+                  "module": "module_gen_prod_plasmaconductors_01"
+                },
+                {
+                  "module": "module_gen_prod_advancedcomposites_01"
+                }
+              ]
+            }
+          ],
+          "settings": {
+            "isDefaultLocked": true
+          },
+          "buildFlow": {
+            "assignments": [
+              {
+                "wareId": "advancedcomposites",
+                "sourceGroupId": "f0780cbb-fc95-48cb-bec5-7f03dd14a64f",
+                "targetType": "line-build-material",
+                "targetGroupId": "f0780cbb-fc95-48cb-bec5-7f03dd14a64f"
+              },
+              {
+                "wareId": "claytronics",
+                "sourceGroupId": "f0780cbb-fc95-48cb-bec5-7f03dd14a64f",
+                "targetType": "line-build-material",
+                "targetGroupId": "f0780cbb-fc95-48cb-bec5-7f03dd14a64f"
+              },
+              {
+                "wareId": "hullparts",
+                "sourceGroupId": "f0780cbb-fc95-48cb-bec5-7f03dd14a64f",
+                "targetType": "line-build-material",
+                "targetGroupId": "f0780cbb-fc95-48cb-bec5-7f03dd14a64f"
+              },
+              {
+                "wareId": "plasmaconductors",
+                "sourceGroupId": "f0780cbb-fc95-48cb-bec5-7f03dd14a64f",
+                "targetType": "line-build-material",
+                "targetGroupId": "f0780cbb-fc95-48cb-bec5-7f03dd14a64f"
+              }
+            ]
+          },
+          "lastUpdated": 1777814458993
+        },
+        {
+          "id": "a1c50da7-159c-4851-ab06-4f66fa0cc450",
+          "name": "我的逻辑组网2",
+          "groups": [
+            {
+              "id": "5d759ebf-fe4e-486a-afb6-40aba969150f",
+              "name": "Group 1",
+              "category": "industrial",
+              "subCategory": "default",
+              "isLocked": true,
+              "lockedLineage": "default",
+              "nodes": [
+                {
+                  "module": "module_gen_prod_claytronics_01"
+                }
+              ]
+            }
+          ],
+          "settings": {
+            "isDefaultLocked": true
+          },
+          "lastUpdated": 1777799436704
+        },
+        {
+          "id": "41230b7b-f500-417a-afca-f8031175a177",
+          "name": "我的逻辑组网",
+          "groups": [
+            {
+              "id": "52171cf6-3d20-4a53-916d-8e3837db0b44",
+              "name": "联合建材",
+              "category": "industrial",
+              "subCategory": "default",
+              "isLocked": true,
+              "lockedLineage": "default",
+              "nodes": [
+                {
+                  "module": "module_gen_prod_claytronics_01"
+                },
+                {
+                  "module": "module_gen_prod_advancedcomposites_01"
+                },
+                {
+                  "module": "module_gen_prod_plasmaconductors_01"
+                },
+                {
+                  "module": "module_gen_prod_hullparts_01"
+                }
+              ]
+            },
+            {
+              "id": "9e928bc1-8287-48ec-80e0-e97e36ecc8ab",
+              "name": "独立建材",
+              "category": "industrial",
+              "subCategory": "default",
+              "isLocked": true,
+              "lockedLineage": "default",
+              "nodes": [
+                {
+                  "module": "module_gen_prod_claytronics_01"
+                },
+                {
+                  "module": "module_gen_prod_hullparts_01"
+                }
+              ]
+            },
+            {
+              "id": "c039ed16-9c52-4cb0-9619-66a5c5b3f70e",
+              "name": "碳化硅",
+              "category": "industrial",
+              "subCategory": "terran",
+              "isLocked": true,
+              "lockedLineage": "terran",
+              "nodes": [
+                {
+                  "module": "module_ter_prod_siliconcarbide_01"
+                },
+                {
+                  "module": "module_ter_prod_metallicmicrolattice_01"
+                }
+              ]
+            },
+            {
+              "id": "2aa58c4c-4b3c-4680-a4d9-356ef16903cd",
+              "name": "Group 4",
+              "category": "industrial",
+              "subCategory": "terran",
+              "isLocked": true,
+              "lockedLineage": "terran",
+              "nodes": [
+                {
+                  "module": "module_ter_prod_computronicsubstrate_01"
+                }
+              ]
+            },
+            {
+              "id": "a6091308-697d-4886-b50c-73e854fc19c2",
+              "name": "特种建材",
+              "category": "industrial",
+              "subCategory": "default",
+              "isLocked": true,
+              "lockedLineage": "default",
+              "nodes": [
+                {
+                  "module": "module_gen_prod_advancedcomposites_01"
+                },
+                {
+                  "module": "module_gen_prod_plasmaconductors_01"
+                }
+              ]
+            }
+          ],
+          "settings": {
+            "isDefaultLocked": true
+          },
+          "buildFlow": {
+            "assignments": [
+              {
+                "wareId": "advancedcomposites",
+                "sourceGroupId": "52171cf6-3d20-4a53-916d-8e3837db0b44",
+                "targetType": "line-build-material",
+                "targetGroupId": "52171cf6-3d20-4a53-916d-8e3837db0b44"
+              },
+              {
+                "wareId": "plasmaconductors",
+                "sourceGroupId": "52171cf6-3d20-4a53-916d-8e3837db0b44",
+                "targetType": "line-build-material",
+                "targetGroupId": "52171cf6-3d20-4a53-916d-8e3837db0b44"
+              },
+              {
+                "wareId": "hullparts",
+                "sourceGroupId": "9e928bc1-8287-48ec-80e0-e97e36ecc8ab",
+                "targetType": "output-material"
+              },
+              {
+                "wareId": "siliconcarbide",
+                "sourceGroupId": "c039ed16-9c52-4cb0-9619-66a5c5b3f70e",
+                "targetType": "line-build-material",
+                "targetGroupId": "c039ed16-9c52-4cb0-9619-66a5c5b3f70e"
+              },
+              {
+                "wareId": "siliconcarbide",
+                "sourceGroupId": "c039ed16-9c52-4cb0-9619-66a5c5b3f70e",
+                "targetType": "output-material"
+              },
+              {
+                "wareId": "computronicsubstrate",
+                "sourceGroupId": "2aa58c4c-4b3c-4680-a4d9-356ef16903cd",
+                "targetType": "output-material"
+              },
+              {
+                "wareId": "computronicsubstrate",
+                "sourceGroupId": "2aa58c4c-4b3c-4680-a4d9-356ef16903cd",
+                "targetType": "line-build-material",
+                "targetGroupId": "2aa58c4c-4b3c-4680-a4d9-356ef16903cd"
+              },
+              {
+                "wareId": "siliconcarbide",
+                "sourceGroupId": "c039ed16-9c52-4cb0-9619-66a5c5b3f70e",
+                "targetType": "line-build-material",
+                "targetGroupId": "2aa58c4c-4b3c-4680-a4d9-356ef16903cd"
+              },
+              {
+                "wareId": "computronicsubstrate",
+                "sourceGroupId": "2aa58c4c-4b3c-4680-a4d9-356ef16903cd",
+                "targetType": "line-build-material",
+                "targetGroupId": "c039ed16-9c52-4cb0-9619-66a5c5b3f70e"
+              },
+              {
+                "wareId": "claytronics",
+                "sourceGroupId": "9e928bc1-8287-48ec-80e0-e97e36ecc8ab",
+                "targetType": "output-material"
+              },
+              {
+                "wareId": "claytronics",
+                "sourceGroupId": "9e928bc1-8287-48ec-80e0-e97e36ecc8ab",
+                "targetType": "line-build-material",
+                "targetGroupId": "52171cf6-3d20-4a53-916d-8e3837db0b44"
+              },
+              {
+                "wareId": "hullparts",
+                "sourceGroupId": "9e928bc1-8287-48ec-80e0-e97e36ecc8ab",
+                "targetType": "line-build-material",
+                "targetGroupId": "52171cf6-3d20-4a53-916d-8e3837db0b44"
+              },
+              {
+                "wareId": "advancedcomposites",
+                "sourceGroupId": "a6091308-697d-4886-b50c-73e854fc19c2",
+                "targetType": "output-material"
+              },
+              {
+                "wareId": "plasmaconductors",
+                "sourceGroupId": "a6091308-697d-4886-b50c-73e854fc19c2",
+                "targetType": "output-material"
+              },
+              {
+                "wareId": "claytronics",
+                "sourceGroupId": "52171cf6-3d20-4a53-916d-8e3837db0b44",
+                "targetType": "line-build-material",
+                "targetGroupId": "9e928bc1-8287-48ec-80e0-e97e36ecc8ab"
+              },
+              {
+                "wareId": "hullparts",
+                "sourceGroupId": "52171cf6-3d20-4a53-916d-8e3837db0b44",
+                "targetType": "line-build-material",
+                "targetGroupId": "9e928bc1-8287-48ec-80e0-e97e36ecc8ab"
+              },
+              {
+                "wareId": "advancedcomposites",
+                "sourceGroupId": "a6091308-697d-4886-b50c-73e854fc19c2",
+                "targetType": "line-build-material",
+                "targetGroupId": "9e928bc1-8287-48ec-80e0-e97e36ecc8ab"
+              },
+              {
+                "wareId": "plasmaconductors",
+                "sourceGroupId": "a6091308-697d-4886-b50c-73e854fc19c2",
+                "targetType": "line-build-material",
+                "targetGroupId": "9e928bc1-8287-48ec-80e0-e97e36ecc8ab"
+              },
+              {
+                "wareId": "hullparts",
+                "sourceGroupId": "9e928bc1-8287-48ec-80e0-e97e36ecc8ab",
+                "targetType": "line-build-material",
+                "targetGroupId": "a6091308-697d-4886-b50c-73e854fc19c2"
+              },
+              {
+                "wareId": "claytronics",
+                "sourceGroupId": "9e928bc1-8287-48ec-80e0-e97e36ecc8ab",
+                "targetType": "line-build-material",
+                "targetGroupId": "a6091308-697d-4886-b50c-73e854fc19c2"
+              }
+            ]
+          },
+          "lastUpdated": 1777803571039
+        },
+        {
+          "id": "245bf4e4-ce82-40a4-adbc-f4a5fdc4e5ca",
+          "name": "模块化组网",
+          "groups": [
+            {
+              "id": "52171cf6-3d20-4a53-916d-8e3837db0b44",
+              "name": "电子黏土",
+              "category": "industrial",
+              "subCategory": "default",
+              "isLocked": true,
+              "lockedLineage": "default",
+              "nodes": [
+                {
+                  "module": "module_gen_prod_claytronics_01"
+                },
+                {
+                  "isolated": "quantumtubes"
+                }
+              ]
+            },
+            {
+              "id": "a6091308-697d-4886-b50c-73e854fc19c2",
+              "name": "烷矿",
+              "category": "industrial",
+              "subCategory": "default",
+              "isLocked": true,
+              "lockedLineage": "default",
+              "nodes": [
+                {
+                  "module": "module_gen_prod_advancedcomposites_01"
+                },
+                {
+                  "module": "module_gen_prod_hullparts_01"
+                }
+              ]
+            },
+            {
+              "id": "ef301aa7-de87-4cac-8026-786deb13d5e4",
+              "name": "烷氦",
+              "category": "industrial",
+              "subCategory": "default",
+              "isLocked": true,
+              "lockedLineage": "default",
+              "nodes": [
+                {
+                  "module": "module_gen_prod_plasmaconductors_01"
+                },
+                {
+                  "module": "module_gen_prod_quantumtubes_01"
+                }
+              ]
+            },
+            {
+              "id": "c039ed16-9c52-4cb0-9619-66a5c5b3f70e",
+              "name": "地球人",
+              "category": "industrial",
+              "subCategory": "terran",
+              "isLocked": true,
+              "lockedLineage": "terran",
+              "nodes": [
+                {
+                  "module": "module_ter_prod_siliconcarbide_01"
+                },
+                {
+                  "module": "module_ter_prod_computronicsubstrate_01"
+                },
+                {
+                  "module": "module_ter_prod_metallicmicrolattice_01"
+                }
+              ]
+            },
+            {
+              "id": "72455d4a-e6d3-4329-a934-fb7268d1261a",
+              "name": "导弹部件",
+              "category": "industrial",
+              "subCategory": "default",
+              "isLocked": true,
+              "lockedLineage": "default",
+              "nodes": [
+                {
+                  "module": "module_gen_prod_missilecomponents_01"
+                },
+                {
+                  "isolated": "advancedcomposites"
+                },
+                {
+                  "isolated": "hullparts"
+                },
+                {
+                  "isolated": "energycells"
+                }
+              ]
+            },
+            {
+              "id": "1bd556a3-0835-45a3-83ad-36829350664e",
+              "name": "Group 6",
+              "category": "industrial",
+              "subCategory": "default",
+              "isLocked": true,
+              "lockedLineage": "default",
+              "nodes": [
+                {
+                  "module": "module_gen_prod_quantumtubes_01"
+                }
+              ]
+            }
+          ],
+          "settings": {
+            "isDefaultLocked": true
+          },
+          "buildFlow": {
+            "assignments": [
+              {
+                "wareId": "siliconcarbide",
+                "sourceGroupId": "c039ed16-9c52-4cb0-9619-66a5c5b3f70e",
+                "targetType": "line-build-material",
+                "targetGroupId": "c039ed16-9c52-4cb0-9619-66a5c5b3f70e"
+              },
+              {
+                "wareId": "siliconcarbide",
+                "sourceGroupId": "c039ed16-9c52-4cb0-9619-66a5c5b3f70e",
+                "targetType": "output-material"
+              },
+              {
+                "wareId": "claytronics",
+                "sourceGroupId": "52171cf6-3d20-4a53-916d-8e3837db0b44",
+                "targetType": "line-build-material",
+                "targetGroupId": "52171cf6-3d20-4a53-916d-8e3837db0b44"
+              },
+              {
+                "wareId": "advancedcomposites",
+                "sourceGroupId": "a6091308-697d-4886-b50c-73e854fc19c2",
+                "targetType": "line-build-material",
+                "targetGroupId": "52171cf6-3d20-4a53-916d-8e3837db0b44"
+              },
+              {
+                "wareId": "advancedcomposites",
+                "sourceGroupId": "a6091308-697d-4886-b50c-73e854fc19c2",
+                "targetType": "line-build-material",
+                "targetGroupId": "a6091308-697d-4886-b50c-73e854fc19c2"
+              },
+              {
+                "wareId": "hullparts",
+                "sourceGroupId": "a6091308-697d-4886-b50c-73e854fc19c2",
+                "targetType": "line-build-material",
+                "targetGroupId": "52171cf6-3d20-4a53-916d-8e3837db0b44"
+              },
+              {
+                "wareId": "hullparts",
+                "sourceGroupId": "a6091308-697d-4886-b50c-73e854fc19c2",
+                "targetType": "line-build-material",
+                "targetGroupId": "a6091308-697d-4886-b50c-73e854fc19c2"
+              },
+              {
+                "wareId": "hullparts",
+                "sourceGroupId": "a6091308-697d-4886-b50c-73e854fc19c2",
+                "targetType": "line-build-material",
+                "targetGroupId": "ef301aa7-de87-4cac-8026-786deb13d5e4"
+              },
+              {
+                "wareId": "plasmaconductors",
+                "sourceGroupId": "ef301aa7-de87-4cac-8026-786deb13d5e4",
+                "targetType": "line-build-material",
+                "targetGroupId": "52171cf6-3d20-4a53-916d-8e3837db0b44"
+              },
+              {
+                "wareId": "plasmaconductors",
+                "sourceGroupId": "ef301aa7-de87-4cac-8026-786deb13d5e4",
+                "targetType": "line-build-material",
+                "targetGroupId": "a6091308-697d-4886-b50c-73e854fc19c2"
+              },
+              {
+                "wareId": "claytronics",
+                "sourceGroupId": "52171cf6-3d20-4a53-916d-8e3837db0b44",
+                "targetType": "line-build-material",
+                "targetGroupId": "a6091308-697d-4886-b50c-73e854fc19c2"
+              },
+              {
+                "wareId": "claytronics",
+                "sourceGroupId": "52171cf6-3d20-4a53-916d-8e3837db0b44",
+                "targetType": "line-build-material",
+                "targetGroupId": "ef301aa7-de87-4cac-8026-786deb13d5e4"
+              },
+              {
+                "wareId": "claytronics",
+                "sourceGroupId": "52171cf6-3d20-4a53-916d-8e3837db0b44",
+                "targetType": "output-build-material"
+              },
+              {
+                "wareId": "claytronics",
+                "sourceGroupId": "52171cf6-3d20-4a53-916d-8e3837db0b44",
+                "targetType": "output-material"
+              },
+              {
+                "wareId": "advancedcomposites",
+                "sourceGroupId": "a6091308-697d-4886-b50c-73e854fc19c2",
+                "targetType": "output-build-material"
+              },
+              {
+                "wareId": "hullparts",
+                "sourceGroupId": "a6091308-697d-4886-b50c-73e854fc19c2",
+                "targetType": "output-build-material"
+              },
+              {
+                "wareId": "advancedcomposites",
+                "sourceGroupId": "a6091308-697d-4886-b50c-73e854fc19c2",
+                "targetType": "output-material"
+              },
+              {
+                "wareId": "hullparts",
+                "sourceGroupId": "a6091308-697d-4886-b50c-73e854fc19c2",
+                "targetType": "output-material"
+              },
+              {
+                "wareId": "plasmaconductors",
+                "sourceGroupId": "ef301aa7-de87-4cac-8026-786deb13d5e4",
+                "targetType": "output-build-material"
+              },
+              {
+                "wareId": "computronicsubstrate",
+                "sourceGroupId": "c039ed16-9c52-4cb0-9619-66a5c5b3f70e",
+                "targetType": "line-build-material",
+                "targetGroupId": "c039ed16-9c52-4cb0-9619-66a5c5b3f70e"
+              },
+              {
+                "wareId": "computronicsubstrate",
+                "sourceGroupId": "c039ed16-9c52-4cb0-9619-66a5c5b3f70e",
+                "targetType": "output-build-material"
+              },
+              {
+                "wareId": "computronicsubstrate",
+                "sourceGroupId": "c039ed16-9c52-4cb0-9619-66a5c5b3f70e",
+                "targetType": "output-material"
+              },
+              {
+                "wareId": "siliconcarbide",
+                "sourceGroupId": "c039ed16-9c52-4cb0-9619-66a5c5b3f70e",
+                "targetType": "output-build-material"
+              },
+              {
+                "wareId": "plasmaconductors",
+                "sourceGroupId": "ef301aa7-de87-4cac-8026-786deb13d5e4",
+                "targetType": "output-material"
+              }
+            ]
+          },
+          "lastUpdated": 1778568652936
+        }
+      ]
+    },
+    "x4_ship_blueprints": {
+      "version": 3,
+      "activeShipId": "ship_atf_l_destroyer_01_a",
+      "activeBlueprintId": "1a29f565-a472-4124-88f3-b55015a396b1",
+      "ships": [
+        {
+          "shipId": "ship_atf_l_destroyer_01_a",
+          "blueprints": [
+            {
+              "id": "1a29f565-a472-4124-88f3-b55015a396b1",
+              "name": "席恩",
+              "shipId": "ship_atf_l_destroyer_01_a",
+              "connections": [
+                {
+                  "slot_type": "engine",
+                  "group": [
+                    {
+                      "group": "group_back_mid_mid",
+                      "equipment_id": "engine_ter_l_allround_01_mk1",
+                      "count": 1,
+                      "shield": {
+                        "equipment_id": "shield_ter_m_standard_02_mk3",
+                        "count": 2
+                      }
+                    }
+                  ]
+                },
+                {
+                  "slot_type": "thruster",
+                  "group": [
+                    {
+                      "group": "thruster",
+                      "equipment_id": "thruster_gen_l_allround_01_mk3",
+                      "count": 1
+                    }
+                  ]
+                },
+                {
+                  "slot_type": "shield",
+                  "group": [
+                    {
+                      "group": "con_shieldgen_l_01",
+                      "equipment_id": "shield_ter_l_standard_01_mk3",
+                      "count": 1
+                    },
+                    {
+                      "group": "con_shieldgen_l_02",
+                      "equipment_id": "shield_ter_l_standard_01_mk3",
+                      "count": 1
+                    },
+                    {
+                      "group": "con_shieldgen_l_03",
+                      "equipment_id": "shield_ter_l_standard_01_mk3",
+                      "count": 1
+                    }
+                  ]
+                },
+                {
+                  "slot_type": "weapon",
+                  "group": [
+                    {
+                      "group": "con_weapon_01",
+                      "equipment_id": "weapon_ter_l_destroyer_01_mk1",
+                      "count": 1
+                    },
+                    {
+                      "group": "con_weapon_02",
+                      "equipment_id": "weapon_ter_l_destroyer_01_mk1",
+                      "count": 1
+                    },
+                    {
+                      "group": "con_weapon_03",
+                      "equipment_id": "weapon_ter_l_destroyer_01_mk1",
+                      "count": 1
+                    }
+                  ]
+                },
+                {
+                  "slot_type": "turret",
+                  "group": [
+                    {
+                      "group": "group_mid_down_left_1",
+                      "equipment_id": "turret_ter_l_beam_01_mk1",
+                      "count": 1,
+                      "shield": {
+                        "equipment_id": "shield_ter_m_standard_02_mk3",
+                        "count": 2
+                      }
+                    },
+                    {
+                      "group": "group_mid_down_left_2",
+                      "equipment_id": "turret_ter_l_beam_01_mk1",
+                      "count": 1,
+                      "shield": {
+                        "equipment_id": "shield_ter_m_standard_02_mk3",
+                        "count": 2
+                      }
+                    },
+                    {
+                      "group": "group_mid_right_down_1",
+                      "equipment_id": "turret_ter_l_beam_01_mk1",
+                      "count": 1,
+                      "shield": {
+                        "equipment_id": "shield_ter_m_standard_02_mk3",
+                        "count": 2
+                      }
+                    },
+                    {
+                      "group": "group_mid_right_down_2",
+                      "equipment_id": "turret_ter_l_beam_01_mk1",
+                      "count": 1,
+                      "shield": {
+                        "equipment_id": "shield_ter_m_standard_02_mk3",
+                        "count": 2
+                      }
+                    },
+                    {
+                      "group": "group_mid_right_up_1",
+                      "equipment_id": "turret_ter_l_beam_01_mk1",
+                      "count": 1,
+                      "shield": {
+                        "equipment_id": "shield_ter_m_standard_02_mk3",
+                        "count": 2
+                      }
+                    },
+                    {
+                      "group": "group_mid_right_up_2",
+                      "equipment_id": "turret_ter_l_beam_01_mk1",
+                      "count": 1,
+                      "shield": {
+                        "equipment_id": "shield_ter_m_standard_02_mk3",
+                        "count": 2
+                      }
+                    },
+                    {
+                      "group": "group_mid_up_left_1",
+                      "equipment_id": "turret_ter_l_beam_01_mk1",
+                      "count": 1,
+                      "shield": {
+                        "equipment_id": "shield_ter_m_standard_02_mk3",
+                        "count": 2
+                      }
+                    },
+                    {
+                      "group": "group_mid_up_left_2",
+                      "equipment_id": "turret_ter_l_beam_01_mk1",
+                      "count": 1,
+                      "shield": {
+                        "equipment_id": "shield_ter_m_standard_02_mk3",
+                        "count": 2
+                      }
+                    },
+                    {
+                      "group": "group_back_down_mid",
+                      "equipment_id": "turret_ter_m_beam_02_mk1",
+                      "count": 2,
+                      "shield": {
+                        "equipment_id": "shield_ter_m_standard_02_mk3",
+                        "count": 2
+                      }
+                    },
+                    {
+                      "group": "group_back_up_mid",
+                      "equipment_id": "turret_ter_m_beam_02_mk1",
+                      "count": 2,
+                      "shield": {
+                        "equipment_id": "shield_ter_m_standard_02_mk3",
+                        "count": 2
+                      }
+                    }
+                  ]
+                }
+              ],
+              "storage": {
+                "deployables": [],
+                "countermeasure": null,
+                "drones": [],
+                "missiles": []
+              },
+              "materialMethod": "terran",
+              "lastUpdated": 1778579657181
+            }
+          ]
+        },
+        {
+          "shipId": "ship_ter_l_destroyer_01_a",
+          "blueprints": [
+            {
+              "id": "9e81a1fe-d921-4795-a59f-3c13d8250805",
+              "name": "大阪 蓝图",
+              "shipId": "ship_ter_l_destroyer_01_a",
+              "connections": [
+                {
+                  "slot_type": "engine",
+                  "group": [
+                    {
+                      "group": "group_back_mid_mid",
+                      "equipment_id": "engine_ter_l_allround_01_mk1",
+                      "count": 2,
+                      "shield": {
+                        "equipment_id": "shield_ter_m_standard_02_mk3",
+                        "count": 4
+                      }
+                    }
+                  ]
+                },
+                {
+                  "slot_type": "thruster",
+                  "group": [
+                    {
+                      "group": "thruster",
+                      "equipment_id": "thruster_gen_l_allround_01_mk3",
+                      "count": 1
+                    }
+                  ]
+                },
+                {
+                  "slot_type": "shield",
+                  "group": [
+                    {
+                      "group": "con_shieldgen_l_01",
+                      "equipment_id": "shield_ter_l_standard_01_mk3",
+                      "count": 1
+                    },
+                    {
+                      "group": "con_shieldgen_l_02",
+                      "equipment_id": "shield_ter_l_standard_01_mk3",
+                      "count": 1
+                    },
+                    {
+                      "group": "con_shieldgen_l_03",
+                      "equipment_id": "shield_ter_l_standard_01_mk3",
+                      "count": 1
+                    }
+                  ]
+                },
+                {
+                  "slot_type": "weapon",
+                  "group": [
+                    {
+                      "group": "con_weapon_01",
+                      "equipment_id": "weapon_ter_l_destroyer_01_mk1",
+                      "count": 1
+                    },
+                    {
+                      "group": "con_weapon_02",
+                      "equipment_id": "weapon_ter_l_destroyer_01_mk1",
+                      "count": 1
+                    }
+                  ]
+                },
+                {
+                  "slot_type": "turret",
+                  "group": [
+                    {
+                      "group": "group_front_down_mid",
+                      "equipment_id": "turret_ter_l_beam_01_mk1",
+                      "count": 1,
+                      "shield": {
+                        "equipment_id": "shield_ter_m_standard_02_mk3",
+                        "count": 2
+                      }
+                    },
+                    {
+                      "group": "group_mid_right_up_2",
+                      "equipment_id": "turret_ter_l_beam_01_mk1",
+                      "count": 1,
+                      "shield": {
+                        "equipment_id": "shield_ter_m_standard_02_mk3",
+                        "count": 2
+                      }
+                    },
+                    {
+                      "group": "group_mid_up_left_2",
+                      "equipment_id": "turret_ter_l_beam_01_mk1",
+                      "count": 1,
+                      "shield": {
+                        "equipment_id": "shield_ter_m_standard_02_mk3",
+                        "count": 2
+                      }
+                    },
+                    {
+                      "group": "group_back_down_mid",
+                      "equipment_id": "turret_ter_m_beam_02_mk1",
+                      "count": 1,
+                      "shield": {
+                        "equipment_id": "shield_ter_m_standard_02_mk3",
+                        "count": 1
+                      }
+                    },
+                    {
+                      "group": "group_back_mid_up",
+                      "equipment_id": "turret_ter_m_beam_02_mk1",
+                      "count": 1,
+                      "shield": {
+                        "equipment_id": "shield_ter_m_standard_02_mk3",
+                        "count": 1
+                      }
+                    },
+                    {
+                      "group": "group_down_mid_left",
+                      "equipment_id": "turret_ter_m_beam_02_mk1",
+                      "count": 2,
+                      "shield": {
+                        "equipment_id": "shield_ter_m_standard_02_mk3",
+                        "count": 1
+                      }
+                    },
+                    {
+                      "group": "group_down_mid_right",
+                      "equipment_id": "turret_ter_m_beam_02_mk1",
+                      "count": 2,
+                      "shield": {
+                        "equipment_id": "shield_ter_m_standard_02_mk3",
+                        "count": 1
+                      }
+                    },
+                    {
+                      "group": "group_mid_right_up",
+                      "equipment_id": "turret_ter_m_beam_02_mk1",
+                      "count": 2,
+                      "shield": {
+                        "equipment_id": "shield_ter_m_standard_02_mk3",
+                        "count": 1
+                      }
+                    },
+                    {
+                      "group": "group_mid_up_left",
+                      "equipment_id": "turret_ter_m_beam_02_mk1",
+                      "count": 2,
+                      "shield": {
+                        "equipment_id": "shield_ter_m_standard_02_mk3",
+                        "count": 1
+                      }
+                    }
+                  ]
+                }
+              ],
+              "storage": {
+                "deployables": [],
+                "countermeasure": null,
+                "drones": [],
+                "missiles": []
+              },
+              "materialMethod": "terran",
+              "lastUpdated": 1778332908378
+            }
+          ]
+        }
+      ]
+    },
+    "x4_build_plan_goals": {
+      "version": 2,
+      "activeId": "b00d82c6-42a7-471e-9ef4-86d2f2c7e566",
+      "list": [
+        {
+          "id": "e5c4d58c-614e-459d-9176-cacf21e242ec",
+          "name": "建造规划 2",
+          "buildGoals": [
+            {
+              "type": "production-rate",
+              "wareId": "siliconcarbide",
+              "ratePerHour": 576
+            },
+            {
+              "type": "production-rate",
+              "wareId": "computronicsubstrate",
+              "ratePerHour": 588
+            },
+            {
+              "type": "production-rate",
+              "wareId": "metallicmicrolattice",
+              "ratePerHour": 3800
+            }
+          ],
+          "logicFlowPlanId": "245bf4e4-ce82-40a4-adbc-f4a5fdc4e5ca",
+          "lastUpdated": 1778406112820
+        },
+        {
+          "id": "d52263a0-1f00-46c8-9de3-47e5a517b4f8",
+          "name": "建造规划 2",
+          "buildGoals": [
+            {
+              "type": "fleet",
+              "buildTime": 3600,
+              "entries": [
+                {
+                  "shipId": "ship_ter_l_destroyer_01_a",
+                  "blueprintId": "9e81a1fe-d921-4795-a59f-3c13d8250805",
+                  "quantity": 1
+                }
+              ],
+              "buildTimeMode": "actual"
+            },
+            {
+              "type": "build-module",
+              "moduleId": "module_gen_prod_missilecomponents_01",
+              "count": 1
+            }
+          ],
+          "logicFlowPlanId": "245bf4e4-ce82-40a4-adbc-f4a5fdc4e5ca",
+          "lastUpdated": 1778503834288
+        },
+        {
+          "id": "b00d82c6-42a7-471e-9ef4-86d2f2c7e566",
+          "name": "建造规划 3",
+          "buildGoals": [
+            {
+              "type": "build-module",
+              "moduleId": "module_gen_prod_missilecomponents_01",
+              "count": 1
+            }
+          ],
+          "logicFlowPlanId": "7f6f8de9-cb79-4ad3-ae19-b053b52f8b8b",
+          "lastUpdated": 1778668592972
+        }
+      ]
+    }
+  }
+}

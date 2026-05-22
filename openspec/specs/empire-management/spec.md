@@ -2,9 +2,7 @@
 
 ## Purpose
 描述帝国管理能力，包括多站数据结构、V1→V2 数据迁移、分站 CRUD 操作。
-
 ## Requirements
-
 ### Requirement: 帝国数据结构 (Empire Data Structure)
 系统 SHALL 使用 V2 数据结构存储帝国方案：
 - **version**: 固定为 2，用于数据迁移判断
@@ -167,6 +165,100 @@
 - **那么** 工业区模块 SHALL 不计算工人需求
 - **并且** 补给区模块 SHALL 不计算工人需求
 - **并且** 所有模块 SHALL 按基础产能计算
+
+### Requirement: Station And Sector Location Persistence
+系统 MUST 将 `station.location` 与 `sector.location` 作为 empire 可编辑输入的一部分进行持久化。
+
+#### Scenario: 保存 station location
+- **前提** 某个 `station` 已写入 `location`
+- **当** 用户保存当前 empire
+- **那么** 系统 SHALL 将该 `location` 写入 `x4_empire_data`
+
+#### Scenario: 保存 sector transit location
+- **前提** 某个 `sector` 已写入 `location`
+- **当** 用户保存当前 empire
+- **那么** 系统 SHALL 将该 `location` 写入 `x4_empire_data`
+
+#### Scenario: 旧存档缺少 location
+- **前提** localStorage 中存在不包含 `location` 的旧 empire 数据
+- **当** 系统执行迁移或归一化
+- **那么** 系统 SHALL 保持向后兼容
+- **并且** 缺少 `location` 的对象 SHALL 仍可正常载入
+
+### Requirement: Location Changes Mark Empire Dirty
+系统 MUST 将 `station.location` 或 `sector.location` 的变动视为 empire dirty 输入变动。
+
+#### Scenario: 更新 station location 后进入 dirty
+- **前提** 当前 empire 已存在已保存快照
+- **当** 用户新增、修改或清除某个 `station.location`
+- **那么** 当前 empire SHALL 被视为 dirty
+- **并且** 用户 SHALL 可以执行保存
+
+#### Scenario: 更新 sector location 后进入 dirty
+- **前提** 当前 empire 已存在已保存快照
+- **当** 用户新增、修改或清除某个 `sector.location`
+- **那么** 当前 empire SHALL 被视为 dirty
+- **并且** 用户 SHALL 可以执行保存
+
+### Requirement: Independent Save Binding Layer
+系统 MUST 使用独立关系层保存 save binding，而不是把关系字段写入单个 `EmpirePlan`。
+
+#### Scenario: 保存独立 binding
+- **前提** 用户为某个 empire 建立了 save binding
+- **当** 系统执行保存
+- **那么** 系统 SHALL 将 binding 数据写入独立的 save binding 结构
+- **并且** 系统 SHALL NOT 将这些关系字段写入 `EmpirePlan` 或 `StationPlan` 本体
+
+### Requirement: Archive Time as View Selection
+系统 MUST 将 `archiveTime` 视为 binding 视角字段，而不是 binding 身份字段。
+
+#### Scenario: 切换到同一 game 的新存档时间
+- **前提** empire 已绑定某个 `gameGuid`
+- **当** 用户切换 `selectedArchiveTime`
+- **那么** 系统 SHALL 保持原 binding 关系不变
+- **并且** 系统 SHALL 只更新当前 `selectedArchiveTime`
+
+### Requirement: Empire Persistence Boundary
+
+系统 MUST 将 empire persistence 限定为 empire 自身规划数据。
+
+#### Scenario: 保存 empire
+- **前提** 用户修改了 active empire
+- **当** 用户点击 `保存帝国`
+- **那么** 系统 SHALL 保存 empire 名称与 station 规划
+- **并且** SHALL NOT 保存 save binding group、station plan、coverage 或 selected archive time
+
+#### Scenario: binding dirty 时保存 empire
+- **前提** binding 存在未保存改动
+- **当** 用户点击 `保存帝国`
+- **那么** 系统 SHALL NOT 清除 binding dirty 状态
+- **并且** SHALL NOT 将 binding 改动写入 empire storage
+
+### Requirement: Empire Store Production Source
+
+系统 MUST 在 `useEmpireStore` 添加 productionSource 路由。
+
+#### Scenario: productionSource 为 empire
+- **前提** `useEmpireStore.productionSource = 'empire'`
+- **当** 系统访问 `stations` / `sectors` / `activeStation`
+- **那么** 系统 SHALL 返回 empire data store 的数据
+
+#### Scenario: productionSource 为 save-binding
+- **前提** `useEmpireStore.productionSource = 'save-binding'`
+- **当** 系统访问 `stations` / `sectors` / `activeStation`
+- **那么** 系统 SHALL 返回 save binding store 的派生数据
+
+#### Scenario: 切换到 save-binding source
+- **前提** 当前 productionSource 为 `empire`
+- **并且** active empire 存在 dirty 改动
+- **当** 用户调用 `switchToBinding(gameGuid)`
+- **那么** 系统 SHALL 返回需要确认的提示
+- **当** 用户确认保存
+- **那么** 系统 SHALL 先保存 empire，再切换到 save-binding
+- **当** 用户确认放弃
+- **那么** 系统 SHALL 放弃 empire 改动，再切换到 save-binding
+- **当** 用户取消确认
+- **那么** 系统 SHALL NOT 切换 productionSource
 
 ## ADDED Requirements
 

@@ -1,3 +1,4 @@
+import type { FlowContribution } from './production-flow'
 
 export type TransportType = 'container' | 'solid' | 'liquid';
 /**
@@ -24,6 +25,7 @@ export interface X4ShipProduction {
   method: string;
   noplayerbuild: boolean;
   cost: Record<string, number>;
+  time: number;
 }
 
 export type EquipmentType = 'engine' | 'shield' | 'turret' | 'weapon' | 'thruster' | 'consumables' | 'units';
@@ -129,6 +131,7 @@ export interface X4Equipment {
   ammunitionTags: string[];
   integrated: boolean;
   cost: Record<string, Partial<Record<string, number>>>;
+  buildTime?: Partial<Record<string, number>>;
   // 引擎数据 (engine)
   thrust?: {
     forward?: number;
@@ -178,6 +181,7 @@ export interface X4Missile {
   tags: string[];
   missileTags: string[];
   cost: Record<string, Partial<Record<string, number>>>;
+  buildTime?: Partial<Record<string, number>>;
   amount: number;
   lifetime: number;
   range: number;
@@ -229,6 +233,7 @@ export interface X4Drone {
   cargo: Array<{ type: 'container' | 'solid' | 'liquid' | 'condensate'; capacity: number }>;
   tags: string[];
   cost: Record<string, Partial<Record<string, number>>>;
+  buildTime?: Partial<Record<string, number>>;
 }
 
 /**
@@ -246,6 +251,7 @@ export interface X4Consumable {
   deployable: boolean;
   tags: string[];
   cost: Record<string, Partial<Record<string, number>>>;
+  buildTime?: Partial<Record<string, number>>;
 }
 
 /**
@@ -342,13 +348,25 @@ export interface X4Module {
 }
 
 /**
- * 种族医疗消耗数据结构
+ * 种族工人消耗数据结构 (per person per hour)
  */
-export interface RaceMedicalConsumption {
-  [race: string]: {
-    [wareId: string]: number; // 商品ID -> 每小时每人消耗量
-  };
+export interface WorkforceStateConsumption {
+  [wareId: string]: number; // per person per hour
 }
+
+export interface RaceWorkforceConsumption {
+  idle: WorkforceStateConsumption
+  busy: WorkforceStateConsumption
+}
+
+export interface WorkforceConsumptionMap {
+  [race: string]: RaceWorkforceConsumption
+}
+
+/**
+ * @deprecated Use WorkforceConsumptionMap instead
+ */
+export type RaceMedicalConsumption = WorkforceConsumptionMap
 
 /**
  * 游戏数据根结构
@@ -362,6 +380,19 @@ export interface X4GameData {
 
 export type LocalizedX4Module = X4Module & { localeName: string }
 export type LocalizedX4ModuleGroup = X4ModuleGroup & { localeName: string }
+export type LocalizedX4Ware = X4Ware & { localeName: string }
+export type LocalizedX4Ship = X4Ship & { localeName: string }
+
+export interface GroupedWareItem extends LocalizedX4Ware {
+  displayLabel: string
+  moduleGroup?: LocalizedX4ModuleGroup
+}
+
+export interface WareGroupResult {
+  group: string
+  displayLabel: string
+  wares: GroupedWareItem[]
+}
 
 export interface GroupedModuleItem extends LocalizedX4Module {
   displayLabel: string
@@ -380,6 +411,8 @@ export interface ModuleGroupResult {
 export interface SavedModule {
   id: string;
   count: number;
+  diffAnnotation?: string;
+  isReferenceRecommended?: boolean;
 }
 
 /**
@@ -404,6 +437,7 @@ export interface StationSettings {
   secondaryProductBufferHours: number; // 副产物缓冲时间（小时）
   transportMinutes: number; // 运输时间（分钟）
   transportShipCapacity: number; // 运输船运量
+  enforceDlcActivation?: boolean;
 }
 
 export interface EntityLocation {
@@ -435,10 +469,14 @@ export interface StationPlan {
   minerals?: string[];
 }
 
-/**
- * 分站类型定义
- */
 export type StationType = 'industrial' | 'supply' | 'transit' | 'shipyard';
+
+export interface FlowSourceStation {
+  id: string;
+  sourceKey: string;
+  sectorId: string | null;
+  station: StationPlan;
+}
 
 export interface SectorPlan {
   id: string;
@@ -458,13 +496,9 @@ export interface EmpirePlan {
   stations: StationPlan[];
 }
 
-/**
- * Empire 持久化存储状态
- */
 export interface SavedEmpiresState {
   version: number;
   activeId: string | null;
-  activeStationId: string | null;
   list: EmpirePlan[];
 }
 
@@ -474,7 +508,6 @@ export interface SavedEmpiresState {
 export interface V2StorageState {
   version: 2;
   activeEmpireId: string | null;
-  activeStationId: string | null;
   empires: EmpirePlan[];
 }
 
@@ -521,29 +554,6 @@ export interface WareDetail {
   list: ProductionLogItem[];
 }
 
-export interface ModuleFlowAtom {
-  moduleId: string;
-  count: number;
-  
-  // 类型：决定了它是作为“输入缓冲”还是“输出缓冲”的来源
-  type: 'production' | 'consumption';
-
-  // --- 1. 数量流 (基础) ---
-  amount: number;       // 贡献的数量 (个)
-  bonusPercent: number;
-
-  // --- 2. 体积流 (重点) ---
-  // 这是你查看"消耗明细"时最关键的字段
-  // 例如：-33,600 m³ (巨大的消耗带宽)
-  volumeFlow: number;   // amount * Module
-  
-  // --- 3. 资金流 (参考) ---
-  valueFlow: number;    // amount * unitPrice
-
-  // --- 4. 运输需求流 (按运输时间折算) ---
-  transportFlow?: number; // abs(amount) * unitVolume * (transportMinutes / 60)
-}
-
 export interface WareFlow {
   // --- 核心标识 ---
   wareId: string;
@@ -555,7 +565,6 @@ export interface WareFlow {
   // 数量流 (Quantity)
   production: number;      // 总产出/h
   consumption: number;     // 总消耗/h
-  workforceConsumption: number; // 工人消耗/h
   netRate: number;         // 净产出
 
   // 体积流 (Volume) - 新增核心
@@ -587,11 +596,7 @@ export interface WareFlow {
   // ====================================================
   // 维度 D: 构成明细 (Drill-down)
   // ====================================================
-  /**
-   * 包含所有的 ModuleFlowAtom。
-   * UI 上可以分为 "来源(Sources)" 和 "去向(Sinks)" 两组展示
-   */
-  contributions: ModuleFlowAtom[];
+  contributions: FlowContribution[];
 }
 
 // [新增] 分组流向接口 - 用于统一管理和展示
@@ -602,9 +607,9 @@ export interface GroupedFlows {
   // 按数量/经济视图分组
   rateGroups: {
     positive: WareFlow[];  // 产品/收入 (netRate > 0)
-    operations: WareFlow[]; // 运营 (netRate <= 0 && transportType === 'container' && workforceConsumption === 0)
-    supply: WareFlow[];    // 补给 (netRate <= 0 && workforceConsumption > 0)
-    resources: WareFlow[];  // 资源 (netRate <= 0 && transportType !== 'container' && workforceConsumption === 0)
+    operations: WareFlow[];  // 运营 (netRate <= 0 && transportType === 'container' && !hasWorkforce)
+    supply: WareFlow[];    // 补给 (netRate <= 0 && hasWorkforce)
+    resources: WareFlow[];  // 资源 (netRate <= 0 && transportType !== 'container' && !hasWorkforce)
   };
   
   // 按体积视图分组
@@ -613,17 +618,6 @@ export interface GroupedFlows {
     liquid: WareFlow[];    // 液体
     container: WareFlow[]; // 容器
   };
-}
-
-export interface StationFlowAtom {
-  stationId: string;
-  stationName: string;
-  stationCount: number;
-  production: number;
-  consumption: number;
-  workforceConsumption: number;
-  netRate: number;
-  netValue: number;
 }
 
 export interface EmpireWareFlow {
@@ -635,13 +629,13 @@ export interface EmpireWareFlow {
   
   production: number;
   consumption: number;
-  workforceConsumption: number;
   netRate: number;
   
-  unitPrice: number;
-  netValue: number;
+  minPrice: number;
+  avgPrice: number;
+  maxPrice: number;
   
-  contributions: StationFlowAtom[];
+  contributions: FlowContribution[];
 }
 
 export interface EmpireGroupedFlows {
@@ -657,33 +651,14 @@ export interface SupplyPlanningInput {
   localStationIds: string[];
 }
 
-export interface SupplyStorageFlowDetail {
-  stationId: string;
-  stationName: string;
-  stationCount: number;
-  kind: 'production' | 'consumption';
-  staticRate: number;
-  storageVolume: number;
-  sortOrder?: number;
-}
-
-export interface SupplyStorageFlow {
-  wareId: string;
-  orderIndex: number;
-  tier: number;
-  transportType: TransportType;
-  unitVolume: number;
-  totalProductionStorageVolume: number;
-  totalConsumptionStorageVolume: number;
-  totalRequiredStorageVolume: number;
-  details: SupplyStorageFlowDetail[];
-}
-
 export interface SectorInternalData {
   sectorId: string;
   planning: SupplyPlanningInput;
   localGroupedFlows: EmpireGroupedFlows;
-  supplyStorageFlows: SupplyStorageFlow[];
+  storageModulePlans: TransitHubStorageModulePlan[];
+  autoIndustryModules: SavedModule[];
+  autoHabitationModules: SavedModule[];
+  autoInfrastructureModules: SavedModule[];
 }
 
 export interface TransitHubStorageModulePlan {
@@ -694,13 +669,6 @@ export interface TransitHubStorageModulePlan {
   capacity: number;
   required: number;
   type: 'container' | 'solid' | 'liquid';
-}
-
-export interface TransitHubViewModel {
-  groupedFlows: EmpireGroupedFlows;
-  storageFlows: SupplyStorageFlow[];
-  storageModulePlans: TransitHubStorageModulePlan[];
-  supplyBuildModules: SavedModule[];
 }
 
 // [新增] 人口普查结果接口
@@ -769,6 +737,7 @@ export interface LogicFlowPlan {
   name: string
   groups: SavedFlowGroup[]
   settings: LogicFlowSettings
+  buildFlow?: BuildFlowPlanData
   lastUpdated: number
 }
 
@@ -776,6 +745,50 @@ export interface SavedFlowPlansState {
   version: number
   activeId: string | null
   list: LogicFlowPlan[]
+}
+
+// --- Build Flow Types ---
+
+export type BuildFlowTargetType = 'line-build-material' | 'output-build-material' | 'output-material'
+
+export interface BuildFlowAssignment {
+  wareId: string
+  sourceGroupId: string
+  targetType: BuildFlowTargetType
+  targetGroupId?: string
+}
+
+export interface BuildFlowPlanData {
+  assignments: BuildFlowAssignment[]
+  archivedGroupIds?: string[]
+}
+
+export interface BuildFlowTag {
+  tagId: string
+  wareId: string
+  label: string
+}
+
+export interface BuildFlowLineCard {
+  groupId: string
+  title: string
+  sourceTags: BuildFlowTag[]
+  buildMaterialTags: BuildFlowTag[]
+}
+
+export interface BuildFlowGroup {
+  groupKey: string
+  lineCards: BuildFlowLineCard[]
+  outputBuildTags: BuildFlowTag[]
+  outputMaterialTags: BuildFlowTag[]
+}
+
+export interface VirtualEdge {
+  wareId: string
+  sourceGroupId: string
+  targetType: 'output-build-material' | 'output-material'
+  isArchived: boolean
+  isDashed: boolean
 }
 
 // Ship Blueprint Storage Types
@@ -825,7 +838,42 @@ export interface ShipBlueprint {
   hull?: ShipBlueprintHull
   /** Storage configuration for C 槽 and U 槽 */
   storage?: ShipBlueprintStorage
+  materialMethod: string
   lastUpdated: number
+}
+
+export type ShipBlueprintBuildEntryKind = 'ship' | 'equipment' | 'storage'
+export type ShipBlueprintStorageEntryType = 'deployable' | 'countermeasure' | 'drone' | 'missile'
+
+export interface ShipBuildMaterialItem {
+  wareId: string
+  count: number
+  value: number
+}
+
+export interface ShipBlueprintBuildEntry {
+  key: string
+  kind: ShipBlueprintBuildEntryKind
+  entityId: string
+  quantity: number
+  totalValue: number
+  unitBuildTime: number
+  totalBuildTime: number
+  materialItems: ShipBuildMaterialItem[]
+  storageType?: ShipBlueprintStorageEntryType
+}
+
+export interface ShipBlueprintBuildAnalysis {
+  methodOptions: string[]
+  selectedMethod: string
+  priceMultiplier: number
+  totalValue: number
+  totalBuildTime: number
+  summaryItems: ShipBuildMaterialItem[]
+  shipEntry: ShipBlueprintBuildEntry | null
+  equipmentEntries: ShipBlueprintBuildEntry[]
+  storageEntries: ShipBlueprintBuildEntry[]
+  entries: ShipBlueprintBuildEntry[]
 }
 
 export interface ShipBlueprintBucket {
@@ -860,7 +908,9 @@ export interface VersionConfig {
     ship_blueprints: string
     setting: string
     save_archives: string
+    build_plan_goals: string
   }
+  indexeddb_name?: string
 }
 
 export interface VersionsFile {
@@ -926,13 +976,6 @@ export interface X4MapSector {
     target_cluster_id?: string
     raw_local_pos?: { x?: number; y?: number; z?: number; sx?: number; sy?: number }
   }>
-  resources?: Array<{
-    ware: string
-    yield?: string
-    level?: number
-    respawn?: number
-    rating?: number
-  }>
   has_khaak_hive?: boolean
   khaak_hive_sources?: string[]
 }
@@ -963,6 +1006,67 @@ export interface X4MapCluster {
 export interface X4Map {
   clusters: Record<string, X4MapCluster>
   sectors: Record<string, X4MapSector>
+}
+
+export interface X4MapSectorResourceEntry {
+  ware: string
+  reserve?: number
+  respawn?: number
+  rating?: number
+  yield?: string
+  level?: number
+}
+
+export interface X4MapSectorRegionEntry {
+  ref: string
+  amount?: number
+  position?: Record<string, unknown>
+  rotation?: Record<string, unknown>
+  boundary?: Record<string, unknown>
+  volume_km3?: number
+}
+
+export interface X4MapSectorResourceArea {
+  ref: string
+  amount?: number
+  position?: Record<string, unknown>
+  boundary?: Record<string, unknown>
+  lateral_factor?: number
+  radial_factor?: number
+  falloff_factor?: number
+  solid_volume_km3?: number
+  gas_volume_km3?: number
+  resources?: Array<Record<string, unknown>>
+}
+
+export interface X4MapSectorResources {
+  regions: X4MapSectorRegionEntry[]
+  resources: X4MapSectorResourceEntry[]
+  areas: X4MapSectorResourceArea[]
+}
+
+export interface X4MapRegionYieldDefinition {
+  id: string
+  ware: string
+  tag: string
+  size: string
+  radius: number
+  yield: number
+  respawnDelay: number
+  rating: number
+  sustainableYieldPerHour: number
+  objectyieldfactor?: number
+  gatherspeedfactor?: number
+  scaneffect?: string
+  scaneffectintensity?: number
+  scaneffectcolor?: string
+}
+
+export interface X4MapResources {
+  version: string
+  resource_model: string
+  sectors: Record<string, X4MapSectorResources>
+  regionyield_definitions: X4MapRegionYieldDefinition[]
 }
 
 // --- Region Yield Types ---
@@ -1086,4 +1190,83 @@ export interface X4ShipSlot {
   slot: string
   size: string
   count: number
+}
+
+export interface CoverageSectorEntry {
+  ref: string
+  jump: number
+}
+
+export interface GroupSaveBinding {
+  sectorGroupId: string
+  sectorMacro?: string
+  jumpRange: number
+  coverageSectorMacros: CoverageSectorEntry[]
+  connectedSectorGroupIds?: string[]
+  tradestationBinding?: StationSaveBinding
+  stationBindings: StationSaveBinding[]
+}
+
+export interface StationSaveBinding {
+  stationId: string
+  saveStationCode?: string
+  sectorMacro?: string
+  position?: { x: number; y: number; z: number }
+}
+
+export interface TradeStationBinding {
+  id: string
+  saveStationCode?: string
+  name: string
+  sectorMacro?: string
+  position?: { x: number; y: number; z: number }
+  settings?: Partial<StationSettings>
+}
+
+export interface BindingSectorGroup {
+  id: string
+  name: string
+  order: number
+  sectorMacro?: string
+  jumpRange: number
+  coverageSectorMacros: CoverageSectorEntry[]
+  connectedGroupIds?: string[]
+  tradeStation?: TradeStationBinding
+}
+
+export interface BindingStationPlan {
+  id: string
+  saveStationCode?: string
+  groupId?: string | null
+  name: string
+  type: StationType
+  modules: SavedModule[]
+  settings: StationSettings
+  lockedWares?: string[]
+  warePriority?: Record<string, number>
+  sectorMacro?: string
+  position?: { x: number; y: number; z: number }
+}
+
+export interface SaveBindingPlan {
+  gameGuid: string
+  bindingName?: string
+  selectedArchiveTime: number | null
+  blueprintEmpireId?: string
+  groups: BindingSectorGroup[]
+  stationPlans: BindingStationPlan[]
+  updatedAt: number
+}
+
+export interface SavedSaveBindingsState {
+  version: number
+  list: SaveBindingPlan[]
+}
+
+export interface ResolvedGroupSaveBinding extends GroupSaveBinding {
+  status: 'ok' | 'missing_at_selected_time'
+}
+
+export interface ResolvedStationSaveBinding extends StationSaveBinding {
+  status: 'ok' | 'missing_at_selected_time'
 }

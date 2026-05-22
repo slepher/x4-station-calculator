@@ -1,25 +1,40 @@
 <script setup lang="ts">
-import type { TransitHubStorageModulePlan } from '@/types/x4'
+import { computed } from 'vue'
+import type { SavedModule, X4Module } from '@/types/x4'
+import { useGameDataStore } from '@/store/useGameDataStore'
 import StationPlanningItem from '../StationPlanningItem.vue'
 
-defineProps<{
-  storageModulePlans: TransitHubStorageModulePlan[]
+const props = defineProps<{
+  modules: SavedModule[]
 }>()
+
+const gameData = useGameDataStore()
+
+const modulesWithInfo = computed<Array<{ module: SavedModule; info: X4Module }>>(() => {
+  const result: Array<{ module: SavedModule; info: X4Module }> = []
+  for (const m of props.modules) {
+    const info = gameData.modulesMap[m.id]
+    if (info) {
+      result.push({ module: m, info })
+    }
+  }
+  return result
+})
 </script>
 
 <template>
   <section>
-    <div class="tier-section tier-auto">
+    <div class="tier-section tier-auto" data-testid="transit-hub-build-panel">
       <div class="tier-header">
         <span class="tier-label">{{ $t('sectorManagement.supply_build_zone') }}</span>
       </div>
       <div class="module-list-scroll">
         <div class="auto-modules-container">
           <StationPlanningItem
-            v-for="(item, index) in storageModulePlans"
-            :key="item.id + '-' + index"
-            :item="item.item"
-            :info="item.info"
+            v-for="({ module, info }, index) in modulesWithInfo"
+            :key="module.id + '-' + index"
+            :item="module"
+            :info="info"
             :readonly="true"
             :no-click="true"
           />
@@ -27,7 +42,7 @@ defineProps<{
       </div>
     </div>
     <div class="build-list">
-      <div v-if="storageModulePlans.length === 0" class="placeholder">
+      <div v-if="modules.length === 0" class="placeholder">
         {{ $t('sectorManagement.supply_build_placeholder') }}
       </div>
     </div>

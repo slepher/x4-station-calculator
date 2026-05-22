@@ -7,6 +7,10 @@ import {
 import { readFile } from 'node:fs/promises'
 import zlib from 'node:zlib'
 
+function values<T>(record: Record<string, T> | undefined): T[] {
+  return record ? Object.values(record) : []
+}
+
 describe('save parser core (simplified)', () => {
   it('parses streamed xml chunks into archive data', async () => {
     const xml = [
@@ -32,13 +36,13 @@ describe('save parser core (simplified)', () => {
     expect(archive.meta.playerName).toBe('slepher')
     expect(archive.meta.version).toBe('800')
     expect(archive.meta.filename).toBe('test_save')
-    expect(archive.meta.parser_version).toBe('v2')
+    expect(archive.meta.parser_version).toBe('v3')
     expect(archive.isCompatible).toBe(true)
     expect(archive.isValid).toBe(true)
     expect(archive.sectors.cluster_01_sector001_macro?.name).toBe('cluster_01_sector001_macro')
     expect(archive.sectors.cluster_01_sector001_macro?.is_known).toBe(true)
-    expect(archive.sectors.cluster_01_sector001_macro?.npcStations).toHaveLength(1)
-    expect(archive.sectors.cluster_01_sector001_macro?.npcStations[0]).toMatchObject({
+    expect(values(archive.sectors.cluster_01_sector001_macro?.npc_stations)).toHaveLength(1)
+    expect(archive.sectors.cluster_01_sector001_macro?.npc_stations?.['station-1']).toMatchObject({
       code: 'station-1',
       owner: 'argon',
       relative_position: { x: 5, y: 6, z: 7 }
@@ -87,12 +91,12 @@ describe('save parser (Rust WASM streaming)', () => {
     expect(archive.meta.playerName).toBe('testplayer')
     expect(archive.meta.version).toBe('800')
     expect(archive.meta.filename).toBe('test')
-    expect(archive.meta.parser_version).toBe('v2')
+    expect(archive.meta.parser_version).toBe('v3')
     expect(archive.isCompatible).toBe(true)
-    expect(archive.sectors.test_sector_macro?.playerStations).toHaveLength(1)
-    expect(archive.sectors.test_sector_macro?.playerStations[0]?.code).toBe('TEST-001')
-    expect(archive.sectors.test_sector_macro?.playerStations[0]?.owner).toBe('player')
-    expect(archive.sectors.test_sector_macro?.playerStations[0]?.relative_position).toEqual({ x: 100, y: 200, z: 300 })
+    expect(values(archive.sectors.test_sector_macro?.player_stations)).toHaveLength(1)
+    expect(archive.sectors.test_sector_macro?.player_stations?.['TEST-001']?.code).toBe('TEST-001')
+    expect(archive.sectors.test_sector_macro?.player_stations?.['TEST-001']?.owner).toBe('player')
+    expect(archive.sectors.test_sector_macro?.player_stations?.['TEST-001']?.relative_position).toEqual({ x: 100, y: 200, z: 300 })
   })
 
   it('parses gzip bytes directly in rust wasm parser', async () => {
@@ -128,9 +132,9 @@ describe('save parser (Rust WASM streaming)', () => {
 
     const archive = JSON.parse(parser.finish('gzip.xml.gz'))
     expect(archive.meta.playerName).toBe('gzip-player')
-    expect(archive.sectors.gzip_sector_macro?.playerStations[0]?.code).toBe('GZIP-001')
-    expect(archive.sectors.gzip_sector_macro?.playerStations[0]?.owner).toBe('player')
-    expect(archive.sectors.gzip_sector_macro?.playerStations[0]?.relative_position).toEqual({ x: 7, y: 8, z: 9 })
+    expect(archive.sectors.gzip_sector_macro?.player_stations?.['GZIP-001']?.code).toBe('GZIP-001')
+    expect(archive.sectors.gzip_sector_macro?.player_stations?.['GZIP-001']?.owner).toBe('player')
+    expect(archive.sectors.gzip_sector_macro?.player_stations?.['GZIP-001']?.relative_position).toEqual({ x: 7, y: 8, z: 9 })
   })
 })
 
@@ -144,7 +148,7 @@ describe('save parser rust worker enrichment', () => {
         playerName: 'p',
         version: '800',
         filename: 'f',
-        parser_version: 'v2',
+        parser_version: 'v3',
         source: 'original'
       },
       isCompatible: true,
@@ -153,7 +157,8 @@ describe('save parser rust worker enrichment', () => {
         cluster_01_sector001_macro: {
           name: 'cluster_01_sector001_macro',
           is_known: true,
-          npcStations: [{
+          npc_stations: {
+            NPC: {
             code: 'NPC',
             macro: 'station_arg_factory_macro',
             owner: 'argon',
@@ -162,7 +167,8 @@ describe('save parser rust worker enrichment', () => {
             z: 3,
             relative_position: { x: 10, y: 20, z: 30 },
             zone_id: 'zone_alpha'
-          }]
+            }
+          }
         }
       }
     }, undefined, {
@@ -194,14 +200,14 @@ describe('save parser rust worker enrichment', () => {
       }
     })
 
-    expect(archive.sectors.cluster_01_sector001_macro.npcStations?.[0]?.position).toMatchObject({
+    expect(archive.sectors.cluster_01_sector001_macro.npc_stations?.NPC?.position).toMatchObject({
       x: 110,
       y: 220,
       z: 330
     })
     const expectedScale = ((Math.sqrt(3) / 2) * 0.8) / Math.hypot(110, 330)
-    expect(archive.sectors.cluster_01_sector001_macro.npcStations?.[0]?.position.tx).toBeCloseTo(110 * expectedScale, 12)
-    expect(archive.sectors.cluster_01_sector001_macro.npcStations?.[0]?.position.ty).toBeCloseTo(-330 * expectedScale, 12)
+    expect(archive.sectors.cluster_01_sector001_macro.npc_stations?.NPC?.position.tx).toBeCloseTo(110 * expectedScale, 12)
+    expect(archive.sectors.cluster_01_sector001_macro.npc_stations?.NPC?.position.ty).toBeCloseTo(-330 * expectedScale, 12)
     expect(archive.meta.post_processor_version).toBe(CURRENT_POST_PROCESSOR_VERSION)
     expect(archive.isValid).toBe(true)
   })
@@ -215,7 +221,7 @@ describe('save parser rust worker enrichment', () => {
         playerName: 'p',
         version: '800',
         filename: 'f',
-        parser_version: 'v2',
+        parser_version: 'v3',
         source: 'original'
       },
       isCompatible: true,
@@ -224,15 +230,15 @@ describe('save parser rust worker enrichment', () => {
         sec: {
           name: 'sec',
           is_known: true,
-          npcStations: [
-            {
+          npc_stations: {
+            ENERGY: {
               code: 'ENERGY',
               macro: 'station_energy_macro',
               owner: 'argon',
               relative_position: { x: 0, y: 0, z: 0 },
               modules: [{ ref: 'energy_macro', amount: 1 }]
             },
-            {
+            GROUP: {
               code: 'GROUP',
               macro: 'station_group_macro',
               owner: 'argon',
@@ -243,7 +249,7 @@ describe('save parser rust worker enrichment', () => {
                 { ref: 'refined_b_macro', amount: 1 }
               ]
             },
-            {
+            CLUSTER: {
               code: 'CLUSTER',
               macro: 'station_cluster_macro',
               owner: 'argon',
@@ -254,7 +260,7 @@ describe('save parser rust worker enrichment', () => {
                 { ref: 'shiptech_macro', amount: 1 }
               ]
             },
-            {
+            MIXED: {
               code: 'MIXED',
               macro: 'station_mixed_macro',
               owner: 'argon',
@@ -264,7 +270,7 @@ describe('save parser rust worker enrichment', () => {
                 { ref: 'food_macro', amount: 1 }
               ]
             }
-          ]
+          }
         }
       }
     }, {
@@ -324,19 +330,19 @@ describe('save parser rust worker enrichment', () => {
       } as any
     })
 
-    expect(archive.sectors.sec.npcStations?.find((station) => station.code === 'ENERGY')).toMatchObject({
+    expect(archive.sectors.sec.npc_stations?.ENERGY).toMatchObject({
       productionProfile: 'module_gen_prod_energycells_01',
       profileName: 'Energy Cells Production'
     })
-    expect(archive.sectors.sec.npcStations?.find((station) => station.code === 'GROUP')).toMatchObject({
+    expect(archive.sectors.sec.npc_stations?.GROUP).toMatchObject({
       productionProfile: 'refined',
       profileName: 'refined'
     })
-    expect(archive.sectors.sec.npcStations?.find((station) => station.code === 'CLUSTER')).toMatchObject({
+    expect(archive.sectors.sec.npc_stations?.CLUSTER).toMatchObject({
       productionProfile: 'shiptech',
       profileName: 'shiptech'
     })
-    expect(archive.sectors.sec.npcStations?.find((station) => station.code === 'MIXED')).toMatchObject({
+    expect(archive.sectors.sec.npc_stations?.MIXED).toMatchObject({
       productionProfile: 'mixed',
       profileName: 'Mixed Production'
     })
@@ -351,7 +357,7 @@ describe('save parser rust worker enrichment', () => {
         playerName: 'p',
         version: '800',
         filename: 'f',
-        parser_version: 'v2',
+        parser_version: 'v3',
         source: 'original'
       },
       isCompatible: true,
@@ -360,8 +366,8 @@ describe('save parser rust worker enrichment', () => {
         sec: {
           name: 'sec',
           is_known: true,
-          playerStations: [
-            {
+          player_stations: {
+            PHQ: {
               code: 'PHQ',
               macro: 'station_player_hq_macro',
               owner: 'player',
@@ -372,7 +378,7 @@ describe('save parser rust worker enrichment', () => {
                 { ref: 'refined_macro', amount: 1 }
               ]
             }
-          ]
+          }
         }
       }
     }, {
@@ -396,7 +402,7 @@ describe('save parser rust worker enrichment', () => {
       } as any
     })
 
-    expect(archive.sectors.sec.playerStations?.[0]).toMatchObject({
+    expect(archive.sectors.sec.player_stations?.PHQ).toMatchObject({
       is_headquarter: true,
       productionProfile: 'module_gen_prod_refinedmetals_01',
       profileName: 'Refined Metals Production'
@@ -412,7 +418,7 @@ describe('save parser rust worker enrichment', () => {
         playerName: 'p',
         version: '800',
         filename: 'f',
-        parser_version: 'v2',
+        parser_version: 'v3',
         source: 'original'
       },
       isCompatible: true,
@@ -421,7 +427,8 @@ describe('save parser rust worker enrichment', () => {
         cluster_01_sector001_macro: {
           name: 'cluster_01_sector001_macro',
           is_known: true,
-          npcStations: [{
+          npc_stations: {
+            NPC: {
             code: 'NPC',
             macro: 'station_arg_factory_macro',
             owner: 'argon',
@@ -430,7 +437,8 @@ describe('save parser rust worker enrichment', () => {
             z: 3,
             relative_position: { x: 5000, y: 0, z: 0 },
             zone_id: 'zone_right'
-          }]
+            }
+          }
         }
       }
     }, undefined, {
@@ -466,14 +474,14 @@ describe('save parser rust worker enrichment', () => {
       }
     })
 
-    expect(archive.sectors.cluster_01_sector001_macro.npcStations?.[0]?.position).toMatchObject({
+    expect(archive.sectors.cluster_01_sector001_macro.npc_stations?.NPC?.position).toMatchObject({
       x: 95000,
       y: 0,
       z: 0
     })
     const expectedScale = ((Math.sqrt(3) / 2) * 0.8) / 31000
-    expect(archive.sectors.cluster_01_sector001_macro.npcStations?.[0]?.position.tx).toBeCloseTo(31000 * expectedScale, 12)
-    expect(Object.is(archive.sectors.cluster_01_sector001_macro.npcStations?.[0]?.position.ty, -0) ? 0 : archive.sectors.cluster_01_sector001_macro.npcStations?.[0]?.position.ty).toBe(0)
+    expect(archive.sectors.cluster_01_sector001_macro.npc_stations?.NPC?.position.tx).toBeCloseTo(31000 * expectedScale, 12)
+    expect(Object.is(archive.sectors.cluster_01_sector001_macro.npc_stations?.NPC?.position.ty, -0) ? 0 : archive.sectors.cluster_01_sector001_macro.npc_stations?.NPC?.position.ty).toBe(0)
   })
 
   it('recomputes sector scale from save poi plus maps zone/gate/highway points and writes static gate data into save', () => {
@@ -485,7 +493,7 @@ describe('save parser rust worker enrichment', () => {
         playerName: 'p',
         version: '800',
         filename: 'f',
-        parser_version: 'v2',
+        parser_version: 'v3',
         source: 'original'
       },
       isCompatible: true,
@@ -494,12 +502,14 @@ describe('save parser rust worker enrichment', () => {
         sec: {
           name: 'sec',
           is_known: true,
-          npcStations: [{
+          npc_stations: {
+            NPC: {
             code: 'NPC',
             macro: 'station_arg_factory_macro',
             owner: 'argon',
             relative_position: { x: 350, y: 50, z: 0 }
-          }]
+            }
+          }
         }
       }
     }, undefined, {
@@ -549,7 +559,7 @@ describe('save parser rust worker enrichment', () => {
     } as any)
 
     expect(archive.sectors.sec.scale_per_radius).toBeCloseTo((Math.sqrt(3) / 2 * 0.8) / 350, 12)
-    expect(archive.sectors.sec.npcStations?.[0]?.position.tx).toBeCloseTo((Math.sqrt(3) / 2 * 0.8), 12)
+    expect(archive.sectors.sec.npc_stations?.NPC?.position.tx).toBeCloseTo((Math.sqrt(3) / 2 * 0.8), 12)
     expect(archive.sectors.sec.clusterGates).toHaveLength(1)
     expect(archive.sectors.sec.clusterGates?.[0]).toMatchObject({
       id: 'gate_a',
@@ -594,7 +604,7 @@ describe('save parser rust worker enrichment', () => {
         playerName: 'p',
         version: '800',
         filename: 'f',
-        parser_version: 'v2',
+        parser_version: 'v3',
         source: 'original'
       },
       isCompatible: true,
@@ -603,7 +613,8 @@ describe('save parser rust worker enrichment', () => {
         sec: {
           name: 'sec',
           is_known: true,
-          npcStations: [{
+          npc_stations: {
+            NPC: {
             code: 'NPC',
             macro: 'station_arg_factory_macro',
             owner: 'argon',
@@ -611,8 +622,10 @@ describe('save parser rust worker enrichment', () => {
             y: 2,
             z: 3,
             modules: [{ ref: 'buildmodule_arg_ships_m_macro', amount: 2 }]
-          }],
-          xenonStations: [{
+            }
+          },
+          xenon_stations: {
+            XEN: {
             code: 'XEN',
             macro: 'station_gen_tradestation_macro',
             owner: 'xenon',
@@ -623,8 +636,10 @@ describe('save parser rust worker enrichment', () => {
               { ref: 'buildmodule_xen_ships_xl_macro', amount: 1 },
               { ref: 'buildmodule_xen_equip_macro', amount: 1 }
             ]
-          }],
-          khaakStations: [{
+            }
+          },
+          khaak_stations: {
+            KHA: {
             code: 'KHA',
             macro: 'landmarks_kha_hive_macro',
             owner: 'khaak',
@@ -632,26 +647,27 @@ describe('save parser rust worker enrichment', () => {
             y: 8,
             z: 9,
             modules: [{ ref: 'module_khaak_special', amount: 1 }]
-          }]
+            }
+          }
         }
       }
     })
 
-    expect(archive.sectors.sec.npcStations?.[0]).toMatchObject({
+    expect(archive.sectors.sec.npc_stations?.NPC).toMatchObject({
       isWharf: true
     })
-    expect(archive.sectors.sec.xenonStations?.[0]).toMatchObject({
+    expect(archive.sectors.sec.xenon_stations?.XEN).toMatchObject({
       isShipyard: true,
       isEquipmentdock: true,
       isTradestation: true
     })
-    expect(archive.sectors.sec.khaakStations?.[0]).toMatchObject({
+    expect(archive.sectors.sec.khaak_stations?.KHA).toMatchObject({
       isHive: true
     })
-    expect(archive.sectors.sec.khaakStations?.[0]?.isShipyard).toBeUndefined()
+    expect(archive.sectors.sec.khaak_stations?.KHA?.isShipyard).toBeUndefined()
   })
 
-  it('omits empty playerStations after post processing', () => {
+  it('omits empty player_stations after post processing', () => {
     const archive = postProcessRustSaveArchive({
       meta: {
         guid: 'g',
@@ -660,7 +676,7 @@ describe('save parser rust worker enrichment', () => {
         playerName: 'p',
         version: '800',
         filename: 'f',
-        parser_version: 'v2',
+        parser_version: 'v3',
         source: 'original'
       },
       isCompatible: true,
@@ -669,13 +685,210 @@ describe('save parser rust worker enrichment', () => {
         sec: {
           name: 'sec',
           is_known: true,
-          playerStations: [],
-          npcStations: []
+          player_stations: {},
+          npc_stations: {}
         }
       }
     })
 
-    expect(archive.sectors.sec.playerStations).toBeUndefined()
-    expect(archive.sectors.sec.npcStations).toBeUndefined()
+    expect(archive.sectors.sec.player_stations).toBeUndefined()
+    expect(archive.sectors.sec.npc_stations).toBeUndefined()
+  })
+
+  it('preserves sector player_buildstorages and links station/buildstorage by code', () => {
+    const archive = postProcessRustSaveArchive({
+      meta: {
+        guid: 'g',
+        seed: 1,
+        time: 2,
+        playerName: 'p',
+        version: '800',
+        filename: 'f',
+        parser_version: 'v3',
+        source: 'original'
+      },
+      isCompatible: true,
+      isValid: true,
+      sectors: {
+        sec: {
+          name: 'sec',
+          is_known: true,
+          player_stations: {
+            'XAJ-926': {
+              code: 'XAJ-926',
+              macro: 'station_macro',
+              owner: 'player',
+              component_id: '0x4646c',
+              relative_position: { x: 0, y: 0, z: 0 },
+              modules: {
+                dock_macro: { ref: 'dock_macro', amount: 1 }
+              },
+              equipments: {
+                shield_ter_m_standard_02_mk2_macro: {
+                  type: 'shields',
+                  ref: 'shield_ter_m_standard_02_mk2_macro',
+                  amount: 2
+                }
+              },
+              cargo: [{ ware: 'energycells', amount: 1 }],
+              reservation: [{ ware: 'hullparts', amount: 2 }]
+            }
+          },
+          player_buildstorages: {
+            'FIX-154': {
+              component_id: '0x456b7',
+              code: 'FIX-154',
+              owner: 'player',
+              relative_position: { x: 10, y: 0, z: 20 },
+              target_station_component_id: '0x4646c',
+              cargo: [{ ware: 'hullparts', amount: 100 }],
+              reservation: [{ ware: 'hullparts', amount: 50 }],
+              constructions: [{
+                id: '0x1f5e',
+                index: 1,
+                ref: 'pier_macro',
+                equipments: [{
+                  type: 'turrets',
+                  ref: 'turret_arg_m_flak_02_mk1_macro',
+                  group: 'group01',
+                  exact: 2
+                }]
+              }],
+              modules: {
+                pier_macro: { ref: 'pier_macro', amount: 1 }
+              },
+              equipments: {
+                turret_arg_m_flak_02_mk1_macro: {
+                  type: 'turrets',
+                  ref: 'turret_arg_m_flak_02_mk1_macro',
+                  amount: 2
+                }
+              },
+              progress: { start: 10, end: 20, sequenceindex: 1 }
+            }
+          }
+        }
+      }
+    }, {
+      dock_macro: {
+        id: 'module_dock',
+        macroId: 'dock_macro',
+        name: 'Dock',
+        type: 'dock',
+        group: 'dock'
+      } as any,
+      pier_macro: {
+        id: 'module_pier',
+        macroId: 'pier_macro',
+        name: 'Pier',
+        type: 'dock',
+        group: 'dock'
+      } as any
+    })
+
+    expect(archive.sectors.sec.player_buildstorages?.['FIX-154']).toMatchObject({
+      component_id: '0x456b7',
+      code: 'FIX-154',
+      station_code: 'XAJ-926',
+      target_station_component_id: '0x4646c',
+      cargo: [{ ware: 'hullparts', amount: 100 }],
+      reservation: [{ ware: 'hullparts', amount: 50 }],
+      constructions: [{
+        id: '0x1f5e',
+        index: 1,
+        ref: 'pier_macro',
+        equipments: [{
+          type: 'turrets',
+          ref: 'turret_arg_m_flak_02_mk1_macro',
+          group: 'group01',
+          exact: 2
+        }]
+      }],
+      modules: {
+        pier_macro: {
+          ref: 'pier_macro',
+          amount: 1,
+          module_id: 'module_pier'
+        }
+      },
+      equipments: {
+        turret_arg_m_flak_02_mk1_macro: {
+          type: 'turrets',
+          ref: 'turret_arg_m_flak_02_mk1_macro',
+          amount: 2,
+          equipment_id: 'turret_arg_m_flak_02_mk1'
+        }
+      },
+      progress: { start: 10, end: 20, sequenceindex: 1 }
+    })
+    expect(archive.sectors.sec.player_stations?.['XAJ-926']).toMatchObject({
+      component_id: '0x4646c',
+      modules: {
+        dock_macro: {
+          ref: 'dock_macro',
+          amount: 1,
+          module_id: 'module_dock'
+        }
+      },
+      equipments: {
+        shield_ter_m_standard_02_mk2_macro: {
+          type: 'shields',
+          ref: 'shield_ter_m_standard_02_mk2_macro',
+          amount: 2,
+          equipment_id: 'shield_ter_m_standard_02_mk2'
+        }
+      },
+      cargo: [{ ware: 'energycells', amount: 1 }],
+      reservation: [{ ware: 'hullparts', amount: 2 }],
+      buildstorage_code: 'FIX-154'
+    })
+  })
+
+  it('preserves player station overrides after post processing', () => {
+    const archive = postProcessRustSaveArchive({
+      meta: {
+        guid: 'g',
+        seed: 1,
+        time: 2,
+        playerName: 'p',
+        version: '800',
+        filename: 'f',
+        parser_version: 'v3',
+        source: 'original'
+      },
+      isCompatible: true,
+      isValid: true,
+      sectors: {
+        sec: {
+          name: 'sec',
+          is_known: true,
+          player_stations: {
+            AAA: {
+              code: 'AAA',
+              macro: 'station_macro',
+              owner: 'player',
+              relative_position: { x: 0, y: 0, z: 0 },
+              overrides: {
+                max: [
+                  { ware: 'energycells', amount: 800000 },
+                  { ware: 'ore', amount: 60000 }
+                ],
+                buy: [{ ware: 'energycells', amount: 200000 }],
+                sell: [{ ware: 'energycells', amount: 400000 }]
+              }
+            }
+          }
+        }
+      }
+    })
+
+    expect(archive.sectors.sec.player_stations?.AAA?.overrides).toEqual({
+      max: [
+        { ware: 'energycells', amount: 800000 },
+        { ware: 'ore', amount: 60000 }
+      ],
+      buy: [{ ware: 'energycells', amount: 200000 }],
+      sell: [{ ware: 'energycells', amount: 400000 }]
+    })
   })
 })

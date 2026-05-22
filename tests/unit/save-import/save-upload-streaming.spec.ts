@@ -1,6 +1,13 @@
 import { describe, expect, it, vi } from 'vitest'
 import { streamFileToSaveParserWorker } from '../../../src/components/save/saveUploadStreaming'
 
+async function flushAsyncTurns(count = 1) {
+  for (let i = 0; i < count; i += 1) {
+    await Promise.resolve()
+    await new Promise((resolve) => setTimeout(resolve, 0))
+  }
+}
+
 describe('save upload streaming', () => {
   it('streams file chunks to worker without reading full arrayBuffer', async () => {
     const chunks = [
@@ -30,8 +37,22 @@ describe('save upload streaming', () => {
       }
     } as unknown as File
 
+    const listeners = new Map<string, Set<(event: MessageEvent) => void>>()
     const worker = {
-      postMessage: vi.fn()
+      postMessage: vi.fn((message: { type: string }) => {
+        if (message.type === 'parse_chunk') {
+          const cbs = listeners.get('message')
+          cbs?.forEach((cb) => cb({ data: { type: 'chunk_processed' } } as MessageEvent))
+        }
+      }),
+      addEventListener: vi.fn((type: string, cb: (event: MessageEvent) => void) => {
+        const set = listeners.get(type) ?? new Set()
+        set.add(cb)
+        listeners.set(type, set)
+      }),
+      removeEventListener: vi.fn((type: string, cb: (event: MessageEvent) => void) => {
+        listeners.get(type)?.delete(cb)
+      })
     } as unknown as Worker
 
     await streamFileToSaveParserWorker({
@@ -48,16 +69,19 @@ describe('save upload streaming', () => {
       currentVersion: '8.0',
       expectedTotalBytes: 0x1234
     })
-    expect(worker.postMessage).toHaveBeenNthCalledWith(2, {
+    expect(worker.postMessage).toHaveBeenNthCalledWith(2, expect.objectContaining({
       type: 'parse_chunk',
-      chunk: chunks[0].buffer
-    }, [chunks[0].buffer])
-    expect(worker.postMessage).toHaveBeenNthCalledWith(3, {
+      chunk: chunks[0].buffer,
+      chunkIndex: 1
+    }), [chunks[0].buffer])
+    expect(worker.postMessage).toHaveBeenNthCalledWith(3, expect.objectContaining({
       type: 'parse_chunk',
-      chunk: chunks[1].buffer
-    }, [chunks[1].buffer])
+      chunk: chunks[1].buffer,
+      chunkIndex: 2
+    }), [chunks[1].buffer])
     expect(worker.postMessage).toHaveBeenNthCalledWith(4, {
       type: 'parse_end'
     })
   })
+
 })

@@ -1,0 +1,190 @@
+import type {
+  SavedModule,
+  X4Module,
+  X4Ware,
+  WareFlow,
+  GroupedFlows
+} from '../../types/x4'
+import type { DerivedProductionFlow, DerivedFlowContribution, WareProductionFlow } from '../../types/production-flow'
+import { computeBufferOccupancy } from './calculateBufferOccupancy'
+
+export interface CalculateWareFlowDerivedInput {
+  productionFlows: WareProductionFlow[]
+  autoIndustryModules?: SavedModule[]
+  plannedModules?: SavedModule[]
+  modulesMap: Record<string, X4Module>
+  waresMap: Record<string, X4Ware>
+  stationNameMap?: Record<string, string>
+  sectorNameMap?: Record<string, string>
+  settings: {
+    racePreference: string
+    resourceBufferHours: number
+    primaryProductBufferHours: number
+    secondaryProductBufferHours: number
+    buyMultiplier: number
+    sellMultiplier: number
+    transportMinutes: number
+    transportShipCapacity: number
+    sunlight: number
+  }
+  warePriorityLevels: Record<string, number>
+}
+
+export interface CalculateWareFlowDerivedOutput {
+  productionFlows: DerivedProductionFlow[]
+  groupedFlows: GroupedFlows
+}
+
+export function deriveProductionFlows(
+  input: CalculateWareFlowDerivedInput
+): DerivedProductionFlow[] {
+  const {
+    productionFlows,
+    waresMap,
+    settings,
+    warePriorityLevels,
+    stationNameMap,
+    sectorNameMap
+  } = input
+
+  const wareFlows: DerivedProductionFlow[] = productionFlows.map(prodFlow => {
+    const ware = waresMap[prodFlow.wareId]
+    const unitVolume = prodFlow.unitVolume
+    const productionVolume = prodFlow.production * unitVolume
+    const consumptionVolume = prodFlow.consumption * unitVolume
+    const netVolume = productionVolume - consumptionVolume
+
+    const isSurplus = prodFlow.netRate >= 0
+    const multiplier = isSurplus ? settings.sellMultiplier : settings.buyMultiplier
+    const unitPrice = getPriceByMultiplier(ware, multiplier)
+    const netValue = prodFlow.netRate * unitPrice
+
+    const priorityLevel = warePriorityLevels?.[prodFlow.wareId] ?? 0
+    const isMainOrSecondary = priorityLevel > 0
+    const isSupplyGap = prodFlow.contributions.some(c => c.class === 'workforce' || c.class === 'workforce_idle')
+    const isResourceFlow = prodFlow.transportType !== 'container'
+    const isDeficit = prodFlow.netRate < 0
+    const shouldCountTransport = isMainOrSecondary || isSupplyGap || isResourceFlow || isDeficit
+    const transportDemand = shouldCountTransport ? Math.abs(prodFlow.netRate) * unitVolume : 0
+
+    const {
+      consumptionBufferCount,
+      totalOccupiedCount,
+      totalOccupiedVolume
+    } = computeBufferOccupancy({
+      flow: { wareId: prodFlow.wareId, consumption: prodFlow.consumption, netRate: prodFlow.netRate, unitVolume },
+      settings,
+      warePriorityLevels: warePriorityLevels || {}
+    }    )
+
+    const totalOccupiedConsumptionCount = consumptionBufferCount
+
+    const storagePriorityLevel = warePriorityLevels?.[prodFlow.wareId] ?? 2
+    let productBufferHours = 0
+    if (storagePriorityLevel === 2) {
+      productBufferHours = settings.primaryProductBufferHours
+    } else if (storagePriorityLevel === 1) {
+      productBufferHours = settings.secondaryProductBufferHours
+    }
+
+    const modulesMap = input.modulesMap
+    const contributions: DerivedFlowContribution[] = prodFlow.contributions.map(atom => ({
+      ...atom,
+      name: atom.class === 'module'
+        ? modulesMap[atom.id]?.name || atom.id
+        : atom.class === 'workforce' || atom.class === 'workforce_idle'
+          ? atom.id
+          : atom.class === 'station'
+            ? stationNameMap?.[atom.id] || (atom as any).name || atom.id
+            : atom.class === 'sector'
+              ? sectorNameMap?.[atom.id] || (atom as any).name || atom.id
+              : (atom as any).name || atom.id,
+      valueContribution: atom.amount * unitPrice,
+      volumeContribution: atom.amount > 0
+        ? atom.amount * productBufferHours
+        : Math.abs(atom.amount) * settings.resourceBufferHours,
+      transportContribution: Math.abs(atom.amount) * unitVolume
+    }))
+
+    return {
+      wareId: prodFlow.wareId,
+      orderIndex: prodFlow.orderIndex,
+      tier: prodFlow.tier,
+      transportType: prodFlow.transportType,
+      unitVolume,
+      production: prodFlow.production,
+      consumption: prodFlow.consumption,
+      netRate: prodFlow.netRate,
+      productionVolume,
+      consumptionVolume,
+      netVolume,
+      transportDemand,
+      totalOccupiedCount,
+      totalOccupiedConsumptionCount,
+      totalOccupiedVolume,
+      unitPrice,
+      netValue,
+      contributions
+    }
+  })
+
+  wareFlows.sort((a, b) => {
+    if (a.orderIndex !== b.orderIndex) return a.orderIndex - b.orderIndex
+    if (a.tier !== b.tier) return b.tier - a.tier
+    return Math.abs(b.netRate) - Math.abs(a.netRate)
+  })
+
+  return wareFlows
+}
+
+function groupDerivedProductionFlows(
+  productionFlows: DerivedProductionFlow[]
+): GroupedFlows {
+  const wareFlows: WareFlow[] = [...productionFlows]
+
+  const groupedFlows: GroupedFlows = {
+    flows: wareFlows,
+    rateGroups: { positive: [], operations: [], supply: [], resources: [] },
+    volumeGroups: { solid: [], liquid: [], container: [] }
+  }
+
+  wareFlows.forEach(flow => {
+    if (flow.netRate >= 0) groupedFlows.rateGroups.positive.push(flow)
+    else if (flow.contributions.some(c => c.class === 'workforce' || c.class === 'workforce_idle')) groupedFlows.rateGroups.supply.push(flow)
+    else if (flow.transportType === 'container') groupedFlows.rateGroups.operations.push(flow)
+    else groupedFlows.rateGroups.resources.push(flow)
+
+    if (flow.transportType === 'solid') groupedFlows.volumeGroups.solid.push(flow)
+    else if (flow.transportType === 'liquid') groupedFlows.volumeGroups.liquid.push(flow)
+    else groupedFlows.volumeGroups.container.push(flow)
+  })
+
+  return groupedFlows
+}
+
+export function calculateWareFlowDerived(
+  input: CalculateWareFlowDerivedInput
+): CalculateWareFlowDerivedOutput {
+  const productionFlows = deriveProductionFlows(input)
+  const groupedFlows = groupDerivedProductionFlows(productionFlows)
+
+  return {
+    productionFlows,
+    groupedFlows
+  }
+}
+
+function getPriceByMultiplier(ware: X4Ware | undefined, multiplier: number): number {
+  if (!ware) return 0
+  const minPrice = ware.minPrice || 0
+  const avgPrice = ware.price || 0
+  const maxPrice = ware.maxPrice || 0
+  
+  if (multiplier <= 0.5) {
+    const t = multiplier * 2
+    return minPrice + (avgPrice - minPrice) * t
+  } else {
+    const t = (multiplier - 0.5) * 2
+    return avgPrice + (maxPrice - avgPrice) * t
+  }
+}

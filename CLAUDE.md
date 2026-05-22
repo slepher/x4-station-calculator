@@ -8,6 +8,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 # Development server (hot reload)
 npm run dev
 
+# Build Rust WASM parser (output to src/wasm/)
+# FORBIDDEN to run this unless rust-parser/src/*.rs files are modified
+npm run build-rust
+# Or manually:
+# cd rust-parser && ./build.sh
+
 # Production build
 npm run build
 
@@ -20,11 +26,11 @@ npm run test:unit
 npm run test:unit -- tests/unit/<path>/<file>.spec.ts
 
 # E2E tests (Playwright)
+npm exec playwright test
+# Run single test file (use -- to pass args to playwright)
+npm exec playwright test -- tests/e2e/<path>/<file>.spec.ts
+# Or shorthand for running all tests
 npm run test:e2e
-# Run single test file
-npm run test:e2e -- tests/e2e/<path>/<file>.spec.ts
-# Interactive UI mode
-npm run test:e2e:ui
 
 # Install Playwright browsers
 npm run playwright:install
@@ -141,7 +147,7 @@ tests/
 Key testing patterns:
 - Playwright config uses `webServer` with `npm run preview`
 - Stores exposed on `window` for E2E access in dev/test mode (see `App.vue`)
-- `data-testid` attributes preferred for stable selectors
+- `data-testid` attributes preferred for stable selectors (avoid text/i18n matching for non-text elements)
 - i18n-aware locators using regex: `/文本|Text/i`
 
 ### E2E Test beforeEach Requirements
@@ -187,6 +193,41 @@ test.beforeEach(async ({ page }) => {
 - 语言存储使用 Cookie (`user_locale`)，但翻译更新必须通过 UI 触发
 - fixture 路径应使用相对于测试文件的路径
 
+### Live Binding E2E Fixture Rule
+
+涉及 Live Production / save-binding / archive 联动的 E2E，不要再手写：
+- 从 `db.json` 删除 `x4_save_archives`
+- 手动 `saveStore.importFromJson(...)`
+- 手动向 `liveStore.playerStationRecords` 回填 records
+
+统一使用：
+- `tests/e2e/helpers/loadLiveBindingFixture.ts`
+- 入口函数：`loadLiveBindingFixture(page)`
+
+原因：
+- `tests/fixtures/db.json` 现在只保留基础 localStorage 状态
+- `tests/fixtures/save.json` 承载 save 明细
+- `loadLiveBindingFixture(page)` 会负责：
+  1. 注入 `db.json` 到 localStorage
+  2. 基于 `save.json` 构造 `x4_save_archives` state
+  3. 把 `save.json` 写入 IndexedDB
+  4. reload 后切到 `live-production`
+  5. 通过 UI 设置语言
+
+示例：
+
+```typescript
+import { test } from '../../test-setup'
+import { loadLiveBindingFixture } from '../helpers/loadLiveBindingFixture'
+
+test.beforeEach(async ({ page }) => {
+  await page.addStyleTag({
+    content: '*, *::before, *::after { transition: none !important; animation: none !important; }'
+  })
+  await loadLiveBindingFixture(page)
+})
+```
+
 ### Skills & Workflow
 
 The `.trae/skills/` directory contains markdown skill definitions for the Trae IDE:
@@ -203,6 +244,19 @@ These define the development workflow patterns used in this codebase.
 - Only fall back to global skills after confirming there is no applicable project-local skill.
 
 ## Working Guidelines
+
+### UI Layering Principle
+- **新方案必须严格采用 `store -> presenter -> vue` 三层结构**
+- **不得再添加中间层**。`store` 和 `presenter` 之间、`presenter` 和 `vue` 之间都不允许再引入新的适配层、view model 层、facade UI 层或其他等价中间层
+- `store` **不面向 UI 直接输出数据**。`store` 只负责领域状态、持久化状态、计算过程、基础派生和可复用业务能力，不负责为了某个 Vue 组件定制返回结构
+- `presenter` **负责面向 UI 组装数据**。所有供界面直接消费的展示结构、组件输入、显示模式切换、分组和 UI 专用字段，都应在 `presenter` 层完成
+- `vue` **不得直接调用 `store`**，除读取静态 JSON 数据这类例外情况外，Vue 组件必须通过 `presenter` 取数和触发行为
+- `vue` **不得直接调用 `presenter` 以外的业务组装逻辑**。凡是组件内直接拼装 store 数据、直接做 UI 导向的数据变形，均视为违反新方案
+- 当前代码中凡是 **没有通过 `presenter` 而直接访问 `store` 的写法，都属于历史遗留问题**。可以识别、记录、渐进清理，但**新方案不得继续采用**
+- 设计评审和实现时，默认检查标准是：
+  - 这段逻辑是否应留在 `store`
+  - 这段面向界面的组装是否应移动到 `presenter`
+  - 该 Vue 组件是否仍然直接依赖 `store`
 
 ### When User Asks for Understanding/Analysis
 - Provide explanation first, do not modify code without confirmation
@@ -227,6 +281,11 @@ These define the development workflow patterns used in this codebase.
 ### Git Worktree Merge
 When merging a worktree branch into develop:
 - Run `git merge <branch-name>` directly in the develop working directory
+
+### Git Operations Safety
+- **当用户说"提交"时，必须先检查本地变动**（`git status`、`git diff`），不得从对话记录里假设没有变动
+- **我不是仓库的唯一编辑人**，用户可能在其他终端、编辑器或工具中修改了文件
+- 任何 git 操作前，必须先确认当前状态，不得假设状态与对话记录一致
 - Do NOT push to remote unless explicitly requested
 - Example workflow: commit on branch → switch to develop → merge branch
 
@@ -251,3 +310,8 @@ When merging a worktree branch into develop:
 **原因：** 使用 `python3 -c "..."` 会触发沙盒确认弹窗，每次执行都需要用户确认，严重妨碍效率。创建脚本文件执行则不会触发确认。
 
 **违反后果：** 每次违反都需要向用户说明原因并道歉。没有例外，无论代码多简单。
+
+## Refactoring Rules
+
+- **禁止在重构中使用 fallback 链**（如 `a || b || c`、`?.modules?.length ?? 0 > 0` 等兜底逻辑）
+- 分支条件必须精确映射业务状态，每个分支只做一件事，不依赖 sequential fallback 掩盖逻辑缺失

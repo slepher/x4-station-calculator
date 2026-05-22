@@ -1,0 +1,103 @@
+gameGuid: CB8837FE-98C1-42F8-9D6A-ED0ADC539111
+bindingName: slepher
+groups:
+  - name: 小行星
+    sectorMacro: cluster_100_sector001_macro
+    coverageSectorMacros:
+      - ref: cluster_106_sector001_macro
+        jump: 3
+    connectedGroupIds:
+      - 月之舟
+    tradeStation:
+      sectorMacro: cluster_100_sector001_macro
+      position:
+        x: 110000
+        y: 0
+        z: -48943
+  - name: 神圣眼光
+    sectorMacro: cluster_24_sector001_macro
+    coverageSectorMacros:
+      - ref: cluster_26_sector001_macro
+        jump: 2
+      - ref: cluster_740_sector001_macro
+        jump: 2
+    connectedGroupIds:
+      - 阿尔忒弥斯的朦胧
+      - 月之舟
+  - name: 阿尔忒弥斯的朦胧
+    sectorMacro: cluster_715_sector001_macro
+    coverageSectorMacros: []
+    connectedGroupIds:
+      - 神圣眼光
+      - 月之舟
+    tradeStation:
+      saveStationCode: BHW-834
+  - name: 月之舟
+    sectorMacro: cluster_48_sector001_macro
+    coverageSectorMacros:
+      - ref: cluster_27_sector001_macro
+        jump: 1
+    connectedGroupIds:
+      - 小行星
+      - 阿尔忒弥斯的朦胧
+      - 神圣眼光
+      - 警惕凝视
+    tradeStation:
+      sectorMacro: cluster_48_sector001_macro
+      position:
+        x: 212136
+        y: 0
+        z: 55597
+  - name: 警惕凝视
+    sectorMacro: cluster_601_sector001_macro
+    coverageSectorMacros:
+      - ref: cluster_31_sector001_macro
+        jump: 1
+    connectedGroupIds:
+      - 月之舟
+    tradeStation:
+      saveStationCode: UKW-234
+stationPlans:
+  - name: 地球人
+    saveStationCode: KXN-018
+    modules:
+      - id: module_ter_prod_computronicsubstrate_01
+        count: 10
+      - id: module_ter_prod_siliconcarbide_01
+        count: 10
+      - id: module_ter_prod_metallicmicrolattice_01
+        count: 10
+  - name: RWC-785
+    saveStationCode: RWC-785
+    modules:
+      - id: module_gen_prod_claytronics_01
+        count: 2
+    lockedWares:
+      - quantumtubes
+  - name: XAJ-926
+    saveStationCode: XAJ-926
+  - name: AVE-937
+    saveStationCode: AVE-937
+  - name: MGO-010
+    saveStationCode: MGO-010
+    modules:
+      - id: module_gen_prod_fieldcoils_01
+        count: 1
+    lockedWares:
+      - quantumtubes
+  - name: EOF-448
+    saveStationCode: EOF-448
+    modules:
+      - id: module_gen_prod_quantumtubes_01
+        count: 2
+  - name: 新建空间站
+    sectorMacro: cluster_100_sector001_macro
+    position:
+      x: 67524
+      y: 0
+      z: 81288
+    modules:
+      - id: module_gen_prod_antimatterconverters_01
+        count: 2
+      - id: module_gen_prod_fieldcoils_01
+        count: 1

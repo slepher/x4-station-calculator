@@ -11,14 +11,16 @@ const props = withDefaults(defineProps<{
   unit?: string
   isTime?: boolean
   isWorkers?: boolean
-  isVolume?: boolean // [新增]
+  isVolume?: boolean
+  badge?: string
 }>(), {
   variant: 'module',
   count: 0,
   unit: 'Cr',
   isTime: false,
   isWorkers: false,
-  isVolume: false // [新增]
+  isVolume: false,
+  badge: ''
 })
 
 const formatNum = (n: number) => new Intl.NumberFormat('en-US').format(Math.round(n))
@@ -58,11 +60,13 @@ const formattedItems = computed(() => {
       <template #title>
         <div v-if="variant === 'summary'" class="group-title variant-summary">
           {{ title }}
+          <span v-if="badge" class="badge-pill">{{ badge }}</span>
         </div>
         <div v-else class="group-title variant-module">
           <span class="name">{{ title }}</span>
           <span class="symbol">x</span>
           <span class="count">{{ count }}</span>
+          <span v-if="badge" class="badge-pill">{{ badge }}</span>
         </div>
       </template>
       <template #header>
@@ -149,6 +153,10 @@ const formattedItems = computed(() => {
 
 .material-name .name {
   @apply text-xs font-normal text-slate-400;
+}
+
+.badge-pill {
+  @apply text-[10px] font-bold uppercase text-amber-400 bg-amber-400/10 border border-amber-400/30 rounded-full px-2 py-0.5 ml-2;
 }
 
 .material-value {

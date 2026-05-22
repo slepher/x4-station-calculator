@@ -57,6 +57,22 @@
   - `example: getEquipmentCandidatesBySlot('turret', 'large', ['standard', 'advanced'], { races: ['argon'], mks: [], tags: ['standard'] })`
   - `constraints: tagsAll 为硬约束（equipment.tags ⊆ tagsAll）；filters.tags 为结果二次过滤（任一命中）`
 
+- `resolveBlueprintMaterialCost`
+  - `file: src/store/logic/resolveBlueprintMaterialCost.ts`
+  - `usage: 从蓝图和舰船数据解析完整材料需求`
+  - `signature: resolveBlueprintMaterialCost(blueprint, ship, equipmentMap, consumablesMap, dronesMap, missilesMap)`
+  - `args:`
+    - `blueprint: ShipBlueprint`
+    - `ship: X4Ship`
+    - `equipmentMap: Map<string, X4Equipment>`
+    - `consumablesMap: Map<string, X4Consumable>`
+    - `dronesMap: Map<string, X4Drone>`
+    - `missilesMap: Map<string, X4Missile>`
+  - `returns: Record<string, number> (wareId -> totalQty)`
+  - `logic: 按 blueprint.materialMethod 分别从 ship.production、equipment.cost、storage 物品 cost 取材料并合并`
+  - `example: resolveBlueprintMaterialCost(bp, ship, equipmentMap, consumablesMap, dronesMap, missilesMap)`
+  - `constraints: 蓝图缺失时调用方自行降级（materials 按 0 计算）；不处理价格`
+
 ## Pending
 
 pending:

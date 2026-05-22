@@ -1,0 +1,473 @@
+{
+  "import-export": [
+    {
+      "change": "import-export-game-version",
+      "requirements": [
+        "Import-Export UI Workflow",
+        "Import Configuration Panel After Upload",
+        "Module-Oriented Import Pipeline",
+        "Export Compatibility",
+        "Module Migration Strategy",
+        "Import-Export Module Naming"
+      ]
+    },
+    {
+      "change": "save-archive-infra",
+      "requirements": [
+        "Save Module Export Data Structure",
+        "Save Module Export UI Behavior",
+        "Save Module Import Sanitize",
+        "Save Module Import Re-process",
+        "Save Module Import Same-Name Archive Handling",
+        "Save Module Import Migration",
+        "Save Module Import ActiveId Decision",
+        "Save Module Import Context Refresh",
+        "Save Module Import Version Scope Isolation",
+        "Save Module Import UI Behavior",
+        "(modified) Import-Export UI Workflow",
+        "(modified) Module-Oriented Import Pipeline"
+      ]
+    }
+  ],
+  "x4-sector": [
+    {
+      "change": "rebase-sector-zeropoint",
+      "requirements": [
+        "Sector Local Coordinate Normalization",
+        "Sector Internal Scale Uses Full Zone Range",
+        "Sector Local Screen Ratio Projection",
+        "Sector Dataset Structure",
+        "Sector Tooltip Center Display"
+      ]
+    },
+    {
+      "change": "user-save-binding",
+      "requirements": [
+        "Sector Group Coverage by Save Binding Hub",
+        "Connected Sector Groups in Binding View"
+      ]
+    }
+  ],
+  "save-import": [
+    {
+      "change": "rebase-sector-zeropoint",
+      "requirements": [
+        "Save Archive Position Normalization",
+        "Save Archive Transform Coordinates",
+        "Save POI Map Consumption",
+        "Placement and Preview Consistency"
+      ]
+    },
+    {
+      "change": "save-archive-infra",
+      "requirements": [
+        "Tab Entry",
+        "Upload Interface",
+        "Archive Version Metadata",
+        "Version Validation",
+        "Save Archive Grouping",
+        "IndexedDB Recovery",
+        "Invalid Archive Interaction",
+        "Save Data Extraction",
+        "Sector Organization",
+        "Parser Capability Boundary",
+        "Save Detail Display",
+        "JSON Export",
+        "SAX Streaming Parser",
+        "Name Translation",
+        "Save Store",
+        "CLI Extraction Tool"
+      ]
+    }
+  ],
+  "player-stations-table": [
+    {
+      "change": "save-archive-infra",
+      "requirements": [
+        "Database Level Versioning",
+        "Table Structure",
+        "Save Archive Loading",
+        "Save Archive Import",
+        "Version Configuration",
+        "Database Migration"
+      ]
+    }
+  ],
+  "save-local-storage": [
+    {
+      "change": "save-archive-infra",
+      "requirements": [
+        "Save Store SHALL Use Versioned LocalStorage State",
+        "Save Store SHALL Persist Active Archive In LocalStorage",
+        "Save Map Settings SHALL Be Persisted Per Version Scope And Not Per Archive",
+        "Save Archive Body SHALL Be Stored In IndexedDB Only",
+        "Save Store SHALL Update LocalStorage Directory Before Body Persistence Completes",
+        "Save Store SHALL Clear Data Per Version Scope",
+        "Maps View SHALL Use Active Archive Without Forcing Save Panel Open",
+        "Legacy Save DB SHALL Be Cleaned When No Scoped Save Keys Exist",
+        "(modified) Save Import Persistence SHALL Use LocalStorage For Directory Recovery"
+      ]
+    }
+  ],
+  "empire-management": [
+    {
+      "change": "map-station",
+      "requirements": [
+        "Station And Sector Location Persistence",
+        "Location Changes Mark Empire Dirty"
+      ]
+    },
+    {
+      "change": "user-save-binding",
+      "requirements": [
+        "Independent Save Binding Layer",
+        "Archive Time as View Selection"
+      ]
+    },
+    {
+      "change": "user-save-binding-data",
+      "requirements": [
+        "Empire Persistence Boundary",
+        "Empire Store Production Source"
+      ]
+    }
+  ],
+  "map-station": [
+    {
+      "change": "map-station",
+      "requirements": [
+        "Map Station Placement Entry",
+        "Station And Sector Transit Placement Sources",
+        "Drag To Map Sector And Save Raw Position",
+        "Placement Metadata Snapshot",
+        "Placement Update And Clear"
+      ]
+    },
+    {
+      "change": "user-save-binding",
+      "requirements": [
+        "Binding Entry in Save Homepage",
+        "Step 2 Sector Group Editing",
+        "Step 3 Station Binding",
+        "Save Parser Exposes Station Buildstorage Reference"
+      ]
+    },
+    {
+      "change": "user-save-binding-map",
+      "requirements": [
+        "Binding State Separation",
+        "SavePanel Manages activeArchiveId",
+        "Binding Entry in Save Homepage",
+        "Step 2 Binding Group Editing",
+        "Step 2 Candidate Sector Locking",
+        "Step 3 Derived Station Planning",
+        "Auto TradeStation Creation",
+        "Save Station TradeStation Binding",
+        "Step 3 Binding Menu UI",
+        "(modified) Drag Interaction on Map",
+        "(modified) Binding Save Status UI"
+      ]
+    }
+  ],
+  "empire-production-summary": [
+    {
+      "change": "user-save-binding-data",
+      "requirements": [
+        "Production Source Selection",
+        "Binding Planned Modules in Production",
+        "Binding Transit Hub Mapping"
+      ]
+    }
+  ],
+  "save-binding": [
+    {
+      "change": "user-save-binding-data",
+      "requirements": [
+        "Standalone Binding Storage",
+        "Binding View Archive Time",
+        "Binding Groups",
+        "Derived Save Station Views",
+        "Binding Station Plans",
+        "Trade Station",
+        "Source Empire Copy Import",
+        "Binding Explicit Save",
+        "Modules/Equipments Aggregation Migration"
+      ]
+    }
+  ],
+  "map-resource-filter": [
+    {
+      "change": "advanced-resource-filter",
+      "requirements": [
+        "Simple And Advanced Filter Modes",
+        "Advanced Tag Group Semantics",
+        "Advanced Transit Permission Toggle",
+        "Advanced Tag Groups Expand In Place",
+        "Advanced Candidate Uses Resource Set And Hub Candidates",
+        "Advanced Pie Fill Aggregates Matched Group Resources",
+        "Advanced Result Keeps Only Maximal Resource Sets",
+        "Advanced Candidate Score Uses Weakest Group",
+        "Advanced Results Are Displayed As Candidate Groups",
+        "Advanced Mode Uses Internal Panel Scroll",
+        "Advanced Jump Limit Control Matches Simple Sunlight Style"
+      ]
+    },
+    {
+      "change": "station-resource-group",
+      "requirements": [
+        "Resource Group Loader Component",
+        "Data Source Integration",
+        "Refresh Button Layout"
+      ]
+    }
+  ],
+  "active-station-refactory": [
+    {
+      "change": "production-workbench-refactory",
+      "requirements": [
+        "Active Station Entity Resolution",
+        "Entity Source Separation",
+        "Editable Plan Separation",
+        "Transit Mode Role Boundary",
+        "Page Consumption Contract"
+      ]
+    }
+  ],
+  "production-store-present-view": [
+    {
+      "change": "production-workbench-refactory",
+      "requirements": [
+        "Store SHALL Preserve Live Domain Models",
+        "Context SHALL Remain Supplemental",
+        "Presenter SHALL Be The Only UI Assembly Layer",
+        "Plan/Live Switching SHALL Converge In Store",
+        "View SHALL Only Render Presenter Output",
+        "Transit SHALL Reuse StationState",
+        "(modified) Production Workbench Boundary"
+      ]
+    }
+  ],
+  "remove-workbench": [
+    {
+      "change": "production-workbench-refactory",
+      "requirements": [
+        "Production Store SHALL Remove Legacy Workbench Exports",
+        "Presenter SHALL Assemble Tabbar From Domain State",
+        "Presenter SHALL Replace Legacy Toolbar Getters",
+        "Planning And Dashboard Presenter SHALL Replace Remaining Legacy Getters",
+        "View SHALL Only Use Formal Entry State",
+        "Legacy Entrypoints SHALL Trigger Static Guardrails",
+        "WorkbenchMode SHALL Remain A Valid Domain Field"
+      ]
+    }
+  ],
+  "station-tab-bar": [
+    {
+      "change": "production-workbench-refactory",
+      "requirements": [
+        "Simplified StationTabBar",
+        "SectorStationTabBar",
+        "(modified) BlueprintProductionStore Station List"
+      ]
+    }
+  ],
+  "production-ui": [
+    {
+      "change": "user-save-binding-station",
+      "requirements": [
+        "productionSource Routing",
+        "isDirty Merge Logic",
+        "saveCurrentSource Dispatch",
+        "StationPlanningPanel Binding Mode",
+        "StationTabBar Binding Mode",
+        "StationDashboard Save Behavior",
+        "ProductionWorkbenchView Data Source Switch",
+        "useStationStore Binding Routing (updateModules/updateSettings)",
+        "extractPlanIdFromStationId"
+      ]
+    }
+  ],
+  "station-derived-map": [
+    {
+      "change": "station-derived-map",
+      "requirements": [
+        "Station Runtime Single Source of Truth",
+        "Derived and Computed Consistency",
+        "Station Derived Independent Compute Layer",
+        "Station Semantic Derived Cache",
+        "Station Derived Aggregation Query",
+        "Station Derived Lifecycle Sync"
+      ]
+    }
+  ],
+  "station-dashboard": [
+    {
+      "change": "live-workforce",
+      "requirements": [
+        "Workforce Override Data Structure",
+        "Workforce Override Compute Branch",
+        "Efficiency Saturation Override",
+        "Store Layer Workforce Data Pass",
+        "Presenter Force Workforce Auto",
+        "Dashboard UI Force Checkbox State",
+        "Contribution Traceability"
+      ]
+    }
+  ],
+  "map-search": [
+    {
+      "change": "poi-search",
+      "requirements": [
+        "Search Control UI",
+        "Autocomplete Search Scope",
+        "Pill Tag Group Logic (OR/AND)",
+        "Station Match Rules",
+        "Search State Management (non-persistent)"
+      ]
+    }
+  ],
+  "active-binding": [
+    {
+      "change": "active-binding",
+      "requirements": [
+        "Active Binding Synchronization",
+        "Archive Guid Consistency",
+        "Binding Activation Rebuild",
+        "Dirty-Driven Recompute",
+        "Active Invalidation After Save Removal",
+        "Invalid Binding Entry Behavior",
+        "Upload Unrelated Archive Does Not Clear Active Binding",
+        "Upload Related Archive Follows Binding Time Constraint",
+        "Load Binding From List Must Activate",
+        "Switch Binding Clears Expanded Sector"
+      ]
+    }
+  ],
+  "map-json-shape": [
+    {
+      "change": "map-json-refactory",
+      "requirements": [
+        "Top-Level Cluster And Sector Indexes",
+        "Lowercase Map Entity Ids",
+        "No Compatibility Bridge For Old Map Shape",
+        "(modified) Maps Json Consumer Access Pattern"
+      ]
+    }
+  ],
+  "poi-performance": [
+    {
+      "change": "poi-performance",
+      "requirements": [
+        "Save Sidebar Decoupled From Zoom",
+        "Save Overlay Source Stability",
+        "Conditional Small Icon Sector Culling",
+        "Large Icon Dynamic Scaling",
+        "Split Live Viewport And Settled Sector Bounds",
+        "Prebuilt Sector Macro Index"
+      ]
+    }
+  ],
+  "map-resource-calc": [
+    {
+      "change": "resource-algorithm",
+      "requirements": [
+        "Region Definition Extraction",
+        "Group Yield Inline Merge",
+        "Region Resource Aggregation",
+        "Sector Resource Aggregation",
+        "Simulated Noise Probability Model",
+        "Region Resource Density Output",
+        "Version Selection Parity With Distiller"
+      ]
+    }
+  ],
+  "resource-processor-docs": [
+    {
+      "change": "resource-algorithm",
+      "requirements": [
+        "Two-step architecture documentation",
+        "Version bifurcation documentation",
+        "Algorithm documentation (4 estimator specs)",
+        "Output data structure documentation",
+        "Field definition consistency",
+        "Verification methodology documentation"
+      ]
+    }
+  ],
+  "resourcearea-map-accum": [
+    {
+      "change": "resource-algorithm",
+      "requirements": [
+        "9.0 resourceareas format: resources array restructure",
+        "Area-level resource calculation with amount multiplication",
+        "Sector-level resource aggregation from areas",
+        "Field rename: factor -> gatherfactor",
+        "rating moved into resources array"
+      ]
+    }
+  ],
+  "resources-new": [
+    {
+      "change": "resource-algorithm",
+      "requirements": [
+        "Version-Gated Map Resource Model (8.0 regions vs 9.0 resourceareas)",
+        "Resourceareas Output Structure (sector refs + definitions)",
+        "Regionyields Compatibility Placeholder",
+        "Maps Sector Resource Summary Compatibility",
+        "8.0 Regions.json Resources Array Enhancement (yield_name, resourcedensity)",
+        "8.0 Regions.json Field Arrays Enhancement (asteroids, debris, nebulae)"
+      ]
+    }
+  ],
+  "save-resource-extract": [
+    {
+      "change": "save-resource-extract",
+      "requirements": [
+        "Implement As TypeScript Utility And Tsx CLI",
+        "Read 8.0 Assets Only",
+        "Extract Save Resource Points",
+        "Preserve Sector Extraction JSON",
+        "Map Resource Points To Candidate Regions",
+        "Collapse Overlapping Regions Into Sector Components",
+        "Produce Validation Total Json"
+      ]
+    }
+  ],
+  "user-save-list": [
+    {
+      "change": "user-save-list",
+      "requirements": [
+        "Save Panel Homepage",
+        "Guid Group Container Interaction",
+        "Homepage Active Projection",
+        "Root Breadcrumb Navigation Only"
+      ]
+    }
+  ],
+  "user-save-poi": [
+    {
+      "change": "user-save-poi",
+      "requirements": [
+        "Save POI Category Navigation",
+        "Save POI Visibility Control",
+        "Save POI Coordinate List",
+        "Save POI Overlay and Tooltip"
+      ]
+    }
+  ],
+  "ware-flow-display": [
+    {
+      "change": "wareflow-refactory",
+      "requirements": [
+        "WareProductionFlow Data Type (phase 1 output)",
+        "Phase 1 Compute Function (calculateProductionFlows)",
+        "Phase 2 Compute Function (calculateWareFlowDerived)",
+        "StationState Field Changes (add productionFlows, remove groupedFlows)",
+        "Phase 1 Trigger Mechanism (direct call in recompute)",
+        "Phase 2 Trigger Mechanism (watch buffer/price/transport)",
+        "Phase 2 Updates Store via emit",
+        "StationPlanningPanel Display Merge (industry + infrastructure)"
+      ]
+    }
+  ]
+}

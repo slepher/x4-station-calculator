@@ -1,12 +1,12 @@
 import fs from 'node:fs'
-import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import zlib from 'node:zlib'
 import sax from 'sax'
-import { createSaveParserRuntime, createSaveXmlFilterRuntime } from '../src/workers/saveParser.worker'
+import getopts from 'getopts'
+import { createSaveParserRuntime, createSaveXmlFilterRuntime, createComponentXmlFilterRuntime } from '../src/workers/saveParser.worker'
 import type { SaveArchive, ProgressInfo } from '../src/types/saveArchive'
 import { postProcessRustSaveArchive } from '../src/workers/saveParser.post'
-import type { X4Module, X4Map } from '../src/types/x4'
+import type { X4Module, X4Map, X4Ship, X4Equipment } from '../src/types/x4'
 
 interface FilteredXmlResult {
   xml: string
@@ -62,43 +62,80 @@ interface QueryMatch {
   root: QueryTreeNode
 }
 
-function printUsage(): void {
-  console.log('Usage: npm exec tsx scripts/extract_save.tsx <input.xml|input.xml.gz|input.gz> [output] [options]')
-  console.log('')
-  console.log('Options:')
-  console.log('  --wasm         Use Rust WASM parser (3.25x faster, experimental)')
-  console.log('  --xml          Output as XML instead of JSON (extracts only relevant data)')
-  console.log('  --query-xml <q>  Output matching tags with full subtree and ancestor chain as XML')
-  console.log('  --version <v>  Expected game version (e.g., "8.0"). If not set, version check is skipped')
-  console.log('  --skip-post    Skip post-processing (output raw parsed data without tag inference)')
+interface ComponentFilterOptions {
+  className: string
+  codes: string[]
 }
 
-function parseArgs(): { input: string; output: string; useWasm: boolean; outputXml: boolean; queryXml: string | null; expectedVersion: string | null; skipPost: boolean } {
-  const args = process.argv.slice(2)
-  const useWasm = args.includes('--wasm')
-  const outputXml = args.includes('--xml')
-  const skipPost = args.includes('--skip-post')
-  const queryXmlIndex = args.indexOf('--query-xml')
-  const queryXml = queryXmlIndex !== -1 && args[queryXmlIndex + 1] && !args[queryXmlIndex + 1].startsWith('--')
-    ? args[queryXmlIndex + 1]
-    : null
-  
-  let expectedVersion: string | null = null
-  const versionIndex = args.indexOf('--version')
-  if (versionIndex !== -1 && args[versionIndex + 1] && !args[versionIndex + 1].startsWith('--')) {
-    expectedVersion = args[versionIndex + 1]
-  }
-  
-  const positional = args.filter((a, i) => {
-    if (a.startsWith('--')) return false
-    if (versionIndex !== -1 && (i === versionIndex + 1)) return false
-    if (queryXmlIndex !== -1 && i === queryXmlIndex + 1) return false
-    return true
+function printHelp(): void {
+  console.log('Usage: vite-node scripts/extract_save.tsx <input.xml|input.xml.gz|input.gz> [output] [options]')
+  console.log('')
+  console.log('Extract and parse X4: Foundations save files into JSON or filtered XML.')
+  console.log('')
+  console.log('Positional arguments:')
+  console.log('  input              Input save file (.xml, .xml.gz, or .gz)')
+  console.log('  output             Output file path (default: derived from input name)')
+  console.log('')
+  console.log('Options:')
+  console.log('  -h, --help         Show this help message and exit')
+  console.log('  --wasm             Use Rust WASM parser (3.25x faster, experimental)')
+  console.log('  --xml              Output as XML instead of JSON (extracts only relevant data)')
+  console.log('  --class <c>        Filter by component class (e.g., station, sector, ship_l)')
+  console.log('  --code <c>         Filter by component code (comma-separated, e.g., XAJ-926,FIX-154)')
+  console.log('  --query-xml <q>    Output matching tags with full subtree and ancestor chain as XML')
+  console.log('  --version <v>      Expected game version (e.g., "8.0"). Skipped if not set')
+  console.log('  --skip-post        Skip post-processing (output raw parsed data without tag inference)')
+  console.log('')
+  console.log('Examples:')
+  console.log('  vite-node scripts/extract_save.tsx save_009.xml')
+  console.log('  vite-node scripts/extract_save.tsx save_009.xml.gz --wasm')
+  console.log('  vite-node scripts/extract_save.tsx save_009.xml out.json --version 8.0')
+  console.log('  vite-node scripts/extract_save.tsx save_009.xml --xml')
+  console.log('  vite-node scripts/extract_save.tsx save_009.xml --query-xml \'<component class="station"/>\'')
+  console.log('  vite-node scripts/extract_save.tsx save_009.xml --class station --code XAJ-926,FIX-154')
+}
+
+interface ParsedArgs {
+  input: string
+  output: string
+  useWasm: boolean
+  outputXml: boolean
+  queryXml: string | null
+  componentFilter: ComponentFilterOptions | null
+  expectedVersion: string | null
+  skipPost: boolean
+}
+
+function parseArgs(): ParsedArgs & { help: boolean } {
+  const rawArgv = process.argv.slice(2)
+  const argv = rawArgv[0] === '--' ? rawArgv.slice(1) : rawArgv
+  const opts = getopts(argv, {
+    alias: {
+      h: 'help',
+    },
+    boolean: ['help', 'wasm', 'xml', 'skip-post'],
+    string: ['class', 'code', 'query-xml', 'version'],
   })
-  
-  const input = positional[0]
-  const output = positional[1]
-  return { input, output, useWasm, outputXml, queryXml, expectedVersion, skipPost }
+
+  const help = opts.help as boolean
+  const useWasm = opts.wasm as boolean
+  const outputXml = opts.xml as boolean
+  const skipPost = opts['skip-post'] as boolean
+  const queryXml = (opts['query-xml'] as string) || null
+  const expectedVersion = (opts.version as string) || null
+
+  let componentFilter: ComponentFilterOptions | null = null
+  const codeValue = opts.code as string | undefined
+  if (codeValue) {
+    const className = (opts.class as string) || ''
+    const codes = codeValue.split(',').map(c => c.trim()).filter(c => c.length > 0)
+    componentFilter = { className, codes }
+  }
+
+  const input = opts._[0] || ''
+  const output = opts._[1] || ''
+
+  return { input, output, useWasm, outputXml, queryXml, componentFilter, expectedVersion, skipPost, help }
 }
 
 function isGzipFile(filePath: string): boolean {
@@ -126,6 +163,18 @@ function defaultQueryOutputPath(inputPath: string): string {
   if (inputPath.toLowerCase().endsWith('.gz')) return inputPath.slice(0, -3) + '.query.xml'
   if (inputPath.toLowerCase().endsWith('.xml')) return inputPath.slice(0, -4) + '.query.xml'
   return inputPath + '.query.xml'
+}
+
+function defaultComponentOutputPath(inputPath: string, className: string, codes: string[]): string {
+  const baseName = inputPath
+    .replace(/\.xml\.gz$/i, '')
+    .replace(/\.gz$/i, '')
+    .replace(/\.xml$/i, '')
+    .replace(/.*[\/\\]/, '')
+  
+  const classPart = className ? `_${className}` : ''
+  const codesPart = codes.length === 1 ? codes[0] : `${codes.length}codes`
+  return `${baseName}${classPart}_${codesPart}.xml`
 }
 
 function formatMB(bytes: number): string {
@@ -225,6 +274,64 @@ function loadMaps(version: string | null): X4Map | undefined {
   
   console.log(`[extract_save] loaded maps for version ${version}: ${clusterCount} clusters, ${sectorCount} sectors, ${zoneCount} zones`)
   return maps
+}
+
+function loadShips(version: string | null): X4Ship[] | undefined {
+  if (!version) return undefined
+  
+  const versionConfigPath = path.resolve(process.cwd(), 'src/assets/versions.json')
+  if (!fs.existsSync(versionConfigPath)) {
+    console.warn(`[extract_save] versions.json not found at ${versionConfigPath}, skipping ships loading`)
+    return undefined
+  }
+  
+  const versionConfig = JSON.parse(fs.readFileSync(versionConfigPath, 'utf-8'))
+  const versionInfo = versionConfig.versions?.find((v: { version: string }) => String(v.version) === version)
+  if (!versionInfo) {
+    console.warn(`[extract_save] version ${version} not found in versions.json, skipping ships loading`)
+    return undefined
+  }
+  
+  const folderName = versionInfo.folder_name || version
+  const shipsPath = path.resolve(process.cwd(), `src/assets/x4_game_data/${folderName}/data/ships.json`)
+  
+  if (!fs.existsSync(shipsPath)) {
+    console.warn(`[extract_save] ships.json not found at ${shipsPath}, skipping ships loading`)
+    return undefined
+  }
+  
+  const ships: X4Ship[] = JSON.parse(fs.readFileSync(shipsPath, 'utf-8'))
+  console.log(`[extract_save] loaded ${ships.length} ships for version ${version}`)
+  return ships
+}
+
+function loadEquipments(version: string | null): X4Equipment[] | undefined {
+  if (!version) return undefined
+  
+  const versionConfigPath = path.resolve(process.cwd(), 'src/assets/versions.json')
+  if (!fs.existsSync(versionConfigPath)) {
+    console.warn(`[extract_save] versions.json not found at ${versionConfigPath}, skipping equipments loading`)
+    return undefined
+  }
+  
+  const versionConfig = JSON.parse(fs.readFileSync(versionConfigPath, 'utf-8'))
+  const versionInfo = versionConfig.versions?.find((v: { version: string }) => String(v.version) === version)
+  if (!versionInfo) {
+    console.warn(`[extract_save] version ${version} not found in versions.json, skipping equipments loading`)
+    return undefined
+  }
+  
+  const folderName = versionInfo.folder_name || version
+  const equipmentsPath = path.resolve(process.cwd(), `src/assets/x4_game_data/${folderName}/data/equipments.json`)
+  
+  if (!fs.existsSync(equipmentsPath)) {
+    console.warn(`[extract_save] equipments.json not found at ${equipmentsPath}, skipping equipments loading`)
+    return undefined
+  }
+  
+  const equipments: X4Equipment[] = JSON.parse(fs.readFileSync(equipmentsPath, 'utf-8'))
+  console.log(`[extract_save] loaded ${equipments.length} equipments for version ${version}`)
+  return equipments
 }
 
 function pumpWasmParser(options: {
@@ -508,6 +615,65 @@ async function extractSaveQueryXml(inputPath: string, outputPath: string, query:
   console.log(`[extract_save] xml written: ${absoluteOutput}`)
 }
 
+async function extractSaveComponentXml(inputPath: string, outputPath: string, filter: ComponentFilterOptions): Promise<void> {
+  const absoluteInput = path.resolve(process.cwd(), inputPath)
+  const absoluteOutput = path.resolve(process.cwd(), outputPath)
+  const gzip = isGzipFile(absoluteInput)
+  const stat = fs.statSync(absoluteInput)
+
+  console.log('[extract_save] parser: sax-js (component XML output)')
+  console.log(`[extract_save] input: ${absoluteInput}`)
+  console.log(`[extract_save] output: ${absoluteOutput}`)
+  console.log(`[extract_save] source size: ${formatMB(stat.size)} MB`)
+  console.log(`[extract_save] source type: ${gzip ? 'gzip' : 'xml'}`)
+  console.log(`[extract_save] filter: class=${filter.className || '(any)'}, codes=${filter.codes.join(',')}`)
+
+  const sourceStream = fs.createReadStream(absoluteInput)
+  const dataStream = gzip ? sourceStream.pipe(zlib.createGunzip()) : sourceStream
+  
+  const outputFd = fs.openSync(absoluteOutput, 'w')
+  fs.writeSync(outputFd, '<?xml version="1.0" encoding="utf-8"?>\n')
+  
+  const runtime = createComponentXmlFilterRuntime({
+    codeFilters: filter.codes,
+    classFilter: filter.className || null,
+    write: (chunk) => {
+      fs.writeSync(outputFd, chunk)
+    }
+  })
+
+  let bytesRead = 0
+  let nextLogMB = 10
+
+  sourceStream.on('data', (chunk: string | Buffer) => {
+    bytesRead += typeof chunk === 'string' ? chunk.length : chunk.length
+    const mb = (bytesRead / (1024 * 1024)).toFixed(1)
+    if (bytesRead >= nextLogMB * 1024 * 1024) {
+      console.log(`[extract_save] read ${mb} MB / ${formatMB(stat.size)} MB`)
+      nextLogMB += 10
+    }
+  })
+
+  const decoder = new TextDecoder()
+  for await (const chunk of dataStream as AsyncIterable<Buffer>) {
+    runtime.feed(decoder.decode(chunk, { stream: true }))
+  }
+
+  const tail = decoder.decode()
+  if (tail) {
+    runtime.feed(tail)
+  }
+
+  try {
+    const result = runtime.close()
+    console.log(`[extract_save] done: ${result.matchCount} matches`)
+  } finally {
+    fs.closeSync(outputFd)
+  }
+  
+  console.log(`[extract_save] xml written: ${absoluteOutput}`)
+}
+
 async function extractSaveSaxJs(inputPath: string, outputPath: string, expectedVersion: string | null): Promise<SaveArchive> {
   const absoluteInput = path.resolve(process.cwd(), inputPath)
   const absoluteOutput = path.resolve(process.cwd(), outputPath)
@@ -719,7 +885,9 @@ async function extractSaveWasm(inputPath: string, outputPath: string, expectedVe
   } else {
     const modulesByMacroId = loadModulesByMacroId(expectedVersion)
     const maps = loadMaps(expectedVersion)
-    archive = postProcessRustSaveArchive(rawArchive, modulesByMacroId, maps)
+    const ships = loadShips(expectedVersion)
+    const equipments = loadEquipments(expectedVersion)
+    archive = postProcessRustSaveArchive(rawArchive, modulesByMacroId, maps, ships, equipments)
   }
 
   console.log(`[extract_save] done: sectors ${Object.keys(archive.sectors).length}, compatible=${archive.isCompatible}`)
@@ -730,16 +898,24 @@ async function extractSaveWasm(inputPath: string, outputPath: string, expectedVe
 }
 
 async function main(): Promise<void> {
-  const { input, output, useWasm, outputXml, queryXml, expectedVersion, skipPost } = parseArgs()
+  const { input, output, useWasm, outputXml, queryXml, componentFilter, expectedVersion, skipPost, help } = parseArgs()
+
+  if (help) {
+    printHelp()
+    return
+  }
 
   if (!input) {
-    printUsage()
+    printHelp()
     process.exitCode = 1
     return
   }
 
   try {
-    if (queryXml) {
+    if (componentFilter) {
+      const outputPath = output || defaultComponentOutputPath(input, componentFilter.className, componentFilter.codes)
+      await extractSaveComponentXml(input, outputPath, componentFilter)
+    } else if (queryXml) {
       await extractSaveQueryXml(input, output || defaultQueryOutputPath(input), queryXml)
     } else if (outputXml) {
       if (useWasm) {
@@ -758,8 +934,4 @@ async function main(): Promise<void> {
   }
 }
 
-const isDirectExecution = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)
-
-if (isDirectExecution) {
-  void main()
-}
+void main()

@@ -1,35 +1,146 @@
 <script setup lang="ts">
-import { useStationStore } from '@/store/useStationStore'
 import draggable from 'vuedraggable'
 import { useI18n } from 'vue-i18n'
+import { ref, watch, nextTick, computed } from 'vue'
+import { useGameDataStore } from '@/store/useGameDataStore'
+import { generateFilteredModulesGrouped, compareModulesByPickerOrder, compareModuleGroupsByPickerOrder } from '@/store/logic/searchModule'
 import StationPlanningItem from './StationPlanningItem.vue'
 import StationModulePicker from './StationModulePicker.vue'
-import { ref, watch, nextTick } from 'vue'
+import type { SavedModule, ModuleGroupResult, X4Module } from '@/types/x4'
+
+const props = defineProps<{
+  plannedModules: SavedModule[]
+  recommendedModules?: SavedModule[]
+  autoIndustryModules: SavedModule[]
+  autoHabitationModules: SavedModule[]
+  autoInfrastructureModules: SavedModule[]
+  enforceDlcActivation: boolean
+  archiveModules?: SavedModule[]
+  buildingModules?: SavedModule[]
+  archiveTotalMap?: Record<string, number>
+}>()
+
+const emit = defineEmits<{
+  updatePlannedModules: [modules: SavedModule[]]
+}>()
 
 const { t } = useI18n()
-const store = useStationStore()
-const flashTime = 300; 0; // 闪烁动画时长（毫秒）
+const gameDataStore = useGameDataStore()
+const flashTime = 300
 
-// 规划区数量调整功能
-// 应用缩放比例
-const applyScale = (scale: number) => {
-  // 更新所有规划模块的数量
-  store.plannedModules.forEach((module: any, index: number) => {
-    const newCount = Math.ceil(module.count * scale)
-    store.updateModuleCount(index, newCount)
-  })
-}
-
-// 跟踪需要高亮的模块，支持多个同时动画
+const searchQuery = ref('')
 const highlightedModuleIds = ref<Set<string>>(new Set())
-
-// 跟踪需要数字闪烁的模块，支持多个同时动画
 const flashingNumberModuleIds = ref<Set<string>>(new Set())
-
-// 记录上一帧的模块数量状态，用于精准对比 { [id: string]: number }
 const lastModuleCounts = ref<Record<string, number>>({})
 
-// --- 动画控制函数 ---
+interface GroupedArchiveModuleItem {
+  moduleId: string
+  savedModule: SavedModule
+  x4Module: X4Module
+  isBuilding: boolean
+}
+
+interface GroupedArchiveGroup {
+  group: string
+  displayLabel: string
+  modules: GroupedArchiveModuleItem[]
+  hasBuilding: boolean
+}
+
+function groupArchiveModulesMixed(built: SavedModule[], building: SavedModule[]): GroupedArchiveGroup[] {
+  const modulesMap = gameDataStore.modulesMap
+  const moduleGroupsMap = gameDataStore.localizedModuleGroupsMap
+  const groups: Record<string, GroupedArchiveModuleItem[]> = {}
+
+  built.forEach((mod) => {
+    const x4Module = modulesMap[mod.id]
+    if (!x4Module) return
+    const group = x4Module.group || ''
+    if (!group) return
+    if (!groups[group]) groups[group] = []
+    groups[group]!.push({
+      moduleId: mod.id,
+      savedModule: mod,
+      x4Module,
+      isBuilding: false
+    })
+  })
+
+  building.forEach((mod) => {
+    const x4Module = modulesMap[mod.id]
+    if (!x4Module) return
+    const group = x4Module.group || ''
+    if (!group) return
+    if (!groups[group]) groups[group] = []
+    groups[group]!.push({
+      moduleId: mod.id,
+      savedModule: mod,
+      x4Module,
+      isBuilding: true
+    })
+  })
+
+  Object.keys(groups).forEach((groupKey) => {
+    const groupModules = groups[groupKey]
+    if (!groupModules) return
+
+    const builtModules = groupModules.filter(m => !m.isBuilding)
+    const buildingMods = groupModules.filter(m => m.isBuilding)
+
+    builtModules.sort((a, b) =>
+      compareModulesByPickerOrder(
+        { id: a.moduleId, group: groupKey },
+        { id: b.moduleId, group: groupKey },
+        moduleGroupsMap
+      )
+    )
+
+    buildingMods.sort((a, b) =>
+      compareModulesByPickerOrder(
+        { id: a.moduleId, group: groupKey },
+        { id: b.moduleId, group: groupKey },
+        moduleGroupsMap
+      )
+    )
+
+    groups[groupKey] = [...builtModules, ...buildingMods]
+  })
+
+  return Object.keys(groups)
+    .sort((a, b) => compareModuleGroupsByPickerOrder(a, b, moduleGroupsMap))
+    .map((groupKey) => ({
+      group: groupKey,
+      displayLabel: moduleGroupsMap[groupKey]?.localeName || groupKey,
+      modules: groups[groupKey] || [],
+      hasBuilding: (groups[groupKey] || []).some(m => m.isBuilding)
+    }))
+}
+
+const groupedArchiveModules = computed(() =>
+  groupArchiveModulesMixed(props.archiveModules || [], props.buildingModules || [])
+)
+
+const hasArchiveData = computed(() => groupedArchiveModules.value.length > 0)
+const recommendedModuleIds = computed(() => new Set((props.recommendedModules || []).map((module) => module.id)))
+
+const archiveTotal = (moduleId: string): number => {
+  return props.archiveTotalMap?.[moduleId] ?? 0
+}
+
+const filteredModulesGrouped = computed<ModuleGroupResult[]>(() => {
+  return generateFilteredModulesGrouped(
+    searchQuery.value,
+    gameDataStore.currentLocale,
+    gameDataStore.localizedModulesMap,
+    gameDataStore.localizedModuleGroupsMap,
+    (module) => !props.enforceDlcActivation || gameDataStore.isDlcActive(module.dlc_tag)
+  )
+})
+
+const internalPlannedModules = computed({
+  get: () => props.plannedModules,
+  set: (val) => emit('updatePlannedModules', val)
+})
 
 const triggerHighlight = (id: string) => {
   highlightedModuleIds.value.add(id)
@@ -39,66 +150,170 @@ const triggerHighlight = (id: string) => {
 }
 
 const triggerNumberFlash = async (id: string) => {
-  // 1. 先移除类名，强制中断当前动画
   flashingNumberModuleIds.value.delete(id)
-
-  // 2. 等待 Vue 更新 DOM (关键：这确保了浏览器感知到类名被移除)
   await nextTick()
-
-  // 3. 重新添加类名，触发新的一轮动画
   setTimeout(() => {
     flashingNumberModuleIds.value.add(id)
-    // 4. 动画结束后清理
     setTimeout(() => {
       flashingNumberModuleIds.value.delete(id)
     }, flashTime)
   }, 10)
 }
 
-// --- 智能监听 ---
-
-// 监听模块列表的深度变化，通过 ID 对比来精准触发闪烁
-// 解决"删除模块导致后续模块错误闪烁"的问题
-watch(() => store.plannedModules, (newVal) => {
+watch(() => props.plannedModules, (newVal) => {
   const currentCounts: Record<string, number> = {}
 
-  newVal.forEach((m: any) => {
+  newVal.forEach((m) => {
     currentCounts[m.id] = m.count
     const prevCount = lastModuleCounts.value[m.id]
 
-    // 只有当 ID 存在且数量不一致时才触发 (避免了删除导致的索引错位)
     if (prevCount !== undefined && prevCount !== m.count) {
       triggerNumberFlash(m.id)
     }
   })
 
-  // 更新历史状态
   lastModuleCounts.value = currentCounts
 }, { deep: true, immediate: true })
 
-// 监听模块列表变化，检测新添加的模块
-watch(() => store.plannedModules.length, (newLength, oldLength) => {
+watch(() => props.plannedModules.length, (newLength, oldLength) => {
   if (newLength > oldLength) {
-    // 检测所有新添加的模块
-    const newModules = store.plannedModules.slice(oldLength)
+    const newModules = props.plannedModules.slice(oldLength)
 
-    newModules.forEach((module: any) => {
+    newModules.forEach((module) => {
       if (module) {
-        // 添加模块到高亮集合（整体边框动画）
         triggerHighlight(module.id)
       }
     })
   }
 })
+
+const applyScale = (scale: number) => {
+  const nextModules = props.plannedModules.map(module => ({
+    ...module,
+    count: Math.ceil(module.count * scale)
+  }))
+  emit('updatePlannedModules', nextModules)
+}
+
+const getModuleInfo = (moduleId: string) => {
+  return gameDataStore.modulesMap[moduleId]
+}
+
+const isModuleDlcActive = (moduleId: string) => {
+  const module = gameDataStore.modulesMap[moduleId]
+  return module ? gameDataStore.isDlcActive(module.dlc_tag) : false
+}
+
+const isModuleCountEditable = (moduleId: string) => {
+  const module = gameDataStore.modulesMap[moduleId]
+  if (!module) return true
+  const moduleGroupType = (module as any).moduleGroup?.type
+  return moduleGroupType !== 'habitation'
+}
+
+const handleAddModule = (moduleId: string) => {
+  const existingIndex = props.plannedModules.findIndex(m => m.id === moduleId)
+  if (recommendedModuleIds.value.has(moduleId)) return
+  let nextModules: SavedModule[]
+  if (existingIndex >= 0) {
+    nextModules = props.plannedModules.map((m, i) =>
+      i === existingIndex ? { ...m, count: m.count + 1 } : m
+    )
+  } else {
+    const defaultCount = archiveTotal(moduleId) || 1
+    nextModules = [...props.plannedModules, { id: moduleId, count: defaultCount }]
+  }
+  emit('updatePlannedModules', nextModules)
+}
+
+const handleUpdateModuleCount = (index: number, count: number) => {
+  let clampedCount = count
+  const module = props.plannedModules[index]!
+  if (recommendedModuleIds.value.has(module.id)) {
+    clampedCount = Math.max(count, archiveTotal(module.id))
+  }
+  const nextModules = props.plannedModules.map((m, i) =>
+    i === index ? { ...m, count: clampedCount } : m
+  )
+  emit('updatePlannedModules', nextModules)
+}
+
+const handleRemoveModule = (index: number) => {
+  const nextModules = props.plannedModules.filter((_, i) => i !== index)
+  emit('updatePlannedModules', nextModules)
+}
+
+const handleReorderModules = (modules: SavedModule[]) => {
+  emit('updatePlannedModules', modules)
+}
+
+const handleTransferAutoModule = (module: SavedModule) => {
+  const info = getModuleInfo(module.id)
+  const isIndustry = info?.type === 'production' && info?.method !== 'recycling'
+  const targetCount = isIndustry ? Math.max(module.count, archiveTotal(module.id)) : module.count
+  const existingIndex = props.plannedModules.findIndex(m => m.id === module.id)
+  let nextModules: SavedModule[]
+  if (existingIndex >= 0) {
+    const current = props.plannedModules[existingIndex]!
+    nextModules = props.plannedModules.map((m, i) =>
+      i === existingIndex ? { ...m, count: Math.max(current.count, targetCount) } : m
+    )
+  } else {
+    nextModules = [...props.plannedModules, { id: module.id, count: targetCount }]
+  }
+  emit('updatePlannedModules', nextModules)
+}
+
+const handleTransferRecommendedModule = (module: SavedModule) => {
+  const targetCount = Math.max(module.count, archiveTotal(module.id))
+  const existingIndex = props.plannedModules.findIndex(m => m.id === module.id)
+  let nextModules: SavedModule[]
+
+  if (existingIndex >= 0) {
+    nextModules = props.plannedModules.map((item, index) =>
+      index === existingIndex ? { ...item, count: Math.max(item.count, targetCount) } : item
+    )
+  } else {
+    nextModules = [...props.plannedModules, { id: module.id, count: targetCount }]
+  }
+
+  emit('updatePlannedModules', nextModules)
+}
+
+const handleTransferArchiveModule = (moduleId: string) => {
+  const total = archiveTotal(moduleId)
+  if (total <= 0) return
+  const existingIndex = props.plannedModules.findIndex(m => m.id === moduleId)
+  if (existingIndex >= 0) {
+    const current = props.plannedModules[existingIndex]!
+    if (current.count >= total) return
+    const nextModules = props.plannedModules.map((m, i) =>
+      i === existingIndex ? { ...m, count: total } : m
+    )
+    emit('updatePlannedModules', nextModules)
+  } else {
+    const nextModules = [...props.plannedModules, { id: moduleId, count: total }]
+    emit('updatePlannedModules', nextModules)
+  }
+}
+
+const handleUpdateSearchQuery = (value: string) => {
+  searchQuery.value = value
+}
+
 </script>
 
 <template>
   <div class="module-list-container">
-    <div class="search-panel">
-      <StationModulePicker />
+    <div class="search-panel" data-testid="search-panel-input">
+      <StationModulePicker
+        :search-query="searchQuery"
+        :filtered-modules-grouped="filteredModulesGrouped"
+        @update-search-query="handleUpdateSearchQuery"
+        @select-module="handleAddModule"
+      />
     </div>
 
-    <!-- Tier 1: 用户规划区 -->
     <div class="tier-section">
       <div class="tier-header">
         <span class="tier-label">{{ t('planning.tier_planned') }}</span>
@@ -114,96 +329,111 @@ watch(() => store.plannedModules.length, (newLength, oldLength) => {
         </div>
       </div>
       <div class="module-list-scroll">
-        <draggable v-model="store.plannedModules" item-key="id" ghost-class="drag-ghost" filter=".ignore-drag"
-          :prevent-on-filter="false" class="draggable-container">
+        <draggable v-model="internalPlannedModules" item-key="id" ghost-class="drag-ghost" filter=".ignore-drag"
+          :prevent-on-filter="false" class="draggable-container" @update:model-value="handleReorderModules">
           <template #item="{ element, index }">
-            <StationPlanningItem :item="element" :info="store.getModuleInfo(element.id)!"
-              :inactive-by-dlc="store.enforceDlcActivation && !store.isModuleDlcActive(element.id)"
-              :count-disabled="!store.isModuleCountEditable(element.id)"
+            <StationPlanningItem :item="element" :info="getModuleInfo(element.id)!"
+              :inactive-by-dlc="props.enforceDlcActivation && !isModuleDlcActive(element.id)"
+              :count-disabled="!isModuleCountEditable(element.id)"
               :class="{ 'module-row--highlight': highlightedModuleIds.has(element.id) }"
               :is-number-flashing="flashingNumberModuleIds.has(element.id)"
-              @update:count="(val: number) => store.updateModuleCount(index, val)" @remove="store.removeModule(index)" />
+              :threshold="archiveTotal(element.id)"
+              :is-recommended="recommendedModuleIds.has(element.id)"
+              @update:count="(val: number) => handleUpdateModuleCount(index, val)" @remove="handleRemoveModule(index)" />
           </template>
         </draggable>
+        <div v-if="(props.recommendedModules?.length || 0) > 0" :class="['recommended-inline-list', { 'mt-2': props.plannedModules.length > 0 }]">
+          <StationPlanningItem
+            v-for="(element, index) in props.recommendedModules"
+            :key="'recommended-inline-' + element.id + '-' + index"
+            :item="element"
+            :info="getModuleInfo(element.id)!"
+            :readonly="true"
+            @transfer="handleTransferRecommendedModule(element)"
+          />
+        </div>
       </div>
     </div>
 
-    <!-- Tier 2: 自动工业区 -->
-    <div v-if="store.autoIndustryModules.length > 0" class="tier-section tier-auto">
-        <div class="tier-header">
-          <span class="tier-label">{{ t('planning.tier_industry') }}</span>
-        </div>
+    <div v-if="props.autoIndustryModules.length > 0" class="tier-section tier-auto">
+      <div class="tier-header">
+        <span class="tier-label">{{ t('planning.tier_industry') }}</span>
+      </div>
       <div class="module-list-scroll">
         <div class="auto-modules-container">
-          <StationPlanningItem v-for="(element, index) in store.autoIndustryModules" :key="element.id + '-' + index"
-            :item="element" :info="store.getModuleInfo(element.id)!" :readonly="true"
-            @transfer="store.transferModuleFromAutoIndustry(element)" />
+          <StationPlanningItem v-for="(element, index) in props.autoIndustryModules" :key="'industry-' + element.id + '-' + index"
+            :item="element" :info="getModuleInfo(element.id)!" :readonly="true"
+            :threshold="archiveTotal(element.id)" :color-by-diff="true"
+            @transfer="handleTransferAutoModule(element)" />
         </div>
       </div>
     </div>
 
-    <!-- 劳动力加成选项已移动到各自标题栏 -->
+    <div v-if="props.autoHabitationModules.length > 0" class="tier-section tier-auto">
+      <div class="tier-header">
+        <span class="tier-label">{{ t('planning.tier_habitation') }}</span>
+      </div>
+      <div class="module-list-scroll">
+        <div class="auto-modules-container">
+          <StationPlanningItem v-for="(element, index) in props.autoHabitationModules" :key="'habitation-' + element.id + '-' + index"
+            :item="element" :info="getModuleInfo(element.id)!" :readonly="true"
+            :threshold="archiveTotal(element.id)" :color-by-diff="true"
+            @transfer="handleTransferAutoModule(element)" />
+        </div>
+      </div>
+    </div>
+
+    <div v-if="props.autoInfrastructureModules.length > 0" class="tier-section tier-auto">
+      <div class="tier-header">
+        <span class="tier-label">{{ t('planning.tier_infrastructure') }}</span>
+      </div>
+      <div class="module-list-scroll">
+        <div class="auto-modules-container">
+          <StationPlanningItem v-for="(element, index) in props.autoInfrastructureModules" :key="'infrastructure-' + element.id + '-' + index"
+            :item="element" :info="getModuleInfo(element.id)!" :readonly="true"
+            :threshold="archiveTotal(element.id)" :color-by-diff="true"
+            @transfer="handleTransferAutoModule(element)" />
+        </div>
+      </div>
+    </div>
+
+    <hr v-if="hasArchiveData" class="archive-separator" />
+
+    <template v-if="hasArchiveData">
+      <div v-for="group in groupedArchiveModules" :key="'archive-group-' + group.group" class="tier-section">
+        <div class="tier-header">
+          <span class="tier-label">{{ group.displayLabel }}</span>
+        </div>
+        <div class="module-list-scroll">
+          <div class="auto-modules-container">
+            <StationPlanningItem
+              v-for="item in group.modules.filter(m => !m.isBuilding)"
+              :key="'built-' + item.moduleId"
+              :item="item.savedModule"
+              :info="item.x4Module"
+              :readonly="true"
+              @transfer="handleTransferArchiveModule(item.moduleId)"
+            />
+            <template v-if="group.hasBuilding">
+              <div class="building-section">
+                <StationPlanningItem
+                  v-for="item in group.modules.filter(m => m.isBuilding)"
+                  :key="'building-' + item.moduleId"
+                  :item="item.savedModule"
+                  :info="item.x4Module"
+                  :readonly="true"
+                  @transfer="handleTransferArchiveModule(item.moduleId)"
+                />
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+    </template>
   </div>
 </template>
 
 <style scoped>
-.header-row {
-  @apply flex justify-between items-center mb-2 border-b border-slate-700 pb-2 h-9;
-}
-
-.header-title {
-  @apply text-lg font-semibold text-slate-200 uppercase tracking-tight;
-}
-
-.header-label {
-  @apply text-slate-500 text-[10px] uppercase font-bold tracking-widest leading-none;
-}
-
-.header-controls {
-  @apply flex items-center gap-4;
-}
-
-.race-selector {
-  @apply flex items-center gap-2;
-  align-items: center; /* Ensure vertical alignment */
-}
-
-.race-select {
-  @apply bg-slate-900 border border-slate-700 text-slate-200 text-[11px] rounded px-2 h-6 focus:border-sky-500 outline-none cursor-pointer hover:border-slate-600 transition-colors;
-  min-width: 80px;
-  padding: 0 8px;
-  appearance: none;
-}
-
-.workforce-option {
-  @apply flex items-end text-[8px] text-slate-600 uppercase font-bold tracking-tighter cursor-pointer hover:text-slate-500 transition-colors select-none;
-}
-
-.supply-workforce-option {
-  @apply flex items-end text-[8px] text-slate-600 uppercase font-bold tracking-tighter cursor-pointer hover:text-slate-500 transition-colors select-none;
-}
-
-.option-icon {
-  @apply text-[12px] leading-none;
-}
-
-.option-text {
-  @apply whitespace-nowrap;
-}
-
-.x4-composite-input-wrapper {
-  @apply flex items-center h-6 overflow-hidden rounded border border-slate-700 bg-slate-950/60 transition-colors duration-200;
-}
-
-:deep(.x4-nested-input .x4-input-container) {
-  @apply border-none bg-transparent rounded-none h-full;
-}
-
-.x4-unit-suffix-box {
-  @apply flex items-center justify-center px-1.5 h-full text-[10px] font-bold text-slate-500 border-l border-slate-700/50 bg-slate-900/40;
-  min-width: 20px;
-}
-
 .module-list-scroll {
   @apply overflow-y-auto pr-1 scrollbar-thin;
 }
@@ -216,10 +446,6 @@ watch(() => store.plannedModules.length, (newLength, oldLength) => {
   @apply space-y-2;
 }
 
-.sunlight-control {
-  @apply flex items-center gap-2;
-}
-
 .draggable-container {
   @apply space-y-2;
 }
@@ -228,32 +454,12 @@ watch(() => store.plannedModules.length, (newLength, oldLength) => {
   @apply space-y-2;
 }
 
-.supply-tier-header {
-  @apply cursor-pointer;
-}
-
-.arrow {
-  @apply mr-1;
+.recommended-inline-list {
+  @apply space-y-2 border-l-2 border-dashed border-slate-600 pl-2;
 }
 
 .search-panel {
   @apply mb-4;
-}
-
-.module-controls-panel {
-  @apply mt-4 pt-4 border-t border-slate-700 space-y-3;
-}
-
-auto-fill-section {
-  @apply flex flex-col gap-1.5 items-start px-1;
-}
-
-.wf-config-note {
-  @apply flex items-center gap-1.5 text-[8px] text-slate-600 uppercase font-bold tracking-tighter cursor-pointer hover:text-slate-500 transition-colors select-none;
-}
-
-.x4-checkbox-mini {
-  @apply w-2.5 h-2.5 rounded-sm border-slate-800 bg-slate-950 text-sky-600 focus:ring-0 cursor-pointer m-0 p-0 flex-shrink-0;
 }
 
 .scrollbar-thin::-webkit-scrollbar {
@@ -276,7 +482,14 @@ auto-fill-section {
   @apply border-l-2 border-dashed border-slate-600 pl-2;
 }
 
-/* 规划区数量调整按钮样式 */
+.archive-separator {
+  @apply border-0 border-b border-slate-700/50 my-1;
+}
+
+.building-section {
+  @apply border-l-2 border-dashed border-amber-600/40 pl-2 ml-1 space-y-2;
+}
+
 .scale-buttons {
   @apply flex gap-1 ml-auto;
 }
@@ -291,23 +504,20 @@ auto-fill-section {
 }
 
 .tier-header {
-  @apply flex items-center justify-between px-3 h-8 bg-slate-800/40 rounded cursor-pointer hover:bg-slate-700/50 transition-colors border border-transparent w-full;
-}
-
-.tier-header-left {
-  @apply flex items-center gap-2 h-full;
-}
-
-.tier-header.is-active {
-  @apply border-slate-600/50 bg-slate-700/40;
+  @apply flex items-center justify-between px-3 h-8 bg-slate-800/40 rounded hover:bg-slate-700/50 transition-colors border border-transparent w-full;
 }
 
 .tier-label {
   @apply text-xs font-semibold text-slate-400 uppercase tracking-wider leading-none;
 }
 
-.tier-controls {
-  @apply flex items-center gap-2;
+.module-row--highlight {
+  animation: highlight-flash 0.3s ease-out;
 }
 
+@keyframes highlight-flash {
+  0% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.4); }
+  50% { box-shadow: 0 0 8px 4px rgba(14, 165, 233, 0.2); }
+  100% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0); }
+}
 </style>

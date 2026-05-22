@@ -2,7 +2,7 @@
 import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGameDataStore } from '@/store/useGameDataStore'
-import { useEmpireStore } from '@/store/useEmpireStore'
+import { useBlueprintProductionStore } from '@/store/useBlueprintProductionStore'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
 import { useX4I18n } from '@/utils/UseX4I18n'
@@ -17,7 +17,7 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 const gameData = useGameDataStore()
-const empireStore = useEmpireStore()
+const blueprintStore = useBlueprintProductionStore()
 const logicFlowStore = useLogicFlowStore()
 const shipBuildStore = useShipBuildStore()
 const { translateShip } = useX4I18n()
@@ -71,8 +71,8 @@ const dirtyModules = computed<DirtyModuleOption[]>(() => {
     {
       key: 'empire',
       label: t('moduleNames.sector'),
-      isDirty: empireStore.isDirty,
-      isNew: empireStore.requiresSaveAsOnSave(),
+      isDirty: blueprintStore.isDirty,
+      isNew: blueprintStore.requiresSaveAsOnSave(),
       defaultName: getDefaultName('empire')
     },
     {
@@ -166,8 +166,8 @@ const saveSelectedModules = () => {
   selectedModules.value.forEach((module) => {
     const inputName = moduleNames.value[module.key].trim()
     if (module.key === 'empire') {
-      if (module.isNew) empireStore.saveEmpireAs(inputName)
-      else empireStore.saveEmpire()
+      if (module.isNew) blueprintStore.saveEmpireAs(inputName)
+      else blueprintStore.saveEmpire()
       return
     }
     if (module.key === 'logic_flow') {
