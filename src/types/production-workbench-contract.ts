@@ -39,7 +39,7 @@ export interface ProductionContextState {
   hasArchive: boolean
 }
 
-export interface LiveVolumeAllocationItem {
+export interface AllocationVolumeItem {
   wareId: string
   name: string
   transportType: 'container' | 'solid' | 'liquid'
@@ -49,18 +49,20 @@ export interface LiveVolumeAllocationItem {
   targetCount: number
   recommendedCount: number
   scaleMaxCount: number
-  detailSections: LiveVolumeAllocationDetailSection[]
+  hasArchiveStation: boolean
+  detailSections: AllocationVolumeDetailSection[]
 }
 
-export interface LiveVolumeAllocationGroup {
+export interface AllocationVolumeGroup {
   key: 'container' | 'solid' | 'liquid'
-  items: LiveVolumeAllocationItem[]
+  items: AllocationVolumeItem[]
   currentTotalVolume: number
   targetTotalVolume: number
   recommendedTotalVolume: number
+  hasArchiveStation: boolean
 }
 
-export interface LiveVolumeAllocationDetailRow {
+export interface AllocationVolumeDetailRow {
   key: string
   label: string
   ratePerHour?: number
@@ -69,15 +71,15 @@ export interface LiveVolumeAllocationDetailRow {
   recommendedMinutes?: number
 }
 
-export interface LiveVolumeAllocationDetailSection {
+export interface AllocationVolumeDetailSection {
   key: string
   title: string
   includeCurrentColumn: boolean
   includeTargetColumn: boolean
-  rows: LiveVolumeAllocationDetailRow[]
+  rows: AllocationVolumeDetailRow[]
 }
 
-export interface LiveCargoOnlyItem {
+export interface AllocationCargoOnlyItem {
   wareId: string
   name: string
   tier: number
