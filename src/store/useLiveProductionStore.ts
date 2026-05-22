@@ -5,16 +5,13 @@ import type {
   ProductionSessionState,
   ProductionContextState,
   ProductionStationState,
-  LiveVolumeAllocationGroup,
-  LiveCargoOnlyItem,
-  LiveVolumeAllocationItem,
-  LiveVolumeAllocationDetailRow,
-  LiveVolumeAllocationDetailSection
+  AllocationVolumeGroup,
+  AllocationCargoOnlyItem
 } from '@/types/production-workbench-contract'
+import { buildAllocationVolumeGroups, buildAllocationCargoOnlyItems } from './logic/buildAllocationVolumeGroups'
 import type { SectorInternalData } from '@/types/x4'
 import type { PlayerStationRecord, ArchiveStationData, BuildStorageEntry, PlayerStationEntry, WareAmount } from '@/types/saveArchive'
 import type { WareFlowViewMode, EmpireGapItem } from '@/types/production-ui'
-import type { DerivedProductionFlow } from '@/types/production-flow'
 import type { StationComponentGapFlows } from './logic/stationGapViewModel'
 import { buildStationComponentGapFlows } from './logic/stationGapViewModel'
 import { classifyAndEnrichFlows } from './logic/empireFlowFacade'
@@ -1709,217 +1706,11 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     }
   })
 
-  function compareAllocationItems(a: LiveVolumeAllocationItem, b: LiveVolumeAllocationItem): number {
-    if (a.orderIndex !== b.orderIndex) return a.orderIndex - b.orderIndex
-    if (a.tier !== b.tier) return b.tier - a.tier
-    if (a.wareId < b.wareId) return -1
-    if (a.wareId > b.wareId) return 1
-    return 0
-  }
-
-  function compareCargoOnlyItems(a: LiveCargoOnlyItem, b: LiveCargoOnlyItem): number {
-    if (a.tier !== b.tier) return b.tier - a.tier
-    if (a.name < b.name) return -1
-    if (a.name > b.name) return 1
-    return 0
-  }
-
-  function computeDeltaFillMinutes(targetCount: number, currentCount: number, ratePerHour: number): number | undefined {
-    if (targetCount <= currentCount) return undefined
-    if (ratePerHour <= 0) return undefined
-    return ((targetCount - currentCount) / ratePerHour) * 60
-  }
-
-  function computeStockConsumeMinutes(stockCount: number, ratePerHour: number): number | undefined {
-    if (stockCount <= 0) return undefined
-    if (ratePerHour <= 0) return undefined
-    return (stockCount / ratePerHour) * 60
-  }
-
-  function buildAllocationDetailSection(
-    key: string,
-    title: string,
-    includeCurrentColumn: boolean,
-    includeTargetColumn: boolean,
-    rows: LiveVolumeAllocationDetailRow[]
-  ): LiveVolumeAllocationDetailSection | null {
-    if (rows.length === 0) return null
-    return { key, title, includeCurrentColumn, includeTargetColumn, rows }
-  }
-
-  function buildAllocationDetailSections(
-    flow: DerivedProductionFlow,
-    currentCount: number,
-    targetCount: number,
-    recommendedCount: number,
-    hasArchiveData: boolean
-  ): LiveVolumeAllocationDetailSection[] {
-    i18n.global.locale.value
-    const sections: LiveVolumeAllocationDetailSection[] = []
-    const netProductionRate = flow.netRate > 0 ? flow.netRate : 0
-    const netConsumptionRate = flow.netRate < 0 ? Math.abs(flow.netRate) : 0
-    const totalProductionRate = flow.production > 0 ? flow.production : 0
-    const totalConsumptionRate = flow.consumption > 0 ? flow.consumption : 0
-
-    const fillCurrentRows = [
-      {
-        key: 'current-net-fill',
-        label: i18n.global.t('wareflow.allocation_current_net_fill_time'),
-        ratePerHour: netProductionRate,
-        targetMinutes: hasArchiveData ? computeDeltaFillMinutes(targetCount, currentCount, netProductionRate) : undefined,
-        recommendedMinutes: computeDeltaFillMinutes(recommendedCount, currentCount, netProductionRate)
-      },
-      {
-        key: 'current-gross-fill',
-        label: i18n.global.t('wareflow.allocation_current_gross_fill_time'),
-        ratePerHour: totalProductionRate,
-        targetMinutes: hasArchiveData ? computeDeltaFillMinutes(targetCount, currentCount, totalProductionRate) : undefined,
-        recommendedMinutes: computeDeltaFillMinutes(recommendedCount, currentCount, totalProductionRate)
-      }
-    ] as LiveVolumeAllocationDetailRow[]
-    const visibleFillCurrentRows = fillCurrentRows.filter((row) => row.currentMinutes !== undefined || row.targetMinutes !== undefined || row.recommendedMinutes !== undefined)
-
-    const fillEmptyRows = [
-      {
-        key: 'empty-net-fill',
-        label: i18n.global.t('wareflow.allocation_empty_net_fill_time'),
-        ratePerHour: netProductionRate,
-        targetMinutes: hasArchiveData ? computeDeltaFillMinutes(targetCount, 0, netProductionRate) : undefined,
-        recommendedMinutes: computeDeltaFillMinutes(recommendedCount, 0, netProductionRate)
-      },
-      {
-        key: 'empty-gross-fill',
-        label: i18n.global.t('wareflow.allocation_empty_gross_fill_time'),
-        ratePerHour: totalProductionRate,
-        targetMinutes: hasArchiveData ? computeDeltaFillMinutes(targetCount, 0, totalProductionRate) : undefined,
-        recommendedMinutes: computeDeltaFillMinutes(recommendedCount, 0, totalProductionRate)
-      }
-    ] as LiveVolumeAllocationDetailRow[]
-    const visibleFillEmptyRows = fillEmptyRows.filter((row) => row.currentMinutes !== undefined || row.targetMinutes !== undefined || row.recommendedMinutes !== undefined)
-
-    const drainRows = [
-      {
-        key: 'current-net-drain',
-        label: i18n.global.t('wareflow.allocation_current_net_drain_time'),
-        ratePerHour: netConsumptionRate,
-        currentMinutes: computeStockConsumeMinutes(currentCount, netConsumptionRate),
-        targetMinutes: hasArchiveData ? computeStockConsumeMinutes(targetCount, netConsumptionRate) : undefined,
-        recommendedMinutes: computeStockConsumeMinutes(recommendedCount, netConsumptionRate)
-      },
-      {
-        key: 'current-gross-drain',
-        label: i18n.global.t('wareflow.allocation_current_gross_drain_time'),
-        ratePerHour: totalConsumptionRate,
-        currentMinutes: computeStockConsumeMinutes(currentCount, totalConsumptionRate),
-        targetMinutes: hasArchiveData ? computeStockConsumeMinutes(targetCount, totalConsumptionRate) : undefined,
-        recommendedMinutes: computeStockConsumeMinutes(recommendedCount, totalConsumptionRate)
-      }
-    ] as LiveVolumeAllocationDetailRow[]
-    const visibleDrainRows = drainRows.filter((row) => row.currentMinutes !== undefined || row.targetMinutes !== undefined || row.recommendedMinutes !== undefined)
-
-    const fillCurrentSection = buildAllocationDetailSection(
-      'fill-current',
-      i18n.global.t('wareflow.allocation_section_fill_current'),
-      false,
-      hasArchiveData,
-      visibleFillCurrentRows
-    )
-    if (fillCurrentSection && hasArchiveData) sections.push(fillCurrentSection)
-
-    const fillEmptySection = buildAllocationDetailSection(
-      'fill-empty',
-      i18n.global.t('wareflow.allocation_section_fill_empty'),
-      false,
-      hasArchiveData,
-      visibleFillEmptyRows
-    )
-    if (fillEmptySection) sections.push(fillEmptySection)
-
-    const drainSection = buildAllocationDetailSection(
-      'drain',
-      i18n.global.t('wareflow.allocation_section_drain'),
-      true,
-      hasArchiveData,
-      visibleDrainRows
-    )
-    if (drainSection) sections.push(drainSection)
-
-    const downstreamRows: LiveVolumeAllocationDetailRow[] = []
-
-    flow.contributions.forEach((contribution, index) => {
-      if (contribution.class !== 'module') return
-      if (contribution.type !== 'consumption') return
-      const pureConsumptionRate = Math.abs(contribution.amount)
-      const localizedModule = gameData.localizedModulesMap[contribution.id]
-      const moduleInfo = gameData.modulesMap[contribution.id]
-      const label = localizedModule?.localeName || moduleInfo?.name || contribution.id
-      const row: LiveVolumeAllocationDetailRow = {
-        key: `downstream-${contribution.id}-${index}`,
-        label,
-        ratePerHour: pureConsumptionRate,
-        currentMinutes: computeStockConsumeMinutes(currentCount, pureConsumptionRate),
-        targetMinutes: hasArchiveData ? computeStockConsumeMinutes(targetCount, pureConsumptionRate) : undefined,
-        recommendedMinutes: computeStockConsumeMinutes(recommendedCount, pureConsumptionRate)
-      }
-      if (row.currentMinutes === undefined && row.targetMinutes === undefined && row.recommendedMinutes === undefined) return
-      downstreamRows.push(row)
-    })
-
-    const downstreamSection = buildAllocationDetailSection(
-      'downstream',
-      i18n.global.t('wareflow.allocation_section_downstream'),
-      true,
-      hasArchiveData,
-      downstreamRows
-    )
-    if (downstreamSection) sections.push(downstreamSection)
-
-    const stationBreakdownRows: LiveVolumeAllocationDetailRow[] = []
-    flow.contributions.forEach((contribution, index) => {
-      if (contribution.class !== 'station') return
-
-      const isProduction = contribution.type === 'production'
-      const ratePerHour = Math.abs(contribution.amount)
-
-      const row: LiveVolumeAllocationDetailRow = isProduction
-        ? {
-            key: `station-${contribution.id}-${index}`,
-            label: (contribution as any).name || contribution.id,
-            ratePerHour,
-            currentMinutes: undefined,
-            targetMinutes: hasArchiveData ? computeDeltaFillMinutes(targetCount, 0, ratePerHour) : undefined,
-            recommendedMinutes: computeDeltaFillMinutes(recommendedCount, 0, ratePerHour)
-          }
-        : {
-            key: `station-${contribution.id}-${index}`,
-            label: (contribution as any).name || contribution.id,
-            ratePerHour,
-            currentMinutes: computeStockConsumeMinutes(currentCount, ratePerHour),
-            targetMinutes: hasArchiveData ? computeStockConsumeMinutes(targetCount, ratePerHour) : undefined,
-            recommendedMinutes: computeStockConsumeMinutes(recommendedCount, ratePerHour)
-          }
-
-      if (row.currentMinutes === undefined && row.targetMinutes === undefined && row.recommendedMinutes === undefined) return
-      stationBreakdownRows.push(row)
-    })
-
-    const stationBreakdownSection = buildAllocationDetailSection(
-      'station-breakdown',
-      i18n.global.t('wareflow.allocation_section_station_breakdown'),
-      true,
-      hasArchiveData,
-      stationBreakdownRows
-    )
-    if (stationBreakdownSection) sections.push(stationBreakdownSection)
-
-    return sections
-  }
-
   const useAllocationVolumeView = computed(() => {
     return workbenchMode.value === 'station' || workbenchMode.value === 'transit'
   })
 
-  const liveVolumeAllocationGroups = computed<LiveVolumeAllocationGroup[]>(() => {
+  const allocationVolumeGroups = computed<AllocationVolumeGroup[]>(() => {
     if (!useAllocationVolumeView.value) return []
     if (session.value.wareflowViewMode !== 'volume') return []
 
@@ -1943,49 +1734,16 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       }
     }
 
-    const grouped = new Map<'container' | 'solid' | 'liquid', LiveVolumeAllocationItem[]>([
-      ['container', []],
-      ['solid', []],
-      ['liquid', []]
-    ])
-
-    for (const flow of state.derivedProductionFlows) {
-      const ware = gameData.waresMap[flow.wareId]
-      const localizedWare = gameData.localizedWaresMap[flow.wareId]
-      const recommendedCount = Math.round(flow.totalOccupiedCount)
-      const currentCount = cargoMap.get(flow.wareId) || 0
-      const targetCount = hasArchive
-        ? (targetMap.get(flow.wareId) || 0)
-        : recommendedCount
-      const item: LiveVolumeAllocationItem = {
-        wareId: flow.wareId,
-        name: localizedWare?.localeName || ware?.name || flow.wareId,
-        transportType: flow.transportType,
-        orderIndex: flow.orderIndex,
-        tier: flow.tier,
-        currentCount,
-        targetCount,
-        recommendedCount,
-        scaleMaxCount: Math.max(currentCount, targetCount, recommendedCount),
-        detailSections: buildAllocationDetailSections(flow, currentCount, targetCount, recommendedCount, hasArchive)
-      }
-      grouped.get(flow.transportType)?.push(item)
-    }
-
-    return (['container', 'solid', 'liquid'] as const).map((key) => {
-      const items = grouped.get(key) || []
-      items.sort(compareAllocationItems)
-      return {
-        key,
-        items,
-        currentTotalVolume: items.reduce((sum, item) => sum + item.currentCount * (gameData.waresMap[item.wareId]?.volume || 0), 0),
-        targetTotalVolume: items.reduce((sum, item) => sum + item.targetCount * (gameData.waresMap[item.wareId]?.volume || 0), 0),
-        recommendedTotalVolume: items.reduce((sum, item) => sum + item.recommendedCount * (gameData.waresMap[item.wareId]?.volume || 0), 0)
-      }
+    return buildAllocationVolumeGroups({
+      derivedProductionFlows: state.derivedProductionFlows,
+      cargoMap,
+      targetMap,
+      hasArchiveStation: hasArchive,
+      gameData
     })
   })
 
-  const liveCargoOnlyItems = computed<LiveCargoOnlyItem[]>(() => {
+  const allocationCargoOnlyItems = computed<AllocationCargoOnlyItem[]>(() => {
     if (!useAllocationVolumeView.value) return []
     if (session.value.wareflowViewMode !== 'volume') return []
 
@@ -1993,29 +1751,12 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     const state = stationState.value
     if (!archive || !state) return []
 
-    const mainWareIds = new Set(state.derivedProductionFlows.map((flow) => flow.wareId))
-    const targetMap = new Map<string, number>()
-    for (const item of archive.targetCounts || []) {
-      targetMap.set(item.ware, item.amount)
-    }
-
-    const items: LiveCargoOnlyItem[] = []
-    for (const item of archive.cargo || []) {
-      if (item.amount <= 0) continue
-      if (mainWareIds.has(item.ware)) continue
-      const ware = gameData.waresMap[item.ware]
-      const localizedWare = gameData.localizedWaresMap[item.ware]
-      items.push({
-        wareId: item.ware,
-        name: localizedWare?.localeName || ware?.name || item.ware,
-        tier: ware?.tier || 0,
-        currentCount: item.amount,
-        targetCount: targetMap.get(item.ware) || 0
-      })
-    }
-
-    items.sort(compareCargoOnlyItems)
-    return items
+    return buildAllocationCargoOnlyItems({
+      cargo: archive.cargo || [],
+      targetCounts: archive.targetCounts || [],
+      derivedProductionFlows: state.derivedProductionFlows,
+      gameData
+    })
   })
 
   const tabSemanticsById = computed<Record<string, { tag?: string; factoryGroup?: string }>>(() => {
@@ -2180,8 +1921,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     context,
     stationState,
     useAllocationVolumeView,
-    liveVolumeAllocationGroups,
-    liveCargoOnlyItems,
+    allocationVolumeGroups,
+    allocationCargoOnlyItems,
     capabilities,
     settingActions,
     wareRuleActions,

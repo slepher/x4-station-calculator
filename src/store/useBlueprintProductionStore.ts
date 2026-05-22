@@ -14,7 +14,9 @@ import type {
   ProductionWorkbenchCapabilities,
   ProductionSessionState,
   ProductionContextState,
-  ProductionStationState
+  ProductionStationState,
+  AllocationVolumeGroup,
+  AllocationCargoOnlyItem
 } from '@/types/production-workbench-contract'
 import type { WareFlowViewMode, EmpireGapItem } from '@/types/production-ui'
 import { calculateNetProduction } from '@/store/logic/calculateBuildPlan'
@@ -34,6 +36,7 @@ import {
 } from './logic/empireSourceView'
 import { buildDerivedActiveStationState } from './logic/productionStationShared'
 import { classifyAndEnrichFlows } from './logic/empireFlowFacade'
+import { buildAllocationVolumeGroups } from './logic/buildAllocationVolumeGroups'
 import { createProductionModuleActions, type ProductionModuleStation } from './actions/productionModuleActions'
 import { createProductionWareRuleActions } from './actions/productionWareRuleActions'
 import { createProductionSettingActions, doesStationSettingsAffectFlowMap } from './actions/productionSettingActions'
@@ -949,6 +952,23 @@ function updateStationModules(stationId: string, modules: SavedModule[]) {
     }
   })
 
+  const allocationVolumeGroups = computed<AllocationVolumeGroup[]>(() => {
+    if (session.value.workbenchMode !== 'station') return []
+    if (session.value.wareflowViewMode !== 'volume') return []
+    const state = stationState.value
+    if (!state) return []
+
+    return buildAllocationVolumeGroups({
+      derivedProductionFlows: state.derivedProductionFlows,
+      cargoMap: new Map(),
+      targetMap: new Map(),
+      hasArchiveStation: false,
+      gameData
+    })
+  })
+
+  const allocationCargoOnlyItems = computed<AllocationCargoOnlyItem[]>(() => [])
+
   const settingActions = createProductionSettingActions<StationPlan>({
     getActiveStation: () => editableStationPlan.value,
     getComputeDeps,
@@ -1045,6 +1065,8 @@ function updateStationModules(stationId: string, modules: SavedModule[]) {
     session,
     context,
     stationState,
+    allocationVolumeGroups,
+    allocationCargoOnlyItems,
     capabilities,
     settingActions,
     wareRuleActions,
