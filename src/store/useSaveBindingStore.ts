@@ -305,10 +305,6 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
   function saveBinding() {
     if (!draftBinding.value) return
     draftBinding.value.updatedAt = Date.now()
-    draftBinding.value.stationPlans = draftBinding.value.stationPlans.filter((plan) => {
-      if (plan.saveStationCode && (!plan.modules || plan.modules.length === 0)) return false
-      return true
-    })
     const next = deepClone(draftBinding.value)
     const idx = savedBindings.value.list.findIndex((item) => item.gameGuid === next.gameGuid)
     if (idx >= 0) savedBindings.value.list[idx] = next

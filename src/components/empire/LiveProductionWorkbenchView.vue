@@ -58,6 +58,7 @@ const showArchiveModuleList = computed(() => {
     :expanded-sector-id="tabbarPresenter.props.expandedSectorId.value"
     :can-create-station="tabbarPresenter.props.canCreateStation"
     :can-open-context-menu="tabbarPresenter.props.canOpenContextMenu"
+    :context-menu-mode="tabbarPresenter.props.contextMenuMode"
     @select-overview="tabbarPresenter.emits.selectOverview"
     @select-transit="tabbarPresenter.emits.selectTransit"
     @select-station="tabbarPresenter.emits.selectStation"

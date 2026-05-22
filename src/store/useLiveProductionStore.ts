@@ -1337,12 +1337,17 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     const binding = activeBinding.value
     if (!binding) return
     const existingPlan = binding.stationPlans.find(plan => plan.id === stationId)
+    const stationSectorId = existingPlan?.groupId ?? orderedStationsBySector.value.find(s => s.id === stationId)?.sectorId ?? null
     if (existingPlan) {
       saveBindingStore.deleteStationPlan(binding.gameGuid, stationId)
       planningDerivedMap.value?.remove(stationId)
     }
     if (activeStationId.value === stationId) {
-      activeStationId.value = null
+      if (stationSectorId) {
+        activeStationId.value = `transit:${stationSectorId}`
+      } else {
+        activeStationId.value = null
+      }
     }
   }
 
