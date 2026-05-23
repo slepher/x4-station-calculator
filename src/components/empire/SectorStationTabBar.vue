@@ -86,7 +86,6 @@ const selectStationWithExpand = (stationId: string) => {
 }
 
 const openMenu = (tabId: string, tabType: 'station' | 'transit', event: MouseEvent) => {
-  if (tabType === 'station' && !props.canOpenContextMenu) return
   event.preventDefault()
   menuTabId.value = tabId
   menuTabType.value = tabType
@@ -96,12 +95,6 @@ const openMenu = (tabId: string, tabType: 'station' | 'transit', event: MouseEve
   
   menuPosition.value = { x, y }
   showMenu.value = true
-}
-
-const onTabContextMenu = (tab: ProductionTabItem, event: MouseEvent) => {
-  if (tab.type === 'station' || tab.type === 'transit') {
-    openMenu(tab.id, tab.type as 'station' | 'transit', event)
-  }
 }
 
 const closeMenu = () => {
@@ -150,12 +143,12 @@ watch(
 )
 
 onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
+  document.addEventListener('mousedown', handleClickOutside)
   window.addEventListener('resize', handleWindowResize)
   nextTick(() => updateTabsScrollState())
 })
 onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside)
+  document.removeEventListener('mousedown', handleClickOutside)
   window.removeEventListener('resize', handleWindowResize)
 })
 
@@ -254,7 +247,7 @@ const tabsToShow = computed(() => {
         :data-tag="tab.tag"
         :data-factory-group="tab.factoryGroup"
         @click="tab.type === 'overview' ? openOverview() : tab.type === 'transit' ? openSupply(tab.sectorId!) : selectStationWithExpand(tab.id)"
-        @contextmenu.stop="onTabContextMenu(tab, $event)"
+        @contextmenu.stop="tab.type === 'station' ? openMenu(tab.id, 'station', $event) : tab.type === 'transit' ? openMenu(tab.id, 'transit', $event) : undefined"
       >
         <div class="tab-highlight"></div>
         <div class="tab-content">
@@ -287,6 +280,7 @@ const tabsToShow = computed(() => {
         v-if="showMenu" 
         class="context-menu"
         :style="{ top: `${menuPosition.y}px`, left: `${menuPosition.x}px` }"
+        @mousedown.stop
         @click.stop
       >
         <div class="menu-header">{{ t('sector.menu_operations') }}</div>
@@ -301,7 +295,7 @@ const tabsToShow = computed(() => {
         </div>
 
         <template v-if="menuTabType === 'station'">
-          <template v-if="props.contextMenuMode !== 'delete-only'">
+          <template v-if="props.contextMenuMode !== 'delete-only' && props.canOpenContextMenu">
             <div class="menu-divider"></div>
             <div class="menu-item" @click="renameStation">
               <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
@@ -316,7 +310,7 @@ const tabsToShow = computed(() => {
             <div class="menu-divider"></div>
           </template>
           
-          <div class="menu-item danger" @click="confirmDelete">
+          <div v-if="props.canOpenContextMenu" class="menu-item danger" @click="confirmDelete">
             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
             <span>{{ t('sector.delete_station') }}</span>
           </div>
