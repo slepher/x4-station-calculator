@@ -86,8 +86,7 @@ const selectStationWithExpand = (stationId: string) => {
 }
 
 const openMenu = (tabId: string, tabType: 'station' | 'transit', event: MouseEvent) => {
-  if (tabType === 'transit') {
-  } else if (!props.canOpenContextMenu) return
+  if (tabType === 'station' && !props.canOpenContextMenu) return
   event.preventDefault()
   menuTabId.value = tabId
   menuTabType.value = tabType
@@ -249,7 +248,7 @@ const tabsToShow = computed(() => {
         :data-tag="tab.tag"
         :data-factory-group="tab.factoryGroup"
         @click="tab.type === 'overview' ? openOverview() : tab.type === 'transit' ? openSupply(tab.sectorId!) : selectStationWithExpand(tab.id)"
-        @contextmenu.stop="tab.type === 'station' || tab.type === 'transit' ? openMenu(tab.id, tab.type, $event) : undefined"
+        @contextmenu.stop="(tab.type === 'station' || tab.type === 'transit') && openMenu(tab.id, tab.type, $event)"
       >
         <div class="tab-highlight"></div>
         <div class="tab-content">
