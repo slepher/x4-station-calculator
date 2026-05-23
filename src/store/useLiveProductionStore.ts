@@ -42,6 +42,8 @@ import { loadPlayerStationsFlatByArchiveId, createArchiveId } from '@/db/saveArc
 import { createProductionModuleActions } from './actions/productionModuleActions'
 import { createProductionWareRuleActions } from './actions/productionWareRuleActions'
 import { createProductionSettingActions, doesStationSettingsAffectFlowMap } from './actions/productionSettingActions'
+import type { TerraformingData, TerraformingCluster } from './logic/terraformingTaskResolver'
+import { loadTerraformingData } from './logic/terraformingTaskResolver'
 
 function mergeSavedModules(modules: SavedModule[]): SavedModule[] {
   const counts = new Map<string, number>()
@@ -96,6 +98,20 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   const { selectedArchive } = storeToRefs(saveStore)
 
   const isReady = ref(false)
+  const isTerraformingMode = computed({
+    get: () => activeViewStore.activeBindingWorkbench === 'terraforming',
+    set: (val: boolean) => {
+      if (val) {
+        activeViewStore.activeBindingWorkbench = 'terraforming'
+      } else {
+        if (activeViewStore.activeBindingWorkbench === 'terraforming') {
+          activeViewStore.activeBindingWorkbench = 'overview'
+        }
+      }
+    }
+  })
+  const terraformingSelectedClusterId = ref<string | null>(null)
+  const terraformingCompletedProjects = ref<Set<string>>(new Set())
   const buildPriceMultiplier = ref(0.5)
   const overviewBuyMultiplier = ref(0.5)
   const overviewSellMultiplier = ref(0.5)
@@ -452,8 +468,55 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     return planningSourceView.getStationById(stationId)
   }
 
-  const workbenchMode = computed<'station' | 'transit' | 'overview'>(() => {
+  const workbenchMode = computed<'station' | 'transit' | 'overview' | 'terraforming'>(() => {
+    if (isTerraformingMode.value) return 'terraforming'
     return activeTransitSectorId.value ? 'transit' : (activeStationId.value ? 'station' : 'overview')
+  })
+
+  const terraformingData = computed<TerraformingData | null>(() => {
+    const version = gameData.folderName
+    if (!version) return null
+    try {
+      return loadTerraformingData(version)
+    } catch {
+      return null
+    }
+  })
+
+  const terraformingSelectedCluster = computed<TerraformingCluster | null>(() => {
+    if (!terraformingData.value) return null
+    const id = terraformingSelectedClusterId.value
+    if (!id) return null
+    return terraformingData.value.clusters.find(c => c.id === id) || null
+  })
+
+  const terraformingCurrentStats = computed<Record<string, number>>(() => {
+    const cluster = terraformingSelectedCluster.value
+    if (!cluster) return {}
+    return { ...cluster.initialStats }
+  })
+
+  const terraformingHqStationCode = computed<string | null>(() => {
+    const semantics = tabSemanticsById.value
+    const stations = orderedStationsBySector.value
+    for (const station of stations) {
+      if (semantics[station.id]?.tag === 'playerhq') {
+        return station.id
+      }
+    }
+    return null
+  })
+
+  const terraformingHqStationName = computed<string>(() => {
+    const code = terraformingHqStationCode.value
+    if (!code) return ''
+    const station = orderedStationsBySector.value.find(s => s.id === code)
+    if (station?.name) return station.name
+    return code
+  })
+
+  const terraformingHqArchiveStation = computed<ArchiveStationData | null>(() => {
+    return getArchiveStationDataByCode(terraformingHqStationCode.value)
   })
 
   const activeBindingStationId = computed(() => activeTransitSectorId.value ? null : activeStationId.value)
@@ -1365,10 +1428,12 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   }
 
   function selectStation(stationId: string | null) {
+    isTerraformingMode.value = false
     activeStationId.value = stationId
   }
 
   function selectTransitSector(sectorId: string | null) {
+    isTerraformingMode.value = false
     if (!sectorId) {
       activeStationId.value = null
       return
@@ -1377,6 +1442,15 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     if (!exists) return
     const transitTabId = toTransitTabId(sectorId)
     activeStationId.value = transitTabId
+  }
+
+  function selectTerraforming() {
+    isTerraformingMode.value = true
+    activeStationId.value = null
+  }
+
+  function selectTerraformingCluster(clusterId: string) {
+    terraformingSelectedClusterId.value = clusterId
   }
 
   function updateStationModules(stationId: string, modules: SavedModule[]) {
@@ -1948,6 +2022,16 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     updateWareflowViewMode: (value: WareFlowViewMode) => { wareflowViewMode.value = value },
     updateBuildPriceMultiplier: (value: number) => { buildPriceMultiplier.value = value },
     duplicateStation: () => null,
-    selectStation
+    selectStation,
+    selectTerraforming,
+    selectTerraformingCluster,
+    terraformingSelectedClusterId,
+    terraformingSelectedCluster,
+    terraformingData,
+    terraformingCurrentStats,
+    terraformingCompletedProjects,
+    terraformingHqStationCode,
+    terraformingHqStationName,
+    terraformingHqArchiveStation
   }
 })

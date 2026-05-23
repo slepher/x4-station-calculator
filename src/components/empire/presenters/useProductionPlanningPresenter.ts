@@ -32,7 +32,7 @@ function shouldShowPlannedDiff(module: SavedModule, totalMap: Record<string, num
 }
 
 export interface PlanningPresenterProps {
-  workbenchMode: ComputedRef<'overview' | 'station' | 'transit'>
+  workbenchMode: ComputedRef<'overview' | 'station' | 'transit' | 'terraforming'>
   visualMode: ComputedRef<'planning' | 'live'>
   hasArchive: ComputedRef<boolean>
   plannedModules: ComputedRef<SavedModule[]>

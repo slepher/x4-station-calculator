@@ -19,6 +19,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   selectOverview: []
+  selectTerraforming: []
   selectTransit: [sectorId: string]
   selectStation: [stationId: string]
   createStation: []
@@ -40,7 +41,7 @@ const canScrollLeft = ref(false)
 const canScrollRight = ref(false)
 
 const getTabIcon = (tab: ProductionTabItem): string => {
-  if (tab.type === 'overview') return playerhqIconUrl
+  if (tab.type === 'overview' || tab.type === 'terraforming') return playerhqIconUrl
   if (tab.type === 'transit') return tradestationIconUrl
   const iconTag = getPoiIconTag(tab)
   if (iconTag) return SAVE_POI_ICON_MAP[iconTag] || factoryIconUrl
@@ -48,7 +49,7 @@ const getTabIcon = (tab: ProductionTabItem): string => {
 }
 
 const getTabIconClass = (tab: ProductionTabItem): string => {
-  if (tab.type === 'overview') return 'icon-green'
+  if (tab.type === 'overview' || tab.type === 'terraforming') return 'icon-green'
   if (tab.type === 'transit') return 'icon-orange'
   if (tab.type === 'station') return 'icon-green'
   return ''
@@ -183,6 +184,8 @@ const tabsToShow = computed(() => {
   props.tabs.forEach(tab => {
     if (tab.type === 'overview') {
       result.push(tab)
+    } else if (tab.type === 'terraforming') {
+      result.push(tab)
     } else if (tab.type === 'station' && !tab.sectorId) {
       result.push(tab)
     }
@@ -190,7 +193,7 @@ const tabsToShow = computed(() => {
   
   const sectorGroups = new Map<string, ProductionTabItem[]>()
   props.tabs.forEach(tab => {
-    if (tab.sectorId && tab.type !== 'overview') {
+    if (tab.sectorId && tab.type !== 'overview' && tab.type !== 'terraforming') {
       if (!sectorGroups.has(tab.sectorId)) {
         sectorGroups.set(tab.sectorId, [])
       }
@@ -233,13 +236,13 @@ const tabsToShow = computed(() => {
         :key="tab.id"
         class="tab-item"
         :class="[
-          tab.type === 'overview' ? 'overview-tab' : tab.type === 'transit' ? 'supply-tab' : 'station-tab',
+          tab.type === 'overview' ? 'overview-tab' : tab.type === 'transit' ? 'supply-tab' : tab.type === 'terraforming' ? 'terraforming-tab' : 'station-tab',
           { 'active': activeTabId === tab.id }
         ]"
-        :data-testid="tab.type === 'overview' ? 'overview-tab' : tab.type === 'transit' ? 'supply-tab' : 'station-tab'"
+        :data-testid="tab.type === 'overview' ? 'overview-tab' : tab.type === 'transit' ? 'supply-tab' : tab.type === 'terraforming' ? 'terraforming-tab' : 'station-tab'"
         :data-tag="tab.tag"
         :data-factory-group="tab.factoryGroup"
-        @click="tab.type === 'overview' ? openOverview() : tab.type === 'transit' ? openSupply(tab.sectorId!) : selectStationWithExpand(tab.id)"
+        @click="tab.type === 'overview' ? openOverview() : tab.type === 'terraforming' ? emit('selectTerraforming') : tab.type === 'transit' ? openSupply(tab.sectorId!) : selectStationWithExpand(tab.id)"
         @contextmenu.stop="tab.type === 'station' ? openMenu(tab.id, $event) : undefined"
       >
         <div class="tab-highlight"></div>

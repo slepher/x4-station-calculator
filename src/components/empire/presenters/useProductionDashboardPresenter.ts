@@ -11,7 +11,7 @@ const DEFAULT_DASHBOARD_SETTINGS = {
 }
 
 export interface DashboardPresenterProps {
-  workbenchMode: ComputedRef<'overview' | 'station' | 'transit'>
+  workbenchMode: ComputedRef<'overview' | 'station' | 'transit' | 'terraforming'>
   visualMode: ComputedRef<'planning' | 'live'>
   displayModules: ComputedRef<SavedModule[]>
   workerModules: ComputedRef<SavedModule[]>

@@ -8,12 +8,14 @@ import { useProductionToolbarPresenter } from '@/components/empire/presenters/us
 import { useProductionPlanningPresenter } from '@/components/empire/presenters/useProductionPlanningPresenter'
 import { useProductionWareflowPresenter } from '@/components/empire/presenters/useProductionWareflowPresenter'
 import { useProductionDashboardPresenter } from '@/components/empire/presenters/useProductionDashboardPresenter'
+import { useTerraformingPresenter } from '@/components/empire/presenters/useTerraformingPresenter'
 import StationPlanningPanelWrapper from '@/components/empire/StationPlanningPanelWrapper.vue'
 import StationDashboard from '@/components/empire/StationDashboard.vue'
 import SectorStationTabBar from '@/components/empire/SectorStationTabBar.vue'
 import LiveOverviewToolbar from '@/components/empire/context_toolbar/LiveOverviewToolbar.vue'
 import LiveTransitToolbar from '@/components/empire/context_toolbar/LiveTransitToolbar.vue'
 import LiveStationToolbar from '@/components/empire/context_toolbar/LiveStationToolbar.vue'
+import TerraformingToolbar from '@/components/empire/context_toolbar/TerraformingToolbar.vue'
 import StationWareFlowsDashboard from '@/components/empire/StationWareFlowsDashboard.vue'
 import EmpireWareFlowsDashboard from '@/components/empire/EmpireWareFlowsDashboard.vue'
 import TransitHubBuildPanel from '@/components/empire/transit-hub/TransitHubBuildPanel.vue'
@@ -45,6 +47,16 @@ const toolbarPresenter = useProductionToolbarPresenter(liveStore)
 const planningPresenter = useProductionPlanningPresenter(liveStore)
 const wareflowPresenter = useProductionWareflowPresenter(liveStore)
 const dashboardPresenter = useProductionDashboardPresenter(liveStore)
+const terraformingPresenter = useTerraformingPresenter({
+  terraformingData: computed(() => liveStore.terraformingData),
+  terraformingSelectedClusterId: computed(() => liveStore.terraformingSelectedClusterId),
+  terraformingSelectedCluster: computed(() => liveStore.terraformingSelectedCluster),
+  terraformingCurrentStats: computed(() => liveStore.terraformingCurrentStats),
+  terraformingCompletedProjects: computed(() => liveStore.terraformingCompletedProjects),
+  terraformingHqStationName: computed(() => liveStore.terraformingHqStationName),
+  terraformingHqArchiveStation: computed(() => liveStore.terraformingHqArchiveStation),
+  selectTerraformingCluster: (id: string) => liveStore.selectTerraformingCluster(id)
+})
 
 const showArchiveModuleList = computed(() => {
   return planningPresenter.props.visualMode.value === 'live' && planningPresenter.props.hasArchive.value
@@ -60,6 +72,7 @@ const showArchiveModuleList = computed(() => {
     :can-open-context-menu="tabbarPresenter.props.canOpenContextMenu"
     :context-menu-mode="tabbarPresenter.props.contextMenuMode"
     @select-overview="tabbarPresenter.emits.selectOverview"
+    @select-terraforming="tabbarPresenter.emits.selectTerraforming"
     @select-transit="tabbarPresenter.emits.selectTransit"
     @select-station="tabbarPresenter.emits.selectStation"
     @create-station="tabbarPresenter.emits.createStation"
@@ -126,6 +139,19 @@ const showArchiveModuleList = computed(() => {
     @cycle-module-scope="toolbarPresenter.emits.cycleModuleScope"
   />
 
+  <TerraformingToolbar
+    v-if="toolbarPresenter.props.workbenchMode.value === 'terraforming' && toolbarPresenter.props.hasActiveBinding.value"
+    :hq-station-name="terraformingPresenter.props.toolbar.hqStationName.value"
+    :station-code="terraformingPresenter.props.toolbar.stationCode.value"
+    :sector-name="terraformingPresenter.props.toolbar.sectorName.value"
+    :sector-name-id="terraformingPresenter.props.toolbar.sectorNameId.value"
+    :position="terraformingPresenter.props.toolbar.position.value"
+    :sector-resources="terraformingPresenter.props.toolbar.sectorResources.value"
+    :sector-sunlight="terraformingPresenter.props.toolbar.sectorSunlight.value"
+    :single-berth-throughput="terraformingPresenter.props.toolbar.singleBerthThroughput.value"
+    :has-hq-station="terraformingPresenter.props.toolbar.hasHqStation.value"
+  />
+
   <ImportPlanModal
     :isOpen="toolbarPresenter.props.showImportModal.value"
     :initialTab="'logic-flow'"
@@ -140,7 +166,47 @@ const showArchiveModuleList = computed(() => {
     @close="toolbarPresenter.emits.closeImport"
   />
 
-<template v-if="toolbarPresenter.props.workbenchMode.value === 'overview' || toolbarPresenter.props.workbenchMode.value === 'transit'">
+  <div v-if="toolbarPresenter.props.workbenchMode.value === 'terraforming'" class="main-layout mt-6">
+    <div class="col-span-12 lg:col-span-3">
+      <div class="panel-card">
+        <div class="panel-header">地球化星区</div>
+        <div class="panel-content">
+          <div v-if="terraformingPresenter.props.sectorPanel.clusters.value.length === 0" class="text-slate-500 text-sm text-center py-4">
+            暂无可用星区
+          </div>
+          <div
+            v-for="cluster in terraformingPresenter.props.sectorPanel.clusters.value"
+            :key="cluster.id"
+            class="cluster-item"
+            :class="{ 'active': terraformingPresenter.props.sectorPanel.selectedClusterId.value === cluster.id }"
+            @click="terraformingPresenter.emits.selectCluster(cluster.id)"
+          >
+            <span class="text-sm font-bold">{{ cluster.id }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-span-12 lg:col-span-5">
+      <div class="panel-card">
+        <div class="panel-header">地球化任务</div>
+        <div class="panel-content">
+          <div class="text-slate-500 text-sm text-center py-4">选择星区查看任务列表</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-span-12 lg:col-span-4">
+      <div class="panel-card">
+        <div class="panel-header">资源消耗</div>
+        <div class="panel-content">
+          <div class="text-slate-500 text-sm text-center py-4">选择星区查看资源消耗</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <template v-else-if="toolbarPresenter.props.workbenchMode.value === 'overview' || toolbarPresenter.props.workbenchMode.value === 'transit'">
     <div v-if="toolbarPresenter.props.workbenchMode.value === 'transit'" class="main-layout mt-6">
       <div class="col-span-12 lg:col-span-3">
         <ArchiveModuleList
@@ -302,5 +368,26 @@ const showArchiveModuleList = computed(() => {
 
 .overview-left-panel .panel-content {
   @apply p-4 flex flex-col gap-4;
+}
+
+.panel-card {
+  @apply bg-slate-900/40 rounded-lg border border-slate-800 shadow-xl overflow-hidden;
+}
+
+.panel-header {
+  @apply h-12 flex items-center px-4 text-slate-200 text-sm font-semibold border-b border-slate-700/50 bg-slate-800/30;
+}
+
+.panel-content {
+  @apply p-2 flex flex-col gap-1 max-h-[calc(100vh-12rem)] overflow-y-auto;
+}
+
+.cluster-item {
+  @apply flex flex-col px-3 py-2 rounded cursor-pointer transition-colors;
+  @apply hover:bg-sky-500/10 text-slate-400 hover:text-slate-200;
+}
+
+.cluster-item.active {
+  @apply bg-sky-500/20 text-sky-400 border border-sky-500/30;
 }
 </style>

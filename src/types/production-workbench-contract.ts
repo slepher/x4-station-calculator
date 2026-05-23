@@ -16,8 +16,8 @@ export interface ProductionWorkbenchCapabilities {
 export type ProductionTabItem = UiProductionTabItem
 
 export interface ProductionSessionState {
-  workbenchMode: 'overview' | 'station' | 'transit'
-  entityType: 'overview' | 'station' | 'transit'
+  workbenchMode: 'overview' | 'station' | 'transit' | 'terraforming'
+  entityType: 'overview' | 'station' | 'transit' | 'terraforming'
   mode: 'planning' | 'live'
   visualMode: 'planning' | 'live'
   activeStationId: string | null

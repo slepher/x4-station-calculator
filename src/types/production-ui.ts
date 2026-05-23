@@ -4,7 +4,7 @@ export type WareFlowViewMode = 'quantity' | 'volume' | 'economy' | 'transport'
 
 export interface ProductionTabItem {
   id: string
-  type: 'station' | 'transit' | 'overview'
+  type: 'station' | 'transit' | 'overview' | 'terraforming'
   name: string
   sectorId?: string
   stationType?: StationType

@@ -15,6 +15,7 @@ export interface TabbarPresenterProps {
 
 export interface TabbarPresenterEmits {
   selectOverview: () => void
+  selectTerraforming: () => void
   selectTransit: (sectorId: string) => void
   selectStation: (stationId: string) => void
   createStation: () => unknown
@@ -31,7 +32,7 @@ export interface UseProductionTabbarPresenterReturn {
 
 export interface TabbarPresenterStore {
   session: {
-    workbenchMode: 'overview' | 'station' | 'transit'
+    workbenchMode: 'overview' | 'station' | 'transit' | 'terraforming'
     activeStationId: string | null
     activeTransitSectorId: string | null
   }
@@ -60,6 +61,7 @@ export interface TabbarPresenterStore {
   tabSemanticsById?: Record<string, { tag?: string; factoryGroup?: string }>
   expandedSectorId?: string | null
   selectStation(stationId: string | null): void
+  selectTerraforming?(): void
   selectTransitSector?(sectorId: string | null): void
   createStation(name?: string): unknown
   renameStation(stationId: string, name: string): void
@@ -94,6 +96,7 @@ export function useProductionTabbarPresenter(store: TabbarPresenterStore): UsePr
     if (!store.capabilities.hasSectors) {
       return [
         { id: 'overview', type: 'overview' as const, name: i18n.global.t('sector.overview') },
+        { id: 'terraforming', type: 'terraforming' as const, name: '地球化' },
         ...(store.orderedStations || []).map((station) => ({
           id: station.id,
           type: 'station' as const,
@@ -106,7 +109,8 @@ export function useProductionTabbarPresenter(store: TabbarPresenterStore): UsePr
     }
 
     const result: ProductionTabItem[] = [
-      { id: 'overview', type: 'overview', name: i18n.global.t('sector.overview') }
+      { id: 'overview', type: 'overview', name: i18n.global.t('sector.overview') },
+      { id: 'terraforming', type: 'terraforming', name: '地球化' }
     ]
 
     const grouped = new Map<string, ProductionTabItem[]>()
@@ -148,6 +152,7 @@ export function useProductionTabbarPresenter(store: TabbarPresenterStore): UsePr
   const props: TabbarPresenterProps = {
     tabs,
     activeTabId: computed(() => {
+      if (store.session.workbenchMode === 'terraforming') return 'terraforming'
       if (store.session.workbenchMode === 'transit' && store.session.activeTransitSectorId) {
         return `transit:${store.session.activeTransitSectorId}`
       }
@@ -162,6 +167,7 @@ export function useProductionTabbarPresenter(store: TabbarPresenterStore): UsePr
 
   const emits: TabbarPresenterEmits = {
     selectOverview: () => store.selectStation(null),
+    selectTerraforming: () => (store.selectTerraforming || (() => {}))(),
     selectTransit: (sectorId: string) => (store.selectTransitSector || (() => {}))(sectorId),
     selectStation: (stationId: string) => store.selectStation(stationId),
     createStation: () => store.createStation(),

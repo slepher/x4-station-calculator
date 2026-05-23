@@ -12,7 +12,7 @@ const props = defineProps<{
     count: number
     minerals: string[]
   } | null
-  workbenchMode: 'overview' | 'station' | 'transit'
+  workbenchMode: 'overview' | 'station' | 'transit' | 'terraforming'
   titleModel: {
     value: string
     placeholder: string
