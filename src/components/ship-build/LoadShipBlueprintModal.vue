@@ -156,6 +156,15 @@ const handleDeleteBlueprint = (id: string) => {
           <div class="flex items-start justify-between gap-3 min-h-7">
             <div class="text-sm leading-6 text-slate-100 truncate">
               <span class="font-bold text-blue-100 group-hover:text-blue-400 transition-colors">{{ bp.name }}</span>
+              <span
+                v-if="!store.isBuiltInBlueprintId(bp.id) && bp.favorite"
+                class="ml-2 inline-flex align-middle"
+                :title="t('shipBuild.fav_remove')"
+              >
+                <svg class="h-3.5 w-3.5 text-yellow-400" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                </svg>
+              </span>
             </div>
             <div class="text-xs text-slate-400 shrink-0 whitespace-nowrap">
               {{ getConnectionCount(bp) }} {{ t('shipBuild.connections_count') }}

@@ -749,7 +749,9 @@
     "blueprint_group_preset": "Preset Loadouts",
     "blueprint_group_user": "Blueprint Loadouts",
     "connections_count": "connections",
-    "shield_secondary": "Shield (Secondary)"
+    "shield_secondary": "Shield (Secondary)",
+    "fav_add": "Add to Favorites",
+    "fav_remove": "Remove from Favorites"
   },
   "wareflow": {
     "resource_overview": "Resource Production",

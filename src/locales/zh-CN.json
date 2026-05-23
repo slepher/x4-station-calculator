@@ -750,7 +750,9 @@
     "blueprint_group_preset": "预设配装",
     "blueprint_group_user": "蓝图配装",
     "connections_count": "个槽位",
-    "shield_secondary": "副盾"
+    "shield_secondary": "副盾",
+    "fav_add": "添加到收藏",
+    "fav_remove": "取消收藏"
   },
   "wareflow": {
     "resource_overview": "资源产出",
