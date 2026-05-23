@@ -94,24 +94,29 @@ function resolveTabSemantics(
 export function useProductionTabbarPresenter(store: TabbarPresenterStore): UseProductionTabbarPresenterReturn {
   const tabs = computed<ProductionTabItem[]>(() => {
     if (!store.capabilities.hasSectors) {
-      return [
-        { id: 'overview', type: 'overview' as const, name: i18n.global.t('sector.overview') },
-        { id: 'terraforming', type: 'terraforming' as const, name: '地球化' },
-        ...(store.orderedStations || []).map((station) => ({
-          id: station.id,
-          type: 'station' as const,
-          name: station.name,
-          sectorId: station.sectorId ?? undefined,
-          stationType: station.type,
-          ...resolveTabSemantics(store, station, station.id)
-        }))
+      const items: ProductionTabItem[] = [
+        { id: 'overview', type: 'overview' as const, name: i18n.global.t('sector.overview') }
       ]
+      if (store.selectTerraforming) {
+        items.push({ id: 'terraforming', type: 'terraforming' as const, name: '地球化' })
+      }
+      items.push(...(store.orderedStations || []).map((station) => ({
+        id: station.id,
+        type: 'station' as const,
+        name: station.name,
+        sectorId: station.sectorId ?? undefined,
+        stationType: station.type,
+        ...resolveTabSemantics(store, station, station.id)
+      })))
+      return items
     }
 
     const result: ProductionTabItem[] = [
-      { id: 'overview', type: 'overview', name: i18n.global.t('sector.overview') },
-      { id: 'terraforming', type: 'terraforming', name: '地球化' }
+      { id: 'overview', type: 'overview', name: i18n.global.t('sector.overview') }
     ]
+    if (store.selectTerraforming) {
+      result.push({ id: 'terraforming', type: 'terraforming', name: '地球化' })
+    }
 
     const grouped = new Map<string, ProductionTabItem[]>()
     const stations = store.orderedStationsBySector || []
