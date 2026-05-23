@@ -11,6 +11,7 @@ export interface TabbarPresenterProps {
   canCreateStation: boolean
   canOpenContextMenu: boolean
   contextMenuMode: 'full' | 'delete-only'
+  canDeleteStation: (stationId: string) => boolean
 }
 
 export interface TabbarPresenterEmits {
@@ -68,6 +69,7 @@ export interface TabbarPresenterStore {
   deleteStation(stationId: string): void
   setExpandedSector?(sectorId: string | null): void
   jumpToMapBinding?(tabId: string, tabType: 'station' | 'transit'): void
+  canDeleteStation?(stationId: string): boolean
 }
 
 function getFallbackTagForStationType(type?: StationType): string | undefined {
@@ -159,7 +161,8 @@ export function useProductionTabbarPresenter(store: TabbarPresenterStore): UsePr
     expandedSectorId: computed(() => store.expandedSectorId ?? null),
     canCreateStation: !store.capabilities.uniqueStation,
     canOpenContextMenu: !store.capabilities.uniqueStation || (store.capabilities.uniqueStation && !store.archiveStation),
-    contextMenuMode: store.capabilities.uniqueStation ? 'delete-only' : 'full'
+    contextMenuMode: store.capabilities.uniqueStation ? 'delete-only' : 'full',
+    canDeleteStation: (stationId: string) => store.canDeleteStation?.(stationId) ?? !store.capabilities.uniqueStation
   }
 
   const emits: TabbarPresenterEmits = {

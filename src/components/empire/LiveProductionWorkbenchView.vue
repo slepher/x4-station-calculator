@@ -59,6 +59,7 @@ const showArchiveModuleList = computed(() => {
     :can-create-station="tabbarPresenter.props.canCreateStation"
     :can-open-context-menu="tabbarPresenter.props.canOpenContextMenu"
     :context-menu-mode="tabbarPresenter.props.contextMenuMode"
+    :can-delete-station="tabbarPresenter.props.canDeleteStation"
     @select-overview="tabbarPresenter.emits.selectOverview"
     @select-transit="tabbarPresenter.emits.selectTransit"
     @select-station="tabbarPresenter.emits.selectStation"

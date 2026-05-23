@@ -1401,6 +1401,13 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     activeViewStore.setActiveView('maps')
   }
 
+  function canDeleteStation(stationId: string): boolean {
+    const plan = activeBinding.value?.stationPlans.find(p => p.id === stationId)
+    if (!plan) return false
+    if (plan.saveStationCode) return false
+    return true
+  }
+
   function updateStationModules(stationId: string, modules: SavedModule[]) {
     updateBindingStationPlan(stationId, { modules })
     syncBindingStationDerivedSnapshot(stationId)
@@ -1935,6 +1942,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     renameStation,
     selectTransitSector,
     jumpToMapBinding,
+    canDeleteStation,
     setExpandedSector: (sectorId: string | null) => { expandedSectorId.value = sectorId },
     getStationById,
     mode,
