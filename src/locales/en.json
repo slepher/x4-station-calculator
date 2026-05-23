@@ -111,6 +111,7 @@
     "delete_station": "Delete",
     "confirm_delete": "Confirm Delete",
     "delete_warning": "This action cannot be undone. Are you sure you want to dismantle this station?",
+    "jump_to_binding": "Jump to map binding edit",
     "menu_operations": "Actions"
   },
   "sectorManagement": {

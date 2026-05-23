@@ -1379,6 +1379,28 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     activeStationId.value = transitTabId
   }
 
+  function jumpToMapBinding(tabId: string, tabType: 'station' | 'transit') {
+    const gameGuid = activeBinding.value?.gameGuid
+    if (!gameGuid) return
+
+    let sectorGroupId: string | null = null
+
+    if (tabType === 'transit') {
+      sectorGroupId = tabId.replace('transit:', '')
+    } else {
+      const station = derivedBindingStations.value.find(s => s.station.id === tabId)
+      sectorGroupId = station?.groupId ?? null
+    }
+
+    if (!sectorGroupId) return
+
+    activeViewStore.isSavePanelOpen = true
+    activeViewStore.mapBindingGameGuid = gameGuid
+    activeViewStore.mapSavePanelLayer = 'binding-station'
+    activeViewStore.mapSavePanelSectorGroupId = sectorGroupId
+    activeViewStore.setActiveView('maps')
+  }
+
   function updateStationModules(stationId: string, modules: SavedModule[]) {
     updateBindingStationPlan(stationId, { modules })
     syncBindingStationDerivedSnapshot(stationId)
@@ -1912,6 +1934,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     deleteStation,
     renameStation,
     selectTransitSector,
+    jumpToMapBinding,
     setExpandedSector: (sectorId: string | null) => { expandedSectorId.value = sectorId },
     getStationById,
     mode,

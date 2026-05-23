@@ -66,6 +66,7 @@ const showArchiveModuleList = computed(() => {
     @rename-station="tabbarPresenter.emits.renameStation"
     @delete-station="tabbarPresenter.emits.deleteStation"
     @expand-sector="tabbarPresenter.emits.expandSector"
+    @jump-to-binding="(tabId, tabType) => tabbarPresenter.emits.jumpToBinding(tabId, tabType)"
   />
   
   <LiveOverviewToolbar

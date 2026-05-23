@@ -28,7 +28,16 @@
 - 绑定 group：`border-blue-400/30 bg-blue-500/5` 蓝色边框和底色，包含整个 header + 所有存档条目
 - save-item 补充 `border-slate-700/30` 卡片式边框，hover 提亮
 
-### 跳转流程
+### Station/Transit Tab 右键跳转绑定
+
+- `SectorStationTabBar.vue`：transit tab 新增 `@contextmenu`；station 和 transit tab 的右键菜单新增"跳转到地图绑定编辑"菜单项（chain-link 图标）。
+- `useProductionTabbarPresenter.ts`：新增 `jumpToBinding` emit，透传到 store 的 `jumpToMapBinding`。
+- `useLiveProductionStore.ts`：新增 `jumpToMapBinding(tabId, tabType)` 方法：
+  - transit tab：从 `tabId` 解析 `sectorGroupId`（去除 `transit:` 前缀）
+  - station tab：从 `derivedBindingStations` 查找匹配的 `groupId`
+  - 设置 `activeViewStore` 面板状态并切换 `activeView = 'maps'`
+- `LiveProductionWorkbenchView.vue`：绑定 `@jump-to-binding` 事件
+- i18n：新增 `sector.jump_to_binding`
 
 点击绑定按钮时执行以下步骤：
 

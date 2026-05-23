@@ -111,6 +111,7 @@
     "delete_station": "删除分站",
     "confirm_delete": "确认删除",
     "delete_warning": "此操作无法撤销，确定要拆除该空间站吗？",
+    "jump_to_binding": "跳转到地图绑定编辑",
     "menu_operations": "操作"
   },
   "sectorManagement": {

@@ -22,6 +22,7 @@ export interface TabbarPresenterEmits {
   duplicateStation: (stationId: string) => unknown
   deleteStation: (stationId: string) => void
   expandSector: (sectorId: string | null) => void
+  jumpToBinding: (tabId: string, tabType: 'station' | 'transit') => void
 }
 
 export interface UseProductionTabbarPresenterReturn {
@@ -66,6 +67,7 @@ export interface TabbarPresenterStore {
   duplicateStation(stationId: string): unknown
   deleteStation(stationId: string): void
   setExpandedSector?(sectorId: string | null): void
+  jumpToMapBinding?(tabId: string, tabType: 'station' | 'transit'): void
 }
 
 function getFallbackTagForStationType(type?: StationType): string | undefined {
@@ -168,7 +170,10 @@ export function useProductionTabbarPresenter(store: TabbarPresenterStore): UsePr
     renameStation: (stationId: string) => store.renameStation(stationId, ''),
     duplicateStation: (stationId: string) => store.duplicateStation(stationId),
     deleteStation: (stationId: string) => store.deleteStation(stationId),
-    expandSector: (sectorId: string | null) => (store.setExpandedSector || (() => {}))(sectorId)
+    expandSector: (sectorId: string | null) => (store.setExpandedSector || (() => {}))(sectorId),
+    jumpToBinding: (tabId: string, tabType: 'station' | 'transit') => {
+      ;(store.jumpToMapBinding || (() => {}))(tabId, tabType)
+    }
   }
 
   return { props, emits }
