@@ -4,21 +4,21 @@
   <!--== Asteroid groups with resources ==-->
   <!--====================================-->
   <!-- Ore -->
-  <group name="asteroid_ore_xxl" resource="ore" yield="1600" yieldvariation="0.2">
+  <group name="asteroid_ore_xxl" resource="ore" yield="8000" yieldvariation="0.2">
     <select macro="env_ast_ore_xxl_01_macro"/>
   </group>
-  <group name="asteroid_ore_xl" resource="ore" yield="1200" yieldvariation="0.2">
+  <group name="asteroid_ore_xl" resource="ore" yield="8000" yieldvariation="0.2">
     <select macro="env_ast_ore_xl_01_macro"/>
     <select macro="env_ast_ore_xl_02_macro"/>
   </group>
-  <group name="asteroid_ore_l" resource="ore" yield="300" yieldvariation="0.3">
+  <group name="asteroid_ore_l" resource="ore" yield="4000" yieldvariation="0.3">
     <select macro="env_ast_ore_l_01_macro"/>
     <select macro="env_ast_ore_l_02_macro"/>
     <select macro="env_ast_ore_l_03_macro"/>
     <select macro="env_ast_ore_l_04_macro"/>
     <select macro="env_ast_ore_l_05_macro"/>
   </group>
-  <group name="asteroid_ore_m" resource="ore" yield="100" yieldvariation="0.5">
+  <group name="asteroid_ore_m" resource="ore" yield="2000" yieldvariation="0.5">
     <select macro="env_ast_ore_m_01_macro"/>
     <select macro="env_ast_ore_m_02_macro"/>
     <select macro="env_ast_ore_m_03_macro"/>
@@ -26,14 +26,14 @@
     <select macro="env_ast_ore_m_05_macro"/>
     <select macro="env_ast_ore_m_06_macro"/>
   </group>
-  <group name="asteroid_ore_s" resource="ore" yield="40" yieldvariation="0.5">
+  <group name="asteroid_ore_s" resource="ore" yield="1000" yieldvariation="0.5">
     <select macro="env_ast_ore_s_01_macro"/>
     <select macro="env_ast_ore_s_02_macro"/>
     <select macro="env_ast_ore_s_03_macro"/>
     <select macro="env_ast_ore_s_04_macro"/>
     <select macro="env_ast_ore_s_05_macro"/>
   </group>
-  <group name="asteroid_ore_xs" resource="ore" yield="20" yieldvariation="0.5">
+  <group name="asteroid_ore_xs" resource="ore" yield="100" yieldvariation="0.5">
     <select macro="env_ast_ore_xs_01_macro"/>
     <select macro="env_ast_ore_xs_02_macro"/>
     <select macro="env_ast_ore_xs_03_macro"/>
@@ -67,15 +67,15 @@
     <select macro="env_asteroid_pierced_m_07_macro"/>
   </group>
   <!-- Silicon -->
-  <group name="asteroid_silicon_xl" resource="silicon" yield="1200" yieldvariation="0.2">
+  <group name="asteroid_silicon_xl" resource="silicon" yield="8000" yieldvariation="0.2">
     <select macro="env_ast_crystal_xl_01_macro"/>
   </group>
-  <group name="asteroid_silicon_l" resource="silicon" yield="300" yieldvariation="0.3">
+  <group name="asteroid_silicon_l" resource="silicon" yield="4000" yieldvariation="0.3">
     <select macro="env_ast_crystal_l_01_macro"/>
     <select macro="env_ast_crystal_l_02_macro"/>
     <select macro="env_ast_crystal_l_03_macro"/>
   </group>
-  <group name="asteroid_silicon_m" resource="silicon" yield="100" yieldvariation="0.3">
+  <group name="asteroid_silicon_m" resource="silicon" yield="2000" yieldvariation="0.3">
     <select macro="env_ast_crystal_m_01_macro"/>
     <select macro="env_ast_crystal_m_02_macro"/>
     <select macro="env_ast_crystal_m_03_macro"/>
@@ -83,7 +83,7 @@
     <select macro="env_ast_crystal_m_05_macro"/>
     <select macro="env_ast_crystal_m_06_macro"/>
   </group>
-  <group name="asteroid_silicon_s" resource="silicon" yield="40" yieldvariation="0.5">
+  <group name="asteroid_silicon_s" resource="silicon" yield="1000" yieldvariation="0.5">
     <select macro="env_ast_crystal_s_01_macro"/>
     <select macro="env_ast_crystal_s_02_macro"/>
     <select macro="env_ast_crystal_s_03_macro"/>
@@ -91,7 +91,7 @@
     <select macro="env_ast_crystal_s_05_macro"/>
     <select macro="env_ast_crystal_s_06_macro"/>
   </group>
-  <group name="asteroid_silicon_xs" resource="silicon" yield="20" yieldvariation="0.5">
+  <group name="asteroid_silicon_xs" resource="silicon" yield="100" yieldvariation="0.5">
     <select macro="env_ast_crystal_xs_01_macro"/>
     <select macro="env_ast_crystal_xs_02_macro"/>
     <select macro="env_ast_crystal_xs_03_macro"/>
@@ -132,15 +132,15 @@
     <select macro="env_ast_niv_xs_05_macro"/>
   </group>
   <!-- Ice -->
-  <group name="asteroid_ice_xl" resource="ice" yield="1200" yieldvariation="0.2">
+  <group name="asteroid_ice_xl" resource="ice" yield="8000" yieldvariation="0.2">
     <select macro="env_ast_ice_xl_01_macro"/>
   </group>
-  <group name="asteroid_ice_l" resource="ice" yield="300" yieldvariation="0.3">
+  <group name="asteroid_ice_l" resource="ice" yield="4000" yieldvariation="0.3">
     <select macro="env_ast_ice_l_01_macro"/>
     <select macro="env_ast_ice_l_02_macro"/>
     <select macro="env_ast_ice_l_03_macro"/>
   </group>
-  <group name="asteroid_ice_m" resource="ice" yield="100" yieldvariation="0.3">
+  <group name="asteroid_ice_m" resource="ice" yield="2000" yieldvariation="0.3">
     <select macro="env_ast_ice_m_01_macro"/>
     <select macro="env_ast_ice_m_02_macro"/>
     <select macro="env_ast_ice_m_03_macro"/>
@@ -148,7 +148,7 @@
     <select macro="env_ast_ice_m_05_macro"/>
     <select macro="env_ast_ice_m_06_macro"/>
   </group>
-  <group name="asteroid_ice_s" resource="ice" yield="40" yieldvariation="0.5">
+  <group name="asteroid_ice_s" resource="ice" yield="1000" yieldvariation="0.5">
     <select macro="env_ast_ice_s_01_macro"/>
     <select macro="env_ast_ice_s_02_macro"/>
     <select macro="env_ast_ice_s_03_macro"/>
@@ -156,7 +156,7 @@
     <select macro="env_ast_ice_s_05_macro"/>
     <select macro="env_ast_ice_s_06_macro"/>
   </group>
-  <group name="asteroid_ice_xs" resource="ice" yield="20" yieldvariation="0.5">
+  <group name="asteroid_ice_xs" resource="ice" yield="100" yieldvariation="0.5">
     <select macro="env_ast_ice_xs_01_macro"/>
     <select macro="env_ast_ice_xs_02_macro"/>
     <select macro="env_ast_ice_xs_03_macro"/>

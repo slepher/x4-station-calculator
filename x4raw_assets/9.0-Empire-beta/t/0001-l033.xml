@@ -3756,6 +3756,10 @@
     <t id="12788">AMD FSR</t>
     <t id="12789">Si c'est votre première plongée dans X4, nous vous suggérons d'essayer quelques tutoriels avant de commencer votre voyage dans l'univers de X4.</t>
     <t id="12790">Commencer un nouvel univers ouvert</t>
+    <t id="12791">Creator Credit for Uploads</t>
+    <t id="12792">Choose whether to include your forum username when uploading data \(e.g. ships\).</t>
+    <t id="12793">Submit Anonymously</t>
+    <t id="12794">Credit My Forum Username</t>
     <t id="12800">(Diplomacy menu)</t>
     <t id="12801">Actions de l'ambassade</t>
     <t id="12803">Diplomate</t>
@@ -3933,7 +3937,7 @@
     <t id="13226">Le vaisseau actuel possède des missiles incompatibles.</t>
     <t id="13227">Stabilité du moteur de voyage</t>
     <t id="13300">(Input bar)</t>
-    <t id="13301">Déplacer la vue(Translation ou panoramique, il faut voir ce que fait cette action)</t>
+    <t id="13301">Déplacer la vue</t>
     <t id="13302">Réinitialiser la vue</t>
     <t id="13303">Pivoter la vue</t>
     <t id="13304">Réinitialiser l'orientation</t>
@@ -3962,7 +3966,7 @@
     <t id="13327">Ordre prioritaire en attente</t>
     <t id="13328">Vitesse de collecte(des ressources; titre d'une colonne dans une table)</t>
     <t id="13400">(map range 32xx, 83xx, 112xx and 116xx continued)</t>
-    <t id="13401">Gaz(euse)</t>
+    <t id="13401">Gaz</t>
     <t id="13402">Débris</t>
   </page>
   <page id="1002" title="Player Choices" descr="General Player Choices in Conversations - Remember to look for text from XRDB before adding new" voice="no">
@@ -57919,6 +57923,10 @@
     <t id="41602">Bombardez les vaisseaux de ligne qui menacent le commandant de ce vaisseau.</t>
     <t id="41603">Bombarder pour</t>
     <t id="41604">Bombarder pour le commandant</t>
+    <t id="41701">Prospector</t>
+    <t id="41702">Prospect for resources needed by this ship's commander.</t>
+    <t id="41703">Prospect for</t>
+    <t id="41704">Prospect for commander</t>
     <t id="50000">(***Tiers***)</t>
     <t id="50101">Apprenti</t>
     <t id="50201">Membre d'équipage capable</t>
@@ -62199,6 +62207,7 @@
     <t id="8">$SHIP$ - passagers en attente : $PASSENGER$</t>
     <t id="11">{30232,101}</t>
     <t id="12">{30232,102}</t>
+    <t id="13">{1001,7310}</t>
     <t id="101">Hors d'ici</t>
     <t id="102">Je n'ai pas vraiment le temps d'expliquer pourquoi mais que dois partir de cette station le plus rapidement possible. Des gens me cherchent. Je dois partir d'ici, n'importe où tant que c'est pas ici. Est-ce que vous voulez bien me fournir un moyen de transport hors de la station ? Je vous paierai pour ça. Si vous pouvez m'aider, posez vous sur la station et venez me voir dans la zone des quais. Merci, étranger.</t>
     <t id="103">{30101,1}</t>

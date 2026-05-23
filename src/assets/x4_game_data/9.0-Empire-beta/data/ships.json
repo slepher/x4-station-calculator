@@ -15018,7 +15018,7 @@
     },
     "hull": 131000,
     "physics": {
-      "mass": 310.0,
+      "mass": 340.0,
       "drag": {
         "forward": 96.868,
         "reverse": 369.02,

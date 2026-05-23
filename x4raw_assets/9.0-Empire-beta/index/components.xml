@@ -2968,6 +2968,8 @@
   <entry name="scs_gen_asteroid_32_entranceplug_02" value="assets\structures\spacesuit_construction_set\scs_gen_asteroid_32_entranceplug_02"/>
   <entry name="test_weapon_xen_l_pewpew_1_mk1" value="assets\test\unai\xenon gun\test_weapon_xen_l_pewpew_1_mk1"/>
   <entry name="test_weapon_xen_l_pewpew_3_mk1" value="assets\test\unai\test_weapon_xen_l_pewpew_3_mk1"/>
+  <entry name="effect_gen_scan_01" value="assets\fx\misc\effect_gen_scan_01"/>
+  <entry name="generic_software" value="assets\interiors\generic_software"/>
   <entry name="station_spl_tradestation_base_01" value="extensions\ego_dlc_split\assets\structures\station_spl_tradestation_base_01"/>
   <entry name="defence_spl_claim_01" value="extensions\ego_dlc_split\assets\structures\defence\defence_spl_claim_01"/>
   <entry name="defence_spl_disc_01" value="extensions\ego_dlc_split\assets\structures\defence\defence_spl_disc_01"/>

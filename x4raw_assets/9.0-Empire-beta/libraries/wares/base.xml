@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<!--Last exported: 08.05.2026 14:49:52-->
+<!--Last exported: 19.05.2026 15:47:06-->
 <wares>
   <production>
     <method id="argon" name="{20206,201}">
@@ -13206,12 +13206,14 @@
   <ware id="software_dockmk1" name="{20108,4011}" description="{20108,4012}" factoryname="{20108,161}" group="software" transport="software" volume="1" tags="equipment noblueprint software">
     <price min="5000" average="7500" max="10000"/>
     <production time="10" amount="1" method="default" name="{20206,101}"/>
+    <component ref="software_dummy_macro"/>
     <icon video="ware_software_macro"/>
     <use threshold="0"/>
   </ware>
   <ware id="software_dockmk2" name="{20108,4021}" description="{20108,4022}" factoryname="{20108,161}" group="software" transport="software" volume="1" tags="equipment noblueprint software">
     <price min="24576" average="32768" max="40960"/>
     <production time="10" amount="1" method="default" name="{20206,101}"/>
+    <component ref="software_dummy_macro"/>
     <icon video="ware_software_macro"/>
     <software predecessor="software_dockmk1"/>
     <use threshold="0.5"/>
@@ -13223,6 +13225,7 @@
   <ware id="software_flightassistmk1" name="{20108,4001}" description="{20108,4002}" factoryname="{20108,151}" group="software" transport="software" volume="1" tags="equipment noblueprint software">
     <price min="6825" average="9100" max="11375"/>
     <production time="10" amount="1" method="default" name="{20206,101}"/>
+    <component ref="software_dummy_macro"/>
     <icon video="ware_software_macro"/>
     <use threshold="0"/>
   </ware>
@@ -13285,6 +13288,7 @@
   <ware id="software_targetmk1" name="{20108,3001}" description="{20108,3002}" factoryname="{20108,141}" group="software" transport="software" volume="1" tags="equipment noblueprint software">
     <price min="6144" average="8192" max="10240"/>
     <production time="10" amount="1" method="default" name="{20206,101}"/>
+    <component ref="software_dummy_macro"/>
     <icon video="ware_software_macro"/>
     <use threshold="0"/>
   </ware>
@@ -13295,6 +13299,7 @@
   <ware id="software_trademk1" name="{20108,2001}" description="{20108,2002}" factoryname="{20108,131}" group="software" transport="software" volume="1" tags="equipment noblueprint software">
     <price min="8438" average="11250" max="14063"/>
     <production time="10" amount="1" method="default" name="{20206,101}"/>
+    <component ref="software_dummy_macro"/>
     <icon video="ware_software_macro"/>
     <use threshold="0"/>
   </ware>

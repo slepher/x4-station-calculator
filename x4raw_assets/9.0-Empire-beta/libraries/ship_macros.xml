@@ -4424,7 +4424,7 @@
       <sounds>
         <shipdetail ref="shipdetail_ship_boron_l_xl_01"/>
       </sounds>
-      <physics mass="310">
+      <physics mass="340">
         <inertia pitch="240" yaw="240" roll="200"/>
         <drag forward="96.868" reverse="369.02" horizontal="70" vertical="70" pitch="120" yaw="120" roll="110"/>
         <accfactors forward="0.8" horizontal="1.35" vertical="1.35"/>
@@ -18319,7 +18319,7 @@
       <physics mass="20.594">
         <inertia pitch="3" yaw="3" roll="3"/>
         <drag forward="2.524" reverse="10.096" horizontal="6.2" vertical="6.2" pitch="5.2" yaw="6.7" roll="6.2"/>
-        <accfactors forward="1.5" horizontal="1.3" vertical="1.3"/>
+        <accfactors forward="1.5" reverse="1.15" horizontal="1.3" vertical="1.3"/>
       </physics>
       <thruster tags="medium"/>
       <ship type="corvette" prestige="20"/>
@@ -18382,7 +18382,7 @@
       <physics mass="20.594">
         <inertia pitch="3" yaw="3" roll="3"/>
         <drag forward="2.524" reverse="10.096" horizontal="6.2" vertical="6.2" pitch="5.2" yaw="6.7" roll="6.2"/>
-        <accfactors forward="1.5" horizontal="1.3" vertical="1.3"/>
+        <accfactors forward="1.5" reverse="1.15" horizontal="1.3" vertical="1.3"/>
       </physics>
       <thruster tags="medium"/>
       <ship type="corvette"/>
