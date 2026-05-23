@@ -192,13 +192,6 @@ function groupLabel(group: string, groupNames: Map<string, string>, i18nMap?: Re
   return emoji ? `${emoji} ${name}` : name
 }
 
-export function loadTerraformingData(version: string): TerraformingData {
-  const modules = import.meta.glob('/src/assets/x4_game_data/*/data/terraforming.json', { eager: true })
-  const key = Object.keys(modules).find(k => k.includes(version))
-  if (!key) throw new Error(`Version ${version} terraforming data not found`)
-  return (modules[key] as { default: TerraformingData }).default
-}
-
 export function resolveAvailableTasks(
   cluster: TerraformingCluster,
   state: TerraformingState,

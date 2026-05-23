@@ -23,6 +23,7 @@ import type {
   X4ShipSlot,
   X4Res
 } from '../../types/x4'
+import type { TerraformingData } from './terraformingTaskResolver'
 
 export type LocalizedX4Module = X4Module & { localeName: string }
 export type LocalizedX4ModuleGroup = X4ModuleGroup & { localeName: string }
@@ -79,6 +80,7 @@ export type GameDataFiles = {
   shipSlots: Record<string, X4ShipSlot[]>
   languages: X4Language[]
   dlcs: X4Dlc[]
+  terraforming: TerraformingData
 }
 
 type JsonModule<T = unknown> = { default: T }
@@ -116,7 +118,7 @@ export async function loadGameDataFiles(
     equipments, equipmentTypes, slotTags,
     consumables, drones, missiles, bullets,
     maps, mapResources, regionyields, res, factions,
-    defaultMaxes, shipSlots, languages, dlcs
+    defaultMaxes, shipSlots, languages, dlcs, terraforming
   ] = await Promise.all([
     loadJsonFromBundle<X4Ware[]>(folderName, 'wares.json', loaders),
     loadJsonFromBundle<X4Module[]>(folderName, 'modules.json', loaders),
@@ -140,7 +142,8 @@ export async function loadGameDataFiles(
     loadJsonFromBundle<Record<string, X4DefaultMax>>(folderName, 'default_maxes.json', loaders),
     loadJsonFromBundle<Record<string, X4ShipSlot[]>>(folderName, 'ship_slots.json', loaders),
     loadJsonFromBundle<X4Language[]>(folderName, 'languages.json', loaders),
-    loadJsonFromBundle<X4Dlc[]>(folderName, 'dlcs.json', loaders)
+    loadJsonFromBundle<X4Dlc[]>(folderName, 'dlcs.json', loaders),
+    loadJsonFromBundle<TerraformingData>(folderName, 'terraforming.json', loaders)
   ])
 
   return {
@@ -149,7 +152,7 @@ export async function loadGameDataFiles(
     equipments, equipmentTypes, slotTags,
     consumables, drones, missiles, bullets,
     maps, mapResources, regionyields, res, factions,
-    defaultMaxes, shipSlots, languages, dlcs
+    defaultMaxes, shipSlots, languages, dlcs, terraforming
   }
 }
 

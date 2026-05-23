@@ -43,7 +43,6 @@ import { createProductionModuleActions } from './actions/productionModuleActions
 import { createProductionWareRuleActions } from './actions/productionWareRuleActions'
 import { createProductionSettingActions, doesStationSettingsAffectFlowMap } from './actions/productionSettingActions'
 import type { TerraformingData, TerraformingCluster } from './logic/terraformingTaskResolver'
-import { loadTerraformingData } from './logic/terraformingTaskResolver'
 
 function mergeSavedModules(modules: SavedModule[]): SavedModule[] {
   const counts = new Map<string, number>()
@@ -474,13 +473,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   })
 
   const terraformingData = computed<TerraformingData | null>(() => {
-    const version = gameData.folderName
-    if (!version) return null
-    try {
-      return loadTerraformingData(version)
-    } catch {
-      return null
-    }
+    return gameData.terraformingData
   })
 
   const terraformingSelectedCluster = computed<TerraformingCluster | null>(() => {

@@ -32,6 +32,7 @@ import type {
   X4Ship,
   X4Equipment
 } from '@/types/x4'
+import type { TerraformingData } from './logic/terraformingTaskResolver'
 import { generateFilteredModulesGrouped } from './logic/searchModule'
 import {
   loadGameDataFiles,
@@ -74,6 +75,7 @@ export const useGameDataStore = defineStore('gameData', () => {
   const isReady = ref(false)
   const searchQuery = ref('')
   const gameData = ref<GameDataFiles | null>(null)
+  const terraformingData = ref<TerraformingData | null>(null)
   const waresMap = ref<Record<string, X4Ware>>({})
   const modulesMap = ref<Record<string, X4Module>>({})
   const modulesByMacroId = ref<Record<string, X4Module>>({})
@@ -443,6 +445,7 @@ export const useGameDataStore = defineStore('gameData', () => {
     shipSlots.value = data.shipSlots
     languages.value = data.languages
     dlcs.value = data.dlcs
+    terraformingData.value = data.terraforming || null
   }
 
   function setVersion(version: string, beta: boolean) {
@@ -545,6 +548,7 @@ export const useGameDataStore = defineStore('gameData', () => {
     isReady,
     searchQuery,
     gameData,
+    terraformingData,
     waresMap,
     modulesMap,
     modulesByMacroId,

@@ -9,7 +9,6 @@
 
 import getopts from 'getopts'
 import {
-  loadTerraformingData,
   resolveAvailableTasks,
   printTaskTree,
   printObjectives,
@@ -17,6 +16,7 @@ import {
   resolveWithReplaces,
 } from '@/store/logic/terraformingTaskResolver'
 import type { TerraformingState, TerraformingData } from '@/store/logic/terraformingTaskResolver'
+import { loadGameDataFiles } from '@/store/logic/useGameData'
 
 const STAT_KEYS = [
   'temperature', 'oxygen', 'methane', 'carbondioxide',
@@ -148,8 +148,9 @@ export function parseArgs(argv: string[]): ParsedArgs {
   }
 }
 
-export function run(args: ParsedArgs): string {
-  const data = loadTerraformingData(args.version)
+export async function run(args: ParsedArgs): Promise<string> {
+  const gameData = await loadGameDataFiles(args.version)
+  const data = gameData.terraforming
   const i18nMap = loadLocale(data, args.version, args.lang)
 
   const cluster = data.clusters.find(c => c.id === args.planet)
@@ -200,7 +201,8 @@ if (args.help) {
 
 if (args.listPlanets) {
   try {
-    const data = loadTerraformingData(args.version)
+    const gameData = await loadGameDataFiles(args.version)
+    const data = gameData.terraforming
     console.log(`Available planets (version: ${args.version}):`)
     for (const c of data.clusters) {
       const name = c.id
@@ -223,9 +225,10 @@ if (!args.planet) {
 }
 
 try {
-  const output = run(args)
+  const output = await run(args)
   if (args.json) {
-    const data = loadTerraformingData(args.version)
+    const gameDataJ = await loadGameDataFiles(args.version)
+    const data = gameDataJ.terraforming
     const cluster = data.clusters.find(c => c.id === args.planet)
     if (!cluster) throw new Error(`Planet "${args.planet}" not found`)
 
@@ -252,7 +255,8 @@ try {
       })),
     }, null, 2))
   } else {
-    const data = loadTerraformingData(args.version)
+    const gameDataE = await loadGameDataFiles(args.version)
+    const data = gameDataE.terraforming
     const cluster = data.clusters.find(c => c.id === args.planet)!
     const currentStats: Record<string, number> = { ...cluster.initialStats }
     for (const [key, val] of Object.entries(args.statOverrides)) {
