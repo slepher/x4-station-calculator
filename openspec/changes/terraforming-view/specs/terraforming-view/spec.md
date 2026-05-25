@@ -2,7 +2,7 @@
 
 ## Purpose
 
-将 terraforming-shell 的 3 列占位布局替换为可交互面板：左列星区列表（accordion + i18n + objectives 进度）、中列任务树（分组 + 交互式完成 + x-number-input 计数）、右列执行序列视图（按真实执行顺序逐条展示，并支持单条取消与后续合法性校验）。
+将 terraforming-shell 的 3 列占位布局替换为可交互面板：左列星区列表（accordion + i18n + objectives 进度）、中列任务树（分组 + 交互式完成 + 递归子节点渲染 + x-number-input 计数）、右列执行序列视图（按真实执行顺序逐条展示，支持单条取消与后续合法性校验，支持清空队列）。
 
 ## ADDED Requirements
 
@@ -331,3 +331,51 @@
 **那么** 需求方块整体显示为空心
 
 **并且** 不得额外补出当前值所在方块
+
+### Requirement: 递归任务树深度
+
+**前提** 任务树存在同组多层强制前置依赖（如 biosphere: genes → microbes → fauna → megafauna）
+
+**当** 中列渲染任务树
+
+**那么** 子节点通过递归组件 `TerraformingTaskNode` 渲染，支持任意深度的父子链
+
+**并且** 每层子节点向左缩进 `ml-6`
+
+**并且** 不得限制为仅渲染一层 children
+
+### Requirement: blocked 状态非叠加样式
+
+**前提** 任务节点为 blocked 状态
+
+**当** 渲染 blocked 节点
+
+**那么** 不应用元素级 `opacity`（避免嵌套叠加）
+
+**并且** 不使用 `grayscale` 滤镜（避免影响 stat 方块颜色辨识）
+
+**并且** 通过暗化任务名称和状态图标文字颜色表达 blocked
+
+### Requirement: 右列清空队列
+
+**前提** 右列执行序列存在至少一条记录
+
+**当** 用户点击标题栏「清空任务」按钮
+
+**那么** 执行序列全部清空
+
+**并且** `terraformingCompletedProjects` 随 execution log 同步重置
+
+**当** 执行序列为空
+
+**那么** 清空按钮自动隐藏
+
+### Requirement: objective.relocate sector 级判定
+
+**前提** objective 的 `relocateTarget` 字段为 `"sector"`（由数据层标记）
+
+**当** 计算 `objective.relocate` 的完成状态
+
+**那么** 除 cluster 级匹配外，还需验证 HQ sector 的 `nameId` 与 objective 已解析的 `$LOCATION$` nameId 一致
+
+**并且** 非 sector 级 relocate 保持原 cluster 级判定

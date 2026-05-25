@@ -276,6 +276,10 @@ terraforming 的若干关键 stat 和事件不是“项目 effect 直接累加�
 
 `$PilotTrainingCourseProject` 在 `build.py` 中解析为 `trn_pilot`（默认）。cluster 可传入自定义值（目前均使用默认）。
 
+`$Sector_X.knownname` 在 `_resolve_replace_value` 中新增 pattern 匹配，解析流向与 `$Cluster_X.knownname` 一致——通过 `cluster_name_map` 查询 cluster macro 对应的显示名 nameId。对单扇区星区（如 MemoryOfProfit），该 nameId 即为该扇区名称。
+
+`relocateTarget` 字段: 当 relocate 目标的 `$LOCATION$` 替换为扇区级名称时，解析器在 objective 上标记 `relocateTarget: "sector"`，消费方据此执行扇区级完成判定而非仅 cluster 级。
+
 ### I18nLookup 重构
 
 `terraformingTaskResolver.ts` 的 i18n 函数从 `i18nMap: Record<string, string>` 改为 `i18nLookup: (key: string) => string`：
@@ -377,7 +381,15 @@ evt_globalwarming_co2 (3600s):
 <set_terraforming_stat cluster="event.object" id="'airpressure'" 
   value="old_airpressure + $AddedAirPressure - $AddedAtmoPressureTable.{...}"/>
 ```
-解析器仅取 initialStats 快照，未实时计算。影响 `atm_outgassing` 可用性（需 airpressure < 5）。
+游戏实际使用 **delta 叠加** (old + newContribution - oldContribution)，保留项目直接效果值。
+
+**已实现**: `deriveAirPressure()` 在 `terraformingRuntime.ts` 中从绝对覆写改为 delta 叠加：
+```
+airpressure = effectStats.airpressure + currentContribution - initialContribution
+```
+且当 cluster 不存在 `airpressure` stat 时（如 OceanOfFantasy），函数直接跳过不计算，避免无中生有。
+
+影响 `atm_outgassing` 可用性（需 airpressure < 5）。
 
 ### 动态项目增删 (StatAdded/StatRemoved)
 

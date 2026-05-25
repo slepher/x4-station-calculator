@@ -112,19 +112,19 @@
 
 ## 14. state/value 语义补全
 
-- [ ] 14.1 `parse_library.py`: 为每个 `stats[].ranges[]` 补出 `start`
-- [ ] 14.2 `parse_library.py`: 确保 `rgb/state/habitable` 原样保留，供前端还原游戏方块颜色
-- [ ] 14.3 `parse_library.py`: 对 `projects[].conditions[]` 保留 `min/max/minvalue/maxvalue`
-- [ ] 14.4 `parse_library.py`: 为 condition 新增 `usesStateBounds` / `usesValueBounds`
-- [ ] 14.5 `terraformingTaskResolver.ts`: 校正条件解释，明确 `condition.min/max` 按 state 判定，`minvalue/maxvalue` 按真实 value 判定
-- [ ] 14.6 验证 `ame_resort_tropical` 的 `temperature min=2 max=3` 可被消费方解释为温度 state 2..3，而非 value 2..3
+- [x] 14.1 `parse_library.py`: 为每个 `stats[].ranges[]` 补出 `start`
+- [x] 14.2 `parse_library.py`: 确保 `rgb/state/habitable` 原样保留，供前端还原游戏方块颜色
+- [x] 14.3 `parse_library.py`: 对 `projects[].conditions[]` 保留 `min/max/minvalue/maxvalue`
+- [x] 14.4 `parse_library.py`: 为 condition 新增 `usesStateBounds` / `usesValueBounds`
+- [x] 14.5 `terraformingTaskResolver.ts`: 校正条件解释，明确 `condition.min/max` 按 state 判定，`minvalue/maxvalue` 按真实 value 判定
+- [x] 14.6 验证 `ame_resort_tropical` 的 `temperature min=2 max=3` 可被消费方解释为温度 state 2..3，而非 value 2..3
 
 ## 15. 运行时派生规则输出
 
-- [ ] 15.1 `parse_md.py` / `build.py`: 明确保留 cluster 级 `Ignore*`、`$AddedAtmoPressureTable.*`、`$GlobalWarmingLimitTable.*`
-- [ ] 15.2 定义并输出 airpressure 派生所需语义，使消费方可根据 `oxygen + methane + carbondioxide` 与 cluster 补正重建当前气压
+- [x] 15.1 `parse_md.py` / `build.py`: 明确保留 cluster 级 `Ignore*`、`$AddedAtmoPressureTable.*`、`$GlobalWarmingLimitTable.*`
+- [x] 15.2 `deriveAirPressure`: 从绝对覆写改为 delta 叠加 `airpressure = effectStats.airpressure + currentContribution - initialContribution`，保留项目效果值；且当 cluster 不存在 airpressure stat 时跳过不计算
 - [x] 15.3 定义并输出 warming event 所需语义，使消费方通过通用动态 event 命中逻辑处理 `evt_globalwarming_*`
 - [x] 15.4 将 `SetupStatDependentProjects` 的项目/事件阈值规则整理为可复用的动态项目池语义，而非仅在初始解析时静态扩表
-- [ ] 15.5 验证 `AtiyasMisfortune`、`OceanOfFantasy`、`GetsuFune` 三类 cluster 的 ignore / warming / dynamic rules 均可被消费方识别
+- [x] 15.5 验证 `AtiyasMisfortune`、`OceanOfFantasy`、`GetsuFune` 三类 cluster 的 ignore / warming / dynamic rules 均可被消费方识别
 - [x] 15.6 `parse_md.py`: 解析 cluster cue / patch 中的 `remove_terraforming_stat`，输出 `removedStats`
 - [x] 15.7 runtime 消费方将 `removedStats` 与 `Ignore*` 合并，统一视为 stat 不存在

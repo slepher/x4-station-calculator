@@ -20,14 +20,9 @@ src/components/empire/
 └── terraforming/
     ├── TerraformingSectorPanel.vue
     ├── TerraformingTaskList.vue
+    ├── TerraformingTaskNode.vue
     ├── TerraformingStatScale.vue
     └── TerraformingResourcePanel.vue
-
-src/store/
-├── useLiveProductionStore.ts
-└── logic/
-    ├── terraformingTaskResolver.ts
-    └── terraformingRuntime.ts
 ```
 
 ## 当前数据流
@@ -208,6 +203,39 @@ src/store/
 - 提供编辑入口
 - 不提前做昂贵未来预测
 - 交给 runtime state 和 resolver 在交互后决定是否合法
+
+### 递归任务节点
+
+任务树渲染已从 `TerraformingTaskList.vue` 内联渲染 + 一层 `node.children` 改为递归组件 `TerraformingTaskNode.vue`：
+
+- `TerraformingTaskNode` 渲染自身节点卡片后，递归渲染 `node.children`
+- 任意深度的依赖链（如 biosphere: genes → microbes → fauna → megafauna）全部可见
+- 子节点通过 `isChild` prop 获得 `ml-6` 缩进
+- 组件复用了 `toggleProject` / `setProjectCount` emit，父级 `TerraformingTaskList` 透传事件
+
+### blocked 状态非叠加样式
+
+`.task-node.blocked` 不再使用元素级 `opacity-50`（嵌套叠加后深层节点 opacity 趋近于 0），改为：
+
+- `task-name → text-slate-500`（暗化名称文字）
+- `task-status-icon → text-slate-600`（暗化图标）
+- 不再使用 `grayscale` 滤镜（影响 stat 方块颜色辨识）
+
+### 右列清空任务
+
+`TerraformingResourcePanel` 标题栏右侧新增「清空任务」按钮：
+
+- 仅在 `executionTimeline` 非空时可见
+- 点击后触发 `clearAll` → `clearTerraformingExecutionQueue()`，设置 execution log 为空数组
+- 红色边框 (`border-red-800`) 标识破坏性操作
+
+### objective.relocate sector 级匹配
+
+当 objective 的 `$LOCATION$` 替换为扇区级名称（`$Sector_X.knownname`）时：
+
+- Python 端标记 `obj.relocateTarget = "sector"`
+- 前端 `objectivesProgress` 中追加扇区匹配：对比 HQ sector 的 `nameId` 与 objective 已解析的 `$LOCATION$` nameId
+- 非 sector 级 relocate 保持原 cluster 级匹配
 
 ### 撤销规则
 

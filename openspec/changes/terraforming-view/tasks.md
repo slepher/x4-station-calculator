@@ -45,6 +45,25 @@
 - [x] `cancelValidation` 已改为惰性计算
 - [x] `projectMaxCounts` 已移除
 
+### 任务树递归渲染
+
+- [x] 创建 `TerraformingTaskNode.vue` 递归组件，支持任意深度子节点渲染
+- [x] `TerraformingTaskList.vue` task 组改用 `<TerraformingTaskNode>` 替代内联渲染 + 一层 children
+- [x] blocked 状态样式从 `opacity-50` + `grayscale` 改为暗化文字颜色，消除嵌套叠加
+- [x] 移除 terraforming 组件中所有 `grayscale` 引用
+
+### 右列执行序列
+
+- [x] 任务队列标题栏新增「清空任务」按钮
+- [x] 仅当 executionTimeline 非空时显示
+- [x] 点击触发 `clearTerraformingExecutionQueue()`，清空当前 cluster 的 execution log
+
+### objective relocate
+
+- [x] 扇区级 relocate 标记: Python 端检测 `$Sector_X.knownname` → 设 `relocateTarget: "sector"`
+- [x] 前端 `objectivesProgress` 中 relocate 完成判定追加 sector nameId 比较
+- [x] 非 sector 级 relocate 保持原 cluster 级判定不变
+
 ## 当前待验证项
 
 ### 运行时与特殊星区
