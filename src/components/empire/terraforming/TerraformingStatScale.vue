@@ -113,8 +113,8 @@ function blockBorderStyle(block: { value: number; state: number; rgb: string }):
             :key="`${model.statId}-segment-${segment.startIndex}-${segment.endIndex}`"
             class="condition-segment"
             :style="{
-              left: `calc(${segment.startIndex} * (var(--block-size) + var(--block-gap)) - var(--segment-padding))`,
-              width: `calc(${segment.endIndex - segment.startIndex + 1} * var(--block-size) + ${segment.endIndex - segment.startIndex} * var(--block-gap) + 2 * var(--segment-padding))`,
+              left: `calc(${segment.startIndex} * (var(--block-size) + var(--block-gap)) - var(--segment-padding-x))`,
+              width: `calc(${segment.endIndex - segment.startIndex + 1} * var(--block-size) + ${segment.endIndex - segment.startIndex} * var(--block-gap) + 2 * var(--segment-padding-x))`,
             }"
           />
           <div
@@ -139,8 +139,8 @@ function blockBorderStyle(block: { value: number; state: number; rgb: string }):
 </template>
 
 <style scoped>
-.stat-scale { @apply rounded border border-slate-700/40 bg-slate-950/40 px-2 py-1.5; }
-.stat-scale.compact { @apply px-2 py-1; }
+.stat-scale { @apply rounded border border-slate-700/40 bg-slate-950/40 px-2 py-2; }
+.stat-scale.compact { @apply px-2 py-2; }
 
 .scale-line { @apply flex items-center gap-1.5 flex-wrap text-xs; }
 .scale-line.centered { @apply justify-center text-center; }
@@ -150,9 +150,12 @@ function blockBorderStyle(block: { value: number; state: number; rgb: string }):
 .block-strip {
   --block-size: 1rem;
   --block-gap: 0.375rem;
-  --segment-padding: 2px;
+  --segment-padding-x: calc(var(--block-gap) / 2 + 1px);
+  --segment-padding-y: 2px;
   @apply relative flex items-center;
+  margin-left: var(--block-gap);
   gap: var(--block-gap);
+  min-height: calc(var(--block-size) + 2 * var(--segment-padding-y));
 }
 .scale-block {
   @apply h-4 w-4 rounded-sm border border-white/10 opacity-85 transition-all flex-none;
@@ -163,9 +166,9 @@ function blockBorderStyle(block: { value: number; state: number; rgb: string }):
 }
 .condition-segment {
   @apply absolute pointer-events-none border border-white/85;
-  top: calc(-1 * var(--segment-padding));
-  bottom: calc(-1 * var(--segment-padding));
-  border-radius: calc(0.125rem + var(--segment-padding));
+  top: calc(-1 * var(--segment-padding-y));
+  bottom: calc(-1 * var(--segment-padding-y));
+  border-radius: calc(0.125rem + var(--segment-padding-y));
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18), 0 0 8px rgba(255, 255, 255, 0.12);
 }
 </style>

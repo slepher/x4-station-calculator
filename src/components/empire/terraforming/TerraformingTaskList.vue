@@ -407,9 +407,9 @@ function getStatusIcon(projectId: string, available: boolean): string {
 .task-state-label { @apply text-sm leading-none; }
 .task-name { @apply text-xs text-slate-300; }
 .task-effects { @apply text-xs text-sky-400; }
-.condition-list { @apply mt-1.5 flex flex-col gap-1; }
+.condition-list { @apply mt-1.5 flex flex-col gap-1.5; }
 .task-repeat { @apply text-xs text-slate-500 bg-slate-800/50 px-1 rounded; }
-.condition-dependency { @apply rounded border border-slate-700/40 bg-slate-950/40 px-2 py-1 flex items-center gap-1.5 flex-wrap text-xs; }
+.condition-dependency { @apply rounded border border-slate-700/40 bg-slate-950/40 px-2 py-1.5 flex items-center gap-1.5 flex-wrap text-xs; }
 .condition-dependency.available { @apply text-amber-400; }
 .condition-dependency.blocked { @apply text-red-400; }
 .dependency-name { @apply text-slate-300 font-medium; }
