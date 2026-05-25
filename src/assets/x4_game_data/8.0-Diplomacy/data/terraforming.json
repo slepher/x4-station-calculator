@@ -14,32 +14,28 @@
           "rgb": "#FFFFFF",
           "descriptionId": "{1001,11402}",
           "habitable": false,
-          "start": 0,
-          "description": "With the entire surface covered in permafrost, life is unable to thrive anywhere. Habitation is only possible in sealed environments."
+          "start": 0
         },
         {
           "end": 4,
           "state": 1,
           "rgb": "#66CCCC",
           "descriptionId": "{1001,11403}",
-          "start": 4,
-          "description": "Equatorial latitudes enjoy a temperate-to-cold climate, allowing resilient life to take hold."
+          "start": 4
         },
         {
           "end": 5,
           "state": 2,
           "rgb": "#00FF00",
           "descriptionId": "{1001,11404}",
-          "start": 5,
-          "description": "A few extreme places near the poles and the equator aside, most of this world is hospitable to life, and a significant area is in the perfect range for habitation and agriculture."
+          "start": 5
         },
         {
           "end": 6,
           "state": 3,
           "rgb": "#FF7F00",
           "descriptionId": "{1001,11405}",
-          "start": 6,
-          "description": "While areas closer to the equator are life-threateningly hot, the polar regions can support life."
+          "start": 6
         },
         {
           "end": 9,
@@ -47,12 +43,9 @@
           "rgb": "#FF0000",
           "descriptionId": "{1001,11406}",
           "habitable": false,
-          "start": 7,
-          "description": "Outside of a precious few sheltered environments, the temperature is always well above the boiling point of water, killing basically everything within seconds. Habitation is only possible in sealed environments."
+          "start": 7
         }
-      ],
-      "name": "Temperature",
-      "inactiveText": "Moderate temperature detected"
+      ]
     },
     {
       "id": "airpressure",
@@ -68,36 +61,30 @@
           "rgb": "#FF0000",
           "descriptionId": "{1001,11408}",
           "habitable": false,
-          "start": 0,
-          "description": "Disregarding the lack of oxygen, pressures below the Armstrong limit cause severe issues and prohibit habitation outside of sealed environments."
+          "start": 0
         },
         {
           "end": 4,
           "state": 1,
           "rgb": "#FFFF00",
           "descriptionId": "{1001,11408}",
-          "start": 2,
-          "description": "Disregarding the lack of oxygen, pressures below the Armstrong limit cause severe issues and prohibit habitation outside of sealed environments."
+          "start": 2
         },
         {
           "end": 5,
           "state": 2,
           "rgb": "#00FF00",
           "descriptionId": "{1001,11408}",
-          "start": 5,
-          "description": "Disregarding the lack of oxygen, pressures below the Armstrong limit cause severe issues and prohibit habitation outside of sealed environments."
+          "start": 5
         },
         {
           "end": 8,
           "state": 1,
           "rgb": "#FFFF00",
           "descriptionId": "{1001,11408}",
-          "start": 6,
-          "description": "Disregarding the lack of oxygen, pressures below the Armstrong limit cause severe issues and prohibit habitation outside of sealed environments."
+          "start": 6
         }
-      ],
-      "name": "Atmospheric Pressure",
-      "inactiveText": "No air pressure detected"
+      ]
     },
     {
       "id": "oxygen",
@@ -113,28 +100,23 @@
           "rgb": "#FF0000",
           "descriptionId": "{1001,11411}",
           "habitable": false,
-          "start": 0,
-          "description": "With the exception of the Boron, all Commonwealth species rely on a rather specific partial pressure of oxygen for a breathable atmospheric mix."
+          "start": 0
         },
         {
           "end": 4,
           "state": 1,
           "rgb": "#FFFF00",
           "descriptionId": "{1001,11411}",
-          "start": 4,
-          "description": "With the exception of the Boron, all Commonwealth species rely on a rather specific partial pressure of oxygen for a breathable atmospheric mix."
+          "start": 4
         },
         {
           "end": 9,
           "state": 2,
           "rgb": "#00FF00",
           "descriptionId": "{1001,11411}",
-          "start": 5,
-          "description": "With the exception of the Boron, all Commonwealth species rely on a rather specific partial pressure of oxygen for a breathable atmospheric mix."
+          "start": 5
         }
-      ],
-      "name": "Oxygen",
-      "inactiveText": "No oxygen detected"
+      ]
     },
     {
       "id": "methane",
@@ -156,20 +138,16 @@
           "state": 1,
           "rgb": "#00FF00",
           "descriptionId": "{1001,11413}",
-          "start": 1,
-          "description": "Methane is mostly non-toxic and an incredibly potent greenhouse gas, about 84 times more effective than carbon dioxide."
+          "start": 1
         },
         {
           "end": 6,
           "state": 2,
           "rgb": "#FFFF00",
           "descriptionId": "{1001,11413}",
-          "start": 2,
-          "description": "Methane is mostly non-toxic and an incredibly potent greenhouse gas, about 84 times more effective than carbon dioxide."
+          "start": 2
         }
-      ],
-      "name": "Methane",
-      "inactiveText": "No methane detected"
+      ]
     },
     {
       "id": "carbondioxide",
@@ -191,8 +169,7 @@
           "state": 1,
           "rgb": "#FFFF00",
           "descriptionId": "{1001,11415}",
-          "start": 1,
-          "description": "Any amount of carbon dioxide above a certain threshold will cause severe poisoning in oxygen breathers, prohibiting habitation outside of sealed environments."
+          "start": 1
         },
         {
           "end": 6,
@@ -200,12 +177,9 @@
           "rgb": "#FF0000",
           "descriptionId": "{1001,11415}",
           "habitable": false,
-          "start": 2,
-          "description": "Any amount of carbon dioxide above a certain threshold will cause severe poisoning in oxygen breathers, prohibiting habitation outside of sealed environments."
+          "start": 2
         }
-      ],
-      "name": "Carbon Dioxide",
-      "inactiveText": "No carbon dioxide detected"
+      ]
     },
     {
       "id": "humidity",
@@ -220,28 +194,23 @@
           "state": 0,
           "rgb": "#FF0000",
           "descriptionId": "{1001,11417}",
-          "start": 0,
-          "description": "While habitation itself would be no worse than uncomfortable on a completely arid world, any kind of self-sustaining biosphere is going to rely on a significant amount of readily accessible water."
+          "start": 0
         },
         {
           "end": 4,
           "state": 1,
           "rgb": "#FFFF00",
           "descriptionId": "{1001,11417}",
-          "start": 4,
-          "description": "While habitation itself would be no worse than uncomfortable on a completely arid world, any kind of self-sustaining biosphere is going to rely on a significant amount of readily accessible water."
+          "start": 4
         },
         {
           "end": 6,
           "state": 2,
           "rgb": "#00FF00",
           "descriptionId": "{1001,11417}",
-          "start": 5,
-          "description": "While habitation itself would be no worse than uncomfortable on a completely arid world, any kind of self-sustaining biosphere is going to rely on a significant amount of readily accessible water."
+          "start": 5
         }
-      ],
-      "name": "Humidity",
-      "inactiveText": "No humidity detected"
+      ]
     },
     {
       "id": "seismicactivity",
@@ -263,28 +232,23 @@
           "state": 1,
           "rgb": "#FFFF00",
           "descriptionId": "{1001,11421}",
-          "start": 1,
-          "description": "Major earthquakes are rare enough that they come as an unpleasant surprise."
+          "start": 1
         },
         {
           "end": 2,
           "state": 2,
           "rgb": "#FF7F00",
           "descriptionId": "{1001,11420}",
-          "start": 2,
-          "description": "Major earthquakes are frequent enough that they need to be reckoned with when undertaking any construction."
+          "start": 2
         },
         {
           "end": 3,
           "state": 3,
           "rgb": "#FF0000",
           "descriptionId": "{1001,11419}",
-          "start": 3,
-          "description": "Major earthquakes are an almost hourly occurrence. While generally manageable, construction is significantly affected more often than not."
+          "start": 3
         }
-      ],
-      "name": "Seismic Activity",
-      "inactiveText": "No seismic activity detected"
+      ]
     },
     {
       "id": "toxicity",
@@ -307,12 +271,9 @@
           "rgb": "#FF0000",
           "descriptionId": "{1001,11450}",
           "habitable": false,
-          "start": 1,
-          "description": "Toxins in the air make cost-effective large-scale habitation practically impossible."
+          "start": 1
         }
-      ],
-      "name": "Toxicity",
-      "inactiveText": "No toxicity detected"
+      ]
     },
     {
       "id": "radioactivity",
@@ -335,12 +296,9 @@
           "rgb": "#FF0000",
           "descriptionId": "{1001,11452}",
           "habitable": false,
-          "start": 1,
-          "description": "The radioactive contamination is so severe that complex lifeforms could not survive any lasting exposure."
+          "start": 1
         }
-      ],
-      "name": "Radioactivity",
-      "inactiveText": "No radioactivity detected"
+      ]
     },
     {
       "id": "population",
@@ -349,9 +307,7 @@
       "dynamic": true,
       "icon": "terraforming_population",
       "inactiveTextId": "{1001,3837}",
-      "ranges": [],
-      "name": "Housing",
-      "inactiveText": "No housing available"
+      "ranges": []
     },
     {
       "id": "trainee_group",
@@ -360,8 +316,7 @@
       "dynamic": true,
       "icon": "terraforming_population",
       "inactiveTextId": "",
-      "ranges": [],
-      "name": "Group Trainees"
+      "ranges": []
     },
     {
       "id": "trainee_individual",
@@ -370,8 +325,7 @@
       "dynamic": true,
       "icon": "terraforming_population",
       "inactiveTextId": "",
-      "ranges": [],
-      "name": "Individual Trainees"
+      "ranges": []
     },
     {
       "id": "xenon_alertness",
@@ -386,28 +340,23 @@
           "state": 1,
           "rgb": "#00FF00",
           "descriptionId": "{1001,11427}",
-          "start": 0,
-          "description": "Being on alert will cause the Xenon to convert districts for industrial use. This will happen even faster if they are on high alert."
+          "start": 0
         },
         {
           "end": 4,
           "state": 2,
           "rgb": "#FFFF00",
           "descriptionId": "{1001,11427}",
-          "start": 3,
-          "description": "Being on alert will cause the Xenon to convert districts for industrial use. This will happen even faster if they are on high alert."
+          "start": 3
         },
         {
           "end": 6,
           "state": 3,
           "rgb": "#FF0000",
           "descriptionId": "{1001,11427}",
-          "start": 5,
-          "description": "Being on alert will cause the Xenon to convert districts for industrial use. This will happen even faster if they are on high alert."
+          "start": 5
         }
-      ],
-      "name": "Xenon Alertness",
-      "inactiveText": "No Xenon alertness state detected"
+      ]
     },
     {
       "id": "xenon_production",
@@ -422,12 +371,9 @@
           "state": 0,
           "rgb": "#FF0000",
           "descriptionId": "{1001,11429}",
-          "start": 0,
-          "description": "The more industrial facilities the Xenon have, the faster they can reclaim or rebuild districts that they lose."
+          "start": 0
         }
-      ],
-      "name": "Xenon Production",
-      "inactiveText": "No Xenon production detected"
+      ]
     },
     {
       "id": "salinity",
@@ -443,113 +389,92 @@
           "rgb": "#FFFFFF",
           "descriptionId": "{1001,11456}",
           "habitable": false,
-          "start": 0,
-          "description": "The ocean water, if it exists, is entirely fresh and non-saline."
+          "start": 0
         },
         {
           "end": 1,
           "state": 1,
           "rgb": "#66CCCC",
           "descriptionId": "{1001,11457}",
-          "start": 1,
-          "description": "The ocean water is brackish."
+          "start": 1
         },
         {
           "end": 2,
           "state": 2,
           "rgb": "#00FF00",
           "descriptionId": "{1001,11458}",
-          "start": 2,
-          "description": "The ocean water is saline."
+          "start": 2
         },
         {
           "end": 3,
           "state": 3,
           "rgb": "#FF7F00",
           "descriptionId": "{1001,11459}",
-          "start": 3,
-          "description": "The ocean water is briny."
+          "start": 3
         }
-      ],
-      "name": "Salinity",
-      "inactiveText": "No salinity detected"
+      ]
     }
   ],
   "projectGroups": [
     {
       "id": "events",
-      "nameId": "{1001,11471}",
-      "name": "Events"
+      "nameId": "{1001,11471}"
     },
     {
       "id": "special",
-      "nameId": "{1001,11472}",
-      "name": "Special"
+      "nameId": "{1001,11472}"
     },
     {
       "id": "power",
-      "nameId": "{1001,11473}",
-      "name": "Power"
+      "nameId": "{1001,11473}"
     },
     {
       "id": "industry",
-      "nameId": "{1001,11474}",
-      "name": "Industry"
+      "nameId": "{1001,11474}"
     },
     {
       "id": "cleanup",
-      "nameId": "{1001,11475}",
-      "name": "Cleanup"
+      "nameId": "{1001,11475}"
     },
     {
       "id": "water",
-      "nameId": "{1001,11476}",
-      "name": "Water"
+      "nameId": "{1001,11476}"
     },
     {
       "id": "atmosphere",
-      "nameId": "{1001,11477}",
-      "name": "Atmosphere"
+      "nameId": "{1001,11477}"
     },
     {
       "id": "biosphere",
-      "nameId": "{1001,11478}",
-      "name": "Biosphere"
+      "nameId": "{1001,11478}"
     },
     {
       "id": "food_staple",
-      "nameId": "{1001,11479}",
-      "name": "Staple Food"
+      "nameId": "{1001,11479}"
     },
     {
       "id": "food_luxury",
-      "nameId": "{1001,11480}",
-      "name": "Luxury Food"
+      "nameId": "{1001,11480}"
     },
     {
       "id": "housing",
-      "nameId": "{1001,11481}",
-      "name": "Housing"
+      "nameId": "{1001,11481}"
     },
     {
       "id": "amenities",
-      "nameId": "{1001,11482}",
-      "name": "Amenities"
+      "nameId": "{1001,11482}"
     },
     {
       "id": "economy",
-      "nameId": "{1001,11483}",
-      "name": "Economy"
+      "nameId": "{1001,11483}"
     },
     {
       "id": "training",
-      "nameId": "{1001,11484}",
-      "name": "Training"
+      "nameId": "{1001,11484}"
     },
     {
       "id": "xenon",
-      "nameId": "{1001,11485}",
-      "name": "Xenon"
+      "nameId": "{1001,11485}"
     }
   ],
   "projects": [
@@ -609,9 +534,7 @@
           "type": "project",
           "any": true
         }
-      ],
-      "name": "Reflective Cloud Particles",
-      "description": "Several strategically placed dispersal facilities spray an aerosol of highly reflective particles into the upper layers of the troposphere. This will decrease the amount of sunlight reaching and warming the surface."
+      ]
     },
     {
       "id": "tmp_moholes",
@@ -661,9 +584,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Moholes",
-      "description": "These holes may seem deceptively primitive at first, but with depths in the tens of kilometres, they pose a significant engineering challenge."
+      "predecessors": []
     },
     {
       "id": "tmp_blackdust",
@@ -710,9 +631,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Black Dust",
-      "description": "There really is no more to this than sprinkling dark particles across the surface in order to increase the amount of energy the world absorbs from its sun's rays. The amount of material required is quite staggering, though."
+      "predecessors": []
     },
     {
       "id": "wat_import",
@@ -763,9 +682,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Import Water",
-      "description": "Without readily available water sources, there are not many alternatives to importing it."
+      "predecessors": []
     },
     {
       "id": "wat_irrigation",
@@ -823,9 +740,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Planetary Irrigation",
-      "description": "A massive system of canals, pumps and treatment facilities can provide most of the benefits of rivers with a reasonable, if still tremendous, amount of imported water."
+      "predecessors": []
     },
     {
       "id": "atm_methane_import",
@@ -871,9 +786,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Import Methane",
-      "description": "Imported methane can not only have a positive effect on atmospheric pressure, as a potent greenhouse gas it also helps to warm up a cold world."
+      "predecessors": []
     },
     {
       "id": "atm_methane_oxidizers",
@@ -935,9 +848,7 @@
           "type": "group",
           "any": false
         }
-      ],
-      "name": "Methane Oxidisers",
-      "description": "Gigantic fans blow the methane-heavy air through filters containing zeolite powder. The trapped methane is then periodically heated to form and release carbon dioxide."
+      ]
     },
     {
       "id": "atm_methane_oxidize",
@@ -1004,8 +915,7 @@
           "type": "project",
           "any": false
         }
-      ],
-      "name": "Oxidise Methane"
+      ]
     },
     {
       "id": "atm_carbon_mineralizers",
@@ -1067,9 +977,7 @@
           "type": "group",
           "any": false
         }
-      ],
-      "name": "Carbon Mineralisers",
-      "description": "When forced through tunnels containing a high surface area of certain minerals, carbon dioxide can be made to crystallise into a solid, removing it from the atmosphere entirely."
+      ]
     },
     {
       "id": "atm_carbon_mineralize",
@@ -1132,8 +1040,7 @@
           "type": "project",
           "any": false
         }
-      ],
-      "name": "Mineralise Carbon"
+      ]
     },
     {
       "id": "atm_toxin_cleanup",
@@ -1189,9 +1096,7 @@
           "type": "group",
           "any": false
         }
-      ],
-      "name": "Clean Up Toxins",
-      "description": "Now that the sources of toxins have been dealt with, we need to clean up the damage that's been done. It won't come cheap, but at least we'll be able to breathe the air."
+      ]
     },
     {
       "id": "atm_nitrogen_fix",
@@ -1262,9 +1167,7 @@
           "type": "project",
           "any": false
         }
-      ],
-      "name": "Fix Atmospheric Nitrogen",
-      "description": "Bacteria that capture nitrogen gas and turn it into forms usable by plants are an essential part of a healthy biosphere. With a little bit of specialised machinery, a moderate amount of energy, and a whole lot of hydrogen, we can generate the heat and pressure required to fix large amounts of atmospheric nitrogen as ammonia, measurably reducing the atmospheric pressure."
+      ]
     },
     {
       "id": "atm_helium_import",
@@ -1310,9 +1213,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Import Helium",
-      "description": "While usually too expensive to be the most practical option, importing interplanetary helium to bolster a world's atmosphere may sometimes be the only available course of action in order to achieve a comfortable air pressure."
+      "predecessors": []
     },
     {
       "id": "ter_volcanocaps",
@@ -1398,9 +1299,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Volcano Caps",
-      "description": "These structures are not mere physical plugs that block eruptions. A variety of systems, including vents and sprinklers controlled by a specialised AI, takes proactive measures to prevent the conditions that lead to eruptions in the first place."
+      "predecessors": []
     },
     {
       "id": "ter_radioactive_cleanup",
@@ -1454,9 +1353,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Clean Up Radioactive Contamination",
-      "description": "Swarms of specialised drones to seek out and gather irradiated substances, enough material to entomb them, and gigantic filters to cleanse the air make this a horrendously costly undertaking. Unfortunately, it is not optional if people are going to live here outside of shielded environments."
+      "predecessors": []
     },
     {
       "id": "evt_icemelt",
@@ -1493,9 +1390,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Ice Melt",
-      "description": "The global temperature has risen enough to melt the ice in the equatorial regions. The released water vapour has had a significant effect on atmospheric pressure."
+      "predecessors": []
     },
     {
       "id": "evt_quake_mild",
@@ -1538,9 +1433,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Quake",
-      "description": "Sensors are detecting an impending seismic event. Completed facilities have been hardened and will only suffer minor damage, but any ongoing construction is still vulnerable and likely to experience a setback."
+      "predecessors": []
     },
     {
       "id": "evt_quake_moderate",
@@ -1583,9 +1476,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Quake",
-      "description": "Sensors are detecting an impending seismic event. Completed facilities have been hardened and will only suffer minor damage, but any ongoing construction is still vulnerable and likely to experience a setback."
+      "predecessors": []
     },
     {
       "id": "evt_quake_severe",
@@ -1636,9 +1527,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Quake",
-      "description": "Sensors are detecting an impending seismic event. Completed facilities have been hardened and will only suffer minor damage, but any ongoing construction is still vulnerable and likely to experience a setback."
+      "predecessors": []
     },
     {
       "id": "evt_globalwarming_co2",
@@ -1688,9 +1577,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Global Warming",
-      "description": "The greenhouse gases in the atmosphere have trapped enough heat to significantly increase the global temperature."
+      "predecessors": []
     },
     {
       "id": "evt_globalwarming_methane",
@@ -1734,9 +1621,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Global Warming",
-      "description": "The greenhouse gases in the atmosphere have trapped enough heat to significantly increase the global temperature."
+      "predecessors": []
     },
     {
       "id": "bio_tailored",
@@ -1807,9 +1692,7 @@
       ],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Tailored Microbes",
-      "description": "It will be a considerable effort, but we can genetically engineer an ecosystem of microbes that is specifically designed to thrive in this world's environment."
+      "predecessors": []
     },
     {
       "id": "bio_jumpstart",
@@ -1886,9 +1769,7 @@
       ],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Jumpstart Microbiome",
-      "description": "Why spend money and resources creating the perfect set of organisms when we can make nature do the hard work for us? Sure, basically throwing piles of biomatter around and seeing what sticks isn't very distinguished, but it might just work!"
+      "predecessors": []
     },
     {
       "id": "bio_cull",
@@ -1931,9 +1812,7 @@
         "agr_fertilize"
       ],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Microbial Culling",
-      "description": "Through careful use of antibiotics, both tailored and wide-spectrum, the microbiome must be curbed before productive use of this world is possible."
+      "predecessors": []
     },
     {
       "id": "bio_cyanobacteria",
@@ -2018,9 +1897,7 @@
           "type": "project",
           "any": true
         }
-      ],
-      "name": "Cyanobacteria",
-      "description": "These photosynthetic bacteria can be a vital part of a world's oxygen cycle."
+      ]
     },
     {
       "id": "bio_toxicfruit_genemod",
@@ -2065,9 +1942,7 @@
         "atm_toxin_cleanup"
       ],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Genetically Modify Toxic Fruit",
-      "description": "A tailored virus, capable of sophisticated genetic modifications, should result in local fauna no longer releasing toxins into the air."
+      "predecessors": []
     },
     {
       "id": "bio_toxicfruit_cull",
@@ -2122,9 +1997,7 @@
         "atm_toxin_cleanup"
       ],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Cull Toxic Fruit",
-      "description": "We can release parasites that should eat only the toxic fruit. This will require a certain amount of trial and error, though, and may have adverse side-effects."
+      "predecessors": []
     },
     {
       "id": "bio_parasites_cull",
@@ -2168,9 +2041,7 @@
         "food_staple",
         "food_luxury"
       ],
-      "predecessors": [],
-      "name": "Cull Parasites",
-      "description": "The parasites have unfortunately adapted to feed on other fruit as well. If we don't get rid of them, we will have a much harder time with agriculture."
+      "predecessors": []
     },
     {
       "id": "bio_reintroduce",
@@ -2255,9 +2126,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Reintroduce Local Flora",
-      "description": "This planet was the home of the sunrise flower and swamp plant that are now staples of the spacefaring Teladi diet. With the conditions for their growth having been restored, we can reintroduce them and restore some of the planet's former glory."
+      "predecessors": []
     },
     {
       "id": "pwr_geothermal",
@@ -2308,9 +2177,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Geothermal Power Plant",
-      "description": "While primitive versions of this technology relied on steam turbines, advanced materials now allow for efficient use of the Seebeck effect to generate power from large heat differentials without any moving parts."
+      "predecessors": []
     },
     {
       "id": "pwr_wind",
@@ -2361,9 +2228,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Wind Turbine Farm",
-      "description": "When it's available, wind power can be a very cost-effective method of generating power."
+      "predecessors": []
     },
     {
       "id": "pwr_antimatter",
@@ -2426,9 +2291,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Matter/Antimatter Power Plant",
-      "description": "Based on the same technology that powers vessels and facilities in space, matter/antimatter is a powerful but costly solution for planetside power generation."
+      "predecessors": []
     },
     {
       "id": "ind_refineries_clean",
@@ -2500,9 +2363,7 @@
           "type": "group",
           "any": false
         }
-      ],
-      "name": "Clean Refineries",
-      "description": "These fully automated facilities refine locally mined resources into various materials."
+      ]
     },
     {
       "id": "ind_refineries_cheap",
@@ -2580,9 +2441,7 @@
           "type": "group",
           "any": false
         }
-      ],
-      "name": "Cheap Refineries",
-      "description": "These fully automated facilities refine locally mined resources into various materials. To keep costs down, they have not been outfitted with emission filters."
+      ]
     },
     {
       "id": "ind_refineries_retrofit",
@@ -2625,9 +2484,7 @@
         "atm_toxin_cleanup"
       ],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Retrofit Emission Filters",
-      "description": "Unfortunately the local minerals contain toxic substances that are being released during the refining process. We will have to stop these emissions before attempting a cleanup."
+      "predecessors": []
     },
     {
       "id": "ind_factories",
@@ -2698,9 +2555,7 @@
           "type": "project",
           "any": true
         }
-      ],
-      "name": "Factories",
-      "description": "These automated facilities produce advanced technology when supplied with materials."
+      ]
     },
     {
       "id": "agr_hydroponics",
@@ -2757,9 +2612,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Hydroponics",
-      "description": "While sometimes there is no alternative, this method of food production is much more expensive than conventional farming, and yields inferior products as well."
+      "predecessors": []
     },
     {
       "id": "agr_fertilize",
@@ -2835,9 +2688,7 @@
           "type": "project",
           "any": true
         }
-      ],
-      "name": "Fertilise Soil",
-      "description": "With a healthy microbiome, we can begin to make the land arable. This requires soil with sufficient drainage, the right pH, necessary nutrients in plant-accessible form, and all of that at a depth sufficient for roots to take hold. A significant effort, to be sure, but absolutely necessary before any large scale settlement can take place."
+      ]
     },
     {
       "id": "agr_forestation",
@@ -2917,9 +2768,7 @@
           "type": "project",
           "any": false
         }
-      ],
-      "name": "Forestation",
-      "description": "Planting and cultivating large arboreal areas does not just make for picturesque postcards; it can also greatly contribute to a stable ecological system."
+      ]
     },
     {
       "id": "agr_fields_wheat",
@@ -3009,9 +2858,7 @@
           "type": "project",
           "any": false
         }
-      ],
-      "name": "Wheat Fields",
-      "description": "While these plants can have a beneficial effect on the global ecology, their main purpose is, of course, feeding the human population."
+      ]
     },
     {
       "id": "agr_fields_sunrise",
@@ -3101,9 +2948,7 @@
           "type": "project",
           "any": false
         }
-      ],
-      "name": "Sunrise Flower Fields",
-      "description": "While these plants can have a beneficial effect on the global ecology, their main purpose is, of course, feeding the Teladi population."
+      ]
     },
     {
       "id": "agr_fields_soja",
@@ -3193,9 +3038,7 @@
           "type": "project",
           "any": false
         }
-      ],
-      "name": "Soja Bean Fields",
-      "description": "While these plants can have a beneficial effect on the global ecology, their main purpose is, of course, feeding the Paranid population."
+      ]
     },
     {
       "id": "agr_fields_spices",
@@ -3279,9 +3122,7 @@
           "type": "project",
           "any": false
         }
-      ],
-      "name": "Spice Fields",
-      "description": "Spices are an absolutely essential component of any well-made meal."
+      ]
     },
     {
       "id": "agr_vineyards",
@@ -3366,9 +3207,7 @@
           "type": "project",
           "any": true
         }
-      ],
-      "name": "Vineyards",
-      "description": "Several local grapes are very well suited for being turned into exquisite beverages, alcoholic and otherwise. We can cultivate them with relatively little effort."
+      ]
     },
     {
       "id": "res_bubblecity",
@@ -3445,9 +3284,7 @@
           "type": "group",
           "any": false
         }
-      ],
-      "name": "Bubble City",
-      "description": "Several layers of self-repairing sheets made from an advanced plastic keep the air inside and maintain a temperate climate, while shielding from dangerous radiation and even micrometeorites. Many complex pieces of technology interoperate to create a stable, even somewhat comfortable environment inside."
+      ]
     },
     {
       "id": "res_habmodule",
@@ -3544,9 +3381,7 @@
           "type": "group",
           "any": false
         }
-      ],
-      "name": "Habitation Module",
-      "description": "Rows of sleeping capsules attached to a common living area and shared facilities make this a quick and cheap way of creating living accommodation. It doesn't offer much in the way of privacy, though."
+      ]
     },
     {
       "id": "res_housing_dense",
@@ -3643,9 +3478,7 @@
           "type": "group",
           "any": false
         }
-      ],
-      "name": "High-Density Housing",
-      "description": "Apartments of varying sizes afford appropriate living conditions for individuals and groups alike. The efficient use of space helps prevent urban sprawl, reducing strain on the local transportation system."
+      ]
     },
     {
       "id": "res_arcology",
@@ -3742,9 +3575,7 @@
           "type": "group",
           "any": false
         }
-      ],
-      "name": "Arcology",
-      "description": "An almost completely self-sustaining complex. From living space to various services and light industries, many of the inhabitants will rarely need to venture out of their complex."
+      ]
     },
     {
       "id": "res_housing_luxury",
@@ -3852,9 +3683,7 @@
           "type": "group",
           "any": false
         }
-      ],
-      "name": "Luxury Housing",
-      "description": "Whether it's classic opulence or modern minimalism, a proper villa remains a popular status symbol of the wealthy elite."
+      ]
     },
     {
       "id": "trn_boarding",
@@ -3937,9 +3766,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Martial Arts School",
-      "description": "While rooted in combat applications, the appeal of martial arts goes way beyond self-defence. Mental and spiritual aspects are often as important as physical ones, perhaps more so."
+      "predecessors": []
     },
     {
       "id": "trn_boarding_group",
@@ -3992,9 +3819,7 @@
           "type": "project",
           "any": false
         }
-      ],
-      "name": "Group Training",
-      "description": "A class of students goes through a formalised regime of combat exercises. Results are consistent, but ultimately limited."
+      ]
     },
     {
       "id": "trn_boarding_single",
@@ -4047,9 +3872,7 @@
           "type": "project",
           "any": false
         }
-      ],
-      "name": "Individual Training",
-      "description": "An especially intense and gruelling training regime, specifically tailored to an individual's talents. Injuries are a frequent occurrence, but rarely more than an inconvenience thanks to expert medical staff who are kept close at hand during all exercises."
+      ]
     },
     {
       "id": "trn_boarding_competition",
@@ -4099,9 +3922,7 @@
           "type": "project",
           "any": false
         }
-      ],
-      "name": "Host Martial Arts Tournament",
-      "description": "Calling participants from all over the galaxy! Compete for honour, glory, prize money, and the ultimate reward: employment!"
+      ]
     },
     {
       "id": "trn_pilot",
@@ -4190,9 +4011,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Aerial Maze",
-      "description": "A combination of underground tunnels and above-ground structures is made into an obstacle course for daring pilots. There are several courses for different skill levels, the most difficult ones being outfitted with simulated hazards and even incoming fire."
+      "predecessors": []
     },
     {
       "id": "trn_pilot_canyons",
@@ -4249,9 +4068,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Aerial Maze",
-      "description": "An especially winding system of canyons has been converted into an obstacle course for daring pilots. There are several courses for different skill levels, the most difficult ones being outfitted with simulated hazards and even attacks."
+      "predecessors": []
     },
     {
       "id": "trn_pilot_group",
@@ -4308,9 +4125,7 @@
           "type": "project",
           "any": false
         }
-      ],
-      "name": "Group Training",
-      "description": "A class of students goes through a formalised regime of aerial exercises. Results are consistent, but ultimately limited."
+      ]
     },
     {
       "id": "trn_pilot_single",
@@ -4367,9 +4182,7 @@
           "type": "project",
           "any": false
         }
-      ],
-      "name": "Individual Training",
-      "description": "An especially intense and gruelling training regime, specifically tailored to an individual's talents, with a reputation for killing its students. This reputation, while actively fostered, is undeserved thanks to state-of-the-art safety mechanisms."
+      ]
     },
     {
       "id": "trn_pilot_competition",
@@ -4423,9 +4236,7 @@
           "type": "project",
           "any": false
         }
-      ],
-      "name": "Host Maze-Run Competition",
-      "description": "A drowsy Argnu can fly in space. Do you have what it takes to perform daring manoeuvres in atmo, navigating narrow tunnels while dodging hazards, incoming fire and other contestants? Make it onto the podium and you'll not only get the prize money, you'll also be offered a top position in the organiser's fleet!"
+      ]
     },
     {
       "id": "ame_themepark",
@@ -4531,9 +4342,7 @@
           "type": "group",
           "any": false
         }
-      ],
-      "name": "Theme Park",
-      "description": "From colourful rides for the little ones to high-speed contraptions for adrenaline junkies, from affordable concession stands to a selection of variety shows, we offer tons of fun for everyone!"
+      ]
     },
     {
       "id": "ame_zoo",
@@ -4634,9 +4443,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Zoo",
-      "description": "Observe and learn about the native wildlife in re-creations of their natural habitats. Ethical treatment of all animals is guaranteed."
+      "predecessors": []
     },
     {
       "id": "ame_venues",
@@ -4707,9 +4514,7 @@
           "type": "group",
           "any": false
         }
-      ],
-      "name": "Live Performance Venues",
-      "description": "From cosy comedy clubs to theatrical stages and giant concert halls, everyone can find something they will love here."
+      ]
     },
     {
       "id": "ame_resort_tropical",
@@ -4806,9 +4611,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Tropical Resort",
-      "description": "Beaches. Spas. Yoga classes. Marinas. Several buffets and all-you-can-drink cocktails. Relaxation has a new name."
+      "predecessors": []
     },
     {
       "id": "ame_resort_winter",
@@ -4905,9 +4708,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Winter Sports Resort",
-      "description": "Spend the day enjoying our many ski slopes, ice rinks and sledding hills, then wind down with a hot beverage in front of a crackling fire."
+      "predecessors": []
     },
     {
       "id": "ame_finedining",
@@ -4983,9 +4784,7 @@
           "type": "group",
           "any": false
         }
-      ],
-      "name": "Fine Dining",
-      "description": "Whether it's imported delicacies or local specialities, good food is always popular."
+      ]
     },
     {
       "id": "ame_temple",
@@ -5056,9 +4855,7 @@
           "type": "group",
           "any": false
         }
-      ],
-      "name": "Temple",
-      "description": "Whether it's a Split Ancestral Hall, a shrine to the Holy Three-Dimensionality, or a non-denominational spiritual sanctuary, this place will bring the community closer together."
+      ]
     },
     {
       "id": "ame_art_college",
@@ -5122,9 +4919,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Art College",
-      "description": "An institution that teaches a wide diversity of artistic crafts, but also frequently organises exhibitions and other cultural events."
+      "predecessors": []
     },
     {
       "id": "eco_clinic",
@@ -5194,9 +4989,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Clinic",
-      "description": "A state-of-the-art hospital with diagnosis, treatment and care facilities. This will not only increase the population's well-being, but also means that we will have first right of refusal on providing shipments of medical supplies in perpetuity."
+      "predecessors": []
     },
     {
       "id": "eco_clinic_supply",
@@ -5240,9 +5033,7 @@
           "type": "project",
           "any": false
         }
-      ],
-      "name": "Send Medical Supplies",
-      "description": "The clinic's stockpile is running low, so they're asking for a new shipment of supplies."
+      ]
     },
     {
       "id": "eco_campus",
@@ -5310,9 +5101,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Research Campus",
-      "description": "A centre for learning and groundbreaking, if not usually practical research, this will be sure to attract bright minds and provide ample opportunities to get a share of those government grants."
+      "predecessors": []
     },
     {
       "id": "eco_campus_supply",
@@ -5533,9 +5322,7 @@
           "type": "project",
           "any": false
         }
-      ],
-      "name": "Send Research Materials",
-      "description": "A research group has received a sizeable grant and is asking for various materials to carry out experiments."
+      ]
     },
     {
       "id": "eco_bank",
@@ -5595,9 +5382,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Bank",
-      "description": "You've got to spend Credits to make Credits. But what to do if you don't have any to start with? Why, get a loan, of course! This bank will put you in contact with innovative entrepreneurs, champing at the bit for a chance to disrupt the market."
+      "predecessors": []
     },
     {
       "id": "eco_bank_supply",
@@ -5631,9 +5416,7 @@
           "type": "project",
           "any": false
         }
-      ],
-      "name": "Fund Start-Up",
-      "description": "Conventional wisdom says that nine out of ten innovations fail. Success usually pays out enough to make the risks worth it, but you still shouldn't bet your entire fortune on it. Still a lot better than playing the lottery, though."
+      ]
     },
     {
       "id": "eco_nividium",
@@ -5701,9 +5484,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Nividium Workshop",
-      "description": "Leveraging an old brand-name, this facility manufactures a range of high-end products with a luxurious Nividium finish."
+      "predecessors": []
     },
     {
       "id": "eco_nividium_supply",
@@ -5747,9 +5528,7 @@
           "type": "project",
           "any": false
         }
-      ],
-      "name": "Send Nividium",
-      "description": "The workshop is running low on Nividium and requires a new shipment."
+      ]
     },
     {
       "id": "xen_dis_claim",
@@ -5791,9 +5570,7 @@
           "type": "project",
           "any": true
         }
-      ],
-      "name": "Claim District",
-      "description": "Using a system of precisely pulsed EMP bursts, we can disable the Xenon units in this area and then destroy them with targeted bombings. This leaves the infrastructure intact for potential future use."
+      ]
     },
     {
       "id": "xen_dis_destroy",
@@ -5835,9 +5612,7 @@
           "type": "project",
           "any": true
         }
-      ],
-      "name": "Destroy District",
-      "description": "We can level this district with a considerable quantity of explosives. It may be cheaper than the alternative, and make it harder for the Xenon to retake control, but it will also mean the loss of very useful infrastructure."
+      ]
     },
     {
       "id": "xen_dis_hab",
@@ -5862,9 +5637,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Habitation District",
-      "description": "Impossibly tall skyscrapers, each one providing ample living space for millions of inhabitants."
+      "predecessors": []
     },
     {
       "id": "xen_dis_com",
@@ -5889,9 +5662,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Commerce District",
-      "description": "Situated on and just below the surface, this district has the perfect infrastructure for all kinds of shops and services."
+      "predecessors": []
     },
     {
       "id": "xen_dis_farm",
@@ -5916,9 +5687,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Farming District",
-      "description": "Cascading tiers of fully automated fields, efficiently irrigated and supplied with ample sunlight via a complex system of mirrors and lenses, provide more than enough yield to feed even the maximum population of the habitation district it's attached to."
+      "predecessors": []
     },
     {
       "id": "xen_dis_admin",
@@ -5943,9 +5712,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Administration District",
-      "description": "In addition to office space for the governing body, this district also houses the local data centre."
+      "predecessors": []
     },
     {
       "id": "xen_dis_ind",
@@ -5970,9 +5737,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Industrial District",
-      "description": "Massive refineries automatically extract and process minerals from the ground. These get distributed to the surrounding factories as needed, controlled by a governing AI."
+      "predecessors": []
     },
     {
       "id": "xen_dis_rec",
@@ -5997,9 +5762,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Recreation District",
-      "description": "Theatres, bars, parks, VR arcades, zoos, sporting grounds, restaurants, water parks, concert halls. These are just some of the many venues this district is designed to house."
+      "predecessors": []
     },
     {
       "id": "xen_core_subvert",
@@ -6051,9 +5814,7 @@
           "type": "project",
           "any": true
         }
-      ],
-      "name": "Subvert AGI Core",
-      "description": "Our coding experts say that they have devised a theoretical method of sending remote commands to the Xenon AGI core. Due to its inherent mutable nature, they are unable to predict the success of any given attempt, and have just given me an estimation of \"more likely than rolling a crit in Gunners & Goners\". If successful, we will tell the AGI and all of its drones to self-delete, leaving the entire area Xenon-free."
+      ]
     },
     {
       "id": "xen_reactor_detonate",
@@ -6105,9 +5866,7 @@
           "type": "project",
           "any": true
         }
-      ],
-      "name": "Detonate Reactor",
-      "description": "Now that we have access, it just takes the push of a button to level the entire area, and all Xenon presence within it. This will destroy all connected districts, so we'll have to start from scratch if we aim to have people living here."
+      ]
     },
     {
       "id": "evt_xen_reclaim",
@@ -6143,9 +5902,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Xenon Reclaim",
-      "description": "Xenon combat drones are mobilising to retake this district. They will soon reclaim it unless we do something to stop them."
+      "predecessors": []
     },
     {
       "id": "evt_xen_rebuild",
@@ -6170,9 +5927,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Xenon Rebuild",
-      "description": "Xenon constructor drones are rebuilding this district. They will soon reclaim it unless we do something to stop them."
+      "predecessors": []
     },
     {
       "id": "xen_drones_emp",
@@ -6208,9 +5963,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "EMP Xenon Drones",
-      "description": "Using a system of precisely pulsed EMP bursts, we can disable the Xenon units in this area and then destroy them with targeted bombings. This leaves the infrastructure intact for potential future use."
+      "predecessors": []
     },
     {
       "id": "xen_drones_bombard_reclaim",
@@ -6246,9 +5999,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Bombard Xenon Drones",
-      "description": "We can stop their efforts by simply carpet-bombing the drones. This will undoubtedly level this district, though."
+      "predecessors": []
     },
     {
       "id": "xen_drones_bombard_rebuild",
@@ -6284,9 +6035,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Bombard Xenon Drones",
-      "description": "We can stop their efforts by simply carpet-bombing the drones. The damage could possibly spill over to another district."
+      "predecessors": []
     },
     {
       "id": "agr_fields_scruffin",
@@ -6352,9 +6101,7 @@
           "type": "project",
           "any": false
         }
-      ],
-      "name": "Scruffin Fields",
-      "description": "While these plants can have a beneficial effect on the global ecology, their main purpose is, of course, feeding the Split population."
+      ]
     },
     {
       "id": "wat_surfacing",
@@ -6408,9 +6155,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Global Water Surfacing",
-      "description": "Most worlds, even seemingly dry ones, have vast amounts of water hidden in subterranean caves and aquifers. We now have the technology to raise and make use of that water on a global scale."
+      "predecessors": []
     },
     {
       "id": "atm_outgassing",
@@ -6472,9 +6217,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Targeted Outgassing",
-      "description": "By letting loose swarms of carbon-eating nanites, we can release massive amounts of nitrogen into the atmosphere. They are programmed to stop at exactly the ideal air pressure."
+      "predecessors": []
     },
     {
       "id": "ter_tectonic_scaffolding",
@@ -6535,9 +6278,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Tectonic Scaffolding",
-      "description": "Lattices of self-organising smart matter find friction points between tectonic plates and release tensions in a controlled manner."
+      "predecessors": []
     },
     {
       "id": "ind_von_neumann",
@@ -6597,9 +6338,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Von-Neumann Constructors",
-      "description": "These self-replicating drones have been outfitted with logarithmic brakes to prevent a runaway scenario at a fundamental level while still allowing them to react to demand at the proper scale. In addition, they are controlled by specialised AI systems which lack the capability to alter their own programming. This makes them a safe, if less effective, version of the original Terraformer designs."
+      "predecessors": []
     },
     {
       "id": "ter_jumpstart_currents",
@@ -6655,9 +6394,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Jumpstart Ocean Currents",
-      "description": "Using a network of biomechanical jets, and massive amounts of energy, we can jumpstart global ocean currents, which are vital to a healthy ecosystem. Once flowing, these currents sustain themselves by means of gradients in temperature and salinity."
+      "predecessors": []
     },
     {
       "id": "pwr_hydro",
@@ -6721,9 +6458,7 @@
           "type": "project",
           "any": false
         }
-      ],
-      "name": "Hydro Power",
-      "description": "We can repurpose the biomechanical jets, used to jumpstart the ocean currents, into power-generating turbines."
+      ]
     },
     {
       "id": "bio_reconstruct_genes",
@@ -6748,9 +6483,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Reconstruct Gene Sequences",
-      "description": "Before we can begin reintroducing native life, we first need to be able to create it. While we have some genetic records, and even a few precious living samples in zoos, there are large gaps that need to be filled. This massive research undertaking is going to require equally massive funding."
+      "predecessors": []
     },
     {
       "id": "bio_reintroduce_microbes",
@@ -6829,9 +6562,7 @@
           "type": "project",
           "any": false
         }
-      ],
-      "name": "Reintroduce Native Microbiome",
-      "description": "A global system of adaptive incubators continually clones millions of species of microbes, reacting to local developments in an effort to reach a final equilibrium. Once the incubators have done their job, we will send a signal for them to decompose."
+      ]
     },
     {
       "id": "bio_reintroduce_flora",
@@ -6905,9 +6636,7 @@
           "type": "project",
           "any": false
         }
-      ],
-      "name": "Reintroduce Native Flora",
-      "description": "While the seeds of many plants can simply be dropped into appropriate areas, some require special attention and equipment to take root. Experts will be continuously monitoring their development over the duration of this project to ensure a stable outcome."
+      ]
     },
     {
       "id": "bio_reintroduce_fauna",
@@ -6986,9 +6715,7 @@
           "type": "project",
           "any": false
         }
-      ],
-      "name": "Reintroduce Native Fauna",
-      "description": "We gradually introduce groups of interconnected species, letting their populations stabilise before moving on to the next group. This is a slow process, to be sure, but one that mitigates most risks and all but guarantees the desired outcome."
+      ]
     },
     {
       "id": "bio_reintroduce_megafauna",
@@ -7062,9 +6789,7 @@
           "type": "project",
           "any": false
         }
-      ],
-      "name": "Reintroduce Native Megafauna",
-      "description": "While all animals deserve equal respect, the giant native ray-like creatures with their translucent and bioluminescent skin are unrivalled in their resplendence. Bringing them back will be costly and time-consuming, but we have the technology. Seeing them gracefully glide through the oceans again will make the effort more than worth it."
+      ]
     },
     {
       "id": "agr_fields_plankton",
@@ -7148,9 +6873,7 @@
           "type": "project",
           "any": false
         }
-      ],
-      "name": "Plankton Fields",
-      "description": "While these plants can have a beneficial effect on the global ecology, their main purpose is, of course, to feed the Boron population."
+      ]
     },
     {
       "id": "res_housing_ocean",
@@ -7230,9 +6953,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Oceanic Dwellings",
-      "description": "Built in the open, communal style that Boron prefer, these dwellings provide everything one needs for ones daily life within comfortable swimming distance, without needlessly obstructing the view of the wide ocean."
+      "predecessors": []
     },
     {
       "id": "ame_pheromone_art_academy",
@@ -7325,9 +7046,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Pheromone Art Academy",
-      "description": "Welcome to the newly endowed Royal Commune for Pheromonal Artistry and Applied Tasting, the pre-eminent venue for the practice, discussion and experience of all the piquant and delectable art forms that have to be smelled to be believed!"
+      "predecessors": []
     },
     {
       "id": "evt_solidify_crust",
@@ -7375,9 +7094,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Outer Crust Solidifies",
-      "description": "The global temperature has been lowered enough for the outer crust to solidify, reducing seismic activity significantly. This also has the effect of binding large amounts of water underground."
+      "predecessors": []
     },
     {
       "id": "evt_volcano_extinction",
@@ -7425,9 +7142,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Major Volcano Extinction",
-      "description": "The volcanoes go extinct, eliminating destructive seismic activity, but in the process they evaporate a large quantity of water into the atmosphere."
+      "predecessors": []
     },
     {
       "id": "evt_salinization",
@@ -7470,9 +7185,7 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [],
-      "name": "Salinisation",
-      "description": "There is enough loose sediment that the process of salinisation, i.e. making the water saltier, is a lot faster than it would normally be. It still takes some time and there is no practical means of artificially accelerating the process."
+      "predecessors": []
     }
   ],
   "clusters": [

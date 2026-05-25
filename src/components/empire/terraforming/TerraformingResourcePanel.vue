@@ -56,7 +56,7 @@ function onCancel(entry: TerraformingExecutionTimelineEntry) {
 
 <template>
   <div class="panel-card">
-    <div class="panel-header">{{ t('terraforming.resourcePanel') }}</div>
+    <div class="panel-header">{{ t('terraforming.taskQueue') }}</div>
     <div class="panel-content">
       <div v-if="!selectedClusterId" class="empty-state">
         {{ t('terraforming.selectClusterForResources') }}
@@ -95,6 +95,37 @@ function onCancel(entry: TerraformingExecutionTimelineEntry) {
             </div>
 
             <div v-if="expandedEntryId === entry.id" class="timeline-body">
+              <div v-if="entry.beforeStats.length > 0 || entry.projectRebates.length > 0" class="detail-section">
+                <div class="section-title">{{ t('terraforming.statChanges') }}</div>
+                <div
+                  v-for="snapshot in entry.beforeStats"
+                  :key="`${entry.id}-stat-${snapshot.statId}`"
+                  class="detail-row"
+                >
+                  <span>{{ snapshot.statName }}</span>
+                  <span>{{ snapshot.beforeValue }} → {{ snapshot.afterValue }}</span>
+                </div>
+                <div
+                  v-for="(rb, i) in entry.projectRebates"
+                  :key="`${entry.id}-rebate-${i}`"
+                  class="detail-row text-emerald-400"
+                >
+                  <span>{{ rb }}</span>
+                </div>
+              </div>
+
+              <div v-if="entry.cumulativeRebates.length > 0" class="detail-section">
+                <div class="section-title">{{ t('terraforming.cumulativeRebates') }}</div>
+                <div
+                  v-for="(rb, i) in entry.cumulativeRebates"
+                  :key="`${entry.id}-cumulative-${i}`"
+                  class="detail-row text-emerald-400"
+                >
+                  <span class="rebate-dot">•</span>
+                  <span>{{ rb }}</span>
+                </div>
+              </div>
+
               <div v-if="entry.wares.length > 0" class="detail-section">
                 <div class="section-title">{{ t('terraforming.resourceRequirements') }}</div>
                 <div v-for="ware in entry.wares" :key="`${entry.id}-ware-${ware.ware}`" class="detail-row">
@@ -107,7 +138,11 @@ function onCancel(entry: TerraformingExecutionTimelineEntry) {
                 <div class="section-title">{{ t('terraforming.price') }}</div>
                 <div class="detail-row">
                   <span>Credits</span>
-                  <span>{{ entry.price.toLocaleString() }}</span>
+                  <span v-if="entry.discountedPrice < entry.price">
+                    <span class="original-price">{{ entry.price.toLocaleString() }}</span>
+                    <span class="discounted-price"> → {{ entry.discountedPrice.toLocaleString() }}</span>
+                  </span>
+                  <span v-else>{{ entry.price.toLocaleString() }}</span>
                 </div>
               </div>
 
@@ -120,18 +155,6 @@ function onCancel(entry: TerraformingExecutionTimelineEntry) {
                 >
                   <span>{{ delivery.macro }}</span>
                   <span>x{{ delivery.amount }} / {{ delivery.buildDuration }}s</span>
-                </div>
-              </div>
-
-              <div v-if="entry.beforeStats.length > 0" class="detail-section">
-                <div class="section-title">{{ t('terraforming.statChanges') }}</div>
-                <div
-                  v-for="snapshot in entry.beforeStats"
-                  :key="`${entry.id}-stat-${snapshot.statId}`"
-                  class="detail-row"
-                >
-                  <span>{{ snapshot.statName }}</span>
-                  <span>{{ snapshot.beforeValue }} → {{ snapshot.afterValue }}</span>
                 </div>
               </div>
 
@@ -238,5 +261,17 @@ function onCancel(entry: TerraformingExecutionTimelineEntry) {
 
 .detail-text {
   @apply text-xs text-slate-300;
+}
+
+.rebate-dot {
+  @apply text-emerald-400 mr-1 shrink-0;
+}
+
+.original-price {
+  @apply text-slate-500 line-through;
+}
+
+.discounted-price {
+  @apply text-emerald-400;
 }
 </style>

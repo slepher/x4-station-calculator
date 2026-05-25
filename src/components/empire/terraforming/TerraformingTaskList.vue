@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import type { TaskTree, TerraformingProject } from '@/store/logic/terraformingTaskResolver'
 import type {
   TerraformingConditionScaleModel,
+  TerraformingEffectItem,
   TerraformingStatScaleModel,
   TerraformingTaskNodeDisplay,
 } from '@/components/empire/presenters/useTerraformingPresenter'
@@ -23,6 +24,7 @@ interface Props {
   statDisplayNames: Map<string, string>
   statScaleModels: Map<string, TerraformingStatScaleModel>
   conditionScaleModels: Map<string, TerraformingConditionScaleModel[]>
+  activeRebates: string[]
 }
 
 const props = defineProps<Props>()
@@ -94,10 +96,6 @@ function getNodeName(projectId: string, fallback: string): string {
   return getNodeDisplay(projectId)?.name || fallback
 }
 
-function getNodeEffects(projectId: string, fallback: string): string {
-  return getNodeDisplay(projectId)?.effects || fallback
-}
-
 function getBlockedReasonLines(projectId: string, fallback: string | undefined): string[] {
   const displayLines = getNodeDisplay(projectId)?.blockedReasonLines
   if (displayLines?.length) return displayLines
@@ -112,6 +110,10 @@ function getDependencyReasonLines(projectId: string, fallback: string | undefine
 function getDependencyValueFromLine(line: string): string {
   const prefix = `${t('terraforming.depends') || 'Needs'}: `
   return line.startsWith(prefix) ? line.slice(prefix.length) : line
+}
+
+function getEffectItems(projectId: string): TerraformingEffectItem[] {
+  return getNodeDisplay(projectId)?.effectItems || []
 }
 
 function getStatusIcon(projectId: string, available: boolean): string {
@@ -137,6 +139,15 @@ function getStatusIcon(projectId: string, available: boolean): string {
             mode="status"
           />
         </div>
+        <div v-if="activeRebates.length > 0" class="effect-list">
+          <div
+            v-for="(text, i) in activeRebates"
+            :key="`active-rebate-${i}`"
+            class="effect-list-item effect-rebate"
+          >
+            {{ text }}
+          </div>
+        </div>
       </div>
       <div v-if="!taskTree" class="text-slate-500 text-sm text-center py-4">
         {{ t('terraforming.selectCluster') }}
@@ -160,18 +171,14 @@ function getStatusIcon(projectId: string, available: boolean): string {
                   <span class="task-name">{{ getNodeName(e.id, e.name) }}</span>
                   <span class="task-repeat">{{ getRepeatLabel(e.id, projectMap) }}</span>
                 </div>
-                <div v-if="e.effects" class="task-actions">
-                  <span class="task-state-label">{{ getStatusIcon(e.id, e.available) }}</span>
-                  <template v-if="(completedProjectCounts.get(e.id) ?? 0) > 0">
-                    <span class="completion-count">{{ completedProjectCounts.get(e.id) }}</span>
-                  </template>
+                <div class="task-actions">
                   <template v-if="isRepeatableProject(e.id, projectMap)">
                     <X4NumberInput
                       :model-value="completedProjectCounts.get(e.id) ?? 0"
                       :min="0"
                       :max="99"
                       :disabled="!e.available && (completedProjectCounts.get(e.id) ?? 0) === 0"
-                      :width-class="'w-16'"
+                      width-class="w-14"
                       @update:model-value="emit('setProjectCount', e.id, $event)"
                     />
                   </template>
@@ -187,7 +194,16 @@ function getStatusIcon(projectId: string, available: boolean): string {
                 </div>
               </div>
               <div class="task-body">
-                <span v-if="getNodeEffects(e.id, e.effects)" class="task-effects">{{ getNodeEffects(e.id, e.effects) }}</span>
+                  <div v-if="getEffectItems(e.id).length > 0" class="effect-list">
+                  <div
+                    v-for="(item, i) in getEffectItems(e.id)"
+                    :key="`${e.id}-effect-${i}`"
+                    class="effect-list-item"
+                    :class="`effect-${item.type}`"
+                  >
+                    {{ item.text }}
+                  </div>
+                </div>
                 <div v-if="getConditionModels(e.id).length > 0" class="condition-list">
                   <TerraformingStatScale
                     v-for="condition in getConditionModels(e.id)"
@@ -205,11 +221,6 @@ function getStatusIcon(projectId: string, available: boolean): string {
                   >
                     <span class="dependency-name">{{ t('terraforming.depends') }}</span>
                     <span class="dependency-value">{{ getDependencyValueFromLine(line) }}</span>
-                  </div>
-                </div>
-                <div v-if="projectMap.get(e.id)?.sideEffects?.length" class="side-effects">
-                  <div v-for="(se, i) in projectMap.get(e.id)!.sideEffects" :key="i" class="side-effect-line">
-                    {{ se.chance }}% {{ t('terraforming.setback') || 'setback' }} {{ se.setback }}%
                   </div>
                 </div>
               </div>
@@ -235,19 +246,15 @@ function getStatusIcon(projectId: string, available: boolean): string {
                       <span class="task-repeat">{{ getRepeatLabel(node.id, projectMap) }}</span>
                     </div>
                     <div class="task-actions">
-                      <span class="task-state-label">{{ getStatusIcon(node.id, node.available) }}</span>
-                      <template v-if="(completedProjectCounts.get(node.id) ?? 0) > 0">
-                        <span class="completion-count">{{ completedProjectCounts.get(node.id) }}</span>
-                      </template>
                       <template v-if="isRepeatableProject(node.id, projectMap)">
-                        <X4NumberInput
-                          :model-value="completedProjectCounts.get(node.id) ?? 0"
-                          :min="0"
-                          :max="99"
-                          :disabled="!node.available && (completedProjectCounts.get(node.id) ?? 0) === 0"
-                          :width-class="'w-16'"
-                          @update:model-value="emit('setProjectCount', node.id, $event)"
-                        />
+                      <X4NumberInput
+                        :model-value="completedProjectCounts.get(node.id) ?? 0"
+                        :min="0"
+                        :max="99"
+                        :disabled="!node.available && (completedProjectCounts.get(node.id) ?? 0) === 0"
+                        width-class="w-14"
+                        @update:model-value="emit('setProjectCount', node.id, $event)"
+                      />
                       </template>
                       <button
                         v-else
@@ -261,7 +268,16 @@ function getStatusIcon(projectId: string, available: boolean): string {
                     </div>
                   </div>
                   <div class="task-body">
-                    <span v-if="getNodeEffects(node.id, node.effects)" class="task-effects">{{ getNodeEffects(node.id, node.effects) }}</span>
+                    <div v-if="getEffectItems(node.id).length > 0" class="effect-list">
+                      <div
+                        v-for="(item, i) in getEffectItems(node.id)"
+                        :key="`${node.id}-effect-${i}`"
+                        class="effect-list-item"
+                        :class="`effect-${item.type}`"
+                      >
+                        {{ item.text }}
+                      </div>
+                    </div>
                     <div v-if="getConditionModels(node.id).length > 0" class="condition-list">
                       <TerraformingStatScale
                         v-for="condition in getConditionModels(node.id)"
@@ -310,19 +326,15 @@ function getStatusIcon(projectId: string, available: boolean): string {
                           <span class="task-repeat">{{ getRepeatLabel(child.id, projectMap) }}</span>
                         </div>
                         <div class="task-actions">
-                          <span class="task-state-label">{{ getStatusIcon(child.id, child.available) }}</span>
-                          <template v-if="(completedProjectCounts.get(child.id) ?? 0) > 0">
-                            <span class="completion-count">{{ completedProjectCounts.get(child.id) }}</span>
-                          </template>
                           <template v-if="isRepeatableProject(child.id, projectMap)">
-                            <X4NumberInput
-                              :model-value="completedProjectCounts.get(child.id) ?? 0"
-                              :min="0"
-                              :max="99"
-                              :disabled="!child.available && (completedProjectCounts.get(child.id) ?? 0) === 0"
-                              :width-class="'w-16'"
-                              @update:model-value="emit('setProjectCount', child.id, $event)"
-                            />
+                          <X4NumberInput
+                            :model-value="completedProjectCounts.get(child.id) ?? 0"
+                            :min="0"
+                            :max="99"
+                            :disabled="!child.available && (completedProjectCounts.get(child.id) ?? 0) === 0"
+                            width-class="w-14"
+                            @update:model-value="emit('setProjectCount', child.id, $event)"
+                          />
                           </template>
                           <button
                             v-else
@@ -336,7 +348,16 @@ function getStatusIcon(projectId: string, available: boolean): string {
                         </div>
                       </div>
                       <div class="task-body">
-                        <span v-if="getNodeEffects(child.id, child.effects)" class="task-effects">{{ getNodeEffects(child.id, child.effects) }}</span>
+                        <div v-if="getEffectItems(child.id).length > 0" class="effect-list">
+                          <div
+                            v-for="(item, i) in getEffectItems(child.id)"
+                            :key="`${child.id}-effect-${i}`"
+                            class="effect-list-item"
+                            :class="`effect-${item.type}`"
+                          >
+                            {{ item.text }}
+                          </div>
+                        </div>
                         <div v-if="getConditionModels(child.id).length > 0" class="condition-list">
                           <TerraformingStatScale
                             v-for="condition in getConditionModels(child.id)"
@@ -406,6 +427,11 @@ function getStatusIcon(projectId: string, available: boolean): string {
 .task-status-icon { @apply flex-shrink-0 text-sm; }
 .task-state-label { @apply text-sm leading-none; }
 .task-name { @apply text-xs text-slate-300; }
+.effect-list { @apply mt-1.5 flex flex-col gap-1.5; }
+.effect-list-item { @apply rounded border px-2 py-1.5 text-xs; }
+.effect-list-item.effect-effect { @apply border-sky-700/40 bg-sky-950/20 text-sky-400; }
+.effect-list-item.effect-rebate { @apply border-emerald-700/40 bg-emerald-950/20 text-emerald-400; }
+.effect-list-item.effect-sideEffect { @apply border-amber-700/40 bg-amber-950/20 text-amber-400; }
 .task-effects { @apply text-xs text-sky-400; }
 .condition-list { @apply mt-1.5 flex flex-col gap-1.5; }
 .task-repeat { @apply text-xs text-slate-500 bg-slate-800/50 px-1 rounded; }
@@ -418,7 +444,7 @@ function getStatusIcon(projectId: string, available: boolean): string {
 .task-actions { @apply flex items-center gap-1 flex-shrink-0; }
 .completion-count { @apply text-xs text-emerald-400 font-bold; }
 
-.toggle-btn { @apply text-xs px-2 py-0.5 rounded bg-slate-700 text-slate-300 transition-colors hover:bg-slate-600 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-slate-700; }
+.toggle-btn { @apply text-xs px-2 py-0.5 rounded bg-slate-700 text-slate-300 transition-colors hover:bg-slate-600 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-slate-700 w-14; }
 .toggle-btn.toggled { @apply bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30; }
 
 .side-effects { @apply mt-0.5; }

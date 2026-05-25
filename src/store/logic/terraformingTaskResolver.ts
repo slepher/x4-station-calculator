@@ -343,7 +343,9 @@ function evaluateProject(
   stats: TerraformingStat[],
 ): TaskNode {
   const name = project.name || project.nameId
-  const effectsStr = project.effects.map(fmtEffect).join(', ')
+  const effectsStr = project.effects
+    .filter(e => e.stat in state.stats)
+    .map(fmtEffect).join(', ')
   const blockedReasons: string[] = []
 
   for (const c of project.conditions) {

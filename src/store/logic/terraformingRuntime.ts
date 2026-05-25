@@ -107,6 +107,7 @@ export function applyProjectEffectsToTerraformingStats(
     const project = projectMap.get(projectId)
     if (!project) continue
     for (const effect of project.effects) {
+      if (!(effect.stat in nextStats)) continue
       if (ignoredStats.has(effect.stat)) continue
       if (effect.value !== undefined) {
         nextStats[effect.stat] = Math.max(0, effect.value)
@@ -118,6 +119,13 @@ export function applyProjectEffectsToTerraformingStats(
       if (effect.min !== undefined) newValue = Math.max(newValue, effect.min)
       if (effect.max !== undefined) newValue = Math.min(newValue, effect.max)
       nextStats[effect.stat] = Math.max(0, newValue)
+    }
+    for (const se of project.sideEffects) {
+      if (!se.stat || se.change === null || se.change === undefined) continue
+      if (!(se.stat in nextStats)) continue
+      if (ignoredStats.has(se.stat)) continue
+      const base = nextStats[se.stat] ?? 0
+      nextStats[se.stat] = Math.max(0, base + se.change * count)
     }
   }
   return nextStats
@@ -229,6 +237,7 @@ export function getRuntimeTerraformingProjectIds(
   cluster: TerraformingCluster | null,
   stats: Record<string, number>,
   completedProjects: Map<string, number>,
+  data?: TerraformingData | null,
 ): string[] {
   if (!cluster) return []
 
@@ -251,6 +260,21 @@ export function getRuntimeTerraformingProjectIds(
 
   for (const [projectId, count] of completedProjects) {
     if (count > 0) visible.add(projectId)
+  }
+
+  // SideEffect-triggered projects: when a parent project is completed,
+  // any sideEffect that spawns a project adds that project to the pool
+  if (data) {
+    for (const [projectId, count] of completedProjects) {
+      if (count <= 0) continue
+      const project = data.projects.find(p => p.id === projectId)
+      if (!project?.sideEffects) continue
+      for (const se of project.sideEffects) {
+        if (se.project) {
+          visible.add(se.project)
+        }
+      }
+    }
   }
 
   return [...visible]

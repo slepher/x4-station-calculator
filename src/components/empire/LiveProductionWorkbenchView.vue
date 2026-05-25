@@ -2,6 +2,7 @@
 import { computed, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useLiveProductionStore } from '@/store/useLiveProductionStore'
+import { useGameDataStore } from '@/store/useGameDataStore'
 import { useActiveViewStore } from '@/store/useActiveViewStore'
 import { useProductionTabbarPresenter } from '@/components/empire/presenters/useProductionTabbarPresenter'
 import { useProductionToolbarPresenter } from '@/components/empire/presenters/useProductionToolbarPresenter'
@@ -30,6 +31,7 @@ import SaveList from '@/components/save/SaveList.vue'
 
 const liveStore = useLiveProductionStore()
 const activeViewStore = useActiveViewStore()
+const gameDataStore = useGameDataStore()
 const { t } = useI18n()
 
 onMounted(() => {
@@ -69,7 +71,31 @@ const terraformingPresenter = useTerraformingPresenter({
   removeTerraformingExecutionEntry: (entryId: string) => liveStore.removeTerraformingExecutionEntry(entryId),
   setTerraformingHousingBuilt: (count: number) => liveStore.setTerraformingHousingBuilt(count),
   mapsClusters: liveStore.gameDataMaps.clusters,
-  mapsSectors: liveStore.gameDataMaps.sectors
+  mapsSectors: liveStore.gameDataMaps.sectors,
+  wareNames: computed(() => {
+    const map = new Map<string, string>()
+    const wm = gameDataStore.waresMap
+    for (const [id, ware] of Object.entries(wm)) {
+      map.set(id, ware.name || id)
+    }
+    return map
+  }),
+  moduleGroupNames: computed(() => {
+    const map = new Map<string, string>()
+    const mg = gameDataStore.localizedModuleGroupsMap
+    for (const [id, group] of Object.entries(mg)) {
+      map.set(id, group.localeName || group.name || id)
+    }
+    return map
+  }),
+  wareGroupMap: computed(() => {
+    const map = new Map<string, string>()
+    const wm = gameDataStore.waresMap
+    for (const [id, ware] of Object.entries(wm)) {
+      if (ware.group) map.set(id, ware.group)
+    }
+    return map
+  }),
 })
 
 const showArchiveModuleList = computed(() => {
@@ -204,6 +230,7 @@ const showArchiveModuleList = computed(() => {
         :stat-display-names="terraformingPresenter.props.taskList.statDisplayNames.value"
         :stat-scale-models="terraformingPresenter.props.taskList.statScaleModels.value"
         :condition-scale-models="terraformingPresenter.props.taskList.conditionScaleModels.value"
+        :active-rebates="terraformingPresenter.props.taskList.activeRebates.value"
         @toggle-project="terraformingPresenter.emits.toggleProject"
         @set-project-count="terraformingPresenter.emits.setProjectCount"
       />

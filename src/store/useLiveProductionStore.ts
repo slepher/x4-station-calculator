@@ -581,7 +581,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   const terraformingRuntimeProjectIds = computed<string[]>(() => {
     const cluster = terraformingSelectedCluster.value
     if (!cluster) return []
-    return getRuntimeTerraformingProjectIds(cluster, terraformingCurrentStats.value, terraformingCompletedProjects.value)
+    return getRuntimeTerraformingProjectIds(cluster, terraformingCurrentStats.value, terraformingCompletedProjects.value, terraformingData.value)
   })
 
   const terraformingHqStationCode = computed<string | null>(() => {
