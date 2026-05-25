@@ -11,6 +11,7 @@ export interface ActiveViewState {
   activeBinding: string | null
   activeBindingStation: string | null
   activeBindingWorkbench: 'overview' | 'station' | 'transit' | 'terraforming'
+  activeTerraformingClusterId: string | null
   activeView: StationActiveView
   isResourcePanelOpen: boolean
   isSavePanelOpen: boolean
@@ -27,6 +28,7 @@ const DEFAULT_STATE: ActiveViewState = {
   activeBinding: null,
   activeBindingStation: null,
   activeBindingWorkbench: 'overview',
+  activeTerraformingClusterId: null,
   activeView: 'blueprint-production',
   isResourcePanelOpen: false,
   isSavePanelOpen: false,
@@ -50,6 +52,7 @@ function loadFromStorage(): ActiveViewState {
         activeBinding: parsed.activeBinding || null,
         activeBindingStation: parsed.activeBindingStation || null,
         activeBindingWorkbench: parsed.activeBindingWorkbench || 'overview',
+        activeTerraformingClusterId: parsed.activeTerraformingClusterId || null,
         activeView: parsed.activeView || 'blueprint-production'
       }
     }
@@ -286,6 +289,13 @@ export const useActiveViewStore = defineStore('activeView', () => {
     activeBinding,
     activeBindingStation,
     activeBindingWorkbench,
+    activeTerraformingClusterId: computed({
+      get: () => state.value.activeTerraformingClusterId,
+      set: (val: string | null) => {
+        state.value.activeTerraformingClusterId = val
+        saveToStorage(state.value)
+      }
+    }),
     activeView,
     isResourcePanelOpen,
     isSavePanelOpen,

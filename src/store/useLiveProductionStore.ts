@@ -520,6 +520,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       ...terraformingCompletedProjectsByCluster.value,
       [clusterId]: buildCompletedProjectsFromExecutionLog(log),
     }
+    persistTerraformingLogs(clusterId, log)
   }
 
   function nextTerraformingExecutionId(clusterId: string): string {
@@ -553,6 +554,52 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       remaining -= 1
     }
     setTerraformingExecutionLogForCluster(clusterId, log)
+  }
+
+  function persistTerraformingLogs(clusterId: string, log: TerraformingExecutionEntry[]) {
+    const binding = activeBinding.value
+    if (!binding) return
+    const logs = { ...binding.terraformingLogs }
+    logs[clusterId] = log.map(e => e.projectId)
+    binding.terraformingLogs = logs
+  }
+
+  function hydrateTerraformingLogs() {
+    const binding = activeBinding.value
+    if (!binding) return
+    const entries = Object.entries(binding.terraformingLogs ?? {})
+
+    const logs: Record<string, TerraformingExecutionEntry[]> = {}
+    const seqs: Record<string, number> = {}
+    for (const [clusterId, projectIds] of entries) {
+      const parsed = projectIds.map((pid, i) => ({ id: `${clusterId}-exec-${i + 1}`, projectId: pid }))
+      seqs[clusterId] = parsed.length
+      logs[clusterId] = parsed
+    }
+    terraformingExecutionLogByCluster.value = logs
+    terraformingExecutionSeqByCluster.value = seqs
+    terraformingCompletedProjectsByCluster.value = Object.fromEntries(
+      Object.entries(logs).map(([cid, log]) => [cid, buildCompletedProjectsFromExecutionLog(log)])
+    )
+    terraformingHousingBuiltByCluster.value = {}
+
+    const savedClusterId = activeViewStore.activeTerraformingClusterId
+    if (savedClusterId && logs[savedClusterId] !== undefined) {
+      terraformingSelectedClusterId.value = savedClusterId
+    } else {
+      const hqCluster = findHqTerraformingCluster()
+      terraformingSelectedClusterId.value = hqCluster
+    }
+  }
+
+  function findHqTerraformingCluster(): string | null {
+    const sectorClusterId = terraformingHqClusterId.value
+    const clusters = terraformingData.value?.clusters
+    if (!sectorClusterId || !clusters) return null
+    for (const c of clusters) {
+      if (c.macro === `macro.${sectorClusterId}` || c.macro === sectorClusterId) return c.id
+    }
+    return null
   }
 
   const terraformingExecutionLog = computed<TerraformingExecutionEntry[]>(() => {
@@ -1559,6 +1606,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
 
   function selectTerraformingCluster(clusterId: string) {
     terraformingSelectedClusterId.value = clusterId
+    activeViewStore.activeTerraformingClusterId = clusterId
   }
 
   function setTerraformingCompletedProjects(projects: Map<string, number>) {
@@ -1746,6 +1794,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
 
     await loadPlayerStationRecords()
     syncAllBindingStationsToStateMap()
+    hydrateTerraformingLogs()
     markAllDirty()
     validateActiveStationId()
     if (activeStationId.value) {

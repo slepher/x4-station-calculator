@@ -1259,6 +1259,7 @@ export interface SaveBindingPlan {
   blueprintEmpireId?: string
   groups: BindingSectorGroup[]
   stationPlans: BindingStationPlan[]
+  terraformingLogs?: Record<string, string[]>
   updatedAt: number
 }
 
