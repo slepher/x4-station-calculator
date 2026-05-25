@@ -15,9 +15,11 @@
 - `dynamic`: 是否为动态属性
 - `icon`: UI 图标引用
 - `inactiveTextId`: 非活跃时文本引用
-- `ranges`: 数值区间数组, 每个区间含 `end`, `state`, `habitable`, `rgb`, `descriptionId`
+- `ranges`: 数值区间数组, 每个区间含 `start`, `end`, `state`, `habitable`, `rgb`, `descriptionId`
 
 **并且** 动态属性在 ranges 中包含 `state=0` 的隐藏区间
+
+**并且** `ranges` 足以唯一确定任意 value 所对应的 state 与颜色
 
 ### Requirement: 解析项目分组
 
@@ -45,6 +47,20 @@
 - `removedProjects`, `blockedProjects`, `blockedGroups`
 - `predecessors` (`[{ ref, type: "project"|"group", any }]`)
 
+**并且** `conditions[]` 中保留原始 `min/max/minvalue/maxvalue`
+
+**并且** 对每个 condition 标记其是 state 语义还是 value 语义
+
+### Requirement: condition state/value 语义保留
+
+**前提** X4 terraforming XSD 定义 `condition.min/max` 为 state 边界、`condition.minvalue/maxvalue` 为真实 value 边界
+
+**当** 运行 terraforming 数据解析模块
+
+**那么** 输出数据必须保留这两套语义的区别
+
+**并且** 消费方无需重新猜测 `min/max` 究竟表示 state 还是 value
+
 ### Requirement: 全局 predecessor 收集
 
 **前提** 存在 `md/terraforming/final.xml` 文件
@@ -67,9 +83,72 @@
 - `id`, `macro`, `partName`
 - `initialStats`: 初始属性值
 - `projectIds`: 项目 ID 列表
+- `removedStats`: 被 mission cue 或 patch 显式移除的 stat 列表
 - `values`: MD `set_value` 捕获的已知数值 (如 housing target)
 - `variableTexts`: `substitute_text` 运行时变量映射
 - `objectives`: 任务目标列表 `[{ step, action, textId, encyclopedia?, textReplaces? }]`
+
+**并且** `values` 中保留会影响运行时推导的 cluster 级参数，例如 `$AddedAtmoPressureTable.*`、`$GlobalWarmingLimitTable.*` 与各类 `Ignore*`
+
+### Requirement: 保留 cluster 级运行时调参
+
+**前提** cluster 通过 `set_value` 或 library 参数传入 terraforming 调参
+
+**当** 运行 terraforming 数据解析模块
+
+**那么** 输出数据必须保留消费方重建运行时规则所需的 cluster 级调参
+
+**并且** 至少包括：
+- `Ignore*` 系列开关
+- `removedStats`
+- `$AddedAtmoPressureTable.*`
+- `$GlobalWarmingLimitTable.*`
+
+**并且** 消费方无需重新扫描原始 MD XML 才能得知这些规则
+
+### Requirement: 暴露空气压力派生语义
+
+**前提** 游戏中的 `airpressure` 不是单纯持久化输入，而是由大气成分与 cluster 补正共同派生
+
+**当** 运行 terraforming 数据解析模块
+
+**那么** 输出数据必须保留消费方重建 `airpressure` 所需的语义
+
+**并且** 消费方能够基于气体总量每满四格增加一档贡献的语义，重建当前运行时空气压力
+
+### Requirement: 暴露 stat 删除语义
+
+**前提** 某些 terraforming cluster 会在 cue 或 patch 中调用 `remove_terraforming_stat`
+
+**当** 运行 terraforming 数据解析模块
+
+**那么** 输出数据必须保留这些被删除的 stat
+
+**并且** 消费方能够把它们视为“不存在的 stat”
+
+**并且** 这些 stat 不得继续参与派生计算、动态项目池、条件显示和可用性判定
+
+### Requirement: 暴露温室效应事件语义
+
+**前提** 游戏中的 `evt_globalwarming_*` 由 `SetupStatDependentProjects` 通用事件规则注入
+
+**当** 运行 terraforming 数据解析模块
+
+**那么** 输出数据必须保留消费方命中这些通用动态事件所需的语义
+
+**并且** 甲烷 / 二氧化碳命中 helper 条件时，相关 warming event 必须进入 cluster 初始项目集合或运行时动态项目池规则
+
+**并且** 消费方应通过通用 event/project 命中逻辑处理这些 warming event，而不是要求单独硬编码温度回推
+
+### Requirement: 暴露动态项目池规则
+
+**前提** `SetupStatDependentProjects` 中的若干项目与事件存在性依赖当前 stat，而非仅依赖初始值
+
+**当** 运行 terraforming 数据解析模块
+
+**那么** 输出数据必须保留消费方重建动态项目池所需的阈值与 ignore gating 语义
+
+**并且** 消费方能够在 stat 变化后重新决定某项目或事件应出现还是移除
 
 ### Requirement: 任务目标提取
 
@@ -134,6 +213,8 @@
 **并且** 条件检查: stat min/max 约束
 
 **并且** 前置检查: type=project 未完成 → 阻塞; type=group → 仅标注, 不阻塞
+
+**并且** 任务推理所使用的 stat 必须允许接入派生后的运行时值，而不局限于 `initialStats + project effects`
 
 ### Requirement: CLI 参数解析
 

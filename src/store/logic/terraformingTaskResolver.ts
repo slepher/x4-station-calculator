@@ -12,6 +12,7 @@ export interface TerraformingStat {
   dynamic: boolean
   icon: string
   ranges: Array<{
+    start?: number
     end: number
     state: number
     rgb: string
@@ -33,6 +34,7 @@ export interface TerraformingCluster {
   partName: string
   initialStats: Record<string, number>
   projectIds: string[]
+  removedStats?: string[]
   objectives?: ClusterObjective[]
   values?: Record<string, string>
   variableTexts?: Record<string, { source: string; replaces: Array<{ from: string; to: string }> }>
@@ -76,6 +78,10 @@ export interface StatCondition {
   stat: string
   min?: number
   max?: number
+  minvalue?: number
+  maxvalue?: number
+  usesStateBounds?: boolean
+  usesValueBounds?: boolean
 }
 
 export interface StatEffect {
@@ -133,7 +139,7 @@ export interface TerraformingData {
 
 export interface TerraformingState {
   stats: Record<string, number>
-  completedProjects: Set<string>
+  completedProjects: Map<string, number>
 }
 
 export interface TaskNode {
@@ -167,6 +173,45 @@ function fmtEffect(e: StatEffect): string {
   return s
 }
 
+export function getSortedRanges(stat: TerraformingStat): TerraformingStat['ranges'] {
+  const sorted = [...stat.ranges].sort((a, b) => a.end - b.end)
+  let nextStart = 0
+  return sorted.map(range => {
+    const start = range.start ?? nextStart
+    nextStart = range.end + 1
+    return { ...range, start }
+  })
+}
+
+export function getCurrentRange(
+  stat: TerraformingStat,
+  value: number,
+): TerraformingStat['ranges'][number] | null {
+  const ranges = getSortedRanges(stat)
+  for (const range of ranges) {
+    const start = range.start ?? 0
+    if (value >= start && value <= range.end) return range
+  }
+  return ranges.length > 0 ? ranges[ranges.length - 1]! : null
+}
+
+function inferConditionMode(
+  condition: StatCondition,
+  stat: TerraformingStat | undefined,
+): 'state' | 'value' {
+  if (condition.usesValueBounds || condition.minvalue !== undefined || condition.maxvalue !== undefined) {
+    return 'value'
+  }
+  if (condition.usesStateBounds) return 'state'
+  if (!stat) return 'value'
+  const ranges = getSortedRanges(stat)
+  const maxState = Math.max(...ranges.map(r => r.state))
+  if ((condition.min ?? -Infinity) > maxState || (condition.max ?? -Infinity) > maxState) {
+    return 'value'
+  }
+  return 'state'
+}
+
 const GROUP_EMOJI: Record<string, string> = {
   power: '⚡',
   industry: '🏭',
@@ -185,10 +230,10 @@ const GROUP_EMOJI: Record<string, string> = {
   special: '🔧',
 }
 
-function groupLabel(group: string, groupNames: Map<string, string>, i18nMap?: Record<string, string>): string {
+function groupLabel(group: string, groupNames: Map<string, string>, i18nLookup?: I18nLookup): string {
   const emoji = GROUP_EMOJI[group] || ''
   const nameId = groupNames.get(group) || group
-  const name = i18nMap ? (i18nMap[nameId] || nameId) : nameId
+  const name = i18nLookup ? (i18nLookup(nameId) || nameId) : nameId
   return emoji ? `${emoji} ${name}` : name
 }
 
@@ -217,17 +262,24 @@ export function resolveAvailableTasks(
   // Build dependency graph
   const blocks = new Map<string, TaskNode>()
   for (const p of clusterProjects) {
-    const node = evaluateProject(p, state, projectMap)
+    const node = evaluateProject(p, state, projectMap, clusterProjects, data.stats)
     blocks.set(p.id, node)
   }
 
-  // Build tree: connect children
+  // Build tree: top-level nodes have no mandatory (non-any) project predecessors
   const roots: TaskNode[] = []
   const blocked: TaskNode[] = []
   const allChildren = new Set<string>()
 
   for (const [id, node] of blocks) {
-    if (node.predecessors.length === 0) {
+    const hasMandatoryProjectPred = node.predecessors.some(
+      p => {
+        if (p.type !== 'project' || p.any || !clusterProjectIds.has(p.ref)) return false
+        const parent = blocks.get(p.ref)
+        return parent?.group === node.group
+      }
+    )
+    if (!hasMandatoryProjectPred) {
       if (!allChildren.has(id)) {
         if (node.available) {
           roots.push(node)
@@ -238,27 +290,30 @@ export function resolveAvailableTasks(
     }
   }
 
-  // Wire up parent-child
+  // Wire up parent-child (only for non-any project predecessors that exist in cluster)
   for (const [id, node] of blocks) {
     for (const pred of node.predecessors) {
-      if (pred.type === 'project') {
-        const parent = blocks.get(pred.ref)
-        if (parent && parent.id !== id) {
-          parent.children.push(node)
-          allChildren.add(id)
-        }
+      if (pred.type !== 'project' || pred.any || !clusterProjectIds.has(pred.ref)) continue
+      const parent = blocks.get(pred.ref)
+      if (parent && parent.id !== id && parent.group === node.group) {
+        parent.children.push(node)
+        allChildren.add(id)
       }
     }
   }
 
   // Collect blocked nodes not already in tree
+  const blockedSet = new Set(blocked.map(n => n.id))
   for (const [id, node] of blocks) {
     if (allChildren.has(id)) continue
-    // Check if it's already a root
     const isRoot = roots.some(r => r.id === id)
     if (isRoot) continue
+    if (blockedSet.has(id)) continue
     if (!node.available) {
       blocked.push(node)
+      blockedSet.add(id)
+    } else {
+      roots.push(node)
     }
   }
 
@@ -284,32 +339,79 @@ function evaluateProject(
   project: TerraformingProject,
   state: TerraformingState,
   projectMap: Map<string, TerraformingProject>,
+  clusterProjects: TerraformingProject[],
+  stats: TerraformingStat[],
 ): TaskNode {
   const name = project.name || project.nameId
   const effectsStr = project.effects.map(fmtEffect).join(', ')
   const blockedReasons: string[] = []
 
-  // Check stat conditions
   for (const c of project.conditions) {
     const currentVal = state.stats[c.stat]
     if (currentVal === undefined) continue
-    if (c.min !== undefined && currentVal < c.min) {
-      blockedReasons.push(`${c.stat} >= ${c.min} (current: ${currentVal})`)
+    const statDef = stats.find(s => s.id === c.stat)
+    const mode = inferConditionMode(c, statDef)
+    if (mode === 'value') {
+      const minValue = c.minvalue ?? c.min
+      const maxValue = c.maxvalue ?? c.max
+      if (minValue !== undefined && currentVal < minValue) {
+        blockedReasons.push(`${c.stat} >= ${minValue} (current: ${currentVal})`)
+      }
+      if (maxValue !== undefined && currentVal > maxValue) {
+        blockedReasons.push(`${c.stat} <= ${maxValue} (current: ${currentVal})`)
+      }
+      continue
     }
-    if (c.max !== undefined && currentVal > c.max) {
-      blockedReasons.push(`${c.stat} <= ${c.max} (current: ${currentVal})`)
+
+    if (!statDef) continue
+    const currentRange = getCurrentRange(statDef, currentVal)
+    const currentState = currentRange?.state
+    if (currentState === undefined) continue
+    if (c.min !== undefined && currentState < c.min) {
+      blockedReasons.push(`${c.stat} state >= ${c.min} (current: ${currentState}, value: ${currentVal})`)
+    }
+    if (c.max !== undefined && currentState > c.max) {
+      blockedReasons.push(`${c.stat} state <= ${c.max} (current: ${currentState}, value: ${currentVal})`)
     }
   }
 
-  // Check predecessors (only project-type are blocking; group-type are informational)
-  const unmetProjectPreds: Predecessor[] = []
-  for (const pred of project.predecessors) {
-    if (pred.type === 'project') {
-      if (!state.completedProjects.has(pred.ref)) {
-        unmetProjectPreds.push(pred)
-      }
+  for (const cp of clusterProjects) {
+    const completed = (state.completedProjects.get(cp.id) ?? 0) > 0
+    if (completed && cp.removedProjects.includes(project.id)) {
+      blockedReasons.push(`depends: ${cp.name || cp.nameId} (removed)`)
     }
-    // group-type predecessors: shown in dependency label, but never block
+    const cpRemoved = clusterProjects.some(
+      cp2 => (state.completedProjects.get(cp2.id) ?? 0) > 0 && cp2.removedProjects.includes(cp.id)
+    )
+    if (!completed && !cpRemoved && cp.blockedProjects.includes(project.id)) {
+      blockedReasons.push(`depends: ${cp.name || cp.nameId} (blocking)`)
+    }
+    if (!completed && !cpRemoved && cp.blockedGroups.includes(project.group)) {
+      blockedReasons.push(`depends: ${cp.name || cp.nameId} (blocking_group)`)
+    }
+  }
+
+  const clusterPids = new Set(clusterProjects.map(p => p.id))
+
+  const projectPreds = project.predecessors.filter(p => {
+    if (p.type !== 'project') return false
+    return clusterPids.has(p.ref)
+  })
+  const anyPreds = projectPreds.filter(p => p.any)
+  const allPreds = projectPreds.filter(p => !p.any)
+  const unmetProjectPreds: Predecessor[] = []
+
+  if (anyPreds.length > 0) {
+    const anyMet = anyPreds.some(p => (state.completedProjects.get(p.ref) ?? 0) > 0)
+    if (!anyMet) {
+      unmetProjectPreds.push(...anyPreds)
+    }
+  }
+
+  for (const pred of allPreds) {
+    if ((state.completedProjects.get(pred.ref) ?? 0) <= 0) {
+      unmetProjectPreds.push(pred)
+    }
   }
 
   if (unmetProjectPreds.length > 0) {
@@ -317,7 +419,15 @@ function evaluateProject(
       const pp = projectMap.get(p.ref)
       return pp ? (pp.name || pp.nameId) : p.ref
     })
-    blockedReasons.push(`depends: ${refs.join(' | ')}`)
+    const hasAnyPreds = anyPreds.length > 0
+    const hasAllPreds = allPreds.length > 0
+    if (hasAnyPreds && !hasAllPreds) {
+      blockedReasons.push(`depends_any: ${refs.join(' | ')}`)
+    } else if (!hasAnyPreds && hasAllPreds) {
+      blockedReasons.push(`depends_all: ${refs.join(' | ')}`)
+    } else {
+      blockedReasons.push(`depends: ${refs.join(' | ')}`)
+    }
   }
 
   return {
@@ -327,17 +437,15 @@ function evaluateProject(
     available: blockedReasons.length === 0,
     blockedReason: blockedReasons.length > 0 ? blockedReasons.join('; ') : undefined,
     effects: effectsStr,
-    predecessors: project.predecessors,
+    predecessors: project.predecessors.filter(p => p.type === 'group' || clusterPids.has(p.ref)),
     children: [],
   }
 }
 
-export function printTaskTree(tree: TaskTree, i18nMap?: Record<string, string>): string {
+export function printTaskTree(tree: TaskTree, i18nLookup?: I18nLookup): string {
   const lines: string[] = []
 
-  // Use groupOrder from data to preserve logical ordering
   const groupOrder = tree.groupOrder.filter(g => tree.groups.has(g))
-  // Append any groups not in the order list
   for (const g of tree.groups.keys()) {
     if (!groupOrder.includes(g)) groupOrder.push(g)
   }
@@ -347,7 +455,7 @@ export function printTaskTree(tree: TaskTree, i18nMap?: Record<string, string>):
     const nodes = tree.groups.get(group)
     if (!nodes) continue
 
-    const label = groupLabel(group, tree.groupNames, i18nMap)
+    const label = groupLabel(group, tree.groupNames, i18nLookup)
     lines.push(label)
 
     const sorted = sortNodes(nodes)
@@ -359,9 +467,9 @@ export function printTaskTree(tree: TaskTree, i18nMap?: Record<string, string>):
       const status = node.available ? '' : ' [BLOCKED]'
       const effects = node.effects ? `  (${node.effects})` : ''
       const repeat = getRepeatLabel(node.id, tree.projectMap)
-      const deps = getDependencyLabel(node, tree.projectMap, i18nMap)
-      const displayName = i18nMap
-        ? (i18nMap[tree.projectMap.get(node.id)?.nameId || ''] || node.name)
+      const deps = getDependencyLabel(node, tree.projectMap, i18nLookup)
+      const displayName = i18nLookup
+        ? (i18nLookup(tree.projectMap.get(node.id)?.nameId || '') || node.name)
         : node.name
       lines.push(`  ${prefix} ${displayName}${effects}${repeat}${status}`)
       if (deps) {
@@ -370,7 +478,7 @@ export function printTaskTree(tree: TaskTree, i18nMap?: Record<string, string>):
       if (!node.available && node.blockedReason) {
         const reasonLines = node.blockedReason.split('; ')
         for (const r of reasonLines) {
-          const translated = translateBlockedReason(r, tree.projectMap, tree.groupNames, i18nMap)
+          const translated = translateBlockedReason(r, tree.projectMap, tree.groupNames, i18nLookup)
           lines.push(`  ${isLast ? '    ' : '│   '}  └─ ⛔ ${translated}`)
         }
       }
@@ -390,33 +498,38 @@ function sortNodes(nodes: TaskNode[]): TaskNode[] {
   })
 }
 
+export type I18nLookup = (key: string) => string
+
 export function resolveTerraformingText(
   textId: string,
   data: TerraformingData,
-  i18nMap: Record<string, string>,
+  i18nLookup: I18nLookup,
 ): string {
-  // {page,id} reference → direct i18n lookup
   if (textId.startsWith('{') && textId.endsWith('}')) {
-    return i18nMap[textId] || textId
+    return i18nLookup(textId) || textId
   }
 
-  // terraforming.stat.X.name → resolve stat name
   const statMatch = textId.match(/^terraforming\.stat\.(\w+)\.name$/)
   if (statMatch) {
     const statId = statMatch[1]!
     const stat = data.stats.find(s => s.id === statId)
     const i18nKey = stat?.nameId
-    if (i18nKey && i18nMap[i18nKey]) return i18nMap[i18nKey]!
+    if (i18nKey) {
+      const resolved = i18nLookup(i18nKey)
+      if (resolved && resolved !== i18nKey) return resolved
+    }
     return stat?.name || statId
   }
 
-  // terraforming.project.Y.name → resolve project name
   const projMatch = textId.match(/^terraforming\.project\.(\w+)\.name$/)
   if (projMatch) {
     const projId = projMatch[1]!
     const proj = data.projects.find(p => p.id === projId)
     const i18nKey = proj?.nameId
-    if (i18nKey && i18nMap[i18nKey]) return i18nMap[i18nKey]!
+    if (i18nKey) {
+      const resolved = i18nLookup(i18nKey)
+      if (resolved && resolved !== i18nKey) return resolved
+    }
     return proj?.name || projId
   }
 
@@ -427,12 +540,12 @@ export function resolveWithReplaces(
   text: string,
   replaces: Array<{ from: string; to: string }> | undefined,
   data: TerraformingData,
-  i18nMap: Record<string, string>,
+  i18nLookup: I18nLookup,
 ): string {
   let result = text
   if (replaces) {
     for (const r of replaces) {
-      const resolvedTo = resolveTerraformingText(r.to, data, i18nMap)
+      const resolvedTo = resolveTerraformingText(r.to, data, i18nLookup)
       result = result.replace(r.from, resolvedTo)
     }
   }
@@ -442,7 +555,7 @@ export function resolveWithReplaces(
 export function printObjectives(
   cluster: TerraformingCluster,
   data: TerraformingData,
-  i18nMap: Record<string, string>,
+  i18nLookup: I18nLookup,
 ): string {
   const lines: string[] = []
   const objs = cluster.objectives
@@ -453,8 +566,8 @@ export function printObjectives(
 
   lines.push('任务目标:')
   for (const obj of objs) {
-    let text = resolveTerraformingText(obj.textId, data, i18nMap)
-    text = resolveWithReplaces(text, obj.textReplaces, data, i18nMap)
+    let text = resolveTerraformingText(obj.textId, data, i18nLookup)
+    text = resolveWithReplaces(text, obj.textReplaces, data, i18nLookup)
 
     const actionLabel = ACTION_LABELS[obj.action] || obj.action
     const step = String(obj.step).padStart(2, ' ')
@@ -484,14 +597,14 @@ function getRepeatLabel(projectId: string, projectMap: Map<string, TerraformingP
 function getDependencyLabel(
   node: TaskNode,
   projectMap: Map<string, TerraformingProject>,
-  i18nMap?: Record<string, string>,
+  i18nLookup?: I18nLookup,
 ): string {
   if (node.predecessors.length === 0) return ''
   const labels = node.predecessors.map(p => {
-    if (p.type === 'group') return `[组: ${resolveGroupName(p.ref, i18nMap)}]`
+    if (p.type === 'group') return `[组: ${resolveGroupName(p.ref, i18nLookup)}]`
     const pp = projectMap.get(p.ref)
     const raw = pp ? (pp.name || pp.nameId) : p.ref
-    if (i18nMap && pp?.nameId) return i18nMap[pp.nameId] || raw
+    if (i18nLookup && pp?.nameId) return i18nLookup(pp.nameId) || raw
     return raw
   })
   const prefix = node.predecessors[0]!.any ? '⟸ 任一: ' : '⟸ '
@@ -502,21 +615,19 @@ function translateBlockedReason(
   reason: string,
   projectMap: Map<string, TerraformingProject>,
   _groupNames: Map<string, string>,
-  i18nMap?: Record<string, string>,
+  i18nLookup?: I18nLookup,
 ): string {
-  // "depends: Fertilise Soil | Genetically Modify Toxic Fruit"
   if (reason.startsWith('depends: ')) {
     const rest = reason.slice('depends: '.length)
     const parts = rest.split(' | ')
     const translated = parts.map(p => {
       if (p.startsWith('group: ')) {
         const gName = p.slice('group: '.length)
-        return `[组: ${resolveGroupName(gName, i18nMap)}]`
+        return `[组: ${resolveGroupName(gName, i18nLookup)}]`
       }
-      // Try to find project by name
       for (const proj of projectMap.values()) {
         if ((proj.name || proj.nameId) === p) {
-          if (i18nMap && proj.nameId) return i18nMap[proj.nameId] || p
+          if (i18nLookup && proj.nameId) return i18nLookup(proj.nameId) || p
           return p
         }
       }
@@ -527,9 +638,9 @@ function translateBlockedReason(
   return reason
 }
 
-function resolveGroupName(groupId: string, i18nMap?: Record<string, string>): string {
-  if (!i18nMap) return groupId
-  // Direct i18n lookup
-  if (i18nMap[groupId]) return i18nMap[groupId]
+function resolveGroupName(groupId: string, i18nLookup?: I18nLookup): string {
+  if (!i18nLookup) return groupId
+  const resolved = i18nLookup(groupId)
+  if (resolved && resolved !== groupId) return resolved
   return groupId
 }

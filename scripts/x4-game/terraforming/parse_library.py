@@ -47,6 +47,11 @@ def parse_stats(root: ET.Element) -> List[Dict[str, Any]]:
                 "descriptionId": "",
             })
 
+        next_start = 0
+        for range_entry in ranges:
+            range_entry["start"] = next_start
+            next_start = _int_or(range_entry.get("end"), 0) + 1
+
         entry["ranges"] = ranges
         stats.append(entry)
     return stats
@@ -222,9 +227,11 @@ def _parse_stat_condition(elem: ET.Element) -> Dict[str, Any]:
     if max_val is not None:
         cond["max"] = max_val
     if min_val2 is not None:
-        cond["min"] = min_val2
+        cond["minvalue"] = min_val2
     if max_val2 is not None:
-        cond["max"] = max_val2
+        cond["maxvalue"] = max_val2
+    cond["usesStateBounds"] = "min" in cond or "max" in cond
+    cond["usesValueBounds"] = "minvalue" in cond or "maxvalue" in cond
     return cond
 
 

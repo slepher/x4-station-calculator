@@ -41,7 +41,7 @@ def parse_md(root: ET.Element) -> Tuple[List[Dict[str, Any]], Dict[str, List[Dic
         if actions is None:
             continue
 
-        cluster = _parse_cluster_actions(actions, cluster_id, predecessors_map)
+        cluster = _parse_cluster_actions(cue, cluster_id, predecessors_map)
         if cluster:
             cluster["objectives"] = _extract_objectives(cue)
             cluster["variableTexts"] = _extract_variable_texts(cue)
@@ -192,11 +192,15 @@ _CLUSTER_NAME_RE = re.compile(r"\$Cluster_(\w+)")
 
 
 def _parse_cluster_actions(
-    actions: ET.Element,
+    cue: ET.Element,
     cluster_id: str,
     predecessors_map: Dict[str, List[Dict[str, Any]]],
 ) -> Optional[Dict[str, Any]]:
-    """Parse a single cluster's <actions> block for initialization data."""
+    """Parse a single cluster cue for initialization data."""
+    actions = cue.find("actions")
+    if actions is None:
+        return None
+
     cluster: Dict[str, Any] = {
         "id": cluster_id,
         "macro": "",
@@ -204,11 +208,13 @@ def _parse_cluster_actions(
         "initialStats": {},
         "projectIds": [],
         "values": {},
+        "removedStats": [],
     }
 
     initial_stats: Dict[str, int] = {}
     project_ids: List[str] = []
     known_values: Dict[str, str] = {}
+    removed_stats: Set[str] = set()
 
     def _process_element(elem: ET.Element):
         tag = elem.tag
@@ -228,6 +234,12 @@ def _parse_cluster_actions(
             value = _int_or(elem.get("value"))
             if stat_id and value is not None:
                 initial_stats[stat_id] = value
+                removed_stats.discard(stat_id)
+        elif tag == "remove_terraforming_stat":
+            stat_id = _clean_xpath_str(elem.get("id", ""))
+            if stat_id:
+                removed_stats.add(stat_id)
+                initial_stats.pop(stat_id, None)
         # set_value (capture known variables like housing target)
         elif tag == "set_value":
             var_name = elem.get("name", "")
@@ -261,10 +273,36 @@ def _parse_cluster_actions(
 
     for child in actions:
         _process_element(child)
+    for patch in cue.findall("patch"):
+        for child in patch:
+            _process_element(child)
 
     cluster["initialStats"] = initial_stats
     cluster["projectIds"] = project_ids
+    cluster["removedStats"] = sorted(removed_stats)
+    # Merge values written directly to cluster["values"] by library expansion
+    known_values.update({k: v for k, v in cluster.get("values", {}).items() if k not in known_values})
     cluster["values"] = known_values
+
+    # Pass ignore params from SetupGeneralProjects call
+    # They're accumulated in known_values during processing
+
+    # Apply stat-dependent projects based on cluster's initial stats
+    _add_stat_dependent_projects_static(cluster, predecessors_map)
+
+    # Resolve $PilotTrainingCourseProject variable in predecessors
+    pilot_course = cluster.get("values", {}).get("$PilotTrainingCourseProject", "trn_pilot")
+    for proj_id in list(predecessors_map.keys()):
+        if proj_id not in project_ids:
+            continue
+        resolved = []
+        for p in predecessors_map[proj_id]:
+            if p["ref"] == "$PilotTrainingCourseProject":
+                resolved.append({**p, "ref": pilot_course})
+            else:
+                resolved.append(p)
+        predecessors_map[proj_id] = resolved
+
     return cluster
 
 
@@ -352,13 +390,181 @@ def _process_library_call(
     """Expand library ref calls to extract project additions."""
     ref = run_elem.get("ref", "")
 
-    # Handle known libraries
+    # Capture Ignore* params from direct SetupStatDependentProjects calls
+    if ref == "SetupStatDependentProjects":
+        for flag in ["IgnoreTemperature", "IgnoreOxygen", "IgnoreMethane",
+                     "IgnoreCarbonDioxide", "IgnoreToxicity", "IgnoreRadioactivity",
+                     "IgnoreHumidity", "IgnoreAirPressure"]:
+            for param in run_elem.findall("param"):
+                if param.get("name", "") == flag and param.get("value", "").lower() == "true":
+                    cluster["values"]["$" + flag] = "true"
+        return
+
     resolved_params = _resolve_params(run_elem)
     projects_to_add = _expand_library(ref, resolved_params)
+
+    # Honor Biosphere param: skip biosphere projects when false
+    if resolved_params.get("Biosphere", "").lower() == "false":
+        biosphere_ids = set(_expand_library("SetupGeneralProjects_Biosphere", {}))
+        projects_to_add = [p for p in projects_to_add if p not in biosphere_ids]
+
+    # Honor EnergyProject param: replace pwr_antimatter with alternative
+    energy_project = resolved_params.get("EnergyProject", "")
+    if energy_project and energy_project != "pwr_antimatter":
+        clean_energy = _clean_xpath_str(energy_project)
+        if "pwr_antimatter" in projects_to_add and clean_energy:
+            projects_to_add = [p if p != "pwr_antimatter" else clean_energy for p in projects_to_add]
+
+    # Store PilotTrainingCourseProject param for later predecessor resolution
+    pilot_project = resolved_params.get("PilotTrainingCourseProject", "")
+    if pilot_project:
+        cluster["values"]["$PilotTrainingCourseProject"] = _clean_xpath_str(pilot_project)
 
     for proj_id in projects_to_add:
         if proj_id not in project_ids:
             project_ids.append(proj_id)
+
+    # Store ignore flags from SetupStatDependentProjects for later use
+    for flag in ["IgnoreTemperature", "IgnoreOxygen", "IgnoreMethane",
+                 "IgnoreCarbonDioxide", "IgnoreToxicity", "IgnoreRadioactivity",
+                 "IgnoreHumidity", "IgnoreAirPressure"]:
+        val = resolved_params.get(flag, "")
+        if val.lower() == "true":
+            cluster["values"]["$" + flag] = "true"
+
+
+def _add_stat_dependent_projects_static(
+    cluster: Dict[str, Any],
+    predecessors_map: Dict[str, List[Dict[str, Any]]],
+):
+    """Apply SetupStatDependentProjects logic based on cluster initialStats."""
+    stats = cluster.get("initialStats", {})
+    project_ids = cluster["projectIds"]
+
+    # Temperature-dependent: only if temperature stat exists on this cluster
+    if "temperature" in stats:
+        if stats.get("temperature", 0) < 5:
+            temps = ["tmp_moholes", "tmp_blackdust", "atm_methane_import"]
+            for pid in temps:
+                if pid not in project_ids:
+                    project_ids.append(pid)
+        if stats.get("temperature", 0) > 5:
+            pid = "tmp_cloudparticles"
+            if pid not in project_ids:
+                project_ids.append(pid)
+            if pid not in predecessors_map:
+                predecessors_map[pid] = [
+                    {"ref": "wat_import", "type": "project", "any": True},
+                    {"ref": "wat_surfacing", "type": "project", "any": True},
+                ]
+
+    # Temperature-dependent: only if temperature stat exists on this cluster
+    if "temperature" in stats and cluster.get("values", {}).get("$IgnoreTemperature") != "true":
+        if stats.get("temperature", 0) < 5:
+            temps = ["tmp_moholes", "tmp_blackdust", "atm_methane_import"]
+            for pid in temps:
+                if pid not in project_ids:
+                    project_ids.append(pid)
+        if stats.get("temperature", 0) > 5:
+            pid = "tmp_cloudparticles"
+            if pid not in project_ids:
+                project_ids.append(pid)
+            if pid not in predecessors_map:
+                predecessors_map[pid] = [
+                    {"ref": "wat_import", "type": "project", "any": True},
+                    {"ref": "wat_surfacing", "type": "project", "any": True},
+                ]
+
+    # Oxygen < 4 → bio_cyanobacteria
+    if cluster.get("values", {}).get("$IgnoreOxygen") != "true":
+        if "oxygen" in stats and stats.get("oxygen", 0) < 4:
+            pid = "bio_cyanobacteria"
+            if pid not in project_ids:
+                project_ids.append(pid)
+            if pid not in predecessors_map:
+                predecessors_map[pid] = [
+                    {"ref": "bio_tailored", "type": "project", "any": True},
+                    {"ref": "bio_jumpstart", "type": "project", "any": True},
+                ]
+
+    # Methane > 0 → methane projects + warming event
+    if cluster.get("values", {}).get("$IgnoreMethane") != "true":
+        if "methane" in stats and stats.get("methane", 0) > 0:
+            for pid in ["atm_methane_oxidizers", "atm_methane_oxidize", "evt_globalwarming_methane"]:
+                if pid not in project_ids:
+                    project_ids.append(pid)
+            if "atm_methane_oxidizers" not in predecessors_map:
+                predecessors_map["atm_methane_oxidizers"] = [
+                    {"ref": "power", "type": "group", "any": False},
+                ]
+            if "atm_methane_oxidize" not in predecessors_map:
+                predecessors_map["atm_methane_oxidize"] = [
+                    {"ref": "atm_methane_oxidizers", "type": "project", "any": False},
+                ]
+
+    # CarbonDioxide > 0 → CO2 projects + warming event
+    if cluster.get("values", {}).get("$IgnoreCarbonDioxide") != "true":
+        if "carbondioxide" in stats and stats.get("carbondioxide", 0) > 0:
+            for pid in ["atm_carbon_mineralizers", "atm_carbon_mineralize", "evt_globalwarming_co2"]:
+                if pid not in project_ids:
+                    project_ids.append(pid)
+            if "atm_carbon_mineralizers" not in predecessors_map:
+                predecessors_map["atm_carbon_mineralizers"] = [
+                    {"ref": "power", "type": "group", "any": False},
+                ]
+            if "atm_carbon_mineralize" not in predecessors_map:
+                predecessors_map["atm_carbon_mineralize"] = [
+                    {"ref": "atm_carbon_mineralizers", "type": "project", "any": False},
+                ]
+
+    # Toxicity > 0 → atm_toxin_cleanup
+    if cluster.get("values", {}).get("$IgnoreToxicity") != "true":
+        if "toxicity" in stats and stats.get("toxicity", 0) > 0:
+            pid = "atm_toxin_cleanup"
+            if pid not in project_ids:
+                project_ids.append(pid)
+            if pid not in predecessors_map:
+                predecessors_map[pid] = [
+                    {"ref": "src_toxicity", "type": "group", "any": False},
+                ]
+
+    # Radioactivity > 0 → ter_radioactive_cleanup
+    if cluster.get("values", {}).get("$IgnoreRadioactivity") != "true":
+        if "radioactivity" in stats and stats.get("radioactivity", 0) > 0:
+            pid = "ter_radioactive_cleanup"
+            if pid not in project_ids:
+                project_ids.append(pid)
+
+    # Humidity < 6 → water projects
+    if cluster.get("values", {}).get("$IgnoreHumidity") != "true":
+        if "humidity" in stats and stats.get("humidity", 9) < 6:
+            water_projects = ["wat_import", "wat_irrigation", "wat_surfacing"]
+            for pid in water_projects:
+                if pid not in project_ids:
+                    project_ids.append(pid)
+
+    # AirPressure exists → nitrogen_fix, helium_import
+    if cluster.get("values", {}).get("$IgnoreAirPressure") != "true":
+        if "airpressure" in stats:
+            for pid in ["atm_nitrogen_fix", "atm_helium_import"]:
+                if pid not in project_ids:
+                    project_ids.append(pid)
+            if "atm_nitrogen_fix" not in predecessors_map:
+                predecessors_map["atm_nitrogen_fix"] = [
+                    {"ref": "agr_fertilize", "type": "project", "any": False},
+                ]
+
+    # AirPressure < 5 → outgassing (only if airpressure exists)
+    if "airpressure" in stats and stats.get("airpressure", 0) < 5:
+        pid = "atm_outgassing"
+        if pid not in project_ids:
+            project_ids.append(pid)
+
+    # SeismicActivity > 0 → quake events + tectonic_scaffolding
+    if "seismicactivity" in stats and stats.get("seismicactivity", 0) > 0:
+        for pid in ["evt_quake_mild", "evt_quake_moderate", "evt_quake_severe", "ter_tectonic_scaffolding"]:
+            if pid not in project_ids:
+                project_ids.append(pid)
 
 
 def _resolve_params(run_elem: ET.Element) -> Dict[str, str]:
@@ -448,15 +654,7 @@ _KNOWN_LIBRARY_REF_MAP: Dict[str, List[str]] = {
         "SetupGeneralProjects_Economy",
     ],
     "SetupStatDependentProjects": [
-        "_TemperatureDependent",
-        "_OxygenDependent",
-        "_MethaneDependent",
-        "_CarbonDioxideDependent",
-        "_ToxicityDependent",
-        "_RadioactivityDependent",
-        "_HumidityDependent",
-        "_AirPressureDependent",
-        "_SeismicDependent",
+        # Note: handled directly in _add_stat_dependent_projects, not via expand_library
     ],
 }
 
@@ -475,23 +673,7 @@ def _expand_library(ref: str, params: Dict[str, str]) -> List[str]:
             result.extend(_expand_library(sub_ref, params))
         return result
 
-    # Stat-dependent: add cleanup/heating projects based on initial state
-    if ref == "SetupStatDependentProjects":
-        # Oxidation/carbon projects
-        result.extend(["atm_methane_oxidizers", "atm_methane_oxidize"])
-        result.extend(["atm_carbon_mineralizers", "atm_carbon_mineralize"])
-        # Events
-        result.extend(["evt_globalwarming_methane", "evt_globalwarming_co2"])
-        result.extend(["evt_quake_mild", "evt_quake_moderate", "evt_quake_severe"])
-        # General cleanup
-        result.extend(["atm_toxin_cleanup", "ter_radioactive_cleanup"])
-        result.extend(["atm_nitrogen_fix", "atm_helium_import"])
-        result.extend(["atm_outgassing", "ter_tectonic_scaffolding"])
-        return result
-    if ref == "SetupStatProjectsAndEvents_Methane":
-        return ["atm_methane_oxidizers", "atm_methane_oxidize", "evt_globalwarming_methane"]
-    if ref == "SetupStatProjectsAndEvents_CO2":
-        return ["atm_carbon_mineralizers", "atm_carbon_mineralize", "evt_globalwarming_co2"]
+    # Temperature-dependent projects
     if ref == "TemperatureProjectsHelper":
         return ["tmp_moholes", "tmp_blackdust", "atm_methane_import", "tmp_cloudparticles"]
 

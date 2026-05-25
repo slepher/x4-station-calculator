@@ -43,6 +43,12 @@ import { createProductionModuleActions } from './actions/productionModuleActions
 import { createProductionWareRuleActions } from './actions/productionWareRuleActions'
 import { createProductionSettingActions, doesStationSettingsAffectFlowMap } from './actions/productionSettingActions'
 import type { TerraformingData, TerraformingCluster } from './logic/terraformingTaskResolver'
+import {
+  buildCompletedProjectsFromExecutionLog,
+  computeTerraformingRuntimeStats,
+  type TerraformingExecutionEntry,
+  getRuntimeTerraformingProjectIds,
+} from './logic/terraformingRuntime'
 
 function mergeSavedModules(modules: SavedModule[]): SavedModule[] {
   const counts = new Map<string, number>()
@@ -110,7 +116,10 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     }
   })
   const terraformingSelectedClusterId = ref<string | null>(null)
-  const terraformingCompletedProjects = ref<Set<string>>(new Set())
+  const terraformingCompletedProjectsByCluster = ref<Record<string, Map<string, number>>>({})
+  const terraformingExecutionLogByCluster = ref<Record<string, TerraformingExecutionEntry[]>>({})
+  const terraformingExecutionSeqByCluster = ref<Record<string, number>>({})
+  const terraformingHousingBuiltByCluster = ref<Record<string, number>>({})
   const buildPriceMultiplier = ref(0.5)
   const overviewBuyMultiplier = ref(0.5)
   const overviewSellMultiplier = ref(0.5)
@@ -483,10 +492,96 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     return terraformingData.value.clusters.find(c => c.id === id) || null
   })
 
+  function getTerraformingExecutionLogForCluster(clusterId: string): TerraformingExecutionEntry[] {
+    const existing = terraformingExecutionLogByCluster.value[clusterId]
+    if (existing) return existing
+
+    const counts = terraformingCompletedProjectsByCluster.value[clusterId]
+    if (!counts) return []
+
+    const log: TerraformingExecutionEntry[] = []
+    let seq = 0
+    for (const [projectId, count] of counts) {
+      for (let i = 0; i < count; i += 1) {
+        seq += 1
+        log.push({ id: `${clusterId}-legacy-${seq}`, projectId })
+      }
+    }
+    return log
+  }
+
+  function setTerraformingExecutionLogForCluster(clusterId: string, log: TerraformingExecutionEntry[]) {
+    terraformingExecutionLogByCluster.value = {
+      ...terraformingExecutionLogByCluster.value,
+      [clusterId]: log,
+    }
+    terraformingCompletedProjectsByCluster.value = {
+      ...terraformingCompletedProjectsByCluster.value,
+      [clusterId]: buildCompletedProjectsFromExecutionLog(log),
+    }
+  }
+
+  function nextTerraformingExecutionId(clusterId: string): string {
+    const nextSeq = (terraformingExecutionSeqByCluster.value[clusterId] ?? 0) + 1
+    terraformingExecutionSeqByCluster.value = {
+      ...terraformingExecutionSeqByCluster.value,
+      [clusterId]: nextSeq,
+    }
+    return `${clusterId}-exec-${nextSeq}`
+  }
+
+  function appendTerraformingExecutionEntries(clusterId: string, projectId: string, count: number) {
+    if (count <= 0) return
+    const log = [...getTerraformingExecutionLogForCluster(clusterId)]
+    for (let i = 0; i < count; i += 1) {
+      log.push({
+        id: nextTerraformingExecutionId(clusterId),
+        projectId,
+      })
+    }
+    setTerraformingExecutionLogForCluster(clusterId, log)
+  }
+
+  function removeTailTerraformingExecutionEntries(clusterId: string, projectId: string, count: number) {
+    if (count <= 0) return
+    const log = [...getTerraformingExecutionLogForCluster(clusterId)]
+    let remaining = count
+    for (let i = log.length - 1; i >= 0 && remaining > 0; i -= 1) {
+      if (log[i]?.projectId !== projectId) continue
+      log.splice(i, 1)
+      remaining -= 1
+    }
+    setTerraformingExecutionLogForCluster(clusterId, log)
+  }
+
+  const terraformingExecutionLog = computed<TerraformingExecutionEntry[]>(() => {
+    const clusterId = terraformingSelectedClusterId.value
+    if (!clusterId) return []
+    return getTerraformingExecutionLogForCluster(clusterId)
+  })
+
+  const terraformingCompletedProjects = computed<Map<string, number>>(() => {
+    const clusterId = terraformingSelectedClusterId.value
+    if (!clusterId) return new Map()
+    return buildCompletedProjectsFromExecutionLog(terraformingExecutionLog.value)
+  })
+
+  const terraformingHousingBuilt = computed<number>(() => {
+    const clusterId = terraformingSelectedClusterId.value
+    if (!clusterId) return 0
+    return terraformingHousingBuiltByCluster.value[clusterId] || 0
+  })
+
   const terraformingCurrentStats = computed<Record<string, number>>(() => {
     const cluster = terraformingSelectedCluster.value
     if (!cluster) return {}
-    return { ...cluster.initialStats }
+    return computeTerraformingRuntimeStats(cluster, terraformingCompletedProjects.value, terraformingData.value)
+  })
+
+  const terraformingRuntimeProjectIds = computed<string[]>(() => {
+    const cluster = terraformingSelectedCluster.value
+    if (!cluster) return []
+    return getRuntimeTerraformingProjectIds(cluster, terraformingCurrentStats.value, terraformingCompletedProjects.value)
   })
 
   const terraformingHqStationCode = computed<string | null>(() => {
@@ -510,6 +605,14 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
 
   const terraformingHqArchiveStation = computed<ArchiveStationData | null>(() => {
     return getArchiveStationDataByCode(terraformingHqStationCode.value)
+  })
+
+  const terraformingHqClusterId = computed<string | null>(() => {
+    const archive = terraformingHqArchiveStation.value
+    if (!archive?.sectorMacro) return null
+    const sectorId = archive.sectorMacro
+    const sector = gameData.maps?.sectors?.[sectorId]
+    return sector?.cluster_id || null
   })
 
   const activeBindingStationId = computed(() => activeTransitSectorId.value ? null : activeStationId.value)
@@ -1446,6 +1549,63 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     terraformingSelectedClusterId.value = clusterId
   }
 
+  function setTerraformingCompletedProjects(projects: Map<string, number>) {
+    const clusterId = terraformingSelectedClusterId.value
+    if (!clusterId) return
+    const currentCounts = buildCompletedProjectsFromExecutionLog(getTerraformingExecutionLogForCluster(clusterId))
+    const touchedProjectIds = new Set<string>([
+      ...currentCounts.keys(),
+      ...projects.keys(),
+    ])
+
+    for (const projectId of touchedProjectIds) {
+      const currentCount = currentCounts.get(projectId) ?? 0
+      const targetCount = projects.get(projectId) ?? 0
+      if (targetCount > currentCount) {
+        appendTerraformingExecutionEntries(clusterId, projectId, targetCount - currentCount)
+      } else if (targetCount < currentCount) {
+        removeTailTerraformingExecutionEntries(clusterId, projectId, currentCount - targetCount)
+      }
+    }
+  }
+
+  function appendTerraformingProjectExecution(projectId: string, count = 1) {
+    const clusterId = terraformingSelectedClusterId.value
+    if (!clusterId) return
+    appendTerraformingExecutionEntries(clusterId, projectId, count)
+  }
+
+  function setTerraformingProjectCount(projectId: string, count: number) {
+    const clusterId = terraformingSelectedClusterId.value
+    if (!clusterId) return
+    const currentCount = terraformingCompletedProjects.value.get(projectId) ?? 0
+    if (count > currentCount) {
+      appendTerraformingExecutionEntries(clusterId, projectId, count - currentCount)
+      return
+    }
+    if (count < currentCount) {
+      removeTailTerraformingExecutionEntries(clusterId, projectId, currentCount - count)
+    }
+  }
+
+  function removeTerraformingExecutionEntry(entryId: string) {
+    const clusterId = terraformingSelectedClusterId.value
+    if (!clusterId) return
+    const currentLog = getTerraformingExecutionLogForCluster(clusterId)
+    const nextLog = currentLog.filter(entry => entry.id !== entryId)
+    if (nextLog.length === currentLog.length) return
+    setTerraformingExecutionLogForCluster(clusterId, nextLog)
+  }
+
+  function setTerraformingHousingBuilt(count: number) {
+    const clusterId = terraformingSelectedClusterId.value
+    if (!clusterId) return
+    terraformingHousingBuiltByCluster.value = {
+      ...terraformingHousingBuiltByCluster.value,
+      [clusterId]: count,
+    }
+  }
+
   function updateStationModules(stationId: string, modules: SavedModule[]) {
     updateBindingStationPlan(stationId, { modules })
     syncBindingStationDerivedSnapshot(stationId)
@@ -2022,9 +2182,19 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     terraformingSelectedCluster,
     terraformingData,
     terraformingCurrentStats,
+    terraformingRuntimeProjectIds,
+    terraformingExecutionLog,
     terraformingCompletedProjects,
+    terraformingHousingBuilt,
     terraformingHqStationCode,
     terraformingHqStationName,
-    terraformingHqArchiveStation
+    terraformingHqArchiveStation,
+    terraformingHqClusterId,
+    setTerraformingCompletedProjects,
+    appendTerraformingProjectExecution,
+    setTerraformingProjectCount,
+    removeTerraformingExecutionEntry,
+    setTerraformingHousingBuilt,
+    gameDataMaps: computed(() => gameData.maps)
   }
 })

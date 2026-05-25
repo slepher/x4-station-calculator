@@ -78,6 +78,19 @@ def process_terraforming(loader: Any) -> None:
             if pid in predecessors_map:
                 proj["predecessors"] = predecessors_map[pid]
 
+        # Resolve $PilotTrainingCourseProject in all project predecessors
+        for proj in projects:
+            preds = proj.get("predecessors")
+            if not preds:
+                continue
+            resolved = []
+            for p in preds:
+                if p.get("ref") == "$PilotTrainingCourseProject":
+                    resolved.append({**p, "ref": "trn_pilot"})
+                else:
+                    resolved.append(p)
+            proj["predecessors"] = resolved
+
         # Ensure predecessor uniqueness (prefer first occurrence)
         seen_predecessors: Dict[str, List[Dict[str, Any]]] = {}
         for proj in projects:

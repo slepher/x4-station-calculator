@@ -16,6 +16,9 @@ import LiveOverviewToolbar from '@/components/empire/context_toolbar/LiveOvervie
 import LiveTransitToolbar from '@/components/empire/context_toolbar/LiveTransitToolbar.vue'
 import LiveStationToolbar from '@/components/empire/context_toolbar/LiveStationToolbar.vue'
 import TerraformingToolbar from '@/components/empire/context_toolbar/TerraformingToolbar.vue'
+import TerraformingSectorPanel from '@/components/empire/terraforming/TerraformingSectorPanel.vue'
+import TerraformingTaskList from '@/components/empire/terraforming/TerraformingTaskList.vue'
+import TerraformingResourcePanel from '@/components/empire/terraforming/TerraformingResourcePanel.vue'
 import StationWareFlowsDashboard from '@/components/empire/StationWareFlowsDashboard.vue'
 import EmpireWareFlowsDashboard from '@/components/empire/EmpireWareFlowsDashboard.vue'
 import TransitHubBuildPanel from '@/components/empire/transit-hub/TransitHubBuildPanel.vue'
@@ -52,10 +55,21 @@ const terraformingPresenter = useTerraformingPresenter({
   terraformingSelectedClusterId: computed(() => liveStore.terraformingSelectedClusterId),
   terraformingSelectedCluster: computed(() => liveStore.terraformingSelectedCluster),
   terraformingCurrentStats: computed(() => liveStore.terraformingCurrentStats),
+  terraformingRuntimeProjectIds: computed(() => liveStore.terraformingRuntimeProjectIds),
   terraformingCompletedProjects: computed(() => liveStore.terraformingCompletedProjects),
+  terraformingExecutionLog: computed(() => liveStore.terraformingExecutionLog),
+  terraformingHousingBuilt: computed(() => liveStore.terraformingHousingBuilt),
   terraformingHqStationName: computed(() => liveStore.terraformingHqStationName),
   terraformingHqArchiveStation: computed(() => liveStore.terraformingHqArchiveStation),
-  selectTerraformingCluster: (id: string) => liveStore.selectTerraformingCluster(id)
+  terraformingHqClusterId: computed(() => liveStore.terraformingHqClusterId),
+  selectTerraformingCluster: (id: string) => liveStore.selectTerraformingCluster(id),
+  setTerraformingCompletedProjects: (projects: Map<string, number>) => liveStore.setTerraformingCompletedProjects(projects),
+  appendTerraformingProjectExecution: (projectId: string, count?: number) => liveStore.appendTerraformingProjectExecution(projectId, count),
+  setTerraformingProjectCount: (projectId: string, count: number) => liveStore.setTerraformingProjectCount(projectId, count),
+  removeTerraformingExecutionEntry: (entryId: string) => liveStore.removeTerraformingExecutionEntry(entryId),
+  setTerraformingHousingBuilt: (count: number) => liveStore.setTerraformingHousingBuilt(count),
+  mapsClusters: liveStore.gameDataMaps.clusters,
+  mapsSectors: liveStore.gameDataMaps.sectors
 })
 
 const showArchiveModuleList = computed(() => {
@@ -168,41 +182,40 @@ const showArchiveModuleList = computed(() => {
 
   <div v-if="toolbarPresenter.props.workbenchMode.value === 'terraforming'" class="main-layout mt-6">
     <div class="col-span-12 lg:col-span-3">
-      <div class="panel-card">
-        <div class="panel-header">地球化星区</div>
-        <div class="panel-content">
-          <div v-if="terraformingPresenter.props.sectorPanel.clusters.value.length === 0" class="text-slate-500 text-sm text-center py-4">
-            暂无可用星区
-          </div>
-          <div
-            v-for="cluster in terraformingPresenter.props.sectorPanel.clusters.value"
-            :key="cluster.id"
-            class="cluster-item"
-            :class="{ 'active': terraformingPresenter.props.sectorPanel.selectedClusterId.value === cluster.id }"
-            @click="terraformingPresenter.emits.selectCluster(cluster.id)"
-          >
-            <span class="text-sm font-bold">{{ cluster.id }}</span>
-          </div>
-        </div>
-      </div>
+      <TerraformingSectorPanel
+        :clusters="terraformingPresenter.props.sectorPanel.clusters.value"
+        :selected-cluster-id="terraformingPresenter.props.sectorPanel.selectedClusterId.value"
+        :cluster-display-names="terraformingPresenter.props.sectorPanel.clusterDisplayNames.value"
+        :cluster-matches-hq="terraformingPresenter.props.sectorPanel.clusterMatchesHq.value"
+        :objectives-progress="terraformingPresenter.props.sectorPanel.objectivesProgress.value"
+        @select-cluster="terraformingPresenter.emits.selectCluster"
+      />
     </div>
 
     <div class="col-span-12 lg:col-span-5">
-      <div class="panel-card">
-        <div class="panel-header">地球化任务</div>
-        <div class="panel-content">
-          <div class="text-slate-500 text-sm text-center py-4">选择星区查看任务列表</div>
-        </div>
-      </div>
+      <TerraformingTaskList
+        :task-tree="terraformingPresenter.props.taskList.taskTree.value"
+        :group-names="terraformingPresenter.props.taskList.groupNames.value"
+        :task-node-displays="terraformingPresenter.props.taskList.taskNodeDisplays.value"
+        :completed-project-counts="terraformingPresenter.props.taskList.completedProjectCounts.value"
+        :project-map="terraformingPresenter.props.taskList.projectMap.value"
+        :project-display-names="terraformingPresenter.props.taskList.projectDisplayNames.value"
+        :current-stats="terraformingPresenter.props.taskList.currentStats.value"
+        :stat-display-names="terraformingPresenter.props.taskList.statDisplayNames.value"
+        :stat-scale-models="terraformingPresenter.props.taskList.statScaleModels.value"
+        :condition-scale-models="terraformingPresenter.props.taskList.conditionScaleModels.value"
+        @toggle-project="terraformingPresenter.emits.toggleProject"
+        @set-project-count="terraformingPresenter.emits.setProjectCount"
+      />
     </div>
 
     <div class="col-span-12 lg:col-span-4">
-      <div class="panel-card">
-        <div class="panel-header">资源消耗</div>
-        <div class="panel-content">
-          <div class="text-slate-500 text-sm text-center py-4">选择星区查看资源消耗</div>
-        </div>
-      </div>
+      <TerraformingResourcePanel
+        :selected-cluster-id="terraformingPresenter.props.resourcePanel.selectedClusterId.value"
+        :execution-timeline="terraformingPresenter.props.resourcePanel.executionTimeline.value"
+        :get-cancel-validation="terraformingPresenter.props.resourcePanel.getCancelValidation"
+        @cancel-execution="terraformingPresenter.emits.cancelExecution"
+      />
     </div>
   </div>
 

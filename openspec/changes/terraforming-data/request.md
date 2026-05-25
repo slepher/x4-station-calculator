@@ -36,7 +36,8 @@
 - **projects[].predecessors**: `[{ref: string, type: "project"|"group", any: boolean}]`，从 MD 的 `<predecessors>` 提取，内嵌在 project 定义中
 - **projects**: 所有文本引用使用 `nameId` / `descriptionId` 保持原样（如 `{20227,1010}`），收集后走现有 i18n 管线统一翻译
 - **clusters**: 每个 cluster 记录 `id`, `macro`, `partName`, `initialStats`, `projectIds`
-- **effects/conditions**: 保留 `stat`, `change`, `min`, `max`, `value` 等字段
+- **stats[].ranges**: 保留并补全 `start`, `end`, `state`, `habitable`, `rgb`, `descriptionId`，明确 value 到 state 的映射
+- **effects/conditions**: 保留 `stat`, `change`, `min`, `max`, `value`, `minvalue`, `maxvalue` 等字段，并显式区分 `condition.min/max` 是 state 语义、`condition.minvalue/maxvalue` 是 value 语义
 
 ### 集成方式
 
@@ -79,6 +80,8 @@
 - 解析 `libraries/terraforming/final.xml` 的 stats, projectGroups, projects
 - 解析 `md/terraforming/final.xml` 的 cluster 初始化（初始 stats、projectIds、依赖链）
 - 内嵌 predecessors 到 project 定义
+- 输出足以还原游戏内 stat 方块显示的数据语义（state 编号、颜色、habitable、value 区间）
+- 输出足以让消费方区分 condition 的 state 约束与 value 约束的字段
 - 生成 `terraforming.json` 到 `data/` 目录
 - 收集 nameId 走现有 i18n 管线
 - `src/store/logic/terraformingTaskResolver.ts` 任务推理逻辑
@@ -96,10 +99,12 @@
 1. `scripts/x4_game/terraforming/` 下存在解析模块，可被 `x4_data_processor.py` 调用
 2. 运行 `x4_data_processor.py` 后在 `data/terraforming.json` 生成有效 JSON
 3. `terraforming.json` 中:
-   - `stats` 包含所有 11+ 个属性定义及其 ranges
-   - `projectGroups` 包含所有分组
-   - `projects` 包含所有项目定义（含内嵌 predecessors），总数 ≥ 80
-   - `clusters` 包含所有星球（≥ 8），每个有 initialStats 和 projectIds
+  - `stats` 包含所有 11+ 个属性定义及其 ranges
+   - 每个 range 至少含 `start/end/state/rgb`，可唯一确定任意 value 所落入的 state 与颜色
+  - `projectGroups` 包含所有分组
+  - `projects` 包含所有项目定义（含内嵌 predecessors），总数 ≥ 80
+   - `projects[].conditions` 中可区分 state 语义 (`min/max`) 与 value 语义 (`minvalue/maxvalue`)
+  - `clusters` 包含所有星球（≥ 8），每个有 initialStats 和 projectIds
 4. 所有 `nameId` / `descriptionId` / `textId` 文本引用已纳入 i18n 收集管线
 5. `npm run build` 无编译错误
 6. `npx vite-node analysis/scripts/terraforming/terraforming.ts --planet=ScalePlateGreen` 可运行并输出任务依赖树

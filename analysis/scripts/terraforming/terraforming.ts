@@ -148,10 +148,11 @@ export function parseArgs(argv: string[]): ParsedArgs {
   }
 }
 
-export async function run(args: ParsedArgs): Promise<string> {
+export async function run(args: ParsedArgs): Promise<{ output: string; currentStats: Record<string, number> }> {
   const gameData = await loadGameDataFiles(args.version)
   const data = gameData.terraforming
   const i18nMap = loadLocale(data, args.version, args.lang)
+  const i18nLookup = (key: string) => i18nMap[key] || ''
 
   const cluster = data.clusters.find(c => c.id === args.planet)
   if (!cluster) {
@@ -164,18 +165,35 @@ export async function run(args: ParsedArgs): Promise<string> {
     if (val !== undefined) currentStats[key] = val
   }
 
+  const projectMap = new Map(data.projects.map(p => [p.id, p]))
+  for (const [projectId, count] of args.completed.map(id => [id, 1] as [string, number])) {
+    const project = projectMap.get(projectId)
+    if (!project) continue
+    for (const effect of project.effects) {
+      if (effect.value !== undefined) {
+        currentStats[effect.stat] = Math.max(0, effect.value)
+      } else if (effect.change !== undefined) {
+        const base = currentStats[effect.stat] ?? 0
+        let newVal = base + effect.change * count
+        if (effect.min !== undefined) newVal = Math.max(newVal, effect.min)
+        if (effect.max !== undefined) newVal = Math.min(newVal, effect.max)
+        currentStats[effect.stat] = Math.max(0, newVal)
+      }
+    }
+  }
+
   const state: TerraformingState = {
     stats: currentStats,
-    completedProjects: new Set(args.completed),
+    completedProjects: new Map(args.completed.map(id => [id, 1])),
   }
 
   const tree = resolveAvailableTasks(cluster, state, data)
 
   const lines: string[] = []
-  lines.push(printObjectives(cluster, data, i18nMap))
+  lines.push(printObjectives(cluster, data, i18nLookup))
   lines.push('')
-  lines.push(printTaskTree(tree, i18nMap))
-  return lines.join('\n')
+  lines.push(printTaskTree(tree, i18nLookup))
+  return { output: lines.join('\n'), currentStats }
 }
 
 function loadLocale(
@@ -225,7 +243,7 @@ if (!args.planet) {
 }
 
 try {
-  const output = await run(args)
+  const result = await run(args)
   if (args.json) {
     const gameDataJ = await loadGameDataFiles(args.version)
     const data = gameDataJ.terraforming
@@ -238,14 +256,14 @@ try {
     }
     const state: TerraformingState = {
       stats: currentStats,
-      completedProjects: new Set(args.completed),
+      completedProjects: new Map(args.completed.map(id => [id, 1])),
     }
     const tree = resolveAvailableTasks(cluster, state, data)
     console.log(JSON.stringify({
       planet: args.planet,
       version: args.version,
       currentStats,
-      completedProjects: [...state.completedProjects],
+      completedProjects: [...state.completedProjects.keys()],
       objectives: (cluster as any).objectives || [],
       available: tree.roots.map(n => n.id),
       blocked: tree.blocked.map(n => ({
@@ -258,14 +276,10 @@ try {
     const gameDataE = await loadGameDataFiles(args.version)
     const data = gameDataE.terraforming
     const cluster = data.clusters.find(c => c.id === args.planet)!
-    const currentStats: Record<string, number> = { ...cluster.initialStats }
-    for (const [key, val] of Object.entries(args.statOverrides)) {
-      if (val !== undefined) currentStats[key] = val
-    }
     console.log(`Planet: ${args.planet} (version: ${args.version})`)
-    console.log(`Current stats: ${JSON.stringify(currentStats)}`)
+    console.log(`Current stats: ${JSON.stringify(result.currentStats)}`)
     console.log('')
-    console.log(output)
+    console.log(result.output)
   }
 } catch (e) {
   console.error(e instanceof Error ? e.message : e)

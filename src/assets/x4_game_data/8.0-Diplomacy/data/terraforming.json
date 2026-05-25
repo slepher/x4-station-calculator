@@ -14,6 +14,7 @@
           "rgb": "#FFFFFF",
           "descriptionId": "{1001,11402}",
           "habitable": false,
+          "start": 0,
           "description": "With the entire surface covered in permafrost, life is unable to thrive anywhere. Habitation is only possible in sealed environments."
         },
         {
@@ -21,6 +22,7 @@
           "state": 1,
           "rgb": "#66CCCC",
           "descriptionId": "{1001,11403}",
+          "start": 4,
           "description": "Equatorial latitudes enjoy a temperate-to-cold climate, allowing resilient life to take hold."
         },
         {
@@ -28,6 +30,7 @@
           "state": 2,
           "rgb": "#00FF00",
           "descriptionId": "{1001,11404}",
+          "start": 5,
           "description": "A few extreme places near the poles and the equator aside, most of this world is hospitable to life, and a significant area is in the perfect range for habitation and agriculture."
         },
         {
@@ -35,6 +38,7 @@
           "state": 3,
           "rgb": "#FF7F00",
           "descriptionId": "{1001,11405}",
+          "start": 6,
           "description": "While areas closer to the equator are life-threateningly hot, the polar regions can support life."
         },
         {
@@ -43,6 +47,7 @@
           "rgb": "#FF0000",
           "descriptionId": "{1001,11406}",
           "habitable": false,
+          "start": 7,
           "description": "Outside of a precious few sheltered environments, the temperature is always well above the boiling point of water, killing basically everything within seconds. Habitation is only possible in sealed environments."
         }
       ],
@@ -63,6 +68,7 @@
           "rgb": "#FF0000",
           "descriptionId": "{1001,11408}",
           "habitable": false,
+          "start": 0,
           "description": "Disregarding the lack of oxygen, pressures below the Armstrong limit cause severe issues and prohibit habitation outside of sealed environments."
         },
         {
@@ -70,6 +76,7 @@
           "state": 1,
           "rgb": "#FFFF00",
           "descriptionId": "{1001,11408}",
+          "start": 2,
           "description": "Disregarding the lack of oxygen, pressures below the Armstrong limit cause severe issues and prohibit habitation outside of sealed environments."
         },
         {
@@ -77,6 +84,7 @@
           "state": 2,
           "rgb": "#00FF00",
           "descriptionId": "{1001,11408}",
+          "start": 5,
           "description": "Disregarding the lack of oxygen, pressures below the Armstrong limit cause severe issues and prohibit habitation outside of sealed environments."
         },
         {
@@ -84,6 +92,7 @@
           "state": 1,
           "rgb": "#FFFF00",
           "descriptionId": "{1001,11408}",
+          "start": 6,
           "description": "Disregarding the lack of oxygen, pressures below the Armstrong limit cause severe issues and prohibit habitation outside of sealed environments."
         }
       ],
@@ -104,6 +113,7 @@
           "rgb": "#FF0000",
           "descriptionId": "{1001,11411}",
           "habitable": false,
+          "start": 0,
           "description": "With the exception of the Boron, all Commonwealth species rely on a rather specific partial pressure of oxygen for a breathable atmospheric mix."
         },
         {
@@ -111,6 +121,7 @@
           "state": 1,
           "rgb": "#FFFF00",
           "descriptionId": "{1001,11411}",
+          "start": 4,
           "description": "With the exception of the Boron, all Commonwealth species rely on a rather specific partial pressure of oxygen for a breathable atmospheric mix."
         },
         {
@@ -118,6 +129,7 @@
           "state": 2,
           "rgb": "#00FF00",
           "descriptionId": "{1001,11411}",
+          "start": 5,
           "description": "With the exception of the Boron, all Commonwealth species rely on a rather specific partial pressure of oxygen for a breathable atmospheric mix."
         }
       ],
@@ -136,13 +148,15 @@
           "end": 0,
           "state": 0,
           "rgb": "#000000",
-          "descriptionId": ""
+          "descriptionId": "",
+          "start": 0
         },
         {
           "end": 1,
           "state": 1,
           "rgb": "#00FF00",
           "descriptionId": "{1001,11413}",
+          "start": 1,
           "description": "Methane is mostly non-toxic and an incredibly potent greenhouse gas, about 84 times more effective than carbon dioxide."
         },
         {
@@ -150,6 +164,7 @@
           "state": 2,
           "rgb": "#FFFF00",
           "descriptionId": "{1001,11413}",
+          "start": 2,
           "description": "Methane is mostly non-toxic and an incredibly potent greenhouse gas, about 84 times more effective than carbon dioxide."
         }
       ],
@@ -168,13 +183,15 @@
           "end": 0,
           "state": 0,
           "rgb": "#000000",
-          "descriptionId": ""
+          "descriptionId": "",
+          "start": 0
         },
         {
           "end": 1,
           "state": 1,
           "rgb": "#FFFF00",
           "descriptionId": "{1001,11415}",
+          "start": 1,
           "description": "Any amount of carbon dioxide above a certain threshold will cause severe poisoning in oxygen breathers, prohibiting habitation outside of sealed environments."
         },
         {
@@ -183,6 +200,7 @@
           "rgb": "#FF0000",
           "descriptionId": "{1001,11415}",
           "habitable": false,
+          "start": 2,
           "description": "Any amount of carbon dioxide above a certain threshold will cause severe poisoning in oxygen breathers, prohibiting habitation outside of sealed environments."
         }
       ],
@@ -202,6 +220,7 @@
           "state": 0,
           "rgb": "#FF0000",
           "descriptionId": "{1001,11417}",
+          "start": 0,
           "description": "While habitation itself would be no worse than uncomfortable on a completely arid world, any kind of self-sustaining biosphere is going to rely on a significant amount of readily accessible water."
         },
         {
@@ -209,6 +228,7 @@
           "state": 1,
           "rgb": "#FFFF00",
           "descriptionId": "{1001,11417}",
+          "start": 4,
           "description": "While habitation itself would be no worse than uncomfortable on a completely arid world, any kind of self-sustaining biosphere is going to rely on a significant amount of readily accessible water."
         },
         {
@@ -216,6 +236,7 @@
           "state": 2,
           "rgb": "#00FF00",
           "descriptionId": "{1001,11417}",
+          "start": 5,
           "description": "While habitation itself would be no worse than uncomfortable on a completely arid world, any kind of self-sustaining biosphere is going to rely on a significant amount of readily accessible water."
         }
       ],
@@ -234,13 +255,15 @@
           "end": 0,
           "state": 0,
           "rgb": "#000000",
-          "descriptionId": ""
+          "descriptionId": "",
+          "start": 0
         },
         {
           "end": 1,
           "state": 1,
           "rgb": "#FFFF00",
           "descriptionId": "{1001,11421}",
+          "start": 1,
           "description": "Major earthquakes are rare enough that they come as an unpleasant surprise."
         },
         {
@@ -248,6 +271,7 @@
           "state": 2,
           "rgb": "#FF7F00",
           "descriptionId": "{1001,11420}",
+          "start": 2,
           "description": "Major earthquakes are frequent enough that they need to be reckoned with when undertaking any construction."
         },
         {
@@ -255,6 +279,7 @@
           "state": 3,
           "rgb": "#FF0000",
           "descriptionId": "{1001,11419}",
+          "start": 3,
           "description": "Major earthquakes are an almost hourly occurrence. While generally manageable, construction is significantly affected more often than not."
         }
       ],
@@ -273,7 +298,8 @@
           "end": 0,
           "state": 0,
           "rgb": "#000000",
-          "descriptionId": ""
+          "descriptionId": "",
+          "start": 0
         },
         {
           "end": 3,
@@ -281,6 +307,7 @@
           "rgb": "#FF0000",
           "descriptionId": "{1001,11450}",
           "habitable": false,
+          "start": 1,
           "description": "Toxins in the air make cost-effective large-scale habitation practically impossible."
         }
       ],
@@ -299,7 +326,8 @@
           "end": 0,
           "state": 0,
           "rgb": "#000000",
-          "descriptionId": ""
+          "descriptionId": "",
+          "start": 0
         },
         {
           "end": 3,
@@ -307,6 +335,7 @@
           "rgb": "#FF0000",
           "descriptionId": "{1001,11452}",
           "habitable": false,
+          "start": 1,
           "description": "The radioactive contamination is so severe that complex lifeforms could not survive any lasting exposure."
         }
       ],
@@ -357,6 +386,7 @@
           "state": 1,
           "rgb": "#00FF00",
           "descriptionId": "{1001,11427}",
+          "start": 0,
           "description": "Being on alert will cause the Xenon to convert districts for industrial use. This will happen even faster if they are on high alert."
         },
         {
@@ -364,6 +394,7 @@
           "state": 2,
           "rgb": "#FFFF00",
           "descriptionId": "{1001,11427}",
+          "start": 3,
           "description": "Being on alert will cause the Xenon to convert districts for industrial use. This will happen even faster if they are on high alert."
         },
         {
@@ -371,6 +402,7 @@
           "state": 3,
           "rgb": "#FF0000",
           "descriptionId": "{1001,11427}",
+          "start": 5,
           "description": "Being on alert will cause the Xenon to convert districts for industrial use. This will happen even faster if they are on high alert."
         }
       ],
@@ -390,6 +422,7 @@
           "state": 0,
           "rgb": "#FF0000",
           "descriptionId": "{1001,11429}",
+          "start": 0,
           "description": "The more industrial facilities the Xenon have, the faster they can reclaim or rebuild districts that they lose."
         }
       ],
@@ -410,6 +443,7 @@
           "rgb": "#FFFFFF",
           "descriptionId": "{1001,11456}",
           "habitable": false,
+          "start": 0,
           "description": "The ocean water, if it exists, is entirely fresh and non-saline."
         },
         {
@@ -417,6 +451,7 @@
           "state": 1,
           "rgb": "#66CCCC",
           "descriptionId": "{1001,11457}",
+          "start": 1,
           "description": "The ocean water is brackish."
         },
         {
@@ -424,6 +459,7 @@
           "state": 2,
           "rgb": "#00FF00",
           "descriptionId": "{1001,11458}",
+          "start": 2,
           "description": "The ocean water is saline."
         },
         {
@@ -431,6 +467,7 @@
           "state": 3,
           "rgb": "#FF7F00",
           "descriptionId": "{1001,11459}",
+          "start": 3,
           "description": "The ocean water is briny."
         }
       ],
@@ -745,7 +782,9 @@
         {
           "stat": "temperature",
           "min": 1,
-          "max": 3
+          "max": 3,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         }
       ],
       "effects": [
@@ -850,7 +889,9 @@
       "conditions": [
         {
           "stat": "methane",
-          "min": 1
+          "min": 1,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         }
       ],
       "effects": [],
@@ -912,7 +953,9 @@
       "conditions": [
         {
           "stat": "methane",
-          "min": 1
+          "min": 1,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         }
       ],
       "effects": [
@@ -978,7 +1021,9 @@
       "conditions": [
         {
           "stat": "carbondioxide",
-          "min": 1
+          "min": 1,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         }
       ],
       "effects": [],
@@ -1040,7 +1085,9 @@
       "conditions": [
         {
           "stat": "carbondioxide",
-          "min": 1
+          "min": 1,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         }
       ],
       "effects": [
@@ -1160,7 +1207,9 @@
       "conditions": [
         {
           "stat": "airpressure",
-          "min": 1
+          "min": 1,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         }
       ],
       "effects": [
@@ -1423,7 +1472,9 @@
       "conditions": [
         {
           "stat": "temperature",
-          "min": 1
+          "min": 1,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         }
       ],
       "effects": [
@@ -1461,7 +1512,9 @@
         {
           "stat": "seismicactivity",
           "min": 1,
-          "max": 1
+          "max": 1,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         }
       ],
       "effects": [],
@@ -1504,7 +1557,9 @@
         {
           "stat": "seismicactivity",
           "min": 2,
-          "max": 2
+          "max": 2,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         }
       ],
       "effects": [],
@@ -1546,7 +1601,9 @@
       "conditions": [
         {
           "stat": "seismicactivity",
-          "min": 3
+          "min": 3,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         }
       ],
       "effects": [],
@@ -1597,15 +1654,21 @@
       "conditions": [
         {
           "stat": "carbondioxide",
-          "min": 1
+          "min": 1,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "methane",
-          "max": 0
+          "max": 0,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "temperature",
-          "max": 5
+          "maxvalue": 5,
+          "usesStateBounds": false,
+          "usesValueBounds": true
         }
       ],
       "effects": [
@@ -1643,11 +1706,15 @@
       "conditions": [
         {
           "stat": "methane",
-          "min": 1
+          "min": 1,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "temperature",
-          "max": 5
+          "maxvalue": 5,
+          "usesStateBounds": false,
+          "usesValueBounds": true
         }
       ],
       "effects": [
@@ -1686,15 +1753,21 @@
         {
           "stat": "temperature",
           "min": 1,
-          "max": 3
+          "max": 3,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "humidity",
-          "min": 1
+          "min": 1,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "airpressure",
-          "min": 1
+          "min": 1,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         }
       ],
       "effects": [],
@@ -1753,15 +1826,21 @@
         {
           "stat": "temperature",
           "min": 1,
-          "max": 3
+          "max": 3,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "humidity",
-          "min": 1
+          "min": 1,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "airpressure",
-          "min": 1
+          "min": 1,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         }
       ],
       "effects": [],
@@ -1871,15 +1950,21 @@
         {
           "stat": "temperature",
           "min": 1,
-          "max": 3
+          "max": 3,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "humidity",
-          "min": 1
+          "min": 1,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "airpressure",
-          "min": 1
+          "min": 1,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         }
       ],
       "effects": [
@@ -2102,15 +2187,21 @@
         {
           "stat": "temperature",
           "min": 1,
-          "max": 3
+          "max": 3,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "humidity",
-          "min": 1
+          "min": 1,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "airpressure",
-          "min": 1
+          "min": 1,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         }
       ],
       "effects": [
@@ -2685,15 +2776,21 @@
         {
           "stat": "temperature",
           "min": 1,
-          "max": 3
+          "max": 3,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "humidity",
-          "min": 1
+          "min": 1,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "airpressure",
-          "min": 1
+          "min": 1,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         }
       ],
       "effects": [],
@@ -2757,15 +2854,21 @@
         {
           "stat": "temperature",
           "min": 1,
-          "max": 3
+          "max": 3,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "humidity",
-          "min": 1
+          "min": 1,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "airpressure",
-          "min": 1
+          "min": 1,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         }
       ],
       "effects": [
@@ -2833,15 +2936,21 @@
         {
           "stat": "temperature",
           "min": 1,
-          "max": 3
+          "max": 3,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "humidity",
-          "min": 1
+          "min": 1,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "airpressure",
-          "min": 1
+          "min": 1,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         }
       ],
       "effects": [
@@ -2919,15 +3028,21 @@
         {
           "stat": "temperature",
           "min": 1,
-          "max": 3
+          "max": 3,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "humidity",
-          "min": 1
+          "min": 1,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "airpressure",
-          "min": 1
+          "min": 1,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         }
       ],
       "effects": [
@@ -3005,15 +3120,21 @@
         {
           "stat": "temperature",
           "min": 1,
-          "max": 3
+          "max": 3,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "humidity",
-          "min": 1
+          "min": 1,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "airpressure",
-          "min": 1
+          "min": 1,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         }
       ],
       "effects": [
@@ -3091,15 +3212,21 @@
         {
           "stat": "temperature",
           "min": 1,
-          "max": 3
+          "max": 3,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "humidity",
-          "min": 1
+          "min": 1,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "airpressure",
-          "min": 1
+          "min": 1,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         }
       ],
       "effects": [
@@ -3171,15 +3298,21 @@
         {
           "stat": "temperature",
           "min": 1,
-          "max": 3
+          "max": 3,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "humidity",
-          "min": 1
+          "min": 1,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "airpressure",
-          "min": 1
+          "min": 1,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         }
       ],
       "effects": [
@@ -3330,24 +3463,34 @@
       "conditions": [
         {
           "stat": "airpressure",
-          "min": 1
+          "min": 1,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "oxygen",
-          "min": 1
+          "min": 1,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "temperature",
           "min": 1,
-          "max": 3
+          "max": 3,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "toxicity",
-          "max": 0
+          "max": 0,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "radioactivity",
-          "max": 0
+          "max": 0,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         }
       ],
       "effects": [
@@ -3419,24 +3562,34 @@
       "conditions": [
         {
           "stat": "airpressure",
-          "min": 1
+          "min": 1,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "oxygen",
-          "min": 1
+          "min": 1,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "temperature",
           "min": 1,
-          "max": 3
+          "max": 3,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "toxicity",
-          "max": 0
+          "max": 0,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "radioactivity",
-          "max": 0
+          "max": 0,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         }
       ],
       "effects": [
@@ -3508,24 +3661,34 @@
       "conditions": [
         {
           "stat": "airpressure",
-          "min": 1
+          "min": 1,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "oxygen",
-          "min": 1
+          "min": 1,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "temperature",
           "min": 1,
-          "max": 3
+          "max": 3,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "toxicity",
-          "max": 0
+          "max": 0,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "radioactivity",
-          "max": 0
+          "max": 0,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         }
       ],
       "effects": [
@@ -3597,28 +3760,40 @@
       "conditions": [
         {
           "stat": "airpressure",
-          "min": 2
+          "min": 2,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "oxygen",
-          "min": 2
+          "min": 2,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "temperature",
           "min": 1,
-          "max": 3
+          "max": 3,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "methane",
-          "max": 0
+          "max": 0,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "toxicity",
-          "max": 0
+          "max": 0,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "radioactivity",
-          "max": 0
+          "max": 0,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         }
       ],
       "effects": [
@@ -3696,19 +3871,27 @@
         {
           "stat": "temperature",
           "min": 1,
-          "max": 3
+          "max": 3,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "toxicity",
-          "max": 0
+          "max": 0,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "radioactivity",
-          "max": 0
+          "max": 0,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "population",
-          "min": 10000
+          "minvalue": 10000,
+          "usesStateBounds": false,
+          "usesValueBounds": true
         }
       ],
       "effects": [],
@@ -3772,7 +3955,9 @@
       "conditions": [
         {
           "stat": "trainee_group",
-          "min": 1
+          "minvalue": 1,
+          "usesStateBounds": false,
+          "usesValueBounds": true
         }
       ],
       "effects": [],
@@ -3825,7 +4010,9 @@
       "conditions": [
         {
           "stat": "trainee_individual",
-          "min": 1
+          "minvalue": 1,
+          "usesStateBounds": false,
+          "usesValueBounds": true
         }
       ],
       "effects": [],
@@ -3930,24 +4117,34 @@
       "conditions": [
         {
           "stat": "airpressure",
-          "min": 5
+          "minvalue": 5,
+          "usesStateBounds": false,
+          "usesValueBounds": true
         },
         {
           "stat": "temperature",
           "min": 1,
-          "max": 3
+          "max": 3,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "toxicity",
-          "max": 0
+          "max": 0,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "radioactivity",
-          "max": 0
+          "max": 0,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "population",
-          "min": 10000
+          "minvalue": 10000,
+          "usesStateBounds": false,
+          "usesValueBounds": true
         }
       ],
       "effects": [],
@@ -4070,7 +4267,9 @@
       "conditions": [
         {
           "stat": "trainee_group",
-          "min": 1
+          "minvalue": 1,
+          "usesStateBounds": false,
+          "usesValueBounds": true
         }
       ],
       "effects": [],
@@ -4105,7 +4304,7 @@
       "blockedGroups": [],
       "predecessors": [
         {
-          "ref": "$PilotTrainingCourseProject",
+          "ref": "trn_pilot",
           "type": "project",
           "any": false
         }
@@ -4127,7 +4326,9 @@
       "conditions": [
         {
           "stat": "trainee_individual",
-          "min": 1
+          "minvalue": 1,
+          "usesStateBounds": false,
+          "usesValueBounds": true
         }
       ],
       "effects": [],
@@ -4162,7 +4363,7 @@
       "blockedGroups": [],
       "predecessors": [
         {
-          "ref": "$PilotTrainingCourseProject",
+          "ref": "trn_pilot",
           "type": "project",
           "any": false
         }
@@ -4218,7 +4419,7 @@
       "blockedGroups": [],
       "predecessors": [
         {
-          "ref": "$PilotTrainingCourseProject",
+          "ref": "trn_pilot",
           "type": "project",
           "any": false
         }
@@ -4240,28 +4441,40 @@
       "conditions": [
         {
           "stat": "airpressure",
-          "min": 2
+          "min": 2,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "oxygen",
-          "min": 2
+          "min": 2,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "temperature",
           "min": 1,
-          "max": 3
+          "max": 3,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "toxicity",
-          "max": 0
+          "max": 0,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "radioactivity",
-          "max": 0
+          "max": 0,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "population",
-          "min": 10000
+          "minvalue": 10000,
+          "usesStateBounds": false,
+          "usesValueBounds": true
         }
       ],
       "effects": [],
@@ -4336,32 +4549,46 @@
       "conditions": [
         {
           "stat": "airpressure",
-          "min": 2
+          "min": 2,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "oxygen",
-          "min": 2
+          "min": 2,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "temperature",
           "min": 1,
-          "max": 3
+          "max": 3,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "methane",
-          "max": 0
+          "max": 0,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "toxicity",
-          "max": 0
+          "max": 0,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "radioactivity",
-          "max": 0
+          "max": 0,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "population",
-          "min": 10000
+          "minvalue": 10000,
+          "usesStateBounds": false,
+          "usesValueBounds": true
         }
       ],
       "effects": [],
@@ -4425,7 +4652,9 @@
       "conditions": [
         {
           "stat": "population",
-          "min": 10000
+          "minvalue": 10000,
+          "usesStateBounds": false,
+          "usesValueBounds": true
         }
       ],
       "effects": [],
@@ -4496,32 +4725,46 @@
       "conditions": [
         {
           "stat": "humidity",
-          "min": 2
+          "min": 2,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "oxygen",
-          "min": 2
+          "min": 2,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "temperature",
           "min": 2,
-          "max": 3
+          "max": 3,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "methane",
-          "max": 0
+          "max": 0,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "toxicity",
-          "max": 0
+          "max": 0,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "radioactivity",
-          "max": 0
+          "max": 0,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "population",
-          "min": 10000
+          "minvalue": 10000,
+          "usesStateBounds": false,
+          "usesValueBounds": true
         }
       ],
       "effects": [],
@@ -4581,32 +4824,46 @@
       "conditions": [
         {
           "stat": "airpressure",
-          "min": 2
+          "min": 2,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "oxygen",
-          "min": 2
+          "min": 2,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "temperature",
           "min": 1,
-          "max": 2
+          "max": 2,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "methane",
-          "max": 0
+          "max": 0,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "toxicity",
-          "max": 0
+          "max": 0,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "radioactivity",
-          "max": 0
+          "max": 0,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "population",
-          "min": 10000
+          "minvalue": 10000,
+          "usesStateBounds": false,
+          "usesValueBounds": true
         }
       ],
       "effects": [],
@@ -4666,7 +4923,9 @@
       "conditions": [
         {
           "stat": "population",
-          "min": 10000
+          "minvalue": 10000,
+          "usesStateBounds": false,
+          "usesValueBounds": true
         }
       ],
       "effects": [],
@@ -4742,7 +5001,9 @@
       "conditions": [
         {
           "stat": "population",
-          "min": 10000
+          "minvalue": 10000,
+          "usesStateBounds": false,
+          "usesValueBounds": true
         }
       ],
       "effects": [],
@@ -4813,7 +5074,9 @@
       "conditions": [
         {
           "stat": "population",
-          "min": 10000
+          "minvalue": 10000,
+          "usesStateBounds": false,
+          "usesValueBounds": true
         }
       ],
       "effects": [],
@@ -4877,7 +5140,9 @@
       "conditions": [
         {
           "stat": "population",
-          "min": 10000
+          "minvalue": 10000,
+          "usesStateBounds": false,
+          "usesValueBounds": true
         }
       ],
       "effects": [],
@@ -4993,7 +5258,9 @@
       "conditions": [
         {
           "stat": "population",
-          "min": 10000
+          "minvalue": 10000,
+          "usesStateBounds": false,
+          "usesValueBounds": true
         }
       ],
       "effects": [],
@@ -5284,7 +5551,9 @@
       "conditions": [
         {
           "stat": "population",
-          "min": 10000
+          "minvalue": 10000,
+          "usesStateBounds": false,
+          "usesValueBounds": true
         }
       ],
       "effects": [],
@@ -5380,7 +5649,9 @@
       "conditions": [
         {
           "stat": "population",
-          "min": 10000
+          "minvalue": 10000,
+          "usesStateBounds": false,
+          "usesValueBounds": true
         }
       ],
       "effects": [],
@@ -6156,7 +6427,9 @@
         {
           "stat": "airpressure",
           "min": 0,
-          "max": 1
+          "max": 1,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         }
       ],
       "effects": [
@@ -6217,7 +6490,9 @@
       "conditions": [
         {
           "stat": "seismicactivity",
-          "min": 1
+          "min": 1,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         }
       ],
       "effects": [
@@ -6340,7 +6615,9 @@
       "conditions": [
         {
           "stat": "humidity",
-          "min": 2
+          "min": 2,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         }
       ],
       "effects": [],
@@ -6396,7 +6673,9 @@
       "conditions": [
         {
           "stat": "humidity",
-          "min": 1
+          "min": 1,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         }
       ],
       "effects": [],
@@ -6488,11 +6767,15 @@
         {
           "stat": "temperature",
           "min": 1,
-          "max": 3
+          "max": 3,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "humidity",
-          "min": 2
+          "min": 2,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         }
       ],
       "effects": [
@@ -6565,11 +6848,15 @@
         {
           "stat": "temperature",
           "min": 1,
-          "max": 3
+          "max": 3,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "humidity",
-          "min": 2
+          "min": 2,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         }
       ],
       "effects": [
@@ -6637,11 +6924,15 @@
         {
           "stat": "temperature",
           "min": 1,
-          "max": 3
+          "max": 3,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "humidity",
-          "min": 2
+          "min": 2,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         }
       ],
       "effects": [
@@ -6714,11 +7005,15 @@
         {
           "stat": "temperature",
           "min": 1,
-          "max": 3
+          "max": 3,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "humidity",
-          "min": 2
+          "min": 2,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         }
       ],
       "effects": [
@@ -6786,11 +7081,15 @@
         {
           "stat": "temperature",
           "min": 1,
-          "max": 3
+          "max": 3,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "humidity",
-          "min": 2
+          "min": 2,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         }
       ],
       "effects": [
@@ -6867,20 +7166,28 @@
       "conditions": [
         {
           "stat": "methane",
-          "min": 1
+          "min": 1,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "temperature",
           "min": 1,
-          "max": 3
+          "max": 3,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "toxicity",
-          "max": 0
+          "max": 0,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "radioactivity",
-          "max": 0
+          "max": 0,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         }
       ],
       "effects": [
@@ -6941,24 +7248,34 @@
       "conditions": [
         {
           "stat": "methane",
-          "min": 1
+          "minvalue": 1,
+          "usesStateBounds": false,
+          "usesValueBounds": true
         },
         {
           "stat": "temperature",
           "min": 1,
-          "max": 3
+          "max": 3,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "toxicity",
-          "max": 0
+          "max": 0,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "radioactivity",
-          "max": 0
+          "max": 0,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "population",
-          "min": 10000
+          "minvalue": 10000,
+          "usesStateBounds": false,
+          "usesValueBounds": true
         }
       ],
       "effects": [],
@@ -7026,12 +7343,16 @@
       "conditions": [
         {
           "stat": "temperature",
-          "max": 7
+          "maxvalue": 7,
+          "usesStateBounds": false,
+          "usesValueBounds": true
         },
         {
           "stat": "seismicactivity",
           "min": 2,
-          "max": 2
+          "max": 2,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         }
       ],
       "effects": [
@@ -7072,12 +7393,16 @@
       "conditions": [
         {
           "stat": "temperature",
-          "max": 6
+          "maxvalue": 6,
+          "usesStateBounds": false,
+          "usesValueBounds": true
         },
         {
           "stat": "seismicactivity",
           "min": 1,
-          "max": 1
+          "max": 1,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         }
       ],
       "effects": [
@@ -7118,11 +7443,15 @@
       "conditions": [
         {
           "stat": "salinity",
-          "max": 2
+          "max": 2,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         },
         {
           "stat": "humidity",
-          "min": 2
+          "min": 2,
+          "usesStateBounds": true,
+          "usesValueBounds": false
         }
       ],
       "effects": [
@@ -7164,10 +7493,6 @@
         "ind_refineries_cheap",
         "ind_factories",
         "ind_von_neumann",
-        "bio_tailored",
-        "bio_jumpstart",
-        "agr_fertilize",
-        "agr_fields_scruffin",
         "wat_import",
         "wat_irrigation",
         "wat_surfacing",
@@ -7201,13 +7526,24 @@
         "eco_bank",
         "eco_bank_supply",
         "bio_reintroduce",
-        "ame_zoo"
+        "ame_zoo",
+        "tmp_moholes",
+        "tmp_blackdust",
+        "atm_methane_import",
+        "bio_cyanobacteria",
+        "atm_carbon_mineralizers",
+        "atm_carbon_mineralize",
+        "evt_globalwarming_co2",
+        "ter_radioactive_cleanup"
       ],
       "values": {
         "$GlobalWarmingLimitTable.{$Cluster_ScalePlateGreen}": "3",
         "$AddedAtmoPressureTable.{$Cluster_ScalePlateGreen}": "1",
         "$Terraforming_ScalePlateGreen_HousingTargetAmount": "1000000000"
       },
+      "removedStats": [
+        "airpressure"
+      ],
       "objectives": [
         {
           "step": 1,
@@ -7303,7 +7639,7 @@
         "population": 0
       },
       "projectIds": [
-        "pwr_antimatter",
+        "pwr_wind",
         "ind_refineries_clean",
         "ind_refineries_cheap",
         "ind_factories",
@@ -7344,13 +7680,21 @@
         "eco_campus_supply",
         "eco_bank",
         "eco_bank_supply",
-        "ame_resort_tropical"
+        "ame_resort_tropical",
+        "tmp_cloudparticles",
+        "bio_cyanobacteria",
+        "atm_methane_oxidizers",
+        "atm_methane_oxidize",
+        "evt_globalwarming_methane"
       ],
       "values": {
         "$GlobalWarmingLimitTable.{$Cluster_BlackHoleSun}": "6",
         "$AddedAtmoPressureTable.{$Cluster_BlackHoleSun}": "0",
         "$Terraforming_BlackHoleSun_HousingTargetAmount": "100000000"
       },
+      "removedStats": [
+        "airpressure"
+      ],
       "objectives": [
         {
           "step": 1,
@@ -7450,10 +7794,6 @@
         "ind_refineries_cheap",
         "ind_factories",
         "ind_von_neumann",
-        "bio_tailored",
-        "bio_jumpstart",
-        "agr_fertilize",
-        "agr_fields_scruffin",
         "wat_import",
         "wat_irrigation",
         "wat_surfacing",
@@ -7489,12 +7829,16 @@
         "bio_toxicfruit_genemod",
         "bio_toxicfruit_cull",
         "ame_zoo",
-        "agr_vineyards"
+        "agr_vineyards",
+        "atm_toxin_cleanup"
       ],
       "values": {
         "$AddedAtmoPressureTable.{$Cluster_GetsuFune}": "1",
         "$Terraforming_GetsuFune_HousingTargetAmount": "250000000"
       },
+      "removedStats": [
+        "airpressure"
+      ],
       "objectives": [
         {
           "step": 1,
@@ -7654,13 +7998,22 @@
         "evt_quake_mild",
         "evt_quake_moderate",
         "evt_quake_severe",
-        "evt_icemelt"
+        "evt_icemelt",
+        "tmp_moholes",
+        "tmp_blackdust",
+        "atm_methane_import",
+        "bio_cyanobacteria",
+        "atm_nitrogen_fix",
+        "atm_helium_import",
+        "atm_outgassing",
+        "ter_tectonic_scaffolding"
       ],
       "values": {
         "$GlobalWarmingLimitTable.{$Cluster_FrontierEdge}": "4",
         "$AddedAtmoPressureTable.{$Cluster_FrontierEdge}": "0",
         "$Terraforming_FrontierEdge_HousingTargetAmount": "250000000"
       },
+      "removedStats": [],
       "objectives": [
         {
           "step": 1,
@@ -7764,7 +8117,7 @@
         "population": 0
       },
       "projectIds": [
-        "pwr_antimatter",
+        "pwr_geothermal",
         "ind_refineries_clean",
         "ind_refineries_cheap",
         "ind_factories",
@@ -7809,12 +8162,21 @@
         "ame_resort_tropical",
         "evt_quake_mild",
         "evt_quake_moderate",
-        "evt_quake_severe"
+        "evt_quake_severe",
+        "tmp_cloudparticles",
+        "bio_cyanobacteria",
+        "atm_methane_oxidizers",
+        "atm_methane_oxidize",
+        "evt_globalwarming_methane",
+        "ter_tectonic_scaffolding"
       ],
       "values": {
         "$AddedAtmoPressureTable.{$Cluster_AtiyasMisfortune}": "0",
         "$Terraforming_Atiya_HousingTargetAmount": "250000000"
       },
+      "removedStats": [
+        "airpressure"
+      ],
       "objectives": [
         {
           "step": 1,
@@ -7958,13 +8320,21 @@
         "eco_campus_supply",
         "eco_bank",
         "eco_bank_supply",
-        "ame_art_college"
+        "ame_art_college",
+        "bio_cyanobacteria",
+        "atm_methane_oxidizers",
+        "atm_methane_oxidize",
+        "evt_globalwarming_methane",
+        "atm_nitrogen_fix",
+        "atm_helium_import",
+        "atm_outgassing"
       ],
       "values": {
         "$GlobalWarmingLimitTable.{$Cluster_18Billion}": "5",
         "$AddedAtmoPressureTable.{$Cluster_18Billion}": "0",
         "$Terraforming_18Billion_HousingTargetAmount": "100000000"
       },
+      "removedStats": [],
       "objectives": [
         {
           "step": 1,
@@ -8096,11 +8466,19 @@
         "eco_bank",
         "eco_bank_supply",
         "eco_nividium",
-        "eco_nividium_supply"
+        "eco_nividium_supply",
+        "tmp_cloudparticles",
+        "bio_cyanobacteria",
+        "atm_methane_oxidizers",
+        "atm_methane_oxidize",
+        "evt_globalwarming_methane"
       ],
       "values": {
         "$AddedAtmoPressureTable.{$Cluster_MemoryOfProfit}": "0"
       },
+      "removedStats": [
+        "airpressure"
+      ],
       "objectives": [
         {
           "step": 1,
@@ -8201,13 +8579,20 @@
         "evt_quake_severe",
         "evt_solidify_crust",
         "evt_volcano_extinction",
-        "evt_salinization"
+        "evt_salinization",
+        "tmp_cloudparticles",
+        "atm_toxin_cleanup",
+        "ter_radioactive_cleanup",
+        "ter_tectonic_scaffolding"
       ],
       "values": {
         "$GlobalWarmingLimitTable.{$Cluster_OceanOfFantasy}": "5",
         "$AddedAtmoPressureTable.{$Cluster_OceanOfFantasy}": "0",
-        "$Terraforming_OceanOfFantasy_HousingTargetAmount": "50000000"
+        "$Terraforming_OceanOfFantasy_HousingTargetAmount": "50000000",
+        "$IgnoreMethane": "true",
+        "$IgnoreHumidity": "true"
       },
+      "removedStats": [],
       "objectives": [
         {
           "step": 1,

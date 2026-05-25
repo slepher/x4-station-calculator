@@ -74,3 +74,57 @@
 - [x] ScalePlateGreen objectives: 5 steps, textId 已解析为 {page,id} 模板, textReplaces 含已解析值
 - [x] 48 projects 含 predecessor 数据
 - [x] 76 一次性 / 25 可无限重复 / 6 带冷却
+
+## 9. Cluster 级参数处理
+
+- [x] 9.1 `_process_library_call`: 识别 `Biosphere=false`, 跳过 `SetupGeneralProjects_Biosphere` 项目
+- [x] 9.2 `_process_library_call`: 识别 `EnergyProject` 参数, 替换 `pwr_antimatter` (BlackHoleSun→pwr_wind, AtiyasMisfortune→pwr_geothermal)
+- [x] 9.3 `_process_library_call`: 从直接调用的 `SetupStatDependentProjects` 捕获 `Ignore*` flags
+- [x] 9.4 cluster values 与 known_values 合并修复: `known_values.update(cluster["values"])` 避免 library 写入被覆盖
+
+## 10. 动态项目条件化添加
+
+- [x] 10.1 `_add_stat_dependent_projects_static()`: 根据 cluster initialStats 条件化添加项目 (temperature/methane/CO2/toxicity/radioactivity/humidity/airpressure/seismic)
+- [x] 10.2 温度项目仅当 `"temperature" in stats` 时添加, 且根据值判断降温/升温方向
+- [x] 10.3 `atm_outgassing` 仅当 `"airpressure" in stats` 且值 < 5 时添加
+- [x] 10.4 所有分支受对应 `$Ignore*` flag 控制
+- [x] 10.5 `SetupStatDependentProjects` 命中的通用动态事件 (`evt_globalwarming_*`, `evt_quake_*`) 与项目一起进入初始/运行时项目池规则
+
+## 11. 变量与 predecessor 解析
+
+- [x] 11.1 `build.py`: `$PilotTrainingCourseProject` 解析为 `trn_pilot`
+- [x] 11.2 `parse_md.py`: cluster 级 `$PilotTrainingCourseProject` 参数存储与 predecessor 替换
+- [x] 11.3 `evaluateProject`: predecessor 仅当引用项目在该 cluster projectIds 中存在时有效
+
+## 12. I18nLookup 重构
+
+- [x] 12.1 `I18nLookup` 类型导出: `(key: string) => string`
+- [x] 12.2 `resolveTerraformingText`, `resolveWithReplaces`, `printTaskTree`, `printObjectives` 签名更新
+- [x] 12.3 helper (`groupLabel`, `getDependencyLabel`, `translateBlockedReason`, `resolveGroupName`) 同步更新
+- [x] 12.4 CLI `terraforming.ts`: `i18nMap` 包装为 `(key) => i18nMap[key] || ''`
+- [x] 12.5 CLI `run()` 返回类型改为 `{ output, currentStats }`；显示代码复用 run() 的 stats
+
+## 13. blockedProjects/removedProjects 语义修正
+
+- [x] 13.1 XSD 校对: `blockedProjects` 是 "阻塞直到完成"（未完成 → 阻塞，完成 → 解锁）
+- [x] 13.2 `evaluateProject`: `!completed && cp.blockedProjects.includes(pid)` 生成阻塞
+- [x] 13.3 被 `removedProjects` 移除的项目其 `blockedProjects` 不再生效
+
+## 14. state/value 语义补全
+
+- [ ] 14.1 `parse_library.py`: 为每个 `stats[].ranges[]` 补出 `start`
+- [ ] 14.2 `parse_library.py`: 确保 `rgb/state/habitable` 原样保留，供前端还原游戏方块颜色
+- [ ] 14.3 `parse_library.py`: 对 `projects[].conditions[]` 保留 `min/max/minvalue/maxvalue`
+- [ ] 14.4 `parse_library.py`: 为 condition 新增 `usesStateBounds` / `usesValueBounds`
+- [ ] 14.5 `terraformingTaskResolver.ts`: 校正条件解释，明确 `condition.min/max` 按 state 判定，`minvalue/maxvalue` 按真实 value 判定
+- [ ] 14.6 验证 `ame_resort_tropical` 的 `temperature min=2 max=3` 可被消费方解释为温度 state 2..3，而非 value 2..3
+
+## 15. 运行时派生规则输出
+
+- [ ] 15.1 `parse_md.py` / `build.py`: 明确保留 cluster 级 `Ignore*`、`$AddedAtmoPressureTable.*`、`$GlobalWarmingLimitTable.*`
+- [ ] 15.2 定义并输出 airpressure 派生所需语义，使消费方可根据 `oxygen + methane + carbondioxide` 与 cluster 补正重建当前气压
+- [x] 15.3 定义并输出 warming event 所需语义，使消费方通过通用动态 event 命中逻辑处理 `evt_globalwarming_*`
+- [x] 15.4 将 `SetupStatDependentProjects` 的项目/事件阈值规则整理为可复用的动态项目池语义，而非仅在初始解析时静态扩表
+- [ ] 15.5 验证 `AtiyasMisfortune`、`OceanOfFantasy`、`GetsuFune` 三类 cluster 的 ignore / warming / dynamic rules 均可被消费方识别
+- [x] 15.6 `parse_md.py`: 解析 cluster cue / patch 中的 `remove_terraforming_stat`，输出 `removedStats`
+- [x] 15.7 runtime 消费方将 `removedStats` 与 `Ignore*` 合并，统一视为 stat 不存在
