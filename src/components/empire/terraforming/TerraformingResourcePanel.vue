@@ -67,6 +67,37 @@ function getWareName(wareId: string): string {
   return translateWare(ware)
 }
 
+function getTotalVolume(entry: TerraformingExecutionTimelineEntry): number {
+  let total = 0
+  for (const w of entry.wares) {
+    const ware = gameDataStore.waresMap[w.ware] as any
+    const volume = ware?.volume ?? 0
+    total += (w.actualAmount ?? w.amount) * volume
+  }
+  return Math.ceil(total)
+}
+
+interface VolumeByTransport {
+  solid: number
+  liquid: number
+  container: number
+}
+
+function getVolumeByTransport(entry: TerraformingExecutionTimelineEntry): VolumeByTransport {
+  const result: VolumeByTransport = { solid: 0, liquid: 0, container: 0 }
+  for (const w of entry.wares) {
+    const ware = gameDataStore.waresMap[w.ware] as any
+    const transport = ware?.transport as string | undefined
+    if (!transport || !(transport in result)) continue
+    const volume = ware?.volume ?? 0
+    result[transport as keyof VolumeByTransport] += (w.actualAmount ?? w.amount) * volume
+  }
+  result.solid = Math.ceil(result.solid)
+  result.liquid = Math.ceil(result.liquid)
+  result.container = Math.ceil(result.container)
+  return result
+}
+
 function getShipName(macro: string): string {
   const ds = props.deliveryShipMap.get(macro)
   if (!ds) return macro
@@ -165,6 +196,12 @@ function onClearAll() {
                   <span>{{ t('terraforming.credits') }}</span>
                   <span>{{ entry.price.toLocaleString() }} Cr</span>
                 </div>
+                <template v-if="getTotalVolume(entry) > 0">
+                  <div v-for="[type, vol] in Object.entries(getVolumeByTransport(entry)).filter(([,v]) => v > 0)" :key="type" class="detail-row volume-row">
+                    <span>{{ t(`terraforming.transport.${type}`) }}</span>
+                    <span>{{ vol.toLocaleString() }} m³</span>
+                  </div>
+                </template>
               </div>
 
               <div v-if="entry.returnedWares.length > 0" class="detail-section">
@@ -203,7 +240,7 @@ function onClearAll() {
                 </div>
               </div>
 
-              <div v-if="entry.dockModules.length > 0" class="detail-section">
+              <div v-if="entry.deliveryDetails.length > 0 && entry.dockModules.length > 0" class="detail-section">
                 <div class="section-title">{{ t('terraforming.build') || 'Build' }}</div>
                 <div v-for="dm in entry.dockModules" :key="`${entry.id}-dock-${dm.name}`" class="detail-row">
                   <span>{{ dm.name }}</span>
@@ -347,6 +384,14 @@ function onClearAll() {
 
 .detail-row.detail-total {
   @apply border-t border-slate-700/40 pt-1 mt-0.5 text-slate-200;
+}
+
+.detail-row.volume-row {
+  @apply mt-0;
+}
+
+.detail-section .volume-row + .volume-row {
+  @apply -mt-0.5;
 }
 
 .detail-text {

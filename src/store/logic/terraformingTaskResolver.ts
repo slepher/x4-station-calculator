@@ -535,9 +535,10 @@ function fmtProjectDetails(
       }
       return `${name} ×${w.amount}`
     })
-    const priceLabel = '材料合计价格'
+    const priceLabel = i18nLookup ? (i18nLookup('terraforming.credits') || 'Credits') : 'Credits'
     const price = project.resources.price.toLocaleString()
-    lines.push(`📦 ${parts.join(', ')} — ${priceLabel}: ${price} Cr`)
+    const creditUnit = i18nLookup ? (i18nLookup('terraforming.creditUnit') || 'Cr') : 'Cr'
+    lines.push(`📦 ${parts.join(', ')} — ${priceLabel}: ${price} ${creditUnit}`)
   }
 
   // Deliveries with ship names

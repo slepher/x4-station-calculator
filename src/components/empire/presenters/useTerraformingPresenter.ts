@@ -443,7 +443,7 @@ function formatDescriptionItem(
       } else if (priceVal < 1) {
         investText = `${N('terraforming.effect.invest') || 'Invest'}: ${N('terraforming.effect.priceFactor') || 'factor'} ${priceVal}`
       } else {
-        investText = `${N('terraforming.effect.invest') || 'Invest'}: ${priceVal.toLocaleString()} Cr`
+        investText = `${N('terraforming.effect.invest') || 'Invest'}: ${priceVal.toLocaleString()} ${N('terraforming.creditUnit') || 'Cr'}`
       }
 
       let scaleText = ''
@@ -459,7 +459,7 @@ function formatDescriptionItem(
       let returnText = `${N('terraforming.effect.returns') || 'Returns'}: ${payoutCr}%`
 
       if (item.maxPrice) {
-        returnText += ` (${N('terraforming.max') || 'max'}: ${item.maxPrice.toLocaleString()} Cr)`
+        returnText += ` (${N('terraforming.max') || 'max'}: ${item.maxPrice.toLocaleString()} ${N('terraforming.creditUnit') || 'Cr'})`
       }
 
       return `${investText} / ${returnText}`
