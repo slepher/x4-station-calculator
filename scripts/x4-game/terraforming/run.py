@@ -30,6 +30,10 @@ _mod_md = importlib.import_module("scripts.x4-game.terraforming.parse_md")
 parse_md = _mod_md.parse_md
 resolve_cluster_objective_texts = _mod_md.resolve_cluster_objective_texts
 
+_mod_build = importlib.import_module("scripts.x4-game.terraforming.build")
+_compute_actual_ware_amounts = _mod_build._compute_actual_ware_amounts
+_build_delivery_ships = _mod_build._build_delivery_ships
+
 
 _CONFIG_FILE = _project_root / "x4-station-calculator.config.json"
 
@@ -114,7 +118,7 @@ def _inject_english_names(data: dict, output_dir: str) -> int:
     with open(en_path, "r", encoding="utf-8") as f:
         en_map = json.load(f)
     count = 0
-    for section in ("stats", "projectGroups", "projects"):
+    for section in ("stats", "projectGroups", "projects", "deliveryShips"):
         for item in data.get(section, []):
             for key in ("nameId", "descriptionId", "inactiveTextId"):
                 raw_key = item.get(key)
@@ -128,6 +132,32 @@ def _inject_english_names(data: dict, output_dir: str) -> int:
                 r["description"] = en_map[raw_key]
                 count += 1
     return count
+
+
+def _load_ship_ware_data(raw_path: str) -> tuple:
+    """Load component_to_ware and ware_index from raw wares XML for deliveryShips nameId resolution."""
+    import xml.etree.ElementTree as ET2
+    component_to_ware: Dict[str, str] = {}
+    ware_index: Dict[str, dict] = {}
+    wares_path = os.path.join(raw_path, "libraries", "wares", "final.xml")
+    if not os.path.exists(wares_path):
+        return component_to_ware, ware_index
+    try:
+        tree = ET2.parse(wares_path)
+        for ware in tree.getroot().findall("ware"):
+            w_id = ware.get("id", "")
+            if not w_id:
+                continue
+            name = ware.get("name", "")
+            ware_index[w_id] = {"nameId": name}
+            comp = ware.find("component")
+            if comp is not None:
+                ref = comp.get("ref", "")
+                if ref and ref not in component_to_ware:
+                    component_to_ware[ref] = w_id
+    except Exception:
+        pass
+    return component_to_ware, ware_index
 
 
 def process_terraforming_standalone(raw_path: str, folder_name: str) -> dict | None:
@@ -179,14 +209,37 @@ def process_terraforming_standalone(raw_path: str, folder_name: str) -> dict | N
                     resolved.append(p)
             proj["predecessors"] = resolved
 
+        # Compute actual in-game ware amounts using max prices from wares.json
+        wares_path = os.path.join(
+            _project_root, "src", "assets", "x4_game_data",
+            folder_name, "data", "wares.json",
+        )
+        if os.path.exists(wares_path):
+            try:
+                with open(wares_path, "r", encoding="utf-8") as f:
+                    wares_data = json.load(f)
+                _compute_actual_ware_amounts(projects, wares_data)
+            except Exception as e:
+                print(f"   WARNING: Failed to load wares data: {e}")
+
+        # Build deliveryShips (nameId from raw wares XML)
+        ctow, widx = _load_ship_ware_data(raw_path)
+        delivery_ships = _build_delivery_ships(projects, ctow, widx)
+
+        # Strip buildDuration from deliveries (moved to deliveryShips)
+        for proj in projects:
+            for d in proj.get("deliveries", []):
+                d.pop("buildDuration", None)
+
         print(f"   Parsed terraforming: {len(stats)} stats, {len(project_groups)} groups, "
-              f"{len(projects)} projects, {len(clusters)} clusters")
+              f"{len(projects)} projects, {len(clusters)} clusters, {len(delivery_ships)} delivery ships")
 
         return {
             "stats": stats,
             "projectGroups": project_groups,
             "projects": projects,
             "clusters": clusters,
+            "deliveryShips": delivery_ships,
         }
 
     except Exception as e:
@@ -243,7 +296,8 @@ def main():
         tf_projects = data.get("projects", [])
         tf_clusters = data.get("clusters", [])
         print(f"   {len(tf_stats)} stats | {len(tf_groups)} groups | "
-              f"{len(tf_projects)} projects | {len(tf_clusters)} clusters")
+              f"{len(tf_projects)} projects | {len(tf_clusters)} clusters | "
+              f"{len(data.get('deliveryShips', []))} delivery ships")
 
 
 if __name__ == "__main__":

@@ -8,7 +8,8 @@ import type {
   TaskNode,
   ClusterObjective,
   TerraformingProject,
-  StatCondition
+  StatCondition,
+  DeliveryShip,
 } from '@/store/logic/terraformingTaskResolver'
 import {
   getCurrentRange,
@@ -23,9 +24,10 @@ import {
   getRuntimeTerraformingProjectIds,
   type TerraformingExecutionEntry,
 } from '@/store/logic/terraformingRuntime'
-import type { ArchiveStationData } from '@/types/saveArchive'
-import type { X4MapCluster, X4MapSector } from '@/types/x4'
+import type { ArchiveStationData, SavedModule } from '@/types/saveArchive'
+import type { X4MapCluster, X4MapSector, X4Module } from '@/types/x4'
 import i18n from '@/i18n'
+import { useGameDataStore } from '@/store/useGameDataStore'
 
 export interface TerraformingToolbarProps {
   hqStationName: ComputedRef<string>
@@ -116,6 +118,14 @@ export interface TerraformingCancelValidation {
   reasons: string[]
 }
 
+export interface TerraformingDeliveryEntry {
+  macro: string
+  amount: number
+  shipName: string
+  buildDuration: number
+  totalTime: number
+}
+
 export interface TerraformingExecutionTimelineEntry {
   id: string
   order: number
@@ -124,12 +134,16 @@ export interface TerraformingExecutionTimelineEntry {
   projectGroupId: string
   projectGroupName: string
   showGroupMarker: boolean
-  wares: Array<{ ware: string; amount: number }>
-  deliveries: Array<{ macro: string; amount: number; buildDuration: number }>
+  wares: Array<{ ware: string; amount: number; actualAmount?: number }>
+  deliveries: Array<{ macro: string; amount: number }>
+  deliveryDetails: Array<{ macro: string; amount: number; shipName: string; buildDuration: number; totalTime: number }>
+  dockModules: Array<{ name: string; count: number; slots: number }>
+  totalSlots: number
   price: number
-  discountedPrice: number
-  projectRebates: string[]
-  cumulativeRebates: string[]
+  projectRebates: Array<{ name: string; value: number }>
+  cumulativeRebates: Array<{ name: string; value: number }>
+  rebateChanges: Array<{ name: string; before: number; after: number }>
+  returnedWares: Array<{ name: string; amount: number }>
   beforeStats: TerraformingTimelineStatSnapshot[]
   afterStats: TerraformingTimelineStatSnapshot[]
   availableBeforeExecution: boolean
@@ -140,6 +154,8 @@ export interface TerraformingResourcePanelProps {
   selectedClusterId: ComputedRef<string | null>
   executionTimeline: ComputedRef<TerraformingExecutionTimelineEntry[]>
   getCancelValidation: (entryId: string) => TerraformingCancelValidation
+  deliveryShipMap: ComputedRef<Map<string, DeliveryShip>>
+  hqBuildDocks: ComputedRef<{ totalSlots: number } | null>
 }
 
 export interface TerraformingPresenterProps {
@@ -173,6 +189,7 @@ export interface TerraformingPresenterStore {
   terraformingHousingBuilt: ComputedRef<number>
   terraformingHqStationName: ComputedRef<string>
   terraformingHqArchiveStation: ComputedRef<ArchiveStationData | null>
+  terraformingHqEffectiveModules: ComputedRef<SavedModule[]>
   terraformingHqClusterId: ComputedRef<string | null>
   selectTerraformingCluster: (clusterId: string) => void
   setTerraformingCompletedProjects: (projects: Map<string, number>) => void
@@ -447,7 +464,7 @@ function buildEffectItems(
 }
 
 interface CumulativeRebateResult {
-  lines: string[]
+  entries: Array<{ name: string; value: number }>
   aggregatedByGroup: Record<string, number>
 }
 
@@ -473,10 +490,10 @@ function computeCumulativeRebates(
       aggregated[name] = (aggregated[name] ?? 0) + rb.value
     }
   }
-  const lines = Object.entries(aggregated)
+  const entries = Object.entries(aggregated)
     .sort(([a], [b]) => a.localeCompare(b))
-    .map(([name, value]) => `${name} -${value}%`)
-  return { lines, aggregatedByGroup: aggregated }
+    .map(([name, value]) => ({ name, value }))
+  return { entries, aggregatedByGroup: aggregated }
 }
 
 function computeDiscountedPrice(
@@ -870,13 +887,25 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
         store.moduleGroupNames.value,
         store.wareNames.value,
       )
-      const discountedPrice = computeDiscountedPrice(
-        project?.resources?.price || 0,
-        project?.resources?.wares || [],
-        cumulative.aggregatedByGroup,
-        store.wareGroupMap.value,
+      const afterCumulative = computeCumulativeRebates(
+        nextCompletedProjects,
+        data,
         store.moduleGroupNames.value,
+        store.wareNames.value,
       )
+      const rebateChanges: Array<{ name: string; before: number; after: number }> = []
+      for (const ae of afterCumulative.entries) {
+        const before = cumulative.aggregatedByGroup[ae.name] ?? 0
+        const after = ae.value
+        if (before !== after) {
+          rebateChanges.push({ name: ae.name, before, after })
+        }
+      }
+      for (const be of cumulative.entries) {
+        if (!afterCumulative.aggregatedByGroup[be.name]) {
+          rebateChanges.push({ name: be.name, before: be.value, after: 0 })
+        }
+      }
       const projectRebates = project?.rebates?.map(rb => {
         let name = ''
         if (rb.wareGroup) {
@@ -884,8 +913,8 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
         } else if (rb.ware) {
           name = store.wareNames.value.get(rb.ware) || rb.ware
         }
-        return name ? `${name} -${rb.value}%` : ''
-      }).filter(Boolean) || []
+        return name ? { name, value: rb.value } : null
+      }).filter((r): r is { name: string; value: number } => r !== null) || []
 
       results.push({
         id: entry.id,
@@ -895,12 +924,60 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
         projectGroupId,
         projectGroupName,
         showGroupMarker: projectGroupId !== previousGroupId,
-        wares: project?.resources?.wares || [],
-        deliveries: project?.deliveries || [],
+        wares: project?.resources?.wares?.map(w => ({
+          ware: w.ware,
+          amount: w.amount,
+          actualAmount: w.actualAmount,
+        })) || [],
+        deliveries: (project?.deliveries || []).map(d => ({
+          macro: d.macro,
+          amount: d.amount,
+        })),
+        deliveryDetails: (() => {
+          const allDeliveries = (project?.deliveries || []).map(d => {
+            const ds = deliveryShipMap.value.get(d.macro)
+            const bd = ds?.buildDuration ?? 0
+            const shipName = ds && ds.nameId ? (vI18nLookup(ds.nameId) || ds.name || d.macro) : (ds?.name || d.macro)
+            return { macro: d.macro, amount: d.amount, shipName, buildDuration: bd, totalTime: d.amount * bd }
+          })
+          const slots = hqBuildDocks.value?.totalSlots ?? 0
+          if (slots > 0) {
+            const totalWork = allDeliveries.reduce((s, d) => s + d.totalTime, 0)
+            const parallel = Math.ceil(totalWork / slots)
+            for (const dd of allDeliveries) {
+              dd.totalTime = parallel
+            }
+          } else {
+            for (const dd of allDeliveries) dd.totalTime = 0
+          }
+          return allDeliveries
+        })(),
+        dockModules: hqDockModules.value,
+        totalSlots: hqBuildDocks.value?.totalSlots ?? 0,
         price: project?.resources?.price || 0,
-        discountedPrice,
         projectRebates,
-        cumulativeRebates: cumulative.lines,
+        rebateChanges,
+        cumulativeRebates: cumulative.entries,
+        returnedWares: (() => {
+          const rw: Array<{ name: string; amount: number }> = []
+          const seen = new Set<string>()
+          for (const rb of cumulative.entries) {
+            const pct = rb.value / 100
+            for (const w of (project?.resources?.wares || [])) {
+              const amount = w.actualAmount ?? w.amount
+              if (amount <= 0) continue
+              const groupId = store.wareGroupMap.value.get(w.ware)
+              const translatedGroup = groupId ? (store.moduleGroupNames.value.get(groupId) || groupId) : ''
+              if (translatedGroup !== rb.name && w.ware !== rb.name) continue
+              if (seen.has(w.ware)) continue
+              seen.add(w.ware)
+              const wareName = store.wareNames.value.get(w.ware) || w.ware
+              const returned = Math.floor(amount * pct)
+              if (returned > 0) rw.push({ name: wareName, amount: returned })
+            }
+          }
+          return rw
+        })(),
         beforeStats: beforeStatsList,
         afterStats: beforeStatsList,
         availableBeforeExecution: evaluated.node?.available ?? false,
@@ -986,6 +1063,45 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     }
   }
 
+  const deliveryShipMap = computed<Map<string, DeliveryShip>>(() => {
+    const data = store.terraformingData.value
+    const map = new Map<string, DeliveryShip>()
+    if (data?.deliveryShips) {
+      for (const ds of data.deliveryShips) map.set(ds.macro, ds)
+    }
+    return map
+  })
+
+  const hqBuildDocks = computed<{ totalSlots: number } | null>(() => {
+    const modules = store.terraformingHqEffectiveModules.value
+    if (!modules.length) return null
+    const gameData = useGameDataStore()
+    const mm = gameData.modulesMap as Record<string, X4Module>
+    let totalSlots = 0
+    for (const sm of modules) {
+      const mod = mm[sm.id] as X4Module | undefined
+      if (!mod?.buildShipClasses?.length) continue
+      totalSlots += sm.count * mod.buildProcessorCount
+    }
+    return { totalSlots }
+  })
+
+  const hqDockModules = computed<Array<{ name: string; count: number; slots: number }>>(() => {
+    const modules = store.terraformingHqEffectiveModules.value
+    if (!modules.length) return []
+    const gameData = useGameDataStore()
+    const localizedMap = gameData.localizedModulesMap as Record<string, { localeName: string; name: string }>
+    const mm = gameData.modulesMap as Record<string, X4Module>
+    const result: Array<{ name: string; count: number; slots: number }> = []
+    for (const sm of modules) {
+      const mod = mm[sm.id] as X4Module | undefined
+      if (!mod?.buildShipClasses?.length) continue
+      const name = localizedMap[sm.id]?.localeName || mod.name || sm.id
+      result.push({ name, count: sm.count, slots: sm.count * mod.buildProcessorCount })
+    }
+    return result
+  })
+
   const props: TerraformingPresenterProps = {
     toolbar: {
       hqStationName,
@@ -1024,6 +1140,8 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
       selectedClusterId,
       executionTimeline,
       getCancelValidation: getExecutionCancelValidation,
+      deliveryShipMap,
+      hqBuildDocks,
     }
   }
 

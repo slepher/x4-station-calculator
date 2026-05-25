@@ -338,6 +338,10 @@ export interface X4Module {
 
   // 泊位逻辑 (仅限 pier 模块)
   dockingCount: number;
+
+  // 建造港槽位 (仅限 buildmodule)
+  buildProcessorCount: number;
+  buildShipClasses: string[];
   
   // 颜色标记
   color: string;

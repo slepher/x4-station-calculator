@@ -109,12 +109,18 @@ export interface ProjectResources {
   minWares?: number
   maxWares?: number
   maxPrice?: number
-  wares: Array<{ ware: string; amount: number }>
+  wares: Array<{ ware: string; amount: number; actualAmount?: number }>
 }
 
 export interface Delivery {
   macro: string
   amount: number
+}
+
+export interface DeliveryShip {
+  macro: string
+  nameId?: string
+  name?: string
   buildDuration: number
 }
 
@@ -135,6 +141,7 @@ export interface TerraformingData {
   projectGroups: TerraformingProjectGroup[]
   projects: TerraformingProject[]
   clusters: TerraformingCluster[]
+  deliveryShips: DeliveryShip[]
 }
 
 export interface TerraformingState {
@@ -444,7 +451,7 @@ function evaluateProject(
   }
 }
 
-export function printTaskTree(tree: TaskTree, i18nLookup?: I18nLookup): string {
+export function printTaskTree(tree: TaskTree, i18nLookup?: I18nLookup, data?: TerraformingData, wareNameIds?: Record<string, string>): string {
   const lines: string[] = []
 
   const groupOrder = tree.groupOrder.filter(g => tree.groups.has(g))
@@ -484,6 +491,14 @@ export function printTaskTree(tree: TaskTree, i18nLookup?: I18nLookup): string {
           lines.push(`  ${isLast ? '    ' : '│   '}  └─ ⛔ ${translated}`)
         }
       }
+      // Ware details
+      const proj = tree.projectMap.get(node.id)
+      if (proj) {
+        const wareLines = fmtProjectDetails(proj, i18nLookup, data, wareNameIds)
+        for (const wl of wareLines) {
+          lines.push(`  ${isLast ? '    ' : '│   '}  ${wl}`)
+        }
+      }
     }
 
     groupIdx++
@@ -491,6 +506,66 @@ export function printTaskTree(tree: TaskTree, i18nLookup?: I18nLookup): string {
   }
 
   return lines.join('\n')
+}
+
+function fmtProjectDetails(
+  project: TerraformingProject,
+  i18nLookup?: I18nLookup,
+  data?: TerraformingData,
+  wareNameIds?: Record<string, string>,
+): string[] {
+  const lines: string[] = []
+
+  const wares = project.resources?.wares
+  if (wares && wares.length > 0) {
+    const parts = wares.map(w => {
+      const nameId = wareNameIds?.[w.ware] || ''
+      const name = i18nLookup && nameId ? (i18nLookup(nameId) || w.ware) : w.ware
+      if (w.actualAmount !== undefined) {
+        return `${name} ×${w.actualAmount.toLocaleString()}`
+      }
+      return `${name} ×${w.amount}`
+    })
+    const priceLabel = '材料合计价格'
+    const price = project.resources.price.toLocaleString()
+    lines.push(`📦 ${parts.join(', ')} — ${priceLabel}: ${price} Cr`)
+  }
+
+  // Deliveries with ship names
+  const deliveries = project.deliveries
+  if (deliveries && deliveries.length > 0) {
+    const shipMap = new Map<string, DeliveryShip>()
+    if (data?.deliveryShips) {
+      for (const ds of data.deliveryShips) {
+        shipMap.set(ds.macro, ds)
+      }
+    }
+    const parts = deliveries.map(d => {
+      const ds = shipMap.get(d.macro)
+      const nameId = ds?.nameId || ''
+      const name = i18nLookup && nameId ? i18nLookup(nameId) || ds?.name || d.macro : ds?.name || d.macro
+      const dur = ds?.buildDuration
+      const durStr = dur ? ` ${dur}s/艘` : ''
+      return `${name} ×${d.amount}${durStr}`
+    })
+    lines.push(`🚀 ${parts.join(', ')}`)
+  }
+
+  // Rebates
+  const rebates = project.rebates
+  if (rebates && rebates.length > 0) {
+    const parts = rebates.map(r => {
+      const target = i18nLookup && r.wareGroup
+        ? (i18nLookup(r.wareGroup) || r.wareGroup)
+        : i18nLookup && r.ware
+          ? (i18nLookup(r.ware) || r.ware)
+          : r.wareGroup || r.ware || ''
+      return `${target} ${r.value}%`
+    })
+    lines.push(`↩️ 返还: ${parts.join(', ')}`)
+  }
+
+  return lines
 }
 
 function sortNodes(nodes: TaskNode[]): TaskNode[] {

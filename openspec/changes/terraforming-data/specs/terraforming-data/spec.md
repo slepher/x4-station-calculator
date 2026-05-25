@@ -41,8 +41,8 @@
 - `repeatCooldown` (null=一次性, 0=可无限重复, >0=冷却秒数)
 - `resilient`, `chance`, `version`, `research`
 - `conditions`, `effects`, `sideEffects`
-- `resources` (`{ price, pricescale?, payout?, minWares?, maxWares?, maxPrice?, wares: [{ware, amount}] }`)
-- `deliveries` (`[{ macro, amount, buildDuration }]`)
+- `resources` (`{ price, pricescale?, payout?, minWares?, maxWares?, maxPrice?, scale, wares: [{ware, amount, actualAmount?, nameId?}] }`)
+- `deliveries` (`[{ macro, amount, buildDuration, nameId? }]`)
 - `rebates` (`[{ ware?, wareGroup?, value }]`)
 - `removedProjects`, `blockedProjects`, `blockedGroups`
 - `predecessors` (`[{ ref, type: "project"|"group", any }]`)
@@ -257,3 +257,31 @@
 **并且** 加入 `loader.needed_raw_names`
 
 **并且** 经 `inject_english_names()` 管线注入翻译后的 name 字段
+
+### Requirement: 资源实际消耗量计算
+
+**前提** `wares.json` 中每个 ware 有 `maxPrice` 字段
+
+**当** 运行 terraforming 数据解析模块
+
+**那么** `resources.wares[].actualAmount` 输出游戏内实际消耗量
+
+**计算**: `actualAmount = amount × ⌊price / Σ(amount × maxPrice)⌋`
+
+**并且** 不产生新的顶层或嵌套结构，仅扩展现有 `wares[]` 条目
+
+### Requirement: deliveryShips 顶层列表
+
+**前提** 项目 `deliveries` 中包含舰船 macro 引用
+
+**当** 运行 terraforming 数据解析模块
+
+**那么** 顶层输出 `deliveryShips` 数组，按 `macro` 去重
+
+**每个条目**: `{ macro, nameId, buildDuration, name }`
+
+- `nameId` 通过 `component_to_ware[macro] → ware_index[ware_id].nameId` 解析
+- `buildDuration` 从 `deliveries` 中提取，统一到 `deliveryShips` 层
+- `name` 由 `inject_english_names()` 管线注入
+
+**并且** `projects[].deliveries[].buildDuration` 移除，只保留 `macro` + `amount`

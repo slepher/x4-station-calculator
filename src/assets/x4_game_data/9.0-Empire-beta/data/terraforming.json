@@ -578,20 +578,19 @@
         "wares": [
           {
             "ware": "graphene",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 429184
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 85,
-          "buildDuration": 30
+          "amount": 85
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 450,
-          "buildDuration": 15
+          "amount": 450
         }
       ],
       "rebates": [],
@@ -641,20 +640,19 @@
         "wares": [
           {
             "ware": "hullparts",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 367647
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 45,
-          "buildDuration": 30
+          "amount": 45
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 220,
-          "buildDuration": 15
+          "amount": 220
         }
       ],
       "rebates": [],
@@ -690,20 +688,19 @@
         "wares": [
           {
             "ware": "graphene",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 429184
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 85,
-          "buildDuration": 30
+          "amount": 85
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 430,
-          "buildDuration": 15
+          "amount": 430
         }
       ],
       "rebates": [],
@@ -743,20 +740,19 @@
         "wares": [
           {
             "ware": "ice",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 2857142
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 200,
-          "buildDuration": 30
+          "amount": 200
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 1000,
-          "buildDuration": 15
+          "amount": 1000
         }
       ],
       "rebates": [],
@@ -799,24 +795,24 @@
         "wares": [
           {
             "ware": "hullparts",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 120578
           },
           {
             "ware": "ice",
-            "amount": 10
+            "amount": 10,
+            "actualAmount": 1205780
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 100,
-          "buildDuration": 30
+          "amount": 100
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 500,
-          "buildDuration": 15
+          "amount": 500
         }
       ],
       "rebates": [],
@@ -851,20 +847,19 @@
         "wares": [
           {
             "ware": "methane",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 181818
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 10,
-          "buildDuration": 30
+          "amount": 10
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 50,
-          "buildDuration": 15
+          "amount": 50
         }
       ],
       "rebates": [],
@@ -901,28 +896,29 @@
         "wares": [
           {
             "ware": "claytronics",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 69280
           },
           {
             "ware": "microchips",
-            "amount": 2
+            "amount": 2,
+            "actualAmount": 138560
           },
           {
             "ware": "refinedmetals",
-            "amount": 13
+            "amount": 13,
+            "actualAmount": 900640
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 200,
-          "buildDuration": 30
+          "amount": 200
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 900,
-          "buildDuration": 15
+          "amount": 900
         }
       ],
       "rebates": [],
@@ -974,24 +970,24 @@
         "wares": [
           {
             "ware": "energycells",
-            "amount": 133
+            "amount": 133,
+            "actualAmount": 2233336
           },
           {
             "ware": "graphene",
-            "amount": 13
+            "amount": 13,
+            "actualAmount": 218296
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 65,
-          "buildDuration": 30
+          "amount": 65
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 300,
-          "buildDuration": 15
+          "amount": 300
         }
       ],
       "rebates": [],
@@ -1033,28 +1029,29 @@
         "wares": [
           {
             "ware": "advancedelectronics",
-            "amount": 2
+            "amount": 2,
+            "actualAmount": 130326
           },
           {
             "ware": "claytronics",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 65163
           },
           {
             "ware": "refinedmetals",
-            "amount": 13
+            "amount": 13,
+            "actualAmount": 847119
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 200,
-          "buildDuration": 30
+          "amount": 200
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 900,
-          "buildDuration": 15
+          "amount": 900
         }
       ],
       "rebates": [],
@@ -1102,24 +1099,24 @@
         "wares": [
           {
             "ware": "advancedcomposites",
-            "amount": 4
+            "amount": 4,
+            "actualAmount": 72488
           },
           {
             "ware": "energycells",
-            "amount": 133
+            "amount": 133,
+            "actualAmount": 2410226
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 50,
-          "buildDuration": 30
+          "amount": 50
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 200,
-          "buildDuration": 15
+          "amount": 200
         }
       ],
       "rebates": [],
@@ -1159,24 +1156,24 @@
         "wares": [
           {
             "ware": "dronecomponents",
-            "amount": 2
+            "amount": 2,
+            "actualAmount": 4060
           },
           {
             "ware": "shieldcomponents",
-            "amount": 10
+            "amount": 10,
+            "actualAmount": 20300
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 3,
-          "buildDuration": 30
+          "amount": 3
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 15,
-          "buildDuration": 15
+          "amount": 15
         }
       ],
       "rebates": [],
@@ -1224,32 +1221,34 @@
         "wares": [
           {
             "ware": "hydrogen",
-            "amount": 100
+            "amount": 100,
+            "actualAmount": 1207400
           },
           {
             "ware": "energycells",
-            "amount": 10
+            "amount": 10,
+            "actualAmount": 120740
           },
           {
             "ware": "hullparts",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 12074
           },
           {
             "ware": "microchips",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 12074
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 5,
-          "buildDuration": 30
+          "amount": 5
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 25,
-          "buildDuration": 15
+          "amount": 25
         }
       ],
       "rebates": [],
@@ -1290,20 +1289,19 @@
         "wares": [
           {
             "ware": "helium",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 1960784
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 5,
-          "buildDuration": 30
+          "amount": 5
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 25,
-          "buildDuration": 15
+          "amount": 25
         }
       ],
       "rebates": [],
@@ -1342,56 +1340,64 @@
         "wares": [
           {
             "ware": "advancedcomposites",
-            "amount": 4
+            "amount": 4,
+            "actualAmount": 213272
           },
           {
             "ware": "claytronics",
-            "amount": 4
+            "amount": 4,
+            "actualAmount": 213272
           },
           {
             "ware": "fieldcoils",
-            "amount": 5
+            "amount": 5,
+            "actualAmount": 266590
           },
           {
             "ware": "hullparts",
-            "amount": 8
+            "amount": 8,
+            "actualAmount": 426544
           },
           {
             "ware": "plasmaconductors",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 53318
           },
           {
             "ware": "refinedmetals",
-            "amount": 8
+            "amount": 8,
+            "actualAmount": 426544
           },
           {
             "ware": "scanningarrays",
-            "amount": 3
+            "amount": 3,
+            "actualAmount": 159954
           },
           {
             "ware": "shieldcomponents",
-            "amount": 3
+            "amount": 3,
+            "actualAmount": 159954
           },
           {
             "ware": "smartchips",
-            "amount": 6
+            "amount": 6,
+            "actualAmount": 319908
           },
           {
             "ware": "superfluidcoolant",
-            "amount": 15
+            "amount": 15,
+            "actualAmount": 799770
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 500,
-          "buildDuration": 30
+          "amount": 500
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 2500,
-          "buildDuration": 15
+          "amount": 2500
         }
       ],
       "rebates": [],
@@ -1426,28 +1432,29 @@
         "wares": [
           {
             "ware": "dronecomponents",
-            "amount": 2
+            "amount": 2,
+            "actualAmount": 26552
           },
           {
             "ware": "hullparts",
-            "amount": 10
+            "amount": 10,
+            "actualAmount": 132760
           },
           {
             "ware": "scanningarrays",
-            "amount": 2
+            "amount": 2,
+            "actualAmount": 26552
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 35,
-          "buildDuration": 30
+          "amount": 35
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 175,
-          "buildDuration": 15
+          "amount": 175
         }
       ],
       "rebates": [],
@@ -1777,28 +1784,29 @@
         "wares": [
           {
             "ware": "energycells",
-            "amount": 133
+            "amount": 133,
+            "actualAmount": 1649466
           },
           {
             "ware": "medicalsupplies",
-            "amount": 33
+            "amount": 33,
+            "actualAmount": 409266
           },
           {
             "ware": "methane",
-            "amount": 40
+            "amount": 40,
+            "actualAmount": 496080
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 60,
-          "buildDuration": 30
+          "amount": 60
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 300,
-          "buildDuration": 15
+          "amount": 300
         }
       ],
       "rebates": [],
@@ -1860,24 +1868,24 @@
         "wares": [
           {
             "ware": "methane",
-            "amount": 40
+            "amount": 40,
+            "actualAmount": 160000
           },
           {
             "ware": "spices",
-            "amount": 100
+            "amount": 100,
+            "actualAmount": 400000
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 20,
-          "buildDuration": 30
+          "amount": 20
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 100,
-          "buildDuration": 15
+          "amount": 100
         }
       ],
       "rebates": [],
@@ -1909,20 +1917,19 @@
         "wares": [
           {
             "ware": "medicalsupplies",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 561797
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 10,
-          "buildDuration": 30
+          "amount": 10
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 50,
-          "buildDuration": 15
+          "amount": 50
         }
       ],
       "rebates": [],
@@ -1979,28 +1986,29 @@
         "wares": [
           {
             "ware": "energycells",
-            "amount": 133
+            "amount": 133,
+            "actualAmount": 3298932
           },
           {
             "ware": "medicalsupplies",
-            "amount": 33
+            "amount": 33,
+            "actualAmount": 818532
           },
           {
             "ware": "methane",
-            "amount": 40
+            "amount": 40,
+            "actualAmount": 992160
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 100,
-          "buildDuration": 30
+          "amount": 100
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 500,
-          "buildDuration": 15
+          "amount": 500
         }
       ],
       "rebates": [],
@@ -2041,20 +2049,19 @@
         "wares": [
           {
             "ware": "medicalsupplies",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 280898
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 5,
-          "buildDuration": 30
+          "amount": 5
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 30,
-          "buildDuration": 15
+          "amount": 30
         }
       ],
       "rebates": [],
@@ -2098,20 +2105,19 @@
         "wares": [
           {
             "ware": "medicalsupplies",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 168539
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 3,
-          "buildDuration": 30
+          "amount": 3
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 15,
-          "buildDuration": 15
+          "amount": 15
         }
       ],
       "rebates": [],
@@ -2145,20 +2151,19 @@
         "wares": [
           {
             "ware": "medicalsupplies",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 280898
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 5,
-          "buildDuration": 30
+          "amount": 5
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 30,
-          "buildDuration": 15
+          "amount": 30
         }
       ],
       "rebates": [],
@@ -2216,28 +2221,29 @@
         "wares": [
           {
             "ware": "methane",
-            "amount": 40
+            "amount": 40,
+            "actualAmount": 51200
           },
           {
             "ware": "sunriseflowers",
-            "amount": 25
+            "amount": 25,
+            "actualAmount": 32000
           },
           {
             "ware": "swampplant",
-            "amount": 24
+            "amount": 24,
+            "actualAmount": 30720
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 7,
-          "buildDuration": 30
+          "amount": 7
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 35,
-          "buildDuration": 15
+          "amount": 35
         }
       ],
       "rebates": [
@@ -2278,24 +2284,24 @@
         "wares": [
           {
             "ware": "advancedcomposites",
-            "amount": 10
+            "amount": 10,
+            "actualAmount": 14810
           },
           {
             "ware": "hullparts",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 1481
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 5,
-          "buildDuration": 30
+          "amount": 5
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 25,
-          "buildDuration": 15
+          "amount": 25
         }
       ],
       "rebates": [
@@ -2331,24 +2337,24 @@
         "wares": [
           {
             "ware": "advancedcomposites",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 2969
           },
           {
             "ware": "hullparts",
-            "amount": 10
+            "amount": 10,
+            "actualAmount": 29690
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 5,
-          "buildDuration": 30
+          "amount": 5
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 25,
-          "buildDuration": 15
+          "amount": 25
         }
       ],
       "rebates": [
@@ -2384,36 +2390,39 @@
         "wares": [
           {
             "ware": "advancedcomposites",
-            "amount": 4
+            "amount": 4,
+            "actualAmount": 14980
           },
           {
             "ware": "antimatterconverters",
-            "amount": 6
+            "amount": 6,
+            "actualAmount": 22470
           },
           {
             "ware": "hullparts",
-            "amount": 10
+            "amount": 10,
+            "actualAmount": 37450
           },
           {
             "ware": "scanningarrays",
-            "amount": 2
+            "amount": 2,
+            "actualAmount": 7490
           },
           {
             "ware": "superfluidcoolant",
-            "amount": 13
+            "amount": 13,
+            "actualAmount": 48685
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 25,
-          "buildDuration": 30
+          "amount": 25
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 100,
-          "buildDuration": 15
+          "amount": 100
         }
       ],
       "rebates": [
@@ -2449,32 +2458,34 @@
         "wares": [
           {
             "ware": "claytronics",
-            "amount": 2
+            "amount": 2,
+            "actualAmount": 3962
           },
           {
             "ware": "energycells",
-            "amount": 133
+            "amount": 133,
+            "actualAmount": 263473
           },
           {
             "ware": "hullparts",
-            "amount": 10
+            "amount": 10,
+            "actualAmount": 19810
           },
           {
             "ware": "smartchips",
-            "amount": 33
+            "amount": 33,
+            "actualAmount": 65373
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 7,
-          "buildDuration": 30
+          "amount": 7
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 35,
-          "buildDuration": 15
+          "amount": 35
         }
       ],
       "rebates": [
@@ -2533,28 +2544,29 @@
         "wares": [
           {
             "ware": "energycells",
-            "amount": 133
+            "amount": 133,
+            "actualAmount": 251769
           },
           {
             "ware": "hullparts",
-            "amount": 10
+            "amount": 10,
+            "actualAmount": 18930
           },
           {
             "ware": "smartchips",
-            "amount": 33
+            "amount": 33,
+            "actualAmount": 62469
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 6,
-          "buildDuration": 30
+          "amount": 6
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 30,
-          "buildDuration": 15
+          "amount": 30
         }
       ],
       "rebates": [
@@ -2603,20 +2615,19 @@
         "wares": [
           {
             "ware": "claytronics",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 4262
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 1,
-          "buildDuration": 30
+          "amount": 1
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 5,
-          "buildDuration": 15
+          "amount": 5
         }
       ],
       "rebates": [],
@@ -2648,28 +2659,29 @@
         "wares": [
           {
             "ware": "energycells",
-            "amount": 133
+            "amount": 133,
+            "actualAmount": 419615
           },
           {
             "ware": "hullparts",
-            "amount": 10
+            "amount": 10,
+            "actualAmount": 31550
           },
           {
             "ware": "smartchips",
-            "amount": 33
+            "amount": 33,
+            "actualAmount": 104115
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 10,
-          "buildDuration": 30
+          "amount": 10
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 50,
-          "buildDuration": 15
+          "amount": 50
         }
       ],
       "rebates": [
@@ -2721,36 +2733,39 @@
         "wares": [
           {
             "ware": "dronecomponents",
-            "amount": 2
+            "amount": 2,
+            "actualAmount": 30170
           },
           {
             "ware": "medicalsupplies",
-            "amount": 33
+            "amount": 33,
+            "actualAmount": 497805
           },
           {
             "ware": "smartchips",
-            "amount": 33
+            "amount": 33,
+            "actualAmount": 497805
           },
           {
             "ware": "spices",
-            "amount": 100
+            "amount": 100,
+            "actualAmount": 1508500
           },
           {
             "ware": "water",
-            "amount": 40
+            "amount": 40,
+            "actualAmount": 603400
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 100,
-          "buildDuration": 30
+          "amount": 100
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 550,
-          "buildDuration": 15
+          "amount": 550
         }
       ],
       "rebates": [],
@@ -2800,24 +2815,24 @@
         "wares": [
           {
             "ware": "medicalsupplies",
-            "amount": 33
+            "amount": 33,
+            "actualAmount": 642378
           },
           {
             "ware": "methane",
-            "amount": 40
+            "amount": 40,
+            "actualAmount": 778640
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 60,
-          "buildDuration": 30
+          "amount": 60
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 300,
-          "buildDuration": 15
+          "amount": 300
         }
       ],
       "rebates": [],
@@ -2887,24 +2902,24 @@
         "wares": [
           {
             "ware": "medicalsupplies",
-            "amount": 33
+            "amount": 33,
+            "actualAmount": 321189
           },
           {
             "ware": "methane",
-            "amount": 40
+            "amount": 40,
+            "actualAmount": 389320
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 30,
-          "buildDuration": 30
+          "amount": 30
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 130,
-          "buildDuration": 15
+          "amount": 130
         }
       ],
       "rebates": [],
@@ -2969,28 +2984,29 @@
         "wares": [
           {
             "ware": "dronecomponents",
-            "amount": 2
+            "amount": 2,
+            "actualAmount": 7418
           },
           {
             "ware": "wheat",
-            "amount": 100
+            "amount": 100,
+            "actualAmount": 370900
           },
           {
             "ware": "methane",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 3709
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 20,
-          "buildDuration": 30
+          "amount": 20
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 100,
-          "buildDuration": 15
+          "amount": 100
         }
       ],
       "rebates": [
@@ -3061,28 +3077,29 @@
         "wares": [
           {
             "ware": "dronecomponents",
-            "amount": 2
+            "amount": 2,
+            "actualAmount": 3692
           },
           {
             "ware": "sunriseflowers",
-            "amount": 100
+            "amount": 100,
+            "actualAmount": 184600
           },
           {
             "ware": "methane",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 1846
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 20,
-          "buildDuration": 30
+          "amount": 20
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 100,
-          "buildDuration": 15
+          "amount": 100
         }
       ],
       "rebates": [
@@ -3153,28 +3170,29 @@
         "wares": [
           {
             "ware": "dronecomponents",
-            "amount": 2
+            "amount": 2,
+            "actualAmount": 4294
           },
           {
             "ware": "sojabeans",
-            "amount": 100
+            "amount": 100,
+            "actualAmount": 214700
           },
           {
             "ware": "methane",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 2147
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 20,
-          "buildDuration": 30
+          "amount": 20
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 100,
-          "buildDuration": 15
+          "amount": 100
         }
       ],
       "rebates": [
@@ -3245,28 +3263,29 @@
         "wares": [
           {
             "ware": "dronecomponents",
-            "amount": 2
+            "amount": 2,
+            "actualAmount": 9728
           },
           {
             "ware": "spices",
-            "amount": 100
+            "amount": 100,
+            "actualAmount": 486400
           },
           {
             "ware": "methane",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 4864
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 20,
-          "buildDuration": 30
+          "amount": 20
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 100,
-          "buildDuration": 15
+          "amount": 100
         }
       ],
       "rebates": [],
@@ -3331,24 +3350,24 @@
         "wares": [
           {
             "ware": "dronecomponents",
-            "amount": 20
+            "amount": 20,
+            "actualAmount": 4360
           },
           {
             "ware": "methane",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 218
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 1,
-          "buildDuration": 30
+          "amount": 1
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 7,
-          "buildDuration": 15
+          "amount": 7
         }
       ],
       "rebates": [],
@@ -3394,40 +3413,44 @@
         "wares": [
           {
             "ware": "claytronics",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 638
           },
           {
             "ware": "energycells",
-            "amount": 133
+            "amount": 133,
+            "actualAmount": 84854
           },
           {
             "ware": "hullparts",
-            "amount": 10
+            "amount": 10,
+            "actualAmount": 6380
           },
           {
             "ware": "microchips",
-            "amount": 2
+            "amount": 2,
+            "actualAmount": 1276
           },
           {
             "ware": "scanningarrays",
-            "amount": 2
+            "amount": 2,
+            "actualAmount": 1276
           },
           {
             "ware": "water",
-            "amount": 40
+            "amount": 40,
+            "actualAmount": 25520
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 5,
-          "buildDuration": 30
+          "amount": 5
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 20,
-          "buildDuration": 15
+          "amount": 20
         }
       ],
       "rebates": [],
@@ -3505,28 +3528,29 @@
         "wares": [
           {
             "ware": "claytronics",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 783
           },
           {
             "ware": "advancedelectronics",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 783
           },
           {
             "ware": "hullparts",
-            "amount": 10
+            "amount": 10,
+            "actualAmount": 7830
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 1,
-          "buildDuration": 30
+          "amount": 1
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 7,
-          "buildDuration": 15
+          "amount": 7
         }
       ],
       "rebates": [],
@@ -3604,28 +3628,29 @@
         "wares": [
           {
             "ware": "claytronics",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 1947
           },
           {
             "ware": "advancedelectronics",
-            "amount": 2
+            "amount": 2,
+            "actualAmount": 3894
           },
           {
             "ware": "hullparts",
-            "amount": 10
+            "amount": 10,
+            "actualAmount": 19470
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 4,
-          "buildDuration": 30
+          "amount": 4
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 20,
-          "buildDuration": 15
+          "amount": 20
         }
       ],
       "rebates": [],
@@ -3703,28 +3728,29 @@
         "wares": [
           {
             "ware": "claytronics",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 19346
           },
           {
             "ware": "advancedelectronics",
-            "amount": 4
+            "amount": 4,
+            "actualAmount": 77384
           },
           {
             "ware": "hullparts",
-            "amount": 10
+            "amount": 10,
+            "actualAmount": 193460
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 50,
-          "buildDuration": 30
+          "amount": 50
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 250,
-          "buildDuration": 15
+          "amount": 250
         }
       ],
       "rebates": [],
@@ -3808,28 +3834,29 @@
         "wares": [
           {
             "ware": "claytronics",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 3182
           },
           {
             "ware": "advancedelectronics",
-            "amount": 20
+            "amount": 20,
+            "actualAmount": 63640
           },
           {
             "ware": "hullparts",
-            "amount": 10
+            "amount": 10,
+            "actualAmount": 31820
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 20,
-          "buildDuration": 30
+          "amount": 20
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 100,
-          "buildDuration": 15
+          "amount": 100
         }
       ],
       "rebates": [],
@@ -3901,36 +3928,39 @@
         "wares": [
           {
             "ware": "claytronics",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 7822
           },
           {
             "ware": "dronecomponents",
-            "amount": 2
+            "amount": 2,
+            "actualAmount": 15644
           },
           {
             "ware": "hullparts",
-            "amount": 10
+            "amount": 10,
+            "actualAmount": 78220
           },
           {
             "ware": "shieldcomponents",
-            "amount": 10
+            "amount": 10,
+            "actualAmount": 78220
           },
           {
             "ware": "weaponcomponents",
-            "amount": 7
+            "amount": 7,
+            "actualAmount": 54754
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 35,
-          "buildDuration": 30
+          "amount": 35
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 180,
-          "buildDuration": 15
+          "amount": 180
         }
       ],
       "rebates": [],
@@ -3967,19 +3997,20 @@
         "wares": [
           {
             "ware": "weaponcomponents",
-            "amount": 10
+            "amount": 10,
+            "actualAmount": 120
           },
           {
             "ware": "medicalsupplies",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 12
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 1,
-          "buildDuration": 30
+          "amount": 1
         }
       ],
       "rebates": [],
@@ -4022,19 +4053,20 @@
         "wares": [
           {
             "ware": "weaponcomponents",
-            "amount": 10
+            "amount": 10,
+            "actualAmount": 120
           },
           {
             "ware": "medicalsupplies",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 12
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 1,
-          "buildDuration": 15
+          "amount": 1
         }
       ],
       "rebates": [],
@@ -4070,23 +4102,25 @@
         "wares": [
           {
             "ware": "weaponcomponents",
-            "amount": 10
+            "amount": 10,
+            "actualAmount": 21430
           },
           {
             "ware": "medicalsupplies",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 2143
           },
           {
             "ware": "nividium",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 2143
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 1,
-          "buildDuration": 30
+          "amount": 1
         }
       ],
       "rebates": [],
@@ -4154,36 +4188,39 @@
         "wares": [
           {
             "ware": "claytronics",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 7822
           },
           {
             "ware": "dronecomponents",
-            "amount": 2
+            "amount": 2,
+            "actualAmount": 15644
           },
           {
             "ware": "hullparts",
-            "amount": 10
+            "amount": 10,
+            "actualAmount": 78220
           },
           {
             "ware": "shieldcomponents",
-            "amount": 10
+            "amount": 10,
+            "actualAmount": 78220
           },
           {
             "ware": "weaponcomponents",
-            "amount": 7
+            "amount": 7,
+            "actualAmount": 54754
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 35,
-          "buildDuration": 30
+          "amount": 35
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 180,
-          "buildDuration": 15
+          "amount": 180
         }
       ],
       "rebates": [],
@@ -4213,36 +4250,39 @@
         "wares": [
           {
             "ware": "claytronics",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 782
           },
           {
             "ware": "dronecomponents",
-            "amount": 2
+            "amount": 2,
+            "actualAmount": 1564
           },
           {
             "ware": "hullparts",
-            "amount": 10
+            "amount": 10,
+            "actualAmount": 7820
           },
           {
             "ware": "shieldcomponents",
-            "amount": 10
+            "amount": 10,
+            "actualAmount": 7820
           },
           {
             "ware": "weaponcomponents",
-            "amount": 7
+            "amount": 7,
+            "actualAmount": 5474
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 3,
-          "buildDuration": 30
+          "amount": 3
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 18,
-          "buildDuration": 15
+          "amount": 18
         }
       ],
       "rebates": [],
@@ -4279,23 +4319,25 @@
         "wares": [
           {
             "ware": "hullparts",
-            "amount": 5
+            "amount": 5,
+            "actualAmount": 90
           },
           {
             "ware": "engineparts",
-            "amount": 5
+            "amount": 5,
+            "actualAmount": 90
           },
           {
             "ware": "medicalsupplies",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 18
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 1,
-          "buildDuration": 30
+          "amount": 1
         }
       ],
       "rebates": [],
@@ -4338,23 +4380,25 @@
         "wares": [
           {
             "ware": "hullparts",
-            "amount": 5
+            "amount": 5,
+            "actualAmount": 90
           },
           {
             "ware": "engineparts",
-            "amount": 5
+            "amount": 5,
+            "actualAmount": 90
           },
           {
             "ware": "medicalsupplies",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 18
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 1,
-          "buildDuration": 15
+          "amount": 1
         }
       ],
       "rebates": [],
@@ -4390,27 +4434,30 @@
         "wares": [
           {
             "ware": "hullparts",
-            "amount": 5
+            "amount": 5,
+            "actualAmount": 15520
           },
           {
             "ware": "engineparts",
-            "amount": 5
+            "amount": 5,
+            "actualAmount": 15520
           },
           {
             "ware": "medicalsupplies",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 3104
           },
           {
             "ware": "nividium",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 3104
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 1,
-          "buildDuration": 30
+          "amount": 1
         }
       ],
       "rebates": [],
@@ -4484,36 +4531,39 @@
         "wares": [
           {
             "ware": "claytronics",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 4014
           },
           {
             "ware": "dronecomponents",
-            "amount": 2
+            "amount": 2,
+            "actualAmount": 8028
           },
           {
             "ware": "energycells",
-            "amount": 133
+            "amount": 133,
+            "actualAmount": 533862
           },
           {
             "ware": "hullparts",
-            "amount": 10
+            "amount": 10,
+            "actualAmount": 40140
           },
           {
             "ware": "microchips",
-            "amount": 2
+            "amount": 2,
+            "actualAmount": 8028
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 15,
-          "buildDuration": 30
+          "amount": 15
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 75,
-          "buildDuration": 15
+          "amount": 75
         }
       ],
       "rebates": [],
@@ -4598,36 +4648,39 @@
         "wares": [
           {
             "ware": "advancedelectronics",
-            "amount": 2
+            "amount": 2,
+            "actualAmount": 7654
           },
           {
             "ware": "dronecomponents",
-            "amount": 2
+            "amount": 2,
+            "actualAmount": 7654
           },
           {
             "ware": "energycells",
-            "amount": 133
+            "amount": 133,
+            "actualAmount": 508991
           },
           {
             "ware": "refinedmetals",
-            "amount": 13
+            "amount": 13,
+            "actualAmount": 49751
           },
           {
             "ware": "scanningarrays",
-            "amount": 2
+            "amount": 2,
+            "actualAmount": 7654
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 20,
-          "buildDuration": 30
+          "amount": 20
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 100,
-          "buildDuration": 15
+          "amount": 100
         }
       ],
       "rebates": [],
@@ -4664,32 +4717,34 @@
         "wares": [
           {
             "ware": "advancedelectronics",
-            "amount": 10
+            "amount": 10,
+            "actualAmount": 19090
           },
           {
             "ware": "energycells",
-            "amount": 133
+            "amount": 133,
+            "actualAmount": 253897
           },
           {
             "ware": "hullparts",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 1909
           },
           {
             "ware": "microchips",
-            "amount": 9
+            "amount": 9,
+            "actualAmount": 17181
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 12,
-          "buildDuration": 30
+          "amount": 12
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 60,
-          "buildDuration": 15
+          "amount": 60
         }
       ],
       "rebates": [],
@@ -4774,32 +4829,34 @@
         "wares": [
           {
             "ware": "advancedelectronics",
-            "amount": 10
+            "amount": 10,
+            "actualAmount": 18700
           },
           {
             "ware": "energycells",
-            "amount": 133
+            "amount": 133,
+            "actualAmount": 248710
           },
           {
             "ware": "hullparts",
-            "amount": 3
+            "amount": 3,
+            "actualAmount": 5610
           },
           {
             "ware": "microchips",
-            "amount": 9
+            "amount": 9,
+            "actualAmount": 16830
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 12,
-          "buildDuration": 30
+          "amount": 12
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 60,
-          "buildDuration": 15
+          "amount": 60
         }
       ],
       "rebates": [],
@@ -4873,32 +4930,34 @@
         "wares": [
           {
             "ware": "advancedelectronics",
-            "amount": 10
+            "amount": 10,
+            "actualAmount": 18700
           },
           {
             "ware": "energycells",
-            "amount": 133
+            "amount": 133,
+            "actualAmount": 248710
           },
           {
             "ware": "hullparts",
-            "amount": 3
+            "amount": 3,
+            "actualAmount": 5610
           },
           {
             "ware": "microchips",
-            "amount": 9
+            "amount": 9,
+            "actualAmount": 16830
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 12,
-          "buildDuration": 30
+          "amount": 12
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 60,
-          "buildDuration": 15
+          "amount": 60
         }
       ],
       "rebates": [],
@@ -4935,32 +4994,34 @@
         "wares": [
           {
             "ware": "advancedelectronics",
-            "amount": 2
+            "amount": 2,
+            "actualAmount": 5558
           },
           {
             "ware": "claytronics",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 2779
           },
           {
             "ware": "energycells",
-            "amount": 133
+            "amount": 133,
+            "actualAmount": 369607
           },
           {
             "ware": "hullparts",
-            "amount": 4
+            "amount": 4,
+            "actualAmount": 11116
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 7,
-          "buildDuration": 30
+          "amount": 7
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 35,
-          "buildDuration": 15
+          "amount": 35
         }
       ],
       "rebates": [],
@@ -5013,32 +5074,34 @@
         "wares": [
           {
             "ware": "advancedelectronics",
-            "amount": 2
+            "amount": 2,
+            "actualAmount": 9408
           },
           {
             "ware": "claytronics",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 4704
           },
           {
             "ware": "energycells",
-            "amount": 133
+            "amount": 133,
+            "actualAmount": 625632
           },
           {
             "ware": "hullparts",
-            "amount": 10
+            "amount": 10,
+            "actualAmount": 47040
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 15,
-          "buildDuration": 30
+          "amount": 15
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 80,
-          "buildDuration": 15
+          "amount": 80
         }
       ],
       "rebates": [],
@@ -5086,36 +5149,39 @@
         "wares": [
           {
             "ware": "advancedelectronics",
-            "amount": 2
+            "amount": 2,
+            "actualAmount": 8454
           },
           {
             "ware": "claytronics",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 4227
           },
           {
             "ware": "energycells",
-            "amount": 133
+            "amount": 133,
+            "actualAmount": 562191
           },
           {
             "ware": "hullparts",
-            "amount": 4
+            "amount": 4,
+            "actualAmount": 16908
           },
           {
             "ware": "teladianium",
-            "amount": 10
+            "amount": 10,
+            "actualAmount": 42270
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 18,
-          "buildDuration": 30
+          "amount": 18
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 90,
-          "buildDuration": 15
+          "amount": 90
         }
       ],
       "rebates": [],
@@ -5152,36 +5218,39 @@
         "wares": [
           {
             "ware": "advancedelectronics",
-            "amount": 2
+            "amount": 2,
+            "actualAmount": 1548
           },
           {
             "ware": "claytronics",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 774
           },
           {
             "ware": "energycells",
-            "amount": 133
+            "amount": 133,
+            "actualAmount": 102942
           },
           {
             "ware": "hullparts",
-            "amount": 10
+            "amount": 10,
+            "actualAmount": 7740
           },
           {
             "ware": "smartchips",
-            "amount": 33
+            "amount": 33,
+            "actualAmount": 25542
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 3,
-          "buildDuration": 30
+          "amount": 3
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 15,
-          "buildDuration": 15
+          "amount": 15
         }
       ],
       "rebates": [
@@ -5217,7 +5286,8 @@
         "wares": [
           {
             "ware": "medicalsupplies",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 5617
           }
         ],
         "pricescale": "population",
@@ -5226,8 +5296,7 @@
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 1,
-          "buildDuration": 30
+          "amount": 1
         }
       ],
       "rebates": [],
@@ -5270,40 +5339,44 @@
         "wares": [
           {
             "ware": "advancedelectronics",
-            "amount": 2
+            "amount": 2,
+            "actualAmount": 1256
           },
           {
             "ware": "claytronics",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 628
           },
           {
             "ware": "energycells",
-            "amount": 133
+            "amount": 133,
+            "actualAmount": 83524
           },
           {
             "ware": "hullparts",
-            "amount": 10
+            "amount": 10,
+            "actualAmount": 6280
           },
           {
             "ware": "scanningarrays",
-            "amount": 2
+            "amount": 2,
+            "actualAmount": 1256
           },
           {
             "ware": "superfluidcoolant",
-            "amount": 13
+            "amount": 13,
+            "actualAmount": 8164
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 4,
-          "buildDuration": 30
+          "amount": 4
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 20,
-          "buildDuration": 15
+          "amount": 20
         }
       ],
       "rebates": [],
@@ -5333,183 +5406,228 @@
         "wares": [
           {
             "ware": "advancedcomposites",
-            "amount": 4
+            "amount": 4,
+            "actualAmount": 64
           },
           {
             "ware": "advancedelectronics",
-            "amount": 2
+            "amount": 2,
+            "actualAmount": 32
           },
           {
             "ware": "antimattercells",
-            "amount": 10
+            "amount": 10,
+            "actualAmount": 160
           },
           {
             "ware": "antimatterconverters",
-            "amount": 6
+            "amount": 6,
+            "actualAmount": 96
           },
           {
             "ware": "claytronics",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 16
           },
           {
             "ware": "dronecomponents",
-            "amount": 2
+            "amount": 2,
+            "actualAmount": 32
           },
           {
             "ware": "energycells",
-            "amount": 133
+            "amount": 133,
+            "actualAmount": 2128
           },
           {
             "ware": "engineparts",
-            "amount": 11
+            "amount": 11,
+            "actualAmount": 176
           },
           {
             "ware": "fieldcoils",
-            "amount": 5
+            "amount": 5,
+            "actualAmount": 80
           },
           {
             "ware": "foodrations",
-            "amount": 100
+            "amount": 100,
+            "actualAmount": 1600
           },
           {
             "ware": "graphene",
-            "amount": 13
+            "amount": 13,
+            "actualAmount": 208
           },
           {
             "ware": "helium",
-            "amount": 40
+            "amount": 40,
+            "actualAmount": 640
           },
           {
             "ware": "hullparts",
-            "amount": 10
+            "amount": 10,
+            "actualAmount": 160
           },
           {
             "ware": "hydrogen",
-            "amount": 40
+            "amount": 40,
+            "actualAmount": 640
           },
           {
             "ware": "ice",
-            "amount": 67
+            "amount": 67,
+            "actualAmount": 1072
           },
           {
             "ware": "majadust",
-            "amount": 10
+            "amount": 10,
+            "actualAmount": 160
           },
           {
             "ware": "majasnails",
-            "amount": 33
+            "amount": 33,
+            "actualAmount": 528
           },
           {
             "ware": "meat",
-            "amount": 40
+            "amount": 40,
+            "actualAmount": 640
           },
           {
             "ware": "medicalsupplies",
-            "amount": 33
+            "amount": 33,
+            "actualAmount": 528
           },
           {
             "ware": "methane",
-            "amount": 40
+            "amount": 40,
+            "actualAmount": 640
           },
           {
             "ware": "microchips",
-            "amount": 2
+            "amount": 2,
+            "actualAmount": 32
           },
           {
             "ware": "missilecomponents",
-            "amount": 200
+            "amount": 200,
+            "actualAmount": 3200
           },
           {
             "ware": "nividium",
-            "amount": 4
+            "amount": 4,
+            "actualAmount": 64
           },
           {
             "ware": "nostropoil",
-            "amount": 67
+            "amount": 67,
+            "actualAmount": 1072
           },
           {
             "ware": "ore",
-            "amount": 40
+            "amount": 40,
+            "actualAmount": 640
           },
           {
             "ware": "plasmaconductors",
-            "amount": 2
+            "amount": 2,
+            "actualAmount": 32
           },
           {
             "ware": "quantumtubes",
-            "amount": 7
+            "amount": 7,
+            "actualAmount": 112
           },
           {
             "ware": "refinedmetals",
-            "amount": 13
+            "amount": 13,
+            "actualAmount": 208
           },
           {
             "ware": "scanningarrays",
-            "amount": 2
+            "amount": 2,
+            "actualAmount": 32
           },
           {
             "ware": "shieldcomponents",
-            "amount": 10
+            "amount": 10,
+            "actualAmount": 160
           },
           {
             "ware": "silicon",
-            "amount": 15
+            "amount": 15,
+            "actualAmount": 240
           },
           {
             "ware": "siliconwafers",
-            "amount": 7
+            "amount": 7,
+            "actualAmount": 112
           },
           {
             "ware": "smartchips",
-            "amount": 33
+            "amount": 33,
+            "actualAmount": 528
           },
           {
             "ware": "sojabeans",
-            "amount": 29
+            "amount": 29,
+            "actualAmount": 464
           },
           {
             "ware": "sojahusk",
-            "amount": 67
+            "amount": 67,
+            "actualAmount": 1072
           },
           {
             "ware": "spacefuel",
-            "amount": 15
+            "amount": 15,
+            "actualAmount": 240
           },
           {
             "ware": "spaceweed",
-            "amount": 13
+            "amount": 13,
+            "actualAmount": 208
           },
           {
             "ware": "spices",
-            "amount": 100
+            "amount": 100,
+            "actualAmount": 1600
           },
           {
             "ware": "sunriseflowers",
-            "amount": 25
+            "amount": 25,
+            "actualAmount": 400
           },
           {
             "ware": "superfluidcoolant",
-            "amount": 13
+            "amount": 13,
+            "actualAmount": 208
           },
           {
             "ware": "swampplant",
-            "amount": 24
+            "amount": 24,
+            "actualAmount": 384
           },
           {
             "ware": "teladianium",
-            "amount": 10
+            "amount": 10,
+            "actualAmount": 160
           },
           {
             "ware": "water",
-            "amount": 40
+            "amount": 40,
+            "actualAmount": 640
           },
           {
             "ware": "weaponcomponents",
-            "amount": 7
+            "amount": 7,
+            "actualAmount": 112
           },
           {
             "ware": "wheat",
-            "amount": 7
+            "amount": 7,
+            "actualAmount": 112
           }
         ],
         "payout": 250,
@@ -5519,8 +5637,7 @@
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 1,
-          "buildDuration": 30
+          "amount": 1
         }
       ],
       "rebates": [],
@@ -5563,32 +5680,34 @@
         "wares": [
           {
             "ware": "claytronics",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 973
           },
           {
             "ware": "energycells",
-            "amount": 133
+            "amount": 133,
+            "actualAmount": 129409
           },
           {
             "ware": "hullparts",
-            "amount": 10
+            "amount": 10,
+            "actualAmount": 9730
           },
           {
             "ware": "smartchips",
-            "amount": 33
+            "amount": 33,
+            "actualAmount": 32109
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 3,
-          "buildDuration": 30
+          "amount": 3
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 16,
-          "buildDuration": 15
+          "amount": 16
         }
       ],
       "rebates": [],
@@ -5661,40 +5780,44 @@
         "wares": [
           {
             "ware": "advancedelectronics",
-            "amount": 2
+            "amount": 2,
+            "actualAmount": 1286
           },
           {
             "ware": "claytronics",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 643
           },
           {
             "ware": "energycells",
-            "amount": 133
+            "amount": 133,
+            "actualAmount": 85519
           },
           {
             "ware": "hullparts",
-            "amount": 10
+            "amount": 10,
+            "actualAmount": 6430
           },
           {
             "ware": "nividium",
-            "amount": 4
+            "amount": 4,
+            "actualAmount": 2572
           },
           {
             "ware": "plasmaconductors",
-            "amount": 2
+            "amount": 2,
+            "actualAmount": 1286
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 3,
-          "buildDuration": 30
+          "amount": 3
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 15,
-          "buildDuration": 15
+          "amount": 15
         }
       ],
       "rebates": [],
@@ -5724,7 +5847,8 @@
         "wares": [
           {
             "ware": "nividium",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 1703
           }
         ],
         "pricescale": "population",
@@ -5733,8 +5857,7 @@
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 1,
-          "buildDuration": 30
+          "amount": 1
         }
       ],
       "rebates": [],
@@ -5772,13 +5895,11 @@
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 5,
-          "buildDuration": 30
+          "amount": 5
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 20,
-          "buildDuration": 15
+          "amount": 20
         }
       ],
       "rebates": [],
@@ -5816,13 +5937,11 @@
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 5,
-          "buildDuration": 30
+          "amount": 5
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 20,
-          "buildDuration": 15
+          "amount": 20
         }
       ],
       "rebates": [],
@@ -6022,13 +6141,11 @@
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 5,
-          "buildDuration": 30
+          "amount": 5
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 20,
-          "buildDuration": 15
+          "amount": 20
         }
       ],
       "rebates": [],
@@ -6076,13 +6193,11 @@
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 5,
-          "buildDuration": 30
+          "amount": 5
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 20,
-          "buildDuration": 15
+          "amount": 20
         }
       ],
       "rebates": [],
@@ -6130,13 +6245,11 @@
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 5,
-          "buildDuration": 30
+          "amount": 5
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 20,
-          "buildDuration": 15
+          "amount": 20
         }
       ],
       "rebates": [],
@@ -6195,13 +6308,11 @@
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 5,
-          "buildDuration": 30
+          "amount": 5
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 20,
-          "buildDuration": 15
+          "amount": 20
         }
       ],
       "rebates": [],
@@ -6233,13 +6344,11 @@
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 5,
-          "buildDuration": 30
+          "amount": 5
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 20,
-          "buildDuration": 15
+          "amount": 20
         }
       ],
       "rebates": [],
@@ -6271,13 +6380,11 @@
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 5,
-          "buildDuration": 30
+          "amount": 5
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 20,
-          "buildDuration": 15
+          "amount": 20
         }
       ],
       "rebates": [],
@@ -6312,28 +6419,29 @@
         "wares": [
           {
             "ware": "dronecomponents",
-            "amount": 2
+            "amount": 2,
+            "actualAmount": 7886
           },
           {
             "ware": "scruffinfruits",
-            "amount": 100
+            "amount": 100,
+            "actualAmount": 394300
           },
           {
             "ware": "methane",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 3943
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 20,
-          "buildDuration": 30
+          "amount": 20
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 100,
-          "buildDuration": 15
+          "amount": 100
         }
       ],
       "rebates": [
@@ -6380,28 +6488,29 @@
         "wares": [
           {
             "ware": "computronicsubstrate",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 5486
           },
           {
             "ware": "metallicmicrolattice",
-            "amount": 200
+            "amount": 200,
+            "actualAmount": 1097200
           },
           {
             "ware": "siliconcarbide",
-            "amount": 7
+            "amount": 7,
+            "actualAmount": 38402
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_02_a_macro",
-          "amount": 20,
-          "buildDuration": 90
+          "amount": 20
         },
         {
           "macro": "ship_gen_s_transdrone_container_02_a_macro",
-          "amount": 100,
-          "buildDuration": 45
+          "amount": 100
         }
       ],
       "rebates": [],
@@ -6444,28 +6553,29 @@
         "wares": [
           {
             "ware": "computronicsubstrate",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 3135
           },
           {
             "ware": "metallicmicrolattice",
-            "amount": 200
+            "amount": 200,
+            "actualAmount": 627000
           },
           {
             "ware": "siliconcarbide",
-            "amount": 7
+            "amount": 7,
+            "actualAmount": 21945
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_02_a_macro",
-          "amount": 10,
-          "buildDuration": 90
+          "amount": 10
         },
         {
           "macro": "ship_gen_s_transdrone_container_02_a_macro",
-          "amount": 60,
-          "buildDuration": 45
+          "amount": 60
         }
       ],
       "rebates": [],
@@ -6507,28 +6617,29 @@
         "wares": [
           {
             "ware": "computronicsubstrate",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 31350
           },
           {
             "ware": "metallicmicrolattice",
-            "amount": 200
+            "amount": 200,
+            "actualAmount": 6270000
           },
           {
             "ware": "siliconcarbide",
-            "amount": 7
+            "amount": 7,
+            "actualAmount": 219450
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_02_a_macro",
-          "amount": 100,
-          "buildDuration": 90
+          "amount": 100
         },
         {
           "macro": "ship_gen_s_transdrone_container_02_a_macro",
-          "amount": 500,
-          "buildDuration": 45
+          "amount": 500
         }
       ],
       "rebates": [],
@@ -6558,28 +6669,29 @@
         "wares": [
           {
             "ware": "computronicsubstrate",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 7837
           },
           {
             "ware": "metallicmicrolattice",
-            "amount": 200
+            "amount": 200,
+            "actualAmount": 1567400
           },
           {
             "ware": "siliconcarbide",
-            "amount": 7
+            "amount": 7,
+            "actualAmount": 54859
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_02_a_macro",
-          "amount": 30,
-          "buildDuration": 90
+          "amount": 30
         },
         {
           "macro": "ship_gen_s_transdrone_container_02_a_macro",
-          "amount": 150,
-          "buildDuration": 45
+          "amount": 150
         }
       ],
       "rebates": [
@@ -6627,28 +6739,29 @@
         "wares": [
           {
             "ware": "dronecomponents",
-            "amount": 20
+            "amount": 20,
+            "actualAmount": 86220
           },
           {
             "ware": "plankton",
-            "amount": 10
+            "amount": 10,
+            "actualAmount": 43110
           },
           {
             "ware": "bogas",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 4311
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 85,
-          "buildDuration": 30
+          "amount": 85
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 450,
-          "buildDuration": 15
+          "amount": 450
         }
       ],
       "rebates": [],
@@ -6685,24 +6798,24 @@
         "wares": [
           {
             "ware": "advancedcomposites",
-            "amount": 10
+            "amount": 10,
+            "actualAmount": 14810
           },
           {
             "ware": "hullparts",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 1481
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 5,
-          "buildDuration": 30
+          "amount": 5
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 25,
-          "buildDuration": 15
+          "amount": 25
         }
       ],
       "rebates": [
@@ -6790,28 +6903,29 @@
         "wares": [
           {
             "ware": "methane",
-            "amount": 40
+            "amount": 40,
+            "actualAmount": 416480
           },
           {
             "ware": "plankton",
-            "amount": 100
+            "amount": 100,
+            "actualAmount": 1041200
           },
           {
             "ware": "bogas",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 10412
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 7,
-          "buildDuration": 30
+          "amount": 7
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 35,
-          "buildDuration": 15
+          "amount": 35
         }
       ],
       "rebates": [],
@@ -6871,28 +6985,29 @@
         "wares": [
           {
             "ware": "methane",
-            "amount": 40
+            "amount": 40,
+            "actualAmount": 1249440
           },
           {
             "ware": "plankton",
-            "amount": 100
+            "amount": 100,
+            "actualAmount": 3123600
           },
           {
             "ware": "bogas",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 31236
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 7,
-          "buildDuration": 30
+          "amount": 7
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 35,
-          "buildDuration": 15
+          "amount": 35
         }
       ],
       "rebates": [],
@@ -6947,28 +7062,29 @@
         "wares": [
           {
             "ware": "methane",
-            "amount": 40
+            "amount": 40,
+            "actualAmount": 1249440
           },
           {
             "ware": "plankton",
-            "amount": 100
+            "amount": 100,
+            "actualAmount": 3123600
           },
           {
             "ware": "bogas",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 31236
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 7,
-          "buildDuration": 30
+          "amount": 7
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 35,
-          "buildDuration": 15
+          "amount": 35
         }
       ],
       "rebates": [],
@@ -7028,28 +7144,29 @@
         "wares": [
           {
             "ware": "methane",
-            "amount": 40
+            "amount": 40,
+            "actualAmount": 2082440
           },
           {
             "ware": "plankton",
-            "amount": 100
+            "amount": 100,
+            "actualAmount": 5206100
           },
           {
             "ware": "bogas",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 52061
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 7,
-          "buildDuration": 30
+          "amount": 7
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 35,
-          "buildDuration": 15
+          "amount": 35
         }
       ],
       "rebates": [],
@@ -7108,28 +7225,29 @@
         "wares": [
           {
             "ware": "dronecomponents",
-            "amount": 2
+            "amount": 2,
+            "actualAmount": 10232
           },
           {
             "ware": "plankton",
-            "amount": 100
+            "amount": 100,
+            "actualAmount": 511600
           },
           {
             "ware": "bogas",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 5116
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 20,
-          "buildDuration": 30
+          "amount": 20
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 100,
-          "buildDuration": 15
+          "amount": 100
         }
       ],
       "rebates": [
@@ -7202,28 +7320,29 @@
         "wares": [
           {
             "ware": "claytronics",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 4836
           },
           {
             "ware": "advancedelectronics",
-            "amount": 4
+            "amount": 4,
+            "actualAmount": 19344
           },
           {
             "ware": "hullparts",
-            "amount": 10
+            "amount": 10,
+            "actualAmount": 48360
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 4,
-          "buildDuration": 30
+          "amount": 4
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 20,
-          "buildDuration": 15
+          "amount": 20
         }
       ],
       "rebates": [],
@@ -7285,40 +7404,44 @@
         "wares": [
           {
             "ware": "advancedelectronics",
-            "amount": 2
+            "amount": 2,
+            "actualAmount": 7428
           },
           {
             "ware": "claytronics",
-            "amount": 1
+            "amount": 1,
+            "actualAmount": 3714
           },
           {
             "ware": "dronecomponents",
-            "amount": 2
+            "amount": 2,
+            "actualAmount": 7428
           },
           {
             "ware": "energycells",
-            "amount": 133
+            "amount": 133,
+            "actualAmount": 493962
           },
           {
             "ware": "hullparts",
-            "amount": 4
+            "amount": 4,
+            "actualAmount": 14856
           },
           {
             "ware": "microchips",
-            "amount": 2
+            "amount": 2,
+            "actualAmount": 7428
           }
         ]
       },
       "deliveries": [
         {
           "macro": "ship_gen_m_transdrone_container_01_a_macro",
-          "amount": 18,
-          "buildDuration": 30
+          "amount": 18
         },
         {
           "macro": "ship_gen_s_transdrone_container_01_a_macro",
-          "amount": 90,
-          "buildDuration": 15
+          "amount": 90
         }
       ],
       "rebates": [],
@@ -8675,6 +8798,32 @@
           ]
         }
       }
+    }
+  ],
+  "deliveryShips": [
+    {
+      "macro": "ship_gen_m_transdrone_container_01_a_macro",
+      "buildDuration": 30,
+      "nameId": "{20101,101601}",
+      "name": "Medium Drop Drone"
+    },
+    {
+      "macro": "ship_gen_m_transdrone_container_02_a_macro",
+      "buildDuration": 90,
+      "nameId": "{20101,101801}",
+      "name": "Medium Terraforming Drone"
+    },
+    {
+      "macro": "ship_gen_s_transdrone_container_01_a_macro",
+      "buildDuration": 15,
+      "nameId": "{20101,101501}",
+      "name": "Small Drop Drone"
+    },
+    {
+      "macro": "ship_gen_s_transdrone_container_02_a_macro",
+      "buildDuration": 45,
+      "nameId": "{20101,101701}",
+      "name": "Small Terraforming Drone"
     }
   ]
 }

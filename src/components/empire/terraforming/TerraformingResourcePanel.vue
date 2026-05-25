@@ -1,15 +1,20 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type {
   TerraformingCancelValidation,
   TerraformingExecutionTimelineEntry,
 } from '@/components/empire/presenters/useTerraformingPresenter'
+import type { DeliveryShip } from '@/store/logic/terraformingTaskResolver'
+import { useX4I18n } from '@/utils/UseX4I18n'
+import { useGameDataStore } from '@/store/useGameDataStore'
 
 interface Props {
   selectedClusterId: string | null
   executionTimeline: TerraformingExecutionTimelineEntry[]
   getCancelValidation: (entryId: string) => TerraformingCancelValidation
+  deliveryShipMap: Map<string, DeliveryShip>
+  hqBuildDocks: { totalSlots: number } | null
 }
 
 const props = defineProps<Props>()
@@ -19,6 +24,8 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+const { translateWare } = useX4I18n()
+const gameDataStore = useGameDataStore()
 const expandedEntryId = ref<string | null>(null)
 const cancelValidationCache = ref<Record<string, TerraformingCancelValidation>>({})
 
@@ -52,11 +59,51 @@ function onCancel(entry: TerraformingExecutionTimelineEntry) {
   if (!validation.canCancel) return
   emit('cancelExecution', entry.id)
 }
+
+function getWareName(wareId: string): string {
+  const ware = gameDataStore.waresMap[wareId] as any
+  if (!ware) return wareId
+  return translateWare(ware)
+}
+
+function getShipName(macro: string): string {
+  const ds = props.deliveryShipMap.get(macro)
+  if (!ds) return macro
+  if (ds.nameId) {
+    const translated = t(ds.nameId)
+    if (translated && translated !== ds.nameId) return translated as string
+  }
+  return ds.name || macro
+}
+
+function getShipBuildDuration(macro: string): string {
+  const ds = props.deliveryShipMap.get(macro)
+  const dur = ds?.buildDuration
+  return dur ? `${dur}s` : ''
+}
+
+const showNoDockWarning = computed(() => {
+  const docks = props.hqBuildDocks
+  if (!docks) return false
+  return docks.totalSlots === 0
+})
+
+function formatTime(seconds: number): string {
+  if (seconds <= 0) return ''
+  const h = Math.floor(seconds / 3600)
+  const m = Math.floor((seconds % 3600) / 60)
+  const s = seconds % 60
+  const parts = [h, m, s].map(p => String(p).padStart(2, '0'))
+  return parts.join(':')
+}
 </script>
 
 <template>
   <div class="panel-card">
-    <div class="panel-header">{{ t('terraforming.taskQueue') }}</div>
+    <div class="panel-header">
+      {{ t('terraforming.taskQueue') }}
+      <span v-if="showNoDockWarning" class="text-amber-400 text-[11px] ml-2">⚠ {{ t('terraforming.noBuildDock') }}</span>
+    </div>
     <div class="panel-content">
       <div v-if="!selectedClusterId" class="empty-state">
         {{ t('terraforming.selectClusterForResources') }}
@@ -95,7 +142,71 @@ function onCancel(entry: TerraformingExecutionTimelineEntry) {
             </div>
 
             <div v-if="expandedEntryId === entry.id" class="timeline-body">
-              <div v-if="entry.beforeStats.length > 0 || entry.projectRebates.length > 0" class="detail-section">
+              <div v-if="entry.wares.length > 0" class="detail-section">
+                <div class="section-title">{{ t('terraforming.materialPrice') }}</div>
+                <div v-for="ware in entry.wares" :key="`${entry.id}-ware-${ware.ware}`" class="detail-row">
+                  <span>{{ getWareName(ware.ware) }}</span>
+                  <span>{{ (ware.actualAmount ?? ware.amount).toLocaleString() }}</span>
+                </div>
+                <div class="detail-row detail-total">
+                  <span>{{ t('terraforming.credits') }}</span>
+                  <span>{{ entry.price.toLocaleString() }} Cr</span>
+                </div>
+              </div>
+
+              <div v-if="entry.returnedWares.length > 0" class="detail-section">
+                <div class="section-title">{{ t('terraforming.return') || 'Return' }}</div>
+                <div
+                  v-for="rw in entry.returnedWares"
+                  :key="`${entry.id}-rtw-${rw.name}`"
+                  class="detail-row text-emerald-400"
+                >
+                  <span>{{ rw.name }}</span>
+                  <span>×{{ rw.amount.toLocaleString() }}</span>
+                </div>
+              </div>
+
+              <div v-if="entry.cumulativeRebates.length > 0" class="detail-section">
+                <div class="section-title">{{ t('terraforming.cumulativeRebates') }}</div>
+                <div
+                  v-for="(rb, i) in entry.cumulativeRebates"
+                  :key="`${entry.id}-crbt-${i}`"
+                  class="detail-row text-sky-400"
+                >
+                  <span>{{ rb.name }}</span>
+                  <span>-{{ rb.value }}%</span>
+                </div>
+              </div>
+
+              <div v-if="entry.deliveryDetails.length > 0" class="detail-section">
+                <div class="section-title">{{ t('terraforming.deliveryList') }}</div>
+                <div
+                  v-for="dd in entry.deliveryDetails"
+                  :key="`${entry.id}-delivery-${dd.macro}`"
+                  class="detail-row"
+                >
+                  <span>{{ dd.shipName }}</span>
+                  <span>×{{ dd.amount }}  {{ dd.buildDuration }}s</span>
+                </div>
+              </div>
+
+              <div v-if="entry.dockModules.length > 0" class="detail-section">
+                <div class="section-title">{{ t('terraforming.build') || 'Build' }}</div>
+                <div v-for="dm in entry.dockModules" :key="`${entry.id}-dock-${dm.name}`" class="detail-row">
+                  <span>{{ dm.name }}</span>
+                  <span>×{{ dm.count }}</span>
+                </div>
+                <div class="detail-row">
+                  <span>{{ t('terraforming.buildSlots') || 'Build Slots' }}</span>
+                  <span>×{{ entry.totalSlots }}</span>
+                </div>
+                <div v-if="entry.deliveryDetails[0]?.totalTime > 0" class="detail-row">
+                  <span>{{ t('terraforming.buildTime') }}</span>
+                  <span>{{ formatTime(entry.deliveryDetails[0].totalTime) }}</span>
+                </div>
+              </div>
+
+              <div v-if="entry.beforeStats.length > 0 || entry.rebateChanges.length > 0" class="detail-section">
                 <div class="section-title">{{ t('terraforming.statChanges') }}</div>
                 <div
                   v-for="snapshot in entry.beforeStats"
@@ -106,55 +217,12 @@ function onCancel(entry: TerraformingExecutionTimelineEntry) {
                   <span>{{ snapshot.beforeValue }} → {{ snapshot.afterValue }}</span>
                 </div>
                 <div
-                  v-for="(rb, i) in entry.projectRebates"
-                  :key="`${entry.id}-rebate-${i}`"
+                  v-for="(rc, i) in entry.rebateChanges"
+                  :key="`${entry.id}-rc-${i}`"
                   class="detail-row text-emerald-400"
                 >
-                  <span>{{ rb }}</span>
-                </div>
-              </div>
-
-              <div v-if="entry.cumulativeRebates.length > 0" class="detail-section">
-                <div class="section-title">{{ t('terraforming.cumulativeRebates') }}</div>
-                <div
-                  v-for="(rb, i) in entry.cumulativeRebates"
-                  :key="`${entry.id}-cumulative-${i}`"
-                  class="detail-row text-emerald-400"
-                >
-                  <span class="rebate-dot">•</span>
-                  <span>{{ rb }}</span>
-                </div>
-              </div>
-
-              <div v-if="entry.wares.length > 0" class="detail-section">
-                <div class="section-title">{{ t('terraforming.resourceRequirements') }}</div>
-                <div v-for="ware in entry.wares" :key="`${entry.id}-ware-${ware.ware}`" class="detail-row">
-                  <span>{{ ware.ware }}</span>
-                  <span>{{ ware.amount.toLocaleString() }}</span>
-                </div>
-              </div>
-
-              <div class="detail-section">
-                <div class="section-title">{{ t('terraforming.price') }}</div>
-                <div class="detail-row">
-                  <span>Credits</span>
-                  <span v-if="entry.discountedPrice < entry.price">
-                    <span class="original-price">{{ entry.price.toLocaleString() }}</span>
-                    <span class="discounted-price"> → {{ entry.discountedPrice.toLocaleString() }}</span>
-                  </span>
-                  <span v-else>{{ entry.price.toLocaleString() }}</span>
-                </div>
-              </div>
-
-              <div v-if="entry.deliveries.length > 0" class="detail-section">
-                <div class="section-title">{{ t('terraforming.deliveryList') }}</div>
-                <div
-                  v-for="delivery in entry.deliveries"
-                  :key="`${entry.id}-delivery-${delivery.macro}`"
-                  class="detail-row"
-                >
-                  <span>{{ delivery.macro }}</span>
-                  <span>x{{ delivery.amount }} / {{ delivery.buildDuration }}s</span>
+                  <span>{{ t('terraforming.discount') || '折扣' }}: {{ rc.name }}</span>
+                  <span>{{ rc.before }}% → {{ rc.after }}%</span>
                 </div>
               </div>
 
@@ -259,19 +327,15 @@ function onCancel(entry: TerraformingExecutionTimelineEntry) {
   @apply flex items-center justify-between gap-3 text-xs text-slate-300;
 }
 
+.detail-row.detail-total {
+  @apply border-t border-slate-700/40 pt-1 mt-0.5 text-slate-200;
+}
+
 .detail-text {
   @apply text-xs text-slate-300;
 }
 
 .rebate-dot {
   @apply text-emerald-400 mr-1 shrink-0;
-}
-
-.original-price {
-  @apply text-slate-500 line-through;
-}
-
-.discounted-price {
-  @apply text-emerald-400;
 }
 </style>

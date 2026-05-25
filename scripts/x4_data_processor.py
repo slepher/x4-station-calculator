@@ -615,11 +615,22 @@ class X4PrecisionLoader:
                     "workforce": { "capacity": wf_cap, "needed": wf_val, "maxBonus": 0 },
                     "outputs": {}, 
                     "inputs": {},
-                    "dockingCount": 0
+                    "dockingCount": 0,
+                    "buildProcessorCount": 0,
+                    "buildShipClasses": [],
                 }
                 
                 # 初始颜色分配 
                 module_data['color'], module_data['color_rgb'] = self._get_module_colors(m_class)
+
+                # Count build processors for build modules
+                if m_class == 'buildmodule':
+                    bp_connections = macro.findall("./connections/connection[@ref='buildprocessorconnection']")
+                    module_data['buildProcessorCount'] = len(bp_connections)
+                    builder = macro.find('properties/builder')
+                    if builder is not None:
+                        classes_raw = builder.get('classes', '')
+                        module_data['buildShipClasses'] = [c for c in classes_raw.split() if c]
 
                 # Fix: Check identification tag for specific module types
                 ident = macro.find('properties/identification')
@@ -2728,7 +2739,7 @@ class X4PrecisionLoader:
         count_tf = 0
         if hasattr(self, 'terraforming_data') and self.terraforming_data is not None:
             tf_data = self.terraforming_data
-            for section in ['stats', 'projectGroups', 'projects']:
+            for section in ['stats', 'projectGroups', 'projects', 'deliveryShips']:
                 for item in tf_data.get(section, []):
                     for key in ('nameId', 'descriptionId', 'inactiveTextId'):
                         raw_key = item.get(key)

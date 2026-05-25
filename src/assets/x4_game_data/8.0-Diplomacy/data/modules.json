@@ -28,6 +28,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 1,
+    "buildShipClasses": [],
     "color": "amber",
     "color_rgb": "#FFBF00"
   },
@@ -60,6 +62,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 8,
+    "buildShipClasses": [],
     "color": "amber",
     "color_rgb": "#FFBF00"
   },
@@ -92,6 +96,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 1,
+    "buildShipClasses": [],
     "color": "amber",
     "color_rgb": "#FFBF00"
   },
@@ -124,6 +130,10 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 1,
+    "buildShipClasses": [
+      "ship_l"
+    ],
     "color": "amber",
     "color_rgb": "#FFBF00"
   },
@@ -156,6 +166,11 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 8,
+    "buildShipClasses": [
+      "ship_m",
+      "ship_s"
+    ],
     "color": "amber",
     "color_rgb": "#FFBF00"
   },
@@ -188,6 +203,10 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 1,
+    "buildShipClasses": [
+      "ship_xl"
+    ],
     "color": "amber",
     "color_rgb": "#FFBF00"
   },
@@ -219,6 +238,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 1,
+    "buildShipClasses": [],
     "color": "amber",
     "color_rgb": "#FFBF00"
   },
@@ -250,6 +271,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 8,
+    "buildShipClasses": [],
     "color": "amber",
     "color_rgb": "#FFBF00"
   },
@@ -281,6 +304,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 1,
+    "buildShipClasses": [],
     "color": "amber",
     "color_rgb": "#FFBF00"
   },
@@ -312,6 +337,10 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 1,
+    "buildShipClasses": [
+      "ship_l"
+    ],
     "color": "amber",
     "color_rgb": "#FFBF00"
   },
@@ -343,6 +372,11 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 8,
+    "buildShipClasses": [
+      "ship_m",
+      "ship_s"
+    ],
     "color": "amber",
     "color_rgb": "#FFBF00"
   },
@@ -374,6 +408,10 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 3,
+    "buildShipClasses": [
+      "ship_m"
+    ],
     "color": "amber",
     "color_rgb": "#FFBF00"
   },
@@ -405,6 +443,10 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 6,
+    "buildShipClasses": [
+      "ship_s"
+    ],
     "color": "amber",
     "color_rgb": "#FFBF00"
   },
@@ -436,6 +478,10 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 1,
+    "buildShipClasses": [
+      "ship_xl"
+    ],
     "color": "amber",
     "color_rgb": "#FFBF00"
   },
@@ -467,6 +513,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 1,
+    "buildShipClasses": [],
     "color": "amber",
     "color_rgb": "#FFBF00"
   },
@@ -498,6 +546,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 8,
+    "buildShipClasses": [],
     "color": "amber",
     "color_rgb": "#FFBF00"
   },
@@ -529,6 +579,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 1,
+    "buildShipClasses": [],
     "color": "amber",
     "color_rgb": "#FFBF00"
   },
@@ -560,6 +612,10 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 1,
+    "buildShipClasses": [
+      "ship_l"
+    ],
     "color": "amber",
     "color_rgb": "#FFBF00"
   },
@@ -591,6 +647,11 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 8,
+    "buildShipClasses": [
+      "ship_m",
+      "ship_s"
+    ],
     "color": "amber",
     "color_rgb": "#FFBF00"
   },
@@ -622,6 +683,10 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 1,
+    "buildShipClasses": [
+      "ship_xl"
+    ],
     "color": "amber",
     "color_rgb": "#FFBF00"
   },
@@ -653,6 +718,10 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 3,
+    "buildShipClasses": [
+      "ship_m"
+    ],
     "color": "amber",
     "color_rgb": "#FFBF00"
   },
@@ -684,6 +753,10 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 6,
+    "buildShipClasses": [
+      "ship_s"
+    ],
     "color": "amber",
     "color_rgb": "#FFBF00"
   },
@@ -715,6 +788,11 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 1,
+    "buildShipClasses": [
+      "ship_xl",
+      "ship_l"
+    ],
     "color": "amber",
     "color_rgb": "#FFBF00"
   },
@@ -746,6 +824,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "red",
     "color_rgb": "#FF0000"
   },
@@ -777,6 +857,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "red",
     "color_rgb": "#FF0000"
   },
@@ -808,6 +890,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "red",
     "color_rgb": "#FF0000"
   },
@@ -840,6 +924,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "red",
     "color_rgb": "#FF0000"
   },
@@ -872,6 +958,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "red",
     "color_rgb": "#FF0000"
   },
@@ -904,6 +992,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "red",
     "color_rgb": "#FF0000"
   },
@@ -935,6 +1025,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "red",
     "color_rgb": "#FF0000"
   },
@@ -966,6 +1058,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "red",
     "color_rgb": "#FF0000"
   },
@@ -997,6 +1091,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "red",
     "color_rgb": "#FF0000"
   },
@@ -1028,6 +1124,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "red",
     "color_rgb": "#FF0000"
   },
@@ -1059,6 +1157,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "red",
     "color_rgb": "#FF0000"
   },
@@ -1090,6 +1190,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "red",
     "color_rgb": "#FF0000"
   },
@@ -1121,6 +1223,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "red",
     "color_rgb": "#FF0000"
   },
@@ -1152,6 +1256,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "red",
     "color_rgb": "#FF0000"
   },
@@ -1183,6 +1289,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "red",
     "color_rgb": "#FF0000"
   },
@@ -1214,6 +1322,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "red",
     "color_rgb": "#FF0000"
   },
@@ -1245,6 +1355,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "red",
     "color_rgb": "#FF0000"
   },
@@ -1276,6 +1388,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "red",
     "color_rgb": "#FF0000"
   },
@@ -1307,6 +1421,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "red",
     "color_rgb": "#FF0000"
   },
@@ -1338,6 +1454,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "yellow",
     "color_rgb": "#FFFF00"
   },
@@ -1369,6 +1487,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "yellow",
     "color_rgb": "#FFFF00"
   },
@@ -1400,6 +1520,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "yellow",
     "color_rgb": "#FFFF00"
   },
@@ -1431,6 +1553,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "yellow",
     "color_rgb": "#FFFF00"
   },
@@ -1462,6 +1586,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "yellow",
     "color_rgb": "#FFFF00"
   },
@@ -1493,6 +1619,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "yellow",
     "color_rgb": "#FFFF00"
   },
@@ -1524,6 +1652,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "yellow",
     "color_rgb": "#FFFF00"
   },
@@ -1556,6 +1686,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "yellow",
     "color_rgb": "#FFFF00"
   },
@@ -1587,6 +1719,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "magenta_dark",
     "color_rgb": "#B300B3"
   },
@@ -1618,6 +1752,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "magenta_dark",
     "color_rgb": "#B300B3"
   },
@@ -1649,6 +1785,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "yellow",
     "color_rgb": "#FFFF00"
   },
@@ -1680,6 +1818,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "yellow",
     "color_rgb": "#FFFF00"
   },
@@ -1711,6 +1851,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "azure_dark",
     "color_rgb": "#0069B3"
   },
@@ -1742,6 +1884,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "azure_dark",
     "color_rgb": "#0069B3"
   },
@@ -1773,6 +1917,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "azure_dark",
     "color_rgb": "#0069B3"
   },
@@ -1805,6 +1951,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "azure_dark",
     "color_rgb": "#0069B3"
   },
@@ -1837,6 +1985,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "azure_dark",
     "color_rgb": "#0069B3"
   },
@@ -1869,6 +2019,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "azure_dark",
     "color_rgb": "#0069B3"
   },
@@ -1900,6 +2052,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "azure_dark",
     "color_rgb": "#0069B3"
   },
@@ -1931,6 +2085,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "azure_dark",
     "color_rgb": "#0069B3"
   },
@@ -1962,6 +2118,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "azure_dark",
     "color_rgb": "#0069B3"
   },
@@ -1993,6 +2151,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "azure_dark",
     "color_rgb": "#0069B3"
   },
@@ -2024,6 +2184,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "azure_dark",
     "color_rgb": "#0069B3"
   },
@@ -2055,6 +2217,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "azure_dark",
     "color_rgb": "#0069B3"
   },
@@ -2086,6 +2250,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "azure_dark",
     "color_rgb": "#0069B3"
   },
@@ -2117,6 +2283,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "azure_dark",
     "color_rgb": "#0069B3"
   },
@@ -2148,6 +2316,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "azure_dark",
     "color_rgb": "#0069B3"
   },
@@ -2179,6 +2349,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "azure_dark",
     "color_rgb": "#0069B3"
   },
@@ -2210,6 +2382,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "azure_dark",
     "color_rgb": "#0069B3"
   },
@@ -2241,6 +2415,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "azure_dark",
     "color_rgb": "#0069B3"
   },
@@ -2272,6 +2448,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "azure_dark",
     "color_rgb": "#0069B3"
   },
@@ -2303,6 +2481,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "azure_dark",
     "color_rgb": "#0069B3"
   },
@@ -2334,6 +2514,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "azure_dark",
     "color_rgb": "#0069B3"
   },
@@ -2365,6 +2547,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -2396,6 +2580,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "azure_dark",
     "color_rgb": "#0069B3"
   },
@@ -2427,6 +2613,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -2458,6 +2646,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "azure_dark",
     "color_rgb": "#0069B3"
   },
@@ -2489,6 +2679,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -2520,6 +2712,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -2551,6 +2745,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -2582,6 +2778,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "azure_dark",
     "color_rgb": "#0069B3"
   },
@@ -2613,6 +2811,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -2648,6 +2848,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "azure_dark",
     "color_rgb": "#0069B3"
   },
@@ -2679,6 +2881,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "red",
     "color_rgb": "#FF0000"
   },
@@ -2710,6 +2914,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "azure_dark",
     "color_rgb": "#0069B3"
   },
@@ -2741,6 +2947,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3"
   },
@@ -2772,6 +2980,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3"
   },
@@ -2803,6 +3013,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -2834,6 +3046,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -2865,6 +3079,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -2896,6 +3112,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "red",
     "color_rgb": "#FF0000"
   },
@@ -2927,6 +3145,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -2958,6 +3178,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "red",
     "color_rgb": "#FF0000"
   },
@@ -2989,6 +3211,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -3020,6 +3244,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -3051,6 +3277,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -3082,6 +3310,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "yellow",
     "color_rgb": "#FFFF00"
   },
@@ -3113,6 +3343,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "red",
     "color_rgb": "#FF0000"
   },
@@ -3144,6 +3376,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -3175,6 +3409,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -3206,6 +3442,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "azure_dark",
     "color_rgb": "#0069B3"
   },
@@ -3237,6 +3475,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "azure_dark",
     "color_rgb": "#0069B3"
   },
@@ -3268,6 +3508,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -3299,6 +3541,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -3334,6 +3578,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "red",
     "color_rgb": "#FF0000"
   },
@@ -3365,6 +3611,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "red",
     "color_rgb": "#FF0000"
   },
@@ -3396,6 +3644,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "red",
     "color_rgb": "#FF0000"
   },
@@ -3427,6 +3677,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -3462,6 +3714,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "yellow",
     "color_rgb": "#FFFF00"
   },
@@ -3493,6 +3747,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 3,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "yellow",
     "color_rgb": "#FFFF00"
   },
@@ -3524,6 +3780,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 1,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "yellow",
     "color_rgb": "#FFFF00"
   },
@@ -3555,6 +3813,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 3,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "yellow",
     "color_rgb": "#FFFF00"
   },
@@ -3586,6 +3846,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 1,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "yellow",
     "color_rgb": "#FFFF00"
   },
@@ -3617,6 +3879,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 1,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "yellow",
     "color_rgb": "#FFFF00"
   },
@@ -3649,6 +3913,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 4,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "yellow",
     "color_rgb": "#FFFF00"
   },
@@ -3681,6 +3947,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 1,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "yellow",
     "color_rgb": "#FFFF00"
   },
@@ -3713,6 +3981,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 3,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "yellow",
     "color_rgb": "#FFFF00"
   },
@@ -3745,6 +4015,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 4,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "yellow",
     "color_rgb": "#FFFF00"
   },
@@ -3777,6 +4049,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 6,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "yellow",
     "color_rgb": "#FFFF00"
   },
@@ -3808,6 +4082,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 3,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "yellow",
     "color_rgb": "#FFFF00"
   },
@@ -3839,6 +4115,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 1,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "yellow",
     "color_rgb": "#FFFF00"
   },
@@ -3870,6 +4148,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 3,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "yellow",
     "color_rgb": "#FFFF00"
   },
@@ -3901,6 +4181,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 4,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "yellow",
     "color_rgb": "#FFFF00"
   },
@@ -3932,6 +4214,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 1,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "yellow",
     "color_rgb": "#FFFF00"
   },
@@ -3963,6 +4247,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 3,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "yellow",
     "color_rgb": "#FFFF00"
   },
@@ -3994,6 +4280,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 3,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "yellow",
     "color_rgb": "#FFFF00"
   },
@@ -4025,6 +4313,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 1,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "yellow",
     "color_rgb": "#FFFF00"
   },
@@ -4056,6 +4346,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 3,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "yellow",
     "color_rgb": "#FFFF00"
   },
@@ -4087,6 +4379,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 3,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "yellow",
     "color_rgb": "#FFFF00"
   },
@@ -4118,6 +4412,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 1,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "yellow",
     "color_rgb": "#FFFF00"
   },
@@ -4149,6 +4445,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 3,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "yellow",
     "color_rgb": "#FFFF00"
   },
@@ -4180,6 +4478,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 4,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "yellow",
     "color_rgb": "#FFFF00"
   },
@@ -4211,6 +4511,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 6,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "yellow",
     "color_rgb": "#FFFF00"
   },
@@ -4242,6 +4544,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "grey_160",
     "color_rgb": "#A0A0A0"
   },
@@ -4280,6 +4584,8 @@
       "wheat": 600.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -4316,6 +4622,8 @@
       "water": 800.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -4354,6 +4662,8 @@
       "wheat": 360.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -4391,6 +4701,8 @@
       "wheat": 600.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -4427,6 +4739,8 @@
       "water": 960.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -4465,6 +4779,8 @@
       "plankton": 1800.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -4502,6 +4818,8 @@
       "water": 2400.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -4540,6 +4858,8 @@
       "water": 720.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -4577,6 +4897,8 @@
       "water": 450.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -4614,6 +4936,8 @@
       "refinedmetals": 960.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -4651,6 +4975,8 @@
       "quantumtubes": 100.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -4687,6 +5013,8 @@
       "hydrogen": 9600.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -4724,6 +5052,8 @@
       "microchips": 360.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -4762,6 +5092,8 @@
       "quantumtubes": 400.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -4801,6 +5133,8 @@
       "scanningarrays": 120.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -4834,6 +5168,8 @@
     },
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -4871,6 +5207,8 @@
       "refinedmetals": 384.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -4908,6 +5246,8 @@
       "quantumtubes": 258.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -4944,6 +5284,8 @@
       "methane": 4800.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -4981,6 +5323,8 @@
       "refinedmetals": 1120.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -5017,6 +5361,8 @@
       "siliconwafers": 1200.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -5054,6 +5400,8 @@
       "hullparts": 8.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -5091,6 +5439,8 @@
       "superfluidcoolant": 560.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -5128,6 +5478,8 @@
       "superfluidcoolant": 150.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -5164,6 +5516,8 @@
       "ore": 5760.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -5201,6 +5555,8 @@
       "siliconwafers": 360.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -5238,6 +5594,8 @@
       "scrapmetal": 4500.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "grey_160",
     "color_rgb": "#A0A0A0"
   },
@@ -5275,6 +5633,8 @@
       "quantumtubes": 60.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -5311,6 +5671,8 @@
       "silicon": 4800.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -5347,6 +5709,8 @@
       "siliconwafers": 120.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -5383,6 +5747,8 @@
       "water": 480.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -5419,6 +5785,8 @@
       "helium": 4800.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -5457,6 +5825,8 @@
       "scanningarrays": 20.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -5493,6 +5863,8 @@
       "ice": 9600.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -5530,6 +5902,8 @@
       "plasmaconductors": 60.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -5567,6 +5941,8 @@
       "spices": 360.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -5603,6 +5979,8 @@
       "water": 800.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -5641,6 +6019,8 @@
       "water": 720.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -5677,6 +6057,8 @@
       "water": 960.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -5715,6 +6097,8 @@
       "spices": 240.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -5751,6 +6135,8 @@
       "water": 960.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -5789,6 +6175,8 @@
       "water": 720.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -5825,6 +6213,8 @@
       "water": 960.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -5862,6 +6252,8 @@
       "teladianium": 696.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -5899,6 +6291,8 @@
       "teladianium": 280.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -5936,6 +6330,8 @@
       "teladianium": 816.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -5974,6 +6370,8 @@
       "water": 720.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -6012,6 +6410,8 @@
       "water": 720.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -6049,6 +6449,8 @@
       "teladianium": 438.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -6086,6 +6488,8 @@
       "swampplant": 720.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -6122,6 +6526,8 @@
       "water": 960.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -6158,6 +6564,8 @@
       "water": 800.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -6194,6 +6602,8 @@
       "ore": 8400.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -6232,6 +6642,8 @@
       "silicon": 18000.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -6265,6 +6677,8 @@
     },
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -6302,6 +6716,8 @@
       "proteinpaste": 288.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -6339,6 +6755,8 @@
       "ore": 1000.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -6375,6 +6793,8 @@
       "proteinpaste": 900.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -6412,6 +6832,8 @@
       "methane": 2400.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -6449,6 +6871,8 @@
       "scrapmetal": 15000.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "grey_160",
     "color_rgb": "#A0A0A0"
   },
@@ -6487,6 +6911,8 @@
       "silicon": 3600.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -6524,6 +6950,8 @@
       "silicon": 240.0
     },
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -6555,6 +6983,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "green_bright",
     "color_rgb": "#4DFF4D"
   },
@@ -6586,6 +7016,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -6621,6 +7053,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -6656,6 +7090,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -6691,6 +7127,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -6726,6 +7164,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -6761,6 +7201,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -6796,6 +7238,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -6831,6 +7275,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -6866,6 +7312,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -6901,6 +7349,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -6937,6 +7387,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -6973,6 +7425,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -7009,6 +7463,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -7045,6 +7501,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -7081,6 +7539,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -7117,6 +7577,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -7153,6 +7615,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -7189,6 +7653,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -7225,6 +7691,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -7260,6 +7728,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -7295,6 +7765,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -7330,6 +7802,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -7365,6 +7839,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -7400,6 +7876,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -7435,6 +7913,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -7470,6 +7950,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -7505,6 +7987,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -7540,6 +8024,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -7575,6 +8061,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -7610,6 +8098,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -7645,6 +8135,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -7680,6 +8172,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -7715,6 +8209,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -7750,6 +8246,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -7785,6 +8283,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -7820,6 +8320,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -7855,6 +8357,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -7890,6 +8394,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -7925,6 +8431,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -7960,6 +8468,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -7995,6 +8505,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -8030,6 +8542,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -8065,6 +8579,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -8100,6 +8616,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -8135,6 +8653,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -8170,6 +8690,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -8205,6 +8727,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -8240,6 +8764,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -8275,6 +8801,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -8310,6 +8838,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -8345,6 +8875,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -8380,6 +8912,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -8415,6 +8949,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -8450,6 +8986,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -8485,6 +9023,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -8520,6 +9060,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -8555,6 +9097,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -8590,6 +9134,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -8625,6 +9171,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {
@@ -8660,6 +9208,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -8691,6 +9241,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -8722,6 +9274,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -8753,6 +9307,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -8784,6 +9340,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -8815,6 +9373,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -8846,6 +9406,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -8877,6 +9439,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -8908,6 +9472,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -8939,6 +9505,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -8970,6 +9538,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -9002,6 +9572,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -9034,6 +9606,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -9066,6 +9640,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -9098,6 +9674,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -9130,6 +9708,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -9162,6 +9742,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -9194,6 +9776,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -9226,6 +9810,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -9258,6 +9844,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -9289,6 +9877,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -9320,6 +9910,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -9351,6 +9943,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -9382,6 +9976,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "magenta_dark",
     "color_rgb": "#B300B3"
   },
@@ -9413,6 +10009,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "magenta_dark",
     "color_rgb": "#B300B3"
   },
@@ -9444,6 +10042,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "magenta_dark",
     "color_rgb": "#B300B3"
   },
@@ -9475,6 +10075,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "magenta_dark",
     "color_rgb": "#B300B3"
   },
@@ -9506,6 +10108,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "magenta_dark",
     "color_rgb": "#B300B3"
   },
@@ -9537,6 +10141,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "magenta_dark",
     "color_rgb": "#B300B3"
   },
@@ -9568,6 +10174,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -9599,6 +10207,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -9630,6 +10240,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -9661,6 +10273,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -9692,6 +10306,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -9723,6 +10339,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -9754,6 +10372,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -9785,6 +10405,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -9816,6 +10438,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -9847,6 +10471,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -9878,6 +10504,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -9909,6 +10537,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -9940,6 +10570,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -9971,6 +10603,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -10002,6 +10636,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -10033,6 +10669,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -10064,6 +10702,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -10095,6 +10735,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -10126,6 +10768,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -10157,6 +10801,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -10188,6 +10834,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -10219,6 +10867,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -10250,6 +10900,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -10281,6 +10933,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -10312,6 +10966,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -10343,6 +10999,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_very_bright",
     "color_rgb": "#99FDFF"
   },
@@ -10374,6 +11032,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "magenta_dark",
     "color_rgb": "#B300B3"
   },
@@ -10406,6 +11066,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "azure_bright",
     "color_rgb": "#4DB5FF"
   },
@@ -10437,6 +11099,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "azure_bright",
     "color_rgb": "#4DB5FF"
   },
@@ -10468,6 +11132,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "azure_bright",
     "color_rgb": "#4DB5FF"
   },
@@ -10499,6 +11165,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "red",
     "color_rgb": "#FF0000"
   },
@@ -10532,6 +11200,8 @@
     },
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "orange",
     "color_rgb": "#FF8B00"
   },
@@ -10563,6 +11233,8 @@
     "outputs": {},
     "inputs": {},
     "dockingCount": 0,
+    "buildProcessorCount": 0,
+    "buildShipClasses": [],
     "color": "cyan_dark",
     "color_rgb": "#00AFB3",
     "cargo": {

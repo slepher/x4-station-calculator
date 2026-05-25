@@ -15,6 +15,53 @@ from .parse_library import parse_stats, parse_project_groups, parse_projects
 from .parse_md import parse_md, resolve_cluster_objective_texts
 
 
+def _build_delivery_ships(projects: List[Dict[str, Any]], component_to_ware: dict, ware_index: dict) -> List[Dict[str, Any]]:
+    """Build top-level deliveryShips list: deduplicated {macro, nameId, buildDuration}."""
+    seen: Dict[str, Dict[str, Any]] = {}
+    for proj in projects:
+        for d in proj.get("deliveries", []):
+            macro = d.get("macro", "")
+            if macro in seen:
+                continue
+            bd = d.get("buildDuration", 0)
+            entry: Dict[str, Any] = {"macro": macro, "buildDuration": bd}
+            ware_id = component_to_ware.get(macro)
+            if ware_id:
+                ware_info = ware_index.get(ware_id)
+                if ware_info and ware_info.get("nameId"):
+                    entry["nameId"] = ware_info["nameId"]
+            seen[macro] = entry
+    return sorted(seen.values(), key=lambda x: x["macro"])
+
+
+def _compute_actual_ware_amounts(projects: List[Dict[str, Any]], wares_data: List[Dict[str, Any]]) -> None:
+    """Inject actualAmount into resources.wares using formula:
+       scale = floor(price / sum(ware.amount * maxPrice(ware)))
+       actualAmount = ware.amount * scale
+    """
+    max_price_map: Dict[str, int] = {
+        w["id"]: w.get("maxPrice", 0)
+        for w in wares_data if isinstance(w, dict) and "id" in w
+    }
+    for proj in projects:
+        res = proj.get("resources")
+        if not res or not res.get("wares"):
+            continue
+        price = res.get("price", 0)
+        if price <= 0:
+            continue
+        bundle = 0
+        for w in res["wares"]:
+            mp = max_price_map.get(w.get("ware", ""))
+            if mp is not None:
+                bundle += w.get("amount", 0) * mp
+        if bundle <= 0:
+            continue
+        scale = price // bundle
+        for w in res["wares"]:
+            w["actualAmount"] = w.get("amount", 0) * scale
+
+
 def process_terraforming(loader: Any) -> None:
     """Parse terraforming XML files and attach data to loader.
 
@@ -38,6 +85,24 @@ def process_terraforming(loader: Any) -> None:
         stats = parse_stats(lib_root)
         project_groups = parse_project_groups(lib_root)
         projects, lib_name_ids = parse_projects(lib_root)
+
+        wares_data = getattr(loader, 'wares_data', [])
+        component_to_ware = getattr(loader, 'component_to_ware', {})
+        ware_index = getattr(loader, 'ware_index', {})
+
+        _compute_actual_ware_amounts(projects, wares_data)
+        delivery_ships = _build_delivery_ships(projects, component_to_ware, ware_index)
+
+        # Strip buildDuration from deliveries (moved to deliveryShips)
+        for proj in projects:
+            for d in proj.get("deliveries", []):
+                d.pop("buildDuration", None)
+
+        # Collect deliveryShips nameIds
+        for ds in delivery_ships:
+            nid = ds.get("nameId")
+            if nid:
+                loader.needed_raw_names.add(nid)
 
         # Collect nameIds from library
         for nid in lib_name_ids:
@@ -121,6 +186,7 @@ def process_terraforming(loader: Any) -> None:
             "projectGroups": project_groups,
             "projects": projects,
             "clusters": clusters,
+            "deliveryShips": delivery_ships,
         }
 
         print(f"   ✅ 解析 terraforming: {len(stats)} stats, {len(project_groups)} groups, "

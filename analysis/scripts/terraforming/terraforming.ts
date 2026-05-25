@@ -17,6 +17,7 @@ import {
 } from '@/store/logic/terraformingTaskResolver'
 import type { TerraformingState, TerraformingData } from '@/store/logic/terraformingTaskResolver'
 import { loadGameDataFiles } from '@/store/logic/useGameData'
+import type { GameDataFiles } from '@/store/logic/useGameData'
 
 const STAT_KEYS = [
   'temperature', 'oxygen', 'methane', 'carbondioxide',
@@ -189,10 +190,15 @@ export async function run(args: ParsedArgs): Promise<{ output: string; currentSt
 
   const tree = resolveAvailableTasks(cluster, state, data)
 
+  const wareNameIds: Record<string, string> = {}
+  for (const w of gameData.wares) {
+    if (w.nameId) wareNameIds[w.id] = w.nameId
+  }
+
   const lines: string[] = []
   lines.push(printObjectives(cluster, data, i18nLookup))
   lines.push('')
-  lines.push(printTaskTree(tree, i18nLookup))
+  lines.push(printTaskTree(tree, i18nLookup, data, wareNameIds))
   return { output: lines.join('\n'), currentStats }
 }
 

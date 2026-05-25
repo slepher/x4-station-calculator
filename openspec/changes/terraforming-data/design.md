@@ -78,41 +78,60 @@ x4_data_processor.py::run_for_config()
 
 - 负责组装:
   1. 调用 parse_library → stats, groups, projects
-  2. 调用 parse_md → clusters, predecessors_map
-  3. `_load_cluster_name_ids(base_path)`: 加载 maps.json, 构建 `macro_id → display_nameId` (多 sector 取 cluster 名, 单 sector 取 sector 名)
-  4. `resolve_cluster_objective_texts(clusters, cluster_name_map)`: 后处理 objectives
-  5. 合并 predecessors_map 到 projects
-  6. 注入所有 nameId 到 `loader.needed_raw_names`
-  7. 挂载 `loader.terraforming_data`
+  2. 调用 `_compute_actual_ware_amounts(projects, wares_data)` — 资源实际消耗量计算
+  3. 调用 `_build_delivery_ships(projects, component_to_ware, ware_index)` — 构建顶层 deliveryShips
+  4. `projects[].deliveries` 移除 `buildDuration`（统一到 deliveryShips）
+  5. 调用 parse_md → clusters, predecessors_map
+  6. `_load_cluster_name_ids(base_path)`: 加载 maps.json, 构建 `macro_id → display_nameId`
+  7. `resolve_cluster_objective_texts(clusters, cluster_name_map)`: 后处理 objectives
+  8. 合并 predecessors_map 到 projects
+  9. 注入所有 nameId 到 `loader.needed_raw_names`（含 deliveryShips nameId）
+  10. 挂载 `loader.terraforming_data`
 - 错误处理: XML 缺失/解析异常 → terraforming_data=None, save() 跳过
 
-## 输出结构
+### deliveryShips 名称解析
 
-```json
-{
-  "stats": [{ "id": "temperature", "nameId": "{1001,11401}", "ranges": [{ "start": 0, "end": 3, "state": 0, "rgb": "#FFFFFF" }], "icon": "..." }],
-  "projectGroups": [{ "id": "power", "nameId": "{1001,11473}" }],
-  "projects": [{
-    "id": "ind_factories",
-    "group": "industry",
-    "repeatCooldown": null,
-    "conditions": [{ "stat": "temperature", "min": 2, "max": 3, "usesStateBounds": true, "usesValueBounds": false }],
-    "predecessors": [{ "ref": "ind_refineries_clean", "type": "project", "any": true }],
-    "resources": { "price": 25000000, "wares": [{ "ware": "energycells", "amount": 133 }] },
-    "deliveries": [{ "macro": "...", "amount": 10, "buildDuration": 30 }]
-  }],
-  "clusters": [{
-    "id": "ScalePlateGreen",
-    "macro": "macro.cluster_21_macro",
-    "initialStats": { "temperature": 3 },
-    "projectIds": ["pwr_antimatter", ...],
-    "removedStats": ["airpressure"],
-    "values": { "$Terraforming_ScalePlateGreen_HousingTargetAmount": "1000000000" },
-    "variableTexts": { "$RelocateObjectiveText": { "source": "{1004,1091}", "replaces": [...] } },
-    "objectives": [{ "step": 1, "action": "objective.relocate", "textId": "{1004,1091}", "textReplaces": [...] }]
-  }]
-}
-```
+`_build_delivery_ships(projects, component_to_ware, ware_index)` 在 build.py 中调用，构建顶层 `deliveryShips` 数组：
+
+- 遍历所有 project 的 `deliveries`，按 `macro` 去重
+- 通过 `loader.component_to_ware[macro]` 获取 ware_id
+- 从 `loader.ware_index[ware_id].nameId` 获取 i18n key
+- 保留 `buildDuration` 到 `deliveryShips` 层
+- `projects[].deliveries` 中**移除** `buildDuration`（只保留 `macro` + `amount`）
+
+输出后由 `inject_english_names()` 管线注入 `name` 字段（英文 locale）。
+
+**背景**: terraforming 交付舰船在 wares.xml 中 `transport="ship"`，被 `build_database()` 的商品筛选排除，不输出到 `wares.json` / `ships.json` / `drones.json`。`loader.ware_index` 保留全量 ware 索引，在 build 阶段直接解析 nameId 注入 `deliveryShips`。
+
+### 资源实际消耗计算
+
+`_compute_actual_ware_amounts(projects, wares_data)` 根据 X4 游戏经济机制计算实际消耗量，写入 `resources.wares[].actualAmount`。
+
+公式: `actualAmount = amount × ⌊price / Σ(amount × maxPrice)⌋`
+
+其中 `maxPrice` 来自 wares.xml `<price max="...">`，由 `loader.wares_data` 提供（即 `wares.json` 的同源数据）。依据 `terraforming.xsd` — `resources` 注解: *"The amounts will be scaled, using the average prices, to reach the defined total price."* 实测确认游戏实际使用 **maxPrice** 进行缩放。
+
+这些字段**不产生新的顶层或嵌套结构**，仅扩展现有 `wares[]` 条目。
+
+### 建造港槽位数提取（modules.json）
+
+`x4_data_processor.py::scan_assets()` 中，对每个 `class="buildmodule"` 的宏：
+
+- `buildProcessorCount`: 统计 `<connections>` 下 `connection[@ref='buildprocessorconnection']` 的数量
+- `buildShipClasses`: 读取 `properties/builder/@classes` 属性，按空格分割
+
+写入 modules.json 的 `X4Module` 条目。**不属于 terraforming data 输出**，但由 terraforming-view presenter 消费用于建造时间计算。
+
+典型值:
+
+| 模块 | buildProcessorCount | buildShipClasses |
+|------|-------------------|-----------------|
+| S/M 综合建造港 (dock area) | 8 | [ship_m, ship_s] |
+| S 建造港 | 6 | [ship_s] |
+| M 建造港 | 3 | [ship_m] |
+| L 建造港 | 1 | [ship_l] |
+| XL 建造港 | 1 | [ship_xl] |
+| Equip docks (维护港) | 1-8 | [] (空) |
 
 ### Range 输出约定
 
@@ -154,9 +173,32 @@ x4_data_processor.py::run_for_config()
 ```
 →
 ```json
-{ "predecessors": [
-    {"ref": "ind_refineries_clean", "type": "project", "any": true},
-    {"ref": "power", "type": "group", "any": true}
+{
+  "stats": [{ "id": "temperature", "nameId": "{1001,11401}", "name": "Temperature", "ranges": [{ "start": 0, "end": 3, "state": 0, "rgb": "#FFFFFF" }], "icon": "..." }],
+  "projectGroups": [{ "id": "power", "nameId": "{1001,11473}", "name": "Power" }],
+  "projects": [{
+    "id": "ind_factories",
+    "group": "industry",
+    "nameId": "{20227,1002}",
+    "name": "Factories",
+    "repeatCooldown": null,
+    "conditions": [{ "stat": "temperature", "min": 2, "max": 3, "usesStateBounds": true, "usesValueBounds": false }],
+    "predecessors": [{ "ref": "ind_refineries_clean", "type": "project", "any": true }],
+    "resources": { "price": 25000000, "wares": [{ "ware": "energycells", "amount": 133, "actualAmount": 263473 }] },
+    "deliveries": [{ "macro": "ship_gen_m_transdrone_container_01_a_macro", "amount": 10 }]
+  }],
+  "clusters": [{
+    "id": "ScalePlateGreen",
+    "macro": "macro.cluster_21_macro",
+    "initialStats": { "temperature": 3 },
+    "projectIds": ["pwr_antimatter", ...],
+    "removedStats": ["airpressure"],
+    "values": { "$Terraforming_ScalePlateGreen_HousingTargetAmount": "1000000000" },
+    "variableTexts": { "$RelocateObjectiveText": { "source": "{1004,1091}", "replaces": [...] } },
+    "objectives": [{ "step": 1, "action": "objective.relocate", "textId": "{1004,1091}", "textReplaces": [...] }]
+  }],
+  "deliveryShips": [
+    { "macro": "ship_gen_m_transdrone_container_01_a_macro", "nameId": "{20101,101601}", "buildDuration": 30, "name": "Medium Drop Drone" }
   ]
 }
 ```

@@ -268,9 +268,68 @@ effect-list 对所有项目节点生效（events + 普通节点 + 子节点）�
 - 条件方块的视觉仍有继续微调空间，但语义模型已稳定
 - 某些特殊星区仍需针对 runtime event、ignore stat、removed stat 做回归验证
 
+## 执行序列面板详情
+
+每条 entry 展开后按固定顺序展示以下 section：
+
+### 材料需求
+
+- 显示每个 ware 的**实际消耗量** (`actualAmount`)，格式: `name  ×1,234`
+- ware 名称通过 `gameDataStore.waresMap` + `useX4I18n().translateWare()` 翻译
+- 末尾汇总行: `Cr  XXX Cr`（即 `resources.price`）
+
+### 返还
+
+- 累计折扣产生的物质返量，独立 flat card
+- 每个 ware: `floor(actualAmount × cumulativeRebate%)`
+- 匹配逻辑: ware 的 `wareGroup` 经翻译后与累计折扣 key 比较
+
+### 累计折扣
+
+- 独立 card，纯百分比列表: `name  -value%`
+- 不计算返量（属于未来交易折扣）
+
+### 交付清单
+
+- 舰船名 ×数量（名称从 `deliveryShips.nameId` 经 i18n 翻译）
+- 每行标注单艘建造时间 `30s`
+- 汇总行: `建造时间  HH:MM:SS`（并行建造总耗时）
+- 并行公式: `ceil(Σ amount_i × buildDuration_i / totalSlots)`
+- 无建造港时标题栏显示 `⚠ HQ 缺少 S/M 建造港`，不显示建造时间
+
+### 建造 card
+
+- 每栋建造港一行：`name  ×count`（名称从 `localizedModulesMap.localeName` 取 i18n）
+- 槽位汇总行：`建造槽位  ×totalSlots`（`totalSlots = Σ count × buildProcessorCount`）
+- 建造时间行：`建造时间  HH:MM:SS`（无建造港时不显示）
+- S/M 无人机竞争同一槽位池，`totalTime = ceil(totalWork / totalSlots)`
+
+### 建造港槽位计算
+
+- HQ 有效模块来源: `effectivePlannedModules = maxSavedModules(plannedModules, archiveModules)`（来自 `live-planning-modules`），即 `max(planned, archive)` — archive 作为地板，planned 可超出（在建）
+- live 模式下无 planned 覆盖时，等价于 `archiveCurrentTotalModules`（已建 + 建造中合并）
+- 通过 `modulesMap[moduleId]` 查找 `X4Module`
+- 筛选: `buildShipClasses.length > 0`（排除维护港，仅制造港）
+- 槽位: `buildProcessorCount`（从 `module_macros.xml` 的 `buildprocessorconnection` 连接数提取）
+- S/M 综合建造港: 8 个共享槽位（`buildShipClasses: [ship_m, ship_s]`）
+- S/M 无人机竞争同一槽位池
+
+### 状态变化
+
+- stats: `name  before → after`
+- 折扣变化: `折扣: name  0% → 10%`（before → after diff，delta=0 不显示）
+- `rebateChanges` 由 entry 执行前后累计折扣的 diff 计算
+
+## 当前已知关注点（续）
+
+- 条件方块的视觉仍有继续微调空间，但语义模型已稳定
+- 某些特殊星区仍需针对 runtime event、ignore stat、removed stat 做回归验证
+
+## 当前已知关注点（续2）
+
 目前设计上最不希望回退的几件事：
 
 - 不要恢复整树预翻译
 - 不要恢复 `projectMaxCounts` 预演
-- 不要让条件区重新分裂为“stat 一套、前置一套”
+- 不要让条件区重新分裂为"stat 一套、前置一套"
 - 不要让效果区回退为散落的文字渲染

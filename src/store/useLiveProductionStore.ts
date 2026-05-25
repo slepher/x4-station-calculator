@@ -49,6 +49,7 @@ import {
   type TerraformingExecutionEntry,
   getRuntimeTerraformingProjectIds,
 } from './logic/terraformingRuntime'
+import { maxSavedModules } from './logic/planningRecommendedModules'
 
 function mergeSavedModules(modules: SavedModule[]): SavedModule[] {
   const counts = new Map<string, number>()
@@ -605,6 +606,17 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
 
   const terraformingHqArchiveStation = computed<ArchiveStationData | null>(() => {
     return getArchiveStationDataByCode(terraformingHqStationCode.value)
+  })
+
+  const terraformingHqEffectiveModules = computed<SavedModule[]>(() => {
+    const archiveModules = archiveCurrentTotalModulesFromArchive(terraformingHqArchiveStation.value)
+    const hqStationCode = terraformingHqStationCode.value
+    if (!hqStationCode) return archiveModules
+    const bindingPlan = activeBinding.value?.stationPlans.find(
+      plan => plan.saveStationCode === hqStationCode
+    )
+    if (!bindingPlan?.modules?.length) return archiveModules
+    return maxSavedModules(bindingPlan.modules, archiveModules)
   })
 
   const terraformingHqClusterId = computed<string | null>(() => {
@@ -2190,6 +2202,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     terraformingHqStationCode,
     terraformingHqStationName,
     terraformingHqArchiveStation,
+    terraformingHqEffectiveModules,
     terraformingHqClusterId,
     setTerraformingCompletedProjects,
     appendTerraformingProjectExecution,

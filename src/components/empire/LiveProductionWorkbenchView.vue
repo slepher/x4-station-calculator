@@ -63,6 +63,7 @@ const terraformingPresenter = useTerraformingPresenter({
   terraformingHousingBuilt: computed(() => liveStore.terraformingHousingBuilt),
   terraformingHqStationName: computed(() => liveStore.terraformingHqStationName),
   terraformingHqArchiveStation: computed(() => liveStore.terraformingHqArchiveStation),
+  terraformingHqEffectiveModules: computed(() => liveStore.terraformingHqEffectiveModules),
   terraformingHqClusterId: computed(() => liveStore.terraformingHqClusterId),
   selectTerraformingCluster: (id: string) => liveStore.selectTerraformingCluster(id),
   setTerraformingCompletedProjects: (projects: Map<string, number>) => liveStore.setTerraformingCompletedProjects(projects),
@@ -74,9 +75,9 @@ const terraformingPresenter = useTerraformingPresenter({
   mapsSectors: liveStore.gameDataMaps.sectors,
   wareNames: computed(() => {
     const map = new Map<string, string>()
-    const wm = gameDataStore.waresMap
-    for (const [id, ware] of Object.entries(wm)) {
-      map.set(id, ware.name || id)
+    const lwm = gameDataStore.localizedWaresMap
+    for (const [id, ware] of Object.entries(lwm)) {
+      map.set(id, ware.localeName || ware.name || id)
     }
     return map
   }),
@@ -241,6 +242,8 @@ const showArchiveModuleList = computed(() => {
         :selected-cluster-id="terraformingPresenter.props.resourcePanel.selectedClusterId.value"
         :execution-timeline="terraformingPresenter.props.resourcePanel.executionTimeline.value"
         :get-cancel-validation="terraformingPresenter.props.resourcePanel.getCancelValidation"
+        :delivery-ship-map="terraformingPresenter.props.resourcePanel.deliveryShipMap.value"
+        :hq-build-docks="terraformingPresenter.props.resourcePanel.hqBuildDocks.value"
         @cancel-execution="terraformingPresenter.emits.cancelExecution"
       />
     </div>

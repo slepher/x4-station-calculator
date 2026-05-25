@@ -34,6 +34,13 @@
   - **状态/需求方块**: 对 stat 条件按游戏内彩色方块形式展示，明确“当前 state”与“要求区间/阈值”
   - **重复性标签**: `[一次性]` (repeatCooldown === null) / `[可重复]` (repeatCooldown === 0) / `[冷却:Ns]` (repeatCooldown > 0)
   - **依赖标注**: `⟸ 项目名` / `⟸ 任一: 项目A, 项目B`
+  - **物资详情**: 展开在任务名下方，显示 `📦 WareName ×actualAmount ... — 材料合计价格: price Cr`
+    - ware 名称从 `wares.json` 的 `nameId` 走 i18n
+    - actualAmount 从 `terraforming.json` 的 `resources.wares[].actualAmount` 读取
+  - **舰船交付详情**: `🚀 ShipName ×amount buildDuration/艘`
+    - 舰船名称从 `deliveryShips` 的 `nameId` 走 i18n
+    - buildDuration 从 `deliveryShips` 获取（`projects[].deliveries` 不再包含 `buildDuration`）
+  - **返还详情**: `↩️ 返还: wareGroup 10%`（出现于 `rebates` 非空时，不直接应用为折扣）
   - **阻塞原因**: `需要: XXX`
   - 依赖树子节点通过缩进表示父子关系
 - `terraformingCompletedProjects` 类型改为 `Map<string, number>`（projectId → 完成次数）：
@@ -53,10 +60,13 @@
   - 一次性项目执行一次，产生一条记录
   - 可重复项目每增加 1 次，必须新增一条记录，不能只保留聚合 count
 - 每条记录支持展开，展开后显示该次执行自己的：
-  - wares 消耗
-  - price
-  - deliveries
-  - 执行前状态
+  - wares 消耗（含 `actualAmount`）
+  - price（标注为"材料合计价格"）
+  - 折扣返量（累计折扣 × actualAmount）
+  - 累计折扣百分比
+  - deliveries（舰船名称 i18n，标注单艘建造时间）
+  - 建造 card（建造港 × 数量、槽位 × 总数、并行建造时间 HH:MM:SS）
+  - 执行前状态（含折扣变化 before → after）
   - 执行后状态
 - 每条记录都有单独取消入口。
 - 相邻且同组的记录，仅做视觉上的组名标记：
@@ -75,6 +85,8 @@
 - 统一的 stat 方块组件：用游戏方块展示当前 state、条件需求区间、通过/未通过
 - 项目条件、objective neutralize、stat 卡片三处共享同一套方块语义，不各自解释颜色/状态
 - 右列: 执行序列视图、单条记录展开明细、相邻同组组名标记、单条取消与后续合法性校验
+- 右列展开明细: 材料需求（含实际消耗量 actualAmount）、返还（累计折扣返量）、累计折扣、交付清单（含并行建造时间计算）、状态变化（含折扣 0%→10% 变化）
+- 交付清单建造时间: 通过 HQ station 已建 S/M 综合建造港的 `buildProcessorCount`（8 共享槽位）计算并行建造耗时
 - Store: `terraformingCompletedProjects` 改为 per-cluster (`Record<string, Map<string, number>>`)，切换星区数据自动隔离
 - Presenter: clusterDisplayNames、objectivesProgress、clusterMatchesHq、statDisplayNames、projectMaxCounts、projectDisplayNames、级联撤销等 computed
 - Vue 组件: 左/中/右三列具体实现（3:5:4 grid 不变），全量 i18n（`terraforming.*` namespace）
