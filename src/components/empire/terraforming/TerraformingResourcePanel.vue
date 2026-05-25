@@ -21,6 +21,7 @@ const props = defineProps<Props>()
 
 const emit = defineEmits<{
   (e: 'cancelExecution', entryId: string): void
+  (e: 'clearAll'): void
 }>()
 
 const { t } = useI18n()
@@ -96,6 +97,11 @@ function formatTime(seconds: number): string {
   const parts = [h, m, s].map(p => String(p).padStart(2, '0'))
   return parts.join(':')
 }
+
+function onClearAll() {
+  if (props.executionTimeline.length === 0) return
+  emit('clearAll')
+}
 </script>
 
 <template>
@@ -103,6 +109,13 @@ function formatTime(seconds: number): string {
     <div class="panel-header">
       {{ t('terraforming.taskQueue') }}
       <span v-if="showNoDockWarning" class="text-amber-400 text-[11px] ml-2">⚠ {{ t('terraforming.noBuildDock') }}</span>
+      <button
+        v-if="executionTimeline.length > 0"
+        class="clear-all-btn"
+        @click="onClearAll"
+      >
+        {{ t('terraforming.clearQueue') }}
+      </button>
     </div>
     <div class="panel-content">
       <div v-if="!selectedClusterId" class="empty-state">
@@ -256,6 +269,11 @@ function formatTime(seconds: number): string {
 
 .panel-header {
   @apply h-12 flex items-center px-4 text-slate-200 text-sm font-semibold border-b border-slate-700/50 bg-slate-800/30;
+}
+
+.clear-all-btn {
+  @apply ml-auto text-[11px] px-2 py-1 rounded border border-red-800 text-red-300 bg-red-900/20 transition-colors;
+  @apply hover:bg-red-800/40 hover:border-red-700;
 }
 
 .panel-content {

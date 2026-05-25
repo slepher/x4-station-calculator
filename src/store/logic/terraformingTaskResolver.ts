@@ -47,6 +47,7 @@ export interface ClusterObjective {
   encyclopedia?: string
   completedVariable?: string
   textReplaces?: Array<{ from: string; to: string }>
+  relocateTarget?: string
 }
 
 export type DescriptionItem =
@@ -616,6 +617,18 @@ export function resolveTerraformingText(
       if (resolved && resolved !== i18nKey) return resolved
     }
     return proj?.name || projId
+  }
+
+  const sectorMatch = textId.match(/^\$Sector_(\w+)\.knownname$/)
+  if (sectorMatch) {
+    const cluster = data.clusters.find(c => c.id === sectorMatch[1])
+    if (cluster?.objectives?.[0]?.textReplaces) {
+      const locReplace = cluster.objectives[0].textReplaces.find(r => r.from === '$LOCATION$')
+      if (locReplace?.to && locReplace.to.startsWith('{')) {
+        const resolved = i18nLookup(locReplace.to)
+        if (resolved && resolved !== locReplace.to) return resolved
+      }
+    }
   }
 
   return textId

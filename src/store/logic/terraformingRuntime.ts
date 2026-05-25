@@ -136,22 +136,17 @@ export function deriveAirPressure(
   stats: Record<string, number>,
   ignoredStats: Set<string>,
 ): Record<string, number> {
-  if (!cluster || ignoredStats.has('airpressure')) return stats
+  if (!cluster || ignoredStats.has('airpressure') || !('airpressure' in stats)) return stats
 
   const gases = ['oxygen', 'methane', 'carbondioxide'] as const
   const initialAtmosphere = gases.reduce((sum, statId) => sum + (cluster.initialStats[statId] ?? 0), 0)
   const currentAtmosphere = gases.reduce((sum, statId) => sum + (stats[statId] ?? 0), 0)
   const initialContribution = Math.floor(initialAtmosphere / 4)
   const currentContribution = Math.floor(currentAtmosphere / 4)
-  const addedAtmoPressure = getClusterValueNumber(cluster, '$AddedAtmoPressureTable') ?? 0
-  const initialAirPressure = cluster.initialStats.airpressure
-  const baselinePressure = initialAirPressure !== undefined
-    ? initialAirPressure - initialContribution
-    : addedAtmoPressure - initialContribution
 
   return {
     ...stats,
-    airpressure: Math.max(0, baselinePressure + currentContribution),
+    airpressure: Math.max(0, (stats.airpressure ?? (cluster.initialStats.airpressure ?? 0)) + currentContribution - initialContribution),
   }
 }
 

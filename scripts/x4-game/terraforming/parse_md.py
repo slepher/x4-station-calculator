@@ -87,6 +87,10 @@ def resolve_cluster_objective_texts(
     Also collects i18n source keys (like {1004,1090}) for the translation pipeline.
     Returns list of i18n source keys to add to needed_raw_names.
     """
+    import re as _re
+
+    _SECTOR_KNOWN_RE = _re.compile(r"\$Sector_(\w+)\.knownname")
+
     if cluster_name_map is None:
         cluster_name_map = {}
     i18n_keys: List[str] = []
@@ -136,6 +140,9 @@ def resolve_cluster_objective_texts(
                     "from": from_val,
                     "to": resolved_to,
                 })
+                # Detect sector-level relocate target
+                if _SECTOR_KNOWN_RE.match(str(to_val)):
+                    obj["relocateTarget"] = "sector"
             if resolved_replaces:
                 obj["textReplaces"] = resolved_replaces
 
@@ -151,6 +158,7 @@ def _resolve_replace_value(
 
     - Numeric values from cluster.values (e.g., housing target)
     - $Cluster_X.knownname → sector/cluster nameId from maps.json
+    - $Sector_X.knownname → sector nameId from maps.json (single-sector clusters)
     - $HQName → fallback {20102,2011}
     """
     import re as _re
@@ -160,6 +168,16 @@ def _resolve_replace_value(
     # $Cluster_Xxx.knownname → resolve to cluster/sector nameId
     knownname_match = _re.match(r"\$Cluster_(\w+)\.knownname", raw_value)
     if knownname_match and cluster_name_map:
+        macro = cluster.get("macro", "")
+        macro_id = macro.replace("macro.", "", 1)
+        sector_name_id = cluster_name_map.get(macro_id, "")
+        if sector_name_id:
+            return sector_name_id
+        return raw_value
+
+    # $Sector_Xxx.knownname → resolve to sector nameId
+    sector_known_match = _re.match(r"\$Sector_(\w+)\.knownname", raw_value)
+    if sector_known_match and cluster_name_map:
         macro = cluster.get("macro", "")
         macro_id = macro.replace("macro.", "", 1)
         sector_name_id = cluster_name_map.get(macro_id, "")

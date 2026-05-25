@@ -1082,6 +1082,7 @@
   "terraforming.selectCluster": "Select a sector to view tasks",
   "terraforming.noAvailableTasks": "No tasks available",
   "terraforming.undo": "Undo",
+  "terraforming.clearQueue": "Clear All",
   "terraforming.complete": "Do",
   "terraforming.taskQueue": "Task Queue",
   "terraforming.noBuildDock": "HQ lacks S/M build docks, unable to calculate drone build time",

@@ -10,6 +10,7 @@ import type {
 } from '@/components/empire/presenters/useTerraformingPresenter'
 import X4NumberInput from '@/components/common/X4NumberInput.vue'
 import TerraformingStatScale from '@/components/empire/terraforming/TerraformingStatScale.vue'
+import TerraformingTaskNode from '@/components/empire/terraforming/TerraformingTaskNode.vue'
 
 const { t } = useI18n()
 
@@ -88,15 +89,6 @@ function formatDuration(duration: number | null): string {
   return [hours, minutes, seconds].map(part => String(part).padStart(2, '0')).join(':')
 }
 
-function getDependencyLabel(node: any, displayNames: Map<string, string>): string {
-  if (!node.predecessors || node.predecessors.length === 0) return ''
-  const projectPreds = node.predecessors.filter((p: any) => p.type === 'project')
-  if (projectPreds.length === 0) return ''
-  const labels = projectPreds.map((p: any) => displayNames.get(p.ref) || p.ref)
-  const prefix = projectPreds[0].any ? t('terraforming.anyOf') || 'Any ' : ''
-  return `${t('terraforming.depends') || 'Needs'}: ${prefix}${labels.join(' | ')}`
-}
-
 function getConditionModels(projectId: string): TerraformingConditionScaleModel[] {
   return props.conditionScaleModels.get(projectId) || []
 }
@@ -127,13 +119,6 @@ function getDependencyValueFromLine(line: string): string {
 
 function getEffectItems(projectId: string): TerraformingEffectItem[] {
   return getNodeDisplay(projectId)?.effectItems || []
-}
-
-function getStatusIcon(projectId: string, available: boolean): string {
-  const count = props.completedProjectCounts.get(projectId) ?? 0
-  if (count > 0) return '✅'
-  if (!available) return '🚫'
-  return '⬜'
 }
 </script>
 
@@ -247,172 +232,18 @@ function getStatusIcon(projectId: string, available: boolean): string {
           <template v-for="group in taskTree.groupOrder" :key="group">
             <div v-if="taskTree.groups.has(group) && group !== 'events'" class="task-group">
               <div class="group-header">{{ groupNames.get(group) || group }}</div>
-              <div
+              <TerraformingTaskNode
                 v-for="node in taskTree.groups.get(group)?.filter(n => topLevelNodeIds.has(n.id))"
                 :key="node.id"
-                class="task-node"
-                :class="{ blocked: !node.available && (completedProjectCounts.get(node.id) ?? 0) === 0, completed: (completedProjectCounts.get(node.id) ?? 0) > 0 }"
-              >
-                <div class="task-card">
-                  <div class="task-head">
-                    <div class="task-title">
-                      <span class="task-status-icon">{{ getStatusIcon(node.id, node.available) }}</span>
-                      <span class="task-name">{{ getNodeName(node.id, node.name) }}</span>
-                      <span v-if="getRepeatTagData(node.id, projectMap).typeLabel" class="task-repeat">{{ getRepeatTagData(node.id, projectMap).typeLabel }}</span>
-                      <span v-if="getRepeatTagData(node.id, projectMap).durationLabel" class="task-repeat">{{ getRepeatTagData(node.id, projectMap).durationLabel }}</span>
-                      <span v-if="getRepeatTagData(node.id, projectMap).cooldownLabel" class="task-repeat">{{ getRepeatTagData(node.id, projectMap).cooldownLabel }}</span>
-                    </div>
-                    <div class="task-actions">
-                      <template v-if="isRepeatableProject(node.id, projectMap)">
-                      <X4NumberInput
-                        :model-value="completedProjectCounts.get(node.id) ?? 0"
-                        :min="0"
-                        :max="99"
-                        :disabled="!node.available && (completedProjectCounts.get(node.id) ?? 0) === 0"
-                        width-class="w-14"
-                        @update:model-value="emit('setProjectCount', node.id, $event)"
-                      />
-                      </template>
-                      <button
-                        v-else
-                        class="toggle-btn"
-                        :class="{ toggled: (completedProjectCounts.get(node.id) ?? 0) > 0 }"
-                        :disabled="!node.available && (completedProjectCounts.get(node.id) ?? 0) === 0"
-                        @click="emit('toggleProject', node.id)"
-                      >
-                        {{ (completedProjectCounts.get(node.id) ?? 0) > 0 ? t('terraforming.undo') : t('terraforming.complete') }}
-                      </button>
-                    </div>
-                  </div>
-                  <div class="task-body">
-                    <div v-if="getEffectItems(node.id).length > 0" class="effect-list">
-                      <div
-                        v-for="(item, i) in getEffectItems(node.id)"
-                        :key="`${node.id}-effect-${i}`"
-                        class="effect-list-item"
-                        :class="`effect-${item.type}`"
-                      >
-                        {{ item.text }}
-                      </div>
-                    </div>
-                    <div v-if="getConditionModels(node.id).length > 0" class="condition-list">
-                      <TerraformingStatScale
-                        v-for="condition in getConditionModels(node.id)"
-                        :key="`${node.id}-${condition.statId}-${condition.requirementLabel}`"
-                        :model="condition"
-                        compact
-                        mode="condition"
-                      />
-                    </div>
-                    <div
-                      v-if="node.available && node.predecessors.some((p: any) => p.type === 'project')"
-                      class="condition-list"
-                    >
-                      <div class="condition-dependency available">
-                        <span class="dependency-name">{{ t('terraforming.depends') }}</span>
-                        <span class="dependency-value">{{ getDependencyLabel(node, projectDisplayNames).replace(`${t('terraforming.depends') || 'Needs'}: `, '') }}</span>
-                      </div>
-                    </div>
-                    <div
-                      v-if="!node.available && getDependencyReasonLines(node.id, node.blockedReason).length > 0"
-                      class="condition-list"
-                    >
-                      <div
-                        v-for="(line, i) in getDependencyReasonLines(node.id, node.blockedReason)"
-                        :key="`${node.id}-dep-${i}`"
-                        class="condition-dependency blocked"
-                      >
-                        <span class="dependency-name">{{ t('terraforming.depends') }}</span>
-                        <span class="dependency-value">{{ getDependencyValueFromLine(line) }}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div v-if="node.children.length > 0" class="task-children">
-                  <div
-                    v-for="child in node.children"
-                    :key="child.id"
-                    class="task-node child-node"
-                    :class="{ blocked: !child.available && (completedProjectCounts.get(child.id) ?? 0) === 0, completed: (completedProjectCounts.get(child.id) ?? 0) > 0 }"
-                  >
-                    <div class="task-card">
-                      <div class="task-head">
-                        <div class="task-title">
-                          <span class="task-status-icon">{{ getStatusIcon(child.id, child.available) }}</span>
-                          <span class="task-name">{{ getNodeName(child.id, child.name) }}</span>
-                          <span v-if="getRepeatTagData(child.id, projectMap).typeLabel" class="task-repeat">{{ getRepeatTagData(child.id, projectMap).typeLabel }}</span>
-                          <span v-if="getRepeatTagData(child.id, projectMap).durationLabel" class="task-repeat">{{ getRepeatTagData(child.id, projectMap).durationLabel }}</span>
-                          <span v-if="getRepeatTagData(child.id, projectMap).cooldownLabel" class="task-repeat">{{ getRepeatTagData(child.id, projectMap).cooldownLabel }}</span>
-                        </div>
-                        <div class="task-actions">
-                          <template v-if="isRepeatableProject(child.id, projectMap)">
-                          <X4NumberInput
-                            :model-value="completedProjectCounts.get(child.id) ?? 0"
-                            :min="0"
-                            :max="99"
-                            :disabled="!child.available && (completedProjectCounts.get(child.id) ?? 0) === 0"
-                            width-class="w-14"
-                            @update:model-value="emit('setProjectCount', child.id, $event)"
-                          />
-                          </template>
-                          <button
-                            v-else
-                            class="toggle-btn"
-                            :class="{ toggled: (completedProjectCounts.get(child.id) ?? 0) > 0 }"
-                            :disabled="!child.available && (completedProjectCounts.get(child.id) ?? 0) === 0"
-                            @click="emit('toggleProject', child.id)"
-                          >
-                            {{ (completedProjectCounts.get(child.id) ?? 0) > 0 ? t('terraforming.undo') : t('terraforming.complete') }}
-                          </button>
-                        </div>
-                      </div>
-                      <div class="task-body">
-                        <div v-if="getEffectItems(child.id).length > 0" class="effect-list">
-                          <div
-                            v-for="(item, i) in getEffectItems(child.id)"
-                            :key="`${child.id}-effect-${i}`"
-                            class="effect-list-item"
-                            :class="`effect-${item.type}`"
-                          >
-                            {{ item.text }}
-                          </div>
-                        </div>
-                        <div v-if="getConditionModels(child.id).length > 0" class="condition-list">
-                          <TerraformingStatScale
-                            v-for="condition in getConditionModels(child.id)"
-                            :key="`${child.id}-${condition.statId}-${condition.requirementLabel}`"
-                            :model="condition"
-                            compact
-                            mode="condition"
-                          />
-                        </div>
-                        <div
-                          v-if="child.available && child.predecessors.some((p: any) => p.type === 'project')"
-                          class="condition-list"
-                        >
-                          <div class="condition-dependency available">
-                            <span class="dependency-name">{{ t('terraforming.depends') }}</span>
-                            <span class="dependency-value">{{ getDependencyLabel(child, projectDisplayNames).replace(`${t('terraforming.depends') || 'Needs'}: `, '') }}</span>
-                          </div>
-                        </div>
-                        <div
-                          v-if="!child.available && getDependencyReasonLines(child.id, child.blockedReason).length > 0"
-                          class="condition-list"
-                        >
-                          <div
-                            v-for="(line, i) in getDependencyReasonLines(child.id, child.blockedReason)"
-                            :key="`${child.id}-dep-${i}`"
-                            class="condition-dependency blocked"
-                          >
-                            <span class="dependency-name">{{ t('terraforming.depends') }}</span>
-                            <span class="dependency-value">{{ getDependencyValueFromLine(line) }}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                :node="node"
+                :completed-project-counts="completedProjectCounts"
+                :project-map="projectMap"
+                :project-display-names="projectDisplayNames"
+                :condition-scale-models="conditionScaleModels"
+                :task-node-displays="taskNodeDisplays"
+                @toggle-project="emit('toggleProject', $event)"
+                @set-project-count="(pid: string, cnt: number) => emit('setProjectCount', pid, cnt)"
+              />
             </div>
           </template>
         </div>
@@ -434,7 +265,9 @@ function getStatusIcon(projectId: string, available: boolean): string {
 .group-header { @apply text-xs text-slate-400 font-bold uppercase tracking-wider px-2 py-1 bg-slate-800/50 rounded; }
 
 .task-node { @apply rounded transition-colors hover:bg-slate-800/30; }
-.task-node.blocked { @apply opacity-50; }
+.task-node.blocked { @apply hover:bg-transparent; }
+.task-node.blocked .task-name { @apply text-slate-500; }
+.task-node.blocked .task-status-icon { @apply text-slate-600; }
 .task-node.completed { @apply bg-emerald-500/5; }
 .task-node.child-node { @apply ml-6; }
 

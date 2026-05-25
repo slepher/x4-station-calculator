@@ -8737,6 +8737,7 @@
           "textId": "{1004,1091}",
           "encyclopedia": "$Cluster_MemoryOfProfit",
           "completedVariable": "$RelocateComplete",
+          "relocateTarget": "sector",
           "textReplaces": [
             {
               "from": "$STATION$",
@@ -8744,7 +8745,7 @@
             },
             {
               "from": "$LOCATION$",
-              "to": "$Sector_MemoryOfProfit.knownname"
+              "to": "{20004,30011}"
             }
           ]
         },

@@ -171,6 +171,7 @@ export interface TerraformingPresenterEmits {
   toggleProject: (projectId: string) => void
   setProjectCount: (projectId: string, count: number) => void
   cancelExecution: (entryId: string) => void
+  clearExecutionQueue: () => void
   setHousingBuilt: (count: number) => void
 }
 
@@ -197,6 +198,7 @@ export interface TerraformingPresenterStore {
   appendTerraformingProjectExecution: (projectId: string, count?: number) => void
   setTerraformingProjectCount: (projectId: string, count: number) => void
   removeTerraformingExecutionEntry: (entryId: string) => void
+  clearTerraformingExecutionQueue: () => void
   setTerraformingHousingBuilt: (count: number) => void
   mapsClusters: Record<string, X4MapCluster>
   mapsSectors: Record<string, X4MapSector>
@@ -669,6 +671,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     const currentStats = store.terraformingCurrentStats.value
     const completedProjects = store.terraformingCompletedProjects.value
     const hqClusterId = store.terraformingHqClusterId.value
+    const hqArchive = store.terraformingHqArchiveStation.value
     const housingTarget = extractHousingTarget(cluster, cluster.objectives)
 
     return cluster.objectives.map(obj => {
@@ -677,7 +680,17 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
 
       switch (obj.action) {
         case 'objective.relocate':
-          completed = hqClusterId !== null && stripMacroPrefix(cluster.macro) === hqClusterId
+          if (hqClusterId !== null && stripMacroPrefix(cluster.macro) === hqClusterId) {
+            if (obj.relocateTarget === 'sector' && hqArchive) {
+              const targetNameId = obj.textReplaces
+                ?.find(r => r.from === '$LOCATION$')?.to
+              const hqSectorNameId = hqArchive.sector?.nameId
+              completed = targetNameId !== undefined && hqSectorNameId !== undefined
+                && targetNameId === hqSectorNameId
+            } else {
+              completed = true
+            }
+          }
           break
         case 'objective.neutralize': {
           const statIdMatch = obj.textId.match(/^terraforming\.stat\.(\w+)\.name$/)
@@ -1236,6 +1249,9 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     },
     cancelExecution: (entryId: string) => {
       store.removeTerraformingExecutionEntry(entryId)
+    },
+    clearExecutionQueue: () => {
+      store.clearTerraformingExecutionQueue()
     },
     setHousingBuilt: (count: number) => {
       store.setTerraformingHousingBuilt(count)

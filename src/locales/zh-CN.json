@@ -1083,6 +1083,7 @@
   "terraforming.selectCluster": "选择星区查看任务列表",
   "terraforming.noAvailableTasks": "该星区无可执行任务",
   "terraforming.undo": "撤销",
+  "terraforming.clearQueue": "清空任务",
   "terraforming.complete": "执行",
   "terraforming.taskQueue": "任务队列",
   "terraforming.noBuildDock": "HQ 缺少 S/M 建造港，无法计算卸货无人机建造时间",

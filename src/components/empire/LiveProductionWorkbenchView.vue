@@ -70,6 +70,7 @@ const terraformingPresenter = useTerraformingPresenter({
   appendTerraformingProjectExecution: (projectId: string, count?: number) => liveStore.appendTerraformingProjectExecution(projectId, count),
   setTerraformingProjectCount: (projectId: string, count: number) => liveStore.setTerraformingProjectCount(projectId, count),
   removeTerraformingExecutionEntry: (entryId: string) => liveStore.removeTerraformingExecutionEntry(entryId),
+  clearTerraformingExecutionQueue: () => liveStore.clearTerraformingExecutionQueue(),
   setTerraformingHousingBuilt: (count: number) => liveStore.setTerraformingHousingBuilt(count),
   mapsClusters: liveStore.gameDataMaps.clusters,
   mapsSectors: liveStore.gameDataMaps.sectors,
@@ -245,6 +246,7 @@ const showArchiveModuleList = computed(() => {
         :delivery-ship-map="terraformingPresenter.props.resourcePanel.deliveryShipMap.value"
         :hq-build-docks="terraformingPresenter.props.resourcePanel.hqBuildDocks.value"
         @cancel-execution="terraformingPresenter.emits.cancelExecution"
+        @clear-all="terraformingPresenter.emits.clearExecutionQueue"
       />
     </div>
   </div>
