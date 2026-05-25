@@ -153,7 +153,7 @@ def parse_projects(root: ET.Element) -> Tuple[List[Dict[str, Any]], List[str]]:
         res_elem = proj_elem.find("resources")
         if res_elem is not None:
             entry["resources"] = {
-                "price": _int_or(res_elem.get("price"), 0),
+                "price": _float_or(res_elem.get("price"), 0),
                 "wares": [],
             }
             ps = res_elem.get("pricescale")
@@ -262,5 +262,14 @@ def _int_or(val: Optional[str], default: Optional[int] = None) -> Optional[int]:
         return default
     try:
         return int(val)
+    except (ValueError, TypeError):
+        return default
+
+
+def _float_or(val: Optional[str], default: Optional[float] = None) -> Optional[float]:
+    if val is None:
+        return default
+    try:
+        return float(val)
     except (ValueError, TypeError):
         return default

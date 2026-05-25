@@ -574,12 +574,12 @@
       ],
       "sideEffects": [],
       "resources": {
-        "price": 100000000,
+        "price": 100000000.0,
         "wares": [
           {
             "ware": "graphene",
             "amount": 1,
-            "actualAmount": 429184
+            "actualAmount": 429184.0
           }
         ]
       },
@@ -636,12 +636,12 @@
       ],
       "sideEffects": [],
       "resources": {
-        "price": 100000000,
+        "price": 100000000.0,
         "wares": [
           {
             "ware": "hullparts",
             "amount": 1,
-            "actualAmount": 367647
+            "actualAmount": 367647.0
           }
         ]
       },
@@ -684,12 +684,12 @@
       ],
       "sideEffects": [],
       "resources": {
-        "price": 100000000,
+        "price": 100000000.0,
         "wares": [
           {
             "ware": "graphene",
             "amount": 1,
-            "actualAmount": 429184
+            "actualAmount": 429184.0
           }
         ]
       },
@@ -736,12 +736,12 @@
       ],
       "sideEffects": [],
       "resources": {
-        "price": 100000000,
+        "price": 100000000.0,
         "wares": [
           {
             "ware": "ice",
             "amount": 1,
-            "actualAmount": 2857142
+            "actualAmount": 2857142.0
           }
         ]
       },
@@ -791,17 +791,17 @@
       ],
       "sideEffects": [],
       "resources": {
-        "price": 75000000,
+        "price": 75000000.0,
         "wares": [
           {
             "ware": "hullparts",
             "amount": 1,
-            "actualAmount": 120578
+            "actualAmount": 120578.0
           },
           {
             "ware": "ice",
             "amount": 10,
-            "actualAmount": 1205780
+            "actualAmount": 1205780.0
           }
         ]
       },
@@ -843,12 +843,12 @@
       ],
       "sideEffects": [],
       "resources": {
-        "price": 10000000,
+        "price": 10000000.0,
         "wares": [
           {
             "ware": "methane",
             "amount": 1,
-            "actualAmount": 181818
+            "actualAmount": 181818.0
           }
         ]
       },
@@ -892,22 +892,22 @@
       "effects": [],
       "sideEffects": [],
       "resources": {
-        "price": 500000000,
+        "price": 500000000.0,
         "wares": [
           {
             "ware": "claytronics",
             "amount": 1,
-            "actualAmount": 69280
+            "actualAmount": 69280.0
           },
           {
             "ware": "microchips",
             "amount": 2,
-            "actualAmount": 138560
+            "actualAmount": 138560.0
           },
           {
             "ware": "refinedmetals",
             "amount": 13,
-            "actualAmount": 900640
+            "actualAmount": 900640.0
           }
         ]
       },
@@ -966,17 +966,17 @@
       ],
       "sideEffects": [],
       "resources": {
-        "price": 100000000,
+        "price": 100000000.0,
         "wares": [
           {
             "ware": "energycells",
             "amount": 133,
-            "actualAmount": 2233336
+            "actualAmount": 2233336.0
           },
           {
             "ware": "graphene",
             "amount": 13,
-            "actualAmount": 218296
+            "actualAmount": 218296.0
           }
         ]
       },
@@ -1025,22 +1025,22 @@
       "effects": [],
       "sideEffects": [],
       "resources": {
-        "price": 500000000,
+        "price": 500000000.0,
         "wares": [
           {
             "ware": "advancedelectronics",
             "amount": 2,
-            "actualAmount": 130326
+            "actualAmount": 130326.0
           },
           {
             "ware": "claytronics",
             "amount": 1,
-            "actualAmount": 65163
+            "actualAmount": 65163.0
           },
           {
             "ware": "refinedmetals",
             "amount": 13,
-            "actualAmount": 847119
+            "actualAmount": 847119.0
           }
         ]
       },
@@ -1095,17 +1095,17 @@
       ],
       "sideEffects": [],
       "resources": {
-        "price": 100000000,
+        "price": 100000000.0,
         "wares": [
           {
             "ware": "advancedcomposites",
             "amount": 4,
-            "actualAmount": 72488
+            "actualAmount": 72488.0
           },
           {
             "ware": "energycells",
             "amount": 133,
-            "actualAmount": 2410226
+            "actualAmount": 2410226.0
           }
         ]
       },
@@ -1152,17 +1152,17 @@
       ],
       "sideEffects": [],
       "resources": {
-        "price": 10000000,
+        "price": 10000000.0,
         "wares": [
           {
             "ware": "dronecomponents",
             "amount": 2,
-            "actualAmount": 4060
+            "actualAmount": 4060.0
           },
           {
             "ware": "shieldcomponents",
             "amount": 10,
-            "actualAmount": 20300
+            "actualAmount": 20300.0
           }
         ]
       },
@@ -1217,27 +1217,27 @@
       ],
       "sideEffects": [],
       "resources": {
-        "price": 100000000,
+        "price": 100000000.0,
         "wares": [
           {
             "ware": "hydrogen",
             "amount": 100,
-            "actualAmount": 1207400
+            "actualAmount": 1207400.0
           },
           {
             "ware": "energycells",
             "amount": 10,
-            "actualAmount": 120740
+            "actualAmount": 120740.0
           },
           {
             "ware": "hullparts",
             "amount": 1,
-            "actualAmount": 12074
+            "actualAmount": 12074.0
           },
           {
             "ware": "microchips",
             "amount": 1,
-            "actualAmount": 12074
+            "actualAmount": 12074.0
           }
         ]
       },
@@ -1285,12 +1285,12 @@
       ],
       "sideEffects": [],
       "resources": {
-        "price": 100000000,
+        "price": 100000000.0,
         "wares": [
           {
             "ware": "helium",
             "amount": 1,
-            "actualAmount": 1960784
+            "actualAmount": 1960784.0
           }
         ]
       },
@@ -1336,57 +1336,57 @@
       ],
       "sideEffects": [],
       "resources": {
-        "price": 1500000000,
+        "price": 1500000000.0,
         "wares": [
           {
             "ware": "advancedcomposites",
             "amount": 4,
-            "actualAmount": 213272
+            "actualAmount": 213272.0
           },
           {
             "ware": "claytronics",
             "amount": 4,
-            "actualAmount": 213272
+            "actualAmount": 213272.0
           },
           {
             "ware": "fieldcoils",
             "amount": 5,
-            "actualAmount": 266590
+            "actualAmount": 266590.0
           },
           {
             "ware": "hullparts",
             "amount": 8,
-            "actualAmount": 426544
+            "actualAmount": 426544.0
           },
           {
             "ware": "plasmaconductors",
             "amount": 1,
-            "actualAmount": 53318
+            "actualAmount": 53318.0
           },
           {
             "ware": "refinedmetals",
             "amount": 8,
-            "actualAmount": 426544
+            "actualAmount": 426544.0
           },
           {
             "ware": "scanningarrays",
             "amount": 3,
-            "actualAmount": 159954
+            "actualAmount": 159954.0
           },
           {
             "ware": "shieldcomponents",
             "amount": 3,
-            "actualAmount": 159954
+            "actualAmount": 159954.0
           },
           {
             "ware": "smartchips",
             "amount": 6,
-            "actualAmount": 319908
+            "actualAmount": 319908.0
           },
           {
             "ware": "superfluidcoolant",
             "amount": 15,
-            "actualAmount": 799770
+            "actualAmount": 799770.0
           }
         ]
       },
@@ -1428,22 +1428,22 @@
       ],
       "sideEffects": [],
       "resources": {
-        "price": 100000000,
+        "price": 100000000.0,
         "wares": [
           {
             "ware": "dronecomponents",
             "amount": 2,
-            "actualAmount": 26552
+            "actualAmount": 26552.0
           },
           {
             "ware": "hullparts",
             "amount": 10,
-            "actualAmount": 132760
+            "actualAmount": 132760.0
           },
           {
             "ware": "scanningarrays",
             "amount": 2,
-            "actualAmount": 26552
+            "actualAmount": 26552.0
           }
         ]
       },
@@ -1780,22 +1780,22 @@
       "effects": [],
       "sideEffects": [],
       "resources": {
-        "price": 100000000,
+        "price": 100000000.0,
         "wares": [
           {
             "ware": "energycells",
             "amount": 133,
-            "actualAmount": 1649466
+            "actualAmount": 1649466.0
           },
           {
             "ware": "medicalsupplies",
             "amount": 33,
-            "actualAmount": 409266
+            "actualAmount": 409266.0
           },
           {
             "ware": "methane",
             "amount": 40,
-            "actualAmount": 496080
+            "actualAmount": 496080.0
           }
         ]
       },
@@ -1864,17 +1864,17 @@
         }
       ],
       "resources": {
-        "price": 20000000,
+        "price": 20000000.0,
         "wares": [
           {
             "ware": "methane",
             "amount": 40,
-            "actualAmount": 160000
+            "actualAmount": 160000.0
           },
           {
             "ware": "spices",
             "amount": 100,
-            "actualAmount": 400000
+            "actualAmount": 400000.0
           }
         ]
       },
@@ -1895,6 +1895,12 @@
       "blockedProjects": [],
       "blockedGroups": [],
       "predecessors": [],
+      "descriptions": [
+        {
+          "type": "chance",
+          "value": 25
+        }
+      ],
       "name": "Jumpstart Microbiome",
       "description": "Why spend money and resources creating the perfect set of organisms when we can make nature do the hard work for us? Sure, basically throwing piles of biomatter around and seeing what sticks isn't very distinguished, but it might just work!"
     },
@@ -1913,12 +1919,12 @@
       "effects": [],
       "sideEffects": [],
       "resources": {
-        "price": 50000000,
+        "price": 50000000.0,
         "wares": [
           {
             "ware": "medicalsupplies",
             "amount": 1,
-            "actualAmount": 561797
+            "actualAmount": 561797.0
           }
         ]
       },
@@ -1982,22 +1988,22 @@
       ],
       "sideEffects": [],
       "resources": {
-        "price": 200000000,
+        "price": 200000000.0,
         "wares": [
           {
             "ware": "energycells",
             "amount": 133,
-            "actualAmount": 3298932
+            "actualAmount": 3298932.0
           },
           {
             "ware": "medicalsupplies",
             "amount": 33,
-            "actualAmount": 818532
+            "actualAmount": 818532.0
           },
           {
             "ware": "methane",
             "amount": 40,
-            "actualAmount": 992160
+            "actualAmount": 992160.0
           }
         ]
       },
@@ -2045,12 +2051,12 @@
       "effects": [],
       "sideEffects": [],
       "resources": {
-        "price": 25000000,
+        "price": 25000000.0,
         "wares": [
           {
             "ware": "medicalsupplies",
             "amount": 1,
-            "actualAmount": 280898
+            "actualAmount": 280898.0
           }
         ]
       },
@@ -2101,12 +2107,12 @@
         }
       ],
       "resources": {
-        "price": 15000000,
+        "price": 15000000.0,
         "wares": [
           {
             "ware": "medicalsupplies",
             "amount": 1,
-            "actualAmount": 168539
+            "actualAmount": 168539.0
           }
         ]
       },
@@ -2147,12 +2153,12 @@
       "effects": [],
       "sideEffects": [],
       "resources": {
-        "price": 25000000,
+        "price": 25000000.0,
         "wares": [
           {
             "ware": "medicalsupplies",
             "amount": 1,
-            "actualAmount": 280898
+            "actualAmount": 280898.0
           }
         ]
       },
@@ -2217,22 +2223,22 @@
       ],
       "sideEffects": [],
       "resources": {
-        "price": 10000000,
+        "price": 10000000.0,
         "wares": [
           {
             "ware": "methane",
             "amount": 40,
-            "actualAmount": 51200
+            "actualAmount": 51200.0
           },
           {
             "ware": "sunriseflowers",
             "amount": 25,
-            "actualAmount": 32000
+            "actualAmount": 32000.0
           },
           {
             "ware": "swampplant",
             "amount": 24,
-            "actualAmount": 30720
+            "actualAmount": 30720.0
           }
         ]
       },
@@ -2280,17 +2286,17 @@
       "effects": [],
       "sideEffects": [],
       "resources": {
-        "price": 10000000,
+        "price": 10000000.0,
         "wares": [
           {
             "ware": "advancedcomposites",
             "amount": 10,
-            "actualAmount": 14810
+            "actualAmount": 14810.0
           },
           {
             "ware": "hullparts",
             "amount": 1,
-            "actualAmount": 1481
+            "actualAmount": 1481.0
           }
         ]
       },
@@ -2333,17 +2339,17 @@
       "effects": [],
       "sideEffects": [],
       "resources": {
-        "price": 10000000,
+        "price": 10000000.0,
         "wares": [
           {
             "ware": "advancedcomposites",
             "amount": 1,
-            "actualAmount": 2969
+            "actualAmount": 2969.0
           },
           {
             "ware": "hullparts",
             "amount": 10,
-            "actualAmount": 29690
+            "actualAmount": 29690.0
           }
         ]
       },
@@ -2386,32 +2392,32 @@
       "effects": [],
       "sideEffects": [],
       "resources": {
-        "price": 50000000,
+        "price": 50000000.0,
         "wares": [
           {
             "ware": "advancedcomposites",
             "amount": 4,
-            "actualAmount": 14980
+            "actualAmount": 14980.0
           },
           {
             "ware": "antimatterconverters",
             "amount": 6,
-            "actualAmount": 22470
+            "actualAmount": 22470.0
           },
           {
             "ware": "hullparts",
             "amount": 10,
-            "actualAmount": 37450
+            "actualAmount": 37450.0
           },
           {
             "ware": "scanningarrays",
             "amount": 2,
-            "actualAmount": 7490
+            "actualAmount": 7490.0
           },
           {
             "ware": "superfluidcoolant",
             "amount": 13,
-            "actualAmount": 48685
+            "actualAmount": 48685.0
           }
         ]
       },
@@ -2454,27 +2460,27 @@
       "effects": [],
       "sideEffects": [],
       "resources": {
-        "price": 25000000,
+        "price": 25000000.0,
         "wares": [
           {
             "ware": "claytronics",
             "amount": 2,
-            "actualAmount": 3962
+            "actualAmount": 3962.0
           },
           {
             "ware": "energycells",
             "amount": 133,
-            "actualAmount": 263473
+            "actualAmount": 263473.0
           },
           {
             "ware": "hullparts",
             "amount": 10,
-            "actualAmount": 19810
+            "actualAmount": 19810.0
           },
           {
             "ware": "smartchips",
             "amount": 33,
-            "actualAmount": 65373
+            "actualAmount": 65373.0
           }
         ]
       },
@@ -2540,22 +2546,22 @@
         }
       ],
       "resources": {
-        "price": 15000000,
+        "price": 15000000.0,
         "wares": [
           {
             "ware": "energycells",
             "amount": 133,
-            "actualAmount": 251769
+            "actualAmount": 251769.0
           },
           {
             "ware": "hullparts",
             "amount": 10,
-            "actualAmount": 18930
+            "actualAmount": 18930.0
           },
           {
             "ware": "smartchips",
             "amount": 33,
-            "actualAmount": 62469
+            "actualAmount": 62469.0
           }
         ]
       },
@@ -2611,12 +2617,12 @@
       "effects": [],
       "sideEffects": [],
       "resources": {
-        "price": 10000000,
+        "price": 10000000.0,
         "wares": [
           {
             "ware": "claytronics",
             "amount": 1,
-            "actualAmount": 4262
+            "actualAmount": 4262.0
           }
         ]
       },
@@ -2655,22 +2661,22 @@
       "effects": [],
       "sideEffects": [],
       "resources": {
-        "price": 25000000,
+        "price": 25000000.0,
         "wares": [
           {
             "ware": "energycells",
             "amount": 133,
-            "actualAmount": 419615
+            "actualAmount": 419615.0
           },
           {
             "ware": "hullparts",
             "amount": 10,
-            "actualAmount": 31550
+            "actualAmount": 31550.0
           },
           {
             "ware": "smartchips",
             "amount": 33,
-            "actualAmount": 104115
+            "actualAmount": 104115.0
           }
         ]
       },
@@ -2729,32 +2735,32 @@
       "effects": [],
       "sideEffects": [],
       "resources": {
-        "price": 200000000,
+        "price": 200000000.0,
         "wares": [
           {
             "ware": "dronecomponents",
             "amount": 2,
-            "actualAmount": 30170
+            "actualAmount": 30170.0
           },
           {
             "ware": "medicalsupplies",
             "amount": 33,
-            "actualAmount": 497805
+            "actualAmount": 497805.0
           },
           {
             "ware": "smartchips",
             "amount": 33,
-            "actualAmount": 497805
+            "actualAmount": 497805.0
           },
           {
             "ware": "spices",
             "amount": 100,
-            "actualAmount": 1508500
+            "actualAmount": 1508500.0
           },
           {
             "ware": "water",
             "amount": 40,
-            "actualAmount": 603400
+            "actualAmount": 603400.0
           }
         ]
       },
@@ -2811,17 +2817,17 @@
       "effects": [],
       "sideEffects": [],
       "resources": {
-        "price": 100000000,
+        "price": 100000000.0,
         "wares": [
           {
             "ware": "medicalsupplies",
             "amount": 33,
-            "actualAmount": 642378
+            "actualAmount": 642378.0
           },
           {
             "ware": "methane",
             "amount": 40,
-            "actualAmount": 778640
+            "actualAmount": 778640.0
           }
         ]
       },
@@ -2898,17 +2904,17 @@
       ],
       "sideEffects": [],
       "resources": {
-        "price": 50000000,
+        "price": 50000000.0,
         "wares": [
           {
             "ware": "medicalsupplies",
             "amount": 33,
-            "actualAmount": 321189
+            "actualAmount": 321189.0
           },
           {
             "ware": "methane",
             "amount": 40,
-            "actualAmount": 389320
+            "actualAmount": 389320.0
           }
         ]
       },
@@ -2980,22 +2986,22 @@
       ],
       "sideEffects": [],
       "resources": {
-        "price": 25000000,
+        "price": 25000000.0,
         "wares": [
           {
             "ware": "dronecomponents",
             "amount": 2,
-            "actualAmount": 7418
+            "actualAmount": 7418.0
           },
           {
             "ware": "wheat",
             "amount": 100,
-            "actualAmount": 370900
+            "actualAmount": 370900.0
           },
           {
             "ware": "methane",
             "amount": 1,
-            "actualAmount": 3709
+            "actualAmount": 3709.0
           }
         ]
       },
@@ -3073,22 +3079,22 @@
       ],
       "sideEffects": [],
       "resources": {
-        "price": 25000000,
+        "price": 25000000.0,
         "wares": [
           {
             "ware": "dronecomponents",
             "amount": 2,
-            "actualAmount": 3692
+            "actualAmount": 3692.0
           },
           {
             "ware": "sunriseflowers",
             "amount": 100,
-            "actualAmount": 184600
+            "actualAmount": 184600.0
           },
           {
             "ware": "methane",
             "amount": 1,
-            "actualAmount": 1846
+            "actualAmount": 1846.0
           }
         ]
       },
@@ -3166,22 +3172,22 @@
       ],
       "sideEffects": [],
       "resources": {
-        "price": 25000000,
+        "price": 25000000.0,
         "wares": [
           {
             "ware": "dronecomponents",
             "amount": 2,
-            "actualAmount": 4294
+            "actualAmount": 4294.0
           },
           {
             "ware": "sojabeans",
             "amount": 100,
-            "actualAmount": 214700
+            "actualAmount": 214700.0
           },
           {
             "ware": "methane",
             "amount": 1,
-            "actualAmount": 2147
+            "actualAmount": 2147.0
           }
         ]
       },
@@ -3259,22 +3265,22 @@
       ],
       "sideEffects": [],
       "resources": {
-        "price": 25000000,
+        "price": 25000000.0,
         "wares": [
           {
             "ware": "dronecomponents",
             "amount": 2,
-            "actualAmount": 9728
+            "actualAmount": 9728.0
           },
           {
             "ware": "spices",
             "amount": 100,
-            "actualAmount": 486400
+            "actualAmount": 486400.0
           },
           {
             "ware": "methane",
             "amount": 1,
-            "actualAmount": 4864
+            "actualAmount": 4864.0
           }
         ]
       },
@@ -3346,17 +3352,17 @@
       ],
       "sideEffects": [],
       "resources": {
-        "price": 5000000,
+        "price": 5000000.0,
         "wares": [
           {
             "ware": "dronecomponents",
             "amount": 20,
-            "actualAmount": 4360
+            "actualAmount": 4360.0
           },
           {
             "ware": "methane",
             "amount": 1,
-            "actualAmount": 218
+            "actualAmount": 218.0
           }
         ]
       },
@@ -3409,37 +3415,37 @@
       ],
       "sideEffects": [],
       "resources": {
-        "price": 10000000,
+        "price": 10000000.0,
         "wares": [
           {
             "ware": "claytronics",
             "amount": 1,
-            "actualAmount": 638
+            "actualAmount": 638.0
           },
           {
             "ware": "energycells",
             "amount": 133,
-            "actualAmount": 84854
+            "actualAmount": 84854.0
           },
           {
             "ware": "hullparts",
             "amount": 10,
-            "actualAmount": 6380
+            "actualAmount": 6380.0
           },
           {
             "ware": "microchips",
             "amount": 2,
-            "actualAmount": 1276
+            "actualAmount": 1276.0
           },
           {
             "ware": "scanningarrays",
             "amount": 2,
-            "actualAmount": 1276
+            "actualAmount": 1276.0
           },
           {
             "ware": "water",
             "amount": 40,
-            "actualAmount": 25520
+            "actualAmount": 25520.0
           }
         ]
       },
@@ -3524,22 +3530,22 @@
       ],
       "sideEffects": [],
       "resources": {
-        "price": 5000000,
+        "price": 5000000.0,
         "wares": [
           {
             "ware": "claytronics",
             "amount": 1,
-            "actualAmount": 783
+            "actualAmount": 783.0
           },
           {
             "ware": "advancedelectronics",
             "amount": 1,
-            "actualAmount": 783
+            "actualAmount": 783.0
           },
           {
             "ware": "hullparts",
             "amount": 10,
-            "actualAmount": 7830
+            "actualAmount": 7830.0
           }
         ]
       },
@@ -3624,22 +3630,22 @@
       ],
       "sideEffects": [],
       "resources": {
-        "price": 15000000,
+        "price": 15000000.0,
         "wares": [
           {
             "ware": "claytronics",
             "amount": 1,
-            "actualAmount": 1947
+            "actualAmount": 1947.0
           },
           {
             "ware": "advancedelectronics",
             "amount": 2,
-            "actualAmount": 3894
+            "actualAmount": 3894.0
           },
           {
             "ware": "hullparts",
             "amount": 10,
-            "actualAmount": 19470
+            "actualAmount": 19470.0
           }
         ]
       },
@@ -3724,22 +3730,22 @@
       ],
       "sideEffects": [],
       "resources": {
-        "price": 200000000,
+        "price": 200000000.0,
         "wares": [
           {
             "ware": "claytronics",
             "amount": 1,
-            "actualAmount": 19346
+            "actualAmount": 19346.0
           },
           {
             "ware": "advancedelectronics",
             "amount": 4,
-            "actualAmount": 77384
+            "actualAmount": 77384.0
           },
           {
             "ware": "hullparts",
             "amount": 10,
-            "actualAmount": 193460
+            "actualAmount": 193460.0
           }
         ]
       },
@@ -3830,22 +3836,22 @@
       ],
       "sideEffects": [],
       "resources": {
-        "price": 100000000,
+        "price": 100000000.0,
         "wares": [
           {
             "ware": "claytronics",
             "amount": 1,
-            "actualAmount": 3182
+            "actualAmount": 3182.0
           },
           {
             "ware": "advancedelectronics",
             "amount": 20,
-            "actualAmount": 63640
+            "actualAmount": 63640.0
           },
           {
             "ware": "hullparts",
             "amount": 10,
-            "actualAmount": 31820
+            "actualAmount": 31820.0
           }
         ]
       },
@@ -3924,32 +3930,32 @@
       "effects": [],
       "sideEffects": [],
       "resources": {
-        "price": 100000000,
+        "price": 100000000.0,
         "wares": [
           {
             "ware": "claytronics",
             "amount": 1,
-            "actualAmount": 7822
+            "actualAmount": 7822.0
           },
           {
             "ware": "dronecomponents",
             "amount": 2,
-            "actualAmount": 15644
+            "actualAmount": 15644.0
           },
           {
             "ware": "hullparts",
             "amount": 10,
-            "actualAmount": 78220
+            "actualAmount": 78220.0
           },
           {
             "ware": "shieldcomponents",
             "amount": 10,
-            "actualAmount": 78220
+            "actualAmount": 78220.0
           },
           {
             "ware": "weaponcomponents",
             "amount": 7,
-            "actualAmount": 54754
+            "actualAmount": 54754.0
           }
         ]
       },
@@ -3993,17 +3999,17 @@
       "effects": [],
       "sideEffects": [],
       "resources": {
-        "price": 50000,
+        "price": 50000.0,
         "wares": [
           {
             "ware": "weaponcomponents",
             "amount": 10,
-            "actualAmount": 120
+            "actualAmount": 120.0
           },
           {
             "ware": "medicalsupplies",
             "amount": 1,
-            "actualAmount": 12
+            "actualAmount": 12.0
           }
         ]
       },
@@ -4022,6 +4028,15 @@
           "ref": "trn_boarding",
           "type": "project",
           "any": false
+        }
+      ],
+      "descriptions": [
+        {
+          "type": "skill_add",
+          "skill": "boarding",
+          "stars": 1,
+          "maxStars": 4,
+          "scope": "group"
         }
       ],
       "name": "Group Training",
@@ -4049,17 +4064,17 @@
       "effects": [],
       "sideEffects": [],
       "resources": {
-        "price": 50000,
+        "price": 50000.0,
         "wares": [
           {
             "ware": "weaponcomponents",
             "amount": 10,
-            "actualAmount": 120
+            "actualAmount": 120.0
           },
           {
             "ware": "medicalsupplies",
             "amount": 1,
-            "actualAmount": 12
+            "actualAmount": 12.0
           }
         ]
       },
@@ -4080,6 +4095,15 @@
           "any": false
         }
       ],
+      "descriptions": [
+        {
+          "type": "skill_add",
+          "skill": "boarding",
+          "stars": 1,
+          "maxStars": 5,
+          "scope": "single"
+        }
+      ],
       "name": "Individual Training",
       "description": "An especially intense and gruelling training regime, specifically tailored to an individual's talents. Injuries are a frequent occurrence, but rarely more than an inconvenience thanks to expert medical staff who are kept close at hand during all exercises."
     },
@@ -4098,22 +4122,22 @@
       "effects": [],
       "sideEffects": [],
       "resources": {
-        "price": 10000000,
+        "price": 10000000.0,
         "wares": [
           {
             "ware": "weaponcomponents",
             "amount": 10,
-            "actualAmount": 21430
+            "actualAmount": 21430.0
           },
           {
             "ware": "medicalsupplies",
             "amount": 1,
-            "actualAmount": 2143
+            "actualAmount": 2143.0
           },
           {
             "ware": "nividium",
             "amount": 1,
-            "actualAmount": 2143
+            "actualAmount": 2143.0
           }
         ]
       },
@@ -4132,6 +4156,17 @@
           "ref": "trn_boarding",
           "type": "project",
           "any": false
+        }
+      ],
+      "descriptions": [
+        {
+          "type": "recruitment",
+          "role": "marine",
+          "count": 3,
+          "primarySkill": "boarding",
+          "skillMin": 13,
+          "skillMax": 15,
+          "morale": 13
         }
       ],
       "name": "Host Martial Arts Tournament",
@@ -4184,32 +4219,32 @@
       "effects": [],
       "sideEffects": [],
       "resources": {
-        "price": 100000000,
+        "price": 100000000.0,
         "wares": [
           {
             "ware": "claytronics",
             "amount": 1,
-            "actualAmount": 7822
+            "actualAmount": 7822.0
           },
           {
             "ware": "dronecomponents",
             "amount": 2,
-            "actualAmount": 15644
+            "actualAmount": 15644.0
           },
           {
             "ware": "hullparts",
             "amount": 10,
-            "actualAmount": 78220
+            "actualAmount": 78220.0
           },
           {
             "ware": "shieldcomponents",
             "amount": 10,
-            "actualAmount": 78220
+            "actualAmount": 78220.0
           },
           {
             "ware": "weaponcomponents",
             "amount": 7,
-            "actualAmount": 54754
+            "actualAmount": 54754.0
           }
         ]
       },
@@ -4246,32 +4281,32 @@
       "effects": [],
       "sideEffects": [],
       "resources": {
-        "price": 10000000,
+        "price": 10000000.0,
         "wares": [
           {
             "ware": "claytronics",
             "amount": 1,
-            "actualAmount": 782
+            "actualAmount": 782.0
           },
           {
             "ware": "dronecomponents",
             "amount": 2,
-            "actualAmount": 1564
+            "actualAmount": 1564.0
           },
           {
             "ware": "hullparts",
             "amount": 10,
-            "actualAmount": 7820
+            "actualAmount": 7820.0
           },
           {
             "ware": "shieldcomponents",
             "amount": 10,
-            "actualAmount": 7820
+            "actualAmount": 7820.0
           },
           {
             "ware": "weaponcomponents",
             "amount": 7,
-            "actualAmount": 5474
+            "actualAmount": 5474.0
           }
         ]
       },
@@ -4315,22 +4350,22 @@
       "effects": [],
       "sideEffects": [],
       "resources": {
-        "price": 50000,
+        "price": 50000.0,
         "wares": [
           {
             "ware": "hullparts",
             "amount": 5,
-            "actualAmount": 90
+            "actualAmount": 90.0
           },
           {
             "ware": "engineparts",
             "amount": 5,
-            "actualAmount": 90
+            "actualAmount": 90.0
           },
           {
             "ware": "medicalsupplies",
             "amount": 1,
-            "actualAmount": 18
+            "actualAmount": 18.0
           }
         ]
       },
@@ -4349,6 +4384,15 @@
           "ref": "trn_pilot",
           "type": "project",
           "any": false
+        }
+      ],
+      "descriptions": [
+        {
+          "type": "skill_add",
+          "skill": "piloting",
+          "stars": 1,
+          "maxStars": 4,
+          "scope": "group"
         }
       ],
       "name": "Group Training",
@@ -4376,22 +4420,22 @@
       "effects": [],
       "sideEffects": [],
       "resources": {
-        "price": 50000,
+        "price": 50000.0,
         "wares": [
           {
             "ware": "hullparts",
             "amount": 5,
-            "actualAmount": 90
+            "actualAmount": 90.0
           },
           {
             "ware": "engineparts",
             "amount": 5,
-            "actualAmount": 90
+            "actualAmount": 90.0
           },
           {
             "ware": "medicalsupplies",
             "amount": 1,
-            "actualAmount": 18
+            "actualAmount": 18.0
           }
         ]
       },
@@ -4412,6 +4456,15 @@
           "any": false
         }
       ],
+      "descriptions": [
+        {
+          "type": "skill_add",
+          "skill": "piloting",
+          "stars": 1,
+          "maxStars": 5,
+          "scope": "single"
+        }
+      ],
       "name": "Individual Training",
       "description": "An especially intense and gruelling training regime, specifically tailored to an individual's talents, with a reputation for killing its students. This reputation, while actively fostered, is undeserved thanks to state-of-the-art safety mechanisms."
     },
@@ -4430,27 +4483,27 @@
       "effects": [],
       "sideEffects": [],
       "resources": {
-        "price": 10000000,
+        "price": 10000000.0,
         "wares": [
           {
             "ware": "hullparts",
             "amount": 5,
-            "actualAmount": 15520
+            "actualAmount": 15520.0
           },
           {
             "ware": "engineparts",
             "amount": 5,
-            "actualAmount": 15520
+            "actualAmount": 15520.0
           },
           {
             "ware": "medicalsupplies",
             "amount": 1,
-            "actualAmount": 3104
+            "actualAmount": 3104.0
           },
           {
             "ware": "nividium",
             "amount": 1,
-            "actualAmount": 3104
+            "actualAmount": 3104.0
           }
         ]
       },
@@ -4469,6 +4522,17 @@
           "ref": "trn_pilot",
           "type": "project",
           "any": false
+        }
+      ],
+      "descriptions": [
+        {
+          "type": "recruitment",
+          "role": "pilot",
+          "count": 3,
+          "primarySkill": "piloting",
+          "skillMin": 13,
+          "skillMax": 15,
+          "morale": 13
         }
       ],
       "name": "Host Maze-Run Competition",
@@ -4527,32 +4591,32 @@
       "effects": [],
       "sideEffects": [],
       "resources": {
-        "price": 50000000,
+        "price": 50000000.0,
         "wares": [
           {
             "ware": "claytronics",
             "amount": 1,
-            "actualAmount": 4014
+            "actualAmount": 4014.0
           },
           {
             "ware": "dronecomponents",
             "amount": 2,
-            "actualAmount": 8028
+            "actualAmount": 8028.0
           },
           {
             "ware": "energycells",
             "amount": 133,
-            "actualAmount": 533862
+            "actualAmount": 533862.0
           },
           {
             "ware": "hullparts",
             "amount": 10,
-            "actualAmount": 40140
+            "actualAmount": 40140.0
           },
           {
             "ware": "microchips",
             "amount": 2,
-            "actualAmount": 8028
+            "actualAmount": 8028.0
           }
         ]
       },
@@ -4644,32 +4708,32 @@
       "effects": [],
       "sideEffects": [],
       "resources": {
-        "price": 50000000,
+        "price": 50000000.0,
         "wares": [
           {
             "ware": "advancedelectronics",
             "amount": 2,
-            "actualAmount": 7654
+            "actualAmount": 7654.0
           },
           {
             "ware": "dronecomponents",
             "amount": 2,
-            "actualAmount": 7654
+            "actualAmount": 7654.0
           },
           {
             "ware": "energycells",
             "amount": 133,
-            "actualAmount": 508991
+            "actualAmount": 508991.0
           },
           {
             "ware": "refinedmetals",
             "amount": 13,
-            "actualAmount": 49751
+            "actualAmount": 49751.0
           },
           {
             "ware": "scanningarrays",
             "amount": 2,
-            "actualAmount": 7654
+            "actualAmount": 7654.0
           }
         ]
       },
@@ -4713,27 +4777,27 @@
       "effects": [],
       "sideEffects": [],
       "resources": {
-        "price": 50000000,
+        "price": 50000000.0,
         "wares": [
           {
             "ware": "advancedelectronics",
             "amount": 10,
-            "actualAmount": 19090
+            "actualAmount": 19090.0
           },
           {
             "ware": "energycells",
             "amount": 133,
-            "actualAmount": 253897
+            "actualAmount": 253897.0
           },
           {
             "ware": "hullparts",
             "amount": 1,
-            "actualAmount": 1909
+            "actualAmount": 1909.0
           },
           {
             "ware": "microchips",
             "amount": 9,
-            "actualAmount": 17181
+            "actualAmount": 17181.0
           }
         ]
       },
@@ -4825,27 +4889,27 @@
       "effects": [],
       "sideEffects": [],
       "resources": {
-        "price": 50000000,
+        "price": 50000000.0,
         "wares": [
           {
             "ware": "advancedelectronics",
             "amount": 10,
-            "actualAmount": 18700
+            "actualAmount": 18700.0
           },
           {
             "ware": "energycells",
             "amount": 133,
-            "actualAmount": 248710
+            "actualAmount": 248710.0
           },
           {
             "ware": "hullparts",
             "amount": 3,
-            "actualAmount": 5610
+            "actualAmount": 5610.0
           },
           {
             "ware": "microchips",
             "amount": 9,
-            "actualAmount": 16830
+            "actualAmount": 16830.0
           }
         ]
       },
@@ -4926,27 +4990,27 @@
       "effects": [],
       "sideEffects": [],
       "resources": {
-        "price": 50000000,
+        "price": 50000000.0,
         "wares": [
           {
             "ware": "advancedelectronics",
             "amount": 10,
-            "actualAmount": 18700
+            "actualAmount": 18700.0
           },
           {
             "ware": "energycells",
             "amount": 133,
-            "actualAmount": 248710
+            "actualAmount": 248710.0
           },
           {
             "ware": "hullparts",
             "amount": 3,
-            "actualAmount": 5610
+            "actualAmount": 5610.0
           },
           {
             "ware": "microchips",
             "amount": 9,
-            "actualAmount": 16830
+            "actualAmount": 16830.0
           }
         ]
       },
@@ -4990,27 +5054,27 @@
       "effects": [],
       "sideEffects": [],
       "resources": {
-        "price": 25000000,
+        "price": 25000000.0,
         "wares": [
           {
             "ware": "advancedelectronics",
             "amount": 2,
-            "actualAmount": 5558
+            "actualAmount": 5558.0
           },
           {
             "ware": "claytronics",
             "amount": 1,
-            "actualAmount": 2779
+            "actualAmount": 2779.0
           },
           {
             "ware": "energycells",
             "amount": 133,
-            "actualAmount": 369607
+            "actualAmount": 369607.0
           },
           {
             "ware": "hullparts",
             "amount": 4,
-            "actualAmount": 11116
+            "actualAmount": 11116.0
           }
         ]
       },
@@ -5070,27 +5134,27 @@
       "effects": [],
       "sideEffects": [],
       "resources": {
-        "price": 50000000,
+        "price": 50000000.0,
         "wares": [
           {
             "ware": "advancedelectronics",
             "amount": 2,
-            "actualAmount": 9408
+            "actualAmount": 9408.0
           },
           {
             "ware": "claytronics",
             "amount": 1,
-            "actualAmount": 4704
+            "actualAmount": 4704.0
           },
           {
             "ware": "energycells",
             "amount": 133,
-            "actualAmount": 625632
+            "actualAmount": 625632.0
           },
           {
             "ware": "hullparts",
             "amount": 10,
-            "actualAmount": 47040
+            "actualAmount": 47040.0
           }
         ]
       },
@@ -5145,32 +5209,32 @@
       "effects": [],
       "sideEffects": [],
       "resources": {
-        "price": 50000000,
+        "price": 50000000.0,
         "wares": [
           {
             "ware": "advancedelectronics",
             "amount": 2,
-            "actualAmount": 8454
+            "actualAmount": 8454.0
           },
           {
             "ware": "claytronics",
             "amount": 1,
-            "actualAmount": 4227
+            "actualAmount": 4227.0
           },
           {
             "ware": "energycells",
             "amount": 133,
-            "actualAmount": 562191
+            "actualAmount": 562191.0
           },
           {
             "ware": "hullparts",
             "amount": 4,
-            "actualAmount": 16908
+            "actualAmount": 16908.0
           },
           {
             "ware": "teladianium",
             "amount": 10,
-            "actualAmount": 42270
+            "actualAmount": 42270.0
           }
         ]
       },
@@ -5214,32 +5278,32 @@
       "effects": [],
       "sideEffects": [],
       "resources": {
-        "price": 10000000,
+        "price": 10000000.0,
         "wares": [
           {
             "ware": "advancedelectronics",
             "amount": 2,
-            "actualAmount": 1548
+            "actualAmount": 1548.0
           },
           {
             "ware": "claytronics",
             "amount": 1,
-            "actualAmount": 774
+            "actualAmount": 774.0
           },
           {
             "ware": "energycells",
             "amount": 133,
-            "actualAmount": 102942
+            "actualAmount": 102942.0
           },
           {
             "ware": "hullparts",
             "amount": 10,
-            "actualAmount": 7740
+            "actualAmount": 7740.0
           },
           {
             "ware": "smartchips",
             "amount": 33,
-            "actualAmount": 25542
+            "actualAmount": 25542.0
           }
         ]
       },
@@ -5282,12 +5346,12 @@
       "effects": [],
       "sideEffects": [],
       "resources": {
-        "price": 500000,
+        "price": 500000.0,
         "wares": [
           {
             "ware": "medicalsupplies",
             "amount": 1,
-            "actualAmount": 5617
+            "actualAmount": 5617.0
           }
         ],
         "pricescale": "population",
@@ -5308,6 +5372,14 @@
           "ref": "eco_clinic",
           "type": "project",
           "any": false
+        }
+      ],
+      "descriptions": [
+        {
+          "type": "payout",
+          "amount": 150,
+          "price": 500000.0,
+          "pricescale": "population"
         }
       ],
       "name": "Send Medical Supplies",
@@ -5335,37 +5407,37 @@
       "effects": [],
       "sideEffects": [],
       "resources": {
-        "price": 10000000,
+        "price": 10000000.0,
         "wares": [
           {
             "ware": "advancedelectronics",
             "amount": 2,
-            "actualAmount": 1256
+            "actualAmount": 1256.0
           },
           {
             "ware": "claytronics",
             "amount": 1,
-            "actualAmount": 628
+            "actualAmount": 628.0
           },
           {
             "ware": "energycells",
             "amount": 133,
-            "actualAmount": 83524
+            "actualAmount": 83524.0
           },
           {
             "ware": "hullparts",
             "amount": 10,
-            "actualAmount": 6280
+            "actualAmount": 6280.0
           },
           {
             "ware": "scanningarrays",
             "amount": 2,
-            "actualAmount": 1256
+            "actualAmount": 1256.0
           },
           {
             "ware": "superfluidcoolant",
             "amount": 13,
-            "actualAmount": 8164
+            "actualAmount": 8164.0
           }
         ]
       },
@@ -5402,232 +5474,232 @@
       "effects": [],
       "sideEffects": [],
       "resources": {
-        "price": 2000000,
+        "price": 2000000.0,
         "wares": [
           {
             "ware": "advancedcomposites",
             "amount": 4,
-            "actualAmount": 64
+            "actualAmount": 64.0
           },
           {
             "ware": "advancedelectronics",
             "amount": 2,
-            "actualAmount": 32
+            "actualAmount": 32.0
           },
           {
             "ware": "antimattercells",
             "amount": 10,
-            "actualAmount": 160
+            "actualAmount": 160.0
           },
           {
             "ware": "antimatterconverters",
             "amount": 6,
-            "actualAmount": 96
+            "actualAmount": 96.0
           },
           {
             "ware": "claytronics",
             "amount": 1,
-            "actualAmount": 16
+            "actualAmount": 16.0
           },
           {
             "ware": "dronecomponents",
             "amount": 2,
-            "actualAmount": 32
+            "actualAmount": 32.0
           },
           {
             "ware": "energycells",
             "amount": 133,
-            "actualAmount": 2128
+            "actualAmount": 2128.0
           },
           {
             "ware": "engineparts",
             "amount": 11,
-            "actualAmount": 176
+            "actualAmount": 176.0
           },
           {
             "ware": "fieldcoils",
             "amount": 5,
-            "actualAmount": 80
+            "actualAmount": 80.0
           },
           {
             "ware": "foodrations",
             "amount": 100,
-            "actualAmount": 1600
+            "actualAmount": 1600.0
           },
           {
             "ware": "graphene",
             "amount": 13,
-            "actualAmount": 208
+            "actualAmount": 208.0
           },
           {
             "ware": "helium",
             "amount": 40,
-            "actualAmount": 640
+            "actualAmount": 640.0
           },
           {
             "ware": "hullparts",
             "amount": 10,
-            "actualAmount": 160
+            "actualAmount": 160.0
           },
           {
             "ware": "hydrogen",
             "amount": 40,
-            "actualAmount": 640
+            "actualAmount": 640.0
           },
           {
             "ware": "ice",
             "amount": 67,
-            "actualAmount": 1072
+            "actualAmount": 1072.0
           },
           {
             "ware": "majadust",
             "amount": 10,
-            "actualAmount": 160
+            "actualAmount": 160.0
           },
           {
             "ware": "majasnails",
             "amount": 33,
-            "actualAmount": 528
+            "actualAmount": 528.0
           },
           {
             "ware": "meat",
             "amount": 40,
-            "actualAmount": 640
+            "actualAmount": 640.0
           },
           {
             "ware": "medicalsupplies",
             "amount": 33,
-            "actualAmount": 528
+            "actualAmount": 528.0
           },
           {
             "ware": "methane",
             "amount": 40,
-            "actualAmount": 640
+            "actualAmount": 640.0
           },
           {
             "ware": "microchips",
             "amount": 2,
-            "actualAmount": 32
+            "actualAmount": 32.0
           },
           {
             "ware": "missilecomponents",
             "amount": 200,
-            "actualAmount": 3200
+            "actualAmount": 3200.0
           },
           {
             "ware": "nividium",
             "amount": 4,
-            "actualAmount": 64
+            "actualAmount": 64.0
           },
           {
             "ware": "nostropoil",
             "amount": 67,
-            "actualAmount": 1072
+            "actualAmount": 1072.0
           },
           {
             "ware": "ore",
             "amount": 40,
-            "actualAmount": 640
+            "actualAmount": 640.0
           },
           {
             "ware": "plasmaconductors",
             "amount": 2,
-            "actualAmount": 32
+            "actualAmount": 32.0
           },
           {
             "ware": "quantumtubes",
             "amount": 7,
-            "actualAmount": 112
+            "actualAmount": 112.0
           },
           {
             "ware": "refinedmetals",
             "amount": 13,
-            "actualAmount": 208
+            "actualAmount": 208.0
           },
           {
             "ware": "scanningarrays",
             "amount": 2,
-            "actualAmount": 32
+            "actualAmount": 32.0
           },
           {
             "ware": "shieldcomponents",
             "amount": 10,
-            "actualAmount": 160
+            "actualAmount": 160.0
           },
           {
             "ware": "silicon",
             "amount": 15,
-            "actualAmount": 240
+            "actualAmount": 240.0
           },
           {
             "ware": "siliconwafers",
             "amount": 7,
-            "actualAmount": 112
+            "actualAmount": 112.0
           },
           {
             "ware": "smartchips",
             "amount": 33,
-            "actualAmount": 528
+            "actualAmount": 528.0
           },
           {
             "ware": "sojabeans",
             "amount": 29,
-            "actualAmount": 464
+            "actualAmount": 464.0
           },
           {
             "ware": "sojahusk",
             "amount": 67,
-            "actualAmount": 1072
+            "actualAmount": 1072.0
           },
           {
             "ware": "spacefuel",
             "amount": 15,
-            "actualAmount": 240
+            "actualAmount": 240.0
           },
           {
             "ware": "spaceweed",
             "amount": 13,
-            "actualAmount": 208
+            "actualAmount": 208.0
           },
           {
             "ware": "spices",
             "amount": 100,
-            "actualAmount": 1600
+            "actualAmount": 1600.0
           },
           {
             "ware": "sunriseflowers",
             "amount": 25,
-            "actualAmount": 400
+            "actualAmount": 400.0
           },
           {
             "ware": "superfluidcoolant",
             "amount": 13,
-            "actualAmount": 208
+            "actualAmount": 208.0
           },
           {
             "ware": "swampplant",
             "amount": 24,
-            "actualAmount": 384
+            "actualAmount": 384.0
           },
           {
             "ware": "teladianium",
             "amount": 10,
-            "actualAmount": 160
+            "actualAmount": 160.0
           },
           {
             "ware": "water",
             "amount": 40,
-            "actualAmount": 640
+            "actualAmount": 640.0
           },
           {
             "ware": "weaponcomponents",
             "amount": 7,
-            "actualAmount": 112
+            "actualAmount": 112.0
           },
           {
             "ware": "wheat",
             "amount": 7,
-            "actualAmount": 112
+            "actualAmount": 112.0
           }
         ],
         "payout": 250,
@@ -5649,6 +5721,13 @@
           "ref": "eco_campus",
           "type": "project",
           "any": false
+        }
+      ],
+      "descriptions": [
+        {
+          "type": "payout",
+          "amount": 250,
+          "price": 2000000.0
         }
       ],
       "name": "Send Research Materials",
@@ -5676,27 +5755,27 @@
       "effects": [],
       "sideEffects": [],
       "resources": {
-        "price": 10000000,
+        "price": 10000000.0,
         "wares": [
           {
             "ware": "claytronics",
             "amount": 1,
-            "actualAmount": 973
+            "actualAmount": 973.0
           },
           {
             "ware": "energycells",
             "amount": 133,
-            "actualAmount": 129409
+            "actualAmount": 129409.0
           },
           {
             "ware": "hullparts",
             "amount": 10,
-            "actualAmount": 9730
+            "actualAmount": 9730.0
           },
           {
             "ware": "smartchips",
             "amount": 33,
-            "actualAmount": 32109
+            "actualAmount": 32109.0
           }
         ]
       },
@@ -5733,7 +5812,7 @@
       "effects": [],
       "sideEffects": [],
       "resources": {
-        "price": 0,
+        "price": 0.1,
         "wares": [],
         "pricescale": "playeraccount",
         "payout": 1500,
@@ -5749,6 +5828,19 @@
           "ref": "eco_bank",
           "type": "project",
           "any": false
+        }
+      ],
+      "descriptions": [
+        {
+          "type": "payout",
+          "amount": 1500,
+          "price": 0.1,
+          "pricescale": "playeraccount",
+          "maxPrice": 100000000000
+        },
+        {
+          "type": "chance",
+          "value": 10
         }
       ],
       "name": "Fund Start-Up",
@@ -5776,37 +5868,37 @@
       "effects": [],
       "sideEffects": [],
       "resources": {
-        "price": 10000000,
+        "price": 10000000.0,
         "wares": [
           {
             "ware": "advancedelectronics",
             "amount": 2,
-            "actualAmount": 1286
+            "actualAmount": 1286.0
           },
           {
             "ware": "claytronics",
             "amount": 1,
-            "actualAmount": 643
+            "actualAmount": 643.0
           },
           {
             "ware": "energycells",
             "amount": 133,
-            "actualAmount": 85519
+            "actualAmount": 85519.0
           },
           {
             "ware": "hullparts",
             "amount": 10,
-            "actualAmount": 6430
+            "actualAmount": 6430.0
           },
           {
             "ware": "nividium",
             "amount": 4,
-            "actualAmount": 2572
+            "actualAmount": 2572.0
           },
           {
             "ware": "plasmaconductors",
             "amount": 2,
-            "actualAmount": 1286
+            "actualAmount": 1286.0
           }
         ]
       },
@@ -5843,12 +5935,12 @@
       "effects": [],
       "sideEffects": [],
       "resources": {
-        "price": 1000000,
+        "price": 1000000.0,
         "wares": [
           {
             "ware": "nividium",
             "amount": 1,
-            "actualAmount": 1703
+            "actualAmount": 1703.0
           }
         ],
         "pricescale": "population",
@@ -5869,6 +5961,14 @@
           "ref": "eco_nividium",
           "type": "project",
           "any": false
+        }
+      ],
+      "descriptions": [
+        {
+          "type": "payout",
+          "amount": 150,
+          "price": 1000000.0,
+          "pricescale": "population"
         }
       ],
       "name": "Send Nividium",
@@ -6415,22 +6515,22 @@
       ],
       "sideEffects": [],
       "resources": {
-        "price": 25000000,
+        "price": 25000000.0,
         "wares": [
           {
             "ware": "dronecomponents",
             "amount": 2,
-            "actualAmount": 7886
+            "actualAmount": 7886.0
           },
           {
             "ware": "scruffinfruits",
             "amount": 100,
-            "actualAmount": 394300
+            "actualAmount": 394300.0
           },
           {
             "ware": "methane",
             "amount": 1,
-            "actualAmount": 3943
+            "actualAmount": 3943.0
           }
         ]
       },
@@ -6484,22 +6584,22 @@
       ],
       "sideEffects": [],
       "resources": {
-        "price": 175000000,
+        "price": 175000000.0,
         "wares": [
           {
             "ware": "computronicsubstrate",
             "amount": 1,
-            "actualAmount": 5486
+            "actualAmount": 5486.0
           },
           {
             "ware": "metallicmicrolattice",
             "amount": 200,
-            "actualAmount": 1097200
+            "actualAmount": 1097200.0
           },
           {
             "ware": "siliconcarbide",
             "amount": 7,
-            "actualAmount": 38402
+            "actualAmount": 38402.0
           }
         ]
       },
@@ -6518,6 +6618,13 @@
       "blockedProjects": [],
       "blockedGroups": [],
       "predecessors": [],
+      "descriptions": [
+        {
+          "type": "research",
+          "id": "research_tf_tech",
+          "nameId": "{20216,1481}"
+        }
+      ],
       "name": "Global Water Surfacing",
       "description": "Most worlds, even seemingly dry ones, have vast amounts of water hidden in subterranean caves and aquifers. We now have the technology to raise and make use of that water on a global scale."
     },
@@ -6549,22 +6656,22 @@
       ],
       "sideEffects": [],
       "resources": {
-        "price": 100000000,
+        "price": 100000000.0,
         "wares": [
           {
             "ware": "computronicsubstrate",
             "amount": 1,
-            "actualAmount": 3135
+            "actualAmount": 3135.0
           },
           {
             "ware": "metallicmicrolattice",
             "amount": 200,
-            "actualAmount": 627000
+            "actualAmount": 627000.0
           },
           {
             "ware": "siliconcarbide",
             "amount": 7,
-            "actualAmount": 21945
+            "actualAmount": 21945.0
           }
         ]
       },
@@ -6583,6 +6690,13 @@
       "blockedProjects": [],
       "blockedGroups": [],
       "predecessors": [],
+      "descriptions": [
+        {
+          "type": "research",
+          "id": "research_tf_tech",
+          "nameId": "{20216,1481}"
+        }
+      ],
       "name": "Targeted Outgassing",
       "description": "By letting loose swarms of carbon-eating nanites, we can release massive amounts of nitrogen into the atmosphere. They are programmed to stop at exactly the ideal air pressure."
     },
@@ -6613,22 +6727,22 @@
       ],
       "sideEffects": [],
       "resources": {
-        "price": 1000000000,
+        "price": 1000000000.0,
         "wares": [
           {
             "ware": "computronicsubstrate",
             "amount": 1,
-            "actualAmount": 31350
+            "actualAmount": 31350.0
           },
           {
             "ware": "metallicmicrolattice",
             "amount": 200,
-            "actualAmount": 6270000
+            "actualAmount": 6270000.0
           },
           {
             "ware": "siliconcarbide",
             "amount": 7,
-            "actualAmount": 219450
+            "actualAmount": 219450.0
           }
         ]
       },
@@ -6647,6 +6761,13 @@
       "blockedProjects": [],
       "blockedGroups": [],
       "predecessors": [],
+      "descriptions": [
+        {
+          "type": "research",
+          "id": "research_tf_tech",
+          "nameId": "{20216,1481}"
+        }
+      ],
       "name": "Tectonic Scaffolding",
       "description": "Lattices of self-organising smart matter find friction points between tectonic plates and release tensions in a controlled manner."
     },
@@ -6665,22 +6786,22 @@
       "effects": [],
       "sideEffects": [],
       "resources": {
-        "price": 250000000,
+        "price": 250000000.0,
         "wares": [
           {
             "ware": "computronicsubstrate",
             "amount": 1,
-            "actualAmount": 7837
+            "actualAmount": 7837.0
           },
           {
             "ware": "metallicmicrolattice",
             "amount": 200,
-            "actualAmount": 1567400
+            "actualAmount": 1567400.0
           },
           {
             "ware": "siliconcarbide",
             "amount": 7,
-            "actualAmount": 54859
+            "actualAmount": 54859.0
           }
         ]
       },
@@ -6710,6 +6831,13 @@
       "blockedProjects": [],
       "blockedGroups": [],
       "predecessors": [],
+      "descriptions": [
+        {
+          "type": "research",
+          "id": "research_tf_tech",
+          "nameId": "{20216,1481}"
+        }
+      ],
       "name": "Von-Neumann Constructors",
       "description": "These self-replicating drones have been outfitted with logarithmic brakes to prevent a runaway scenario at a fundamental level while still allowing them to react to demand at the proper scale. In addition, they are controlled by specialised AI systems which lack the capability to alter their own programming. This makes them a safe, if less effective, version of the original Terraformer designs."
     },
@@ -6735,22 +6863,22 @@
       "effects": [],
       "sideEffects": [],
       "resources": {
-        "price": 100000000,
+        "price": 100000000.0,
         "wares": [
           {
             "ware": "dronecomponents",
             "amount": 20,
-            "actualAmount": 86220
+            "actualAmount": 86220.0
           },
           {
             "ware": "plankton",
             "amount": 10,
-            "actualAmount": 43110
+            "actualAmount": 43110.0
           },
           {
             "ware": "bogas",
             "amount": 1,
-            "actualAmount": 4311
+            "actualAmount": 4311.0
           }
         ]
       },
@@ -6794,17 +6922,17 @@
       "effects": [],
       "sideEffects": [],
       "resources": {
-        "price": 10000000,
+        "price": 10000000.0,
         "wares": [
           {
             "ware": "advancedcomposites",
             "amount": 10,
-            "actualAmount": 14810
+            "actualAmount": 14810.0
           },
           {
             "ware": "hullparts",
             "amount": 1,
-            "actualAmount": 1481
+            "actualAmount": 1481.0
           }
         ]
       },
@@ -6853,7 +6981,7 @@
       "effects": [],
       "sideEffects": [],
       "resources": {
-        "price": 500000000,
+        "price": 500000000.0,
         "wares": []
       },
       "deliveries": [],
@@ -6899,22 +7027,22 @@
       ],
       "sideEffects": [],
       "resources": {
-        "price": 50000000,
+        "price": 50000000.0,
         "wares": [
           {
             "ware": "methane",
             "amount": 40,
-            "actualAmount": 416480
+            "actualAmount": 416480.0
           },
           {
             "ware": "plankton",
             "amount": 100,
-            "actualAmount": 1041200
+            "actualAmount": 1041200.0
           },
           {
             "ware": "bogas",
             "amount": 1,
-            "actualAmount": 10412
+            "actualAmount": 10412.0
           }
         ]
       },
@@ -6981,22 +7109,22 @@
       ],
       "sideEffects": [],
       "resources": {
-        "price": 150000000,
+        "price": 150000000.0,
         "wares": [
           {
             "ware": "methane",
             "amount": 40,
-            "actualAmount": 1249440
+            "actualAmount": 1249440.0
           },
           {
             "ware": "plankton",
             "amount": 100,
-            "actualAmount": 3123600
+            "actualAmount": 3123600.0
           },
           {
             "ware": "bogas",
             "amount": 1,
-            "actualAmount": 31236
+            "actualAmount": 31236.0
           }
         ]
       },
@@ -7058,22 +7186,22 @@
       ],
       "sideEffects": [],
       "resources": {
-        "price": 150000000,
+        "price": 150000000.0,
         "wares": [
           {
             "ware": "methane",
             "amount": 40,
-            "actualAmount": 1249440
+            "actualAmount": 1249440.0
           },
           {
             "ware": "plankton",
             "amount": 100,
-            "actualAmount": 3123600
+            "actualAmount": 3123600.0
           },
           {
             "ware": "bogas",
             "amount": 1,
-            "actualAmount": 31236
+            "actualAmount": 31236.0
           }
         ]
       },
@@ -7140,22 +7268,22 @@
       ],
       "sideEffects": [],
       "resources": {
-        "price": 250000000,
+        "price": 250000000.0,
         "wares": [
           {
             "ware": "methane",
             "amount": 40,
-            "actualAmount": 2082440
+            "actualAmount": 2082440.0
           },
           {
             "ware": "plankton",
             "amount": 100,
-            "actualAmount": 5206100
+            "actualAmount": 5206100.0
           },
           {
             "ware": "bogas",
             "amount": 1,
-            "actualAmount": 52061
+            "actualAmount": 52061.0
           }
         ]
       },
@@ -7221,22 +7349,22 @@
       ],
       "sideEffects": [],
       "resources": {
-        "price": 25000000,
+        "price": 25000000.0,
         "wares": [
           {
             "ware": "dronecomponents",
             "amount": 2,
-            "actualAmount": 10232
+            "actualAmount": 10232.0
           },
           {
             "ware": "plankton",
             "amount": 100,
-            "actualAmount": 511600
+            "actualAmount": 511600.0
           },
           {
             "ware": "bogas",
             "amount": 1,
-            "actualAmount": 5116
+            "actualAmount": 5116.0
           }
         ]
       },
@@ -7316,22 +7444,22 @@
       ],
       "sideEffects": [],
       "resources": {
-        "price": 50000000,
+        "price": 50000000.0,
         "wares": [
           {
             "ware": "claytronics",
             "amount": 1,
-            "actualAmount": 4836
+            "actualAmount": 4836.0
           },
           {
             "ware": "advancedelectronics",
             "amount": 4,
-            "actualAmount": 19344
+            "actualAmount": 19344.0
           },
           {
             "ware": "hullparts",
             "amount": 10,
-            "actualAmount": 48360
+            "actualAmount": 48360.0
           }
         ]
       },
@@ -7400,37 +7528,37 @@
       "effects": [],
       "sideEffects": [],
       "resources": {
-        "price": 50000000,
+        "price": 50000000.0,
         "wares": [
           {
             "ware": "advancedelectronics",
             "amount": 2,
-            "actualAmount": 7428
+            "actualAmount": 7428.0
           },
           {
             "ware": "claytronics",
             "amount": 1,
-            "actualAmount": 3714
+            "actualAmount": 3714.0
           },
           {
             "ware": "dronecomponents",
             "amount": 2,
-            "actualAmount": 7428
+            "actualAmount": 7428.0
           },
           {
             "ware": "energycells",
             "amount": 133,
-            "actualAmount": 493962
+            "actualAmount": 493962.0
           },
           {
             "ware": "hullparts",
             "amount": 4,
-            "actualAmount": 14856
+            "actualAmount": 14856.0
           },
           {
             "ware": "microchips",
             "amount": 2,
-            "actualAmount": 7428
+            "actualAmount": 7428.0
           }
         ]
       },

@@ -5,11 +5,12 @@ import xml.etree.ElementTree as ET
 from typing import List, Dict, Any, Set, Optional, Tuple
 
 
-def parse_md(root: ET.Element) -> Tuple[List[Dict[str, Any]], Dict[str, List[Dict[str, Any]]]]:
+def parse_md(root: ET.Element) -> Tuple[List[Dict[str, Any]], Dict[str, List[Dict[str, Any]]], Dict[str, List[Dict[str, Any]]]]:
     """Parse MD terraforming XML for cluster initializations and project predecessors.
 
-    Returns (clusters, predecessors_map).
+    Returns (clusters, predecessors_map, project_descriptions).
     predecessors_map: {project_id: [{ref: str, type: "project"|"group", any: bool}]}
+    project_descriptions: {project_id: [{type: str, ...}]}
     """
     clusters = []
     predecessors_map: Dict[str, List[Dict[str, Any]]] = {}
@@ -52,7 +53,10 @@ def parse_md(root: ET.Element) -> Tuple[List[Dict[str, Any]], Dict[str, List[Dic
         if proj_id not in predecessors_map:
             predecessors_map[proj_id] = preds
 
-    return clusters, predecessors_map
+    # Extract human-readable effect descriptions from event_terraforming_project_succeeded
+    project_descriptions = _extract_project_descriptions(root)
+
+    return clusters, predecessors_map, project_descriptions
 
 
 def _collect_all_predecessors(root: ET.Element) -> Dict[str, List[Dict[str, Any]]]:
@@ -714,6 +718,149 @@ def _clean_xpath_str(val: Optional[str]) -> str:
     s = re.sub(r"^'+", "", s)
     s = re.sub(r"'+$", "", s)
     return s
+
+
+def _extract_project_descriptions(root: ET.Element) -> Dict[str, List[Dict[str, Any]]]:
+    """Extract structured effect descriptions from event_terraforming_project_succeeded cues.
+
+    Returns {project_id: [{type: str, ...}, ...]}.
+    Types: skill_add, recruitment
+    """
+    results: Dict[str, List[Dict[str, Any]]] = {}
+
+    for cue in root.iter("cue"):
+        conditions = cue.find("conditions")
+        if conditions is None:
+            continue
+        event = conditions.find("event_terraforming_project_succeeded")
+        if event is None:
+            continue
+
+        project_id = _clean_xpath_str(event.get("project", ""))
+        if not project_id:
+            continue
+
+        actions = cue.find("actions")
+        if actions is None:
+            continue
+
+        desc = _generate_effect_description(project_id, actions)
+        if desc:
+            results[project_id] = [desc]
+
+    return results
+
+
+def _generate_effect_description(project_id: str, actions: ET.Element) -> Optional[Dict[str, Any]]:
+    """Parse event_terraforming_project_succeeded actions into a structured description item.
+
+    Returns None if no recognizable pattern is found.
+    """
+    add_skill_elem = actions.find(".//add_skill")
+    if add_skill_elem is not None:
+        skill_type = add_skill_elem.get("type", "")
+        skill = _skill_type_to_name(skill_type)
+        if not skill:
+            return None
+
+        max_stars = _extract_max_stars(actions, add_skill_elem)
+        is_group = _is_group_training(actions)
+
+        return {
+            "type": "skill_add",
+            "skill": skill,
+            "stars": 1,
+            "maxStars": max_stars or 4,
+            "scope": "group" if is_group else "single",
+        }
+
+    create_npc = actions.find(".//create_npc_template")
+    if create_npc is not None:
+        primary_skill = _extract_primary_recruitment_skill(actions)
+        if not primary_skill:
+            return None
+
+        gchar = actions.find(".//get_character_definition[@tags]")
+        tags = gchar.get("tags", "") if gchar is not None else ""
+        role = "marine" if "tag.marine" in tags else "pilot"
+
+        return {
+            "type": "recruitment",
+            "role": role,
+            "count": 3,
+            "primarySkill": primary_skill,
+            "skillMin": 13,
+            "skillMax": 15,
+            "morale": 13,
+        }
+
+    return None
+
+
+def _skill_type_to_name(skill_type: str) -> str:
+    """Convert skilltype.X to skill name for i18n key.
+    e.g., skilltype.boarding → boarding, skilltype.piloting → piloting
+    """
+    SKILL_MAP = {
+        "skilltype.boarding": "boarding",
+        "skilltype.piloting": "piloting",
+        "skilltype.engineering": "engineering",
+        "skilltype.management": "management",
+        "skilltype.morale": "morale",
+    }
+    return SKILL_MAP.get(skill_type, "")
+
+
+def _extract_max_stars(actions: ET.Element, target_elem: ET.Element) -> int:
+    """Find the enclosing do_if condition and extract max star level.
+    e.g., <do_if value="$CurrentSkill lt 12" comment="4 stars"> → 4
+    """
+    # Search for do_if elements containing the target element
+    for do_if in actions.iter("do_if"):
+        value_attr = do_if.get("value", "")
+        if "lt" in value_attr:
+            # Extract the number from e.g. "$CurrentSkill lt 12"
+            m = re.search(r"lt\s+(\d+)", value_attr)
+            if m:
+                max_val = int(m.group(1))
+                if max_val > 0 and max_val % 3 == 0:
+                    return max_val // 3
+    return 0
+
+
+def _is_group_training(actions: ET.Element) -> bool:
+    """Check if training affects group or individual."""
+    # Group training: uses do_for_each with entityrole.trainee_group
+    for elem in actions.iter("do_for_each"):
+        in_attr = elem.get("in", "")
+        if "trainee_group" in in_attr:
+            return True
+    # Individual training: uses assignedcontrolentity
+    for elem in actions.iter("set_value"):
+        exact = elem.get("exact", "")
+        if "trainee_individual" in exact:
+            return False
+    return False
+
+
+def _extract_primary_recruitment_skill(actions: ET.Element) -> str:
+    """Find the primary skill from set_skill calls in a recruitment action.
+    The primary skill is the one with the highest max value (5 stars = 15).
+    min values may contain XPath expressions like 'if $i == 1 then 15 else 13'.
+    """
+    skills: Dict[str, Dict[str, int]] = {}
+    for ss in actions.iter("set_skill"):
+        skill_type = ss.get("type", "")
+        max_val = _int_or(ss.get("max"), 0)
+        if skill_type:
+            prev = skills.get(skill_type)
+            if prev is None or max_val > prev.get("max", 0):
+                skills[skill_type] = {"max": max_val}
+
+    if not skills:
+        return ""
+    primary = max(skills.keys(), key=lambda k: skills[k]["max"])
+    return _skill_type_to_name(primary)
 
 
 def _int_or(val: Optional[str], default: Optional[int] = None) -> Optional[int]:

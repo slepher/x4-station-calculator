@@ -1,15 +1,16 @@
 import { computed, type ComputedRef } from 'vue'
 import type {
-  TerraformingData,
+  ClusterObjective,
+  DeliveryShip,
+  DescriptionItem,
+  StatCondition,
+  TaskNode,
+  TaskTree,
   TerraformingCluster,
+  TerraformingData,
+  TerraformingProject,
   TerraformingStat,
   TerraformingState,
-  TaskTree,
-  TaskNode,
-  ClusterObjective,
-  TerraformingProject,
-  StatCondition,
-  DeliveryShip,
 } from '@/store/logic/terraformingTaskResolver'
 import {
   getCurrentRange,
@@ -80,15 +81,6 @@ export interface TerraformingConditionScaleModel extends TerraformingStatScaleMo
 export interface TerraformingEffectItem {
   type: 'effect' | 'rebate' | 'sideEffect' | 'description'
   text: string
-}
-
-const PROJECT_DESCRIPTION_KEYS: Record<string, string> = {
-  'trn_boarding_group': 'terraforming.effect.boardingGroup',
-  'trn_boarding_single': 'terraforming.effect.boardingSingle',
-  'trn_boarding_competition': 'terraforming.effect.boardingCompetition',
-  'trn_pilot_group': 'terraforming.effect.pilotingGroup',
-  'trn_pilot_single': 'terraforming.effect.pilotingSingle',
-  'trn_pilot_competition': 'terraforming.effect.pilotingCompetition',
 }
 
 export interface TerraformingTaskNodeDisplay {
@@ -418,6 +410,73 @@ function translateBlockedReasonLines(
   })
 }
 
+function formatDescriptionItem(
+  item: DescriptionItem,
+  i18n: (key: string) => string,
+): string {
+  const N = i18n
+
+  switch (item.type) {
+    case 'skill_add': {
+      const skillName = N(`terraforming.skill.${item.skill}`) || item.skill
+      const scope = item.scope === 'group'
+        ? (N('terraforming.effect.allTrainees') || 'all trainees')
+        : (N('terraforming.effect.assignedTrainee') || 'assigned trainee')
+      return `${scope} ${skillName} +${item.stars}★ (${N('terraforming.max') || 'max'} ${item.maxStars}★)`
+    }
+
+    case 'recruitment': {
+      const roleName = N(`terraforming.role.${item.role}`) || item.role
+      const skillName = N(`terraforming.skill.${item.primarySkill}`) || item.primarySkill
+      const measure = N('terraforming.effect.measure') || ''
+      const countText = measure ? `${item.count}${measure} ` : `${item.count} `
+      return `${N('terraforming.effect.recruit') || 'Recruit'} ${countText}${roleName} (${skillName}${N('terraforming.effect.skill') || ' Skill'} ${item.skillMin}-${item.skillMax}, ${N('terraforming.effect.starHint') || '3pts=1★'})`
+    }
+
+    case 'payout': {
+      const priceVal = item.price ?? 0
+      let investText: string
+      if (priceVal <= 0) {
+        investText = ''
+      } else if (priceVal < 1) {
+        investText = `${N('terraforming.effect.invest') || 'Invest'}: ${N('terraforming.effect.priceFactor') || 'factor'} ${priceVal}`
+      } else {
+        investText = `${N('terraforming.effect.invest') || 'Invest'}: ${priceVal.toLocaleString()} Cr`
+      }
+
+      let scaleText = ''
+      if (item.pricescale === 'population') {
+        scaleText = N('terraforming.effect.scalePopulation') || ' × population'
+        investText = investText ? investText + scaleText : `${N('terraforming.effect.invest') || 'Invest'}: ${scaleText.trim()}`
+      } else if (item.pricescale === 'playeraccount') {
+        scaleText = N('terraforming.effect.scaleAccount') || ' × account'
+        investText = investText ? investText + scaleText : `${N('terraforming.effect.invest') || 'Invest'}: ${scaleText.trim()}`
+      }
+
+      const payoutCr = item.amount
+      let returnText = `${N('terraforming.effect.returns') || 'Returns'}: ${payoutCr}%`
+
+      if (item.maxPrice) {
+        returnText += ` (${N('terraforming.max') || 'max'}: ${item.maxPrice.toLocaleString()} Cr)`
+      }
+
+      return `${investText} / ${returnText}`
+    }
+
+    case 'chance': {
+      return `${N('terraforming.effect.chance') || 'Success rate'}: ${item.value}%`
+    }
+
+    case 'research': {
+      const name = (item.nameId ? N(item.nameId) : null) || item.id
+      return `${N('terraforming.effect.research') || 'Requires research'}: ${name}`
+    }
+
+    default:
+      return ''
+  }
+}
+
 function buildEffectItems(
   projectId: string,
   nodeEffects: string,
@@ -441,11 +500,13 @@ function buildEffectItems(
     }
   }
 
-  const descKey = PROJECT_DESCRIPTION_KEYS[projectId]
-  if (descKey) {
-    const descText = i18nLookup(descKey)
-    if (descText) {
-      items.push({ type: 'description', text: descText })
+  const projectDescriptions = project.descriptions
+  if (projectDescriptions && projectDescriptions.length) {
+    for (const desc of projectDescriptions) {
+      const text = formatDescriptionItem(desc, i18nLookup)
+      if (text) {
+        items.push({ type: 'description', text })
+      }
     }
   }
 

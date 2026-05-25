@@ -49,6 +49,13 @@ export interface ClusterObjective {
   textReplaces?: Array<{ from: string; to: string }>
 }
 
+export type DescriptionItem =
+  | { type: 'skill_add'; skill: string; stars: number; maxStars: number; scope: 'group' | 'single' }
+  | { type: 'recruitment'; role: string; count: number; primarySkill: string; skillMin: number; skillMax: number; morale: number }
+  | { type: 'payout'; amount: number; price: number; pricescale?: string; maxPrice?: number }
+  | { type: 'chance'; value: number }
+  | { type: 'research'; id: string; nameId?: string }
+
 export interface TerraformingProject {
   id: string
   group: string
@@ -72,6 +79,7 @@ export interface TerraformingProject {
   blockedProjects: string[]
   blockedGroups: string[]
   predecessors: Predecessor[]
+  descriptions?: DescriptionItem[]
 }
 
 export interface StatCondition {

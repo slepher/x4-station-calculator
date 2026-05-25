@@ -10,29 +10,18 @@ import argparse
 import json
 import os
 import sys
-import xml.etree.ElementTree as ET
 from copy import deepcopy
 from pathlib import Path
 from typing import Any, Dict, List
+import xml.etree.ElementTree as ET2
 
 _project_root = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(_project_root))
 
 import importlib
 
-# Dynamic imports for x4-game directory (hyphen in name prevents standard Python import)
-_mod_lib = importlib.import_module("scripts.x4-game.terraforming.parse_library")
-parse_stats = _mod_lib.parse_stats
-parse_project_groups = _mod_lib.parse_project_groups
-parse_projects = _mod_lib.parse_projects
-
-_mod_md = importlib.import_module("scripts.x4-game.terraforming.parse_md")
-parse_md = _mod_md.parse_md
-resolve_cluster_objective_texts = _mod_md.resolve_cluster_objective_texts
-
 _mod_build = importlib.import_module("scripts.x4-game.terraforming.build")
-_compute_actual_ware_amounts = _mod_build._compute_actual_ware_amounts
-_build_delivery_ships = _mod_build._build_delivery_ships
+build_terraforming_data = _mod_build.build_terraforming_data
 
 
 _CONFIG_FILE = _project_root / "x4-station-calculator.config.json"
@@ -83,31 +72,28 @@ def _merge_config(base: Dict[str, Any], version_item: Dict[str, Any]) -> Dict[st
     return m
 
 
-def _load_cluster_name_ids(folder_name: str) -> Dict[str, str]:
-    alt_path = os.path.join(
-        _project_root, "src", "assets", "x4_game_data",
-        folder_name, "data", "maps.json",
-    )
-    if not os.path.exists(alt_path):
-        return {}
+def _load_ship_ware_data(raw_path: str) -> "tuple[Dict[str, str], Dict[str, dict]]":
+    component_to_ware: Dict[str, str] = {}
+    ware_index: Dict[str, dict] = {}
+    wares_path = os.path.join(raw_path, "libraries", "wares", "final.xml")
+    if not os.path.exists(wares_path):
+        return component_to_ware, ware_index
     try:
-        with open(alt_path, "r", encoding="utf-8") as f:
-            maps_data = json.load(f)
-        result: Dict[str, str] = {}
-        clusters = maps_data.get("clusters", {})
-        sectors_map = maps_data.get("sectors", {})
-        for macro_id, cluster_info in clusters.items():
-            sector_list = cluster_info.get("sectors", [])
-            if len(sector_list) == 1:
-                sector = sectors_map.get(sector_list[0], {})
-                name_id = sector.get("nameId", "")
-            else:
-                name_id = cluster_info.get("nameId", "")
-            if name_id:
-                result[macro_id] = name_id
-        return result
+        tree = ET2.parse(wares_path)
+        for ware in tree.getroot().findall("ware"):
+            w_id = ware.get("id", "")
+            if not w_id:
+                continue
+            name = ware.get("name", "")
+            ware_index[w_id] = {"nameId": name}
+            comp = ware.find("component")
+            if comp is not None:
+                ref = comp.get("ref", "")
+                if ref and ref not in component_to_ware:
+                    component_to_ware[ref] = w_id
     except Exception:
-        return {}
+        pass
+    return component_to_ware, ware_index
 
 
 def _inject_english_names(data: dict, output_dir: str) -> int:
@@ -132,119 +118,6 @@ def _inject_english_names(data: dict, output_dir: str) -> int:
                 r["description"] = en_map[raw_key]
                 count += 1
     return count
-
-
-def _load_ship_ware_data(raw_path: str) -> tuple:
-    """Load component_to_ware and ware_index from raw wares XML for deliveryShips nameId resolution."""
-    import xml.etree.ElementTree as ET2
-    component_to_ware: Dict[str, str] = {}
-    ware_index: Dict[str, dict] = {}
-    wares_path = os.path.join(raw_path, "libraries", "wares", "final.xml")
-    if not os.path.exists(wares_path):
-        return component_to_ware, ware_index
-    try:
-        tree = ET2.parse(wares_path)
-        for ware in tree.getroot().findall("ware"):
-            w_id = ware.get("id", "")
-            if not w_id:
-                continue
-            name = ware.get("name", "")
-            ware_index[w_id] = {"nameId": name}
-            comp = ware.find("component")
-            if comp is not None:
-                ref = comp.get("ref", "")
-                if ref and ref not in component_to_ware:
-                    component_to_ware[ref] = w_id
-    except Exception:
-        pass
-    return component_to_ware, ware_index
-
-
-def process_terraforming_standalone(raw_path: str, folder_name: str) -> dict | None:
-    library_path = os.path.join(raw_path, "libraries", "terraforming", "final.xml")
-    md_path = os.path.join(raw_path, "md", "terraforming", "final.xml")
-
-    if not os.path.exists(library_path):
-        print(f"   WARNING: terraforming library file not found: {library_path}")
-        return None
-
-    try:
-        lib_tree = ET.parse(library_path)
-        lib_root = lib_tree.getroot()
-
-        stats = parse_stats(lib_root)
-        project_groups = parse_project_groups(lib_root)
-        projects, _lib_name_ids = parse_projects(lib_root)
-
-        clusters: List[Dict[str, Any]] = []
-        predecessors_map: Dict[str, List[Dict[str, Any]]] = {}
-
-        if os.path.exists(md_path):
-            try:
-                md_tree = ET.parse(md_path)
-                md_root = md_tree.getroot()
-                clusters, predecessors_map = parse_md(md_root)
-            except Exception as e:
-                print(f"   WARNING: MD terraforming parsing failed: {e}")
-
-        clusters = [c for c in clusters if len(c.get("projectIds", [])) > 0]
-
-        cluster_name_map = _load_cluster_name_ids(folder_name)
-        resolve_cluster_objective_texts(clusters, cluster_name_map)
-
-        for proj in projects:
-            pid = proj["id"]
-            if pid in predecessors_map:
-                proj["predecessors"] = predecessors_map[pid]
-
-        for proj in projects:
-            preds = proj.get("predecessors")
-            if not preds:
-                continue
-            resolved = []
-            for p in preds:
-                if p.get("ref") == "$PilotTrainingCourseProject":
-                    resolved.append({**p, "ref": "trn_pilot"})
-                else:
-                    resolved.append(p)
-            proj["predecessors"] = resolved
-
-        # Compute actual in-game ware amounts using max prices from wares.json
-        wares_path = os.path.join(
-            _project_root, "src", "assets", "x4_game_data",
-            folder_name, "data", "wares.json",
-        )
-        if os.path.exists(wares_path):
-            try:
-                with open(wares_path, "r", encoding="utf-8") as f:
-                    wares_data = json.load(f)
-                _compute_actual_ware_amounts(projects, wares_data)
-            except Exception as e:
-                print(f"   WARNING: Failed to load wares data: {e}")
-
-        # Build deliveryShips (nameId from raw wares XML)
-        ctow, widx = _load_ship_ware_data(raw_path)
-        delivery_ships = _build_delivery_ships(projects, ctow, widx)
-
-        # Strip buildDuration from deliveries (moved to deliveryShips)
-        for proj in projects:
-            for d in proj.get("deliveries", []):
-                d.pop("buildDuration", None)
-
-        print(f"   Parsed terraforming: {len(stats)} stats, {len(project_groups)} groups, "
-              f"{len(projects)} projects, {len(clusters)} clusters, {len(delivery_ships)} delivery ships")
-
-        return {
-            "stats": stats,
-            "projectGroups": project_groups,
-            "projects": projects,
-            "clusters": clusters,
-            "deliveryShips": delivery_ships,
-        }
-
-    except Exception as e:
-        print(f"   Terraforming XML Error: {e}")
-        return None
 
 
 def main():
@@ -275,7 +148,20 @@ def main():
             print(f"   WARNING: raw data directory does not exist: {raw_path}")
             continue
 
-        data = process_terraforming_standalone(raw_path, folder_name)
+        ctow, widx = _load_ship_ware_data(raw_path)
+
+        wares_path = os.path.join(processed_assets_dir, folder_name, "data", "wares.json")
+        wares_data: list = []
+        if os.path.exists(wares_path):
+            with open(wares_path, "r", encoding="utf-8") as f:
+                wares_data = json.load(f)
+
+        try:
+            data = build_terraforming_data(raw_path, ctow, widx, wares_data)
+        except Exception as e:
+            print(f"   Terraforming XML Error: {e}")
+            continue
+
         if data is None:
             continue
 
@@ -291,12 +177,8 @@ def main():
             json.dump(data, f, indent=2, ensure_ascii=False)
 
         print(f"   terraforming.json -> {output_path}")
-        tf_stats = data.get("stats", [])
-        tf_groups = data.get("projectGroups", [])
-        tf_projects = data.get("projects", [])
-        tf_clusters = data.get("clusters", [])
-        print(f"   {len(tf_stats)} stats | {len(tf_groups)} groups | "
-              f"{len(tf_projects)} projects | {len(tf_clusters)} clusters | "
+        print(f"   {len(data['stats'])} stats | {len(data['projectGroups'])} groups | "
+              f"{len(data['projects'])} projects | {len(data['clusters'])} clusters | "
               f"{len(data.get('deliveryShips', []))} delivery ships")
 
 
