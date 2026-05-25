@@ -1783,15 +1783,16 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       stationPlansById.set(plan.id, plan)
     })
 
-    const entries = orderedStationsBySector.value.map((station) => {
+     const entries = orderedStationsBySector.value.map((station) => {
       const matchingPlan = stationPlansByCode.get(station.id) || stationPlansById.get(station.id)
+      const liveSemantics = liveFlowMap.value?.getCache(station.id)?.semantics
       const semantics = matchingPlan
         ? planningDerivedMap.value?.getCache(station.id)?.semantics
-        : liveFlowMap.value?.getCache(station.id)?.semantics
+        : liveSemantics
       return [
         station.id,
         {
-          tag: semantics?.tag ?? (matchingPlan ? undefined : 'constructionsite'),
+          tag: liveSemantics?.tag ?? (matchingPlan ? undefined : 'constructionsite'),
           factoryGroup: semantics?.factoryGroup
         }
       ] as const
