@@ -1119,5 +1119,12 @@
   "terraforming.oneTime": "One-time",
   "terraforming.repeatable": "Repeatable",
   "terraforming.cooldown": "Cooldown",
-  "terraforming.setback": "setback"
+  "terraforming.setback": "setback",
+  "terraforming.duration": "Duration",
+  "terraforming.effect.boardingGroup": "Boarding +1★ (max 4★) for all trainees",
+  "terraforming.effect.boardingSingle": "Boarding +1★ (max 5★) for assigned trainee",
+  "terraforming.effect.boardingCompetition": "Recruit 3 marines (Boarding 13-15, Morale 13-15)",
+  "terraforming.effect.pilotingGroup": "Piloting +1★ (max 4★) for all trainees",
+  "terraforming.effect.pilotingSingle": "Piloting +1★ (max 5★) for assigned trainee",
+  "terraforming.effect.pilotingCompetition": "Recruit 3 pilots (Piloting 13-15, Morale 13-15)"
 }

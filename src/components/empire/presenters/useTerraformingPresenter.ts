@@ -78,8 +78,17 @@ export interface TerraformingConditionScaleModel extends TerraformingStatScaleMo
 }
 
 export interface TerraformingEffectItem {
-  type: 'effect' | 'rebate' | 'sideEffect'
+  type: 'effect' | 'rebate' | 'sideEffect' | 'description'
   text: string
+}
+
+const PROJECT_DESCRIPTION_KEYS: Record<string, string> = {
+  'trn_boarding_group': 'terraforming.effect.boardingGroup',
+  'trn_boarding_single': 'terraforming.effect.boardingSingle',
+  'trn_boarding_competition': 'terraforming.effect.boardingCompetition',
+  'trn_pilot_group': 'terraforming.effect.pilotingGroup',
+  'trn_pilot_single': 'terraforming.effect.pilotingSingle',
+  'trn_pilot_competition': 'terraforming.effect.pilotingCompetition',
 }
 
 export interface TerraformingTaskNodeDisplay {
@@ -418,6 +427,7 @@ function buildEffectItems(
   wareNames: Map<string, string>,
   moduleGroupNames: Map<string, string>,
   uiLabels: { min: string; max: string; setback: string },
+  i18nLookup: (key: string) => string,
 ): TerraformingEffectItem[] {
   const items: TerraformingEffectItem[] = []
 
@@ -428,6 +438,14 @@ function buildEffectItems(
     const translated = translateTaskEffects(nodeEffects, statNames, uiLabels)
     if (translated) {
       items.push({ type: 'effect', text: translated })
+    }
+  }
+
+  const descKey = PROJECT_DESCRIPTION_KEYS[projectId]
+  if (descKey) {
+    const descText = i18nLookup(descKey)
+    if (descText) {
+      items.push({ type: 'description', text: descText })
     }
   }
 
@@ -728,6 +746,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
           store.wareNames.value,
           store.moduleGroupNames.value,
           { min: uiLabels.min, max: uiLabels.max, setback: uiLabels.setback },
+          vI18nLookup,
         ),
       })
       for (const child of node.children) visit(child)

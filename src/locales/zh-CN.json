@@ -1120,5 +1120,12 @@
   "terraforming.oneTime": "一次性",
   "terraforming.repeatable": "可重复",
   "terraforming.cooldown": "冷却",
-  "terraforming.setback": "进度损失"
+  "terraforming.setback": "进度损失",
+  "terraforming.duration": "耗时",
+  "terraforming.effect.boardingGroup": "全体学员 陆战队 +1★ (上限4★)",
+  "terraforming.effect.boardingSingle": "指定学员 陆战队 +1★ (上限5★)",
+  "terraforming.effect.boardingCompetition": "招募3名陆战队员 (陆战队13-15, 士气13-15)",
+  "terraforming.effect.pilotingGroup": "全体学员 驾驶 +1★ (上限4★)",
+  "terraforming.effect.pilotingSingle": "指定学员 驾驶 +1★ (上限5★)",
+  "terraforming.effect.pilotingCompetition": "招募3名飞行员 (驾驶13-15, 士气13-15)"
 }

@@ -47,19 +47,32 @@ const topLevelNodeIds = computed(() => {
   return set
 })
 
-function getRepeatLabel(projectId: string, projectMap: Map<string, TerraformingProject>): string {
+interface RepeatTagData {
+  typeLabel: string
+  durationLabel: string
+  cooldownLabel: string
+}
+
+function getRepeatTagData(projectId: string, projectMap: Map<string, TerraformingProject>): RepeatTagData {
   const proj = projectMap.get(projectId)
-  if (!proj) return ''
-  const durationLabel = formatDuration(proj.duration)
-  if (proj.repeatCooldown === null) return t('terraforming.oneTime') || 'One-time'
-  if (proj.repeatCooldown === 0) {
-    return durationLabel
-      ? `${t('terraforming.repeatable') || 'Repeatable'} ${durationLabel}`
-      : (t('terraforming.repeatable') || 'Repeatable')
-  }
-  return durationLabel
-    ? `${t('terraforming.cooldown') || 'Cooldown'} ${durationLabel}`
-    : (t('terraforming.cooldown') || 'Cooldown')
+  if (!proj) return { typeLabel: '', durationLabel: '', cooldownLabel: '' }
+
+  const isOneTime = proj.repeatCooldown === null
+  const typeLabel = isOneTime
+    ? (t('terraforming.oneTime') || 'One-time')
+    : (t('terraforming.repeatable') || 'Repeatable')
+
+  const durationSecs = proj.duration
+  const durationLabel = durationSecs && durationSecs > 0
+    ? `${t('terraforming.duration') || 'Duration'} ${formatDuration(durationSecs)}`
+    : ''
+
+  const cooldownSecs = proj.repeatCooldown
+  const cooldownLabel = cooldownSecs && cooldownSecs > 0
+    ? `${t('terraforming.cooldown') || 'Cooldown'} ${formatDuration(cooldownSecs)}`
+    : ''
+
+  return { typeLabel, durationLabel, cooldownLabel }
 }
 
 function isRepeatableProject(projectId: string, projectMap: Map<string, TerraformingProject>): boolean {
@@ -169,7 +182,9 @@ function getStatusIcon(projectId: string, available: boolean): string {
                 <div class="task-title">
                   <span class="task-status-icon">⚠️</span>
                   <span class="task-name">{{ getNodeName(e.id, e.name) }}</span>
-                  <span class="task-repeat">{{ getRepeatLabel(e.id, projectMap) }}</span>
+                  <span v-if="getRepeatTagData(e.id, projectMap).typeLabel" class="task-repeat">{{ getRepeatTagData(e.id, projectMap).typeLabel }}</span>
+                  <span v-if="getRepeatTagData(e.id, projectMap).durationLabel" class="task-repeat">{{ getRepeatTagData(e.id, projectMap).durationLabel }}</span>
+                  <span v-if="getRepeatTagData(e.id, projectMap).cooldownLabel" class="task-repeat">{{ getRepeatTagData(e.id, projectMap).cooldownLabel }}</span>
                 </div>
                 <div class="task-actions">
                   <template v-if="isRepeatableProject(e.id, projectMap)">
@@ -243,7 +258,9 @@ function getStatusIcon(projectId: string, available: boolean): string {
                     <div class="task-title">
                       <span class="task-status-icon">{{ getStatusIcon(node.id, node.available) }}</span>
                       <span class="task-name">{{ getNodeName(node.id, node.name) }}</span>
-                      <span class="task-repeat">{{ getRepeatLabel(node.id, projectMap) }}</span>
+                      <span v-if="getRepeatTagData(node.id, projectMap).typeLabel" class="task-repeat">{{ getRepeatTagData(node.id, projectMap).typeLabel }}</span>
+                      <span v-if="getRepeatTagData(node.id, projectMap).durationLabel" class="task-repeat">{{ getRepeatTagData(node.id, projectMap).durationLabel }}</span>
+                      <span v-if="getRepeatTagData(node.id, projectMap).cooldownLabel" class="task-repeat">{{ getRepeatTagData(node.id, projectMap).cooldownLabel }}</span>
                     </div>
                     <div class="task-actions">
                       <template v-if="isRepeatableProject(node.id, projectMap)">
@@ -323,7 +340,9 @@ function getStatusIcon(projectId: string, available: boolean): string {
                         <div class="task-title">
                           <span class="task-status-icon">{{ getStatusIcon(child.id, child.available) }}</span>
                           <span class="task-name">{{ getNodeName(child.id, child.name) }}</span>
-                          <span class="task-repeat">{{ getRepeatLabel(child.id, projectMap) }}</span>
+                          <span v-if="getRepeatTagData(child.id, projectMap).typeLabel" class="task-repeat">{{ getRepeatTagData(child.id, projectMap).typeLabel }}</span>
+                          <span v-if="getRepeatTagData(child.id, projectMap).durationLabel" class="task-repeat">{{ getRepeatTagData(child.id, projectMap).durationLabel }}</span>
+                          <span v-if="getRepeatTagData(child.id, projectMap).cooldownLabel" class="task-repeat">{{ getRepeatTagData(child.id, projectMap).cooldownLabel }}</span>
                         </div>
                         <div class="task-actions">
                           <template v-if="isRepeatableProject(child.id, projectMap)">
@@ -434,6 +453,7 @@ function getStatusIcon(projectId: string, available: boolean): string {
 .effect-list-item.effect-effect { @apply border-sky-700/40 bg-sky-950/20 text-sky-400; }
 .effect-list-item.effect-rebate { @apply border-emerald-700/40 bg-emerald-950/20 text-emerald-400; }
 .effect-list-item.effect-sideEffect { @apply border-amber-700/40 bg-amber-950/20 text-amber-400; }
+.effect-list-item.effect-description { @apply border-violet-700/40 bg-violet-950/20 text-violet-400; }
 .task-effects { @apply text-xs text-sky-400; }
 .condition-list { @apply mt-1.5 flex flex-col gap-1.5; }
 .task-repeat { @apply text-xs text-slate-500 bg-slate-800/50 px-1 rounded; }
