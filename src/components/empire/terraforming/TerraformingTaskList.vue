@@ -421,6 +421,8 @@ function getStatusIcon(projectId: string, available: boolean): string {
 
 .task-card { @apply px-2 py-1.5; }
 .task-head { @apply flex items-start justify-between gap-3; }
+.task-actions { @apply opacity-0 transition-all duration-300; }
+.task-node:hover .task-actions { @apply opacity-100; }
 .task-title { @apply flex min-w-0 items-center gap-1.5 flex-wrap; }
 .task-body { @apply mt-1 flex flex-col gap-1; }
 

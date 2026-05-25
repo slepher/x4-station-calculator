@@ -400,7 +400,7 @@ function buildEffectItems(
   projectNames: Map<string, string>,
   wareNames: Map<string, string>,
   moduleGroupNames: Map<string, string>,
-  uiLabels: { min: string; max: string },
+  uiLabels: { min: string; max: string; setback: string },
 ): TerraformingEffectItem[] {
   const items: TerraformingEffectItem[] = []
 
@@ -438,7 +438,7 @@ function buildEffectItems(
       parts.push(`${statName} ${sign}${se.change}`)
     }
     if (se.setback > 0) {
-      parts.push(`${se.setback}% setback`)
+      parts.push(`${se.setback}% ${uiLabels.setback}`)
     }
     items.push({ type: 'sideEffect', text: parts.join(', ') })
   }
@@ -690,6 +690,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
       depends: vI18nLookup('terraforming.depends') || 'Depends',
       current: vI18nLookup('terraforming.current') || 'current',
       anyOf: vI18nLookup('terraforming.anyOf') || 'Any ',
+      setback: vI18nLookup('terraforming.setback') || 'setback',
     }
 
     const visit = (node: TaskNode) => {
@@ -709,7 +710,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
           projectNames,
           store.wareNames.value,
           store.moduleGroupNames.value,
-          { min: uiLabels.min, max: uiLabels.max },
+          { min: uiLabels.min, max: uiLabels.max, setback: uiLabels.setback },
         ),
       })
       for (const child of node.children) visit(child)
