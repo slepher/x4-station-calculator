@@ -3,8 +3,8 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { TaskTree, TerraformingProject } from '@/store/logic/terraformingTaskResolver'
 import type {
-  TerraformingConditionScaleModel,
   TerraformingEffectItem,
+  TerraformingStatLineModel,
   TerraformingStatScaleModel,
   TerraformingTaskNodeDisplay,
 } from '@/components/empire/presenters/useTerraformingPresenter'
@@ -24,7 +24,6 @@ interface Props {
   currentStats: Record<string, number>
   statDisplayNames: Map<string, string>
   statScaleModels: Map<string, TerraformingStatScaleModel>
-  conditionScaleModels: Map<string, TerraformingConditionScaleModel[]>
   activeRebates: string[]
 }
 
@@ -89,10 +88,6 @@ function formatDuration(duration: number | null): string {
   return [hours, minutes, seconds].map(part => String(part).padStart(2, '0')).join(':')
 }
 
-function getConditionModels(projectId: string): TerraformingConditionScaleModel[] {
-  return props.conditionScaleModels.get(projectId) || []
-}
-
 function getNodeDisplay(projectId: string): TerraformingTaskNodeDisplay | null {
   return props.taskNodeDisplays.get(projectId) || null
 }
@@ -119,6 +114,10 @@ function getDependencyValueFromLine(line: string): string {
 
 function getEffectItems(projectId: string): TerraformingEffectItem[] {
   return getNodeDisplay(projectId)?.effectItems || []
+}
+
+function getStatLines(projectId: string): TerraformingStatLineModel[] {
+  return getNodeDisplay(projectId)?.statLines || []
 }
 </script>
 
@@ -194,7 +193,17 @@ function getEffectItems(projectId: string): TerraformingEffectItem[] {
                 </div>
               </div>
               <div class="task-body">
-                  <div v-if="getEffectItems(e.id).length > 0" class="effect-list">
+                <div v-if="getStatLines(e.id).length > 0" class="stat-impact-list">
+                  <TerraformingStatScale
+                    v-for="line in getStatLines(e.id)"
+                    :key="`${e.id}-${line.statId}-${line.effectLabel || line.numericText || 'impact'}`"
+                    :model="line"
+                    compact
+                    mode="impact"
+                    show-effect-label
+                  />
+                </div>
+                <div v-if="getEffectItems(e.id).length > 0" class="effect-list">
                   <div
                     v-for="(item, i) in getEffectItems(e.id)"
                     :key="`${e.id}-effect-${i}`"
@@ -203,15 +212,6 @@ function getEffectItems(projectId: string): TerraformingEffectItem[] {
                   >
                     {{ item.text }}
                   </div>
-                </div>
-                <div v-if="getConditionModels(e.id).length > 0" class="condition-list">
-                  <TerraformingStatScale
-                    v-for="condition in getConditionModels(e.id)"
-                    :key="`${e.id}-${condition.statId}-${condition.requirementLabel}`"
-                    :model="condition"
-                    compact
-                    mode="condition"
-                  />
                 </div>
                 <div v-if="!e.available && getDependencyReasonLines(e.id, e.blockedReason).length > 0" class="condition-list">
                   <div
@@ -239,7 +239,6 @@ function getEffectItems(projectId: string): TerraformingEffectItem[] {
                 :completed-project-counts="completedProjectCounts"
                 :project-map="projectMap"
                 :project-display-names="projectDisplayNames"
-                :condition-scale-models="conditionScaleModels"
                 :task-node-displays="taskNodeDisplays"
                 @toggle-project="emit('toggleProject', $event)"
                 @set-project-count="(pid: string, cnt: number) => emit('setProjectCount', pid, cnt)"
@@ -273,10 +272,10 @@ function getEffectItems(projectId: string): TerraformingEffectItem[] {
 
 .task-card { @apply px-2 py-1.5; }
 .task-head { @apply flex items-start justify-between gap-3; }
-.task-actions { @apply opacity-0 transition-all duration-300; }
-.task-node:hover .task-actions { @apply opacity-100; }
+.task-actions { @apply flex items-center gap-1 flex-shrink-0; }
 .task-title { @apply flex min-w-0 items-center gap-1.5 flex-wrap; }
 .task-body { @apply mt-1 flex flex-col gap-1; }
+.stat-impact-list { @apply mt-1.5 flex flex-col gap-1; }
 
 .task-status-icon { @apply flex-shrink-0 text-sm; }
 .task-state-label { @apply text-sm leading-none; }
@@ -296,7 +295,6 @@ function getEffectItems(projectId: string): TerraformingEffectItem[] {
 .dependency-name { @apply text-slate-300 font-medium; }
 .dependency-value { @apply break-all; }
 
-.task-actions { @apply flex items-center gap-1 flex-shrink-0; }
 .completion-count { @apply text-xs text-emerald-400 font-bold; }
 
 .toggle-btn { @apply text-xs px-2 py-0.5 rounded bg-slate-700 text-slate-300 transition-colors hover:bg-slate-600 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-slate-700 w-14; }

@@ -2,7 +2,7 @@
 import { useI18n } from 'vue-i18n'
 import type { TerraformingProject, TaskNode } from '@/store/logic/terraformingTaskResolver'
 import type {
-  TerraformingConditionScaleModel,
+  TerraformingStatLineModel,
   TerraformingTaskNodeDisplay,
 } from '@/components/empire/presenters/useTerraformingPresenter'
 import X4NumberInput from '@/components/common/X4NumberInput.vue'
@@ -16,7 +16,6 @@ interface Props {
   completedProjectCounts: Map<string, number>
   projectMap: Map<string, TerraformingProject>
   projectDisplayNames: Map<string, string>
-  conditionScaleModels: Map<string, TerraformingConditionScaleModel[]>
   taskNodeDisplays: Map<string, TerraformingTaskNodeDisplay>
 }
 
@@ -77,10 +76,6 @@ function getDependencyLabel(node: TaskNode, displayNames: Map<string, string>): 
   return `${t('terraforming.depends') || 'Needs'}: ${prefix}${labels.join(' | ')}`
 }
 
-function getConditionModels(projectId: string): TerraformingConditionScaleModel[] {
-  return props.conditionScaleModels.get(projectId) || []
-}
-
 function getNodeDisplay(projectId: string): TerraformingTaskNodeDisplay | null {
   return props.taskNodeDisplays.get(projectId) || null
 }
@@ -100,13 +95,20 @@ function getDependencyReasonLines(projectId: string, fallback: string | undefine
   return getBlockedReasonLines(projectId, fallback).filter(line => line.startsWith(`${t('terraforming.depends') || 'Needs'}:`))
 }
 
-function getDependencyValueFromLine(line: string): string {
-  const prefix = `${t('terraforming.depends') || 'Needs'}: `
-  return line.startsWith(prefix) ? line.slice(prefix.length) : line
+function hasProjectDependency(node: TaskNode): boolean {
+  return node.predecessors.some((p: any) => p.type === 'project')
+}
+
+function isDependencyBlocked(projectId: string, blockedReason: string | undefined): boolean {
+  return getDependencyReasonLines(projectId, blockedReason).length > 0
 }
 
 function getEffectItems(projectId: string): any[] {
   return getNodeDisplay(projectId)?.effectItems || []
+}
+
+function getStatLines(projectId: string): TerraformingStatLineModel[] {
+  return getNodeDisplay(projectId)?.statLines || []
 }
 
 function getStatusIcon(projectId: string, available: boolean): string {
@@ -158,6 +160,16 @@ function getStatusIcon(projectId: string, available: boolean): string {
         </div>
       </div>
       <div class="task-body">
+        <div v-if="getStatLines(node.id).length > 0" class="stat-impact-list">
+          <TerraformingStatScale
+            v-for="line in getStatLines(node.id)"
+            :key="`${node.id}-${line.statId}-${line.effectLabel || line.numericText || 'impact'}`"
+            :model="line"
+            compact
+            mode="impact"
+            show-effect-label
+          />
+        </div>
         <div v-if="getEffectItems(node.id).length > 0" class="effect-list">
           <div
             v-for="(item, i) in getEffectItems(node.id)"
@@ -168,35 +180,13 @@ function getStatusIcon(projectId: string, available: boolean): string {
             {{ item.text }}
           </div>
         </div>
-        <div v-if="getConditionModels(node.id).length > 0" class="condition-list">
-          <TerraformingStatScale
-            v-for="condition in getConditionModels(node.id)"
-            :key="`${node.id}-${condition.statId}-${condition.requirementLabel}`"
-            :model="condition"
-            compact
-            mode="condition"
-          />
-        </div>
-        <div
-          v-if="node.available && node.predecessors.some((p: any) => p.type === 'project')"
-          class="condition-list"
-        >
-          <div class="condition-dependency available">
-            <span class="dependency-name">{{ t('terraforming.depends') }}</span>
-            <span class="dependency-value">{{ getDependencyLabel(node, projectDisplayNames).replace(`${t('terraforming.depends') || 'Needs'}: `, '') }}</span>
-          </div>
-        </div>
-        <div
-          v-if="!node.available && getDependencyReasonLines(node.id, node.blockedReason).length > 0"
-          class="condition-list"
-        >
+        <div v-if="hasProjectDependency(node)" class="condition-list">
           <div
-            v-for="(line, i) in getDependencyReasonLines(node.id, node.blockedReason)"
-            :key="`${node.id}-dep-${i}`"
-            class="condition-dependency blocked"
+            class="condition-dependency"
+            :class="isDependencyBlocked(node.id, node.blockedReason) ? 'blocked' : 'available'"
           >
             <span class="dependency-name">{{ t('terraforming.depends') }}</span>
-            <span class="dependency-value">{{ getDependencyValueFromLine(line) }}</span>
+            <span class="dependency-value">{{ getDependencyLabel(node, projectDisplayNames).replace(`${t('terraforming.depends') || 'Needs'}: `, '') }}</span>
           </div>
         </div>
       </div>
@@ -210,7 +200,6 @@ function getStatusIcon(projectId: string, available: boolean): string {
         :completed-project-counts="completedProjectCounts"
         :project-map="projectMap"
         :project-display-names="projectDisplayNames"
-        :condition-scale-models="conditionScaleModels"
         :task-node-displays="taskNodeDisplays"
         @toggle-project="emit('toggleProject', $event)"
         @set-project-count="(pid: string, cnt: number) => emit('setProjectCount', pid, cnt)"
@@ -221,19 +210,11 @@ function getStatusIcon(projectId: string, available: boolean): string {
 
 <style scoped>
 .task-node {
-  @apply rounded transition-colors hover:bg-slate-800/30;
-}
-
-.task-node.blocked {
-  @apply hover:bg-transparent;
+  @apply rounded;
 }
 
 .task-node.child-node {
   @apply ml-6;
-}
-
-.task-node.blocked {
-  @apply hover:bg-transparent;
 }
 
 .task-node.blocked .task-name {
@@ -244,12 +225,20 @@ function getStatusIcon(projectId: string, available: boolean): string {
   @apply text-slate-600;
 }
 
-.task-node.completed {
-  @apply bg-emerald-500/5;
+.task-node.completed .task-status-icon {
+  @apply text-emerald-300;
+}
+
+.task-node.completed .task-name {
+  @apply text-emerald-200;
 }
 
 .task-card {
-  @apply px-2 py-1.5;
+  @apply px-2 py-1.5 rounded transition-colors hover:bg-slate-800/30;
+}
+
+.task-node.blocked > .task-card {
+  @apply hover:bg-transparent;
 }
 
 .task-head {
@@ -257,11 +246,7 @@ function getStatusIcon(projectId: string, available: boolean): string {
 }
 
 .task-actions {
-  @apply opacity-0 transition-all duration-300;
-}
-
-.task-node:hover .task-actions {
-  @apply opacity-100;
+  @apply flex items-center gap-1 flex-shrink-0;
 }
 
 .task-title {
@@ -270,6 +255,10 @@ function getStatusIcon(projectId: string, available: boolean): string {
 
 .task-body {
   @apply mt-1 flex flex-col gap-1;
+}
+
+.stat-impact-list {
+  @apply mt-1.5 flex flex-col gap-1;
 }
 
 .task-status-icon {

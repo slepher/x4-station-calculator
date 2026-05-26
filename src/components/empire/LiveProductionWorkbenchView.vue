@@ -231,7 +231,6 @@ const showArchiveModuleList = computed(() => {
         :current-stats="terraformingPresenter.props.taskList.currentStats.value"
         :stat-display-names="terraformingPresenter.props.taskList.statDisplayNames.value"
         :stat-scale-models="terraformingPresenter.props.taskList.statScaleModels.value"
-        :condition-scale-models="terraformingPresenter.props.taskList.conditionScaleModels.value"
         :active-rebates="terraformingPresenter.props.taskList.activeRebates.value"
         @toggle-project="terraformingPresenter.emits.toggleProject"
         @set-project-count="terraformingPresenter.emits.setProjectCount"

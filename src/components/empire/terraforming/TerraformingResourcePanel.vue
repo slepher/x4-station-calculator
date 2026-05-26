@@ -8,6 +8,7 @@ import type {
 import type { DeliveryShip } from '@/store/logic/terraformingTaskResolver'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { useGameDataStore } from '@/store/useGameDataStore'
+import TerraformingStatScale from '@/components/empire/terraforming/TerraformingStatScale.vue'
 
 interface Props {
   selectedClusterId: string | null
@@ -98,22 +99,6 @@ function getVolumeByTransport(entry: TerraformingExecutionTimelineEntry): Volume
   return result
 }
 
-function getShipName(macro: string): string {
-  const ds = props.deliveryShipMap.get(macro)
-  if (!ds) return macro
-  if (ds.nameId) {
-    const translated = t(ds.nameId)
-    if (translated && translated !== ds.nameId) return translated as string
-  }
-  return ds.name || macro
-}
-
-function getShipBuildDuration(macro: string): string {
-  const ds = props.deliveryShipMap.get(macro)
-  const dur = ds?.buildDuration
-  return dur ? `${dur}s` : ''
-}
-
 const showNoDockWarning = computed(() => {
   const docks = props.hqBuildDocks
   if (!docks) return false
@@ -132,6 +117,10 @@ function formatTime(seconds: number): string {
 function onClearAll() {
   if (props.executionTimeline.length === 0) return
   emit('clearAll')
+}
+
+function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
+  return entry.deliveryDetails[0]?.totalTime ?? 0
 }
 </script>
 
@@ -250,22 +239,21 @@ function onClearAll() {
                   <span>{{ t('terraforming.buildSlots') || 'Build Slots' }}</span>
                   <span>×{{ entry.totalSlots }}</span>
                 </div>
-                <div v-if="entry.deliveryDetails[0]?.totalTime > 0" class="detail-row">
+                <div v-if="getTotalBuildTime(entry) > 0" class="detail-row">
                   <span>{{ t('terraforming.buildTime') }}</span>
-                  <span>{{ formatTime(entry.deliveryDetails[0].totalTime) }}</span>
+                  <span>{{ formatTime(getTotalBuildTime(entry)) }}</span>
                 </div>
               </div>
 
-              <div v-if="entry.beforeStats.length > 0 || entry.rebateChanges.length > 0" class="detail-section">
+              <div v-if="entry.statLines.length > 0 || entry.rebateChanges.length > 0" class="detail-section">
                 <div class="section-title">{{ t('terraforming.statChanges') }}</div>
-                <div
-                  v-for="snapshot in entry.beforeStats"
-                  :key="`${entry.id}-stat-${snapshot.statId}`"
-                  class="detail-row"
-                >
-                  <span>{{ snapshot.statName }}</span>
-                  <span>{{ snapshot.beforeValue }} → {{ snapshot.afterValue }}</span>
-                </div>
+                <TerraformingStatScale
+                  v-for="line in entry.statLines"
+                  :key="`${entry.id}-stat-${line.statId}`"
+                  :model="line"
+                  compact
+                  mode="impact"
+                />
                 <div
                   v-for="(rc, i) in entry.rebateChanges"
                   :key="`${entry.id}-rc-${i}`"

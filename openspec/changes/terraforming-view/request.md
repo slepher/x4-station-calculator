@@ -2,7 +2,7 @@
 
 ## 目标
 
-将 `terraforming-shell` 的 3 列占位布局替换为可交互的地球化内容面板：左列实现星区列表（accordion + 任务目标进度）、中列实现任务列表（分组树 + 交互式完成 toggle）、右列实现按用户实际执行顺序记录的项目执行序列面板。同时使用游戏中的彩色方块语义展示 stat 当前状态与任务需求。本次仅改动 `presenter → vue` 两层和必要的 store 状态扩展；领域语义依赖 `terraforming-data` 提供，不在 view 层重新猜测 state/value 规则。
+将 `terraforming-shell` 的 3 列占位布局替换为可交互的地球化内容面板：左列实现星区列表（accordion + 任务目标进度）、中列实现任务列表（分组树 + 交互式完成 toggle）、右列实现按用户实际执行顺序记录的项目执行序列面板。本次仅改动 `presenter → vue` 两层和必要的 store 状态扩展；领域语义依赖 `terraforming-data` 提供，不在 view 层重新猜测 state/value 规则。任务树与执行序列中的 stat 方块/数字型 stat 展示规则由 `terraforming-blocks` change 定义并复用。
 
 ## 已确认方案（审核重点）
 
@@ -31,7 +31,7 @@
   - **状态图标**: `⬜` 可用未完成 / `❌` 阻塞 / `✅` 已完成（completedProjects 计数 > 0）
   - **名称** (i18n)
   - **效果摘要**: `(+2 temp, humidity=4)`
-  - **状态/需求方块**: 对 stat 条件按游戏内彩色方块形式展示，明确“当前 state”与“要求区间/阈值”
+  - **stat 展示**: 对 stat 条件、效果和执行序列中的显示统一复用 `terraforming-blocks` change 中定义的方块/数字语义
   - **重复性标签**: `[一次性]` (repeatCooldown === null) / `[可重复]` (repeatCooldown === 0) / `[冷却:Ns]` (repeatCooldown > 0)
   - **依赖标注**: `⟸ 项目名` / `⟸ 任一: 项目A, 项目B`
   - **物资详情**: 展开在任务名下方，显示 `📦 WareName ×actualAmount ... — 材料合计价格: price Cr`
@@ -82,8 +82,7 @@
 
 - 左列: accordion + i18n 星区名 + objectives 进度 + 当前星区 tag
 - 中列: 分组任务树 + 交互式完成 toggle + x-number-input 计数 + re-resolve + stats 卡片
-- 统一的 stat 方块组件：用游戏方块展示当前 state、条件需求区间、通过/未通过
-- 项目条件、objective neutralize、stat 卡片三处共享同一套方块语义，不各自解释颜色/状态
+- 统一的 stat 展示组件与语义复用 `terraforming-blocks` change 定义，不在 `terraforming-view` 中重复定义其方块细节
 - 右列: 执行序列视图、单条记录展开明细、相邻同组组名标记、单条取消与后续合法性校验
 - 右列展开明细: 材料需求（含实际消耗量 actualAmount）、返还（累计折扣返量）、累计折扣、交付清单（含并行建造时间计算）、状态变化（含折扣 0%→10% 变化）
 - 交付清单建造时间: 通过 HQ station 已建 S/M 综合建造港的 `buildProcessorCount`（8 共享槽位）计算并行建造耗时
@@ -106,7 +105,7 @@
 3. 展开新星区时前一个自动折叠
 4. 与 HQ 同星区的 cluster 显示「当前星区」药丸 tag
 5. 中列按分组显示任务树，含名称、效果、重复性标签、依赖/阻塞标注
-6. 所有 stat 条件以游戏方块形式显示，`condition.min/max` 被正确解释为 state 区间而非真实 value 区间
+6. 所有 stat 条件、任务树 effect 叠加和执行序列 stat 变化的显示均复用 `terraforming-blocks` change 定义的统一语义
 7. x-number-input 控件用于可重复任务的完成次数设置
 8. 一次性任务点击 toggle 完成状态，修改后自动 re-resolve
 9. 右列按真实执行顺序逐条显示执行记录，不再使用三 tab 聚合视图

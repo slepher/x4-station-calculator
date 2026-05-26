@@ -98,29 +98,9 @@
 
 **当** 界面渲染 stat 卡片、项目条件或 objective neutralize 条件
 
-**那么** 使用与游戏一致的彩色方块形式展示 state
+**那么** 必须复用 `terraforming-blocks` change 中定义的统一 stat 展示语义
 
-**并且** 每个方块对应一个实际 value，而不是一个 state
-
-**并且** 若条件来自 `condition.min/max`，则按 state 区间高亮需求方块
-
-**并且** 若条件来自 `condition.minvalue/maxvalue`，则按 value 阈值映射后高亮需求方块
-
-**并且** 当前 stat 卡片显示完整 value 色带
-
-**并且** 项目条件和 objective neutralize 也显示完整 value 色带，而不是仅显示命中区间
-
-**并且** 若某个命中的 state 覆盖多个 value，则必须展开显示该 state 对应的全部同色方块
-
-**并且** 不得把 `condition.min/max` 误解释为真实 value 区间
-
-**并且** 命中条件的连续 value 区间必须在完整色带外叠加空心外框
-
-**并且** 外框与方块本体之间保留固定视觉间距，圆角与内部方块圆角保持匹配
-
-**并且** 不再依据“当前值是否满足条件”切换单独的空心/实心判定；当前 stat 的完整状态图已经承担该职责
-
-**并且** 无 `ranges` 的 stat（例如 `population`）改为数字展示，不显示方块
+**并且** `terraforming-view` 不得在本规格中重复定义方块或数字型 stat 的具体视觉细节
 
 ### Requirement: 前置条件与 stat 条件视觉统一
 
@@ -300,7 +280,7 @@
 - `housingBuilt` 读写（绑定 store `terraformingHousingBuilt`）
 - `completedProjectCounts` (兼容 `Map<string, number>` 的读写接口)
 - `executionTimeline` / `cancelValidationPreview` / `groupMarkers`
-- `statScaleModels` / `conditionScaleModels`（供方块组件渲染）
+- `statScaleModels` / `conditionScaleModels`（供统一 stat 展示组件渲染）
 
 **并且** 所有面向 UI 的数据组装由 Presenter 层完成，不直接在 Vue 组件中操作为 store 数据
 
@@ -310,27 +290,7 @@
 
 **当** 该 stat 出现在 status 或 condition 展示中
 
-**那么** 不得渲染 state 方块
-
-**并且** 必须改为显示数字值
-
-**并且** 在 condition 场景中必须同时显示需求文本
-
-### Requirement: 条件方块的当前值表达
-
-**前提** 某个 condition 使用方块展示
-
-**当** 当前值命中需求区间
-
-**那么** 仅当前命中的那一格显示边框高亮
-
-**并且** 不得通过位移表达高亮
-
-**当** 当前值未命中需求区间
-
-**那么** 需求方块整体显示为空心
-
-**并且** 不得额外补出当前值所在方块
+**那么** 必须复用 `terraforming-blocks` change 中定义的数字型 stat 展示语义
 
 ### Requirement: 递归任务树深度
 

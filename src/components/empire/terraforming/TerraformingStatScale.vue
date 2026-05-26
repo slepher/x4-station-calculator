@@ -1,18 +1,23 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { TerraformingConditionScaleModel, TerraformingStatScaleModel } from '@/components/empire/presenters/useTerraformingPresenter'
+import type {
+  TerraformingConditionScaleModel,
+  TerraformingStatLineModel,
+  TerraformingStatScaleModel,
+} from '@/components/empire/presenters/useTerraformingPresenter'
 
 interface Props {
-  model: TerraformingStatScaleModel | TerraformingConditionScaleModel
+  model: TerraformingStatScaleModel | TerraformingConditionScaleModel | TerraformingStatLineModel
   compact?: boolean
   centered?: boolean
-  mode?: 'status' | 'condition'
+  mode?: 'status' | 'condition' | 'impact'
+  showEffectLabel?: boolean
 }
 
 const props = defineProps<Props>()
 
 const requiredStateSet = computed(() => {
-  if (!('requiredStates' in props.model)) return new Set<number>()
+  if (!('requiredStates' in props.model) || !props.model.requiredStates) return new Set<number>()
   return new Set(props.model.requiredStates)
 })
 
@@ -25,10 +30,7 @@ const visibleBlocks = computed(() => {
   }> = []
 
   for (const range of props.model.ranges) {
-    const start = range.start
-    const end = range.end
-
-    for (let value = start; value <= end; value += 1) {
+    for (let value = range.start; value <= range.end; value += 1) {
       if (value === 0) continue
       blocks.push({
         value,
@@ -43,7 +45,9 @@ const visibleBlocks = computed(() => {
 })
 
 const requiredSegments = computed(() => {
-  if (props.mode !== 'condition') return [] as Array<{ startIndex: number; endIndex: number }>
+  if (props.mode === 'status' || requiredStateSet.value.size === 0) {
+    return [] as Array<{ startIndex: number; endIndex: number }>
+  }
 
   const segments: Array<{ startIndex: number; endIndex: number }> = []
   let currentStart: number | null = null
@@ -67,6 +71,35 @@ const requiredSegments = computed(() => {
   return segments
 })
 
+const effectMeta = computed(() => {
+  if (!('effectDirection' in props.model)) {
+    return {
+      direction: 'none',
+      start: null,
+      end: null,
+      label: '',
+    } as const
+  }
+
+  const start = props.model.effectFromValue
+  const end = props.model.effectToValue
+  if (start === null || end === null || start === end) {
+    return {
+      direction: 'none',
+      start: null,
+      end: null,
+      label: props.model.effectLabel || '',
+    } as const
+  }
+
+  return {
+    direction: props.model.effectDirection,
+    start: Math.min(start, end) + 1,
+    end: Math.max(start, end),
+    label: props.model.effectLabel || '',
+  } as const
+})
+
 const titleText = computed(() => {
   const lines = [
     `${props.model.statName}: ${props.model.currentValue}`,
@@ -75,41 +108,55 @@ const titleText = computed(() => {
   if ('requirementLabel' in props.model && props.model.requirementLabel) {
     lines.push(`requirement: ${props.model.requirementLabel}`)
   }
+  if ('effectLabel' in props.model && props.model.effectLabel) {
+    lines.push(`effect: ${props.model.effectLabel}`)
+  }
   return lines.join('\n')
 })
 
 const hasVisibleBlocks = computed(() => visibleBlocks.value.length > 0)
 
-const numericRequirementText = computed(() => {
-  if (!('requirementLabel' in props.model)) return ''
-  const prefix = `${props.model.statName} `
-  if (props.model.requirementLabel.startsWith(prefix)) {
-    return props.model.requirementLabel.slice(prefix.length)
+const numericText = computed(() => {
+  if ('numericText' in props.model && props.model.numericText) return props.model.numericText
+  if ('requirementLabel' in props.model && props.model.requirementLabel) {
+    const prefix = `${props.model.statName} `
+    if (props.model.requirementLabel.startsWith(prefix)) {
+      return props.model.requirementLabel.slice(prefix.length)
+    }
+    return props.model.requirementLabel
   }
-  return props.model.requirementLabel
+  return props.model.currentValue.toLocaleString()
 })
 
-function blockStyle(): { backgroundColor: string } {
-  return { backgroundColor: 'transparent' }
+function blockBorderStyle(block: { value: number; state: number; rgb: string }): { borderColor: string; backgroundColor?: string; '--effect-color'?: string } {
+  if (block.value <= props.model.currentValue) {
+    return { borderColor: block.rgb, backgroundColor: block.rgb, '--effect-color': block.rgb }
+  }
+  return { borderColor: block.rgb, backgroundColor: 'transparent', '--effect-color': block.rgb }
 }
 
-function blockBorderStyle(block: { value: number; state: number; rgb: string }): { borderColor: string; backgroundColor?: string } {
-  if (block.value <= props.model.currentValue) {
-    return { borderColor: block.rgb, backgroundColor: block.rgb }
-  }
-  return { borderColor: block.rgb, backgroundColor: 'transparent' }
+function isEffectBlock(value: number): boolean {
+  if (effectMeta.value.direction === 'none') return false
+  const { start, end } = effectMeta.value
+  if (start === null || end === null) return false
+  return value >= start && value <= end
 }
 </script>
 
 <template>
-  <div class="stat-scale" :class="{ compact, centered }" :title="titleText">
-    <div class="scale-line" :class="{ centered }">
+  <div class="stat-scale" :class="{ compact, centered, impact: mode === 'impact' }" :title="titleText">
+    <div class="scale-line" :class="{ centered, impact: mode === 'impact' }">
       <span class="stat-name">{{ model.statName }}</span>
       <template v-if="hasVisibleBlocks">
-        <div class="block-strip" :class="{ condition: mode === 'condition' }">
+        <span
+          v-if="mode === 'impact' && showEffectLabel && effectMeta.label"
+          class="effect-label"
+        >
+          {{ effectMeta.label }}
+        </span>
+        <div class="block-strip" :class="{ condition: mode === 'condition' || mode === 'impact', impact: mode === 'impact' }">
           <div
             v-for="segment in requiredSegments"
-            v-if="mode === 'condition'"
             :key="`${model.statId}-segment-${segment.startIndex}-${segment.endIndex}`"
             class="condition-segment"
             :style="{
@@ -121,32 +168,52 @@ function blockBorderStyle(block: { value: number; state: number; rgb: string }):
             v-for="block in visibleBlocks"
             :key="`${model.statId}-${block.state}-${block.value}`"
             class="scale-block"
-            :class="{ unsafe: block.habitable === false }"
-            :style="{ ...blockStyle(), ...blockBorderStyle(block) }"
+            :class="{
+              unsafe: block.habitable === false,
+              'effect-increase': isEffectBlock(block.value) && effectMeta.direction === 'increase',
+              'effect-decrease': isEffectBlock(block.value) && effectMeta.direction === 'decrease',
+            }"
+            :style="blockBorderStyle(block)"
           >
+            <span
+              v-if="isEffectBlock(block.value) && effectMeta.direction !== 'none'"
+              class="effect-marker"
+              :class="{
+                increase: effectMeta.direction === 'increase',
+                decrease: effectMeta.direction === 'decrease',
+              }"
+            />
             <span class="sr-only">{{ block.value }}</span>
           </div>
         </div>
       </template>
       <template v-else>
-        <span class="numeric-value">{{ model.currentValue.toLocaleString() }}</span>
-        <span v-if="mode === 'condition' && numericRequirementText" class="numeric-requirement">
-          {{ numericRequirementText }}
-        </span>
+        <span class="numeric-value" :class="{ impact: mode === 'impact' }">{{ numericText }}</span>
       </template>
     </div>
   </div>
 </template>
 
 <style scoped>
-.stat-scale { @apply rounded border border-slate-700/40 bg-slate-950/40 px-2 py-2; }
+.stat-scale {
+  --void-bg: rgb(2, 6, 23);
+  @apply rounded border border-slate-700/40 bg-slate-950/40 px-2 py-2;
+}
 .stat-scale.compact { @apply px-2 py-2; }
+.stat-scale.impact { @apply px-2 py-1.5; }
 
 .scale-line { @apply flex items-center gap-1.5 flex-wrap text-xs; }
 .scale-line.centered { @apply justify-center text-center; }
-.stat-name { @apply text-slate-300 font-medium; }
+.scale-line.impact {
+  @apply flex-nowrap;
+  gap: 0.5625rem;
+}
+
+.stat-name { @apply text-slate-300 font-medium shrink-0; }
 .numeric-value { @apply font-mono text-sky-300; }
-.numeric-requirement { @apply text-slate-500 font-mono; }
+.numeric-value.impact { @apply text-slate-300; }
+.effect-label { @apply text-[11px] text-sky-300 font-mono shrink-0; }
+
 .block-strip {
   --block-size: 1rem;
   --block-gap: 0.375rem;
@@ -157,18 +224,46 @@ function blockBorderStyle(block: { value: number; state: number; rgb: string }):
   gap: var(--block-gap);
   min-height: calc(var(--block-size) + 2 * var(--segment-padding-y));
 }
+
+.block-strip.impact {
+  --block-size: 0.875rem;
+  --block-gap: 0.25rem;
+  margin-left: 0;
+}
+
 .scale-block {
-  @apply h-4 w-4 rounded-sm border border-white/10 opacity-85 transition-all flex-none;
+  @apply h-4 w-4 rounded-sm border border-white/10 opacity-85 transition-all flex-none relative overflow-hidden;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
 }
+
+.block-strip.impact .scale-block {
+  width: var(--block-size);
+  height: var(--block-size);
+}
+
 .scale-block.unsafe {
   filter: saturate(0.75);
 }
+
 .condition-segment {
   @apply absolute pointer-events-none border border-white/85;
   top: calc(-1 * var(--segment-padding-y));
   bottom: calc(-1 * var(--segment-padding-y));
   border-radius: calc(0.125rem + var(--segment-padding-y));
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18), 0 0 8px rgba(255, 255, 255, 0.12);
+}
+
+.effect-marker {
+  @apply absolute inset-[22%] rounded-[2px] pointer-events-none;
+}
+
+.effect-marker.increase {
+  background: var(--effect-color);
+  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.35);
+}
+
+.effect-marker.decrease {
+  background: var(--void-bg);
+  box-shadow: inset 0 0 0 1px var(--effect-color);
 }
 </style>

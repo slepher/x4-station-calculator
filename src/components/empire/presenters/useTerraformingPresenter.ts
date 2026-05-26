@@ -3,6 +3,7 @@ import type {
   ClusterObjective,
   DeliveryShip,
   DescriptionItem,
+  StatEffect,
   StatCondition,
   TaskNode,
   TaskTree,
@@ -25,8 +26,8 @@ import {
   getRuntimeTerraformingProjectIds,
   type TerraformingExecutionEntry,
 } from '@/store/logic/terraformingRuntime'
-import type { ArchiveStationData, SavedModule } from '@/types/saveArchive'
-import type { X4MapCluster, X4MapSector, X4Module } from '@/types/x4'
+import type { ArchiveStationData } from '@/types/saveArchive'
+import type { SavedModule, X4MapCluster, X4MapSector, X4Module } from '@/types/x4'
 import i18n from '@/i18n'
 import { useGameDataStore } from '@/store/useGameDataStore'
 
@@ -78,6 +79,18 @@ export interface TerraformingConditionScaleModel extends TerraformingStatScaleMo
   requiredStates: number[]
 }
 
+export type TerraformingStatEffectDirection = 'none' | 'increase' | 'decrease'
+
+export interface TerraformingStatLineModel extends TerraformingStatScaleModel {
+  requirementLabel?: string
+  requiredStates?: number[]
+  effectDirection: TerraformingStatEffectDirection
+  effectFromValue: number | null
+  effectToValue: number | null
+  effectLabel?: string
+  numericText?: string | null
+}
+
 export interface TerraformingEffectItem {
   type: 'effect' | 'rebate' | 'sideEffect' | 'description'
   text: string
@@ -87,6 +100,7 @@ export interface TerraformingTaskNodeDisplay {
   name: string
   effects: string
   blockedReasonLines: string[]
+  statLines: TerraformingStatLineModel[]
   effectItems: TerraformingEffectItem[]
 }
 
@@ -145,6 +159,7 @@ export interface TerraformingExecutionTimelineEntry {
   cumulativeRebates: Array<{ name: string; value: number }>
   rebateChanges: Array<{ name: string; before: number; after: number }>
   returnedWares: Array<{ name: string; amount: number }>
+  statLines: TerraformingStatLineModel[]
   beforeStats: TerraformingTimelineStatSnapshot[]
   afterStats: TerraformingTimelineStatSnapshot[]
   availableBeforeExecution: boolean
@@ -322,6 +337,175 @@ function buildNeutralizeScaleModel(
   }
 }
 
+function formatEffectLabel(
+  effect: StatEffect,
+  uiLabels: { min: string; max: string },
+): string {
+  if (effect.value !== undefined) return `=${effect.value}`
+  if (effect.change === undefined) return ''
+  const sign = effect.change >= 0 ? '+' : ''
+  let label = `${sign}${effect.change}`
+  if (effect.min !== undefined) label += `(${uiLabels.min}:${effect.min})`
+  if (effect.max !== undefined) label += `(${uiLabels.max}:${effect.max})`
+  return label
+}
+
+function resolveEffectTargetValue(effect: StatEffect, currentValue: number): number {
+  let targetValue = effect.value ?? currentValue
+  if (effect.change !== undefined) {
+    targetValue = currentValue + effect.change
+  }
+  if (effect.min !== undefined && targetValue < effect.min) {
+    targetValue = effect.min
+  }
+  if (effect.max !== undefined && targetValue > effect.max) {
+    targetValue = effect.max
+  }
+  return targetValue
+}
+
+function buildTaskStatLineModels(
+  project: TerraformingProject,
+  data: TerraformingData,
+  currentStats: Record<string, number>,
+  completedCount: number,
+  i18nLookup: I18nLookup,
+  uiLabels: { min: string; max: string },
+): TerraformingStatLineModel[] {
+  const statIds = new Set<string>()
+  for (const condition of project.conditions) statIds.add(condition.stat)
+  for (const effect of project.effects) statIds.add(effect.stat)
+
+  const lines: TerraformingStatLineModel[] = []
+
+  for (const stat of data.stats) {
+    if (!statIds.has(stat.id)) continue
+    if (!(stat.id in currentStats)) continue
+
+    const statName = getStatName(stat.id, data, i18nLookup)
+    const currentValue = currentStats[stat.id] ?? 0
+    const currentRange = getCurrentRange(stat, currentValue)
+    const ranges = toScaleRanges(stat)
+    const effect = project.effects.find(item => item.stat === stat.id)
+    const conditionModels = project.conditions
+      .filter(item => item.stat === stat.id)
+      .map(item => buildConditionScaleModel(item, data, currentStats, i18nLookup))
+      .filter((model): model is TerraformingConditionScaleModel => model !== null)
+
+    const requiredStates = [...new Set(conditionModels.flatMap(model => model.requiredStates))]
+    const requirementLabel = conditionModels
+      .map(model => model.requirementLabel)
+      .filter(Boolean)
+      .join(' / ')
+
+    let effectDirection: TerraformingStatEffectDirection = 'none'
+    let effectToValue: number | null = null
+    let effectLabel = ''
+    const hideBlockEffectPreview = project.repeatCooldown === null && completedCount > 0 && ranges.length > 0
+
+    if (effect) {
+      effectToValue = resolveEffectTargetValue(effect, currentValue)
+      if (!hideBlockEffectPreview) {
+        if (effectToValue > currentValue) effectDirection = 'increase'
+        else if (effectToValue < currentValue) effectDirection = 'decrease'
+        effectLabel = formatEffectLabel(effect, uiLabels)
+      }
+    }
+
+    if (ranges.length === 0) {
+      const numericParts: string[] = []
+      if (effectToValue !== null) {
+        numericParts.push(`${currentValue.toLocaleString()} -> ${effectToValue.toLocaleString()}`)
+      } else {
+        numericParts.push(currentValue.toLocaleString())
+      }
+
+      if (requirementLabel) {
+        const prefix = `${statName} `
+        numericParts.push(
+          requirementLabel.startsWith(prefix)
+            ? requirementLabel.slice(prefix.length)
+            : requirementLabel
+        )
+      }
+
+      lines.push({
+        statId: stat.id,
+        statName,
+        currentValue,
+        currentState: currentRange?.state ?? null,
+        ranges,
+        requirementLabel,
+        requiredStates,
+        effectDirection,
+        effectFromValue: currentValue,
+        effectToValue,
+        effectLabel,
+        numericText: numericParts.join('  '),
+      })
+      continue
+    }
+
+    lines.push({
+      statId: stat.id,
+      statName,
+      currentValue,
+      currentState: currentRange?.state ?? null,
+      ranges,
+      requirementLabel,
+      requiredStates,
+      effectDirection,
+      effectFromValue: currentValue,
+      effectToValue,
+      effectLabel,
+      numericText: null,
+    })
+  }
+
+  return lines
+}
+
+function buildTimelineStatLineModel(
+  snapshot: TerraformingTimelineStatSnapshot,
+  data: TerraformingData,
+): TerraformingStatLineModel | null {
+  const stat = data.stats.find(item => item.id === snapshot.statId)
+  if (!stat) return null
+  const currentRange = getCurrentRange(stat, snapshot.beforeValue)
+  const ranges = toScaleRanges(stat)
+  const effectDirection: TerraformingStatEffectDirection = snapshot.afterValue > snapshot.beforeValue
+    ? 'increase'
+    : snapshot.afterValue < snapshot.beforeValue
+      ? 'decrease'
+      : 'none'
+
+  if (ranges.length === 0) {
+    return {
+      statId: snapshot.statId,
+      statName: snapshot.statName,
+      currentValue: snapshot.beforeValue,
+      currentState: currentRange?.state ?? null,
+      ranges,
+      effectDirection,
+      effectFromValue: snapshot.beforeValue,
+      effectToValue: snapshot.afterValue,
+      numericText: `${snapshot.beforeValue.toLocaleString()} -> ${snapshot.afterValue.toLocaleString()}`,
+    }
+  }
+
+  return {
+    statId: snapshot.statId,
+    statName: snapshot.statName,
+    currentValue: snapshot.beforeValue,
+    currentState: currentRange?.state ?? null,
+    ranges,
+    effectDirection,
+    effectFromValue: snapshot.beforeValue,
+    effectToValue: snapshot.afterValue,
+    numericText: null,
+  }
+}
+
 function extractHousingTarget(cluster: TerraformingCluster, objectives: ClusterObjective[]): number | null {
   const housingObj = objectives.find(o => o.action === 'objective.build_housing')
   if (!housingObj) return null
@@ -481,7 +665,6 @@ function formatDescriptionItem(
 
 function buildEffectItems(
   projectId: string,
-  nodeEffects: string,
   statNames: Map<string, string>,
   data: TerraformingData,
   projectNames: Map<string, string>,
@@ -494,13 +677,6 @@ function buildEffectItems(
 
   const project = data.projects.find(p => p.id === projectId)
   if (!project) return items
-
-  if (nodeEffects) {
-    const translated = translateTaskEffects(nodeEffects, statNames, uiLabels)
-    if (translated) {
-      items.push({ type: 'effect', text: translated })
-    }
-  }
 
   const projectDescriptions = project.descriptions
   if (projectDescriptions && projectDescriptions.length) {
@@ -575,38 +751,6 @@ function computeCumulativeRebates(
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([name, value]) => ({ name, value }))
   return { entries, aggregatedByGroup: aggregated }
-}
-
-function computeDiscountedPrice(
-  basePrice: number,
-  wares: Array<{ ware: string; amount: number }>,
-  aggregatedByGroup: Record<string, number>,
-  wareGroupMap: Map<string, string>,
-  moduleGroupNames: Map<string, string>,
-): number {
-  const wareDiscounts: number[] = []
-  for (const w of wares) {
-    const groupId = wareGroupMap.get(w.ware) || ''
-    let discount = 0
-    for (const [name, pct] of Object.entries(aggregatedByGroup)) {
-      const groupEntry = moduleGroupNames.get(groupId)
-      if (name === groupEntry || name === groupId) {
-        discount += pct
-      }
-    }
-    // Also check for ware-specific rebates matching by name
-    if (!discount) {
-      for (const [name, pct] of Object.entries(aggregatedByGroup)) {
-        if (name === w.ware) {
-          discount += pct
-        }
-      }
-    }
-    wareDiscounts.push(Math.min(discount, 100))
-  }
-  if (wareDiscounts.length === 0) return basePrice
-  const avgDiscount = wareDiscounts.reduce((s, d) => s + d, 0) / wareDiscounts.length
-  return Math.round(basePrice * (1 - avgDiscount / 100))
 }
 
 export function useTerraformingPresenter(store: TerraformingPresenterStore): UseTerraformingPresenterReturn {
@@ -803,6 +947,8 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     }
 
     const visit = (node: TaskNode) => {
+      const project = data.projects.find(item => item.id === node.id)
+      if (!project) return
       displays.set(node.id, {
         name: projectNames.get(node.id) || node.name,
         effects: translateTaskEffects(node.effects, statNames, { min: uiLabels.min, max: uiLabels.max }),
@@ -811,9 +957,16 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
           current: uiLabels.current,
           anyOf: uiLabels.anyOf,
         }),
+        statLines: buildTaskStatLineModels(
+          project,
+          data,
+          store.terraformingCurrentStats.value,
+          store.terraformingCompletedProjects.value.get(node.id) ?? 0,
+          vI18nLookup,
+          { min: uiLabels.min, max: uiLabels.max },
+        ),
         effectItems: buildEffectItems(
           node.id,
-          node.effects,
           statNames,
           data,
           projectNames,
@@ -972,6 +1125,10 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
           beforeValue: evaluated.beforeStats[statId] ?? 0,
           afterValue: afterStats[statId] ?? 0,
         }))
+        .filter(snapshot => snapshot.beforeValue !== snapshot.afterValue)
+      const statLines = beforeStatsList
+        .map(snapshot => buildTimelineStatLineModel(snapshot, data))
+        .filter((model): model is TerraformingStatLineModel => model !== null)
 
       // Compute rebates
       const cumulative = computeCumulativeRebates(
@@ -1071,6 +1228,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
           }
           return rw
         })(),
+        statLines,
         beforeStats: beforeStatsList,
         afterStats: beforeStatsList,
         availableBeforeExecution: evaluated.node?.available ?? false,
