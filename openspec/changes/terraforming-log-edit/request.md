@@ -89,6 +89,7 @@
 - 完成时移除禁用项并提交 draft 到正式 execution log。
 - 非编辑模式收敛执行与撤销规则，删除/减少次数使用同一撤销校验。
 - 数据层输出统一依赖表达式，覆盖 predecessors、blocked、removed、sideEffect project 等语义。
+- 地球化任务树保持 runtime cluster 范围限制；非静态项目只有在当前 runtime 可见项目的 `sideEffects[].project` 引入时才进入任务树。
 - Presenter 负责 draft queue、replay 结果与 UI 可消费状态组装。
 - Vue 只消费 presenter 输出，不直接解释业务依赖。
 - `npm run build` 无编译错误。
@@ -117,7 +118,8 @@
 13. 非编辑模式右列不再展示撤销影响列表，只展示该条是否允许撤销。
 14. `sideEffects[].project`、`blockedProjects`、`blockedGroups`、`removedProjects` 已由数据层转换为统一依赖表达式，view 不直接解释原始动态规则。
 15. 概率触发项目只通过条件 blocker 影响依赖，概率展示文案保持原样，页面不模拟概率。
-16. `npm run build` 无编译错误。
+16. 同组非 `any` project predecessor 只有在 parent 和 child 都属于当前 runtime cluster 时才形成任务树父子关系；不允许为了显示子项目而全局拉入不属于当前 runtime 范围的项目。
+17. `npm run build` 无编译错误。
 
 ## 未决项
 

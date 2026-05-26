@@ -361,6 +361,14 @@ interface TerraformingDraftTimelineEntry {
 
 Vue 不直接读取 store 或 resolver；只消费这些结构。
 
+## 任务树可见范围
+
+任务树的输入 MUST 是 runtime cluster project ids，而不是全量 terraforming project 列表。基础范围来自当前 cluster 的 `projectIds`，再由运行时规则补充当前 stat 动态项目、已完成项目以及当前可见项目的 `sideEffects[].project` 目标项目。
+
+同组非 `any` project predecessor 只有在 parent 与 child 都已经进入 runtime cluster 时才形成父子关系。不得为了显示潜在子项目而移除 runtime cluster 范围限制，否则会把其他星球或未进入当前流程的全局项目混入任务树，并可能放大跨项目依赖检查范围。
+
+`ind_refineries_retrofit` 这类 sideEffect 目标项目的正确显示路径是：`ind_refineries_cheap` 先作为当前 runtime 可见项目存在，runtime project id 计算再将其 `sideEffects[].project` 加入任务树输入，最后 resolver 根据同组非 `any` predecessor 将 retrofit 挂到 cheap 下方。
+
 ## 风险与取舍
 
 - 将 blocked/removed/sideEffect project 归一化到数据层会改变数据结构，必须同步更新 resolver 与 CLI。

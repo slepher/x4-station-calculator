@@ -119,6 +119,20 @@
 
 **并且** UI MUST NOT 渲染空正文区域
 
+#### Scenario: 任务树父子关系保持 runtime 范围限制
+
+**前提** 项目 B 的 predecessors 包含项目 A
+
+**并且** 项目 A 与项目 B 在同一个 group
+
+**并且** 项目 A 与项目 B 都属于当前 runtime cluster project ids
+
+**当** UI 渲染地球化任务树
+
+**那么** 项目 B MUST 作为项目 A 的子项目显示
+
+**并且** 系统 MUST NOT 为了显示项目 B 而加载不属于当前 runtime cluster project ids 的全局项目
+
 ### Requirement: 右列 MUST 支持独立编辑模式
 
 **前提** 右列任务队列处于非编辑模式

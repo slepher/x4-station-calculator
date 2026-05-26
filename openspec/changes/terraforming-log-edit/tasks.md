@@ -45,6 +45,7 @@
 - [x] 4.9 `notCompleted` 依赖显示为“互斥: 项目名”，不显示为“需要 项目名”
 - [x] 4.10 edit log 隐藏组依赖正文；entry 无正文内容时只显示标题行
 - [x] 4.11 地球化任务列表同时显示同组 `predecessors` 与 `dependencies` 依赖，并隐藏 group 依赖
+- [x] 4.12 任务树父子关系保持 runtime cluster 范围限制，不为潜在子项目全局拉入无关项目
 
 ## 5. 拖拽、插入、禁用、复制
 
