@@ -1,7 +1,12 @@
 <script setup lang="ts">
+import { ref, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { TerraformingCluster } from '@/store/logic/terraformingTaskResolver'
-import type { TerraformingConditionScaleModel } from '@/components/empire/presenters/useTerraformingPresenter'
+import type {
+  TerraformingConditionScaleModel,
+  TerraformingStatScaleModel,
+} from '@/components/empire/presenters/useTerraformingPresenter'
+import TerraformingStatScale from '@/components/empire/terraforming/TerraformingStatScale.vue'
 
 const { t } = useI18n()
 
@@ -17,20 +22,46 @@ interface Props {
     completed: boolean
     neutralizeScale?: TerraformingConditionScaleModel
   }>
+  statScaleModels: Map<string, TerraformingStatScaleModel>
+  currentStats: Record<string, number>
+  statDisplayNames: Map<string, string>
+  activeRebates: string[]
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
 
 const emit = defineEmits<{
   (e: 'selectCluster', clusterId: string): void
+  (e: 'displayModeChange', mode: 'list' | 'item'): void
 }>()
 
-function handleClusterClick(clusterId: string, currentSelected: string | null) {
-  if (currentSelected === clusterId) {
-    emit('selectCluster', '')
-  } else {
-    emit('selectCluster', clusterId)
+const displayMode = ref<'list' | 'item'>('list')
+
+onMounted(() => {
+  if (props.selectedClusterId) {
+    displayMode.value = 'item'
   }
+})
+
+watch(() => props.selectedClusterId, (newId) => {
+  if (newId) {
+    displayMode.value = 'item'
+  } else {
+    displayMode.value = 'list'
+  }
+})
+
+function handleClusterClick(clusterId: string) {
+  if (displayMode.value === 'list') {
+    emit('selectCluster', clusterId)
+    displayMode.value = 'item'
+    emit('displayModeChange', 'item')
+  }
+}
+
+function handleBackClick() {
+  displayMode.value = 'list'
+  emit('displayModeChange', 'list')
 }
 
 function getActionLabel(action: string): string {
@@ -50,29 +81,55 @@ function formatPartName(partName: string): string {
 
 <template>
   <div class="panel-card">
-    <div class="panel-header">{{ t('terraforming.sectorPanel') }}</div>
-    <div class="panel-content">
-      <div v-if="clusters.length === 0" class="text-slate-500 text-sm text-center py-4">
-        {{ t('terraforming.noSectors') }}
-      </div>
-      <div v-for="cluster in clusters" :key="cluster.id">
-        <div
-          class="cluster-item"
-          :class="{ 'active': selectedClusterId === cluster.id }"
-          @click="handleClusterClick(cluster.id, selectedClusterId)"
-        >
-          <div class="flex items-center gap-2">
-            <span class="cluster-name">{{ clusterDisplayNames.get(cluster.id) || cluster.id }}</span>
-            <span
-              v-if="clusterMatchesHq[cluster.id]"
-              class="hq-pill"
-            >{{ t('terraforming.currentSector') }}</span>
-          </div>
-          <span class="cluster-part">{{ formatPartName(cluster.partName) }}</span>
-        </div>
+    <!-- Item Mode Header -->
+    <div v-if="displayMode === 'item'" class="panel-header item-header">
+      <button
+        class="back-btn"
+        :title="t('terraforming.backToList')"
+        :aria-label="t('terraforming.backToList')"
+        @click="handleBackClick"
+      >
+        <svg class="back-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 3h6v6" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10 14L21 3" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+        </svg>
+      </button>
+      <span class="header-title">{{ selectedClusterId ? (clusterDisplayNames.get(selectedClusterId) || selectedClusterId) : '' }}</span>
+    </div>
 
-        <div v-if="selectedClusterId === cluster.id" class="objectives-panel">
-          <div class="objectives-title">{{ t('terraforming.objectivesTitle') }}</div>
+    <!-- List Mode Header -->
+    <div v-else class="panel-header">{{ t('terraforming.sectorPanel') }}</div>
+
+    <div class="panel-content">
+      <!-- ============ List Mode ============ -->
+      <template v-if="displayMode === 'list'">
+        <div v-if="clusters.length === 0" class="text-slate-500 text-sm text-center py-4">
+          {{ t('terraforming.noSectors') }}
+        </div>
+        <div v-for="cluster in clusters" :key="cluster.id">
+          <div
+            class="cluster-item"
+            :class="{ 'active': selectedClusterId === cluster.id }"
+            @click="handleClusterClick(cluster.id)"
+          >
+            <div class="flex items-center gap-2">
+              <span class="cluster-name">{{ clusterDisplayNames.get(cluster.id) || cluster.id }}</span>
+              <span
+                v-if="clusterMatchesHq[cluster.id]"
+                class="hq-pill"
+              >{{ t('terraforming.currentSector') }}</span>
+            </div>
+            <span class="cluster-part">{{ formatPartName(cluster.partName) }}</span>
+          </div>
+        </div>
+      </template>
+
+      <!-- ============ Item Mode ============ -->
+      <template v-else>
+        <!-- Objectives -->
+        <div class="section-block">
+          <div class="section-title">{{ t('terraforming.objectivesTitle') }}</div>
           <div
             v-for="obj in objectivesProgress"
             :key="obj.step"
@@ -88,7 +145,36 @@ function formatPartName(partName: string): string {
             </div>
           </div>
         </div>
-      </div>
+
+        <!-- Stats -->
+        <div v-if="selectedClusterId && Object.keys(currentStats).length > 0" class="section-block">
+          <div class="section-title">{{ t('terraforming.statsTitle') }}</div>
+          <div class="stats-grid">
+            <TerraformingStatScale
+              v-for="[statId, model] in statScaleModels"
+              :key="statId"
+              :model="model"
+              compact
+              centered
+              mode="status"
+            />
+          </div>
+        </div>
+
+        <!-- Rebates -->
+        <div v-if="selectedClusterId && activeRebates.length > 0" class="section-block">
+          <div class="section-title">{{ t('terraforming.rebatesTitle') }}</div>
+          <div class="effect-list">
+            <div
+              v-for="(text, i) in activeRebates"
+              :key="`active-rebate-${i}`"
+              class="effect-list-item effect-rebate"
+            >
+              {{ text }}
+            </div>
+          </div>
+        </div>
+      </template>
     </div>
   </div>
 </template>
@@ -100,6 +186,22 @@ function formatPartName(partName: string): string {
 
 .panel-header {
   @apply h-12 flex items-center px-4 text-slate-200 text-sm font-semibold border-b border-slate-700/50 bg-slate-800/30;
+}
+
+.item-header {
+  @apply gap-2;
+}
+
+.header-title {
+  @apply truncate;
+}
+
+.back-btn {
+  @apply flex items-center justify-center w-7 h-7 rounded transition-colors text-slate-400 hover:text-slate-200 hover:bg-slate-700/50 flex-shrink-0;
+}
+
+.back-icon {
+  @apply h-3.5 w-3.5;
 }
 
 .panel-content {
@@ -127,11 +229,11 @@ function formatPartName(partName: string): string {
   @apply text-xs px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex-shrink-0;
 }
 
-.objectives-panel {
-  @apply bg-slate-950/50 border-t border-slate-700/30 px-3 py-2;
+.section-block {
+  @apply px-3 py-2 border-b border-slate-700/20;
 }
 
-.objectives-title {
+.section-title {
   @apply text-xs text-slate-500 font-semibold mb-2;
 }
 
@@ -161,5 +263,17 @@ function formatPartName(partName: string): string {
 
 .objective-status.completed {
   @apply text-emerald-400;
+}
+
+.stats-grid {
+  @apply grid grid-cols-1 gap-1;
+}
+
+.effect-list {
+  @apply flex flex-col gap-1.5;
+}
+
+.effect-list-item {
+  @apply rounded border px-2 py-1.5 text-xs border-emerald-700/40 bg-emerald-950/20 text-emerald-400;
 }
 </style>

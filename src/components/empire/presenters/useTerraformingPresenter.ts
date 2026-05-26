@@ -57,6 +57,10 @@ export interface TerraformingSectorPanelProps {
     completed: boolean
     neutralizeScale?: TerraformingConditionScaleModel
   }>>
+  statScaleModels: ComputedRef<Map<string, TerraformingStatScaleModel>>
+  currentStats: ComputedRef<Record<string, number>>
+  statDisplayNames: ComputedRef<Map<string, string>>
+  activeRebates: ComputedRef<string[]>
 }
 
 export interface TerraformingScaleRange {
@@ -120,11 +124,6 @@ export interface TerraformingTaskListProps {
   completedProjectCounts: ComputedRef<Map<string, number>>
   projectMap: ComputedRef<Map<string, TerraformingProject>>
   projectDisplayNames: ComputedRef<Map<string, string>>
-  currentStats: ComputedRef<Record<string, number>>
-  statDisplayNames: ComputedRef<Map<string, string>>
-  statScaleModels: ComputedRef<Map<string, TerraformingStatScaleModel>>
-  conditionScaleModels: ComputedRef<Map<string, TerraformingConditionScaleModel[]>>
-  activeRebates: ComputedRef<string[]>
   wareNames: ComputedRef<Map<string, string>>
   moduleGroupNames: ComputedRef<Map<string, string>>
 }
@@ -1417,6 +1416,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     return map
   })
 
+  // @ts-ignore: kept as backup — conditionScaleModels was migrated from taskList to sectorPanel (via statScaleModels)
   const conditionScaleModels = computed<Map<string, TerraformingConditionScaleModel[]>>(() => {
     const data = store.terraformingData.value
     const cluster = store.terraformingSelectedCluster.value
@@ -1859,7 +1859,11 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
       selectedClusterId,
       clusterDisplayNames,
       clusterMatchesHq,
-      objectivesProgress
+      objectivesProgress,
+      statScaleModels,
+      currentStats: effectiveCurrentStats,
+      statDisplayNames,
+      activeRebates,
     },
     taskList: {
       taskTree,
@@ -1868,11 +1872,6 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
       completedProjectCounts,
       projectMap,
       projectDisplayNames,
-      currentStats: effectiveCurrentStats,
-      statDisplayNames,
-      statScaleModels,
-      conditionScaleModels,
-      activeRebates,
       wareNames: store.wareNames,
       moduleGroupNames: store.moduleGroupNames,
     },

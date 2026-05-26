@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useLiveProductionStore } from '@/store/useLiveProductionStore'
 import { useTerraformingStore } from '@/store/useTerraformingStore'
@@ -38,12 +38,17 @@ const { t } = useI18n()
 
 const gameDataMaps = computed(() => gameDataStore.maps)
 
+const terraformingSectorMode = ref<'list' | 'item'>('list')
+
 onMounted(() => {
   terraformingStore.init()
   const gameGuid = activeViewStore.activeBinding
   if (gameGuid) {
     liveStore.activateBinding(gameGuid)
     terraformingStore.ensurePlanForContext('live', gameGuid)
+  }
+  if (terraformingStore.activePlan?.selectedClusterId) {
+    terraformingSectorMode.value = 'item'
   }
 })
 
@@ -226,7 +231,12 @@ const showArchiveModuleList = computed(() => {
         :cluster-display-names="terraformingPresenter.props.sectorPanel.clusterDisplayNames.value"
         :cluster-matches-hq="terraformingPresenter.props.sectorPanel.clusterMatchesHq.value"
         :objectives-progress="terraformingPresenter.props.sectorPanel.objectivesProgress.value"
+        :stat-scale-models="terraformingPresenter.props.sectorPanel.statScaleModels.value"
+        :current-stats="terraformingPresenter.props.sectorPanel.currentStats.value"
+        :stat-display-names="terraformingPresenter.props.sectorPanel.statDisplayNames.value"
+        :active-rebates="terraformingPresenter.props.sectorPanel.activeRebates.value"
         @select-cluster="terraformingPresenter.emits.selectCluster"
+        @display-mode-change="(mode) => terraformingSectorMode = mode"
       />
     </div>
 
@@ -238,10 +248,6 @@ const showArchiveModuleList = computed(() => {
         :completed-project-counts="terraformingPresenter.props.taskList.completedProjectCounts.value"
         :project-map="terraformingPresenter.props.taskList.projectMap.value"
         :project-display-names="terraformingPresenter.props.taskList.projectDisplayNames.value"
-        :current-stats="terraformingPresenter.props.taskList.currentStats.value"
-        :stat-display-names="terraformingPresenter.props.taskList.statDisplayNames.value"
-        :stat-scale-models="terraformingPresenter.props.taskList.statScaleModels.value"
-        :active-rebates="terraformingPresenter.props.taskList.activeRebates.value"
         @toggle-project="terraformingPresenter.emits.toggleProject"
         @set-project-count="terraformingPresenter.emits.setProjectCount"
       />

@@ -5,7 +5,6 @@ import type { TaskTree, TerraformingProject } from '@/store/logic/terraformingTa
 import type {
   TerraformingEffectItem,
   TerraformingStatLineModel,
-  TerraformingStatScaleModel,
   TerraformingTaskNodeDisplay,
 } from '@/components/empire/presenters/useTerraformingPresenter'
 import X4NumberInput from '@/components/common/X4NumberInput.vue'
@@ -21,10 +20,6 @@ interface Props {
   completedProjectCounts: Map<string, number>
   projectMap: Map<string, TerraformingProject>
   projectDisplayNames: Map<string, string>
-  currentStats: Record<string, number>
-  statDisplayNames: Map<string, string>
-  statScaleModels: Map<string, TerraformingStatScaleModel>
-  activeRebates: string[]
 }
 
 const props = defineProps<Props>()
@@ -113,27 +108,6 @@ function getStatLines(projectId: string): TerraformingStatLineModel[] {
   <div class="panel-card">
     <div class="panel-header">{{ t('terraforming.taskPanel') }}</div>
     <div class="panel-content">
-      <div v-if="taskTree && Object.keys(currentStats).length > 0" class="stats-card">
-        <div class="stats-grid">
-          <TerraformingStatScale
-            v-for="[statId, model] in statScaleModels"
-            :key="statId"
-            :model="model"
-            compact
-            centered
-            mode="status"
-          />
-        </div>
-        <div v-if="activeRebates.length > 0" class="effect-list">
-          <div
-            v-for="(text, i) in activeRebates"
-            :key="`active-rebate-${i}`"
-            class="effect-list-item effect-rebate"
-          >
-            {{ text }}
-          </div>
-        </div>
-      </div>
       <div v-if="!taskTree" class="text-slate-500 text-sm text-center py-4">
         {{ t('terraforming.selectCluster') }}
       </div>
