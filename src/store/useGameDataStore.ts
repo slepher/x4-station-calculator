@@ -174,14 +174,15 @@ export const useGameDataStore = defineStore('gameData', () => {
     )
   })
 
-  function getStorageKey(module: 'empire' | 'logic_flow' | 'ship_blueprints' | 'setting' | 'save_archives' | 'build_plan_goals'): string {
+  function getStorageKey(module: 'empire' | 'logic_flow' | 'ship_blueprints' | 'setting' | 'save_archives' | 'build_plan_goals' | 'terraforming'): string {
     const config = currentVersionConfig.value
     if (!config) {
       return module === 'empire' ? 'x4_empire_data' :
              module === 'logic_flow' ? 'x4_logic_flow_plans' :
              module === 'ship_blueprints' ? 'x4_ship_blueprints' :
              module === 'save_archives' ? 'x4_save_archives' :
-             module === 'build_plan_goals' ? 'x4_build_plan_goals' : 'x4-setting'
+             module === 'build_plan_goals' ? 'x4_build_plan_goals' :
+             module === 'terraforming' ? 'x4_terraforming_data' : 'x4-setting'
     }
     return config.storage_keys[module]
   }

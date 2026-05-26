@@ -2,6 +2,7 @@
 import { computed, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useLiveProductionStore } from '@/store/useLiveProductionStore'
+import { useTerraformingStore } from '@/store/useTerraformingStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useActiveViewStore } from '@/store/useActiveViewStore'
 import { useProductionTabbarPresenter } from '@/components/empire/presenters/useProductionTabbarPresenter'
@@ -30,20 +31,26 @@ import SaveUploadPanel from '@/components/save/SaveUploadPanel.vue'
 import SaveList from '@/components/save/SaveList.vue'
 
 const liveStore = useLiveProductionStore()
+const terraformingStore = useTerraformingStore()
 const activeViewStore = useActiveViewStore()
 const gameDataStore = useGameDataStore()
 const { t } = useI18n()
 
+const gameDataMaps = computed(() => gameDataStore.maps)
+
 onMounted(() => {
+  terraformingStore.init()
   const gameGuid = activeViewStore.activeBinding
   if (gameGuid) {
     liveStore.activateBinding(gameGuid)
+    terraformingStore.ensurePlanForContext('live', gameGuid)
   }
 })
 
 watch(() => activeViewStore.activeBinding, (newGuid) => {
   if (newGuid) {
     liveStore.activateBinding(newGuid)
+    terraformingStore.ensurePlanForContext('live', newGuid)
   }
 })
 
@@ -53,28 +60,32 @@ const planningPresenter = useProductionPlanningPresenter(liveStore)
 const wareflowPresenter = useProductionWareflowPresenter(liveStore)
 const dashboardPresenter = useProductionDashboardPresenter(liveStore)
 const terraformingPresenter = useTerraformingPresenter({
-  terraformingData: computed(() => liveStore.terraformingData),
-  terraformingSelectedClusterId: computed(() => liveStore.terraformingSelectedClusterId),
-  terraformingSelectedCluster: computed(() => liveStore.terraformingSelectedCluster),
-  terraformingCurrentStats: computed(() => liveStore.terraformingCurrentStats),
-  terraformingRuntimeProjectIds: computed(() => liveStore.terraformingRuntimeProjectIds),
-  terraformingCompletedProjects: computed(() => liveStore.terraformingCompletedProjects),
-  terraformingExecutionLog: computed(() => liveStore.terraformingExecutionLog),
-  terraformingHousingBuilt: computed(() => liveStore.terraformingHousingBuilt),
-  terraformingHqStationName: computed(() => liveStore.terraformingHqStationName),
-  terraformingHqArchiveStation: computed(() => liveStore.terraformingHqArchiveStation),
-  terraformingHqEffectiveModules: computed(() => liveStore.terraformingHqEffectiveModules),
-  terraformingHqClusterId: computed(() => liveStore.terraformingHqClusterId),
-  selectTerraformingCluster: (id: string) => liveStore.selectTerraformingCluster(id),
-  setTerraformingCompletedProjects: (projects: Map<string, number>) => liveStore.setTerraformingCompletedProjects(projects),
-  appendTerraformingProjectExecution: (projectId: string, count?: number) => liveStore.appendTerraformingProjectExecution(projectId, count),
-  setTerraformingProjectCount: (projectId: string, count: number) => liveStore.setTerraformingProjectCount(projectId, count),
-  removeTerraformingExecutionEntry: (entryId: string) => liveStore.removeTerraformingExecutionEntry(entryId),
-  replaceTerraformingExecutionLog: (entries) => liveStore.replaceTerraformingExecutionLog(entries),
-  clearTerraformingExecutionQueue: () => liveStore.clearTerraformingExecutionQueue(),
-  setTerraformingHousingBuilt: (count: number) => liveStore.setTerraformingHousingBuilt(count),
-  mapsClusters: liveStore.gameDataMaps.clusters,
-  mapsSectors: liveStore.gameDataMaps.sectors,
+  terraformingData: computed(() => terraformingStore.terraformingData),
+  terraformingSelectedClusterId: computed(() => terraformingStore.activePlan?.selectedClusterId ?? null),
+  terraformingSelectedCluster: computed(() => terraformingStore.selectedCluster),
+  terraformingCurrentStats: computed(() => terraformingStore.currentStats),
+  terraformingRuntimeProjectIds: computed(() => terraformingStore.runtimeProjectIds),
+  terraformingCompletedProjects: computed(() => terraformingStore.completedProjects),
+  terraformingExecutionLog: computed(() => terraformingStore.executionLog),
+  terraformingHousingBuilt: computed(() => terraformingStore.housingBuilt),
+  terraformingHqStationName: computed(() => terraformingStore.hqStationName),
+  terraformingHqArchiveStation: computed(() => terraformingStore.hqArchiveStation),
+  terraformingHqEffectiveModules: computed(() => terraformingStore.hqEffectiveModules),
+  terraformingHqClusterId: computed(() => terraformingStore.hqClusterId),
+  selectTerraformingCluster: (id: string) => terraformingStore.selectCluster(id),
+  setTerraformingCompletedProjects: (projects: Map<string, number>) => {
+    for (const [projectId, count] of projects) {
+      terraformingStore.setProjectCount(projectId, count)
+    }
+  },
+  appendTerraformingProjectExecution: (projectId: string, count?: number) => terraformingStore.appendExecution(projectId, count ?? 1),
+  setTerraformingProjectCount: (projectId: string, count: number) => terraformingStore.setProjectCount(projectId, count),
+  removeTerraformingExecutionEntry: (entryId: string) => terraformingStore.removeExecution(entryId),
+  replaceTerraformingExecutionLog: (entries) => terraformingStore.replaceExecutionLog(entries as any),
+  clearTerraformingExecutionQueue: () => terraformingStore.clearExecutionQueue(),
+  setTerraformingHousingBuilt: (count: number) => terraformingStore.setHousingBuilt(count),
+  mapsClusters: gameDataMaps.value?.clusters ?? {},
+  mapsSectors: gameDataMaps.value?.sectors ?? {},
   wareNames: computed(() => {
     const map = new Map<string, string>()
     const lwm = gameDataStore.localizedWaresMap

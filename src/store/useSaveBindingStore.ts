@@ -113,7 +113,6 @@ function normalizeState(input: Partial<SavedSaveBindingsState> | null | undefine
             blueprintEmpireId: item.blueprintEmpireId,
             groups,
             stationPlans: normalizedStationPlans,
-            terraformingLogs: (item as any).terraformingLogs as Record<string, string[]> | undefined,
             updatedAt: Number.isFinite(Number(item.updatedAt)) ? Number(item.updatedAt) : Date.now()
           }
         })

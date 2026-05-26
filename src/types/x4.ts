@@ -913,8 +913,23 @@ export interface VersionConfig {
     setting: string
     save_archives: string
     build_plan_goals: string
+    terraforming: string
   }
   indexeddb_name?: string
+}
+
+export interface TerraformingPlan {
+  id: string
+  mode: 'live' | 'blueprint'
+  planId: string
+  selectedClusterId: string | null
+  executionLogByCluster: Record<string, string[]>
+}
+
+export interface SavedTerraformingState {
+  version: number
+  activeId: string | null
+  list: TerraformingPlan[]
 }
 
 export interface VersionsFile {
@@ -1259,7 +1274,6 @@ export interface SaveBindingPlan {
   blueprintEmpireId?: string
   groups: BindingSectorGroup[]
   stationPlans: BindingStationPlan[]
-  terraformingLogs?: Record<string, string[]>
   updatedAt: number
 }
 

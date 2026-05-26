@@ -835,28 +835,35 @@ function formatDependencyExpression(
   dependency: TerraformingProjectDependency | undefined,
   projectNames: Map<string, string>,
   labels: { mutuallyExclusive: string; notCompletedBranch: string; completedBranch: string; or: string },
+  runtimeProjectIds?: Set<string>,
 ): string[] {
   if (!dependency) return []
   if ('all' in dependency) {
-    return dependency.all.flatMap(child => formatDependencyExpression(child, projectNames, labels))
+    return dependency.all.flatMap(child => formatDependencyExpression(child, projectNames, labels, runtimeProjectIds))
   }
   if ('any' in dependency) {
     const isLeaf = (dep: TerraformingProjectDependency): boolean => 'completed' in dep || 'notCompleted' in dep
     if (dependency.any.every(isLeaf) && dependency.any.length > 0 && dependency.any.some(d => 'notCompleted' in d)) {
       const branchStrings = dependency.any.map(child => {
-        if ('notCompleted' in child) return `${labels.notCompletedBranch}${projectNames.get(child.notCompleted) || child.notCompleted}`
-        if ('completed' in child) return `${labels.completedBranch}${projectNames.get(child.completed) || child.completed}`
+        if ('notCompleted' in child) return (runtimeProjectIds && !runtimeProjectIds.has(child.notCompleted)) ? '' : (`${labels.notCompletedBranch}${projectNames.get(child.notCompleted) || child.notCompleted}`)
+        if ('completed' in child) return (runtimeProjectIds && !runtimeProjectIds.has(child.completed)) ? '' : (`${labels.completedBranch}${projectNames.get(child.completed) || child.completed}`)
         return ''
       }).filter(s => s.length > 0)
       return branchStrings.length > 0 ? [branchStrings.join(labels.or)] : []
     }
     const branchLabels = dependency.any
-      .map(child => formatDependencyExpression(child, projectNames, labels).join(' + '))
+      .map(child => formatDependencyExpression(child, projectNames, labels, runtimeProjectIds).join(' + '))
       .filter(label => label.length > 0)
     return branchLabels.length > 0 ? [branchLabels.join(' | ')] : []
   }
-  if ('completed' in dependency) return [projectNames.get(dependency.completed) || dependency.completed]
-  if ('notCompleted' in dependency) return [`${labels.mutuallyExclusive}: ${projectNames.get(dependency.notCompleted) || dependency.notCompleted}`]
+  if ('completed' in dependency) {
+    if (runtimeProjectIds && !runtimeProjectIds.has(dependency.completed)) return []
+    return [projectNames.get(dependency.completed) || dependency.completed]
+  }
+  if ('notCompleted' in dependency) {
+    if (runtimeProjectIds && !runtimeProjectIds.has(dependency.notCompleted)) return []
+    return [`${labels.mutuallyExclusive}: ${projectNames.get(dependency.notCompleted) || dependency.notCompleted}`]
+  }
   if ('groupCompleted' in dependency) return []
   if ('groupNotCompleted' in dependency) return []
   return []
@@ -872,29 +879,39 @@ function formatDependencyExpressionLines(
   dependency: TerraformingProjectDependency | undefined,
   projectNames: Map<string, string>,
   labels: { depends: string; anyOf: string; mutuallyExclusive: string; notCompletedBranch: string; completedBranch: string; or: string },
-  blocked: boolean,
+  completedProjects: Map<string, number>,
+  runtimeProjectIds?: Set<string>,
 ): TerraformingDependencyLineModel[] {
   if (!dependency) return []
   if ('all' in dependency) {
-    return dependency.all.flatMap(child => formatDependencyExpressionLines(child, projectNames, labels, blocked))
+    return dependency.all.flatMap(child => formatDependencyExpressionLines(child, projectNames, labels, completedProjects, runtimeProjectIds))
   }
   if ('any' in dependency) {
     const isLeaf = (dep: TerraformingProjectDependency): boolean => 'completed' in dep || 'notCompleted' in dep
     if (dependency.any.every(isLeaf) && dependency.any.length > 0 && dependency.any.some(d => 'notCompleted' in d)) {
-      const branchStrings = dependency.any.map(child => {
-        if ('notCompleted' in child) return `${labels.notCompletedBranch}${projectDisplayName(child.notCompleted, projectNames)}`
-        if ('completed' in child) return `${labels.completedBranch}${projectDisplayName(child.completed, projectNames)}`
-        return ''
-      }).filter(s => s.length > 0)
-      if (branchStrings.length === 0) return []
+      const branchInfo = dependency.any.map(child => {
+        if ('notCompleted' in child) {
+          if (runtimeProjectIds && !runtimeProjectIds.has(child.notCompleted)) return null
+          const b = (completedProjects.get(child.notCompleted) ?? 0) > 0
+          return { text: `${labels.notCompletedBranch}${projectDisplayName(child.notCompleted, projectNames)}`, blocked: b }
+        }
+        if ('completed' in child) {
+          if (runtimeProjectIds && !runtimeProjectIds.has(child.completed)) return null
+          const b = (completedProjects.get(child.completed) ?? 0) <= 0
+          return { text: `${labels.completedBranch}${projectDisplayName(child.completed, projectNames)}`, blocked: b }
+        }
+        return null
+      }).filter((x): x is { text: string; blocked: boolean } => x !== null)
+      if (branchInfo.length === 0) return []
+      const anyBlocked = branchInfo.every(b => b.blocked)
       return [{
         label: labels.depends,
-        value: branchStrings.join(labels.or),
-        blocked,
+        value: branchInfo.map(b => b.text).join(labels.or),
+        blocked: anyBlocked,
       }]
     }
     const branchLabels = dependency.any
-      .map(child => formatDependencyExpressionLines(child, projectNames, labels, blocked)
+      .map(child => formatDependencyExpressionLines(child, projectNames, labels, completedProjects, runtimeProjectIds)
         .map(line => `${line.label}: ${line.value}`)
         .join(' + '))
       .filter(label => label.length > 0)
@@ -902,21 +919,26 @@ function formatDependencyExpressionLines(
     return [{
       label: labels.depends,
       value: `${labels.anyOf}${branchLabels.join(' | ')}`,
-      blocked,
+      blocked: dependency.any.length > 0 && dependency.any.every(child => {
+        const lines = formatDependencyExpressionLines(child, projectNames, labels, completedProjects, runtimeProjectIds)
+        return lines.length > 0 && lines.every(l => l.blocked)
+      }),
     }]
   }
   if ('completed' in dependency) {
+    if (runtimeProjectIds && !runtimeProjectIds.has(dependency.completed)) return []
     return [{
       label: labels.depends,
       value: projectDisplayName(dependency.completed, projectNames),
-      blocked,
+      blocked: (completedProjects.get(dependency.completed) ?? 0) <= 0,
     }]
   }
   if ('notCompleted' in dependency) {
+    if (runtimeProjectIds && !runtimeProjectIds.has(dependency.notCompleted)) return []
     return [{
       label: labels.mutuallyExclusive,
       value: projectDisplayName(dependency.notCompleted, projectNames),
-      blocked,
+      blocked: (completedProjects.get(dependency.notCompleted) ?? 0) > 0,
     }]
   }
   if ('groupCompleted' in dependency) return []
@@ -928,7 +950,7 @@ function formatPredecessorDependencyLines(
   predecessors: TaskNode['predecessors'],
   projectNames: Map<string, string>,
   labels: { depends: string; anyOf: string },
-  blocked: boolean,
+  completedProjects: Map<string, number>,
 ): TerraformingDependencyLineModel[] {
   const projectPreds = predecessors.filter(pred => pred.type === 'project')
   if (projectPreds.length === 0) return []
@@ -938,10 +960,11 @@ function formatPredecessorDependencyLines(
   const lines: TerraformingDependencyLineModel[] = []
 
   if (anyPreds.length > 0) {
+    const anyBlocked = anyPreds.every(pred => (completedProjects.get(pred.ref) ?? 0) <= 0)
     lines.push({
       label: labels.depends,
       value: `${labels.anyOf}${anyPreds.map(pred => projectDisplayName(pred.ref, projectNames)).join(' | ')}`,
-      blocked,
+      blocked: anyBlocked,
     })
   }
 
@@ -949,7 +972,7 @@ function formatPredecessorDependencyLines(
     lines.push({
       label: labels.depends,
       value: projectDisplayName(pred.ref, projectNames),
-      blocked,
+      blocked: (completedProjects.get(pred.ref) ?? 0) <= 0,
     })
   }
 
@@ -1124,6 +1147,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
       const project = projectMap.value.get(entry.projectId)
       const beforeStats = computeTerraformingRuntimeStats(cluster, completedProjects, data)
       const { clusterProjects } = buildRuntimeClusterForReplay(cluster, beforeStats, completedProjects, data)
+      const runtimePidSet = new Set(clusterProjects.map(p => p.id))
       const evaluation = entry.enabled
         ? evaluateTerraformingProjectExecution(project, { stats: beforeStats, completedProjects }, projectMap.value, clusterProjects, data.stats)
         : { valid: false, reasons: [] }
@@ -1167,7 +1191,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
           notCompletedBranch: vI18nLookup('terraforming.branch.notCompleted') || 'not ',
           completedBranch: vI18nLookup('terraforming.branch.completed') || '',
           or: vI18nLookup('terraforming.or') || ' or ',
-        }),
+        }, runtimePidSet),
         statLines,
       })
 
@@ -1261,6 +1285,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
 
     const statNames = statDisplayNames.value
     const projectNames = projectDisplayNames.value
+    const runtimePidSet = new Set(store.terraformingRuntimeProjectIds.value)
     const uiLabels = {
       min: vI18nLookup('terraforming.min') || 'min',
       max: vI18nLookup('terraforming.max') || 'max',
@@ -1283,7 +1308,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
         current: uiLabels.current,
         anyOf: uiLabels.anyOf,
       })
-      const dependencyBlocked = node.blockedReason ? node.blockedReason.includes('depends') : false
+      const completedMap = effectiveCompletedProjects.value
       displays.set(node.id, {
         name: projectNames.get(node.id) || node.name,
         effects: translateTaskEffects(node.effects, statNames, { min: uiLabels.min, max: uiLabels.max }),
@@ -1292,7 +1317,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
           ...formatPredecessorDependencyLines(node.predecessors, projectNames, {
             depends: uiLabels.depends,
             anyOf: uiLabels.anyOf,
-          }, dependencyBlocked),
+          }, completedMap),
           ...formatDependencyExpressionLines(project.dependencies, projectNames, {
             depends: uiLabels.depends,
             anyOf: uiLabels.anyOf,
@@ -1300,7 +1325,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
             notCompletedBranch: uiLabels.notCompletedBranch,
             completedBranch: uiLabels.completedBranch,
             or: uiLabels.or,
-          }, dependencyBlocked),
+          }, completedMap, runtimePidSet),
         ],
         statLines: buildTaskStatLineModels(
           project,

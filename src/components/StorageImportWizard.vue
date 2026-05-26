@@ -9,6 +9,7 @@ import { useSaveStore } from '@/store/useSaveStore'
 import { useSaveBindingStore } from '@/store/useSaveBindingStore'
 import { useStatusStore } from '@/store/useStatusStore'
 import { useBuildPlanStore } from '@/store/useBuildPlanStore'
+import { useTerraformingStore } from '@/store/useTerraformingStore'
 import {
   applyImportPayload,
   normalizeImportPayload,
@@ -37,6 +38,7 @@ const saveStore = useSaveStore()
 const saveBindingStore = useSaveBindingStore()
 const statusStore = useStatusStore()
 const buildPlanStore = useBuildPlanStore()
+const terraformingStore = useTerraformingStore()
 
 const fileName = ref('')
 const parseError = ref('')
@@ -50,7 +52,8 @@ const selectedModules = ref<Record<ImportModuleKey, boolean>>({
   x4_ship_blueprints: false,
   x4_save_archives: false,
   x4_save_bindings: false,
-  x4_build_plan_goals: false
+  x4_build_plan_goals: false,
+  x4_terraforming_data: false
 })
 
 const hasParsedPayload = computed(() => parsedPayload.value !== null)
@@ -60,7 +63,7 @@ const sanitizeSummaries = computed(() => preparedPayload.value?.sanitizeSummarie
 
 const setDefaultSelections = (selectAll: boolean) => {
   const keys = new Set(availableKeys.value)
-  ;(['x4_empire_data', 'x4_logic_flow_plans', 'x4_ship_blueprints', 'x4_save_archives', 'x4_save_bindings', 'x4_build_plan_goals'] as ImportModuleKey[]).forEach((key) => {
+  ;(['x4_empire_data', 'x4_logic_flow_plans', 'x4_ship_blueprints', 'x4_save_archives', 'x4_save_bindings', 'x4_build_plan_goals', 'x4_terraforming_data'] as ImportModuleKey[]).forEach((key) => {
     selectedModules.value[key] = selectAll ? keys.has(key) : selectedModules.value[key] && keys.has(key)
   })
 }
@@ -81,7 +84,8 @@ watch(
       x4_ship_blueprints: false,
       x4_save_archives: false,
       x4_save_bindings: false,
-      x4_build_plan_goals: false
+      x4_build_plan_goals: false,
+      x4_terraforming_data: false
     }
   }
 )
@@ -107,6 +111,8 @@ const moduleTitle = (key: ImportModuleKey) => {
       return t('moduleNames.save_binding')
     case 'x4_build_plan_goals':
       return t('moduleNames.build_plan')
+    case 'x4_terraforming_data':
+      return t('moduleNames.terraforming', 'Terraforming')
     default:
       return key
   }
@@ -173,7 +179,8 @@ const handleApplyImport = async () => {
     shipBuildStore,
     saveStore,
     saveBindingStore,
-    buildPlanStore
+    buildPlanStore,
+    terraformingStore
   })
 
   if (result.applied.length === 0) {
