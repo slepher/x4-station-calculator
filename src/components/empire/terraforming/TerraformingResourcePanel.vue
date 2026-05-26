@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import draggable from 'vuedraggable'
 import { useI18n } from 'vue-i18n'
 import type {
   TerraformingCancelValidation,
+  TerraformingDraftTimelineEntry,
   TerraformingExecutionTimelineEntry,
 } from '@/components/empire/presenters/useTerraformingPresenter'
 import type { DeliveryShip } from '@/store/logic/terraformingTaskResolver'
@@ -13,6 +15,12 @@ import TerraformingStatScale from '@/components/empire/terraforming/Terraforming
 interface Props {
   selectedClusterId: string | null
   executionTimeline: TerraformingExecutionTimelineEntry[]
+  queueEditState: {
+    editing: boolean
+    canComplete: boolean
+    invalidCount: number
+    draftEntries: TerraformingDraftTimelineEntry[]
+  }
   getCancelValidation: (entryId: string) => TerraformingCancelValidation
   deliveryShipMap: Map<string, DeliveryShip>
   hqBuildDocks: { totalSlots: number } | null
@@ -23,6 +31,15 @@ const props = defineProps<Props>()
 const emit = defineEmits<{
   (e: 'cancelExecution', entryId: string): void
   (e: 'clearAll'): void
+  (e: 'startEdit'): void
+  (e: 'cancelEdit'): void
+  (e: 'completeEdit'): void
+  (e: 'setDraftEnabled', entryId: string, enabled: boolean): void
+  (e: 'deleteDraft', entryId: string): void
+  (e: 'copyDraft', entryId: string): void
+  (e: 'updateDraftEntries', entries: TerraformingDraftTimelineEntry[]): void
+  (e: 'disableAllDraft'): void
+  (e: 'enableAllDraft'): void
 }>()
 
 const { t } = useI18n()
@@ -30,6 +47,10 @@ const { translateWare } = useX4I18n()
 const gameDataStore = useGameDataStore()
 const expandedEntryId = ref<string | null>(null)
 const cancelValidationCache = ref<Record<string, TerraformingCancelValidation>>({})
+const internalDraftEntries = computed({
+  get: () => props.queueEditState.draftEntries,
+  set: (val: TerraformingDraftTimelineEntry[]) => emit('updateDraftEntries', val),
+})
 
 watch(() => props.executionTimeline, () => {
   cancelValidationCache.value = {}
@@ -114,11 +135,6 @@ function formatTime(seconds: number): string {
   return parts.join(':')
 }
 
-function onClearAll() {
-  if (props.executionTimeline.length === 0) return
-  emit('clearAll')
-}
-
 function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
   return entry.deliveryDetails[0]?.totalTime ?? 0
 }
@@ -129,17 +145,113 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
     <div class="panel-header">
       {{ t('terraforming.taskQueue') }}
       <span v-if="showNoDockWarning" class="text-amber-400 text-[11px] ml-2">⚠ {{ t('terraforming.noBuildDock') }}</span>
+      <span v-if="queueEditState.editing && queueEditState.invalidCount > 0" class="text-red-400 text-[11px] ml-2">
+        {{ queueEditState.invalidCount }} {{ t('terraforming.invalidTasks') || 'invalid' }}
+      </span>
       <button
-        v-if="executionTimeline.length > 0"
+        v-if="!queueEditState.editing"
         class="clear-all-btn"
-        @click="onClearAll"
+        @click="emit('startEdit')"
       >
-        {{ t('terraforming.clearQueue') }}
+        {{ t('terraforming.editQueue') || 'Edit' }}
       </button>
+      <template v-else>
+        <div class="edit-actions-group">
+          <button class="edit-action-btn" @click="emit('cancelEdit')">
+            {{ t('ui.cancel') }}
+          </button>
+          <button
+            class="edit-action-btn complete"
+            :disabled="!queueEditState.canComplete"
+            @click="emit('completeEdit')"
+          >
+            {{ t('ui.save') }}
+          </button>
+        </div>
+      </template>
     </div>
     <div class="panel-content">
       <div v-if="!selectedClusterId" class="empty-state">
         {{ t('terraforming.selectClusterForResources') }}
+      </div>
+
+      <div v-else-if="queueEditState.editing" class="timeline-list">
+        <div class="bulk-edit-card">
+          <button class="draft-btn" @click="emit('disableAllDraft')">{{ t('terraforming.disableAll') || 'Disable all' }}</button>
+          <button class="draft-btn" @click="emit('enableAllDraft')">{{ t('terraforming.enableAll') || 'Enable all' }}</button>
+        </div>
+
+        <div v-if="queueEditState.draftEntries.length === 0" class="empty-state">
+          {{ t('terraforming.noExecutionTimeline') }}
+        </div>
+
+        <draggable
+          v-else
+          v-model="internalDraftEntries"
+          item-key="id"
+          ghost-class="drag-ghost"
+          handle=".drag-handle"
+          class="draggable-container"
+        >
+          <template #item="{ element }">
+            <div class="timeline-item draft-item" :class="[element.state]">
+              <div class="timeline-head">
+                <button class="timeline-main" @click="toggleEntry(element.id)">
+                  <span class="drag-handle">↕</span>
+                  <span class="entry-order">#{{ element.order }}</span>
+                  <span class="entry-name">{{ element.projectName }}</span>
+                  <span class="draft-state">{{ t(`terraforming.queueState.${element.state}`) || element.state }}</span>
+                </button>
+                <div class="draft-actions">
+                  <button
+                    v-if="element.repeatRole === 'duplicate'"
+                    class="draft-btn danger"
+                    @click="emit('deleteDraft', element.id)"
+                  >
+                    {{ t('terraforming.undo') }}
+                  </button>
+                  <button
+                    v-else
+                    class="draft-btn"
+                    @click="emit('setDraftEnabled', element.id, !element.enabled)"
+                  >
+                    {{ element.enabled ? (t('terraforming.disable') || 'Disable') : (t('terraforming.enable') || 'Enable') }}
+                  </button>
+                  <button
+                    v-if="element.repeatRole !== 'single'"
+                    class="draft-btn"
+                    @click="emit('copyDraft', element.id)"
+                  >
+                    {{ t('terraforming.copy') || 'Copy' }}
+                  </button>
+                </div>
+              </div>
+              <div
+                v-if="element.dependencies.length > 0 || element.statLines.length > 0 || element.reasons.length > 0"
+                class="timeline-body draft-body"
+              >
+                <div v-if="element.dependencies.length > 0" class="detail-section">
+                  <div class="section-title">{{ t('terraforming.depends') }}</div>
+                  <div v-for="dep in element.dependencies" :key="`${element.id}-${dep}`" class="detail-text">{{ dep }}</div>
+                </div>
+                <div v-if="element.statLines.length > 0" class="detail-section">
+                  <div class="section-title">{{ t('terraforming.statChanges') }}</div>
+                  <TerraformingStatScale
+                    v-for="line in element.statLines"
+                    :key="`${element.id}-draft-stat-${line.statId}`"
+                    :model="line"
+                    compact
+                    mode="impact"
+                  />
+                </div>
+                <div v-if="element.reasons.length > 0" class="detail-section">
+                  <div class="section-title">{{ t('terraforming.invalidReason') || 'Invalid reason' }}</div>
+                  <div v-for="reason in element.reasons" :key="`${element.id}-${reason}`" class="detail-text text-red-300">{{ reason }}</div>
+                </div>
+              </div>
+            </div>
+          </template>
+        </draggable>
       </div>
 
       <div v-else-if="executionTimeline.length === 0" class="empty-state">
@@ -161,16 +273,15 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
               </button>
               <button
                 class="cancel-btn"
+                :class="{ disabled: !getValidation(entry.id).canCancel }"
+                :disabled="!getValidation(entry.id).canCancel"
                 @click="onCancel(entry)"
               >
                 {{ t('terraforming.undo') }}
               </button>
             </div>
 
-            <div
-              v-if="expandedEntryId === entry.id && !getValidation(entry.id).canCancel"
-              class="entry-warning"
-            >
+            <div v-if="!getValidation(entry.id).canCancel" class="entry-warning">
               {{ t('terraforming.cancelBlocked') }}
             </div>
 
@@ -269,16 +380,6 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
                 <div class="detail-text">{{ entry.blockedReason }}</div>
               </div>
 
-              <div v-if="getValidation(entry.id).reasons.length > 0" class="detail-section">
-                <div class="section-title">{{ t('terraforming.cancelImpact') }}</div>
-                <div
-                  v-for="reason in getValidation(entry.id).reasons"
-                  :key="`${entry.id}-${reason}`"
-                  class="detail-text"
-                >
-                  {{ reason }}
-                </div>
-              </div>
             </div>
           </div>
         </template>
@@ -301,6 +402,18 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
   @apply hover:bg-red-800/40 hover:border-red-700;
 }
 
+.edit-actions-group {
+  @apply ml-auto flex gap-2;
+}
+
+.edit-action-btn {
+  @apply ml-2 text-[11px] px-2 py-1 rounded border border-slate-600 text-slate-200 bg-slate-800/70 transition-colors disabled:opacity-40 disabled:cursor-not-allowed;
+}
+
+.edit-action-btn.complete {
+  @apply border-emerald-700 text-emerald-300 bg-emerald-950/30;
+}
+
 .panel-content {
   @apply p-3 flex flex-col gap-2;
 }
@@ -319,6 +432,50 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
 
 .timeline-item {
   @apply border border-slate-700/40 rounded bg-slate-950/40 overflow-hidden;
+}
+
+.bulk-edit-card {
+  @apply bg-slate-950/40 border border-slate-700 rounded-lg p-2 flex gap-2;
+}
+
+.draft-item.enabled-valid {
+  @apply border-emerald-700/50;
+}
+
+.draft-item.enabled-invalid {
+  @apply border-red-700/70 bg-red-950/20;
+}
+
+.draft-item.disabled {
+  @apply opacity-60;
+}
+
+.drag-ghost {
+  @apply opacity-30 bg-slate-700 border-sky-500 border-dashed border-2;
+}
+
+.draggable-container {
+  @apply space-y-2;
+}
+
+.drag-handle {
+  @apply text-slate-500 cursor-grab;
+}
+
+.draft-state {
+  @apply text-[11px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-300;
+}
+
+.draft-actions {
+  @apply flex gap-1;
+}
+
+.draft-btn {
+  @apply text-[11px] px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700;
+}
+
+.draft-btn.danger {
+  @apply border-red-800 text-red-300 bg-red-950/30;
 }
 
 .timeline-head {

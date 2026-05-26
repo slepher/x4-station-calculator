@@ -70,6 +70,7 @@ const terraformingPresenter = useTerraformingPresenter({
   appendTerraformingProjectExecution: (projectId: string, count?: number) => liveStore.appendTerraformingProjectExecution(projectId, count),
   setTerraformingProjectCount: (projectId: string, count: number) => liveStore.setTerraformingProjectCount(projectId, count),
   removeTerraformingExecutionEntry: (entryId: string) => liveStore.removeTerraformingExecutionEntry(entryId),
+  replaceTerraformingExecutionLog: (entries) => liveStore.replaceTerraformingExecutionLog(entries),
   clearTerraformingExecutionQueue: () => liveStore.clearTerraformingExecutionQueue(),
   setTerraformingHousingBuilt: (count: number) => liveStore.setTerraformingHousingBuilt(count),
   mapsClusters: liveStore.gameDataMaps.clusters,
@@ -241,11 +242,26 @@ const showArchiveModuleList = computed(() => {
       <TerraformingResourcePanel
         :selected-cluster-id="terraformingPresenter.props.resourcePanel.selectedClusterId.value"
         :execution-timeline="terraformingPresenter.props.resourcePanel.executionTimeline.value"
+        :queue-edit-state="{
+          editing: terraformingPresenter.props.resourcePanel.queueEditState.editing.value,
+          canComplete: terraformingPresenter.props.resourcePanel.queueEditState.canComplete.value,
+          invalidCount: terraformingPresenter.props.resourcePanel.queueEditState.invalidCount.value,
+          draftEntries: terraformingPresenter.props.resourcePanel.queueEditState.draftEntries.value
+        }"
         :get-cancel-validation="terraformingPresenter.props.resourcePanel.getCancelValidation"
         :delivery-ship-map="terraformingPresenter.props.resourcePanel.deliveryShipMap.value"
         :hq-build-docks="terraformingPresenter.props.resourcePanel.hqBuildDocks.value"
         @cancel-execution="terraformingPresenter.emits.cancelExecution"
         @clear-all="terraformingPresenter.emits.clearExecutionQueue"
+        @start-edit="terraformingPresenter.emits.startQueueEdit"
+        @cancel-edit="terraformingPresenter.emits.cancelQueueEdit"
+        @complete-edit="terraformingPresenter.emits.completeQueueEdit"
+        @set-draft-enabled="terraformingPresenter.emits.setDraftEntryEnabled"
+        @delete-draft="terraformingPresenter.emits.deleteDraftEntry"
+        @copy-draft="terraformingPresenter.emits.copyDraftEntry"
+        @update-draft-entries="terraformingPresenter.emits.reorderDraftEntries"
+        @disable-all-draft="terraformingPresenter.emits.disableAllDraftEntries"
+        @enable-all-draft="terraformingPresenter.emits.enableAllDraftEntries"
       />
     </div>
   </div>

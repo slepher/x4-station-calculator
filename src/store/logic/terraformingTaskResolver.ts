@@ -80,8 +80,17 @@ export interface TerraformingProject {
   blockedProjects: string[]
   blockedGroups: string[]
   predecessors: Predecessor[]
+  dependencies?: TerraformingProjectDependency
   descriptions?: DescriptionItem[]
 }
+
+export type TerraformingProjectDependency =
+  | { all: TerraformingProjectDependency[] }
+  | { any: TerraformingProjectDependency[] }
+  | { completed: string }
+  | { notCompleted: string }
+  | { groupCompleted: string }
+  | { groupNotCompleted: string }
 
 export interface StatCondition {
   stat: string
@@ -179,6 +188,11 @@ export interface TaskTree {
   groupNames: Map<string, string>
 }
 
+export interface TerraformingExecutionEvaluation {
+  valid: boolean
+  reasons: string[]
+}
+
 function fmtEffect(e: StatEffect): string {
   if (e.value !== undefined) return `${e.stat}=${e.value}`
   if (e.change === undefined) return `${e.stat}`
@@ -251,6 +265,201 @@ function groupLabel(group: string, groupNames: Map<string, string>, i18nLookup?:
   const nameId = groupNames.get(group) || group
   const name = i18nLookup ? (i18nLookup(nameId) || nameId) : nameId
   return emoji ? `${emoji} ${name}` : name
+}
+
+function checkStatConditions(
+  project: TerraformingProject,
+  state: TerraformingState,
+  stats: TerraformingStat[],
+): string[] {
+  const blockedReasons: string[] = []
+
+  for (const c of project.conditions) {
+    const currentVal = state.stats[c.stat]
+    if (currentVal === undefined) continue
+    const statDef = stats.find(s => s.id === c.stat)
+    const mode = inferConditionMode(c, statDef)
+    if (mode === 'value') {
+      const minValue = c.minvalue ?? c.min
+      const maxValue = c.maxvalue ?? c.max
+      if (minValue !== undefined && currentVal < minValue) {
+        blockedReasons.push(`${c.stat} >= ${minValue} (current: ${currentVal})`)
+      }
+      if (maxValue !== undefined && currentVal > maxValue) {
+        blockedReasons.push(`${c.stat} <= ${maxValue} (current: ${currentVal})`)
+      }
+      continue
+    }
+
+    if (!statDef) continue
+    const currentRange = getCurrentRange(statDef, currentVal)
+    const currentState = currentRange?.state
+    if (currentState === undefined) continue
+    if (c.min !== undefined && currentState < c.min) {
+      blockedReasons.push(`${c.stat} state >= ${c.min} (current: ${currentState}, value: ${currentVal})`)
+    }
+    if (c.max !== undefined && currentState > c.max) {
+      blockedReasons.push(`${c.stat} state <= ${c.max} (current: ${currentState}, value: ${currentVal})`)
+    }
+  }
+
+  return blockedReasons
+}
+
+function projectDependencyLabel(
+  projectId: string,
+  projectMap: Map<string, TerraformingProject>,
+): string {
+  const target = projectMap.get(projectId)
+  return target?.nameId || projectId
+}
+
+function evaluateDependencyExpression(
+  dependency: TerraformingProjectDependency,
+  state: TerraformingState,
+  projectMap: Map<string, TerraformingProject>,
+  clusterProjects: TerraformingProject[],
+): string[] {
+  const clusterPids = new Set(clusterProjects.map(p => p.id))
+
+  if ('all' in dependency) {
+    const reasons: string[] = []
+    for (const child of dependency.all) {
+      reasons.push(...evaluateDependencyExpression(child, state, projectMap, clusterProjects))
+    }
+    return reasons
+  }
+
+  if ('any' in dependency) {
+    const childReasons = dependency.any.map(child => evaluateDependencyExpression(child, state, projectMap, clusterProjects))
+    const hasMetChild = childReasons.some(reasons => reasons.length === 0)
+    if (hasMetChild) return []
+    return [`depends_any: ${childReasons.map(reasons => reasons.join(' + ')).join(' | ')}`]
+  }
+
+  if ('completed' in dependency) {
+    if (!clusterPids.has(dependency.completed)) return []
+    if ((state.completedProjects.get(dependency.completed) ?? 0) > 0) return []
+    return [`depends: ${projectDependencyLabel(dependency.completed, projectMap)}`]
+  }
+
+  if ('notCompleted' in dependency) {
+    if (!clusterPids.has(dependency.notCompleted)) return []
+    if ((state.completedProjects.get(dependency.notCompleted) ?? 0) <= 0) return []
+    return [`depends: ${projectDependencyLabel(dependency.notCompleted, projectMap)} (removed)`]
+  }
+
+  if ('groupCompleted' in dependency) {
+    return []
+  }
+
+  if ('groupNotCompleted' in dependency) {
+    return []
+  }
+
+  return []
+}
+
+function checkDependencyExpression(
+  project: TerraformingProject,
+  state: TerraformingState,
+  projectMap: Map<string, TerraformingProject>,
+  clusterProjects: TerraformingProject[],
+): string[] {
+  const dependencyExpression = project.dependencies
+  if (dependencyExpression) {
+    return evaluateDependencyExpression(dependencyExpression, state, projectMap, clusterProjects)
+  }
+
+  const reasons: string[] = []
+
+  for (const cp of clusterProjects) {
+    const completed = (state.completedProjects.get(cp.id) ?? 0) > 0
+    if (completed && cp.removedProjects.includes(project.id)) {
+      reasons.push(`depends: ${cp.nameId} (removed)`)
+    }
+    const cpRemoved = clusterProjects.some(
+      cp2 => (state.completedProjects.get(cp2.id) ?? 0) > 0 && cp2.removedProjects.includes(cp.id)
+    )
+    if (!completed && !cpRemoved && cp.blockedProjects.includes(project.id)) {
+      reasons.push(`depends: ${cp.nameId} (blocking)`)
+    }
+    if (!completed && !cpRemoved && cp.blockedGroups.includes(project.group)) {
+      reasons.push(`depends: ${cp.nameId} (blocking_group)`)
+    }
+  }
+
+  return reasons
+}
+
+function checkPredecessors(
+  project: TerraformingProject,
+  state: TerraformingState,
+  projectMap: Map<string, TerraformingProject>,
+  clusterProjects: TerraformingProject[],
+): string[] {
+  const clusterPids = new Set(clusterProjects.map(p => p.id))
+  const projectPreds = project.predecessors.filter(p => {
+    if (p.type !== 'project') return false
+    return clusterPids.has(p.ref)
+  })
+  const anyPreds = projectPreds.filter(p => p.any)
+  const allPreds = projectPreds.filter(p => !p.any)
+  const unmetProjectPreds: Predecessor[] = []
+
+  if (anyPreds.length > 0) {
+    const anyMet = anyPreds.some(p => (state.completedProjects.get(p.ref) ?? 0) > 0)
+    if (!anyMet) {
+      unmetProjectPreds.push(...anyPreds)
+    }
+  }
+
+  for (const pred of allPreds) {
+    if ((state.completedProjects.get(pred.ref) ?? 0) <= 0) {
+      unmetProjectPreds.push(pred)
+    }
+  }
+
+  if (unmetProjectPreds.length === 0) return []
+
+  const refs = unmetProjectPreds.map(p => {
+    const pp = projectMap.get(p.ref)
+    return pp ? (pp.name || pp.nameId) : p.ref
+  })
+  const hasAnyPreds = anyPreds.length > 0
+  const hasAllPreds = allPreds.length > 0
+  if (hasAnyPreds && !hasAllPreds) {
+    return [`depends_any: ${refs.join(' | ')}`]
+  }
+  if (!hasAnyPreds && hasAllPreds) {
+    return [`depends_all: ${refs.join(' | ')}`]
+  }
+  return [`depends: ${refs.join(' | ')}`]
+}
+
+export function evaluateTerraformingProjectExecution(
+  project: TerraformingProject | undefined,
+  state: TerraformingState,
+  projectMap: Map<string, TerraformingProject>,
+  clusterProjects: TerraformingProject[],
+  stats: TerraformingStat[],
+): TerraformingExecutionEvaluation {
+  if (!project) {
+    return { valid: false, reasons: ['project unavailable'] }
+  }
+
+  const reasons: string[] = []
+  if (project.repeatCooldown === null && (state.completedProjects.get(project.id) ?? 0) > 0) {
+    reasons.push('one-time project already completed')
+  }
+  reasons.push(...checkStatConditions(project, state, stats))
+  reasons.push(...checkDependencyExpression(project, state, projectMap, clusterProjects))
+  reasons.push(...checkPredecessors(project, state, projectMap, clusterProjects))
+
+  return {
+    valid: reasons.length === 0,
+    reasons,
+  }
 }
 
 export function resolveAvailableTasks(
@@ -362,91 +571,10 @@ function evaluateProject(
   const effectsStr = project.effects
     .filter(e => e.stat in state.stats)
     .map(fmtEffect).join(', ')
-  const blockedReasons: string[] = []
-
-  for (const c of project.conditions) {
-    const currentVal = state.stats[c.stat]
-    if (currentVal === undefined) continue
-    const statDef = stats.find(s => s.id === c.stat)
-    const mode = inferConditionMode(c, statDef)
-    if (mode === 'value') {
-      const minValue = c.minvalue ?? c.min
-      const maxValue = c.maxvalue ?? c.max
-      if (minValue !== undefined && currentVal < minValue) {
-        blockedReasons.push(`${c.stat} >= ${minValue} (current: ${currentVal})`)
-      }
-      if (maxValue !== undefined && currentVal > maxValue) {
-        blockedReasons.push(`${c.stat} <= ${maxValue} (current: ${currentVal})`)
-      }
-      continue
-    }
-
-    if (!statDef) continue
-    const currentRange = getCurrentRange(statDef, currentVal)
-    const currentState = currentRange?.state
-    if (currentState === undefined) continue
-    if (c.min !== undefined && currentState < c.min) {
-      blockedReasons.push(`${c.stat} state >= ${c.min} (current: ${currentState}, value: ${currentVal})`)
-    }
-    if (c.max !== undefined && currentState > c.max) {
-      blockedReasons.push(`${c.stat} state <= ${c.max} (current: ${currentState}, value: ${currentVal})`)
-    }
-  }
-
-  for (const cp of clusterProjects) {
-    const completed = (state.completedProjects.get(cp.id) ?? 0) > 0
-    if (completed && cp.removedProjects.includes(project.id)) {
-      blockedReasons.push(`depends: ${cp.name || cp.nameId} (removed)`)
-    }
-    const cpRemoved = clusterProjects.some(
-      cp2 => (state.completedProjects.get(cp2.id) ?? 0) > 0 && cp2.removedProjects.includes(cp.id)
-    )
-    if (!completed && !cpRemoved && cp.blockedProjects.includes(project.id)) {
-      blockedReasons.push(`depends: ${cp.name || cp.nameId} (blocking)`)
-    }
-    if (!completed && !cpRemoved && cp.blockedGroups.includes(project.group)) {
-      blockedReasons.push(`depends: ${cp.name || cp.nameId} (blocking_group)`)
-    }
-  }
 
   const clusterPids = new Set(clusterProjects.map(p => p.id))
-
-  const projectPreds = project.predecessors.filter(p => {
-    if (p.type !== 'project') return false
-    return clusterPids.has(p.ref)
-  })
-  const anyPreds = projectPreds.filter(p => p.any)
-  const allPreds = projectPreds.filter(p => !p.any)
-  const unmetProjectPreds: Predecessor[] = []
-
-  if (anyPreds.length > 0) {
-    const anyMet = anyPreds.some(p => (state.completedProjects.get(p.ref) ?? 0) > 0)
-    if (!anyMet) {
-      unmetProjectPreds.push(...anyPreds)
-    }
-  }
-
-  for (const pred of allPreds) {
-    if ((state.completedProjects.get(pred.ref) ?? 0) <= 0) {
-      unmetProjectPreds.push(pred)
-    }
-  }
-
-  if (unmetProjectPreds.length > 0) {
-    const refs = unmetProjectPreds.map(p => {
-      const pp = projectMap.get(p.ref)
-      return pp ? (pp.name || pp.nameId) : p.ref
-    })
-    const hasAnyPreds = anyPreds.length > 0
-    const hasAllPreds = allPreds.length > 0
-    if (hasAnyPreds && !hasAllPreds) {
-      blockedReasons.push(`depends_any: ${refs.join(' | ')}`)
-    } else if (!hasAnyPreds && hasAllPreds) {
-      blockedReasons.push(`depends_all: ${refs.join(' | ')}`)
-    } else {
-      blockedReasons.push(`depends: ${refs.join(' | ')}`)
-    }
-  }
+  const evaluation = evaluateTerraformingProjectExecution(project, state, projectMap, clusterProjects, stats)
+  const blockedReasons = evaluation.reasons
 
   return {
     id: project.id,

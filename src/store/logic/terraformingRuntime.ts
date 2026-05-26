@@ -257,11 +257,9 @@ export function getRuntimeTerraformingProjectIds(
     if (count > 0) visible.add(projectId)
   }
 
-  // SideEffect-triggered projects: when a parent project is completed,
-  // any sideEffect that spawns a project adds that project to the pool
   if (data) {
-    for (const [projectId, count] of completedProjects) {
-      if (count <= 0) continue
+    const baseVisible = new Set(visible)
+    for (const projectId of [...baseVisible, ...completedProjects.keys()]) {
       const project = data.projects.find(p => p.id === projectId)
       if (!project?.sideEffects) continue
       for (const se of project.sideEffects) {

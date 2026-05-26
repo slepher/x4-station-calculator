@@ -1187,6 +1187,26 @@
           "any": false
         }
       ],
+      "dependencies": {
+        "all": [
+          {
+            "completed": "bio_toxicfruit_genemod"
+          },
+          {
+            "completed": "bio_toxicfruit_cull"
+          },
+          {
+            "any": [
+              {
+                "notCompleted": "ind_refineries_cheap"
+              },
+              {
+                "completed": "ind_refineries_retrofit"
+              }
+            ]
+          }
+        ]
+      },
       "name": "Clean Up Toxins",
       "description": "Now that the sources of toxins have been dealt with, we need to clean up the damage that's been done. It won't come cheap, but at least we'll be able to breathe the air."
     },
@@ -1255,13 +1275,10 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [
-        {
-          "ref": "agr_fertilize",
-          "type": "project",
-          "any": false
-        }
-      ],
+      "predecessors": [],
+      "dependencies": {
+        "completed": "agr_fertilize"
+      },
       "name": "Fix Atmospheric Nitrogen",
       "description": "Bacteria that capture nitrogen gas and turn it into forms usable by plants are an essential part of a healthy biosphere. With a little bit of specialised machinery, a moderate amount of energy, and a whole lot of hydrogen, we can generate the heat and pressure required to fix large amounts of atmospheric nitrogen as ammonia, measurably reducing the atmospheric pressure."
     },
@@ -1816,6 +1833,9 @@
       "blockedProjects": [],
       "blockedGroups": [],
       "predecessors": [],
+      "dependencies": {
+        "notCompleted": "bio_jumpstart"
+      },
       "name": "Tailored Microbes",
       "description": "It will be a considerable effort, but we can genetically engineer an ecosystem of microbes that is specifically designed to thrive in this world's environment."
     },
@@ -1901,6 +1921,9 @@
           "value": 25
         }
       ],
+      "dependencies": {
+        "notCompleted": "bio_tailored"
+      },
       "name": "Jumpstart Microbiome",
       "description": "Why spend money and resources creating the perfect set of organisms when we can make nature do the hard work for us? Sure, basically throwing piles of biomatter around and seeing what sticks isn't very distinguished, but it might just work!"
     },
@@ -1944,7 +1967,13 @@
         "agr_fertilize"
       ],
       "blockedGroups": [],
-      "predecessors": [],
+      "predecessors": [
+        {
+          "ref": "bio_jumpstart",
+          "type": "project",
+          "any": false
+        }
+      ],
       "name": "Microbial Culling",
       "description": "Through careful use of antibiotics, both tailored and wide-spectrum, the microbiome must be curbed before productive use of this world is possible."
     },
@@ -2079,6 +2108,9 @@
       ],
       "blockedGroups": [],
       "predecessors": [],
+      "dependencies": {
+        "notCompleted": "bio_toxicfruit_cull"
+      },
       "name": "Genetically Modify Toxic Fruit",
       "description": "A tailored virus, capable of sophisticated genetic modifications, should result in local fauna no longer releasing toxins into the air."
     },
@@ -2135,6 +2167,9 @@
       ],
       "blockedGroups": [],
       "predecessors": [],
+      "dependencies": {
+        "notCompleted": "bio_toxicfruit_genemod"
+      },
       "name": "Cull Toxic Fruit",
       "description": "We can release parasites that should eat only the toxic fruit. This will require a certain amount of trial and error, though, and may have adverse side-effects."
     },
@@ -2179,7 +2214,13 @@
         "food_staple",
         "food_luxury"
       ],
-      "predecessors": [],
+      "predecessors": [
+        {
+          "ref": "bio_toxicfruit_cull",
+          "type": "project",
+          "any": false
+        }
+      ],
       "name": "Cull Parasites",
       "description": "The parasites have unfortunately adapted to feed on other fruit as well. If we don't get rid of them, we will have a much harder time with agriculture."
     },
@@ -2518,6 +2559,9 @@
           "any": false
         }
       ],
+      "dependencies": {
+        "notCompleted": "ind_refineries_cheap"
+      },
       "name": "Clean Refineries",
       "description": "These fully automated facilities refine locally mined resources into various materials."
     },
@@ -2599,6 +2643,9 @@
           "any": false
         }
       ],
+      "dependencies": {
+        "notCompleted": "ind_refineries_clean"
+      },
       "name": "Cheap Refineries",
       "description": "These fully automated facilities refine locally mined resources into various materials. To keep costs down, they have not been outfitted with emission filters."
     },
@@ -2642,7 +2689,13 @@
         "atm_toxin_cleanup"
       ],
       "blockedGroups": [],
-      "predecessors": [],
+      "predecessors": [
+        {
+          "ref": "ind_refineries_cheap",
+          "type": "project",
+          "any": false
+        }
+      ],
       "name": "Retrofit Emission Filters",
       "description": "Unfortunately the local minerals contain toxic substances that are being released during the refining process. We will have to stop these emissions before attempting a cleanup."
     },
@@ -2779,6 +2832,16 @@
       "blockedProjects": [],
       "blockedGroups": [],
       "predecessors": [],
+      "dependencies": {
+        "any": [
+          {
+            "notCompleted": "bio_toxicfruit_cull"
+          },
+          {
+            "completed": "bio_parasites_cull"
+          }
+        ]
+      },
       "name": "Hydroponics",
       "description": "While sometimes there is no alternative, this method of food production is much more expensive than conventional farming, and yields inferior products as well."
     },
@@ -2845,18 +2908,24 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [
-        {
-          "ref": "bio_tailored",
-          "type": "project",
-          "any": true
-        },
-        {
-          "ref": "bio_jumpstart",
-          "type": "project",
-          "any": true
-        }
-      ],
+      "predecessors": [],
+      "dependencies": {
+        "any": [
+          {
+            "completed": "bio_tailored"
+          },
+          {
+            "all": [
+              {
+                "completed": "bio_jumpstart"
+              },
+              {
+                "completed": "bio_cull"
+              }
+            ]
+          }
+        ]
+      },
       "name": "Fertilise Soil",
       "description": "With a healthy microbiome, we can begin to make the land arable. This requires soil with sufficient drainage, the right pH, necessary nutrients in plant-accessible form, and all of that at a depth sufficient for roots to take hold. A significant effort, to be sure, but absolutely necessary before any large scale settlement can take place."
     },
@@ -3025,13 +3094,24 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [
-        {
-          "ref": "agr_fertilize",
-          "type": "project",
-          "any": false
-        }
-      ],
+      "predecessors": [],
+      "dependencies": {
+        "all": [
+          {
+            "completed": "agr_fertilize"
+          },
+          {
+            "any": [
+              {
+                "notCompleted": "bio_toxicfruit_cull"
+              },
+              {
+                "completed": "bio_parasites_cull"
+              }
+            ]
+          }
+        ]
+      },
       "name": "Wheat Fields",
       "description": "While these plants can have a beneficial effect on the global ecology, their main purpose is, of course, feeding the human population."
     },
@@ -3118,13 +3198,24 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [
-        {
-          "ref": "agr_fertilize",
-          "type": "project",
-          "any": false
-        }
-      ],
+      "predecessors": [],
+      "dependencies": {
+        "all": [
+          {
+            "completed": "agr_fertilize"
+          },
+          {
+            "any": [
+              {
+                "notCompleted": "bio_toxicfruit_cull"
+              },
+              {
+                "completed": "bio_parasites_cull"
+              }
+            ]
+          }
+        ]
+      },
       "name": "Sunrise Flower Fields",
       "description": "While these plants can have a beneficial effect on the global ecology, their main purpose is, of course, feeding the Teladi population."
     },
@@ -3211,13 +3302,24 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [
-        {
-          "ref": "agr_fertilize",
-          "type": "project",
-          "any": false
-        }
-      ],
+      "predecessors": [],
+      "dependencies": {
+        "all": [
+          {
+            "completed": "agr_fertilize"
+          },
+          {
+            "any": [
+              {
+                "notCompleted": "bio_toxicfruit_cull"
+              },
+              {
+                "completed": "bio_parasites_cull"
+              }
+            ]
+          }
+        ]
+      },
       "name": "Soja Bean Fields",
       "description": "While these plants can have a beneficial effect on the global ecology, their main purpose is, of course, feeding the Paranid population."
     },
@@ -3298,13 +3400,24 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [
-        {
-          "ref": "agr_fertilize",
-          "type": "project",
-          "any": false
-        }
-      ],
+      "predecessors": [],
+      "dependencies": {
+        "all": [
+          {
+            "completed": "agr_fertilize"
+          },
+          {
+            "any": [
+              {
+                "notCompleted": "bio_toxicfruit_cull"
+              },
+              {
+                "completed": "bio_parasites_cull"
+              }
+            ]
+          }
+        ]
+      },
       "name": "Spice Fields",
       "description": "Spices are an absolutely essential component of any well-made meal."
     },
@@ -3380,18 +3493,24 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [
-        {
-          "ref": "bio_toxicfruit_genemod",
-          "type": "project",
-          "any": true
-        },
-        {
-          "ref": "bio_toxicfruit_cull",
-          "type": "project",
-          "any": true
-        }
-      ],
+      "predecessors": [],
+      "dependencies": {
+        "any": [
+          {
+            "completed": "bio_toxicfruit_genemod"
+          },
+          {
+            "all": [
+              {
+                "completed": "bio_toxicfruit_cull"
+              },
+              {
+                "completed": "bio_parasites_cull"
+              }
+            ]
+          }
+        ]
+      },
       "name": "Vineyards",
       "description": "Several local grapes are very well suited for being turned into exquisite beverages, alcoholic and otherwise. We can cultivate them with relatively little effort."
     },
@@ -6006,13 +6125,10 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [
-        {
-          "ref": "$Predecessor + $Index",
-          "type": "project",
-          "any": true
-        }
-      ],
+      "predecessors": [],
+      "dependencies": {
+        "completed": "$Predecessor + $Index"
+      },
       "name": "Claim District",
       "description": "Using a system of precisely pulsed EMP bursts, we can disable the Xenon units in this area and then destroy them with targeted bombings. This leaves the infrastructure intact for potential future use."
     },
@@ -6048,13 +6164,10 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [
-        {
-          "ref": "$Predecessor + $Index",
-          "type": "project",
-          "any": true
-        }
-      ],
+      "predecessors": [],
+      "dependencies": {
+        "completed": "$Predecessor + $Index"
+      },
       "name": "Destroy District",
       "description": "We can level this district with a considerable quantity of explosives. It may be cheaper than the alternative, and make it harder for the Xenon to retake control, but it will also mean the loss of very useful infrastructure."
     },
@@ -6252,23 +6365,20 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [
-        {
-          "ref": "xen_dis_admin' + $Index",
-          "type": "project",
-          "any": true
-        },
-        {
-          "ref": "xen_dis_ind' + $Index",
-          "type": "project",
-          "any": true
-        },
-        {
-          "ref": "xen_dis_rec' + $Index",
-          "type": "project",
-          "any": true
-        }
-      ],
+      "predecessors": [],
+      "dependencies": {
+        "any": [
+          {
+            "completed": "xen_dis_admin' + $Index"
+          },
+          {
+            "completed": "xen_dis_ind' + $Index"
+          },
+          {
+            "completed": "xen_dis_rec' + $Index"
+          }
+        ]
+      },
       "name": "Subvert AGI Core",
       "description": "Our coding experts say that they have devised a theoretical method of sending remote commands to the Xenon AGI core. Due to its inherent mutable nature, they are unable to predict the success of any given attempt, and have just given me an estimation of \"more likely than rolling a crit in Gunners & Goners\". If successful, we will tell the AGI and all of its drones to self-delete, leaving the entire area Xenon-free."
     },
@@ -6304,23 +6414,20 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [
-        {
-          "ref": "xen_dis_admin' + $Index",
-          "type": "project",
-          "any": true
-        },
-        {
-          "ref": "xen_dis_ind' + $Index",
-          "type": "project",
-          "any": true
-        },
-        {
-          "ref": "xen_dis_rec' + $Index",
-          "type": "project",
-          "any": true
-        }
-      ],
+      "predecessors": [],
+      "dependencies": {
+        "any": [
+          {
+            "completed": "xen_dis_admin' + $Index"
+          },
+          {
+            "completed": "xen_dis_ind' + $Index"
+          },
+          {
+            "completed": "xen_dis_rec' + $Index"
+          }
+        ]
+      },
       "name": "Detonate Reactor",
       "description": "Now that we have access, it just takes the push of a button to level the entire area, and all Xenon presence within it. This will destroy all connected districts, so we'll have to start from scratch if we aim to have people living here."
     },
@@ -6554,13 +6661,24 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [
-        {
-          "ref": "agr_fertilize",
-          "type": "project",
-          "any": false
-        }
-      ],
+      "predecessors": [],
+      "dependencies": {
+        "all": [
+          {
+            "completed": "agr_fertilize"
+          },
+          {
+            "any": [
+              {
+                "notCompleted": "bio_toxicfruit_cull"
+              },
+              {
+                "completed": "bio_parasites_cull"
+              }
+            ]
+          }
+        ]
+      },
       "name": "Scruffin Fields",
       "description": "While these plants can have a beneficial effect on the global ecology, their main purpose is, of course, feeding the Split population."
     },
@@ -6956,13 +7074,10 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [
-        {
-          "ref": "ter_jumpstart_currents",
-          "type": "project",
-          "any": false
-        }
-      ],
+      "predecessors": [],
+      "dependencies": {
+        "completed": "ter_jumpstart_currents"
+      },
       "name": "Hydro Power",
       "description": "We can repurpose the biomechanical jets, used to jumpstart the ocean currents, into power-generating turbines."
     },
@@ -7065,13 +7180,11 @@
           "ref": "bio_reconstruct_genes",
           "type": "project",
           "any": false
-        },
-        {
-          "ref": "ter_jumpstart_currents",
-          "type": "project",
-          "any": false
         }
       ],
+      "dependencies": {
+        "completed": "ter_jumpstart_currents"
+      },
       "name": "Reintroduce Native Microbiome",
       "description": "A global system of adaptive incubators continually clones millions of species of microbes, reacting to local developments in an effort to reach a final equilibrium. Once the incubators have done their job, we will send a signal for them to decompose."
     },
@@ -7224,13 +7337,11 @@
           "ref": "bio_reconstruct_genes",
           "type": "project",
           "any": false
-        },
-        {
-          "ref": "ter_jumpstart_currents",
-          "type": "project",
-          "any": false
         }
       ],
+      "dependencies": {
+        "completed": "ter_jumpstart_currents"
+      },
       "name": "Reintroduce Native Fauna",
       "description": "We gradually introduce groups of interconnected species, letting their populations stabilise before moving on to the next group. This is a slow process, to be sure, but one that mitigates most risks and all but guarantees the desired outcome."
     },
@@ -7388,13 +7499,24 @@
       "removedProjects": [],
       "blockedProjects": [],
       "blockedGroups": [],
-      "predecessors": [
-        {
-          "ref": "bio_reintroduce_flora",
-          "type": "project",
-          "any": false
-        }
-      ],
+      "predecessors": [],
+      "dependencies": {
+        "all": [
+          {
+            "completed": "bio_reintroduce_flora"
+          },
+          {
+            "any": [
+              {
+                "notCompleted": "bio_toxicfruit_cull"
+              },
+              {
+                "completed": "bio_parasites_cull"
+              }
+            ]
+          }
+        ]
+      },
       "name": "Plankton Fields",
       "description": "While these plants can have a beneficial effect on the global ecology, their main purpose is, of course, to feed the Boron population."
     },

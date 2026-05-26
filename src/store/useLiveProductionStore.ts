@@ -523,6 +523,13 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     persistTerraformingLogs(clusterId, log)
   }
 
+  function normalizeTerraformingExecutionLog(clusterId: string, entries: TerraformingExecutionEntry[]): TerraformingExecutionEntry[] {
+    return entries.map((entry) => ({
+      id: entry.id || nextTerraformingExecutionId(clusterId),
+      projectId: entry.projectId,
+    }))
+  }
+
   function nextTerraformingExecutionId(clusterId: string): string {
     const nextSeq = (terraformingExecutionSeqByCluster.value[clusterId] ?? 0) + 1
     terraformingExecutionSeqByCluster.value = {
@@ -1658,6 +1665,12 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     setTerraformingExecutionLogForCluster(clusterId, nextLog)
   }
 
+  function replaceTerraformingExecutionLog(entries: TerraformingExecutionEntry[]) {
+    const clusterId = terraformingSelectedClusterId.value
+    if (!clusterId) return
+    setTerraformingExecutionLogForCluster(clusterId, normalizeTerraformingExecutionLog(clusterId, entries))
+  }
+
   function clearTerraformingExecutionQueue() {
     const clusterId = terraformingSelectedClusterId.value
     if (!clusterId) return
@@ -2264,6 +2277,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     appendTerraformingProjectExecution,
     setTerraformingProjectCount,
     removeTerraformingExecutionEntry,
+    replaceTerraformingExecutionLog,
     clearTerraformingExecutionQueue,
     setTerraformingHousingBuilt,
     gameDataMaps: computed(() => gameData.maps)

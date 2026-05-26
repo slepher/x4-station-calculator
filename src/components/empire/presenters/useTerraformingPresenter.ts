@@ -1,4 +1,4 @@
-import { computed, type ComputedRef } from 'vue'
+import { computed, ref, type ComputedRef } from 'vue'
 import type {
   ClusterObjective,
   DeliveryShip,
@@ -10,6 +10,7 @@ import type {
   TerraformingCluster,
   TerraformingData,
   TerraformingProject,
+  TerraformingProjectDependency,
   TerraformingStat,
   TerraformingState,
 } from '@/store/logic/terraformingTaskResolver'
@@ -19,6 +20,7 @@ import {
   resolveAvailableTasks,
   resolveTerraformingText,
   resolveWithReplaces,
+  evaluateTerraformingProjectExecution,
   type I18nLookup
 } from '@/store/logic/terraformingTaskResolver'
 import {
@@ -96,10 +98,17 @@ export interface TerraformingEffectItem {
   text: string
 }
 
+export interface TerraformingDependencyLineModel {
+  label: string
+  value: string
+  blocked: boolean
+}
+
 export interface TerraformingTaskNodeDisplay {
   name: string
   effects: string
   blockedReasonLines: string[]
+  dependencyLines: TerraformingDependencyLineModel[]
   statLines: TerraformingStatLineModel[]
   effectItems: TerraformingEffectItem[]
 }
@@ -166,9 +175,39 @@ export interface TerraformingExecutionTimelineEntry {
   blockedReason: string | null
 }
 
+export type TerraformingDraftEntryState = 'disabled' | 'enabled-valid' | 'enabled-invalid'
+export type TerraformingDraftRepeatRole = 'single' | 'first' | 'duplicate'
+
+export interface TerraformingDraftExecutionEntry extends TerraformingExecutionEntry {
+  enabled: boolean
+  source: 'committed' | 'draft'
+}
+
+export interface TerraformingDraftTimelineEntry {
+  id: string
+  order: number
+  projectId: string
+  projectName: string
+  projectGroupName: string
+  enabled: boolean
+  state: TerraformingDraftEntryState
+  repeatRole: TerraformingDraftRepeatRole
+  reasons: string[]
+  dependencies: string[]
+  statLines: TerraformingStatLineModel[]
+}
+
+export interface TerraformingQueueEditState {
+  editing: ComputedRef<boolean>
+  canComplete: ComputedRef<boolean>
+  invalidCount: ComputedRef<number>
+  draftEntries: ComputedRef<TerraformingDraftTimelineEntry[]>
+}
+
 export interface TerraformingResourcePanelProps {
   selectedClusterId: ComputedRef<string | null>
   executionTimeline: ComputedRef<TerraformingExecutionTimelineEntry[]>
+  queueEditState: TerraformingQueueEditState
   getCancelValidation: (entryId: string) => TerraformingCancelValidation
   deliveryShipMap: ComputedRef<Map<string, DeliveryShip>>
   hqBuildDocks: ComputedRef<{ totalSlots: number } | null>
@@ -187,6 +226,16 @@ export interface TerraformingPresenterEmits {
   setProjectCount: (projectId: string, count: number) => void
   cancelExecution: (entryId: string) => void
   clearExecutionQueue: () => void
+  startQueueEdit: () => void
+  cancelQueueEdit: () => void
+  completeQueueEdit: () => void
+  setDraftEntryEnabled: (entryId: string, enabled: boolean) => void
+  deleteDraftEntry: (entryId: string) => void
+  copyDraftEntry: (entryId: string) => void
+  moveDraftEntry: (entryId: string, targetIndex: number) => void
+  reorderDraftEntries: (entries: TerraformingDraftTimelineEntry[]) => void
+  disableAllDraftEntries: () => void
+  enableAllDraftEntries: () => void
   setHousingBuilt: (count: number) => void
 }
 
@@ -213,6 +262,7 @@ export interface TerraformingPresenterStore {
   appendTerraformingProjectExecution: (projectId: string, count?: number) => void
   setTerraformingProjectCount: (projectId: string, count: number) => void
   removeTerraformingExecutionEntry: (entryId: string) => void
+  replaceTerraformingExecutionLog: (entries: TerraformingExecutionEntry[]) => void
   clearTerraformingExecutionQueue: () => void
   setTerraformingHousingBuilt: (count: number) => void
   mapsClusters: Record<string, X4MapCluster>
@@ -753,8 +803,153 @@ function computeCumulativeRebates(
   return { entries, aggregatedByGroup: aggregated }
 }
 
+function translateEvaluationReasons(
+  reasons: string[],
+  data: TerraformingData,
+  i18nLookup: I18nLookup,
+): string[] {
+  const tDepends = i18nLookup('terraforming.depends') || 'Needs'
+  const tDependsAny = i18nLookup('terraforming.dependsAny') || 'Any of'
+  const tDependsAll = i18nLookup('terraforming.dependsAll') || 'All of'
+  const tRemoved = i18nLookup('terraforming.removed') || 'Removed'
+  const tBlocking = i18nLookup('terraforming.blocking') || 'Blocking'
+  const tBlockingGroup = i18nLookup('terraforming.blocking_group') || 'Blocking Group'
+
+  return reasons.map(reason => {
+    let s = reason.replace(/\{[^}]+\}/g, match => resolveTerraformingText(match, data, i18nLookup))
+
+    s = s.replace(/^depends_any: /, `${tDependsAny}: `)
+    s = s.replace(/^depends_all: /, `${tDependsAll}: `)
+    s = s.replace(/(^| \| | \+ )depends: /g, `$1${tDepends}: `)
+    s = s.replace(/^depends: /, `${tDepends}: `)
+
+    s = s.replace(/ \(removed\)/g, ` (${tRemoved})`)
+    s = s.replace(/ \(blocking\)/g, ` (${tBlocking})`)
+    s = s.replace(/ \(blocking_group\)/g, ` (${tBlockingGroup})`)
+
+    return s
+  })
+}
+
+function formatDependencyExpression(
+  dependency: TerraformingProjectDependency | undefined,
+  projectNames: Map<string, string>,
+  labels: { mutuallyExclusive: string },
+): string[] {
+  if (!dependency) return []
+  if ('all' in dependency) {
+    return dependency.all.flatMap(child => formatDependencyExpression(child, projectNames, labels))
+  }
+  if ('any' in dependency) {
+    const branchLabels = dependency.any
+      .map(child => formatDependencyExpression(child, projectNames, labels).join(' + '))
+      .filter(label => label.length > 0)
+    return branchLabels.length > 0 ? [branchLabels.join(' | ')] : []
+  }
+  if ('completed' in dependency) return [projectNames.get(dependency.completed) || dependency.completed]
+  if ('notCompleted' in dependency) return [`${labels.mutuallyExclusive}: ${projectNames.get(dependency.notCompleted) || dependency.notCompleted}`]
+  if ('groupCompleted' in dependency) return []
+  if ('groupNotCompleted' in dependency) return []
+  return []
+}
+
+function projectDisplayName(projectId: string, projectNames: Map<string, string>): string {
+  const displayName = projectNames.get(projectId)
+  if (displayName !== undefined) return displayName
+  return projectId
+}
+
+function formatDependencyBranchText(
+  line: TerraformingDependencyLineModel,
+  dependsLabel: string,
+): string {
+  if (line.label === dependsLabel) return line.value
+  return `${line.label}: ${line.value}`
+}
+
+function formatDependencyExpressionLines(
+  dependency: TerraformingProjectDependency | undefined,
+  projectNames: Map<string, string>,
+  labels: { depends: string; anyOf: string; mutuallyExclusive: string },
+  blocked: boolean,
+): TerraformingDependencyLineModel[] {
+  if (!dependency) return []
+  if ('all' in dependency) {
+    return dependency.all.flatMap(child => formatDependencyExpressionLines(child, projectNames, labels, blocked))
+  }
+  if ('any' in dependency) {
+    const branchLabels = dependency.any
+      .map(child => formatDependencyExpressionLines(child, projectNames, labels, blocked)
+        .map(line => formatDependencyBranchText(line, labels.depends))
+        .join(' + '))
+      .filter(label => label.length > 0)
+    if (branchLabels.length === 0) return []
+    return [{
+      label: labels.depends,
+      value: `${labels.anyOf}${branchLabels.join(' | ')}`,
+      blocked,
+    }]
+  }
+  if ('completed' in dependency) {
+    return [{
+      label: labels.depends,
+      value: projectDisplayName(dependency.completed, projectNames),
+      blocked,
+    }]
+  }
+  if ('notCompleted' in dependency) {
+    return [{
+      label: labels.mutuallyExclusive,
+      value: projectDisplayName(dependency.notCompleted, projectNames),
+      blocked,
+    }]
+  }
+  if ('groupCompleted' in dependency) return []
+  if ('groupNotCompleted' in dependency) return []
+  return []
+}
+
+function formatPredecessorDependencyLines(
+  predecessors: TaskNode['predecessors'],
+  projectNames: Map<string, string>,
+  labels: { depends: string; anyOf: string },
+  blocked: boolean,
+): TerraformingDependencyLineModel[] {
+  const projectPreds = predecessors.filter(pred => pred.type === 'project')
+  if (projectPreds.length === 0) return []
+
+  const anyPreds = projectPreds.filter(pred => pred.any)
+  const allPreds = projectPreds.filter(pred => !pred.any)
+  const lines: TerraformingDependencyLineModel[] = []
+
+  if (anyPreds.length > 0) {
+    lines.push({
+      label: labels.depends,
+      value: `${labels.anyOf}${anyPreds.map(pred => projectDisplayName(pred.ref, projectNames)).join(' | ')}`,
+      blocked,
+    })
+  }
+
+  for (const pred of allPreds) {
+    lines.push({
+      label: labels.depends,
+      value: projectDisplayName(pred.ref, projectNames),
+      blocked,
+    })
+  }
+
+  return lines
+}
+
+function isRepeatable(project: TerraformingProject | undefined): boolean {
+  return (project?.repeatCooldown ?? null) !== null
+}
+
 export function useTerraformingPresenter(store: TerraformingPresenterStore): UseTerraformingPresenterReturn {
   const vI18nLookup: I18nLookup = (key: string) => (i18n.global.t(key) as string) || ''
+  const isQueueEditing = ref(false)
+  const draftExecutionLog = ref<TerraformingDraftExecutionEntry[]>([])
+  const draftSequence = ref(0)
 
   const hqArchiveStation = computed(() => store.terraformingHqArchiveStation.value)
 
@@ -776,6 +971,11 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
   const selectedClusterId = computed<string | null>(() => {
     return store.terraformingSelectedClusterId.value
   })
+
+  function nextDraftId(): string {
+    draftSequence.value += 1
+    return `draft-${draftSequence.value}`
+  }
 
   const clusterDisplayNames = computed<Map<string, string>>(() => {
     const map = new Map<string, string>()
@@ -812,7 +1012,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     const cluster = store.terraformingSelectedCluster.value
     if (!cluster || !cluster.objectives) return []
     const data = store.terraformingData.value
-    const currentStats = store.terraformingCurrentStats.value
+    const currentStats = effectiveCurrentStats.value
     const completedProjects = store.terraformingCompletedProjects.value
     const hqClusterId = store.terraformingHqClusterId.value
     const hqArchive = store.terraformingHqArchiveStation.value
@@ -876,17 +1076,123 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     })
   })
 
+  function buildRuntimeClusterForReplay(
+    cluster: TerraformingCluster,
+    stats: Record<string, number>,
+    completedProjects: Map<string, number>,
+    data: TerraformingData,
+  ): { runtimeCluster: TerraformingCluster; clusterProjects: TerraformingProject[] } {
+    const runtimeProjectIds = getRuntimeTerraformingProjectIds(cluster, stats, completedProjects, data)
+    const runtimeCluster: TerraformingCluster = {
+      ...cluster,
+      projectIds: runtimeProjectIds,
+    }
+    const pidSet = new Set(runtimeProjectIds)
+    return {
+      runtimeCluster,
+      clusterProjects: data.projects.filter(project => pidSet.has(project.id)),
+    }
+  }
+
+  const draftReplayEntries = computed<TerraformingDraftTimelineEntry[]>(() => {
+    const data = store.terraformingData.value
+    const cluster = store.terraformingSelectedCluster.value
+    if (!data || !cluster) return []
+
+    let completedProjects = new Map<string, number>()
+    const entries: TerraformingDraftTimelineEntry[] = []
+    const projectNames = projectDisplayNames.value
+    const translatedGroupNames = groupNames.value
+
+    for (let index = 0; index < draftExecutionLog.value.length; index += 1) {
+      const entry = draftExecutionLog.value[index]!
+      const project = projectMap.value.get(entry.projectId)
+      const beforeStats = computeTerraformingRuntimeStats(cluster, completedProjects, data)
+      const { clusterProjects } = buildRuntimeClusterForReplay(cluster, beforeStats, completedProjects, data)
+      const evaluation = entry.enabled
+        ? evaluateTerraformingProjectExecution(project, { stats: beforeStats, completedProjects }, projectMap.value, clusterProjects, data.stats)
+        : { valid: false, reasons: [] }
+      const relevantStatIds = project ? getProjectSnapshotStatIds(project) : []
+      const nextCompletedProjects = new Map(completedProjects)
+      if (entry.enabled && evaluation.valid) {
+        nextCompletedProjects.set(entry.projectId, (nextCompletedProjects.get(entry.projectId) ?? 0) + 1)
+      }
+      const afterStats = computeTerraformingRuntimeStats(cluster, nextCompletedProjects, data)
+      const statLines = relevantStatIds
+        .filter(statId => statId in beforeStats)
+        .map(statId => ({
+          statId,
+          statName: statDisplayNames.value.get(statId) || statId,
+          beforeValue: beforeStats[statId] ?? 0,
+          afterValue: afterStats[statId] ?? 0,
+        }))
+        .filter(snapshot => snapshot.beforeValue !== snapshot.afterValue)
+        .map(snapshot => buildTimelineStatLineModel(snapshot, data))
+        .filter((model): model is TerraformingStatLineModel => model !== null)
+
+      const previous = draftExecutionLog.value[index - 1]
+      const next = draftExecutionLog.value[index + 1]
+      let repeatRole: TerraformingDraftRepeatRole = 'single'
+      if (isRepeatable(project) && (previous?.projectId === entry.projectId || next?.projectId === entry.projectId)) {
+        repeatRole = previous?.projectId === entry.projectId ? 'duplicate' : 'first'
+      }
+
+      entries.push({
+        id: entry.id,
+        order: index + 1,
+        projectId: entry.projectId,
+        projectName: projectNames.get(entry.projectId) || project?.name || entry.projectId,
+        projectGroupName: translatedGroupNames.get(project?.group || '') || project?.group || '',
+        enabled: entry.enabled,
+        state: !entry.enabled ? 'disabled' : evaluation.valid ? 'enabled-valid' : 'enabled-invalid',
+        repeatRole,
+        reasons: translateEvaluationReasons(evaluation.reasons, data, vI18nLookup),
+        dependencies: formatDependencyExpression(project?.dependencies, projectNames, {
+          mutuallyExclusive: vI18nLookup('terraforming.mutuallyExclusive') || 'Mutually exclusive',
+        }),
+        statLines,
+      })
+
+      completedProjects = nextCompletedProjects
+    }
+
+    return entries
+  })
+
+  const draftCompletedProjectCounts = computed<Map<string, number>>(() => {
+    const counts = new Map<string, number>()
+    for (const entry of draftReplayEntries.value) {
+      if (entry.state !== 'enabled-valid') continue
+      counts.set(entry.projectId, (counts.get(entry.projectId) ?? 0) + 1)
+    }
+    return counts
+  })
+
+  const effectiveCompletedProjects = computed<Map<string, number>>(() => {
+    return isQueueEditing.value ? draftCompletedProjectCounts.value : store.terraformingCompletedProjects.value
+  })
+
+  const effectiveCurrentStats = computed<Record<string, number>>(() => {
+    const data = store.terraformingData.value
+    const cluster = store.terraformingSelectedCluster.value
+    if (!data || !cluster) return store.terraformingCurrentStats.value
+    return computeTerraformingRuntimeStats(cluster, effectiveCompletedProjects.value, data)
+  })
+
   const taskTree = computed<TaskTree | null>(() => {
     const data = store.terraformingData.value
     const cluster = store.terraformingSelectedCluster.value
     if (!data || !cluster) return null
+    const completedProjects = effectiveCompletedProjects.value
+    const stats = effectiveCurrentStats.value
+    const runtimeProjectIds = getRuntimeTerraformingProjectIds(cluster, stats, completedProjects, data)
     const runtimeCluster: TerraformingCluster = {
       ...cluster,
-      projectIds: [...store.terraformingRuntimeProjectIds.value],
+      projectIds: runtimeProjectIds,
     }
     const state: TerraformingState = {
-      stats: store.terraformingCurrentStats.value,
-      completedProjects: store.terraformingCompletedProjects.value
+      stats,
+      completedProjects,
     }
     return resolveAvailableTasks(runtimeCluster, state, data)
   })
@@ -905,7 +1211,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
   })
 
   const completedProjectCounts = computed<Map<string, number>>(() => {
-    return new Map(store.terraformingCompletedProjects.value)
+    return new Map(effectiveCompletedProjects.value)
   })
 
   const projectMap = computed<Map<string, TerraformingProject>>(() => {
@@ -944,24 +1250,38 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
       current: vI18nLookup('terraforming.current') || 'current',
       anyOf: vI18nLookup('terraforming.anyOf') || 'Any ',
       setback: vI18nLookup('terraforming.setback') || 'setback',
+      mutuallyExclusive: vI18nLookup('terraforming.mutuallyExclusive') || 'Mutually exclusive',
     }
 
     const visit = (node: TaskNode) => {
       const project = data.projects.find(item => item.id === node.id)
       if (!project) return
+      const blockedReasonLines = translateBlockedReasonLines(node.blockedReason, data, projectNames, statNames, {
+        depends: uiLabels.depends,
+        current: uiLabels.current,
+        anyOf: uiLabels.anyOf,
+      })
+      const dependencyBlocked = node.blockedReason ? node.blockedReason.includes('depends') : false
       displays.set(node.id, {
         name: projectNames.get(node.id) || node.name,
         effects: translateTaskEffects(node.effects, statNames, { min: uiLabels.min, max: uiLabels.max }),
-        blockedReasonLines: translateBlockedReasonLines(node.blockedReason, data, projectNames, statNames, {
-          depends: uiLabels.depends,
-          current: uiLabels.current,
-          anyOf: uiLabels.anyOf,
-        }),
+        blockedReasonLines,
+        dependencyLines: [
+          ...formatPredecessorDependencyLines(node.predecessors, projectNames, {
+            depends: uiLabels.depends,
+            anyOf: uiLabels.anyOf,
+          }, dependencyBlocked),
+          ...formatDependencyExpressionLines(project.dependencies, projectNames, {
+            depends: uiLabels.depends,
+            anyOf: uiLabels.anyOf,
+            mutuallyExclusive: uiLabels.mutuallyExclusive,
+          }, dependencyBlocked),
+        ],
         statLines: buildTaskStatLineModels(
           project,
           data,
-          store.terraformingCurrentStats.value,
-          store.terraformingCompletedProjects.value.get(node.id) ?? 0,
+          effectiveCurrentStats.value,
+          effectiveCompletedProjects.value.get(node.id) ?? 0,
           vI18nLookup,
           { min: uiLabels.min, max: uiLabels.max },
         ),
@@ -988,7 +1308,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
 
   const activeRebates = computed<string[]>(() => {
     const data = store.terraformingData.value
-    const completed = store.terraformingCompletedProjects.value
+    const completed = effectiveCompletedProjects.value
     if (!data) return []
     const wareNames = store.wareNames.value
     const moduleGroupNames = store.moduleGroupNames.value
@@ -1030,7 +1350,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
 
   const statScaleModels = computed<Map<string, TerraformingStatScaleModel>>(() => {
     const data = store.terraformingData.value
-    const currentStats = store.terraformingCurrentStats.value
+    const currentStats = effectiveCurrentStats.value
     const map = new Map<string, TerraformingStatScaleModel>()
     if (!data) return map
 
@@ -1274,32 +1594,23 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
       completedProjects: Map<string, number>,
     ) => {
       const beforeStats = computeTerraformingRuntimeStats(cluster, completedProjects, data)
-      const beforeProjectIds = getRuntimeTerraformingProjectIds(cluster, beforeStats, completedProjects, data)
-      const runtimeCluster: TerraformingCluster = {
-        ...cluster,
-        projectIds: beforeProjectIds,
-      }
-      const tree = resolveAvailableTasks(runtimeCluster, {
-        stats: beforeStats,
-        completedProjects,
-      }, data)
-      return findTaskNodeById(tree, entry.projectId)
+      const { clusterProjects } = buildRuntimeClusterForReplay(cluster, beforeStats, completedProjects, data)
+      return evaluateTerraformingProjectExecution(
+        projectMap.value.get(entry.projectId),
+        { stats: beforeStats, completedProjects },
+        projectMap.value,
+        clusterProjects,
+        data.stats,
+      )
     }
 
     for (let index = 0; index < nextLog.length; index += 1) {
       const entry = nextLog[index]!
-      const node = evaluateEntry(entry, replayCounts)
-      if (!node) {
+      const evaluation = evaluateEntry(entry, replayCounts)
+      if (!evaluation.valid) {
         if (index >= targetIndex) {
           affectedEntryIds.push(entry.id)
-          reasons.push(`${translatedProjectNames.get(entry.projectId) || entry.projectId}: ${vI18nLookup('terraforming.projectUnavailableAfterCancel') || 'Unavailable after cancel'}`)
-        }
-        continue
-      }
-      if (!node.available) {
-        if (index >= targetIndex) {
-          affectedEntryIds.push(entry.id)
-          reasons.push(`${translatedProjectNames.get(entry.projectId) || entry.projectId}: ${node.blockedReason || (vI18nLookup('terraforming.projectBlockedAfterCancel') || 'Blocked after cancel')}`)
+          reasons.push(`${translatedProjectNames.get(entry.projectId) || entry.projectId}: ${translateEvaluationReasons(evaluation.reasons, data, vI18nLookup).join('; ') || (vI18nLookup('terraforming.projectBlockedAfterCancel') || 'Blocked after cancel')}`)
         }
         continue
       }
@@ -1353,6 +1664,137 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     return result
   })
 
+  const invalidDraftCount = computed(() => draftReplayEntries.value.filter(entry => entry.state === 'enabled-invalid').length)
+  const canCompleteQueueEdit = computed(() => isQueueEditing.value && invalidDraftCount.value === 0)
+
+  function startQueueEdit() {
+    draftExecutionLog.value = store.terraformingExecutionLog.value.map(entry => ({
+      ...entry,
+      enabled: true,
+      source: 'committed',
+    }))
+    isQueueEditing.value = true
+  }
+
+  function cancelQueueEdit() {
+    draftExecutionLog.value = []
+    isQueueEditing.value = false
+  }
+
+  function completeQueueEdit() {
+    if (!canCompleteQueueEdit.value) return
+    const committed = draftExecutionLog.value
+      .filter(entry => entry.enabled)
+      .map(entry => ({ id: entry.source === 'committed' ? entry.id : '', projectId: entry.projectId }))
+    store.replaceTerraformingExecutionLog(committed)
+    draftExecutionLog.value = []
+    isQueueEditing.value = false
+  }
+
+  function setDraftEntryEnabled(entryId: string, enabled: boolean) {
+    draftExecutionLog.value = draftExecutionLog.value.map(entry => entry.id === entryId ? { ...entry, enabled } : entry)
+  }
+
+  function deleteDraftEntry(entryId: string) {
+    draftExecutionLog.value = draftExecutionLog.value.filter(entry => entry.id !== entryId)
+  }
+
+  function copyDraftEntry(entryId: string) {
+    const index = draftExecutionLog.value.findIndex(entry => entry.id === entryId)
+    if (index < 0) return
+    const source = draftExecutionLog.value[index]!
+    const project = projectMap.value.get(source.projectId)
+    if (!isRepeatable(project)) return
+    const next = [...draftExecutionLog.value]
+    next.splice(index + 1, 0, {
+      id: nextDraftId(),
+      projectId: source.projectId,
+      enabled: true,
+      source: 'draft',
+    })
+    draftExecutionLog.value = next
+  }
+
+  function moveDraftEntry(entryId: string, targetIndex: number) {
+    const currentIndex = draftExecutionLog.value.findIndex(entry => entry.id === entryId)
+    if (currentIndex < 0) return
+    const next = [...draftExecutionLog.value]
+    const [entry] = next.splice(currentIndex, 1)
+    if (!entry) return
+    const boundedIndex = Math.max(0, Math.min(targetIndex, next.length))
+    next.splice(boundedIndex, 0, entry)
+    draftExecutionLog.value = next
+  }
+
+  function reorderDraftEntries(entries: TerraformingDraftTimelineEntry[]) {
+    const lookup = new Map(draftExecutionLog.value.map(e => [e.id, e]))
+    draftExecutionLog.value = entries
+      .map(e => lookup.get(e.id))
+      .filter((e): e is TerraformingDraftExecutionEntry => e !== undefined)
+  }
+
+  function disableAllDraftEntries() {
+    draftExecutionLog.value = draftExecutionLog.value.map(entry => ({ ...entry, enabled: false }))
+  }
+
+  function enableAllDraftEntries() {
+    draftExecutionLog.value = draftExecutionLog.value.map(entry => ({ ...entry, enabled: true }))
+  }
+
+  function appendDraftProject(projectId: string) {
+    const project = projectMap.value.get(projectId)
+    if (project?.repeatCooldown === null && draftExecutionLog.value.some(entry => entry.projectId === projectId && entry.enabled)) {
+      return
+    }
+    draftExecutionLog.value = [
+      ...draftExecutionLog.value,
+      { id: nextDraftId(), projectId, enabled: true, source: 'draft' },
+    ]
+  }
+
+  function removeLastDraftProject(projectId: string) {
+    const index = [...draftExecutionLog.value].reverse().findIndex(entry => entry.projectId === projectId)
+    if (index < 0) return
+    const actualIndex = draftExecutionLog.value.length - 1 - index
+    const entry = draftExecutionLog.value[actualIndex]
+    if (!entry) return
+    const previous = draftExecutionLog.value[actualIndex - 1]
+    if (previous?.projectId === projectId) {
+      deleteDraftEntry(entry.id)
+      return
+    }
+    setDraftEntryEnabled(entry.id, false)
+  }
+
+  function canAppendCommittedProject(projectId: string): boolean {
+    const data = store.terraformingData.value
+    const cluster = store.terraformingSelectedCluster.value
+    if (!data || !cluster) return false
+    const completedProjects = store.terraformingCompletedProjects.value
+    const stats = store.terraformingCurrentStats.value
+    const { clusterProjects } = buildRuntimeClusterForReplay(cluster, stats, completedProjects, data)
+    const evaluation = evaluateTerraformingProjectExecution(
+      projectMap.value.get(projectId),
+      { stats, completedProjects },
+      projectMap.value,
+      clusterProjects,
+      data.stats,
+    )
+    return evaluation.valid
+  }
+
+  function removeLastCommittedProject(projectId: string) {
+    const log = store.terraformingExecutionLog.value
+    for (let index = log.length - 1; index >= 0; index -= 1) {
+      const entry = log[index]
+      if (!entry || entry.projectId !== projectId) continue
+      const validation = getExecutionCancelValidation(entry.id)
+      if (!validation.canCancel) return
+      store.removeTerraformingExecutionEntry(entry.id)
+      return
+    }
+  }
+
   const props: TerraformingPresenterProps = {
     toolbar: {
       hqStationName,
@@ -1379,7 +1821,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
       completedProjectCounts,
       projectMap,
       projectDisplayNames,
-      currentStats: computed(() => store.terraformingCurrentStats.value),
+      currentStats: effectiveCurrentStats,
       statDisplayNames,
       statScaleModels,
       conditionScaleModels,
@@ -1390,6 +1832,12 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     resourcePanel: {
       selectedClusterId,
       executionTimeline,
+      queueEditState: {
+        editing: computed(() => isQueueEditing.value),
+        canComplete: canCompleteQueueEdit,
+        invalidCount: invalidDraftCount,
+        draftEntries: draftReplayEntries,
+      },
       getCancelValidation: getExecutionCancelValidation,
       deliveryShipMap,
       hqBuildDocks,
@@ -1399,18 +1847,58 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
   const emits: TerraformingPresenterEmits = {
     selectCluster: (clusterId: string) => store.selectTerraformingCluster(clusterId),
     toggleProject: (projectId: string) => {
+      if (isQueueEditing.value) {
+        const currentCount = draftCompletedProjectCounts.value.get(projectId) ?? 0
+        if (currentCount > 0) removeLastDraftProject(projectId)
+        else appendDraftProject(projectId)
+        return
+      }
       const currentCount = store.terraformingCompletedProjects.value.get(projectId) ?? 0
-      store.setTerraformingProjectCount(projectId, currentCount > 0 ? 0 : 1)
+      if (currentCount > 0) {
+        removeLastCommittedProject(projectId)
+      } else if (canAppendCommittedProject(projectId)) {
+        store.appendTerraformingProjectExecution(projectId, 1)
+      }
     },
     setProjectCount: (projectId: string, count: number) => {
-      store.setTerraformingProjectCount(projectId, count)
+      if (isQueueEditing.value) {
+        const currentCount = draftCompletedProjectCounts.value.get(projectId) ?? 0
+        if (count > currentCount) {
+          for (let i = 0; i < count - currentCount; i += 1) appendDraftProject(projectId)
+        } else if (count < currentCount) {
+          for (let i = 0; i < currentCount - count; i += 1) removeLastDraftProject(projectId)
+        }
+        return
+      }
+      const currentCount = store.terraformingCompletedProjects.value.get(projectId) ?? 0
+      if (count > currentCount) {
+        for (let i = 0; i < count - currentCount; i += 1) {
+          if (canAppendCommittedProject(projectId)) store.appendTerraformingProjectExecution(projectId, 1)
+        }
+        return
+      }
+      if (count < currentCount) {
+        for (let i = 0; i < currentCount - count; i += 1) removeLastCommittedProject(projectId)
+      }
     },
     cancelExecution: (entryId: string) => {
+      const validation = getExecutionCancelValidation(entryId)
+      if (!validation.canCancel) return
       store.removeTerraformingExecutionEntry(entryId)
     },
     clearExecutionQueue: () => {
       store.clearTerraformingExecutionQueue()
     },
+    startQueueEdit,
+    cancelQueueEdit,
+    completeQueueEdit,
+    setDraftEntryEnabled,
+    deleteDraftEntry,
+    copyDraftEntry,
+    moveDraftEntry,
+    reorderDraftEntries,
+    disableAllDraftEntries,
+    enableAllDraftEntries,
     setHousingBuilt: (count: number) => {
       store.setTerraformingHousingBuilt(count)
     }

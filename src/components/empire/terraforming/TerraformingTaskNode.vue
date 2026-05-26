@@ -67,15 +67,6 @@ function formatDuration(duration: number | null): string {
   return [hours, minutes, seconds].map(part => String(part).padStart(2, '0')).join(':')
 }
 
-function getDependencyLabel(node: TaskNode, displayNames: Map<string, string>): string {
-  if (!node.predecessors || node.predecessors.length === 0) return ''
-  const projectPreds = node.predecessors.filter((p: any) => p.type === 'project')
-  if (projectPreds.length === 0) return ''
-  const labels = projectPreds.map((p: any) => displayNames.get(p.ref) || p.ref)
-  const prefix = projectPreds[0]!.any ? t('terraforming.anyOf') || 'Any ' : ''
-  return `${t('terraforming.depends') || 'Needs'}: ${prefix}${labels.join(' | ')}`
-}
-
 function getNodeDisplay(projectId: string): TerraformingTaskNodeDisplay | null {
   return props.taskNodeDisplays.get(projectId) || null
 }
@@ -84,23 +75,8 @@ function getNodeName(projectId: string, fallback: string): string {
   return getNodeDisplay(projectId)?.name || fallback
 }
 
-function getBlockedReasonLines(projectId: string, fallback: string | undefined): string[] {
-  const displayLines = getNodeDisplay(projectId)?.blockedReasonLines
-  if (displayLines?.length) return displayLines
-  if (!fallback) return []
-  return fallback.split('; ')
-}
-
-function getDependencyReasonLines(projectId: string, fallback: string | undefined): string[] {
-  return getBlockedReasonLines(projectId, fallback).filter(line => line.startsWith(`${t('terraforming.depends') || 'Needs'}:`))
-}
-
-function hasProjectDependency(node: TaskNode): boolean {
-  return node.predecessors.some((p: any) => p.type === 'project')
-}
-
-function isDependencyBlocked(projectId: string, blockedReason: string | undefined): boolean {
-  return getDependencyReasonLines(projectId, blockedReason).length > 0
+function getDependencyLines(projectId: string) {
+  return getNodeDisplay(projectId)?.dependencyLines || []
 }
 
 function getEffectItems(projectId: string): any[] {
@@ -180,13 +156,15 @@ function getStatusIcon(projectId: string, available: boolean): string {
             {{ item.text }}
           </div>
         </div>
-        <div v-if="hasProjectDependency(node)" class="condition-list">
+        <div v-if="getDependencyLines(node.id).length > 0" class="condition-list">
           <div
+            v-for="(line, i) in getDependencyLines(node.id)"
+            :key="`${node.id}-dependency-${i}`"
             class="condition-dependency"
-            :class="isDependencyBlocked(node.id, node.blockedReason) ? 'blocked' : 'available'"
+            :class="line.blocked ? 'blocked' : 'available'"
           >
-            <span class="dependency-name">{{ t('terraforming.depends') }}</span>
-            <span class="dependency-value">{{ getDependencyLabel(node, projectDisplayNames).replace(`${t('terraforming.depends') || 'Needs'}: `, '') }}</span>
+            <span class="dependency-name">{{ line.label }}</span>
+            <span class="dependency-value">{{ line.value }}</span>
           </div>
         </div>
       </div>

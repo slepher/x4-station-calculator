@@ -96,20 +96,8 @@ function getNodeName(projectId: string, fallback: string): string {
   return getNodeDisplay(projectId)?.name || fallback
 }
 
-function getBlockedReasonLines(projectId: string, fallback: string | undefined): string[] {
-  const displayLines = getNodeDisplay(projectId)?.blockedReasonLines
-  if (displayLines?.length) return displayLines
-  if (!fallback) return []
-  return fallback.split('; ')
-}
-
-function getDependencyReasonLines(projectId: string, fallback: string | undefined): string[] {
-  return getBlockedReasonLines(projectId, fallback).filter(line => line.startsWith(`${t('terraforming.depends') || 'Needs'}:`))
-}
-
-function getDependencyValueFromLine(line: string): string {
-  const prefix = `${t('terraforming.depends') || 'Needs'}: `
-  return line.startsWith(prefix) ? line.slice(prefix.length) : line
+function getDependencyLines(projectId: string) {
+  return getNodeDisplay(projectId)?.dependencyLines || []
 }
 
 function getEffectItems(projectId: string): TerraformingEffectItem[] {
@@ -213,14 +201,15 @@ function getStatLines(projectId: string): TerraformingStatLineModel[] {
                     {{ item.text }}
                   </div>
                 </div>
-                <div v-if="!e.available && getDependencyReasonLines(e.id, e.blockedReason).length > 0" class="condition-list">
+                <div v-if="getDependencyLines(e.id).length > 0" class="condition-list">
                   <div
-                    v-for="(line, i) in getDependencyReasonLines(e.id, e.blockedReason)"
+                    v-for="(line, i) in getDependencyLines(e.id)"
                     :key="`${e.id}-dep-${i}`"
-                    class="condition-dependency blocked"
+                    class="condition-dependency"
+                    :class="line.blocked ? 'blocked' : 'available'"
                   >
-                    <span class="dependency-name">{{ t('terraforming.depends') }}</span>
-                    <span class="dependency-value">{{ getDependencyValueFromLine(line) }}</span>
+                    <span class="dependency-name">{{ line.label }}</span>
+                    <span class="dependency-value">{{ line.value }}</span>
                   </div>
                 </div>
               </div>
