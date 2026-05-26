@@ -720,7 +720,7 @@ function buildEffectItems(
   projectNames: Map<string, string>,
   wareNames: Map<string, string>,
   moduleGroupNames: Map<string, string>,
-  uiLabels: { min: string; max: string; setback: string },
+  uiLabels: { min: string; max: string; setback: string; chance: string },
   i18nLookup: (key: string) => string,
 ): TerraformingEffectItem[] {
   const items: TerraformingEffectItem[] = []
@@ -751,7 +751,7 @@ function buildEffectItems(
   }
 
   for (const se of project.sideEffects) {
-    const parts: string[] = [`${se.chance}%`]
+    const parts: string[] = [`${se.chance}%${uiLabels.chance}`]
     if (se.project) {
       const projName = projectNames.get(se.project) || se.project
       parts.push(`${projName}`)
@@ -834,13 +834,22 @@ function translateEvaluationReasons(
 function formatDependencyExpression(
   dependency: TerraformingProjectDependency | undefined,
   projectNames: Map<string, string>,
-  labels: { mutuallyExclusive: string },
+  labels: { mutuallyExclusive: string; notCompletedBranch: string; completedBranch: string; or: string },
 ): string[] {
   if (!dependency) return []
   if ('all' in dependency) {
     return dependency.all.flatMap(child => formatDependencyExpression(child, projectNames, labels))
   }
   if ('any' in dependency) {
+    const isLeaf = (dep: TerraformingProjectDependency): boolean => 'completed' in dep || 'notCompleted' in dep
+    if (dependency.any.every(isLeaf) && dependency.any.length > 0 && dependency.any.some(d => 'notCompleted' in d)) {
+      const branchStrings = dependency.any.map(child => {
+        if ('notCompleted' in child) return `${labels.notCompletedBranch}${projectNames.get(child.notCompleted) || child.notCompleted}`
+        if ('completed' in child) return `${labels.completedBranch}${projectNames.get(child.completed) || child.completed}`
+        return ''
+      }).filter(s => s.length > 0)
+      return branchStrings.length > 0 ? [branchStrings.join(labels.or)] : []
+    }
     const branchLabels = dependency.any
       .map(child => formatDependencyExpression(child, projectNames, labels).join(' + '))
       .filter(label => label.length > 0)
@@ -859,18 +868,10 @@ function projectDisplayName(projectId: string, projectNames: Map<string, string>
   return projectId
 }
 
-function formatDependencyBranchText(
-  line: TerraformingDependencyLineModel,
-  dependsLabel: string,
-): string {
-  if (line.label === dependsLabel) return line.value
-  return `${line.label}: ${line.value}`
-}
-
 function formatDependencyExpressionLines(
   dependency: TerraformingProjectDependency | undefined,
   projectNames: Map<string, string>,
-  labels: { depends: string; anyOf: string; mutuallyExclusive: string },
+  labels: { depends: string; anyOf: string; mutuallyExclusive: string; notCompletedBranch: string; completedBranch: string; or: string },
   blocked: boolean,
 ): TerraformingDependencyLineModel[] {
   if (!dependency) return []
@@ -878,9 +879,23 @@ function formatDependencyExpressionLines(
     return dependency.all.flatMap(child => formatDependencyExpressionLines(child, projectNames, labels, blocked))
   }
   if ('any' in dependency) {
+    const isLeaf = (dep: TerraformingProjectDependency): boolean => 'completed' in dep || 'notCompleted' in dep
+    if (dependency.any.every(isLeaf) && dependency.any.length > 0 && dependency.any.some(d => 'notCompleted' in d)) {
+      const branchStrings = dependency.any.map(child => {
+        if ('notCompleted' in child) return `${labels.notCompletedBranch}${projectDisplayName(child.notCompleted, projectNames)}`
+        if ('completed' in child) return `${labels.completedBranch}${projectDisplayName(child.completed, projectNames)}`
+        return ''
+      }).filter(s => s.length > 0)
+      if (branchStrings.length === 0) return []
+      return [{
+        label: labels.depends,
+        value: branchStrings.join(labels.or),
+        blocked,
+      }]
+    }
     const branchLabels = dependency.any
       .map(child => formatDependencyExpressionLines(child, projectNames, labels, blocked)
-        .map(line => formatDependencyBranchText(line, labels.depends))
+        .map(line => `${line.label}: ${line.value}`)
         .join(' + '))
       .filter(label => label.length > 0)
     if (branchLabels.length === 0) return []
@@ -1148,7 +1163,10 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
         repeatRole,
         reasons: translateEvaluationReasons(evaluation.reasons, data, vI18nLookup),
         dependencies: formatDependencyExpression(project?.dependencies, projectNames, {
-          mutuallyExclusive: vI18nLookup('terraforming.mutuallyExclusive') || 'Mutually exclusive',
+          mutuallyExclusive: vI18nLookup('terraforming.mutuallyExclusive') || 'Missing',
+          notCompletedBranch: vI18nLookup('terraforming.branch.notCompleted') || 'not ',
+          completedBranch: vI18nLookup('terraforming.branch.completed') || '',
+          or: vI18nLookup('terraforming.or') || ' or ',
         }),
         statLines,
       })
@@ -1250,7 +1268,11 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
       current: vI18nLookup('terraforming.current') || 'current',
       anyOf: vI18nLookup('terraforming.anyOf') || 'Any ',
       setback: vI18nLookup('terraforming.setback') || 'setback',
-      mutuallyExclusive: vI18nLookup('terraforming.mutuallyExclusive') || 'Mutually exclusive',
+      sideEffectChance: vI18nLookup('terraforming.sideEffect.chance') || 'chance',
+      mutuallyExclusive: vI18nLookup('terraforming.mutuallyExclusive') || 'Missing',
+      notCompletedBranch: vI18nLookup('terraforming.branch.notCompleted') || 'not ',
+      completedBranch: vI18nLookup('terraforming.branch.completed') || '',
+      or: vI18nLookup('terraforming.or') || ' or ',
     }
 
     const visit = (node: TaskNode) => {
@@ -1275,6 +1297,9 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
             depends: uiLabels.depends,
             anyOf: uiLabels.anyOf,
             mutuallyExclusive: uiLabels.mutuallyExclusive,
+            notCompletedBranch: uiLabels.notCompletedBranch,
+            completedBranch: uiLabels.completedBranch,
+            or: uiLabels.or,
           }, dependencyBlocked),
         ],
         statLines: buildTaskStatLineModels(
@@ -1292,7 +1317,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
           projectNames,
           store.wareNames.value,
           store.moduleGroupNames.value,
-          { min: uiLabels.min, max: uiLabels.max, setback: uiLabels.setback },
+          { min: uiLabels.min, max: uiLabels.max, setback: uiLabels.setback, chance: uiLabels.sideEffectChance },
           vI18nLookup,
         ),
       })
