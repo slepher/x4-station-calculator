@@ -143,6 +143,12 @@ src/components/empire/
 - 不提前做昂贵未来预测
 - 交给 runtime state 和 resolver 在交互后决定是否合法
 
+补充交互约束：
+
+- 执行按钮、撤销按钮、`X4NumberInput` 保持默认常显
+- 不再采用 hover reveal，以免递归树中的父子 hover 态互相干扰
+- 这些控件属于主操作，不作为次级发现式交互
+
 ### 递归任务节点
 
 任务树渲染已从 `TerraformingTaskList.vue` 内联渲染 + 一层 `node.children` 改为递归组件 `TerraformingTaskNode.vue`：
@@ -151,6 +157,13 @@ src/components/empire/
 - 任意深度的依赖链（如 biosphere: genes → microbes → fauna → megafauna）全部可见
 - 子节点通过 `isChild` prop 获得 `ml-6` 缩进
 - 组件复用了 `toggleProject` / `setProjectCount` emit，父级 `TerraformingTaskList` 透传事件
+
+依赖条目显示规则也固定为：
+
+- 只要项目存在前置依赖，就持续显示依赖条目
+- 依赖条目不再跟随“当前 blockedReason 是否正好是 depends”而消失
+- 若当前确实因依赖阻塞，则显示 blocked 样式
+- 若当前因其他 stat 条件阻塞，依赖条目仍显示 available 样式
 
 ### blocked 状态非叠加样式
 
