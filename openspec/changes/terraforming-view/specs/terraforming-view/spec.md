@@ -2,7 +2,7 @@
 
 ## Purpose
 
-将 terraforming-shell 的 3 列占位布局替换为可交互面板：左列星区列表（accordion + i18n + objectives 进度）、中列任务树（分组 + 交互式完成 + 递归子节点渲染 + x-number-input 计数）、右列执行序列视图（按真实执行顺序逐条展示，支持单条取消与后续合法性校验，支持清空队列）。
+将 terraforming-shell 的 3 列占位布局替换为可交互面板：左列星区列表（accordion + i18n + objectives 进度）、中列任务树（分组 + 交互式完成 + 递归子节点渲染 + x-number-input 计数）、右列执行序列视图（按真实执行顺序逐条展示，支持单条取消与后续合法性校验，支持清空队列）。所有领域状态由 `useTerraformingStore` 提供（见 terraforming-store change），View 层通过 Presenter 组装 UI 数据。
 
 ## ADDED Requirements
 
@@ -44,15 +44,15 @@
 - 翻译后的描述文本 (textId 经 i18n，textReplaces 替换变量为已解析值)
 - 完成标记: 已完成 ✅ / 未完成 ⬜
 
-**并且** 完成判定规则：
+**并且** 完成判定规则（数据来源：`useTerraformingStore`）：
 - `objective.relocate`: HQ 所在 sector 的 `cluster_id` === 当前 terraforming cluster 的 `macro` 去掉 `macro.` 前缀
 - `objective.neutralize`: `terraformingCurrentStats[stat]` >= `stats[i].ranges` 中 `state >= 2` 的最小 `end` 值
 - `objective.build_project`: projectId 在 `completedProjects` 中且计数 > 0
-- `objective.build_housing`: `terraformingHousingBuilt` >= 目标值（从 `cluster.values` 或 textReplaces 提取）
+- `objective.build_housing`: `currentStats.population` >= 目标值（从 `cluster.values` 或 textReplaces 的 `$AMOUNT$` 提取）
 
 ### Requirement: 当前星区药丸标记
 
-**前提** HQ archive station 数据已加载，左列星区列表渲染
+**前提** `useTerraformingStore` 已提供 HQ context（`hqClusterId`、`hqArchiveStation` 等），左列星区列表渲染
 
 **当** terraforming cluster 的 macro（去掉 `macro.` 前缀）等于 HQ archive station 所属 sector 的 `cluster_id`
 
@@ -118,11 +118,11 @@
 
 ### Requirement: 运行时 stat 一致性
 
-**前提** terraforming 的部分 stat 需要通过项目 effect 之外的运行时规则派生
+**前提** terraforming 的 stat 计算由 `useTerraformingStore` 负责（见 terraforming-store change），View 层消费其输出
 
 **当** 界面渲染状态卡片、项目条件、objective 进度与可用性
 
-**那么** 必须基于同一份运行时 stat 结果
+**那么** 所有 UI 展示 MUST 消费 `useTerraformingStore` 提供的同一份 `terraformingCurrentStats`，不得在 View/Presenter 层独立计算 stat
 
 **并且** 至少包含：
 - 项目 effects 应用后的 stat
@@ -133,7 +133,7 @@
 
 ### Requirement: 动态项目池可见性
 
-**前提** 某项目来自 `SetupStatDependentProjects`，其存在性取决于当前 stat
+**前提** 某项目来自 `SetupStatDependentProjects`，其存在性取决于当前 stat（stat 数据由 `useTerraformingStore` 提供）
 
 **当** 当前 stat 跨越动态项目阈值
 
@@ -159,7 +159,7 @@
 
 **当** 用户点击一次性任务的 toggle
 
-**那么** `completedProjects` 中该 projectId 的值在 0 和 1 之间切换
+**那么** `completedProjects` 中该 projectId 的值在 0 和 1 之间切换（mutation 通过 `useTerraformingStore` 的 `setProjectCount` / `toggleProject` 执行）
 
 **并且** 切换后自动 re-resolve
 
@@ -195,7 +195,7 @@
 
 ### Requirement: completedProjects 类型变更
 
-**前提** Store 中 `terraformingCompletedProjects` 存在
+**前提** `useTerraformingStore` 提供 per-cluster `completedProjects`（`Map<string, number>`，见 terraforming-store change）
 
 **当** 中列任务交互
 
@@ -205,7 +205,7 @@
 
 **并且** 可重复任务计数可为任意 ≥ 0 整数
 
-**并且** `resolveAvailableTasks()` 适配新类型（`completedProjects.get(id) > 0` 判定是否完成）
+**并且** `resolveAvailableTasks()` 适配该类型（`completedProjects.get(id) > 0` 判定是否完成）
 
 ### Requirement: 项目依赖条目持续显示
 
@@ -289,18 +289,17 @@
 
 ### Requirement: Presenter 层新增 computed
 
-**前提** `useTerraformingPresenter` 存在
+**前提** `useTerraformingPresenter` 存在，数据源为 `useTerraformingStore`
 
 **那么** 新增以下 assembled props:
 - `clusterDisplayNames` (Map<clusterId, i18n name>)
-- `clusterMatchesHq` (Record<clusterId, boolean>)
+- `clusterMatchesHq` (Record<clusterId, boolean>，基于 store 的 `hqClusterId` 计算)
 - `objectivesProgress` (Array<{step, action, text, completed, targetVariable?}>)
-- `housingBuilt` 读写（绑定 store `terraformingHousingBuilt`）
-- `completedProjectCounts` (兼容 `Map<string, number>` 的读写接口)
+- `completedProjectCounts` (通过 store 的 completedProjects 读写)
 - `executionTimeline` / `cancelValidationPreview` / `groupMarkers`
 - `statScaleModels` / `conditionScaleModels`（供统一 stat 展示组件渲染）
 
-**并且** 所有面向 UI 的数据组装由 Presenter 层完成，不直接在 Vue 组件中操作为 store 数据
+**并且** 所有面向 UI 的数据组装由 Presenter 层完成，不直接在 Vue 组件中操作 store 数据
 
 ### Requirement: 无 Range Stat 改为数字展示
 

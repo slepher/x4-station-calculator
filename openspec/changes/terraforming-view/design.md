@@ -4,10 +4,11 @@
 
 ```
 LiveProductionWorkbenchView
-  └── useTerraformingPresenter
-      ├── TerraformingSectorPanel
-      ├── TerraformingTaskList
-      └── TerraformingResourcePanel
+  └─ useTerraformingStore (数据源，见 terraforming-store change)
+      └── useTerraformingPresenter (UI 组装)
+          ├── TerraformingSectorPanel
+          ├── TerraformingTaskList
+          └── TerraformingResourcePanel
 ```
 
 相关文件：
@@ -29,7 +30,7 @@ src/components/empire/
 
 ### 1. 星区与 objective
 
-- `useLiveProductionStore` 提供当前 selected cluster、runtime stats、completed projects、execution log
+- `useTerraformingStore` 提供当前 selected cluster、runtime stats、completed projects、execution log（见 terraforming-store change）
 - `useTerraformingPresenter` 负责：
   - `clusterDisplayNames`
   - `clusterMatchesHq`
@@ -62,7 +63,7 @@ src/components/empire/
 
 ### 3. 执行序列
 
-- `useLiveProductionStore` 维护 per-cluster `terraformingExecutionLog`
+- `useTerraformingStore` 维护 per-cluster execution log 和 completedProjects（见 terraforming-store change）
 - `useTerraformingPresenter` 基于 execution log 和 runtime state 回放得到：
   - `executionTimeline`
   - `getCancelValidation(entryId)`
@@ -287,6 +288,7 @@ effect-list 对所有项目节点生效（events + 普通节点 + 子节点）�
 ### 建造港槽位计算
 
 - HQ 有效模块来源: `effectivePlannedModules = maxSavedModules(plannedModules, archiveModules)`（来自 `live-planning-modules`），即 `max(planned, archive)` — archive 作为地板，planned 可超出（在建）
+- HQ module 数据由 `useTerraformingStore` 的 HQ context 提供，包括 `hqEffectiveModules`、`hqArchiveStation` 等
 - live 模式下无 planned 覆盖时，等价于 `archiveCurrentTotalModules`（已建 + 建造中合并）
 - 通过 `modulesMap[moduleId]` 查找 `X4Module`
 - 筛选: `buildShipClasses.length > 0`（排除维护港，仅制造港）

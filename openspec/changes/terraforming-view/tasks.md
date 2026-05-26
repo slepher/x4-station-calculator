@@ -1,5 +1,7 @@
 # terraforming-view Tasks
 
+> **依赖**: 领域状态由 `useTerraformingStore` 提供（见 terraforming-store change）。View 层通过 Presenter 组装 UI 数据，不直接管理 store 状态。
+
 ## 当前实现清单
 
 ### 左列

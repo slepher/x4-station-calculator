@@ -112,6 +112,50 @@ blueprint 模式下 MUST NOT 依赖 `ArchiveStationData`，制造港默认 slot 
 **那么** `terraformingSelectedClusterId`、`terraformingCompletedProjectsByCluster`、`terraformingExecutionLogByCluster`、`terraformingExecutionSeqByCluster`、`terraformingHousingBuiltByCluster` 均不存在  
 **并且** `persistTerraformingLogs`、`hydrateTerraformingLogs` 函数不存在
 
+### Requirement: Terraforming Store Must Provide Per-Cluster Data Isolation
+
+`completedProjects`、`executionLog` MUST 按选中的 cluster 隔离，切换 cluster 时数据自动切换，不同 cluster 的数据互不干扰。
+
+#### Scenario: Switching cluster isolates completed projects and execution log
+
+**前提** 用户 cluster A 有 completed projects `{proj_1: 3, proj_2: 1}` 和 execution log  
+**当** 用户切换到 cluster B  
+**那么** `completedProjects` 显示 cluster B 的数据（可能为空）  
+**并且** `executionLog` 显示 cluster B 的数据  
+**并且** 切回 cluster A 后，之前的 `{proj_1: 3, proj_2: 1}` 和 execution log 完整恢复
+
+### Requirement: Terraforming Store Must Guarantee Runtime Stat Consistency
+
+`currentStats` MUST 基于同一份运行时规则统一计算，覆盖所有 UI 消费场景（状态卡片、项目条件、objective 进度、可用性判定）。
+
+#### Scenario: Runtime stats computed from unified pipeline
+
+**前提** 某 cluster 有 completed projects，存在 warming events  
+**当** store 计算 `currentStats`  
+**那么** 结果 MUST 包含：
+- 项目 effects 应用后的所有 stat
+- 派生的 airpressure
+- warming events 回推后的 temperature
+
+#### Scenario: Same stat value used across all UI contexts
+
+**前提** `currentStats` 已计算完毕  
+**当** View/Presenter 层获取 stat 用于渲染或判定  
+**那么** 所有消费方 MUST 获取同一份 `currentStats` 值  
+**并且** 不允许出现"显示层把 stat 视为 0，但判定层把同一 stat 视为不存在"的不一致
+
+### Requirement: Dynamic Project Pool Depends On Store State
+
+任务列表中的动态项目可见性取决于 store 提供的 `currentStats`，当 stat 跨越动态项目阈值时通过 `resolveAvailableTasks()` 反映变化。
+
+#### Scenario: Stat crosses dynamic project threshold
+
+**前提** 某项目来自 `SetupStatDependentProjects`，其阈值要求 `temperature >= 30`  
+**并且** 当前 `currentStats.temperature = 25`  
+**当** 用户完成升温项目使 `temperature` 达到 30  
+**那么** `resolveAvailableTasks()` 返回的 TaskTree 中 MUST 包含该动态项目  
+**并且** 该动态项目不得仅因为是"曾被注入过"就永久保留在列表中
+
 ### Requirement: Terraforming Store Must Internally Derive HQ Context From Live Store
 
 `useTerraformingStore` MUST 内部从 `useLiveProductionStore` / `useSaveBindingStore` 获取 HQ context，而非依赖外部 View 注入。调用方向 MUST 为 `useTerraformingStore` → live/blueprint store，不允许反向。

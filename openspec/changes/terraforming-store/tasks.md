@@ -27,12 +27,11 @@
   - `savedPlans: ref<SavedTerraformingState>` — 持久化数据
   - `expandedExecutionLogByCluster: ref<Record<string, TerraformingExecutionEntry[]>>` — 内存展开
   - `executionSeqByCluster: ref<Record<string, number>>` — 内存
-  - `housingBuiltByCluster: ref<Record<string, number>>` — 内存
 - [x] 实现持久化方法：
   - `getStorageKey()`: 从 `useGameDataStore`.getStorageKey('terraforming')
   - `saveToStorage()`: JSON.stringify `savedPlans.value` 写入 localStorage
   - `loadFromStorage()`: 读取 localStorage，parse + 校验结构，设置 `savedPlans.value`
-  - `hydrateExecutionLogs()`: 将 active plan 的 `executionLogByCluster` 展开为 `expandedExecutionLogByCluster.value`，reset `housingBuiltByCluster`
+  - `hydrateExecutionLogs()`: 将 active plan 的 `executionLogByCluster` 展开为 `expandedExecutionLogByCluster.value`
 - [x] 实现 Plans CRUD：
   - `ensurePlanForContext(mode, planId)`: 按 mode+planId 查找已有 plan，未找到则 `createPlan`
   - `createPlan(mode, planId)`: 生成 `id = "tp-${Date.now()}"`，创建 plan 加入 list，设为 active，`saveToStorage` + `hydrateExecutionLogs`
@@ -45,7 +44,6 @@
   - `setProjectCount(projectId, count)`: 确保当前 cluster log 中该 project 恰有 count 个 entry
   - `replaceExecutionLog(entries)`: 替换当前 cluster 的整个 expanded log，同步回 plan
   - `clearExecutionQueue()`: 清空当前 cluster log
-  - `setHousingBuilt(count)`: 设置内存 `housingBuiltByCluster`
 - [x] 实现 HQ Context computed（内部从 live/blueprint store 获取）：
   - 导入 `useLiveProductionStore`、`useSaveBindingStore`
   - `hqStationName` / `hqArchiveStation` / `hqEffectiveModules` / `hqClusterId` — live 模式下从 active binding 对应 archive station 取值；blueprint 模式返回空/默认
@@ -57,7 +55,6 @@
   - `completedProjects`: `buildCompletedProjectsFromExecutionLog(executionLog)`
   - `currentStats`: `computeTerraformingRuntimeStats(selectedCluster, completedProjects, terraformingData)`
   - `runtimeProjectIds`: `getRuntimeTerraformingProjectIds(selectedCluster, currentStats, completedProjects, terraformingData)`
-  - `housingBuilt`: 当前 cluster 的 housing count
   - `terraformingData`: 来自 `useGameDataStore()` 的 game data
 
 ## Task 5: 清理 SaveBindingPlan 中的 terraformingLogs

@@ -236,7 +236,6 @@ export interface TerraformingPresenterEmits {
   reorderDraftEntries: (entries: TerraformingDraftTimelineEntry[]) => void
   disableAllDraftEntries: () => void
   enableAllDraftEntries: () => void
-  setHousingBuilt: (count: number) => void
 }
 
 export interface UseTerraformingPresenterReturn {
@@ -252,7 +251,6 @@ export interface TerraformingPresenterStore {
   terraformingRuntimeProjectIds: ComputedRef<string[]>
   terraformingCompletedProjects: ComputedRef<Map<string, number>>
   terraformingExecutionLog: ComputedRef<TerraformingExecutionEntry[]>
-  terraformingHousingBuilt: ComputedRef<number>
   terraformingHqStationName: ComputedRef<string>
   terraformingHqArchiveStation: ComputedRef<ArchiveStationData | null>
   terraformingHqEffectiveModules: ComputedRef<SavedModule[]>
@@ -264,7 +262,6 @@ export interface TerraformingPresenterStore {
   removeTerraformingExecutionEntry: (entryId: string) => void
   replaceTerraformingExecutionLog: (entries: TerraformingExecutionEntry[]) => void
   clearTerraformingExecutionQueue: () => void
-  setTerraformingHousingBuilt: (count: number) => void
   mapsClusters: Record<string, X4MapCluster>
   mapsSectors: Record<string, X4MapSector>
   wareNames: ComputedRef<Map<string, string>>
@@ -1949,9 +1946,6 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     reorderDraftEntries,
     disableAllDraftEntries,
     enableAllDraftEntries,
-    setHousingBuilt: (count: number) => {
-      store.setTerraformingHousingBuilt(count)
-    }
   }
 
   return { props, emits }

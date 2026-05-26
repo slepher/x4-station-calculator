@@ -43,7 +43,7 @@
   - **返还详情**: `↩️ 返还: wareGroup 10%`（出现于 `rebates` 非空时，不直接应用为折扣）
   - **阻塞原因**: `需要: XXX`
   - 依赖树子节点通过缩进表示父子关系
-- `terraformingCompletedProjects` 类型改为 `Map<string, number>`（projectId → 完成次数）：
+- `completedProjects` 来自 `useTerraformingStore`，类型为 `Map<string, number>`（projectId → 完成次数）：
   - 一次性任务: 计数只能为 0 或 1
   - 可重复任务: 计数 ≥ 0
 - 交互：
@@ -88,7 +88,7 @@
 - 右列: 执行序列视图、单条记录展开明细、相邻同组组名标记、单条取消与后续合法性校验
 - 右列展开明细: 材料需求（含实际消耗量 actualAmount）、返还（累计折扣返量）、累计折扣、交付清单（含并行建造时间计算）、状态变化（含折扣 0%→10% 变化）
 - 交付清单建造时间: 通过 HQ station 已建 S/M 综合建造港的 `buildProcessorCount`（8 共享槽位）计算并行建造耗时
-- Store: `terraformingCompletedProjects` 改为 per-cluster (`Record<string, Map<string, number>>`)，切换星区数据自动隔离
+- `completedProjects` per-cluster 隔离和 execution log 管理由 `useTerraformingStore` 负责（见 terraforming-store change）
 - Presenter: clusterDisplayNames、objectivesProgress、clusterMatchesHq、statDisplayNames、projectMaxCounts、projectDisplayNames、级联撤销等 computed
 - Vue 组件: 左/中/右三列具体实现（3:5:4 grid 不变），全量 i18n（`terraforming.*` namespace）
 - 阻塞原因多行显示 + 项目名/stat 名/标签 i18n
@@ -119,5 +119,5 @@
 
 ## 未决项
 
-- housing built 数据来源：目前无 X4 save 数据支撑，暂用 store ref 手动输入。后续需从 HQ station plan 的人口 housing 模块推导。
-- `terraformingCurrentStats` 是否需要合并 completed projects 的 effects（当前保持 initialStats baseline）。
+- housing built 数据来源：目前无 X4 save 数据支撑，`objective.build_housing` 暂通过 `currentStats.population` 判定。后续需从 HQ station plan 的人口 housing 模块推导。
+- `terraformingCurrentStats` 合并 completed projects 的 effects 策略由 `useTerraformingStore` 内部处理，View 层不感知计算细节。

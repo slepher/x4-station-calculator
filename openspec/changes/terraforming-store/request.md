@@ -21,7 +21,7 @@
    - `planId: string` — live 模式引用 `save_binding` id，blueprint 模式引用 `empire` plan id
    - `selectedClusterId: string | null`
    - `executionLogByCluster: Record<string, string[]>` — clusterId → projectId[]（保持简洁，与当前 binding.terraformingLogs 一致）
-6. `housingBuiltByCluster` 不持久化，仅内存维护。
+6. `housingBuiltByCluster` 已移除，`objective.build_housing` 通过 `currentStats.population` 判定。
 
 ### 内存展开
 

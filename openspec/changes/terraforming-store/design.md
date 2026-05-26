@@ -17,8 +17,7 @@ useTerraformingStore (新 Pinia store)
 ├── 内存展开
 │   ├── executionLogByCluster: Record<string, TerraformingExecutionEntry[]>
 │   ├── executionSeqByCluster: Record<string, number>
-│   ├── completedProjectsByCluster: Record<string, Map<string, number>>
-│   └── housingBuiltByCluster: Record<string, number>
+│   └── completedProjectsByCluster: Record<string, Map<string, number>>
 │
 ├── HQ Context (内部从 live/blueprint store 获取)
 │   ├── isLiveMode → 从 useLiveProductionStore / useSaveBindingStore 取 HQ
@@ -26,7 +25,7 @@ useTerraformingStore (新 Pinia store)
 │
 ├── Display Computeds
 │   ├── terraformingData / selectedCluster / executionLog / completedProjects
-│   ├── currentStats / runtimeProjectIds / housingBuilt
+│   ├── currentStats / runtimeProjectIds
 │   ├── hqStationName / hqArchiveStation / hqEffectiveModules / hqClusterId
 │   └── isLiveMode / isBlueprintMode
 │
@@ -85,7 +84,6 @@ const savedPlans = ref<SavedTerraformingState>({ version: 1, activeId: null, lis
 
 // 内存展开 (非持久化)
 const expandedExecutionLogByCluster = ref<Record<string, TerraformingExecutionEntry[]>>({})
-const housingBuiltByCluster = ref<Record<string, number>>({})
 ```
 
 ### Computed: active plan
@@ -126,8 +124,6 @@ function hydrateExecutionLogs() {
   for (const [cid, entries] of Object.entries(expanded)) {
     completed[cid] = buildCompletedProjectsFromExecutionLog(entries)
   }
-  // ...
-  housingBuiltByCluster.value = {}  // 始终 reset
 }
 ```
 
@@ -163,10 +159,6 @@ function removeExecution(entryId: string): void
 function setProjectCount(projectId: string, count: number): void
 function replaceExecutionLog(entries: TerraformingExecutionEntry[]): void
 function clearExecutionQueue(): void
-function setHousingBuilt(count: number): void
-
-// HQ Context
-function setHousingBuilt(count: number): void
 ```
 
 每个 mutation 方法最后调用 `saveToStorage()`。
@@ -214,7 +206,6 @@ interface TerraformingPresenterStore {
   terraformingRuntimeProjectIds: ComputedRef<string[]>
   terraformingCompletedProjects: ComputedRef<Map<string, number>>
   terraformingExecutionLog: ComputedRef<TerraformingExecutionEntry[]>
-  terraformingHousingBuilt: ComputedRef<number>
   terraformingHqStationName: ComputedRef<string>
   terraformingHqArchiveStation: ComputedRef<ArchiveStationData | null>
   terraformingHqEffectiveModules: ComputedRef<SavedModule[]>

@@ -576,15 +576,7 @@ function evaluateProject(
   const evaluation = evaluateTerraformingProjectExecution(project, state, projectMap, clusterProjects, stats)
   const blockedReasons = evaluation.reasons
 
-  if (blockedReasons.length > 0) {
-    const completedArr: string[] = []
-    state.completedProjects.forEach((v, k) => { completedArr.push(`${k}=${v}`) })
-    console.log(
-      `[TF] blocked: ${project.id}`,
-      `| reasons: ${blockedReasons.join(' ; ')}`,
-      `| completed: [${completedArr.join(', ')}]`
-    )
-  }
+
 
   return {
     id: project.id,

@@ -67,7 +67,6 @@ const terraformingPresenter = useTerraformingPresenter({
   terraformingRuntimeProjectIds: computed(() => terraformingStore.runtimeProjectIds),
   terraformingCompletedProjects: computed(() => terraformingStore.completedProjects),
   terraformingExecutionLog: computed(() => terraformingStore.executionLog),
-  terraformingHousingBuilt: computed(() => terraformingStore.housingBuilt),
   terraformingHqStationName: computed(() => terraformingStore.hqStationName),
   terraformingHqArchiveStation: computed(() => terraformingStore.hqArchiveStation),
   terraformingHqEffectiveModules: computed(() => terraformingStore.hqEffectiveModules),
@@ -83,7 +82,6 @@ const terraformingPresenter = useTerraformingPresenter({
   removeTerraformingExecutionEntry: (entryId: string) => terraformingStore.removeExecution(entryId),
   replaceTerraformingExecutionLog: (entries) => terraformingStore.replaceExecutionLog(entries as any),
   clearTerraformingExecutionQueue: () => terraformingStore.clearExecutionQueue(),
-  setTerraformingHousingBuilt: (count: number) => terraformingStore.setHousingBuilt(count),
   mapsClusters: gameDataMaps.value?.clusters ?? {},
   mapsSectors: gameDataMaps.value?.sectors ?? {},
   wareNames: computed(() => {

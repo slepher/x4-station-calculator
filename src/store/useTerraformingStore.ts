@@ -35,7 +35,6 @@ export const useTerraformingStore = defineStore('terraforming', () => {
 
   const expandedExecutionLogByCluster = ref<Record<string, TerraformingExecutionEntry[]>>({})
   const executionSeqByCluster = ref<Record<string, number>>({})
-  const housingBuiltByCluster = ref<Record<string, number>>({})
 
   function saveToStorage(): void {
     localStorage.setItem(getStorageKey(), JSON.stringify(savedPlans.value))
@@ -60,7 +59,6 @@ export const useTerraformingStore = defineStore('terraforming', () => {
     if (!plan) {
       expandedExecutionLogByCluster.value = {}
       executionSeqByCluster.value = {}
-      housingBuiltByCluster.value = {}
       return
     }
 
@@ -72,7 +70,6 @@ export const useTerraformingStore = defineStore('terraforming', () => {
     }
     expandedExecutionLogByCluster.value = expanded
     executionSeqByCluster.value = seqs
-    housingBuiltByCluster.value = {}
   }
 
   function syncExecutionLogToPlan(): void {
@@ -215,15 +212,6 @@ export const useTerraformingStore = defineStore('terraforming', () => {
     setExecutionLogForCluster(clusterId, [])
   }
 
-  function setHousingBuilt(count: number): void {
-    const clusterId = activePlan.value?.selectedClusterId
-    if (!clusterId) return
-    housingBuiltByCluster.value = {
-      ...housingBuiltByCluster.value,
-      [clusterId]: count,
-    }
-  }
-
   const isLiveMode = computed(() => activePlan.value?.mode === 'live')
   const isBlueprintMode = computed(() => activePlan.value?.mode === 'blueprint')
 
@@ -262,12 +250,6 @@ export const useTerraformingStore = defineStore('terraforming', () => {
     const cluster = selectedCluster.value
     if (!cluster) return []
     return getRuntimeTerraformingProjectIds(cluster, currentStats.value, completedProjects.value, terraformingData.value)
-  })
-
-  const housingBuilt = computed<number>(() => {
-    const clusterId = activePlan.value?.selectedClusterId
-    if (!clusterId) return 0
-    return housingBuiltByCluster.value[clusterId] ?? 0
   })
 
   const hqStationName = computed<string>(() => {
@@ -318,7 +300,6 @@ export const useTerraformingStore = defineStore('terraforming', () => {
     completedProjects,
     currentStats,
     runtimeProjectIds,
-    housingBuilt,
     hqStationName,
     hqArchiveStation,
     hqEffectiveModules,
@@ -333,7 +314,6 @@ export const useTerraformingStore = defineStore('terraforming', () => {
     setProjectCount,
     replaceExecutionLog,
     clearExecutionQueue,
-    setHousingBuilt,
     loadFromStorage,
     saveToStorage,
     hydrateExecutionLogs,
