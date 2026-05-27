@@ -141,12 +141,6 @@ function handleSetCount(node: { id: string; available: boolean }, newCount: numb
           >
             {{ (completedProjectCounts.get(node.id) ?? 0) > 0 ? t('terraforming.undo') : t('terraforming.complete') }}
           </button>
-          <span
-            v-if="isEditing"
-            class="drag-to-log"
-            draggable="true"
-            @dragstart="(e: DragEvent) => e.dataTransfer?.setData('terraforming-project-id', node.id)"
-          >↔</span>
         </div>
       </div>
       <div class="task-body">

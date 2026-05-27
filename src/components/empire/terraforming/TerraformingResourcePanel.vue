@@ -51,81 +51,16 @@ const gameDataStore = useGameDataStore()
 const expandedEntryId = ref<string | null>(null)
 const panelContentRef = ref<HTMLElement | null>(null)
 const cancelValidationCache = ref<Record<string, TerraformingCancelValidation>>({})
-const isDragOver = ref(false)
-const dropTargetIndex = ref(-1)
 
-const dragInsertBeforePlanIndex = computed(() => {
-  if (dropTargetIndex.value < 0) return -1
-  // Convert draftExecutionLog insert index back to planEntries list index
-  let taskCount = 0
-  for (let i = 0; i < props.queueEditState.planEntries.length; i++) {
-    const pe = props.queueEditState.planEntries[i]!
-    if (pe.type === 'task') {
-      if (taskCount === dropTargetIndex.value) return i
-      taskCount++
-    }
-  }
-  // Insert at end
-  return props.queueEditState.planEntries.length
-})
-
-function getTaskDropIndex(pe: TerraformingGoalPlanDisplayEntry, listIndex: number): number {
-  // Convert plan-entry listIndex to draftExecutionLog index
-  // Count task entries before this position
-  let taskCount = 0
-  for (let i = 0; i < listIndex; i++) {
-    if (props.queueEditState.planEntries[i]?.type === 'task') taskCount++
-  }
-  if (pe.type === 'task') return taskCount + 1 // insert after this task
-  return taskCount // insert before the next task (at this goal's position)
-}
-
-let dragCounter = 0
-
-function onPanelDragOver(e: DragEvent) {
-  e.preventDefault()
-  isDragOver.value = true
-  if (e.currentTarget instanceof HTMLElement) {
-    const entries = e.currentTarget.querySelectorAll('[data-drop-index]')
-    let closestIdx = -1
-    let closestDist = Infinity
-    entries.forEach((el) => {
-      const rect = el.getBoundingClientRect()
-      const midY = rect.top + rect.height / 2
-      const dist = Math.abs(e.clientY - midY)
-      const dropIdx = parseInt(el.getAttribute('data-drop-index') || '-1')
-      if (dropIdx >= 0 && dist < closestDist) {
-        closestDist = dist
-        closestIdx = dropIdx
-      }
-    })
-    dropTargetIndex.value = closestIdx
-  }
-}
-
-function onPanelDragEnter(e: DragEvent) {
-  e.preventDefault()
-  dragCounter++
-  isDragOver.value = true
-}
-
-function onPanelDragLeave() {
-  dragCounter--
-  if (dragCounter <= 0) {
-    dragCounter = 0
-    isDragOver.value = false
-  }
-}
-
-function onPanelDrop(e: DragEvent) {
-  dragCounter = 0
-  isDragOver.value = false
-  const projectId = e.dataTransfer?.getData('terraforming-project-id')
-  if (projectId) {
-    const targetIdx = dropTargetIndex.value >= 0 ? dropTargetIndex.value : undefined
-    emit('dropTask', projectId, targetIdx)
-  }
-  dropTargetIndex.value = -1
+function onExternalDrop(e: any) {
+  const projectId = e.item?._underlying_vm_?.projectId || e.item?.projectId
+  if (!projectId) return
+  const targetIdx = e.newIndex
+  // Remove the cloned drag item from plan entries list
+  const next = [...props.queueEditState.planEntries]
+  const cloneIdx = next.findIndex((pe: any) => pe._type === 'drag-clone' || pe.projectId === projectId)
+  if (cloneIdx >= 0) next.splice(cloneIdx, 1)
+  emit('dropTask', projectId, targetIdx)
 }
 
 const internalPlanEntries = computed({
@@ -250,13 +185,9 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
 </script>
 
 <template>
-  <div class="panel-card" :class="{ 'panel-floating': floating, 'drag-target': isDragOver }">
-    <div
-      class="panel-header"
-      :class="{ 'drag-over': isDragOver }"
-    >
-      <span v-if="isDragOver" class="drop-hint">↧ Drop to insert</span>
-      <span v-else>{{ t('terraforming.taskQueue') }}</span>
+  <div class="panel-card" :class="{ 'panel-floating': floating }">
+    <div class="panel-header">
+      {{ t('terraforming.taskQueue') }}
       <span v-if="showNoDockWarning" class="text-amber-400 text-[11px] ml-2">⚠ {{ t('terraforming.noBuildDock') }}</span>
       <span v-if="queueEditState.editing && queueEditState.unsatisfiedGoalCount > 0" class="text-red-400 text-[11px] ml-2">
         {{ queueEditState.unsatisfiedGoalCount }} {{ t('terraforming.unmetDependencies') || 'unmet dependencies' }}
@@ -283,20 +214,7 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
         </div>
       </template>
     </div>
-    <div
-      ref="panelContentRef"
-      class="panel-content"
-      @dragover="onPanelDragOver"
-      @dragenter="onPanelDragEnter"
-      @dragleave="onPanelDragLeave"
-      @drop="onPanelDrop"
-    >
-      <div
-        v-if="isDragOver && queueEditState.planEntries.length === 0"
-        class="drop-placeholder"
-      >
-        ↧ Drop to add task
-      </div>
+    <div ref="panelContentRef" class="panel-content">
       <div v-if="!selectedClusterId" class="empty-state">
         {{ t('terraforming.selectClusterForResources') }}
       </div>
@@ -315,25 +233,24 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
           v-else
           v-model="internalPlanEntries"
           :item-key="planEntryKey"
+          :group="{ name: 'terraforming-tasks', pull: false, put: () => true }"
           ghost-class="drag-ghost"
           handle=".drag-handle"
           filter=".goal-entry"
           class="draggable-container"
+          @add="onExternalDrop"
         >
-          <template #item="{ element: planEntry, index: listIndex }">
+          <template #item="{ element: planEntry }">
             <div
-              :data-drop-index="getTaskDropIndex(planEntry, listIndex)"
               :class="planEntry.type === 'goal'
                 ? ['goal-entry', {
                     'goal-filter-active': planEntry.entry.isFilterActive,
                     'goal-satisfied': planEntry.entry.satisfied,
                     'goal-unsatisfied': !planEntry.entry.satisfied,
                     'goal-has-risk': planEntry.entry.hasRisk,
-                    'drag-insert-before': isDragOver && dragInsertBeforePlanIndex === listIndex,
                   }]
                 : ['timeline-item', 'draft-item', {
                     'system-disabled': planEntry.entry.systemDisabled,
-                    'drag-insert-before': isDragOver && dragInsertBeforePlanIndex === listIndex,
                   }]"
               @click="planEntry.type === 'goal' ? emit('clickGoal', planEntry.entry.id) : undefined"
             >
@@ -553,11 +470,7 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
 
 <style scoped>
 .panel-card {
-  @apply bg-slate-900/40 rounded-lg border border-slate-800 shadow-xl overflow-hidden transition-colors;
-}
-
-.panel-card.drag-target {
-  @apply border-sky-500/60;
+  @apply bg-slate-900/40 rounded-lg border border-slate-800 shadow-xl overflow-hidden;
 }
 
 .panel-card.panel-floating {
@@ -570,24 +483,11 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
 }
 
 .panel-header {
-  @apply h-12 flex items-center px-4 text-slate-200 text-sm font-semibold border-b border-slate-700/50 bg-slate-800/30 flex-shrink-0 transition-colors;
-}
-
-.panel-header.drag-over {
-  @apply bg-sky-900/40 border-sky-500/60;
-}
-
-.drop-hint {
-  @apply text-sky-300;
+  @apply h-12 flex items-center px-4 text-slate-200 text-sm font-semibold border-b border-slate-700/50 bg-slate-800/30 flex-shrink-0;
 }
 
 .panel-content {
   @apply p-3 flex flex-col gap-2;
-}
-
-.drop-placeholder {
-  @apply border-2 border-dashed border-sky-500/60 rounded-lg py-6 text-center;
-  @apply text-sky-300 text-sm bg-sky-950/20;
 }
 
 .panel-floating .panel-content {
@@ -728,10 +628,6 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
 
 .drag-ghost {
   @apply opacity-30 bg-slate-700 border-sky-500 border-dashed border-2;
-}
-
-.drag-insert-before {
-  @apply border-t-2 border-sky-400;
 }
 
 .draggable-container {

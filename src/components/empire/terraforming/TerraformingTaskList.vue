@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import draggable from 'vuedraggable'
 import { useI18n } from 'vue-i18n'
 import type { TaskTree, TerraformingProject } from '@/store/logic/terraformingTaskResolver'
 import type {
@@ -284,19 +285,31 @@ function getStatLines(projectId: string): TerraformingStatLineModel[] {
           <template v-for="group in taskTree.groupOrder" :key="group">
             <div v-if="taskTree.groups.has(group) && group !== 'events' && isGroupVisible(group)" class="task-group">
               <div class="group-header">{{ groupNames.get(group) || group }}</div>
-              <TerraformingTaskNode
-                v-for="node in taskTree.groups.get(group)?.filter(n => topLevelNodeIds.has(n.id) && isTaskVisible(n.id))"
-                :key="node.id"
-                :node="node"
-                :is-editing="isEditing"
-                :completed-project-counts="completedProjectCounts"
-                :project-map="projectMap"
-                :project-display-names="projectDisplayNames"
-                :task-node-displays="taskNodeDisplays"
-                @toggle-project="emit('toggleProject', $event)"
-                @set-project-count="(pid: string, cnt: number) => emit('setProjectCount', pid, cnt)"
-                @click-stat="emit('clickStat', $event)"
-              />
+              <draggable
+                :model-value="taskTree.groups.get(group)?.filter(n => topLevelNodeIds.has(n.id) && isTaskVisible(n.id)) || []"
+                :group="{ name: 'terraforming-tasks', pull: 'clone', put: false }"
+                :sort="false"
+                :clone="(n: any) => ({ projectId: n.id, _type: 'drag-clone' })"
+                item-key="id"
+                :disabled="!isEditing"
+                ghost-class="drag-ghost"
+                class="task-node-list"
+              >
+                <template #item="{ element: node }">
+                  <TerraformingTaskNode
+                    :key="node.id"
+                    :node="node"
+                    :is-editing="isEditing"
+                    :completed-project-counts="completedProjectCounts"
+                    :project-map="projectMap"
+                    :project-display-names="projectDisplayNames"
+                    :task-node-displays="taskNodeDisplays"
+                    @toggle-project="emit('toggleProject', $event)"
+                    @set-project-count="(pid: string, cnt: number) => emit('setProjectCount', pid, cnt)"
+                    @click-stat="emit('clickStat', $event)"
+                  />
+                </template>
+              </draggable>
             </div>
           </template>
         </div>
