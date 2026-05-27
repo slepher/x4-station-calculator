@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useLiveProductionStore } from '@/store/useLiveProductionStore'
 import { useTerraformingStore } from '@/store/useTerraformingStore'
@@ -39,6 +39,15 @@ const { t } = useI18n()
 const gameDataMaps = computed(() => gameDataStore.maps)
 
 const terraformingSectorMode = ref<'list' | 'item'>('list')
+const panelMaxHeight = ref('calc(100vh - 8rem)')
+
+function updatePanelMaxHeight() {
+  const h = window.innerHeight
+  const margin = 32
+  const maxH = h - margin
+  console.log(`[panelMaxHeight] innerHeight=${h} margin=${margin} → ${maxH}px`)
+  panelMaxHeight.value = `${maxH}px`
+}
 
 onMounted(() => {
   terraformingStore.init()
@@ -50,6 +59,12 @@ onMounted(() => {
   if (terraformingStore.activePlan?.selectedClusterId) {
     terraformingSectorMode.value = 'item'
   }
+  window.addEventListener('resize', updatePanelMaxHeight)
+  requestAnimationFrame(() => updatePanelMaxHeight())
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', updatePanelMaxHeight)
 })
 
 watch(() => activeViewStore.activeBinding, (newGuid) => {
@@ -61,6 +76,14 @@ watch(() => activeViewStore.activeBinding, (newGuid) => {
 
 const tabbarPresenter = useProductionTabbarPresenter(liveStore)
 const toolbarPresenter = useProductionToolbarPresenter(liveStore)
+
+watch(() => toolbarPresenter.props.workbenchMode.value, (mode) => {
+  if (mode === 'terraforming') {
+    nextTick(() => {
+      requestAnimationFrame(() => updatePanelMaxHeight())
+    })
+  }
+})
 const planningPresenter = useProductionPlanningPresenter(liveStore)
 const wareflowPresenter = useProductionWareflowPresenter(liveStore)
 const dashboardPresenter = useProductionDashboardPresenter(liveStore)
@@ -118,6 +141,13 @@ const terraformingPresenter = useTerraformingPresenter({
 const showArchiveModuleList = computed(() => {
   return planningPresenter.props.visualMode.value === 'live' && planningPresenter.props.hasArchive.value
 })
+
+const isQueueEditing = computed(() => terraformingPresenter.props.resourcePanel.queueEditState.editing.value)
+const terraformingFloating = computed(() => ({
+  sectorPanel: true,
+  taskList: isQueueEditing.value,
+  resourcePanel: !isQueueEditing.value,
+}))
 </script>
 
 <template>
@@ -223,7 +253,7 @@ const showArchiveModuleList = computed(() => {
     @close="toolbarPresenter.emits.closeImport"
   />
 
-  <div v-if="toolbarPresenter.props.workbenchMode.value === 'terraforming'" class="main-layout mt-6">
+  <div v-if="toolbarPresenter.props.workbenchMode.value === 'terraforming'" class="main-layout terraforming-layout mt-6" :style="{ '--panel-max-h': panelMaxHeight }">
     <div class="col-span-12 lg:col-span-3">
       <TerraformingSectorPanel
         :clusters="terraformingPresenter.props.sectorPanel.clusters.value"
@@ -235,6 +265,7 @@ const showArchiveModuleList = computed(() => {
         :current-stats="terraformingPresenter.props.sectorPanel.currentStats.value"
         :stat-display-names="terraformingPresenter.props.sectorPanel.statDisplayNames.value"
         :active-rebates="terraformingPresenter.props.sectorPanel.activeRebates.value"
+        :floating="terraformingFloating.sectorPanel"
         @select-cluster="terraformingPresenter.emits.selectCluster"
         @display-mode-change="(mode) => terraformingSectorMode = mode"
       />
@@ -248,6 +279,7 @@ const showArchiveModuleList = computed(() => {
         :completed-project-counts="terraformingPresenter.props.taskList.completedProjectCounts.value"
         :project-map="terraformingPresenter.props.taskList.projectMap.value"
         :project-display-names="terraformingPresenter.props.taskList.projectDisplayNames.value"
+        :floating="terraformingFloating.taskList"
         @toggle-project="terraformingPresenter.emits.toggleProject"
         @set-project-count="terraformingPresenter.emits.setProjectCount"
       />
@@ -266,6 +298,7 @@ const showArchiveModuleList = computed(() => {
         :get-cancel-validation="terraformingPresenter.props.resourcePanel.getCancelValidation"
         :delivery-ship-map="terraformingPresenter.props.resourcePanel.deliveryShipMap.value"
         :hq-build-docks="terraformingPresenter.props.resourcePanel.hqBuildDocks.value"
+        :floating="terraformingFloating.resourcePanel"
         @cancel-execution="terraformingPresenter.emits.cancelExecution"
         @clear-all="terraformingPresenter.emits.clearExecutionQueue"
         @start-edit="terraformingPresenter.emits.startQueueEdit"
@@ -427,6 +460,10 @@ const showArchiveModuleList = computed(() => {
 <style scoped>
 .main-layout {
   @apply grid grid-cols-12 gap-8 items-start;
+}
+
+.terraforming-layout {
+  @apply items-stretch;
 }
 
 .overview-left-panel {

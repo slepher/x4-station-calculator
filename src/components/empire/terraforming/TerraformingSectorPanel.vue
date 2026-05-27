@@ -26,6 +26,7 @@ interface Props {
   currentStats: Record<string, number>
   statDisplayNames: Map<string, string>
   activeRebates: string[]
+  floating: boolean
 }
 
 const props = defineProps<Props>()
@@ -80,7 +81,7 @@ function formatPartName(partName: string): string {
 </script>
 
 <template>
-  <div class="panel-card">
+  <div class="panel-card" :class="{ 'panel-floating': floating }">
     <!-- Item Mode Header -->
     <div v-if="displayMode === 'item'" class="panel-header item-header">
       <button
@@ -181,11 +182,16 @@ function formatPartName(partName: string): string {
 
 <style scoped>
 .panel-card {
-  @apply bg-slate-900/40 rounded-lg border border-slate-800 shadow-xl overflow-hidden;
+  @apply bg-slate-900/40 rounded-lg border border-slate-800 shadow-xl overflow-hidden flex flex-col;
+  max-height: var(--panel-max-h, calc(100vh - 8rem));
+}
+
+.panel-card.panel-floating .panel-header {
+  @apply sticky top-0 z-10;
 }
 
 .panel-header {
-  @apply h-12 flex items-center px-4 text-slate-200 text-sm font-semibold border-b border-slate-700/50 bg-slate-800/30;
+  @apply h-12 flex items-center px-4 text-slate-200 text-sm font-semibold border-b border-slate-700/50 bg-slate-800/30 flex-shrink-0;
 }
 
 .item-header {
@@ -205,8 +211,13 @@ function formatPartName(partName: string): string {
 }
 
 .panel-content {
-  @apply flex flex-col gap-0;
+  @apply flex flex-col gap-0 overflow-y-auto flex-1 min-h-0;
 }
+
+.panel-content::-webkit-scrollbar { width: 6px; }
+.panel-content::-webkit-scrollbar-track { background: rgba(30, 41, 59, 0.5); }
+.panel-content::-webkit-scrollbar-thumb { background: rgba(71, 85, 105, 0.8); border-radius: 3px; }
+.panel-content::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 1); }
 
 .cluster-item {
   @apply flex flex-col px-3 py-2 cursor-pointer transition-colors border-b border-slate-700/20;

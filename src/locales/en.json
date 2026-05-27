@@ -1138,7 +1138,7 @@
   "terraforming.queueState.enabled-invalid": "Invalid",
   "terraforming.anyOf": "Any ",
   "terraforming.removed": "Removed",
-  "terraforming.mutuallyExclusive": "Missing",
+  "terraforming.mutuallyExclusive": "Mutually exclusive",
   "terraforming.branch.notCompleted": "not ",
   "terraforming.branch.completed": "",
   "terraforming.or": " or ",

@@ -1099,6 +1099,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
       if (obj.textReplaces) {
         text = resolveWithReplaces(text, obj.textReplaces, td, vI18nLookup)
       }
+      text = text.replace(/\b\d{4,}\b/g, (m) => parseInt(m, 10).toLocaleString())
 
       return {
         step: obj.step,
@@ -1183,7 +1184,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
         repeatRole,
         reasons: translateEvaluationReasons(evaluation.reasons, data, vI18nLookup),
         dependencies: formatDependencyExpression(project?.dependencies, projectNames, {
-          mutuallyExclusive: vI18nLookup('terraforming.mutuallyExclusive') || 'Missing',
+          mutuallyExclusive: vI18nLookup('terraforming.mutuallyExclusive') || 'Mutually exclusive',
           notCompletedBranch: vI18nLookup('terraforming.branch.notCompleted') || 'not ',
           completedBranch: vI18nLookup('terraforming.branch.completed') || '',
           or: vI18nLookup('terraforming.or') || ' or ',
@@ -1290,7 +1291,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
       anyOf: vI18nLookup('terraforming.anyOf') || 'Any ',
       setback: vI18nLookup('terraforming.setback') || 'setback',
       sideEffectChance: vI18nLookup('terraforming.sideEffect.chance') || 'chance',
-      mutuallyExclusive: vI18nLookup('terraforming.mutuallyExclusive') || 'Missing',
+      mutuallyExclusive: vI18nLookup('terraforming.mutuallyExclusive') || 'Mutually exclusive',
       notCompletedBranch: vI18nLookup('terraforming.branch.notCompleted') || 'not ',
       completedBranch: vI18nLookup('terraforming.branch.completed') || '',
       or: vI18nLookup('terraforming.or') || ' or ',

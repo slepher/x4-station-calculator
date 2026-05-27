@@ -24,6 +24,7 @@ interface Props {
   getCancelValidation: (entryId: string) => TerraformingCancelValidation
   deliveryShipMap: Map<string, DeliveryShip>
   hqBuildDocks: { totalSlots: number } | null
+  floating: boolean
 }
 
 const props = defineProps<Props>()
@@ -141,7 +142,7 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
 </script>
 
 <template>
-  <div class="panel-card">
+  <div class="panel-card" :class="{ 'panel-floating': floating }">
     <div class="panel-header">
       {{ t('terraforming.taskQueue') }}
       <span v-if="showNoDockWarning" class="text-amber-400 text-[11px] ml-2">⚠ {{ t('terraforming.noBuildDock') }}</span>
@@ -390,12 +391,26 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
 
 <style scoped>
 .panel-card {
-  @apply bg-slate-900/40 rounded-lg border border-slate-800 shadow-xl overflow-hidden;
+  @apply bg-slate-900/40 rounded-lg border border-slate-800 shadow-xl overflow-hidden flex flex-col;
+  max-height: var(--panel-max-h, calc(100vh - 8rem));
+}
+
+.panel-card.panel-floating .panel-header {
+  @apply sticky top-0 z-10;
 }
 
 .panel-header {
-  @apply h-12 flex items-center px-4 text-slate-200 text-sm font-semibold border-b border-slate-700/50 bg-slate-800/30;
+  @apply h-12 flex items-center px-4 text-slate-200 text-sm font-semibold border-b border-slate-700/50 bg-slate-800/30 flex-shrink-0;
 }
+
+.panel-content {
+  @apply p-3 flex flex-col gap-2 overflow-y-auto flex-1 min-h-0;
+}
+
+.panel-content::-webkit-scrollbar { width: 6px; }
+.panel-content::-webkit-scrollbar-track { background: rgba(30, 41, 59, 0.5); }
+.panel-content::-webkit-scrollbar-thumb { background: rgba(71, 85, 105, 0.8); border-radius: 3px; }
+.panel-content::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 1); }
 
 .clear-all-btn {
   @apply ml-auto text-[11px] px-2 py-1 rounded border border-red-800 text-red-300 bg-red-900/20 transition-colors;

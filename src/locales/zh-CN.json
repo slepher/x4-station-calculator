@@ -1139,7 +1139,7 @@
   "terraforming.queueState.enabled-invalid": "失效",
   "terraforming.anyOf": "任一 ",
   "terraforming.removed": "已移除",
-  "terraforming.mutuallyExclusive": "缺少",
+  "terraforming.mutuallyExclusive": "互斥",
   "terraforming.branch.notCompleted": "未执行",
   "terraforming.branch.completed": "执行",
   "terraforming.or": " 或 ",
