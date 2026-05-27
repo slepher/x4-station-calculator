@@ -1363,29 +1363,48 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     // 2. Generate cluster root goals from unmet objectives
     const clusterGoals: TerraformingGoalEntry[] = []
     if (cluster.objectives) {
+      const housingTarget = extractHousingTarget(cluster, cluster.objectives)
       for (let oi = 0; oi < cluster.objectives.length; oi++) {
         const obj = cluster.objectives[oi]!
         let satisfied = false
+        let label = ''
+        let targetProjectId: string | null = null
+
         if (obj.action === 'objective.build_project') {
           const projMatch = obj.textId.match(/^terraforming\.project\.(\w+)\.name$/)
           if (projMatch) {
             satisfied = (cumulativeCompleted.get(projMatch[1]!) ?? 0) > 0
+            targetProjectId = projMatch[1]!
+            const project = pmap.get(targetProjectId)
+            label = project ? (projectNames.get(targetProjectId) || project.name || targetProjectId) : obj.textId
+          } else {
+            satisfied = true
+            continue
+          }
+        } else if (obj.action === 'objective.build_housing') {
+          if (housingTarget !== null) {
+            satisfied = (cumulativeStats.population ?? 0) >= housingTarget
+            const td = data!
+            label = resolveTerraformingText(obj.textId, td, vI18nLookup)
+            if (obj.textReplaces) {
+              label = resolveWithReplaces(label, obj.textReplaces, td, vI18nLookup)
+            }
+            label = label.replace(/\b\d{4,}\b/g, (m) => parseInt(m, 10).toLocaleString())
+          } else {
+            satisfied = true
+            continue
           }
         } else {
           satisfied = true
+          continue
         }
+
         if (!satisfied) {
-          const projMatch = obj.textId.match(/^terraforming\.project\.(\w+)\.name$/)
-          let label = obj.textId
-          if (projMatch && data) {
-            const project = pmap.get(projMatch[1]!)
-            label = project ? (projectNames.get(projMatch[1]!) || project.name || projMatch[1]!) : label
-          }
           clusterGoals.push({
             id: nextGoalId(),
             kind: 'cluster',
-            label,
-            targetProjectId: projMatch?.[1] ?? null,
+            label: label || obj.textId,
+            targetProjectId,
             targetStatId: null,
             position: -1,
             satisfied: false,
