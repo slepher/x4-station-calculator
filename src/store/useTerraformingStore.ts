@@ -249,7 +249,7 @@ export const useTerraformingStore = defineStore('terraforming', () => {
   const runtimeProjectIds = computed<string[]>(() => {
     const cluster = selectedCluster.value
     if (!cluster) return []
-    return getRuntimeTerraformingProjectIds(cluster, currentStats.value, completedProjects.value, terraformingData.value)
+    return getRuntimeTerraformingProjectIds(cluster)
   })
 
   const hqStationName = computed<string>(() => {

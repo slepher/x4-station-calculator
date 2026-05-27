@@ -47,6 +47,7 @@ function presenterFor(projects: TerraformingProject[]) {
       partName: 'cluster',
       initialStats: {},
       projectIds: projects.map(item => item.id),
+      taskProjectIds: projects.map(item => item.id),
     }],
     deliveryShips: [],
   }

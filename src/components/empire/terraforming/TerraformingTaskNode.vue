@@ -32,6 +32,7 @@ const emit = defineEmits<{
   (e: 'setProjectCount', projectId: string, count: number): void
   (e: 'clickStat', statId: string): void
   (e: 'startDragTask', projectId: string, projectName: string): void
+  (e: 'endDragTask'): void
 }>()
 
 interface RepeatTagData {
@@ -128,6 +129,26 @@ function handleSetCount(node: { id: string; available: boolean }, newCount: numb
   const current = props.completedProjectCounts.get(node.id) ?? 0
   if (newCount > current && !node.available && !props.isEditing) return
   emit('setProjectCount', node.id, newCount)
+}
+
+function onChildDragStart(event: any) {
+  const dragged = event.item?._underlying_vm_
+  let projectId = ''
+  let projectName = ''
+
+  const target = event.originalEvent?.target as HTMLElement | undefined
+  const closest = target?.closest('[data-project-id]') as HTMLElement | undefined
+  if (closest?.dataset.projectId) {
+    projectId = closest.dataset.projectId
+    projectName = closest.dataset.projectName || ''
+  }
+
+  if (!projectId && event.item?.dataset?.projectId) projectId = event.item.dataset.projectId
+  if (!projectId && dragged?.id) projectId = dragged.id
+  if (!projectName && event.item?.dataset?.projectName) projectName = event.item.dataset.projectName
+  if (!projectName && projectId) projectName = getNodeName(projectId, dragged?.name || projectId)
+
+  if (projectId && projectName) emit('startDragTask', projectId, projectName)
 }
 </script>
 
@@ -231,7 +252,8 @@ function handleSetCount(node: { id: string; available: boolean }, newCount: numb
         ghost-class="drag-ghost"
         handle=".drag-to-log"
         class="task-node-list"
-        @start="(e: any) => { const n = e.item?._underlying_vm_; if (n?.id) emit('startDragTask', n.id, getNodeName(n.id, n.name)) }"
+        @start="onChildDragStart"
+        @end="emit('endDragTask')"
       >
         <template #item="{ element: child }">
           <div
@@ -249,6 +271,9 @@ function handleSetCount(node: { id: string; available: boolean }, newCount: numb
               :task-node-displays="taskNodeDisplays"
               @toggle-project="emit('toggleProject', $event)"
               @set-project-count="(pid: string, cnt: number) => emit('setProjectCount', pid, cnt)"
+              @click-stat="emit('clickStat', $event)"
+              @start-drag-task="(pid, pname) => emit('startDragTask', pid, pname)"
+              @end-drag-task="emit('endDragTask')"
             />
           </div>
         </template>
@@ -266,6 +291,9 @@ function handleSetCount(node: { id: string; available: boolean }, newCount: numb
           :task-node-displays="taskNodeDisplays"
           @toggle-project="emit('toggleProject', $event)"
           @set-project-count="(pid: string, cnt: number) => emit('setProjectCount', pid, cnt)"
+          @click-stat="emit('clickStat', $event)"
+          @start-drag-task="(pid, pname) => emit('startDragTask', pid, pname)"
+          @end-drag-task="emit('endDragTask')"
         />
       </template>
     </div>

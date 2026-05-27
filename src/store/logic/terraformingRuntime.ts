@@ -20,32 +20,6 @@ export const TERRAFORMING_IGNORE_FLAG_TO_STAT: Record<string, string> = {
   '$IgnoreAirPressure': 'airpressure',
 }
 
-export const TERRAFORMING_DYNAMIC_PROJECT_IDS = new Set([
-  'tmp_moholes',
-  'tmp_blackdust',
-  'atm_methane_import',
-  'tmp_cloudparticles',
-  'bio_cyanobacteria',
-  'atm_methane_oxidizers',
-  'atm_methane_oxidize',
-  'atm_carbon_mineralizers',
-  'atm_carbon_mineralize',
-  'atm_toxin_cleanup',
-  'ter_radioactive_cleanup',
-  'wat_import',
-  'wat_irrigation',
-  'wat_surfacing',
-  'atm_nitrogen_fix',
-  'atm_helium_import',
-  'atm_outgassing',
-  'evt_globalwarming_methane',
-  'evt_globalwarming_co2',
-  'evt_quake_mild',
-  'evt_quake_moderate',
-  'evt_quake_severe',
-  'ter_tectonic_scaffolding',
-])
-
 export function buildProjectMap(data: TerraformingData): Map<string, TerraformingProject> {
   return new Map(data.projects.map(project => [project.id, project]))
 }
@@ -163,112 +137,9 @@ export function computeTerraformingRuntimeStats(
   return deriveAirPressure(cluster, effectStats, ignoredStats)
 }
 
-export function getDynamicProjectsForStats(
-  stats: Record<string, number>,
-  ignoredStats: Set<string>,
-): Set<string> {
-  const dynamicIds = new Set<string>()
-
-  if (!ignoredStats.has('temperature') && stats.temperature !== undefined) {
-    if ((stats.temperature ?? 0) < 5) {
-      dynamicIds.add('tmp_moholes')
-      dynamicIds.add('tmp_blackdust')
-      dynamicIds.add('atm_methane_import')
-    }
-    if ((stats.temperature ?? 0) > 5) {
-      dynamicIds.add('tmp_cloudparticles')
-    }
-  }
-
-  if (!ignoredStats.has('oxygen') && (stats.oxygen ?? 0) < 4) {
-    dynamicIds.add('bio_cyanobacteria')
-  }
-
-  if (!ignoredStats.has('methane') && (stats.methane ?? 0) > 0) {
-    dynamicIds.add('atm_methane_oxidizers')
-    dynamicIds.add('atm_methane_oxidize')
-    dynamicIds.add('evt_globalwarming_methane')
-  }
-
-  if (!ignoredStats.has('carbondioxide') && (stats.carbondioxide ?? 0) > 0) {
-    dynamicIds.add('atm_carbon_mineralizers')
-    dynamicIds.add('atm_carbon_mineralize')
-    dynamicIds.add('evt_globalwarming_co2')
-  }
-
-  if (!ignoredStats.has('toxicity') && (stats.toxicity ?? 0) > 0) {
-    dynamicIds.add('atm_toxin_cleanup')
-  }
-
-  if (!ignoredStats.has('radioactivity') && (stats.radioactivity ?? 0) > 0) {
-    dynamicIds.add('ter_radioactive_cleanup')
-  }
-
-  if (!ignoredStats.has('humidity') && (stats.humidity ?? 9) < 6) {
-    dynamicIds.add('wat_import')
-    dynamicIds.add('wat_irrigation')
-    dynamicIds.add('wat_surfacing')
-  }
-
-  if (!ignoredStats.has('airpressure') && stats.airpressure !== undefined) {
-    dynamicIds.add('atm_nitrogen_fix')
-    dynamicIds.add('atm_helium_import')
-    if ((stats.airpressure ?? 0) < 5) {
-      dynamicIds.add('atm_outgassing')
-    }
-  }
-
-  if ((stats.seismicactivity ?? 0) > 0) {
-    dynamicIds.add('evt_quake_mild')
-    dynamicIds.add('evt_quake_moderate')
-    dynamicIds.add('evt_quake_severe')
-    dynamicIds.add('ter_tectonic_scaffolding')
-  }
-
-  return dynamicIds
-}
-
 export function getRuntimeTerraformingProjectIds(
   cluster: TerraformingCluster | null,
-  stats: Record<string, number>,
-  completedProjects: Map<string, number>,
-  data?: TerraformingData | null,
 ): string[] {
   if (!cluster) return []
-
-  const ignoredStats = getTerraformingIgnoredStats(cluster)
-  const initialDynamicIds = getDynamicProjectsForStats(buildTerraformingBaseStats(cluster), ignoredStats)
-  const runtimeDynamicIds = getDynamicProjectsForStats(stats, ignoredStats)
-  const visible = new Set<string>()
-
-  for (const projectId of cluster.projectIds) {
-    const isDynamicCandidate = TERRAFORMING_DYNAMIC_PROJECT_IDS.has(projectId)
-    const wasInjectedDynamically = initialDynamicIds.has(projectId)
-    if (!isDynamicCandidate || !wasInjectedDynamically) {
-      visible.add(projectId)
-    }
-  }
-
-  for (const projectId of runtimeDynamicIds) {
-    visible.add(projectId)
-  }
-
-  for (const [projectId, count] of completedProjects) {
-    if (count > 0) visible.add(projectId)
-  }
-
-  if (data) {
-    const baseVisible = new Set(visible)
-    for (const projectId of [...baseVisible, ...completedProjects.keys()]) {
-      const project = data.projects.find(p => p.id === projectId)
-      if (!project?.sideEffects) continue
-      for (const se of project.sideEffects) {
-        if (se.project) {
-          visible.add(se.project)
-        }
-      }
-    }
-  }
-
-  return [...visible]
+  return [...cluster.taskProjectIds]
 }

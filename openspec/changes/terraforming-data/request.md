@@ -82,6 +82,7 @@
 - 内嵌 predecessors 到 project 定义
 - 输出足以还原游戏内 stat 方块显示的数据语义（state 编号、颜色、habitable、value 区间）
 - 输出足以让消费方区分 condition 的 state 约束与 value 约束的字段
+- 为每个 cluster 预计算 `taskProjectIds`（生成端固化）：根据 cluster 的 `Ignore*` flag / `removedStats` 过滤动态项目，非动态项目全部保留
 - 生成 `terraforming.json` 到 `data/` 目录
 - 收集 nameId 走现有 i18n 管线
 - `src/store/logic/terraformingTaskResolver.ts` 任务推理逻辑
@@ -104,7 +105,8 @@
   - `projectGroups` 包含所有分组
   - `projects` 包含所有项目定义（含内嵌 predecessors），总数 ≥ 80
    - `projects[].conditions` 中可区分 state 语义 (`min/max`) 与 value 语义 (`minvalue/maxvalue`)
-  - `clusters` 包含所有星球（≥ 8），每个有 initialStats 和 projectIds
+  - `clusters` 包含所有星球（≥ 8），每个有 initialStats、projectIds 和 **taskProjectIds**
+  - `clusters[].taskProjectIds` 为前端唯一源：按 cluster Ignore flag / removedStats 已过滤动态项目
 4. 所有 `nameId` / `descriptionId` / `textId` 文本引用已纳入 i18n 收集管线
 5. `npm run build` 无编译错误
 6. `npx vite-node analysis/scripts/terraforming/terraforming.ts --planet=ScalePlateGreen` 可运行并输出任务依赖树

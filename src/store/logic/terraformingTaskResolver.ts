@@ -34,6 +34,7 @@ export interface TerraformingCluster {
   partName: string
   initialStats: Record<string, number>
   projectIds: string[]
+  taskProjectIds: string[]
   removedStats?: string[]
   objectives?: ClusterObjective[]
   values?: Record<string, string>

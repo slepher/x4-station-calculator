@@ -1201,11 +1201,9 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
 
   function buildRuntimeClusterForReplay(
     cluster: TerraformingCluster,
-    stats: Record<string, number>,
-    completedProjects: Map<string, number>,
     data: TerraformingData,
   ): { runtimeCluster: TerraformingCluster; clusterProjects: TerraformingProject[] } {
-    const runtimeProjectIds = getRuntimeTerraformingProjectIds(cluster, stats, completedProjects, data)
+    const runtimeProjectIds = getRuntimeTerraformingProjectIds(cluster)
     const runtimeCluster: TerraformingCluster = {
       ...cluster,
       projectIds: runtimeProjectIds,
@@ -1633,7 +1631,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
       const entry = draftExecutionLog.value[index]!
       const project = pmap.get(entry.projectId)
       const beforeStats = computeTerraformingRuntimeStats(cluster, completedProjects, data)
-      const { clusterProjects } = buildRuntimeClusterForReplay(cluster, beforeStats, completedProjects, data)
+      const { clusterProjects } = buildRuntimeClusterForReplay(cluster, data)
       const runtimePidSet = new Set(clusterProjects.map(p => p.id))
       const evaluation = !entry.systemDisabled
         ? evaluateTerraformingProjectExecution(project, { stats: beforeStats, completedProjects }, pmap, clusterProjects, data.stats)
@@ -1744,7 +1742,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     if (!data || !cluster) return null
     const completedProjects = effectiveCompletedProjects.value
     const stats = effectiveCurrentStats.value
-    const runtimeProjectIds = getRuntimeTerraformingProjectIds(cluster, stats, completedProjects, data)
+    const runtimeProjectIds = getRuntimeTerraformingProjectIds(cluster)
     const runtimeCluster: TerraformingCluster = {
       ...cluster,
       projectIds: runtimeProjectIds,
@@ -1975,7 +1973,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
       completedProjects: Map<string, number>,
     ) => {
       const beforeStats = computeTerraformingRuntimeStats(cluster, completedProjects, data)
-      const beforeProjectIds = getRuntimeTerraformingProjectIds(cluster, beforeStats, completedProjects, data)
+      const beforeProjectIds = getRuntimeTerraformingProjectIds(cluster)
       const runtimeCluster: TerraformingCluster = {
         ...cluster,
         projectIds: beforeProjectIds,
@@ -2163,7 +2161,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
       completedProjects: Map<string, number>,
     ) => {
       const beforeStats = computeTerraformingRuntimeStats(cluster, completedProjects, data)
-      const { clusterProjects } = buildRuntimeClusterForReplay(cluster, beforeStats, completedProjects, data)
+      const { clusterProjects } = buildRuntimeClusterForReplay(cluster, data)
       return evaluateTerraformingProjectExecution(
         projectMap.value.get(entry.projectId),
         { stats: beforeStats, completedProjects },
@@ -2758,7 +2756,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     if (!data || !cluster) return false
     const completedProjects = store.terraformingCompletedProjects.value
     const stats = store.terraformingCurrentStats.value
-    const { clusterProjects } = buildRuntimeClusterForReplay(cluster, stats, completedProjects, data)
+    const { clusterProjects } = buildRuntimeClusterForReplay(cluster, data)
     const evaluation = evaluateTerraformingProjectExecution(
       projectMap.value.get(projectId),
       { stats, completedProjects },

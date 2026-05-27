@@ -435,3 +435,27 @@ evt_salinization: salinity≤2, humidity≥2 → salinity+1
 ### 韧性项目 (未区分)
 
 17 个项目 `resilient: true`（setback 后效果保留），当前无区分。
+
+## 补充 — Cluster taskProjectIds 固化
+
+### 背景
+
+原先前端在运行时根据 `currentStats` 和 `completedProjects` 动态计算 project 可见性（`getRuntimeTerraformingProjectIds`）。这导致：
+- 同一个 cluster 在不同 stat 状态下任务树不同
+- 动态项目的可见性依赖于当前运行时状态，而非 cluster 固有属性
+
+### 方案
+
+改为生成端（build.py）预计算：为每个 cluster 明确列出该项目在这个星球上的生效任务。
+
+- `build.py` 新增 `_DYNAMIC_PROJECT_REQUIRED_STATS` 映射（约 25 个动态项目 → 所需 stat）
+- 对每个 cluster，若其 `Ignore*` flag 或 `removedStats` 忽略了某 stat，则依赖该 stat 的动态项目不出现在 `taskProjectIds` 中
+- 非动态项目（不依赖特定 stat 阈值）全部保留
+- 输出字段 `cluster.taskProjectIds: string[]`
+
+### 前端变化
+
+- 类型新增 `TerraformingCluster.taskProjectIds`
+- `terraformingRuntime.ts` 删除 `getRuntimeTerraformingProjectIds` 和相关逻辑
+- 任务树构建直接使用 `cluster.taskProjectIds`
+- 不再有"动态增删 project"的行为——所有 project 对 cluster 要么始终可见，要么始终不可见

@@ -285,3 +285,27 @@
 - `name` 由 `inject_english_names()` 管线注入
 
 **并且** `projects[].deliveries[].buildDuration` 移除，只保留 `macro` + `amount`
+
+### Requirement: Cluster MUST 固化 taskProjectIds
+
+Cluster 数据 MUST 在生成时预计算 `taskProjectIds` — 该 planet 为"前端唯一源"的固定 task 集合。
+
+#### Scenario: 动态项目按 stat 可用性过滤
+
+**前提** 某 cluster 通过 `Ignore*` flag 或 `removedStats` 忽略了某 stat（如 temperature）
+
+**当** build.py 为该 cluster 计算 `taskProjectIds`
+
+**那么** 依赖该 stat 的动态项目 MUST NOT 出现在 `taskProjectIds` 中
+
+**并且** 非动态项目（不依赖特定 stat 阈值的）MUST 全部保留
+
+#### Scenario: 前端直接消费
+
+**前提** `terraforming.json` 已生成
+
+**当** 前端构建任务树
+
+**那么** MUST 使用 `cluster.taskProjectIds` 作为 project 候选集合
+
+**并且** MUST NOT 在运行时根据 `currentStats` 或 `completedProjects` 动态增删 project

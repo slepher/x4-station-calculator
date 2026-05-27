@@ -17,9 +17,119 @@ from .parse_md import parse_md, resolve_cluster_objective_texts
 
 DependencyExpr = Dict[str, Any]
 
+_IGNORE_FLAG_TO_STAT: Dict[str, str] = {
+    "$IgnoreTemperature": "temperature",
+    "$IgnoreOxygen": "oxygen",
+    "$IgnoreMethane": "methane",
+    "$IgnoreCarbonDioxide": "carbondioxide",
+    "$IgnoreToxicity": "toxicity",
+    "$IgnoreRadioactivity": "radioactivity",
+    "$IgnoreHumidity": "humidity",
+    "$IgnoreAirPressure": "airpressure",
+}
+
+_DYNAMIC_PROJECT_REQUIRED_STATS: Dict[str, List[str]] = {
+    "tmp_moholes": ["temperature"],
+    "tmp_blackdust": ["temperature"],
+    "atm_methane_import": ["temperature"],
+    "tmp_cloudparticles": ["temperature"],
+    "bio_cyanobacteria": ["oxygen"],
+    "atm_methane_oxidizers": ["methane"],
+    "atm_methane_oxidize": ["methane"],
+    "atm_carbon_mineralizers": ["carbondioxide"],
+    "atm_carbon_mineralize": ["carbondioxide"],
+    "atm_toxin_cleanup": ["toxicity"],
+    "ter_radioactive_cleanup": ["radioactivity"],
+    "wat_import": ["humidity"],
+    "wat_irrigation": ["humidity"],
+    "wat_surfacing": ["humidity"],
+    "atm_nitrogen_fix": ["airpressure"],
+    "atm_helium_import": ["airpressure"],
+    "atm_outgassing": ["airpressure"],
+    "evt_globalwarming_methane": ["methane"],
+    "evt_globalwarming_co2": ["carbondioxide"],
+    "evt_quake_mild": ["seismicactivity"],
+    "evt_quake_moderate": ["seismicactivity"],
+    "evt_quake_severe": ["seismicactivity"],
+    "ter_tectonic_scaffolding": ["seismicactivity"],
+}
+
+_DYNAMIC_PROJECT_IDS = set(_DYNAMIC_PROJECT_REQUIRED_STATS.keys())
+
 
 def _expr_key(expr: DependencyExpr) -> str:
     return json.dumps(expr, sort_keys=True, separators=(",", ":"))
+
+
+def _append_unique(items: List[str], item: str) -> None:
+    if item and item not in items:
+        items.append(item)
+
+
+def _cluster_ignored_stats(cluster: Dict[str, Any]) -> set[str]:
+    ignored = set(cluster.get("removedStats", []))
+    values = cluster.get("values", {})
+    for flag, stat_id in _IGNORE_FLAG_TO_STAT.items():
+        if values.get(flag) == "true":
+            ignored.add(stat_id)
+    return ignored
+
+
+def _dynamic_project_matches_cluster(
+    project_id: str,
+    initial_stats: Dict[str, Any],
+    ignored_stats: set[str],
+) -> bool:
+    required_stats = set(_DYNAMIC_PROJECT_REQUIRED_STATS.get(project_id, []))
+    for stat_id in required_stats:
+        if stat_id in ignored_stats:
+            return False
+        if stat_id not in initial_stats:
+            return False
+    return True
+
+
+def _build_cluster_task_project_ids(
+    cluster: Dict[str, Any],
+    project_map: Dict[str, Dict[str, Any]],
+) -> List[str]:
+    """Freeze the task membership for a cluster from static cluster capability.
+
+    This is intentionally based on stat existence and cluster metadata, not on
+    current stat values. Runtime state should block tasks, not add/remove them.
+    """
+    initial_stats = cluster.get("initialStats", {})
+    ignored_stats = _cluster_ignored_stats(cluster)
+    task_project_ids: List[str] = []
+
+    for project_id in cluster.get("projectIds", []):
+        if project_id in _DYNAMIC_PROJECT_IDS:
+            if _dynamic_project_matches_cluster(project_id, initial_stats, ignored_stats):
+                _append_unique(task_project_ids, project_id)
+            continue
+        _append_unique(task_project_ids, project_id)
+
+    for project_id in _DYNAMIC_PROJECT_REQUIRED_STATS.keys():
+        if _dynamic_project_matches_cluster(project_id, initial_stats, ignored_stats):
+            _append_unique(task_project_ids, project_id)
+
+    index = 0
+    while index < len(task_project_ids):
+        project = project_map.get(task_project_ids[index])
+        index += 1
+        if not project:
+            continue
+        for side_effect in project.get("sideEffects", []):
+            target_id = side_effect.get("project")
+            if not target_id:
+                continue
+            if target_id in _DYNAMIC_PROJECT_IDS:
+                if _dynamic_project_matches_cluster(target_id, initial_stats, ignored_stats):
+                    _append_unique(task_project_ids, target_id)
+                continue
+            _append_unique(task_project_ids, target_id)
+
+    return task_project_ids
 
 
 def _simplify_dependency_expr(expr: DependencyExpr | None) -> DependencyExpr | None:
@@ -454,6 +564,10 @@ def build_terraforming_data(
             seen_predecessors[pid] = proj["predecessors"]
 
     _build_dependency_expressions(projects)
+
+    project_map = {project["id"]: project for project in projects}
+    for cluster in clusters:
+        cluster["taskProjectIds"] = _build_cluster_task_project_ids(cluster, project_map)
 
     for s in stats:
         if s.get("nameId"):
