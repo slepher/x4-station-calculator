@@ -1055,10 +1055,6 @@ function isStatInRuntime(stats: Record<string, number>, statId: string): boolean
   return statId in stats
 }
 
-function isProjectInCluster(runtimeProjectIds: Set<string>, projectId: string): boolean {
-  return runtimeProjectIds.has(projectId)
-}
-
 export function useTerraformingPresenter(store: TerraformingPresenterStore): UseTerraformingPresenterReturn {
   const vI18nLookup: I18nLookup = (key: string) => (i18n.global.t(key) as string) || ''
   const isQueueEditing = ref(false)
@@ -1400,10 +1396,24 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
 
       // Check predecessors for unmet project goals
       if (project.predecessors) {
-        for (const pred of project.predecessors) {
-          if (pred.type !== 'project') continue
-          if (!isProjectInCluster(clusterProjectIds, pred.ref)) continue
-          if ((lastCumulativeCompleted.get(pred.ref) ?? 0) > 0) continue
+        const projectPreds = project.predecessors.filter(p => p.type === 'project' && clusterProjectIds.has(p.ref))
+        const anyPreds = projectPreds.filter(p => p.any)
+        const allPreds = projectPreds.filter(p => !p.any)
+
+        let predsToAdd: typeof anyPreds = []
+        if (anyPreds.length > 0) {
+          const anyMet = anyPreds.some(p => (lastCumulativeCompleted.get(p.ref) ?? 0) > 0)
+          if (!anyMet) {
+            predsToAdd.push(...anyPreds)
+          }
+        }
+        for (const pred of allPreds) {
+          if ((lastCumulativeCompleted.get(pred.ref) ?? 0) <= 0) {
+            predsToAdd.push(pred)
+          }
+        }
+
+        for (const pred of predsToAdd) {
           const key = `project:${pred.ref}`
           const existing = projectGoalCandidates.get(key)
           if (existing) {
