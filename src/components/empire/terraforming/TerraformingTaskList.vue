@@ -378,6 +378,7 @@ function getStatLines(projectId: string): TerraformingStatLineModel[] {
                       @toggle-project="emit('toggleProject', $event)"
                       @set-project-count="(pid: string, cnt: number) => emit('setProjectCount', pid, cnt)"
                       @click-stat="emit('clickStat', $event)"
+                      @start-drag-task="(pid, pname) => emit('startDragTask', pid, pname)"
                     />
                   </div>
                 </template>

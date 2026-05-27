@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
+import draggable from 'vuedraggable'
 import type { TerraformingProject, TaskNode } from '@/store/logic/terraformingTaskResolver'
 import type {
   TerraformingStatLineModel,
@@ -30,6 +31,7 @@ const emit = defineEmits<{
   (e: 'toggleProject', projectId: string): void
   (e: 'setProjectCount', projectId: string, count: number): void
   (e: 'clickStat', statId: string): void
+  (e: 'startDragTask', projectId: string, projectName: string): void
 }>()
 
 interface RepeatTagData {
@@ -219,19 +221,53 @@ function handleSetCount(node: { id: string; available: boolean }, newCount: numb
       </div>
     </div>
     <div v-if="node.children.length > 0" class="task-children">
-      <TerraformingTaskNode
-        v-for="child in node.children"
-        :key="child.id"
-        :node="child"
-        :is-child="true"
-        :is-editing="isEditing"
-        :completed-project-counts="completedProjectCounts"
-        :project-map="projectMap"
-        :project-display-names="projectDisplayNames"
-        :task-node-displays="taskNodeDisplays"
-        @toggle-project="emit('toggleProject', $event)"
-        @set-project-count="(pid: string, cnt: number) => emit('setProjectCount', pid, cnt)"
-      />
+      <draggable
+        v-if="isEditing"
+        :model-value="node.children"
+        :group="{ name: 'terraforming-tasks', pull: 'clone', put: false }"
+        :sort="false"
+        :clone="(n: any) => ({ projectId: n.id, projectName: getNodeName(n.id, n.name), _type: 'drag-clone' })"
+        item-key="id"
+        ghost-class="drag-ghost"
+        handle=".drag-to-log"
+        class="task-node-list"
+        @start="(e: any) => { const n = e.item?._underlying_vm_; if (n?.id) emit('startDragTask', n.id, getNodeName(n.id, n.name)) }"
+      >
+        <template #item="{ element: child }">
+          <div
+            class="task-node-drag-wrapper"
+            :data-project-id="child.id"
+            :data-project-name="getNodeName(child.id, child.name)"
+          >
+            <TerraformingTaskNode
+              :node="child"
+              :is-child="true"
+              :is-editing="isEditing"
+              :completed-project-counts="completedProjectCounts"
+              :project-map="projectMap"
+              :project-display-names="projectDisplayNames"
+              :task-node-displays="taskNodeDisplays"
+              @toggle-project="emit('toggleProject', $event)"
+              @set-project-count="(pid: string, cnt: number) => emit('setProjectCount', pid, cnt)"
+            />
+          </div>
+        </template>
+      </draggable>
+      <template v-else>
+        <TerraformingTaskNode
+          v-for="child in node.children"
+          :key="child.id"
+          :node="child"
+          :is-child="true"
+          :is-editing="isEditing"
+          :completed-project-counts="completedProjectCounts"
+          :project-map="projectMap"
+          :project-display-names="projectDisplayNames"
+          :task-node-displays="taskNodeDisplays"
+          @toggle-project="emit('toggleProject', $event)"
+          @set-project-count="(pid: string, cnt: number) => emit('setProjectCount', pid, cnt)"
+        />
+      </template>
     </div>
   </div>
 </template>
