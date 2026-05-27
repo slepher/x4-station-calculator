@@ -54,6 +54,21 @@ const cancelValidationCache = ref<Record<string, TerraformingCancelValidation>>(
 const isDragOver = ref(false)
 const dropTargetIndex = ref(-1)
 
+const dragInsertBeforePlanIndex = computed(() => {
+  if (dropTargetIndex.value < 0) return -1
+  // Convert draftExecutionLog insert index back to planEntries list index
+  let taskCount = 0
+  for (let i = 0; i < props.queueEditState.planEntries.length; i++) {
+    const pe = props.queueEditState.planEntries[i]!
+    if (pe.type === 'task') {
+      if (taskCount === dropTargetIndex.value) return i
+      taskCount++
+    }
+  }
+  // Insert at end
+  return props.queueEditState.planEntries.length
+})
+
 function getTaskDropIndex(pe: TerraformingGoalPlanDisplayEntry, listIndex: number): number {
   // Convert plan-entry listIndex to draftExecutionLog index
   // Count task entries before this position
@@ -240,7 +255,7 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
       class="panel-header"
       :class="{ 'drag-over': isDragOver }"
     >
-      <span v-if="isDragOver" class="drop-hint">↧ {{ t('terraforming.dropToEnd') || 'Drop here' }}</span>
+      <span v-if="isDragOver" class="drop-hint">↧ Drop to insert</span>
       <span v-else>{{ t('terraforming.taskQueue') }}</span>
       <span v-if="showNoDockWarning" class="text-amber-400 text-[11px] ml-2">⚠ {{ t('terraforming.noBuildDock') }}</span>
       <span v-if="queueEditState.editing && queueEditState.unsatisfiedGoalCount > 0" class="text-red-400 text-[11px] ml-2">
@@ -314,9 +329,11 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
                     'goal-satisfied': planEntry.entry.satisfied,
                     'goal-unsatisfied': !planEntry.entry.satisfied,
                     'goal-has-risk': planEntry.entry.hasRisk,
+                    'drag-insert-before': isDragOver && dragInsertBeforePlanIndex === listIndex,
                   }]
                 : ['timeline-item', 'draft-item', {
                     'system-disabled': planEntry.entry.systemDisabled,
+                    'drag-insert-before': isDragOver && dragInsertBeforePlanIndex === listIndex,
                   }]"
               @click="planEntry.type === 'goal' ? emit('clickGoal', planEntry.entry.id) : undefined"
             >
@@ -711,6 +728,10 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
 
 .drag-ghost {
   @apply opacity-30 bg-slate-700 border-sky-500 border-dashed border-2;
+}
+
+.drag-insert-before {
+  @apply border-t-2 border-sky-400;
 }
 
 .draggable-container {
