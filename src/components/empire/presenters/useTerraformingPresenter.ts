@@ -213,6 +213,8 @@ export interface TerraformingGoalEntry {
   hasRisk: boolean
   riskReason?: string
   dependentTaskIds: string[]
+  hasExistingTask: boolean
+  existingDraftEntryId?: string
 }
 
 export interface TerraformingGoalDisplayEntry {
@@ -224,6 +226,8 @@ export interface TerraformingGoalDisplayEntry {
   riskReason?: string
   isFilterActive: boolean
   statGoalModel?: TerraformingStatGoalLineModel
+  hasExistingTask: boolean
+  existingDraftEntryId?: string
 }
 
 export type TerraformingGoalPlanDisplayEntry =
@@ -284,6 +288,7 @@ export interface TerraformingPresenterEmits {
   removeDraftEntry: (entryId: string) => void
   removeAllDraftEntries: () => void
   clickGoal: (goalId: string) => void
+  moveTaskBeforeDependency: (entryId: string, targetGoalId: string) => void
   appendDraftTask: (projectId: string, targetIndex?: number) => void
   startDraggingTask: (projectId: string, projectName: string) => void
   endDraggingTask: () => void
@@ -1485,6 +1490,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
             satisfied: false,
             hasRisk: false,
             dependentTaskIds: [],
+            hasExistingTask: false,
           })
         }
       }
@@ -1504,6 +1510,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
         satisfied: false,
         hasRisk: false,
         dependentTaskIds: [...cg.dependentTaskIds],
+        hasExistingTask: false,
       })
     }
 
@@ -1521,6 +1528,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
         satisfied: false,
         hasRisk: false,
         dependentTaskIds: [...cg.dependentTaskIds],
+        hasExistingTask: false,
       })
     }
 
@@ -1543,6 +1551,19 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
         goal.position = minIndex
       } else {
         goal.position = draftEntries.length
+      }
+    }
+
+    // 6.5 Detect goals whose target project already exists as a task in the queue
+    const draftProjectMap = new Map<string, { entryId: string; index: number }>()
+    draftEntries.forEach((e, i) => draftProjectMap.set(e.projectId, { entryId: e.id, index: i }))
+    for (const goal of mergedGoals) {
+      if (goal.targetProjectId) {
+        const draftTask = draftProjectMap.get(goal.targetProjectId)
+        if (draftTask) {
+          goal.hasExistingTask = true
+          goal.existingDraftEntryId = draftTask.entryId
+        }
       }
     }
 
@@ -2219,6 +2240,8 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
         riskReason: goal.riskReason,
         isFilterActive: activeFilter.has(goal.id),
         statGoalModel: statModel,
+        hasExistingTask: goal.hasExistingTask,
+        existingDraftEntryId: goal.existingDraftEntryId,
       }
     })
   })
@@ -2523,6 +2546,28 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
       next.add(goalId)
     }
     activeGoalFilterIds.value = next
+  }
+
+  function moveTaskBeforeDependency(entryId: string, goalId: string) {
+    const goal = generatedGoals.value.find(g => g.id === goalId)
+    if (!goal?.dependentTaskIds.length) return
+
+    const sourceIndex = draftExecutionLog.value.findIndex(e => e.id === entryId)
+    if (sourceIndex < 0) return
+
+    // Find the earliest dependent task (task A that depends on B)
+    let earliestIndex = Infinity
+    for (const depId of goal.dependentTaskIds) {
+      const idx = draftExecutionLog.value.findIndex(e => e.id === depId)
+      if (idx >= 0 && idx < earliestIndex) earliestIndex = idx
+    }
+    if (earliestIndex === Infinity || earliestIndex >= sourceIndex) return
+
+    const next = [...draftExecutionLog.value]
+    const [moved] = next.splice(sourceIndex, 1)
+    if (!moved) return
+    next.splice(earliestIndex, 0, moved)
+    draftExecutionLog.value = next
   }
 
   function copyDraftEntry(entryId: string) {
@@ -2832,6 +2877,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     removeDraftEntry,
     removeAllDraftEntries,
     clickGoal,
+    moveTaskBeforeDependency,
     copyDraftEntry,
     moveDraftEntry,
     reorderDraftEntries,

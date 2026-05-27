@@ -44,7 +44,8 @@ const emit = defineEmits<{
   (e: 'updateDraftEntries', entries: TerraformingDraftTimelineEntry[]): void
   (e: 'clickStat', statId: string): void
   (e: 'clickGoal', goalId: string): void
-  (e: 'dropTask', projectId: string, targetIndex?: number): void
+  (e: 'moveTaskBeforeDependency', entryId: string, goalId: string): void
+  (e: 'dropTask', projectId: string, targetIdx: number): void
 }>()
 
 const { t } = useI18n()
@@ -337,11 +338,12 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
                     'goal-satisfied': planEntry.entry.satisfied,
                     'goal-unsatisfied': !planEntry.entry.satisfied,
                     'goal-has-risk': planEntry.entry.hasRisk,
+                    'goal-has-task': planEntry.entry.hasExistingTask,
                   }]
                 : ['timeline-item', 'draft-item', {
                     'system-disabled': planEntry.entry.systemDisabled,
                   }]"
-              @click="planEntry.type === 'goal' ? emit('clickGoal', planEntry.entry.id) : undefined"
+              @click="planEntry.type === 'goal' && !planEntry.entry.hasExistingTask ? emit('clickGoal', planEntry.entry.id) : undefined"
             >
               <template v-if="planEntry.type === 'goal'">
                 <div class="goal-head">
@@ -351,7 +353,15 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
                   <span v-else-if="planEntry.entry.kind === 'stat'" class="goal-kind-tag">{{ t('terraforming.goal.statGoal') || 'Stat Goal' }}</span>
                   <span v-else class="goal-kind-tag">{{ t('terraforming.goal.projectGoal') || 'Goal' }}</span>
                   <span v-if="planEntry.entry.satisfied" class="goal-status done">✓</span>
+                  <span v-else-if="planEntry.entry.hasExistingTask" class="goal-status ordering">↕</span>
                   <span v-else class="goal-status pending">○</span>
+                  <button
+                    v-if="planEntry.entry.hasExistingTask"
+                    class="goal-move-btn"
+                    @click.stop="emit('moveTaskBeforeDependency', planEntry.entry.existingDraftEntryId!, planEntry.entry.id)"
+                  >
+                    ↑
+                  </button>
                 </div>
                 <div v-if="planEntry.entry.statGoalModel" class="goal-stat-display">
                   <TerraformingStatScale
@@ -650,6 +660,18 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
 
 .goal-entry.goal-has-risk {
   @apply border-red-700/60;
+}
+
+.goal-entry.goal-has-task {
+  @apply border-sky-600/60 bg-sky-950/30 cursor-default;
+}
+
+.goal-move-btn {
+  @apply ml-auto text-xs px-2 py-0.5 rounded bg-sky-800 text-sky-200 border border-sky-700 hover:bg-sky-700 transition-colors;
+}
+
+.goal-status.ordering {
+  @apply text-sky-400;
 }
 
 .goal-head {
