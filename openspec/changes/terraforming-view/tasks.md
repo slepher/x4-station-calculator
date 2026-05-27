@@ -9,7 +9,11 @@
 - [x] 星区名称通过 presenter 提供的 i18n 映射显示
 - [x] 当前星区 tag 已接入
 - [x] objective 文本与完成状态已接入
-- [x] accordion 为单展开模式
+- [x] accordion 已替换为 list/item 双模式
+- [x] list 模式：星区列表，选中星区保持高亮
+- [x] item 模式：星区 title + objectives + stats + rebates，返回按钮（更换船只 SVG）
+- [x] 返回 list 模式不清理 selectedClusterId
+- [x] stats 与 rebates 显示从 TaskList 移至 SectorPanel item 模式
 
 ### 中列：任务树
 
@@ -39,6 +43,7 @@
 - [x] 单条 entry 支持取消
 - [x] 单条取消预演改为按需计算
 - [x] 同组关系仅作视觉标记，不折叠、不合并
+- [x] 非编辑模式新增 entry 时自动展开末条并滚动到底（double nextTick）
 
 ### Presenter 与性能边界
 
@@ -46,6 +51,8 @@
 - [x] presenter 承担 UI 组装职责
 - [x] `cancelValidation` 已改为惰性计算
 - [x] `projectMaxCounts` 已移除
+- [x] `TerraformingSectorPanelProps` 新增 stat/rebate 字段
+- [x] `TerraformingTaskListProps` 移除 stat/rebate/conditionScaleModels 字段
 
 ### 任务树递归渲染
 
@@ -99,3 +106,19 @@
 - [ ] 若继续优化性能，优先检查 presenter 边界和 timeline 惰性计算，不要恢复整树预翻译
 - [ ] 不要重新引入未来总上限预测逻辑
 - [ ] 不要把 execution timeline 回退为聚合资源表
+
+## 面板布局与交互
+
+- [x] 三栏面板浮动/固定双模式：根据 `queueEditState.editing` 切换
+- [x] 浮动面板：`flex-col` + `max-height`（动态 `window.innerHeight - 32px`）+ `overflow-y-auto` + header `sticky`
+- [x] 浮动面板 sticky 置于父级 wrapper（`top-2`），避免与 `overflow-hidden` 冲突
+- [x] 固定面板：无 max-h/flex-col，内容自然撑开，页级滚动
+- [x] 自定义滚动条样式：6px 暗色 slate，与其他区域一致
+- [x] panel-header 加 `flex-shrink-0` 防止被压缩
+- [x] rebates 显示为 `grid-cols-2`
+- [x] objective 数字千位分隔（`toLocaleString()`）
+- [x] `terraforming.mutuallyExclusive` i18n 改为互斥/排他语义
+
+## I18n 新增
+
+- [x] `terraforming.backToList` / `terraforming.statsTitle` / `terraforming.rebatesTitle`

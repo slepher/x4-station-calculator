@@ -121,3 +121,71 @@
 
 - housing built 数据来源：目前无 X4 save 数据支撑，`objective.build_housing` 暂通过 `currentStats.population` 判定。后续需从 HQ station plan 的人口 housing 模块推导。
 - `terraformingCurrentStats` 合并 completed projects 的 effects 策略由 `useTerraformingStore` 内部处理，View 层不感知计算细节。
+
+---
+
+## 补充 — 星区面板导航重构
+
+### 背景
+
+原 accordion（手风琴）展开模式被 list/item 双模式替代，提升星区导航的清晰度和信息密度。
+
+### List 模式（星区列表）
+
+- 星区列表以垂直列表展示，每条显示星区名称、part 类型、当前星区标记
+- 点击星区条目 → 进入 Item 模式，触发 `selectCluster`
+- 返回 List 模式后 `selectedClusterId` 保留，选中星区保持高亮 (`.active`)
+- 默认无选中星区时 TaskList / ResourcePanel 显示各自的占位空状态
+
+### Item 模式（星区详情）
+
+- 标题栏：`[← 返回按钮]` `星区名称`
+- 返回按钮复用船只建造界面的"更换船只"SVG icon（`viewBox="0 0 24 24"` 三 path）
+- 内容按顺序展示：
+  1. Objectives 列表（step / action / 描述文本 / ✅⬜）
+  2. Stats 展示（从 TaskList 移动过来，复用 `TerraformingStatScale`，单列 grid-cols-1）
+  3. Rebates 列表（从 TaskList 移动过来，两列 grid-cols-2）
+- 有默认选中星区时页面加载直接进入 Item 模式
+
+---
+
+## 补充 — 面板布局与滚动
+
+### 浮动/固定双模式
+
+基于 `queueEditState.editing` 动态切换面板行为：
+
+| 模式 | SectorPanel | TaskList | ResourcePanel |
+|------|:-:|:-:|:-:|
+| 非编辑 | 浮动 | 固定 | 浮动 |
+| 编辑中 | 浮动 | 浮动 | 固定 |
+
+- **浮动 (floating)**：`flex-col` + `max-height`（动态计算）+ `overflow-y-auto` + header `sticky top-0`
+  - 面板约束到视口内，内容独立滚动，标题始终可见
+  - 父级 wrapper 附加 `position: sticky; top: 2`，页级滚动时保持在视野上方
+- **固定**：纯 base 样式，无 `max-h`/`flex-col`，内容自然撑开
+  - 内容超出视口时触发页级滚动
+
+### 动态高度
+
+- max-height 通过 CSS 变量 `--panel-max-h` 注入：`window.innerHeight - 32px`
+- 触发时机：页面加载（`rAF`）、切换到 terraforming 模式（`nextTick + rAF`）、窗口 resize
+
+### 自定义滚动条
+
+- 6px 宽，暗色 track (`rgba(30,41,59,0.5)`)，slate thumb (`rgba(71,85,105,0.8)`)，hover 高亮
+- 与项目其他区域 `custom-scrollbar` 风格一致
+
+---
+
+## 补充 — 执行队列自动滚动
+
+- 非编辑模式下新增执行条目时，自动展开末条并滚动到队列底部
+- 先 `nextTick` 展开（等待 DOM 渲染展开内容），再 `nextTick` 滚动到底
+
+---
+
+## 补充 — 其他优化
+
+- **数字千位分隔**：Objective 文本中 ≥ 4 位的整数自动 `toLocaleString()` 格式化（如 `1000000000` → `1,000,000,000`）
+- **互斥文案**：`terraforming.mutuallyExclusive` 从 "缺少"/"Missing" 改为 "互斥"/"Mutually exclusive"，避免误解为资源缺失

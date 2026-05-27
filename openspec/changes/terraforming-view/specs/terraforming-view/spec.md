@@ -355,4 +355,121 @@
 
 **那么** 除 cluster 级匹配外，还需验证 HQ sector 的 `nameId` 与 objective 已解析的 `$LOCATION$` nameId 一致
 
+## MODIFIED Requirements
+
+### Requirement: 星区面板 List/Item 双模式
+
+Sector panel SHALL support list mode (browse all sectors) and item mode (view selected sector details).
+
+#### Scenario: List 模式 — 星区列表
+
+**前提** 用户进入地球化页面
+
+**当** SectorPanel 处于 list 模式
+
+**那么** 所有可地球化星区以列表展示
+**并且** 已选中星区保持 `.active` 高亮
+**并且** 点击星区条目进入 item 模式
+
+#### Scenario: Item 模式 — 星区详情
+
+**前提** 用户点击星区条目
+
+**当** SectorPanel 切换到 item 模式
+
+**那么** 标题栏显示返回按钮（更换船只 SVG icon）和星区名称
+**并且** 按序显示 Objectives、Stats（TerraformingStatScale，单列）、Rebates（两列 grid-cols-2）
+**并且** 点击返回按钮回到 list 模式，不清理 selectedClusterId
+
+#### Scenario: 默认选中星区
+
+**前提** 页面加载时 selectedClusterId 非空
+
+**那么** SectorPanel 直接进入 item 模式
+
+### Requirement: 面板浮动/固定双模式
+
+Panels SHALL switch between floating and fixed mode based on queue edit state.
+
+#### Scenario: 非编辑模式
+
+**前提** queueEditState.editing 为 false
+
+**那么** SectorPanel 浮动、TaskList 固定、ResourcePanel 浮动
+**并且** 浮动面板：flex-col + max-height + overflow-y-auto + header sticky
+**并且** 固定面板：无 max-h/flex-col，内容自然撑开
+
+#### Scenario: 编辑模式
+
+**前提** queueEditState.editing 为 true
+
+**那么** SectorPanel 浮动、TaskList 浮动、ResourcePanel 固定
+
+### Requirement: 动态面板高度
+
+Panel max-height SHALL be calculated dynamically from viewport.
+
+#### Scenario: 高度计算
+
+**前提** 浏览器窗口大小为 H px
+
+**当** 计算 panel-max-h
+
+**那么** max-height = H - 32px
+**并且** 切换 terraforming 模式、窗口 resize 时重新计算
+
+### Requirement: 执行队列自动滚动展开
+
+Execution queue SHALL auto-scroll to the last entry when a new entry is added in non-edit mode.
+
+#### Scenario: 新增执行条目
+
+**前提** 非编辑模式，executionTimeline 长度从 n 变为 n+1
+
+**那么** 末条自动展开
+**并且** 面板滚动到底部（先 nextTick 展开，再 nextTick 滚动）
+
+### Requirement: Objective 数字格式化
+
+Objective text SHALL format large numbers with locale-aware separators.
+
+#### Scenario: 住宅目标数字
+
+**前提** objective 文本经 textReplaces 解析后含 ≥ 4 位整数
+
+**那么** 数字自动 `toLocaleString()` 格式化（如 `1000000000` → `1,000,000,000`）
+
+### Requirement: 互斥依赖文案
+
+Mutually exclusive dependency labels SHALL use exclusionary wording.
+
+#### Scenario: 互斥项目显示
+
+**前提** 项目有 `notCompleted` 依赖
+
+**当** 渲染依赖行
+
+**那么** 中文显示"互斥: 项目名"，英文显示 "Mutually exclusive: ProjectName"
+
+### Requirement: 三栏布局始终可见
+
+The three-column layout SHALL persist regardless of display mode.
+
+#### Scenario: 面板始终渲染
+
+**前提** 在 terraforming view 任意状态下
+
+**那么** 三栏（SectorPanel | TaskList | ResourcePanel）始终以 `lg:col-span-3 | 5 | 4` 布局呈现
+**并且** 未选中星区时 TaskList / ResourcePanel 显示各自的占位空状态
+
+## REMOVED Requirements
+
+### Requirement: Sector Accordion Expansion
+
+**理由**: 手风琴展开模式被 list/item 双模式替代。
+
+### Requirement: TaskList Global Stats Card
+
+**理由**: Stats 和 Rebates 显示从 TaskList 移至 SectorPanel 的 item 模式。
+
 **并且** 非 sector 级 relocate 保持原 cluster 级判定

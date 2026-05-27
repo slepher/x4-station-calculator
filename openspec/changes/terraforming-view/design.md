@@ -314,4 +314,70 @@ effect-list 对所有项目节点生效（events + 普通节点 + 子节点）�
 - 不要恢复整树预翻译
 - 不要恢复 `projectMaxCounts` 预演
 - 不要让条件区重新分裂为"stat 一套、前置一套"
+
+---
+
+## 补充 — 星区面板导航重构
+
+### 设计决策
+
+将原 accordion（手风琴展开）替换为 list/item 双模式：
+
+```
+TerraformingSectorPanel
+  ├── list 模式: 星区列表（选中星区高亮，点击 → item 模式）
+  └── item 模式: 星区详情
+        ├── header: [返回 btn SVG] 星区名称
+        ├── Objectives 列表
+        ├── Stats（TerraformingStatScale, grid-cols-1）
+        └── Rebates（grid-cols-2）
+```
+
+- 内部状态 `displayMode: ref<'list' | 'item'>`
+- `onMounted`: 若 selectedClusterId 非空 → item 模式
+- `handleBackClick`: 仅切换 displayMode，不清理 selectedClusterId
+- Stats/Rebates 数据从 presenter 的 sectorPanel 输出提供（原在 taskList）
+
+### 按钮复用
+
+返回按钮 SVG 复用 `ShipBuildPanelFit.vue` 中更换船只图标
+
+---
+
+## 补充 — 面板布局与滚动
+
+### 浮动/固定双模式
+
+```
+LiveProductionWorkbenchView
+  └─ grid cell wrapper (conditional sticky top-2 z-10)
+      └── TerraformingPanel (floating prop)
+
+非编辑模式: SectorPanel 浮动, TaskList 固定, ResourcePanel 浮动
+编辑模式:   SectorPanel 浮动, TaskList 浮动, ResourcePanel 固定
+```
+
+- 浮动面板 CSS: `flex-col` + `max-height: var(--panel-max-h)` + header `sticky top-0`
+  - panel-content: `flex-1 min-h-0 overflow-y-auto`
+- 固定面板 CSS: 纯 base 样式，无 max-h/flex-col
+- Grid 用 `items-start`，三栏独立高度
+
+### 动态高度
+
+- `--panel-max-h` = `window.innerHeight - 32px`
+- 更新时机: onMounted (rAF) / watch(workbenchMode) + nextTick + rAF / window resize
+
+---
+
+## 补充 — 执行队列自动滚动
+
+- watch executionTimeline 长度增长 → double nextTick（展开 → 滚动）
+- 仅在非编辑模式触发
+
+---
+
+## 补充 — 其他
+
+- Objective 数字千位分隔: `\b\d{4,}\b` → `toLocaleString()`
+- `terraforming.mutuallyExclusive` i18n: "互斥" / "Mutually exclusive"
 - 不要让效果区回退为散落的文字渲染
