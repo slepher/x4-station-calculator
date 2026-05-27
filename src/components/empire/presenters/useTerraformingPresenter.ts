@@ -173,6 +173,7 @@ export interface TerraformingExecutionTimelineEntry {
   afterStats: TerraformingTimelineStatSnapshot[]
   availableBeforeExecution: boolean
   blockedReason: string | null
+  projectDuration: number
 }
 
 export type TerraformingGoalKind = 'project' | 'stat' | 'cluster'
@@ -2120,6 +2121,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
         afterStats: beforeStatsList,
         availableBeforeExecution: evaluated.node?.available ?? false,
         blockedReason: evaluated.node?.available === false ? (evaluated.node.blockedReason || null) : null,
+        projectDuration: project?.duration ?? 0,
       })
 
       previousGroupId = projectGroupId
