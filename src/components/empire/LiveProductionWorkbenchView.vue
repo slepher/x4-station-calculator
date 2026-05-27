@@ -324,6 +324,7 @@ function toggleStatFilter(statId: string) {
         @copy-draft="terraformingPresenter.emits.copyDraftEntry"
         @update-draft-entries="terraformingPresenter.emits.reorderDraftEntries"
         @click-goal="terraformingPresenter.emits.clickGoal"
+        @drop-task="terraformingPresenter.emits.appendDraftTask"
       />
     </div>
   </div>

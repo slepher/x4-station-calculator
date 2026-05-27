@@ -42,6 +42,7 @@ const emit = defineEmits<{
   (e: 'updateDraftEntries', entries: TerraformingDraftTimelineEntry[]): void
   (e: 'clickStat', statId: string): void
   (e: 'clickGoal', goalId: string): void
+  (e: 'dropTask', projectId: string): void
 }>()
 
 const { t } = useI18n()
@@ -50,6 +51,29 @@ const gameDataStore = useGameDataStore()
 const expandedEntryId = ref<string | null>(null)
 const panelContentRef = ref<HTMLElement | null>(null)
 const cancelValidationCache = ref<Record<string, TerraformingCancelValidation>>({})
+const isDragOver = ref(false)
+let dragCounter = 0
+
+function onPanelDragEnter(e: DragEvent) {
+  e.preventDefault()
+  dragCounter++
+  isDragOver.value = true
+}
+
+function onPanelDragLeave() {
+  dragCounter--
+  if (dragCounter <= 0) {
+    dragCounter = 0
+    isDragOver.value = false
+  }
+}
+
+function onPanelDrop(e: DragEvent) {
+  dragCounter = 0
+  isDragOver.value = false
+  const projectId = e.dataTransfer?.getData('terraforming-project-id')
+  if (projectId) emit('dropTask', projectId)
+}
 
 const internalPlanEntries = computed({
   get: () => props.queueEditState.planEntries,
@@ -174,8 +198,16 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
 
 <template>
   <div class="panel-card" :class="{ 'panel-floating': floating }">
-    <div class="panel-header">
-      {{ t('terraforming.taskQueue') }}
+    <div
+      class="panel-header"
+      :class="{ 'drag-over': isDragOver }"
+      @dragover.prevent
+      @dragenter="onPanelDragEnter"
+      @dragleave="onPanelDragLeave"
+      @drop="onPanelDrop"
+    >
+      <span v-if="isDragOver" class="drop-hint">{{ t('terraforming.dropToEnd') || 'Drop here' }}</span>
+      <span v-else>{{ t('terraforming.taskQueue') }}</span>
       <span v-if="showNoDockWarning" class="text-amber-400 text-[11px] ml-2">⚠ {{ t('terraforming.noBuildDock') }}</span>
       <span v-if="queueEditState.editing && queueEditState.unsatisfiedGoalCount > 0" class="text-red-400 text-[11px] ml-2">
         {{ queueEditState.unsatisfiedGoalCount }} {{ t('terraforming.unmetDependencies') || 'unmet dependencies' }}
@@ -469,7 +501,15 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
 }
 
 .panel-header {
-  @apply h-12 flex items-center px-4 text-slate-200 text-sm font-semibold border-b border-slate-700/50 bg-slate-800/30 flex-shrink-0;
+  @apply h-12 flex items-center px-4 text-slate-200 text-sm font-semibold border-b border-slate-700/50 bg-slate-800/30 flex-shrink-0 transition-colors;
+}
+
+.panel-header.drag-over {
+  @apply bg-sky-900/40 border-sky-500/60;
+}
+
+.drop-hint {
+  @apply text-sky-300;
 }
 
 .panel-content {
