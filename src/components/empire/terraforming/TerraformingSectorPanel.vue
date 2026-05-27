@@ -182,7 +182,11 @@ function formatPartName(partName: string): string {
 
 <style scoped>
 .panel-card {
-  @apply bg-slate-900/40 rounded-lg border border-slate-800 shadow-xl overflow-hidden flex flex-col;
+  @apply bg-slate-900/40 rounded-lg border border-slate-800 shadow-xl overflow-hidden;
+}
+
+.panel-card.panel-floating {
+  @apply flex flex-col;
   max-height: var(--panel-max-h, calc(100vh - 8rem));
 }
 
@@ -211,13 +215,17 @@ function formatPartName(partName: string): string {
 }
 
 .panel-content {
-  @apply flex flex-col gap-0 overflow-y-auto flex-1 min-h-0;
+  @apply flex flex-col gap-0;
 }
 
-.panel-content::-webkit-scrollbar { width: 6px; }
-.panel-content::-webkit-scrollbar-track { background: rgba(30, 41, 59, 0.5); }
-.panel-content::-webkit-scrollbar-thumb { background: rgba(71, 85, 105, 0.8); border-radius: 3px; }
-.panel-content::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 1); }
+.panel-floating .panel-content {
+  @apply flex-1 min-h-0 overflow-y-auto;
+}
+
+.panel-floating .panel-content::-webkit-scrollbar { width: 6px; }
+.panel-floating .panel-content::-webkit-scrollbar-track { background: rgba(30, 41, 59, 0.5); }
+.panel-floating .panel-content::-webkit-scrollbar-thumb { background: rgba(71, 85, 105, 0.8); border-radius: 3px; }
+.panel-floating .panel-content::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 1); }
 
 .cluster-item {
   @apply flex flex-col px-3 py-2 cursor-pointer transition-colors border-b border-slate-700/20;
@@ -281,7 +289,7 @@ function formatPartName(partName: string): string {
 }
 
 .effect-list {
-  @apply flex flex-col gap-1.5;
+  @apply grid grid-cols-2 gap-1.5;
 }
 
 .effect-list-item {

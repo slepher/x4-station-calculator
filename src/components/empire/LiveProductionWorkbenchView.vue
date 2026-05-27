@@ -253,8 +253,8 @@ const terraformingFloating = computed(() => ({
     @close="toolbarPresenter.emits.closeImport"
   />
 
-  <div v-if="toolbarPresenter.props.workbenchMode.value === 'terraforming'" class="main-layout terraforming-layout mt-6" :style="{ '--panel-max-h': panelMaxHeight }">
-    <div class="col-span-12 lg:col-span-3">
+  <div v-if="toolbarPresenter.props.workbenchMode.value === 'terraforming'" class="main-layout mt-6" :style="{ '--panel-max-h': panelMaxHeight }">
+    <div class="col-span-12 lg:col-span-3" :class="{ 'sticky top-2 z-10': terraformingFloating.sectorPanel }">
       <TerraformingSectorPanel
         :clusters="terraformingPresenter.props.sectorPanel.clusters.value"
         :selected-cluster-id="terraformingPresenter.props.sectorPanel.selectedClusterId.value"
@@ -271,7 +271,7 @@ const terraformingFloating = computed(() => ({
       />
     </div>
 
-    <div class="col-span-12 lg:col-span-5">
+    <div class="col-span-12 lg:col-span-5" :class="{ 'sticky top-2 z-10': terraformingFloating.taskList }">
       <TerraformingTaskList
         :task-tree="terraformingPresenter.props.taskList.taskTree.value"
         :group-names="terraformingPresenter.props.taskList.groupNames.value"
@@ -285,7 +285,7 @@ const terraformingFloating = computed(() => ({
       />
     </div>
 
-    <div class="col-span-12 lg:col-span-4">
+    <div class="col-span-12 lg:col-span-4" :class="{ 'sticky top-2 z-10': terraformingFloating.resourcePanel }">
       <TerraformingResourcePanel
         :selected-cluster-id="terraformingPresenter.props.resourcePanel.selectedClusterId.value"
         :execution-timeline="terraformingPresenter.props.resourcePanel.executionTimeline.value"
@@ -460,10 +460,6 @@ const terraformingFloating = computed(() => ({
 <style scoped>
 .main-layout {
   @apply grid grid-cols-12 gap-8 items-start;
-}
-
-.terraforming-layout {
-  @apply items-stretch;
 }
 
 .overview-left-panel {

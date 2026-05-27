@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import draggable from 'vuedraggable'
 import { useI18n } from 'vue-i18n'
 import type {
@@ -47,14 +47,34 @@ const { t } = useI18n()
 const { translateWare } = useX4I18n()
 const gameDataStore = useGameDataStore()
 const expandedEntryId = ref<string | null>(null)
+const panelContentRef = ref<HTMLElement | null>(null)
 const cancelValidationCache = ref<Record<string, TerraformingCancelValidation>>({})
 const internalDraftEntries = computed({
   get: () => props.queueEditState.draftEntries,
   set: (val: TerraformingDraftTimelineEntry[]) => emit('updateDraftEntries', val),
 })
 
-watch(() => props.executionTimeline, () => {
+let prevTimelineLength = 0
+
+watch(() => props.executionTimeline, (timeline) => {
   cancelValidationCache.value = {}
+  if (!props.queueEditState.editing && timeline.length > prevTimelineLength) {
+    const lastEntry = timeline[timeline.length - 1]
+    if (lastEntry) {
+      nextTick(() => {
+        expandedEntryId.value = lastEntry.id
+        cancelValidationCache.value = {
+          [lastEntry.id]: props.getCancelValidation(lastEntry.id),
+        }
+        nextTick(() => {
+          if (panelContentRef.value) {
+            panelContentRef.value.scrollTop = panelContentRef.value.scrollHeight
+          }
+        })
+      })
+    }
+  }
+  prevTimelineLength = timeline.length
 }, { deep: true })
 
 function toggleEntry(entryId: string) {
@@ -171,7 +191,7 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
         </div>
       </template>
     </div>
-    <div class="panel-content">
+    <div ref="panelContentRef" class="panel-content">
       <div v-if="!selectedClusterId" class="empty-state">
         {{ t('terraforming.selectClusterForResources') }}
       </div>
@@ -391,7 +411,11 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
 
 <style scoped>
 .panel-card {
-  @apply bg-slate-900/40 rounded-lg border border-slate-800 shadow-xl overflow-hidden flex flex-col;
+  @apply bg-slate-900/40 rounded-lg border border-slate-800 shadow-xl overflow-hidden;
+}
+
+.panel-card.panel-floating {
+  @apply flex flex-col;
   max-height: var(--panel-max-h, calc(100vh - 8rem));
 }
 
@@ -404,13 +428,17 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
 }
 
 .panel-content {
-  @apply p-3 flex flex-col gap-2 overflow-y-auto flex-1 min-h-0;
+  @apply p-3 flex flex-col gap-2;
 }
 
-.panel-content::-webkit-scrollbar { width: 6px; }
-.panel-content::-webkit-scrollbar-track { background: rgba(30, 41, 59, 0.5); }
-.panel-content::-webkit-scrollbar-thumb { background: rgba(71, 85, 105, 0.8); border-radius: 3px; }
-.panel-content::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 1); }
+.panel-floating .panel-content {
+  @apply flex-1 min-h-0 overflow-y-auto;
+}
+
+.panel-floating .panel-content::-webkit-scrollbar { width: 6px; }
+.panel-floating .panel-content::-webkit-scrollbar-track { background: rgba(30, 41, 59, 0.5); }
+.panel-floating .panel-content::-webkit-scrollbar-thumb { background: rgba(71, 85, 105, 0.8); border-radius: 3px; }
+.panel-floating .panel-content::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 1); }
 
 .clear-all-btn {
   @apply ml-auto text-[11px] px-2 py-1 rounded border border-red-800 text-red-300 bg-red-900/20 transition-colors;

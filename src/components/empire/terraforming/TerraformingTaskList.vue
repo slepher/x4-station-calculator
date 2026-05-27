@@ -216,14 +216,16 @@ function getStatLines(projectId: string): TerraformingStatLineModel[] {
 </template>
 
 <style scoped>
-.panel-card { @apply bg-slate-900/40 rounded-lg border border-slate-800 shadow-xl overflow-hidden flex flex-col; max-height: var(--panel-max-h, calc(100vh - 8rem)); }
+.panel-card { @apply bg-slate-900/40 rounded-lg border border-slate-800 shadow-xl overflow-hidden; }
+.panel-card.panel-floating { @apply flex flex-col; max-height: var(--panel-max-h, calc(100vh - 8rem)); }
 .panel-card.panel-floating .panel-header { @apply sticky top-0 z-10; }
 .panel-header { @apply h-12 flex items-center px-4 text-slate-200 text-sm font-semibold border-b border-slate-700/50 bg-slate-800/30 flex-shrink-0; }
-.panel-content { @apply p-2 flex flex-col gap-1 overflow-y-auto flex-1 min-h-0; }
-.panel-content::-webkit-scrollbar { width: 6px; }
-.panel-content::-webkit-scrollbar-track { background: rgba(30, 41, 59, 0.5); }
-.panel-content::-webkit-scrollbar-thumb { background: rgba(71, 85, 105, 0.8); border-radius: 3px; }
-.panel-content::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 1); }
+.panel-content { @apply p-2 flex flex-col gap-1; }
+.panel-floating .panel-content { @apply flex-1 min-h-0 overflow-y-auto; }
+.panel-floating .panel-content::-webkit-scrollbar { width: 6px; }
+.panel-floating .panel-content::-webkit-scrollbar-track { background: rgba(30, 41, 59, 0.5); }
+.panel-floating .panel-content::-webkit-scrollbar-thumb { background: rgba(71, 85, 105, 0.8); border-radius: 3px; }
+.panel-floating .panel-content::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 1); }
 
 .stats-card { @apply bg-slate-950/50 border border-slate-700/30 rounded p-2 mb-1; }
 .stats-grid { @apply grid grid-cols-1 gap-1 sm:grid-cols-2; }
