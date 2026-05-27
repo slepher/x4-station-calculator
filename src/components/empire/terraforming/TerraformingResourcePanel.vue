@@ -353,15 +353,18 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
                   <span v-else-if="planEntry.entry.kind === 'stat'" class="goal-kind-tag">{{ t('terraforming.goal.statGoal') || 'Stat Goal' }}</span>
                   <span v-else class="goal-kind-tag">{{ t('terraforming.goal.projectGoal') || 'Goal' }}</span>
                   <span v-if="planEntry.entry.satisfied" class="goal-status done">✓</span>
-                  <span v-else-if="planEntry.entry.hasExistingTask" class="goal-status ordering">↕</span>
+                  <span v-else-if="planEntry.entry.hasExistingTask" class="goal-status pending">○</span>
                   <span v-else class="goal-status pending">○</span>
                   <button
                     v-if="planEntry.entry.hasExistingTask"
                     class="goal-move-btn"
                     @click.stop="emit('moveTaskBeforeDependency', planEntry.entry.existingDraftEntryId!, planEntry.entry.id)"
                   >
-                    ↑
+                    {{ t('terraforming.goal.moveBefore') || '↑' }}
                   </button>
+                </div>
+                <div v-if="planEntry.entry.hasExistingTask" class="goal-hint-text">
+                  {{ t('terraforming.goal.reorderHint') || 'Task exists after dependencies — click to reorder' }}
                 </div>
                 <div v-if="planEntry.entry.statGoalModel" class="goal-stat-display">
                   <TerraformingStatScale
@@ -670,8 +673,8 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
   @apply ml-auto text-xs px-2 py-0.5 rounded bg-sky-800 text-sky-200 border border-sky-700 hover:bg-sky-700 transition-colors;
 }
 
-.goal-status.ordering {
-  @apply text-sky-400;
+.goal-hint-text {
+  @apply text-[10px] text-sky-400 mt-1;
 }
 
 .goal-head {

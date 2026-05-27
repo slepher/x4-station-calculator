@@ -1136,6 +1136,8 @@
   "terraforming.goal.clusterGoal": "Cluster Goal",
   "terraforming.goal.statGoal": "Stat Goal",
   "terraforming.goal.projectGoal": "Goal",
+  "terraforming.goal.moveBefore": "Move Up",
+  "terraforming.goal.reorderHint": "Task exists after dependencies — click to reorder",
   "terraforming.invalidReason": "Invalid Reason",
   "terraforming.queueState.disabled": "Disabled",
   "terraforming.queueState.enabled-valid": "Valid",
