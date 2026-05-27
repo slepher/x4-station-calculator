@@ -1137,7 +1137,7 @@
   "terraforming.goal.clusterGoal": "星区目标",
   "terraforming.goal.statGoal": "数值目标",
   "terraforming.goal.projectGoal": "项目目标",
-  "terraforming.goal.moveBefore": "移到前面",
+  "terraforming.goal.moveBefore": "移到此处",
   "terraforming.goal.reorderHint": "目标已在队列中但排序靠后 — 点击移动",
   "terraforming.invalidReason": "失效原因",
   "terraforming.queueState.disabled": "禁用",
