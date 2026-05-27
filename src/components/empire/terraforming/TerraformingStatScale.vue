@@ -49,7 +49,15 @@ const visibleBlocks = computed(() => {
 })
 
 const requiredSegments = computed(() => {
-  if (props.mode === 'status' || requiredStateSet.value.size === 0) {
+  if (props.mode === 'status') {
+    return [] as Array<{ startIndex: number; endIndex: number }>
+  }
+
+  if ('requirementSegments' in props.model && props.model.requirementSegments && props.model.requirementSegments.length > 0) {
+    return props.model.requirementSegments as Array<{ startIndex: number; endIndex: number }>
+  }
+
+  if (requiredStateSet.value.size === 0) {
     return [] as Array<{ startIndex: number; endIndex: number }>
   }
 

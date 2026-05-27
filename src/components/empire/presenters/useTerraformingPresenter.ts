@@ -83,6 +83,7 @@ export interface TerraformingConditionScaleModel extends TerraformingStatScaleMo
   mode: 'state-range' | 'value-range'
   requirementLabel: string
   requiredStates: number[]
+  requirementSegments: Array<{ startIndex: number; endIndex: number }>
 }
 
 export type TerraformingStatEffectDirection = 'none' | 'increase' | 'decrease'
@@ -90,6 +91,7 @@ export type TerraformingStatEffectDirection = 'none' | 'increase' | 'decrease'
 export interface TerraformingStatLineModel extends TerraformingStatScaleModel {
   requirementLabel?: string
   requiredStates?: number[]
+  requirementSegments?: Array<{ startIndex: number; endIndex: number }>
   effectDirection: TerraformingStatEffectDirection
   effectFromValue: number | null
   effectToValue: number | null
@@ -373,6 +375,47 @@ function getConditionMode(condition: StatCondition, statDef?: TerraformingStat):
   return 'state-range'
 }
 
+function computeRequirementSegments(
+  ranges: TerraformingScaleRange[],
+  minValue: number | undefined,
+  maxValue: number | undefined,
+  requiredStates: number[],
+): Array<{ startIndex: number; endIndex: number }> {
+  const segments: Array<{ startIndex: number; endIndex: number }> = []
+  let blockIdx = 0
+  let segStart: number | null = null
+
+  for (const range of ranges) {
+    for (let value = range.start; value <= range.end; value += 1) {
+      if (value === 0) continue
+
+      let required = false
+      if (minValue === undefined && maxValue === undefined) {
+        required = requiredStates.includes(range.state)
+      } else {
+        required =
+          (minValue === undefined || value >= minValue) &&
+          (maxValue === undefined || value <= maxValue)
+      }
+
+      if (required && segStart === null) {
+        segStart = blockIdx
+      } else if (!required && segStart !== null) {
+        segments.push({ startIndex: segStart, endIndex: blockIdx - 1 })
+        segStart = null
+      }
+
+      blockIdx += 1
+    }
+  }
+
+  if (segStart !== null) {
+    segments.push({ startIndex: segStart, endIndex: blockIdx - 1 })
+  }
+
+  return segments
+}
+
 function buildConditionScaleModel(
   condition: StatCondition,
   data: TerraformingData,
@@ -389,6 +432,8 @@ function buildConditionScaleModel(
 
   let requiredStates: number[] = []
   let requirementLabel = ''
+  const minValue = condition.minvalue ?? condition.min
+  const maxValue = condition.maxvalue ?? condition.max
 
   if (mode === 'state-range') {
     const minState = condition.min ?? Math.min(...ranges.map(r => r.state))
@@ -396,8 +441,6 @@ function buildConditionScaleModel(
     requiredStates = ranges.filter(r => r.state >= minState && r.state <= maxState).map(r => r.state)
     requirementLabel = `${getStatName(condition.stat, data, i18nLookup)} state ${minState}-${maxState}`
   } else {
-    const minValue = condition.minvalue ?? condition.min
-    const maxValue = condition.maxvalue ?? condition.max
     requiredStates = ranges
       .filter(r => (minValue === undefined || r.end >= minValue) && (maxValue === undefined || r.start <= maxValue))
       .map(r => r.state)
@@ -405,6 +448,13 @@ function buildConditionScaleModel(
     else if (minValue !== undefined) requirementLabel = `${getStatName(condition.stat, data, i18nLookup)} >= ${minValue}`
     else if (maxValue !== undefined) requirementLabel = `${getStatName(condition.stat, data, i18nLookup)} <= ${maxValue}`
   }
+
+  const requirementSegments = computeRequirementSegments(
+    ranges,
+    mode === 'value-range' ? minValue : undefined,
+    mode === 'value-range' ? maxValue : undefined,
+    requiredStates,
+  )
 
   return {
     statId: condition.stat,
@@ -415,6 +465,7 @@ function buildConditionScaleModel(
     mode,
     requirementLabel,
     requiredStates,
+    requirementSegments,
   }
 }
 
@@ -443,6 +494,7 @@ function buildNeutralizeScaleModel(
     mode: 'state-range',
     requirementLabel: `${getStatName(statId, data, i18nLookup)} neutralized`,
     requiredStates,
+    requirementSegments: computeRequirementSegments(ranges, undefined, undefined, requiredStates),
   }
 }
 
@@ -502,6 +554,7 @@ function buildTaskStatLineModels(
       .filter((model): model is TerraformingConditionScaleModel => model !== null)
 
     const requiredStates = [...new Set(conditionModels.flatMap(model => model.requiredStates))]
+    const requirementSegments = conditionModels.flatMap(model => model.requirementSegments)
     const requirementLabel = conditionModels
       .map(model => model.requirementLabel)
       .filter(Boolean)
@@ -546,6 +599,7 @@ function buildTaskStatLineModels(
         ranges,
         requirementLabel,
         requiredStates,
+        requirementSegments,
         effectDirection,
         effectFromValue: currentValue,
         effectToValue,
@@ -563,6 +617,7 @@ function buildTaskStatLineModels(
       ranges,
       requirementLabel,
       requiredStates,
+      requirementSegments,
       effectDirection,
       effectFromValue: currentValue,
       effectToValue,
@@ -1655,9 +1710,8 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
         .filter((model): model is TerraformingStatLineModel => model !== null)
 
       const previous = draftExecutionLog.value[index - 1]
-      const next = draftExecutionLog.value[index + 1]
       let repeatRole: TerraformingDraftRepeatRole = 'single'
-      if (isRepeatable(project) && (previous?.projectId === entry.projectId || next?.projectId === entry.projectId)) {
+      if (isRepeatable(project)) {
         repeatRole = previous?.projectId === entry.projectId ? 'duplicate' : 'first'
       }
 
@@ -2432,6 +2486,9 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
               } else if (condition.maxvalue !== undefined && currentValue > condition.maxvalue) {
                 targetValue = condition.maxvalue
               }
+              const minValue = condition.minvalue ?? condition.min
+              const maxValue = condition.maxvalue ?? condition.max
+              requirementSegments = computeRequirementSegments(ranges, minValue, maxValue, [])
             } else {
               const currentRange = getCurrentRange(statDef, currentValue)
               const currentState = currentRange?.state ?? 0
@@ -2449,12 +2506,10 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
 
               const minS = minState ?? Math.min(...ranges.map(r => r.state))
               const maxS = maxState ?? Math.max(...ranges.map(r => r.state))
-              requirementSegments = ranges
+              const requiredStates = ranges
                 .filter(r => r.state >= minS && r.state <= maxS)
-                .map(r => ({
-                  startIndex: ranges.indexOf(r),
-                  endIndex: ranges.indexOf(r),
-                }))
+                .map(r => r.state)
+              requirementSegments = computeRequirementSegments(ranges, undefined, undefined, requiredStates)
             }
 
             if (targetValue > currentValue) {

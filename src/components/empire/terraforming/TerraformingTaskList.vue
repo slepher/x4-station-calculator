@@ -255,6 +255,7 @@ function getStatLines(projectId: string): TerraformingStatLineModel[] {
             handle=".drag-to-log"
             class="task-node-list"
             @start="onTaskDragStart"
+            @end="emit('endDragTask')"
           >
             <template #item="{ element: e }">
               <div

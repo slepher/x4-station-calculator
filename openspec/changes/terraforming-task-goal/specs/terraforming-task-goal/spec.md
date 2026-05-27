@@ -462,6 +462,26 @@ cluster 的 `objective.build_housing` 生成的 cluster goal MUST 存储 `target
 
 **并且** 系统 MUST NOT 使用“启用且有效 / 启用但失效 / 禁用”的 draft 三态作为编辑主模型
 
+### Requirement: 可重复项目 MUST 始终显示复制按钮
+
+可重复项目 MUST 始终显示复制按钮，点击后在当前 entry 下方生成一条相同 projectId 的 draft entry。
+
+#### Scenario: 可重复项目仅有一条 entry
+
+**前提** 编辑队列中可重复项目 X 仅有一条 draft entry
+
+**当** UI 渲染该 task entry
+
+**那么** 该条 entry MUST 显示复制按钮
+
+#### Scenario: 可重复项目相邻重复
+
+**前提** 编辑队列中可重复项目 X 存在多条相邻 draft entry
+
+**当** UI 渲染该 task entry
+
+**那么** 所有 entry MUST 各自显示复制按钮
+
 
 ### Requirement: Predecessors MUST 生成 project goal
 
