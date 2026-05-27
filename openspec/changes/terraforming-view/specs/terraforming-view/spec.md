@@ -422,6 +422,31 @@ Drag-to-log 手柄 MUST 具有 hover 和 grab 光标 CSS。
 **当** 用户正在拖拽
 
 **那么** 光标 MUST 为 `grabbing`
+
+### Requirement: Task/Event desc 信息图标与 tooltip
+
+Task 和 Event 名称后 MUST 显示 ⓘ 图标，hover 时通过 v-tippy 向上弹出 project 的 description 文本。
+
+#### Scenario: Task desc tooltip
+
+**前提** project 具有 `descriptionId`（如 `{20227,1181}`）
+
+**当** 用户 hover 任务名称旁的 ⓘ 图标
+
+**那么** tippy popup MUST 向上弹出（placement: top），显示 i18n 翻译后的 description 文本
+
+**并且** popup 最大宽度为 360px
+
+**并且** 通过 `t(descriptionId)` 获取翻译文本（game locale 已 merge 到 i18n instance）
+
+#### Scenario: Event desc tooltip
+
+**前提** event project 具有 `descriptionId`
+
+**当** 用户 hover event 名称旁的 ⓘ 图标
+
+**那么** 行为与普通 task 一致
+
 ## MODIFIED Requirements
 
 ### Requirement: 星区面板 List/Item 双模式

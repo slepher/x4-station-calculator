@@ -400,3 +400,10 @@ LiveProductionWorkbenchView
 - Task list 中 event tasks (group: 'events') 包裹 vuedraggable，配置与普通 tasks 相同 (`group: 'terraforming-tasks'`, `pull: 'clone'`, `handle: '.drag-to-log'`)。
 - Event card 在 `task-actions` 中添加 `.drag-to-log` 手柄，位置与 `TerraformingTaskNode` 一致。
 - CSS `.drag-to-log` 在 `TerraformingTaskList.vue` 中定义（`cursor-grab`, hover/active 变色）。
+
+## 补充 — 任务/事件 Description Tooltip
+
+- 任务名和事件名后追加 ⓘ 图标（class `task-desc-icon`），仅当 project 有 `descriptionId` 时显示。
+- hover 时通过 `v-tippy` 向上弹出 description 文本（placement: top, maxWidth: 360）。
+- 文本通过 `t(descriptionId)` 获取，descriptionId 为 game locale 键（如 `{20227,1191}`），已在 i18n instance 中 merge。
+- `TerraformingTaskNode.vue` 和 `TerraformingTaskList.vue` 事件区域各自实现，CSS 一致。

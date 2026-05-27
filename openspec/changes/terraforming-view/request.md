@@ -15,6 +15,8 @@
   - **描述文本**: textId 经 i18n 翻译（如 `{1004,1091}` → 中文文本，textReplaces 替换 `$STATION$`/`$LOCATION$`/`$AMOUNT$` 为已解析值）
   - **完成进度**: 按 objective.action 分别判定：
     - `objective.relocate`: HQ archive station 的 `sector.id` → `maps.sectors[].cluster_id` 是否等于 terraforming cluster 的 `macro` 去掉 `macro.` 前缀
+18. 任务/事件名称后 ⓘ 图标 hover 弹出 description 文本（i18n 翻译，max-width 360）
+
     - `objective.neutralize`: 对应 stat 的 `terraformingCurrentStats[stat]` 是否达到 `stats[].ranges` 中 `state >= 2` 的最小 end 值
     - `objective.build_project`: 对应 projectId 在 `completedProjects` 中且计数 > 0
     - `objective.build_housing`: `terraformingHousingBuilt` (新增) >= 目标值 (从 `cluster.values` 或 objective textReplaces 中提取)
@@ -97,6 +99,7 @@
 - 编辑模式下事件（events group）可拖拽添加至 edit log，使用与普通 task 相同的 draggable 配置和 `.drag-to-log` 手柄。
 - `.drag-to-log` 手柄 hover/grab/grabbing 光标样式。
 - `npm run build` 无编译错误
+- 任务和事件名称后附带 ⓘ 图标，hover 通过 v-tippy 向上弹出 project description 文本（i18n 翻译，max-width 360）。
 
 ### Out of Scope
 
