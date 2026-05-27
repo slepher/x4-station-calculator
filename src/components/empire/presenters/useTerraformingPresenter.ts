@@ -1055,6 +1055,10 @@ function isStatInRuntime(stats: Record<string, number>, statId: string): boolean
   return statId in stats
 }
 
+function isProjectInCluster(runtimeProjectIds: Set<string>, projectId: string): boolean {
+  return runtimeProjectIds.has(projectId)
+}
+
 export function useTerraformingPresenter(store: TerraformingPresenterStore): UseTerraformingPresenterReturn {
   const vI18nLookup: I18nLookup = (key: string) => (i18n.global.t(key) as string) || ''
   const isQueueEditing = ref(false)
@@ -1391,6 +1395,26 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
             targetStatId: null,
             dependentTaskIds: new Set([entry.id]),
           })
+        }
+      }
+
+      // Check predecessors for unmet project goals
+      if (project.predecessors) {
+        for (const pred of project.predecessors) {
+          if (pred.type !== 'project') continue
+          if (!isProjectInCluster(clusterProjectIds, pred.ref)) continue
+          if ((lastCumulativeCompleted.get(pred.ref) ?? 0) > 0) continue
+          const key = `project:${pred.ref}`
+          const existing = projectGoalCandidates.get(key)
+          if (existing) {
+            existing.dependentTaskIds.add(entry.id)
+          } else {
+            projectGoalCandidates.set(key, {
+              targetProjectId: pred.ref,
+              targetStatId: null,
+              dependentTaskIds: new Set([entry.id]),
+            })
+          }
         }
       }
 
