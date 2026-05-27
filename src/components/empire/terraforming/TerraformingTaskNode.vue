@@ -123,12 +123,12 @@ function handleSetCount(node: { id: string; available: boolean }, newCount: numb
         <div class="task-title">
           <span class="task-status-icon">{{ getStatusIcon(node.id, node.available) }}</span>
           <span class="task-name">{{ getNodeName(node.id, node.name) }}</span>
-          <span v-if="getPrice(node.id) > 0" class="task-price">{{ getPrice(node.id).toLocaleString() }} Cr</span>
           <span v-if="getRepeatTagData(node.id).typeLabel" class="task-repeat">{{ getRepeatTagData(node.id).typeLabel }}</span>
           <span v-if="getRepeatTagData(node.id).durationLabel" class="task-repeat">{{ getRepeatTagData(node.id).durationLabel }}</span>
           <span v-if="getRepeatTagData(node.id).cooldownLabel" class="task-repeat">{{ getRepeatTagData(node.id).cooldownLabel }}</span>
         </div>
         <div class="task-actions">
+          <span v-if="getPrice(node.id) > 0" class="task-price">{{ getPrice(node.id).toLocaleString() }} Cr</span>
           <template v-if="isRepeatableProject(node.id)">
             <X4NumberInput
               :model-value="completedProjectCounts.get(node.id) ?? 0"
@@ -266,7 +266,7 @@ function handleSetCount(node: { id: string; available: boolean }, newCount: numb
 }
 
 .task-price {
-  @apply text-[11px] text-slate-500 shrink-0;
+  @apply text-[11px] text-slate-500 shrink-0 mr-1;
 }
 
 .task-repeat {

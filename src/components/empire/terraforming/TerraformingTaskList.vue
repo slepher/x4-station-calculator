@@ -221,16 +221,33 @@ function getStatLines(projectId: string): TerraformingStatLineModel[] {
       <div v-else>
         <div v-if="visibleEvents.length > 0" class="events-section">
           <div class="group-header">{{ groupNames.get('events') || 'Events' }}</div>
-          <div
-            v-for="e in visibleEvents"
-            :key="e.id"
-            class="task-node"
-            :class="{ blocked: !e.available && (completedProjectCounts.get(e.id) ?? 0) === 0 }"
+          <draggable
+            :model-value="visibleEvents"
+            :group="{ name: 'terraforming-tasks', pull: 'clone', put: false }"
+            :sort="false"
+            :clone="(n: any) => ({ projectId: n.id, projectName: getNodeName(n.id, n.name), _type: 'drag-clone' })"
+            item-key="id"
+            :disabled="!isEditing"
+            ghost-class="drag-ghost"
+            handle=".drag-to-log"
+            class="task-node-list"
+            @start="onTaskDragStart"
           >
+            <template #item="{ element: e }">
+              <div
+                class="task-node-drag-wrapper"
+                :data-project-id="e.id"
+                :data-project-name="getNodeName(e.id, e.name)"
+              >
+                <div
+                  class="task-node"
+                  :class="{ blocked: !e.available && (completedProjectCounts.get(e.id) ?? 0) === 0 }"
+                >
             <div class="task-card">
-              <div class="task-head">
-                <div class="task-title">
-                  <span class="task-status-icon">⚠️</span>
+                <div class="task-head">
+                    <div class="task-title">
+                      <span v-if="isEditing" class="drag-to-log">↔</span>
+                      <span class="task-status-icon">⚠️</span>
                   <span class="task-name">{{ getNodeName(e.id, e.name) }}</span>
                   <span v-if="getRepeatTagData(e.id, projectMap).typeLabel" class="task-repeat">{{ getRepeatTagData(e.id, projectMap).typeLabel }}</span>
                   <span v-if="getRepeatTagData(e.id, projectMap).durationLabel" class="task-repeat">{{ getRepeatTagData(e.id, projectMap).durationLabel }}</span>
@@ -290,11 +307,14 @@ function getStatLines(projectId: string): TerraformingStatLineModel[] {
                     <span class="dependency-name">{{ line.label }}</span>
                     <span class="dependency-value">{{ line.value }}</span>
                   </div>
-                </div>
+                  </div>
               </div>
             </div>
+            </div>
+              </div>
+              </template>
+            </draggable>
           </div>
-        </div>
 
         <div class="task-tree">
           <template v-for="group in taskTree.groupOrder" :key="group">

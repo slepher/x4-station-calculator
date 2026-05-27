@@ -384,12 +384,12 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
                     <span class="drag-handle">↕</span>
                     <span class="entry-order">#{{ planEntry.entry.order }}</span>
                     <span class="entry-name">{{ planEntry.entry.projectName }}</span>
-                    <span v-if="planEntry.entry.price > 0" class="entry-price">{{ planEntry.entry.price.toLocaleString() }} Cr</span>
                     <span v-if="planEntry.entry.systemDisabled" class="draft-state disabled">
                       {{ t('terraforming.queueState.disabled') || 'Disabled' }}
                     </span>
                   </button>
                   <div class="draft-actions">
+                    <span v-if="planEntry.entry.price > 0" class="entry-price">{{ planEntry.entry.price.toLocaleString() }} Cr</span>
                     <button
                       class="draft-btn danger"
                       @click.stop="emit('removeDraft', planEntry.entry.id)"
@@ -722,7 +722,7 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
 }
 
 .draft-actions {
-  @apply flex gap-1;
+  @apply flex items-center gap-1;
 }
 
 .draft-btn {
@@ -782,7 +782,7 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
 }
 
 .draft-actions {
-  @apply flex gap-1;
+  @apply flex items-center gap-1;
 }
 
 .draft-btn {
@@ -814,7 +814,7 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
 }
 
 .entry-price {
-  @apply text-[11px] text-slate-400 shrink-0;
+  @apply text-[11px] text-slate-500 shrink-0 mr-1;
 }
 
 .cancel-btn {
