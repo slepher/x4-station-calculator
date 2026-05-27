@@ -396,7 +396,7 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
                       {{ t('terraforming.remove') || 'Remove' }}
                     </button>
                     <button
-                      v-if="planEntry.entry.repeatRole === 'duplicate'"
+                      v-if="planEntry.entry.repeatRole !== 'single'"
                       class="draft-btn"
                       @click.stop="emit('copyDraft', planEntry.entry.id)"
                     >
