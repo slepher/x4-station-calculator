@@ -89,6 +89,10 @@ function getStatLines(projectId: string): TerraformingStatLineModel[] {
   return getNodeDisplay(projectId)?.statLines || []
 }
 
+function getPrice(projectId: string): number {
+  return props.projectMap.get(projectId)?.resources?.price ?? 0
+}
+
 function getStatusIcon(projectId: string, available: boolean): string {
   const count = props.completedProjectCounts.get(projectId) ?? 0
   if (count > 0) return '✅'
@@ -119,6 +123,7 @@ function handleSetCount(node: { id: string; available: boolean }, newCount: numb
         <div class="task-title">
           <span class="task-status-icon">{{ getStatusIcon(node.id, node.available) }}</span>
           <span class="task-name">{{ getNodeName(node.id, node.name) }}</span>
+          <span v-if="getPrice(node.id) > 0" class="task-price">{{ getPrice(node.id).toLocaleString() }} Cr</span>
           <span v-if="getRepeatTagData(node.id).typeLabel" class="task-repeat">{{ getRepeatTagData(node.id).typeLabel }}</span>
           <span v-if="getRepeatTagData(node.id).durationLabel" class="task-repeat">{{ getRepeatTagData(node.id).durationLabel }}</span>
           <span v-if="getRepeatTagData(node.id).cooldownLabel" class="task-repeat">{{ getRepeatTagData(node.id).cooldownLabel }}</span>
@@ -258,6 +263,10 @@ function handleSetCount(node: { id: string; available: boolean }, newCount: numb
 
 .task-name {
   @apply text-xs text-slate-300;
+}
+
+.task-price {
+  @apply text-[11px] text-slate-500 shrink-0;
 }
 
 .task-repeat {

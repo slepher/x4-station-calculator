@@ -199,6 +199,7 @@ export interface TerraformingDraftTimelineEntry {
   reasons: string[]
   dependencies: string[]
   statLines: TerraformingStatLineModel[]
+  price: number
 }
 
 export interface TerraformingGoalEntry {
@@ -1678,6 +1679,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
           or: vI18nLookup('terraforming.or') || ' or ',
         }, runtimePidSet),
         statLines,
+        price: project?.resources?.price ?? 0,
       })
 
       completedProjects = nextCompletedProjects

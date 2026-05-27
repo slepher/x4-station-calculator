@@ -384,6 +384,7 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
                     <span class="drag-handle">↕</span>
                     <span class="entry-order">#{{ planEntry.entry.order }}</span>
                     <span class="entry-name">{{ planEntry.entry.projectName }}</span>
+                    <span v-if="planEntry.entry.price > 0" class="entry-price">{{ planEntry.entry.price.toLocaleString() }} Cr</span>
                     <span v-if="planEntry.entry.systemDisabled" class="draft-state disabled">
                       {{ t('terraforming.queueState.disabled') || 'Disabled' }}
                     </span>
@@ -810,6 +811,10 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
 
 .entry-name {
   @apply text-xs text-slate-200 truncate;
+}
+
+.entry-price {
+  @apply text-[11px] text-slate-400 shrink-0;
 }
 
 .cancel-btn {
