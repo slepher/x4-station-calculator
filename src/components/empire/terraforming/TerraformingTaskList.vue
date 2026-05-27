@@ -246,7 +246,6 @@ function getStatLines(projectId: string): TerraformingStatLineModel[] {
             <div class="task-card">
                 <div class="task-head">
                     <div class="task-title">
-                      <span v-if="isEditing" class="drag-to-log">↔</span>
                       <span class="task-status-icon">⚠️</span>
                   <span class="task-name">{{ getNodeName(e.id, e.name) }}</span>
                   <span v-if="getRepeatTagData(e.id, projectMap).typeLabel" class="task-repeat">{{ getRepeatTagData(e.id, projectMap).typeLabel }}</span>
@@ -273,7 +272,8 @@ function getStatLines(projectId: string): TerraformingStatLineModel[] {
                   >
                     {{ (completedProjectCounts.get(e.id) ?? 0) > 0 ? t('terraforming.undo') : t('terraforming.complete') }}
                   </button>
-                </div>
+                    <span v-if="isEditing" class="drag-to-log">↔</span>
+                  </div>
               </div>
               <div class="task-body">
                 <div v-if="getStatLines(e.id).length > 0" class="stat-impact-list">
