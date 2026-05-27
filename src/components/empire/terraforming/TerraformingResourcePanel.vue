@@ -42,7 +42,7 @@ const emit = defineEmits<{
   (e: 'updateDraftEntries', entries: TerraformingDraftTimelineEntry[]): void
   (e: 'clickStat', statId: string): void
   (e: 'clickGoal', goalId: string): void
-  (e: 'dropTask', projectId: string): void
+  (e: 'dropTask', projectId: string, targetIndex?: number): void
 }>()
 
 const { t } = useI18n()
@@ -52,19 +52,52 @@ const expandedEntryId = ref<string | null>(null)
 const panelContentRef = ref<HTMLElement | null>(null)
 const cancelValidationCache = ref<Record<string, TerraformingCancelValidation>>({})
 const isDragOver = ref(false)
+const dropTargetIndex = ref(-1)
+let dragCounter = 0
 
-function onPanelDragOver() {
+function onPanelDragOver(e: DragEvent) {
+  e.preventDefault()
+  isDragOver.value = true
+  if (e.currentTarget instanceof HTMLElement) {
+    const entries = e.currentTarget.querySelectorAll('.draggable-insert-target')
+    let closestIdx = -1
+    let closestDist = Infinity
+    entries.forEach((el, i) => {
+      const rect = el.getBoundingClientRect()
+      const midY = rect.top + rect.height / 2
+      const dist = Math.abs(e.clientY - midY)
+      if (dist < closestDist) {
+        closestDist = dist
+        closestIdx = i
+      }
+    })
+    dropTargetIndex.value = closestIdx
+  }
+}
+
+function onPanelDragEnter(e: DragEvent) {
+  e.preventDefault()
+  dragCounter++
   isDragOver.value = true
 }
 
 function onPanelDragLeave() {
-  isDragOver.value = false
+  dragCounter--
+  if (dragCounter <= 0) {
+    dragCounter = 0
+    isDragOver.value = false
+  }
 }
 
 function onPanelDrop(e: DragEvent) {
+  dragCounter = 0
   isDragOver.value = false
   const projectId = e.dataTransfer?.getData('terraforming-project-id')
-  if (projectId) emit('dropTask', projectId)
+  if (projectId) {
+    const targetIdx = dropTargetIndex.value >= 0 ? dropTargetIndex.value : undefined
+    emit('dropTask', projectId, targetIdx)
+  }
+  dropTargetIndex.value = -1
 }
 
 const internalPlanEntries = computed({
@@ -225,13 +258,13 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
     <div
       ref="panelContentRef"
       class="panel-content"
-      @dragover.prevent="onPanelDragOver"
-      @dragenter.prevent="onPanelDragOver"
+      @dragover="onPanelDragOver"
+      @dragenter="onPanelDragEnter"
       @dragleave="onPanelDragLeave"
       @drop="onPanelDrop"
     >
       <div v-if="isDragOver" class="drop-placeholder">
-        {{ t('terraforming.dropToEnd') || 'Drop task here to add' }}
+        {{ t('terraforming.dropToEnd') || 'Drop to insert task' }}
       </div>
       <div v-if="!selectedClusterId" class="empty-state">
         {{ t('terraforming.selectClusterForResources') }}
@@ -259,13 +292,13 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
           <template #item="{ element: planEntry }">
             <div
               :class="planEntry.type === 'goal'
-                ? ['goal-entry', {
+                ? ['goal-entry', 'draggable-insert-target', {
                     'goal-filter-active': planEntry.entry.isFilterActive,
                     'goal-satisfied': planEntry.entry.satisfied,
                     'goal-unsatisfied': !planEntry.entry.satisfied,
                     'goal-has-risk': planEntry.entry.hasRisk,
                   }]
-                : ['timeline-item', 'draft-item', {
+                : ['timeline-item', 'draft-item', 'draggable-insert-target', {
                     'system-disabled': planEntry.entry.systemDisabled,
                   }]"
               @click="planEntry.type === 'goal' ? emit('clickGoal', planEntry.entry.id) : undefined"

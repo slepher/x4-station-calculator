@@ -277,7 +277,7 @@ export interface TerraformingPresenterEmits {
   removeDraftEntry: (entryId: string) => void
   removeAllDraftEntries: () => void
   clickGoal: (goalId: string) => void
-  appendDraftTask: (projectId: string) => void
+  appendDraftTask: (projectId: string, targetIndex?: number) => void
   copyDraftEntry: (entryId: string) => void
   moveDraftEntry: (entryId: string, targetIndex: number) => void
   reorderDraftEntries: (entries: TerraformingDraftTimelineEntry[]) => void
@@ -2771,7 +2771,18 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     copyDraftEntry,
     moveDraftEntry,
     reorderDraftEntries,
-    appendDraftTask: appendDraftProject,
+    appendDraftTask: (projectId: string, targetIndex?: number) => {
+      appendDraftProject(projectId)
+      if (targetIndex !== undefined && targetIndex >= 0 && targetIndex < draftExecutionLog.value.length) {
+        const lastIdx = draftExecutionLog.value.length - 1
+        const [moved] = draftExecutionLog.value.splice(lastIdx, 1)
+        if (moved) {
+          const next = [...draftExecutionLog.value]
+          next.splice(targetIndex, 0, moved)
+          draftExecutionLog.value = next
+        }
+      }
+    },
   }
 
   return { props, emits }
