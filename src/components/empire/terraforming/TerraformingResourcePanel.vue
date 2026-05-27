@@ -252,6 +252,13 @@ function formatTime(seconds: number): string {
 function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
   return entry.deliveryDetails[0]?.totalTime ?? 0
 }
+
+function buildDraftWaresTooltip(wares: Array<{ name: string; amount: number }>): string {
+  const lines = wares.map(w =>
+    `<div class='tooltip-ware-row'><span class='tooltip-ware-name'>${w.name}</span><span class='tooltip-ware-amount'>${w.amount.toLocaleString()}</span></div>`
+  )
+  return `<div class='tooltip-wares'>${lines.join('')}</div>`
+}
 </script>
 
 <template>
@@ -390,6 +397,11 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
                   </button>
                   <div class="draft-actions">
                     <span v-if="planEntry.entry.price > 0" class="entry-price">{{ planEntry.entry.price.toLocaleString() }} Cr</span>
+                    <span
+                      v-if="planEntry.entry.price > 0 && planEntry.entry.wares.length > 0"
+                      class="entry-info-icon"
+                      v-tippy="{ content: buildDraftWaresTooltip(planEntry.entry.wares), allowHTML: true, placement: 'top', theme: 'material' }"
+                    >ⓘ</span>
                     <button
                       class="draft-btn danger"
                       @click.stop="emit('removeDraft', planEntry.entry.id)"
@@ -815,6 +827,10 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
 
 .entry-price {
   @apply text-[11px] text-slate-500 shrink-0 mr-1;
+}
+
+.entry-info-icon {
+  @apply text-[11px] text-slate-600 shrink-0 cursor-help hover:text-slate-400 mr-1;
 }
 
 .cancel-btn {

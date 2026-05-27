@@ -7,8 +7,12 @@ import type {
 } from '@/components/empire/presenters/useTerraformingPresenter'
 import X4NumberInput from '@/components/common/X4NumberInput.vue'
 import TerraformingStatScale from '@/components/empire/terraforming/TerraformingStatScale.vue'
+import { useGameDataStore } from '@/store/useGameDataStore'
+import { useX4I18n } from '@/utils/UseX4I18n'
 
 const { t } = useI18n()
+const { translateWare } = useX4I18n()
+const gameDataStore = useGameDataStore()
 
 interface Props {
   node: TaskNode
@@ -93,6 +97,18 @@ function getPrice(projectId: string): number {
   return props.projectMap.get(projectId)?.resources?.price ?? 0
 }
 
+function buildWaresTooltip(projectId: string): string {
+  const proj = props.projectMap.get(projectId)
+  if (!proj?.resources?.wares?.length) return ''
+  const lines = proj.resources.wares.map(w => {
+    const ware = gameDataStore.waresMap[w.ware] as any
+    const name = ware ? translateWare(ware) : w.ware
+    const amount = (w.actualAmount ?? w.amount).toLocaleString()
+    return `<div class='tooltip-ware-row'><span class='tooltip-ware-name'>${name}</span><span class='tooltip-ware-amount'>${amount}</span></div>`
+  })
+  return `<div class='tooltip-wares'>${lines.join('')}</div>`
+}
+
 function getStatusIcon(projectId: string, available: boolean): string {
   const count = props.completedProjectCounts.get(projectId) ?? 0
   if (count > 0) return '✅'
@@ -129,6 +145,11 @@ function handleSetCount(node: { id: string; available: boolean }, newCount: numb
         </div>
         <div class="task-actions">
           <span v-if="getPrice(node.id) > 0" class="task-price">{{ getPrice(node.id).toLocaleString() }} Cr</span>
+          <span
+            v-if="getPrice(node.id) > 0"
+            class="task-info-icon"
+            v-tippy="{ content: buildWaresTooltip(node.id), allowHTML: true, placement: 'top', theme: 'material' }"
+          >ⓘ</span>
           <template v-if="isRepeatableProject(node.id)">
             <X4NumberInput
               :model-value="completedProjectCounts.get(node.id) ?? 0"
@@ -267,6 +288,10 @@ function handleSetCount(node: { id: string; available: boolean }, newCount: numb
 
 .task-price {
   @apply text-[11px] text-slate-500 shrink-0 mr-1;
+}
+
+.task-info-icon {
+  @apply text-[11px] text-slate-600 shrink-0 cursor-help hover:text-slate-400;
 }
 
 .task-repeat {

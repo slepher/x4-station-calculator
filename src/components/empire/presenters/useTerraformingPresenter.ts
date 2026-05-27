@@ -200,6 +200,7 @@ export interface TerraformingDraftTimelineEntry {
   dependencies: string[]
   statLines: TerraformingStatLineModel[]
   price: number
+  wares: Array<{ name: string; amount: number }>
 }
 
 export interface TerraformingGoalEntry {
@@ -1680,6 +1681,10 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
         }, runtimePidSet),
         statLines,
         price: project?.resources?.price ?? 0,
+        wares: (project?.resources?.wares || []).map(w => ({
+          name: store.wareNames.value.get(w.ware) || w.ware,
+          amount: w.actualAmount ?? w.amount,
+        })),
       })
 
       completedProjects = nextCompletedProjects
