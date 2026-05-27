@@ -1099,6 +1099,8 @@
   "terraforming.resourceSummary": "资源汇总",
   "terraforming.deliveryList": "交付清单",
   "terraforming.buildTime": "建造时间",
+  "terraforming.executionTime": "执行时间",
+  "terraforming.totalDuration": "总共耗时",
   "terraforming.build": "建造",
   "terraforming.buildSlots": "建造槽位",
   "terraforming.projectDetails": "项目明细",

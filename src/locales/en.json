@@ -1098,6 +1098,8 @@
   "terraforming.resourceSummary": "Resource Summary",
   "terraforming.deliveryList": "Delivery List",
   "terraforming.buildTime": "Build Time",
+  "terraforming.executionTime": "Execution",
+  "terraforming.totalDuration": "Total",
   "terraforming.build": "Build",
   "terraforming.buildSlots": "Build Slots",
   "terraforming.projectDetails": "Project Details",
