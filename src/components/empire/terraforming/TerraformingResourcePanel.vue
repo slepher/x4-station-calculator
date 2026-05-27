@@ -670,6 +670,25 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
   @apply opacity-30 bg-slate-700 border-sky-500 border-dashed border-2;
 }
 
+/* SortableJS ghost during external drag-in: strip children, show name */
+:deep(.sortable-ghost) {
+  @apply border-2 border-dashed border-sky-500/70 bg-sky-950/20 rounded opacity-80;
+  max-height: 2rem !important;
+  overflow: hidden !important;
+  padding: 0.25rem 0.75rem !important;
+}
+
+:deep(.sortable-ghost) > * {
+  display: none !important;
+}
+
+:deep(.sortable-ghost)::after {
+  content: attr(data-project-name);
+  color: #bae6fd;
+  font-size: 0.75rem;
+  line-height: 1.5rem;
+}
+
 .drag-preview-entry {
   @apply border-2 border-dashed border-sky-500/70 bg-sky-950/20 opacity-80;
 }

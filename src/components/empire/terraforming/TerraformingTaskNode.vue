@@ -106,6 +106,7 @@ function handleSetCount(node: { id: string; available: boolean }, newCount: numb
 <template>
   <div
     class="task-node"
+    :data-project-name="getNodeName(node.id, node.name)"
     :class="{
       'child-node': isChild,
       blocked: !node.available && (completedProjectCounts.get(node.id) ?? 0) === 0,
