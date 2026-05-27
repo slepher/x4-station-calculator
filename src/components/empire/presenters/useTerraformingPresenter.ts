@@ -1305,6 +1305,8 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     let cumulativeStats = { ...initialStats }
     let cumulativeCompleted = new Map<string, number>()
 
+    const clusterProjectIds = new Set(cluster.projectIds)
+
     interface CandidateGoal {
       id?: string
       targetProjectId: string | null
@@ -1372,14 +1374,11 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
       }
 
       // Check dependency expression for unmet project goals
-      const entryRuntimePids = new Set(
-        getRuntimeTerraformingProjectIds(cluster, cumulativeStats, cumulativeCompleted, data),
-      )
       const depGoals = extractUnmetDependencyGoals(
         project.dependencies,
         lastCumulativeCompleted,
         pmap,
-        entryRuntimePids,
+        clusterProjectIds,
       )
       for (const dg of depGoals) {
         const key = `project:${dg.targetProjectId}`
@@ -2619,14 +2618,28 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     return { disabled: false }
   }
 
-  function appendDraftProject(projectId: string) {
+  function resolveDraftIndexFromPlanIndex(targetPlanIndex: number): number {
+    if (targetPlanIndex <= 0) return 0
+    const planEntries = planDisplayEntries.value
+    let draftIndex = 0
+    const boundedPlanIndex = Math.min(targetPlanIndex, planEntries.length)
+    for (let i = 0; i < boundedPlanIndex; i += 1) {
+      const entry = planEntries[i]
+      if (entry?.type === 'task') draftIndex += 1
+    }
+    return draftIndex
+  }
+
+  function appendDraftProject(projectId: string, targetPlanIndex?: number) {
     const project = projectMap.value.get(projectId)
     if (project?.repeatCooldown === null && draftExecutionLog.value.some(entry => entry.projectId === projectId && !entry.systemDisabled)) {
       return
     }
 
     const exclusion = computeMutualExclusionForEntry(projectId)
-    const insertIndex = resolveInsertIndex(projectId)
+    const insertIndex = targetPlanIndex === undefined
+      ? resolveInsertIndex(projectId)
+      : resolveDraftIndexFromPlanIndex(targetPlanIndex)
 
     const newEntry: TerraformingDraftExecutionEntry = {
       id: nextDraftId(),

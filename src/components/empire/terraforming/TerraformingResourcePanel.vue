@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
 import draggable from 'vuedraggable'
 import { useI18n } from 'vue-i18n'
 import type {
@@ -55,6 +55,7 @@ const panelContentRef = ref<HTMLElement | null>(null)
 const cancelValidationCache = ref<Record<string, TerraformingCancelValidation>>({})
 
 const dragHoverIndex = ref(-1)
+const draggableContainerRef = ref<any>(null)
 
 const displayPlanEntries = computed(() => {
   const entries = [...props.queueEditState.planEntries] as TerraformingGoalPlanDisplayEntry[]
@@ -68,12 +69,26 @@ const displayPlanEntries = computed(() => {
 })
 
 watch(() => props.taskDrag.isDragging.value, (dragging) => {
+  document.body.classList.toggle('terraforming-task-dragging', dragging)
   if (!dragging) dragHoverIndex.value = -1
 })
 
+onUnmounted(() => {
+  document.body.classList.remove('terraforming-task-dragging')
+})
+
+function getDraggedProjectId(event: any): string {
+  if (props.taskDrag.projectId.value) return props.taskDrag.projectId.value
+  const draggedModel = event.item?._underlying_vm_
+  if (draggedModel?.projectId) return draggedModel.projectId
+  if (draggedModel?.id) return draggedModel.id
+  if (event.item?.dataset?.projectId) return event.item.dataset.projectId
+  return ''
+}
+
 function onExternalDrop(e: any) {
-  const targetIdx = e.newIndex ?? e.moved?.newIndex
-  const projectId = props.taskDrag.projectId.value
+  const targetIdx = dragHoverIndex.value >= 0 ? dragHoverIndex.value : (e.newIndex ?? e.added?.newIndex)
+  const projectId = getDraggedProjectId(e)
   if (!projectId) return
   dragHoverIndex.value = -1
   emit('dropTask', projectId, targetIdx)
@@ -89,9 +104,37 @@ function onDragChange(e: any) {
   }
 }
 
-function onInternalReorder() {
+function updateHoverIndexFromPointer(event: DragEvent | MouseEvent) {
+  if (!props.taskDrag.isDragging.value) return
+  event.preventDefault()
+  const rawContainer = draggableContainerRef.value
+  let container: HTMLElement | null = null
+  if (rawContainer instanceof HTMLElement) {
+    container = rawContainer
+  } else if (rawContainer?.$el instanceof HTMLElement) {
+    container = rawContainer.$el
+  }
+  if (!container) return
+
+  const rows = Array.from(container.querySelectorAll<HTMLElement>('[data-plan-entry-row="true"]'))
+  let nextIndex = rows.length
+  for (let i = 0; i < rows.length; i += 1) {
+    const rect = rows[i]!.getBoundingClientRect()
+    if (event.clientY < rect.top + rect.height / 2) {
+      nextIndex = i
+      break
+    }
+  }
+  dragHoverIndex.value = nextIndex
+}
+
+function clearHoverIndex() {
   dragHoverIndex.value = -1
-  const tasks = displayPlanEntries.value
+}
+
+function onModelValueUpdate(entries: TerraformingGoalPlanDisplayEntry[]) {
+  if (props.taskDrag.isDragging.value) return
+  const tasks = entries
     .filter((pe): pe is { type: 'task'; entry: TerraformingDraftTimelineEntry } => pe.type === 'task')
     .map(pe => pe.entry)
   emit('updateDraftEntries', tasks)
@@ -257,7 +300,8 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
 
         <draggable
           v-else
-          v-model="displayPlanEntries"
+          ref="draggableContainerRef"
+          :model-value="displayPlanEntries"
           :item-key="planEntryKey"
           :group="{ name: 'terraforming-tasks', pull: false, put: () => true }"
           ghost-class="drag-ghost"
@@ -266,7 +310,10 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
           class="draggable-container"
           @add="onExternalDrop"
           @change="onDragChange"
-          @update:model-value="onInternalReorder"
+          @dragover.prevent="updateHoverIndexFromPointer"
+          @mousemove="updateHoverIndexFromPointer"
+          @mouseleave="clearHoverIndex"
+          @update:model-value="onModelValueUpdate"
         >
           <template #item="{ element: planEntry }">
             <div>
@@ -276,13 +323,14 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
                 class="timeline-item draft-item drag-preview-entry"
               >
                 <div class="timeline-head">
-                  <span class="drag-handle">↧</span>
+                  <span class="drag-handle preview-drag-handle">↕</span>
                   <span class="entry-name">{{ planEntry.projectName || planEntry.projectId }}</span>
                 </div>
               </div>
 
               <div
                 v-else
+                data-plan-entry-row="true"
                 :class="planEntry.type === 'goal'
                 ? ['goal-entry', {
                     'goal-filter-active': planEntry.entry.isFilterActive,
@@ -681,7 +729,19 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
 }
 
 .drag-preview-entry {
-  @apply border-2 border-dashed border-sky-500/70 bg-sky-950/20 rounded opacity-80 max-h-8 overflow-hidden;
+  @apply border-2 border-dashed border-sky-500/80 bg-sky-950/20 rounded overflow-hidden;
+}
+
+.drag-preview-entry .timeline-head {
+  @apply px-2 py-2 gap-2;
+}
+
+.preview-drag-handle {
+  @apply w-3 shrink-0 text-center;
+}
+
+.drag-preview-entry .entry-name {
+  @apply text-slate-100;
 }
 
 .draggable-container {
@@ -775,5 +835,14 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
 
 .rebate-dot {
   @apply text-emerald-400 mr-1 shrink-0;
+}
+</style>
+
+<style>
+body.terraforming-task-dragging .sortable-ghost,
+body.terraforming-task-dragging .sortable-fallback,
+body.terraforming-task-dragging .sortable-drag,
+body.terraforming-task-dragging .drag-ghost:not(.drag-preview-entry) {
+  display: none !important;
 }
 </style>

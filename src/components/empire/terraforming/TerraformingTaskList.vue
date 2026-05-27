@@ -82,6 +82,19 @@ const filteredTaskIds = computed(() => {
   return ids
 })
 
+function onTaskDragStart(event: any) {
+  const node = event.item?._underlying_vm_
+  let projectId = ''
+  let projectName = ''
+  if (event.item?.dataset?.projectId) projectId = event.item.dataset.projectId
+  else if (node?.id) projectId = node.id
+
+  if (event.item?.dataset?.projectName) projectName = event.item.dataset.projectName
+  else if (projectId) projectName = getNodeName(projectId, node?.name || projectId)
+
+  if (projectId && projectName) emit('startDragTask', projectId, projectName)
+}
+
 function isTaskVisible(nodeId: string): boolean {
   if (!filteredTaskIds.value) return true
   return filteredTaskIds.value.has(nodeId)
@@ -291,28 +304,34 @@ function getStatLines(projectId: string): TerraformingStatLineModel[] {
                 :model-value="taskTree.groups.get(group)?.filter(n => topLevelNodeIds.has(n.id) && isTaskVisible(n.id)) || []"
                 :group="{ name: 'terraforming-tasks', pull: 'clone', put: false }"
                 :sort="false"
-                :clone="(n: any) => ({ projectId: n.id, projectName: n.name, _type: 'drag-clone' })"
+                :clone="(n: any) => ({ projectId: n.id, projectName: getNodeName(n.id, n.name), _type: 'drag-clone' })"
                 item-key="id"
                 :disabled="!isEditing"
                 ghost-class="drag-ghost"
                 handle=".drag-to-log"
                 class="task-node-list"
-                @start="(e: any) => { const node = e.item?._underlying_vm_ || e.item; if (node?.id && node?.name) emit('startDragTask', node.id, node.name) }"
+                @start="onTaskDragStart"
                 @end="emit('endDragTask')"
               >
                 <template #item="{ element: node }">
-                  <TerraformingTaskNode
-                    :key="node.id"
-                    :node="node"
-                    :is-editing="isEditing"
-                    :completed-project-counts="completedProjectCounts"
-                    :project-map="projectMap"
-                    :project-display-names="projectDisplayNames"
-                    :task-node-displays="taskNodeDisplays"
-                    @toggle-project="emit('toggleProject', $event)"
-                    @set-project-count="(pid: string, cnt: number) => emit('setProjectCount', pid, cnt)"
-                    @click-stat="emit('clickStat', $event)"
-                  />
+                  <div
+                    class="task-node-drag-wrapper"
+                    :data-project-id="node.id"
+                    :data-project-name="getNodeName(node.id, node.name)"
+                  >
+                    <TerraformingTaskNode
+                      :key="node.id"
+                      :node="node"
+                      :is-editing="isEditing"
+                      :completed-project-counts="completedProjectCounts"
+                      :project-map="projectMap"
+                      :project-display-names="projectDisplayNames"
+                      :task-node-displays="taskNodeDisplays"
+                      @toggle-project="emit('toggleProject', $event)"
+                      @set-project-count="(pid: string, cnt: number) => emit('setProjectCount', pid, cnt)"
+                      @click-stat="emit('clickStat', $event)"
+                    />
+                  </div>
                 </template>
               </draggable>
             </div>
