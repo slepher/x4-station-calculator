@@ -429,4 +429,8 @@ function getStatLines(projectId: string): TerraformingStatLineModel[] {
 .stat-tag { @apply flex items-center gap-0.5 rounded-full px-2 py-0.5 text-xs bg-sky-500/20 text-sky-400 border border-sky-500/30; }
 .stat-tag-name { @apply truncate max-w-28; }
 .stat-tag-close { @apply ml-0.5 text-slate-400 hover:text-slate-200 leading-none; }
+.drag-to-log {
+  @apply text-slate-500 cursor-grab text-sm px-1 select-none;
+  @apply hover:text-slate-300 active:cursor-grabbing;
+}
 </style>
