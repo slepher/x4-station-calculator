@@ -34,6 +34,7 @@ const props = defineProps<Props>()
 const emit = defineEmits<{
   (e: 'selectCluster', clusterId: string): void
   (e: 'displayModeChange', mode: 'list' | 'item'): void
+  (e: 'clickStat', statId: string): void
 }>()
 
 const displayMode = ref<'list' | 'item'>('list')
@@ -158,6 +159,7 @@ function formatPartName(partName: string): string {
               compact
               centered
               mode="status"
+              @click-stat="emit('clickStat', $event)"
             />
           </div>
         </div>

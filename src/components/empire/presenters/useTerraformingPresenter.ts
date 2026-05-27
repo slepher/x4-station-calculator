@@ -454,8 +454,8 @@ function buildTaskStatLineModels(
       if (!hideBlockEffectPreview) {
         if (effectToValue > currentValue) effectDirection = 'increase'
         else if (effectToValue < currentValue) effectDirection = 'decrease'
-        effectLabel = formatEffectLabel(effect, uiLabels)
       }
+      effectLabel = formatEffectLabel(effect, uiLabels)
     }
 
     if (ranges.length === 0) {

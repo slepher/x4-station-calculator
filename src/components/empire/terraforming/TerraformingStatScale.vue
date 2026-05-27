@@ -16,6 +16,10 @@ interface Props {
 
 const props = defineProps<Props>()
 
+const emit = defineEmits<{
+  (e: 'clickStat', statId: string): void
+}>()
+
 const requiredStateSet = computed(() => {
   if (!('requiredStates' in props.model) || !props.model.requiredStates) return new Set<number>()
   return new Set(props.model.requiredStates)
@@ -146,7 +150,7 @@ function isEffectBlock(value: number): boolean {
 <template>
   <div class="stat-scale" :class="{ compact, centered, impact: mode === 'impact' }" :title="titleText">
     <div class="scale-line" :class="{ centered, impact: mode === 'impact' }">
-      <span class="stat-name">{{ model.statName }}</span>
+      <span class="stat-name" @click.stop="emit('clickStat', model.statId)">{{ model.statName }}</span>
       <template v-if="hasVisibleBlocks">
         <span
           v-if="mode === 'impact' && showEffectLabel && effectMeta.label"
@@ -209,7 +213,7 @@ function isEffectBlock(value: number): boolean {
   gap: 0.5625rem;
 }
 
-.stat-name { @apply text-slate-300 font-medium shrink-0; }
+.stat-name { @apply text-slate-300 font-medium shrink-0 cursor-pointer hover:text-sky-400 transition-colors; }
 .numeric-value { @apply font-mono text-sky-300; }
 .numeric-value.impact { @apply text-slate-300; }
 .effect-label { @apply text-[11px] text-sky-300 font-mono shrink-0; }

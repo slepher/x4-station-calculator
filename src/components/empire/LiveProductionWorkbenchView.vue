@@ -148,6 +148,14 @@ const terraformingFloating = computed(() => ({
   taskList: isQueueEditing.value,
   resourcePanel: !isQueueEditing.value,
 }))
+const statFilter = ref(new Set<string>())
+
+function toggleStatFilter(statId: string) {
+  const next = new Set(statFilter.value)
+  if (next.has(statId)) next.delete(statId)
+  else next.add(statId)
+  statFilter.value = next
+}
 </script>
 
 <template>
@@ -266,6 +274,7 @@ const terraformingFloating = computed(() => ({
         :stat-display-names="terraformingPresenter.props.sectorPanel.statDisplayNames.value"
         :active-rebates="terraformingPresenter.props.sectorPanel.activeRebates.value"
         :floating="terraformingFloating.sectorPanel"
+        @click-stat="toggleStatFilter"
         @select-cluster="terraformingPresenter.emits.selectCluster"
         @display-mode-change="(mode) => terraformingSectorMode = mode"
       />
@@ -280,6 +289,10 @@ const terraformingFloating = computed(() => ({
         :project-map="terraformingPresenter.props.taskList.projectMap.value"
         :project-display-names="terraformingPresenter.props.taskList.projectDisplayNames.value"
         :floating="terraformingFloating.taskList"
+        :stat-filter="statFilter"
+        :is-editing="isQueueEditing"
+        :stat-display-names="terraformingPresenter.props.sectorPanel.statDisplayNames.value"
+        @click-stat="toggleStatFilter"
         @toggle-project="terraformingPresenter.emits.toggleProject"
         @set-project-count="terraformingPresenter.emits.setProjectCount"
       />
@@ -299,6 +312,7 @@ const terraformingFloating = computed(() => ({
         :delivery-ship-map="terraformingPresenter.props.resourcePanel.deliveryShipMap.value"
         :hq-build-docks="terraformingPresenter.props.resourcePanel.hqBuildDocks.value"
         :floating="terraformingFloating.resourcePanel"
+        @click-stat="toggleStatFilter"
         @cancel-execution="terraformingPresenter.emits.cancelExecution"
         @clear-all="terraformingPresenter.emits.clearExecutionQueue"
         @start-edit="terraformingPresenter.emits.startQueueEdit"

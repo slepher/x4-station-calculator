@@ -41,6 +41,7 @@ const emit = defineEmits<{
   (e: 'updateDraftEntries', entries: TerraformingDraftTimelineEntry[]): void
   (e: 'disableAllDraft'): void
   (e: 'enableAllDraft'): void
+  (e: 'clickStat', statId: string): void
 }>()
 
 const { t } = useI18n()
@@ -263,6 +264,7 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
                     :model="line"
                     compact
                     mode="impact"
+                    @click-stat="emit('clickStat', $event)"
                   />
                 </div>
                 <div v-if="element.reasons.length > 0" class="detail-section">
@@ -385,6 +387,7 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
                   :model="line"
                   compact
                   mode="impact"
+                  @click-stat="emit('clickStat', $event)"
                 />
                 <div
                   v-for="(rc, i) in entry.rebateChanges"

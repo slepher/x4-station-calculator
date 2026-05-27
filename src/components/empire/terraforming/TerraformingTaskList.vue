@@ -21,6 +21,9 @@ interface Props {
   projectMap: Map<string, TerraformingProject>
   projectDisplayNames: Map<string, string>
   floating: boolean
+  statFilter: Set<string>
+  isEditing: boolean
+  statDisplayNames: Map<string, string>
 }
 
 const props = defineProps<Props>()
@@ -28,7 +31,55 @@ const props = defineProps<Props>()
 const emit = defineEmits<{
   (e: 'toggleProject', projectId: string): void
   (e: 'setProjectCount', projectId: string, count: number): void
+  (e: 'clickStat', statId: string): void
 }>()
+
+const filteredTaskIds = computed(() => {
+  if (props.statFilter.size === 0) return null
+  const ids = new Set<string>()
+
+  const parentMap = new Map<string, string>()
+  function collectParents(nodes: { id: string; children: { id: string; children: any[] }[] }[]) {
+    for (const node of nodes) {
+      for (const child of node.children) {
+        parentMap.set(child.id, node.id)
+        collectParents([child])
+      }
+    }
+  }
+  if (props.taskTree) {
+    for (const nodes of props.taskTree.groups.values()) {
+      collectParents(nodes)
+    }
+  }
+
+  for (const [projectId, display] of props.taskNodeDisplays) {
+    if (display.statLines.some(
+      line => props.statFilter.has(line.statId) && line.effectToValue !== null
+    )) {
+      ids.add(projectId)
+      let parentId = parentMap.get(projectId)
+      while (parentId) {
+        ids.add(parentId)
+        parentId = parentMap.get(parentId)
+      }
+    }
+  }
+  return ids.size > 0 ? ids : null
+})
+
+function isTaskVisible(nodeId: string): boolean {
+  if (!filteredTaskIds.value) return true
+  return filteredTaskIds.value.has(nodeId)
+}
+
+function isGroupVisible(groupId: string): boolean {
+  if (!filteredTaskIds.value) return true
+  if (!props.taskTree) return false
+  const nodes = props.taskTree.groups.get(groupId)
+  if (!nodes) return false
+  return nodes.some(n => isTaskVisible(n.id) && topLevelNodeIds.value.has(n.id))
+}
 
 const topLevelNodeIds = computed(() => {
   const set = new Set<string>()
@@ -84,6 +135,12 @@ function formatDuration(duration: number | null): string {
   return [hours, minutes, seconds].map(part => String(part).padStart(2, '0')).join(':')
 }
 
+function handleEventSetCount(event: { id: string; available: boolean }, newCount: number) {
+  const current = props.completedProjectCounts.get(event.id) ?? 0
+  if (newCount > current && !event.available) return
+  emit('setProjectCount', event.id, newCount)
+}
+
 function getNodeDisplay(projectId: string): TerraformingTaskNodeDisplay | null {
   return props.taskNodeDisplays.get(projectId) || null
 }
@@ -100,6 +157,13 @@ function getEffectItems(projectId: string): TerraformingEffectItem[] {
   return getNodeDisplay(projectId)?.effectItems || []
 }
 
+const visibleEvents = computed(() => {
+  if (!props.taskTree?.groups.has('events')) return []
+  const events = props.taskTree.groups.get('events')!
+  if (!filteredTaskIds.value) return events
+  return events.filter(e => isTaskVisible(e.id))
+})
+
 function getStatLines(projectId: string): TerraformingStatLineModel[] {
   return getNodeDisplay(projectId)?.statLines || []
 }
@@ -107,7 +171,19 @@ function getStatLines(projectId: string): TerraformingStatLineModel[] {
 
 <template>
   <div class="panel-card" :class="{ 'panel-floating': floating }">
-    <div class="panel-header">{{ t('terraforming.taskPanel') }}</div>
+    <div class="panel-header">
+      <span>{{ t('terraforming.taskPanel') }}</span>
+      <div v-if="statFilter.size > 0" class="stat-tag-bar">
+        <span
+          v-for="statId in [...statFilter]"
+          :key="statId"
+          class="stat-tag"
+        >
+          <span class="stat-tag-name">{{ statDisplayNames.get(statId) || statId }}</span>
+          <button class="stat-tag-close" @click="emit('clickStat', statId)">×</button>
+        </span>
+      </div>
+    </div>
     <div class="panel-content">
       <div v-if="!taskTree" class="text-slate-500 text-sm text-center py-4">
         {{ t('terraforming.selectCluster') }}
@@ -116,10 +192,10 @@ function getStatLines(projectId: string): TerraformingStatLineModel[] {
         {{ t('terraforming.noAvailableTasks') }}
       </div>
       <div v-else>
-        <div v-if="taskTree.groups.has('events')" class="events-section">
+        <div v-if="visibleEvents.length > 0" class="events-section">
           <div class="group-header">{{ groupNames.get('events') || 'Events' }}</div>
           <div
-            v-for="e in taskTree.groups.get('events')!"
+            v-for="e in visibleEvents"
             :key="e.id"
             class="task-node"
             :class="{ blocked: !e.available && (completedProjectCounts.get(e.id) ?? 0) === 0 }"
@@ -141,7 +217,7 @@ function getStatLines(projectId: string): TerraformingStatLineModel[] {
                       :max="99"
                       :disabled="!e.available && (completedProjectCounts.get(e.id) ?? 0) === 0"
                       width-class="w-14"
-                      @update:model-value="emit('setProjectCount', e.id, $event)"
+                      @update:model-value="handleEventSetCount(e, $event)"
                     />
                   </template>
                   <button
@@ -164,6 +240,7 @@ function getStatLines(projectId: string): TerraformingStatLineModel[] {
                     compact
                     mode="impact"
                     show-effect-label
+                    @click-stat="emit('clickStat', $event)"
                   />
                 </div>
                 <div v-if="getEffectItems(e.id).length > 0" class="effect-list">
@@ -194,10 +271,10 @@ function getStatLines(projectId: string): TerraformingStatLineModel[] {
 
         <div class="task-tree">
           <template v-for="group in taskTree.groupOrder" :key="group">
-            <div v-if="taskTree.groups.has(group) && group !== 'events'" class="task-group">
+            <div v-if="taskTree.groups.has(group) && group !== 'events' && isGroupVisible(group)" class="task-group">
               <div class="group-header">{{ groupNames.get(group) || group }}</div>
               <TerraformingTaskNode
-                v-for="node in taskTree.groups.get(group)?.filter(n => topLevelNodeIds.has(n.id))"
+                v-for="node in taskTree.groups.get(group)?.filter(n => topLevelNodeIds.has(n.id) && isTaskVisible(n.id))"
                 :key="node.id"
                 :node="node"
                 :completed-project-counts="completedProjectCounts"
@@ -206,6 +283,7 @@ function getStatLines(projectId: string): TerraformingStatLineModel[] {
                 :task-node-displays="taskNodeDisplays"
                 @toggle-project="emit('toggleProject', $event)"
                 @set-project-count="(pid: string, cnt: number) => emit('setProjectCount', pid, cnt)"
+                @click-stat="emit('clickStat', $event)"
               />
             </div>
           </template>
@@ -277,4 +355,9 @@ function getStatLines(projectId: string): TerraformingStatLineModel[] {
 .events-section { @apply mb-2; }
 :deep(.x4-input-container) { @apply h-5; }
 :deep(.x4-num-input) { font-size: 11px; }
+
+.stat-tag-bar { @apply flex items-center gap-1 ml-auto flex-wrap; }
+.stat-tag { @apply flex items-center gap-0.5 rounded-full px-2 py-0.5 text-xs bg-sky-500/20 text-sky-400 border border-sky-500/30; }
+.stat-tag-name { @apply truncate max-w-28; }
+.stat-tag-close { @apply ml-0.5 text-slate-400 hover:text-slate-200 leading-none; }
 </style>

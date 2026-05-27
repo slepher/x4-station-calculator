@@ -119,6 +119,14 @@
 - [x] objective 数字千位分隔（`toLocaleString()`）
 - [x] `terraforming.mutuallyExclusive` i18n 改为互斥/排他语义
 
+## Stat 标签过滤
+
+- [x] `TerraformingStatScale` 新增 `clickStat` emit
+- [x] TaskList tag bar + effect-only 过滤 + 祖先包含 + 空组隐藏
+- [x] 三面板 stat 名称均可点击添加标签
+- [x] 所有模式生效（非仅编辑模式）
+- [x] 已完成项目效果文本始终显示
+
 ## I18n 新增
 
 - [x] `terraforming.backToList` / `terraforming.statsTitle` / `terraforming.rebatesTitle`

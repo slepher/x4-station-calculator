@@ -24,6 +24,7 @@ const props = defineProps<Props>()
 const emit = defineEmits<{
   (e: 'toggleProject', projectId: string): void
   (e: 'setProjectCount', projectId: string, count: number): void
+  (e: 'clickStat', statId: string): void
 }>()
 
 interface RepeatTagData {
@@ -93,6 +94,12 @@ function getStatusIcon(projectId: string, available: boolean): string {
   if (!available) return '🚫'
   return '⬜'
 }
+
+function handleSetCount(node: { id: string; available: boolean }, newCount: number) {
+  const current = props.completedProjectCounts.get(node.id) ?? 0
+  if (newCount > current && !node.available) return
+  emit('setProjectCount', node.id, newCount)
+}
 </script>
 
 <template>
@@ -121,7 +128,7 @@ function getStatusIcon(projectId: string, available: boolean): string {
               :max="99"
               :disabled="!node.available && (completedProjectCounts.get(node.id) ?? 0) === 0"
               width-class="w-14"
-              @update:model-value="emit('setProjectCount', node.id, $event)"
+              @update:model-value="handleSetCount(node, $event)"
             />
           </template>
           <button
@@ -144,6 +151,7 @@ function getStatusIcon(projectId: string, available: boolean): string {
             compact
             mode="impact"
             show-effect-label
+            @click-stat="emit('clickStat', $event)"
           />
         </div>
         <div v-if="getEffectItems(node.id).length > 0" class="effect-list">
