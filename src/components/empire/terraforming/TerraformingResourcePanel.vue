@@ -627,7 +627,7 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
 }
 
 .bulk-edit-card {
-  @apply bg-slate-950/40 border border-slate-700 rounded-lg p-2 flex gap-2;
+  @apply bg-slate-950/40 border border-slate-700 rounded-lg p-2 flex gap-2 justify-end;
 }
 
 .draft-item.system-disabled {
