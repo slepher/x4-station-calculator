@@ -475,10 +475,6 @@ function buildDraftWaresTooltip(wares: Array<{ name: string; amount: number }>):
               </button>
             </div>
 
-            <div v-if="!getValidation(entry.id).canCancel" class="entry-warning">
-              {{ t('terraforming.cancelBlocked') }}
-            </div>
-
             <div v-if="expandedEntryId === entry.id" class="timeline-body">
               <div v-if="entry.wares.length > 0" class="detail-section">
                 <div class="section-title">{{ t('terraforming.materialPrice') }}</div>
@@ -840,10 +836,6 @@ function buildDraftWaresTooltip(wares: Array<{ name: string; amount: number }>):
 
 .cancel-btn.disabled {
   @apply opacity-40 cursor-not-allowed hover:bg-transparent;
-}
-
-.entry-warning {
-  @apply px-3 pb-2 text-[11px] text-amber-300;
 }
 
 .timeline-body {
