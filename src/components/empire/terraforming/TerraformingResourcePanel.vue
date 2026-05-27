@@ -52,26 +52,50 @@ const expandedEntryId = ref<string | null>(null)
 const panelContentRef = ref<HTMLElement | null>(null)
 const cancelValidationCache = ref<Record<string, TerraformingCancelValidation>>({})
 
+const displayPlanEntries = ref<TerraformingGoalPlanDisplayEntry[]>([])
+
+watch(() => props.queueEditState.planEntries, (val) => {
+  const hasClone = displayPlanEntries.value.some((pe: any) => pe._type === 'drag-clone')
+  if (!hasClone) {
+    displayPlanEntries.value = [...val] as TerraformingGoalPlanDisplayEntry[]
+  }
+}, { immediate: true })
+
 function onExternalDrop(e: any) {
   const projectId = e.item?._underlying_vm_?.projectId || e.item?.projectId
   if (!projectId) return
   const targetIdx = e.newIndex
-  // Remove the cloned drag item from plan entries list
-  const next = [...props.queueEditState.planEntries]
-  const cloneIdx = next.findIndex((pe: any) => pe._type === 'drag-clone' || pe.projectId === projectId)
-  if (cloneIdx >= 0) next.splice(cloneIdx, 1)
+  // Remove the clone from display list
+  displayPlanEntries.value = displayPlanEntries.value.filter(
+    (pe: any) => pe._type !== 'drag-clone'
+  )
+  // Sync real plan entries back to presenter
+  emit('updateDraftEntries',
+    displayPlanEntries.value
+      .filter((pe): pe is { type: 'task'; entry: TerraformingDraftTimelineEntry } => pe.type === 'task')
+      .map(pe => pe.entry)
+  )
   emit('dropTask', projectId, targetIdx)
 }
 
-const internalPlanEntries = computed({
-  get: () => props.queueEditState.planEntries,
-  set: (val: TerraformingGoalPlanDisplayEntry[]) => {
-    const tasks = val
-      .filter((pe): pe is { type: 'task'; entry: TerraformingDraftTimelineEntry } => pe.type === 'task')
-      .map(pe => pe.entry)
-    emit('updateDraftEntries', tasks)
-  },
-})
+function onDragEnd() {
+  // Clean up any stray clones (drag cancelled)
+  const hasClone = displayPlanEntries.value.some((pe: any) => pe._type === 'drag-clone')
+  if (hasClone) {
+    displayPlanEntries.value = [...props.queueEditState.planEntries] as TerraformingGoalPlanDisplayEntry[]
+  }
+}
+
+function onInternalReorder() {
+  const hasClone = displayPlanEntries.value.some((pe: any) => pe._type === 'drag-clone')
+  if (!hasClone) {
+    emit('updateDraftEntries',
+      displayPlanEntries.value
+        .filter((pe): pe is { type: 'task'; entry: TerraformingDraftTimelineEntry } => pe.type === 'task')
+        .map(pe => pe.entry)
+    )
+  }
+}
 
 function planEntryKey(pe: TerraformingGoalPlanDisplayEntry): string {
   return pe.type === 'goal' ? `goal-${pe.entry.id}` : pe.entry.id
@@ -231,7 +255,7 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
 
         <draggable
           v-else
-          v-model="internalPlanEntries"
+          v-model="displayPlanEntries"
           :item-key="planEntryKey"
           :group="{ name: 'terraforming-tasks', pull: false, put: () => true }"
           ghost-class="drag-ghost"
@@ -239,6 +263,8 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
           filter=".goal-entry"
           class="draggable-container"
           @add="onExternalDrop"
+          @end="onDragEnd"
+          @update:model-value="onInternalReorder"
         >
           <template #item="{ element: planEntry }">
             <div>
