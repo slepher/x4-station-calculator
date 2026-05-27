@@ -253,3 +253,27 @@ UI 操作调整：
 - 不新增 stat 方块控件语义。
 - 不模拟材料、交付、建造、折扣、返还。
 - 不模拟概率分支。
+
+## 补充 — Predecessors 支持
+
+已加入 task 的项目可能使用 `predecessors` 字段（遗留格式）而非 `dependencies` 递归树。Goal 生成器必须对 `project.predecessors` 做同样的未满足目标提取。
+
+- `any: true` 前置项：若任一项已完成 → 跳过组；若皆未完成 → 组内全体生成 goal
+- `any: false` (默认) 前置项：每个未完成项生成 goal
+- 分组逻辑复用 `checkPredecessors()` 语义
+
+## 补充 — Goal 与已有 Draft Task 匹配
+
+Goal 生成步骤 6.5 检测每个 goal 的目标 project 是否已作为 entry 存在于 draft 队列中。
+
+- `hasExistingTask: true` / `existingDraftEntryId` 标记 goal
+- 具有该标记的 goal：sky 边框、不响应点击过滤、显示「移到此处」按钮 + 提示文字
+- 按钮触发 `moveTaskBeforeDependency`：将已存在 task entry 移至最早依赖者之前
+
+## 补充 — Cluster build_housing Goal
+
+Cluster root goal 生成已补全对 `objective.build_housing` 的处理。使用 `extractHousingTarget()` 获取目标人口，比较 `cumulativeStats.population`；标签文本经 `resolveTerraformingText` + `textReplaces` 解析与千位分隔格式化。
+
+## 补充 — Draft Entry price 与 wares 字段
+
+`TerraformingDraftTimelineEntry` 增加 `price: number` 和 `wares: Array<{name, amount}>`，供 UI 在编辑模式任务条目中显示材料价格与材料清单。`wares` 中的 name 已通过 `store.wareNames` 做 i18n 翻译。

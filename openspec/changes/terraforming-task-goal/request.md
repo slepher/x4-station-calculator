@@ -99,9 +99,11 @@
 ### In Scope
 
 - 编辑模式 log 区域支持 task entry 与 goal entry 混排展示。
-- cluster 未实现任务目标在 log 列表末尾生成 root goal。
-- task 未满足依赖生成、合并、定位 goal。
+- cluster 未实现任务目标在 log 列表末尾生成 root goal（含 build_project 与 build_housing 两类 objective）。
+- task 未满足依赖从 `project.dependencies` 和 `project.predecessors` 两处提取，生成、合并、定位 goal。
+- predecessor 中 `any` 标记的任意满足语义与 `checkPredecessors()` 对齐。
 - 点击 goal 触发 OR 过滤，并显示能实现 goal 的 task 及其父节点/前置链 task。
+- Goal 检测目标 project 是否已作为 draft task 存在于队列中，若存在但排序靠后则显示排序提示与"移到此处"按钮。
 - 编辑模式下放宽 task 添加与移除按钮的可点击限制。
 - 新增 task 按目标关系自动插入 goal 上方或队列末尾。
 - Project goal 满足后移除；stat goal 满足后作为检查点保留。
@@ -109,6 +111,7 @@
 - 单纯互斥不生成 goal；复合条件 blocker 按可实现正向分支生成 goal。
 - 替换旧的 draft 启用/禁用操作为移除/移除全部。
 - Presenter 负责 goal 生成、过滤状态、插入位置与 UI 可消费模型。
+- `TerraformingDraftTimelineEntry` 暴露 `price` 和 `wares` 字段供 UI 显示材料信息。
 - Vue 只消费 presenter 输出，不直接解释业务依赖。
 - `npm run build` 无编译错误。
 

@@ -381,3 +381,22 @@ LiveProductionWorkbenchView
 - Objective 数字千位分隔: `\b\d{4,}\b` → `toLocaleString()`
 - `terraforming.mutuallyExclusive` i18n: "互斥" / "Mutually exclusive"
 - 不要让效果区回退为散落的文字渲染
+
+## 补充 — 材料价格显示
+
+- `TerraformingTaskNode` 和 `TerraformingResourcePanel` draft entry 中在操作按钮前显示 `price.toLocaleString() Cr`。
+- 价格从 `project.resources.price` 或 `TerraformingDraftTimelineEntry.price` 获取。
+- CSS class `task-price` / `entry-price`，`task-actions` / `draft-actions` 中 `items-center` 垂直居中。
+
+## 补充 — 材料清单 Tooltip
+
+- 价格后跟 ⓘ 图标（class `task-info-icon` / `entry-info-icon`），hover 时通过 v-tippy 向上弹出材料清单。
+- Tooltip 内容在全球 CSS (`App.vue` 非 scoped) 中定义 flex 布局：ware 名称左对齐、数量右对齐。
+- Ware 名称在 task list 中通过 `useGameDataStore` + `translateWare` 翻译；在 edit log 中 `TerraformingDraftTimelineEntry.wares[].name` 已预翻译。
+- Tooltip 不重复显示 price。
+
+## 补充 — Events 拖拽
+
+- Task list 中 event tasks (group: 'events') 包裹 vuedraggable，配置与普通 tasks 相同 (`group: 'terraforming-tasks'`, `pull: 'clone'`, `handle: '.drag-to-log'`)。
+- Event card 在 `task-actions` 中添加 `.drag-to-log` 手柄，位置与 `TerraformingTaskNode` 一致。
+- CSS `.drag-to-log` 在 `TerraformingTaskList.vue` 中定义（`cursor-grab`, hover/active 变色）。

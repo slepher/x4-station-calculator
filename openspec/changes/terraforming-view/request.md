@@ -92,6 +92,10 @@
 - Presenter: clusterDisplayNames、objectivesProgress、clusterMatchesHq、statDisplayNames、projectMaxCounts、projectDisplayNames、级联撤销等 computed
 - Vue 组件: 左/中/右三列具体实现（3:5:4 grid 不变），全量 i18n（`terraforming.*` namespace）
 - 阻塞原因多行显示 + 项目名/stat 名/标签 i18n
+- Task 材料价格在操作按钮/输入框前显示，格式为 `toLocaleString() Cr`（task list 和 edit log 两侧）。
+- 价格后附带 ⓘ 图标，hover 通过 v-tippy 向上弹出材料清单（ware 名称 i18n，名称-数量 flex 对齐，不重复显示 price）。
+- 编辑模式下事件（events group）可拖拽添加至 edit log，使用与普通 task 相同的 draggable 配置和 `.drag-to-log` 手柄。
+- `.drag-to-log` 手柄 hover/grab/grabbing 光标样式。
 - `npm run build` 无编译错误
 
 ### Out of Scope
@@ -116,6 +120,10 @@
 12. `npm run build` 无编译错误
 13. 中列任务操作区默认常显，不依赖 hover reveal
 14. 中列项目依赖条目只要存在就持续显示，不因当前阻塞原因来自其他 stat 条件而消失
+15. Task 材料价格在操作按钮前显示（task list 和 edit log 两侧）
+16. 价格后 ⓘ 图标 hover 弹出材料清单（flex 对齐，i18n ware 名）
+17. 编辑模式事件可拖拽至 edit log
+
 
 ## 未决项
 
