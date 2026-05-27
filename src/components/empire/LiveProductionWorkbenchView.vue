@@ -292,6 +292,7 @@ function toggleStatFilter(statId: string) {
         :stat-filter="statFilter"
         :is-editing="isQueueEditing"
         :stat-display-names="terraformingPresenter.props.sectorPanel.statDisplayNames.value"
+        :goal-filtered-task-ids="terraformingPresenter.props.taskList.goalFilteredTaskIds.value"
         @click-stat="toggleStatFilter"
         @toggle-project="terraformingPresenter.emits.toggleProject"
         @set-project-count="terraformingPresenter.emits.setProjectCount"
@@ -305,8 +306,8 @@ function toggleStatFilter(statId: string) {
         :queue-edit-state="{
           editing: terraformingPresenter.props.resourcePanel.queueEditState.editing.value,
           canComplete: terraformingPresenter.props.resourcePanel.queueEditState.canComplete.value,
-          invalidCount: terraformingPresenter.props.resourcePanel.queueEditState.invalidCount.value,
-          draftEntries: terraformingPresenter.props.resourcePanel.queueEditState.draftEntries.value
+          unsatisfiedGoalCount: terraformingPresenter.props.resourcePanel.queueEditState.unsatisfiedGoalCount.value,
+          planEntries: terraformingPresenter.props.resourcePanel.queueEditState.planEntries.value
         }"
         :get-cancel-validation="terraformingPresenter.props.resourcePanel.getCancelValidation"
         :delivery-ship-map="terraformingPresenter.props.resourcePanel.deliveryShipMap.value"
@@ -318,12 +319,11 @@ function toggleStatFilter(statId: string) {
         @start-edit="terraformingPresenter.emits.startQueueEdit"
         @cancel-edit="terraformingPresenter.emits.cancelQueueEdit"
         @complete-edit="terraformingPresenter.emits.completeQueueEdit"
-        @set-draft-enabled="terraformingPresenter.emits.setDraftEntryEnabled"
-        @delete-draft="terraformingPresenter.emits.deleteDraftEntry"
+        @remove-draft="terraformingPresenter.emits.removeDraftEntry"
+        @remove-all-draft="terraformingPresenter.emits.removeAllDraftEntries"
         @copy-draft="terraformingPresenter.emits.copyDraftEntry"
         @update-draft-entries="terraformingPresenter.emits.reorderDraftEntries"
-        @disable-all-draft="terraformingPresenter.emits.disableAllDraftEntries"
-        @enable-all-draft="terraformingPresenter.emits.enableAllDraftEntries"
+        @click-goal="terraformingPresenter.emits.clickGoal"
       />
     </div>
   </div>

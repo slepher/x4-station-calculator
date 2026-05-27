@@ -126,6 +126,7 @@ export interface TerraformingTaskListProps {
   projectDisplayNames: ComputedRef<Map<string, string>>
   wareNames: ComputedRef<Map<string, string>>
   moduleGroupNames: ComputedRef<Map<string, string>>
+  goalFilteredTaskIds: ComputedRef<Set<string> | null>
 }
 
 export interface TerraformingTimelineStatSnapshot {
@@ -174,13 +175,16 @@ export interface TerraformingExecutionTimelineEntry {
   blockedReason: string | null
 }
 
-export type TerraformingDraftEntryState = 'disabled' | 'enabled-valid' | 'enabled-invalid'
-export type TerraformingDraftRepeatRole = 'single' | 'first' | 'duplicate'
+export type TerraformingGoalKind = 'project' | 'stat' | 'cluster'
 
 export interface TerraformingDraftExecutionEntry extends TerraformingExecutionEntry {
-  enabled: boolean
   source: 'committed' | 'draft'
+  systemDisabled: boolean
+  systemDisabledReason?: string
+  mutuallyExclusiveWith?: string
 }
+
+export type TerraformingDraftRepeatRole = 'single' | 'first' | 'duplicate'
 
 export interface TerraformingDraftTimelineEntry {
   id: string
@@ -188,19 +192,61 @@ export interface TerraformingDraftTimelineEntry {
   projectId: string
   projectName: string
   projectGroupName: string
-  enabled: boolean
-  state: TerraformingDraftEntryState
+  systemDisabled: boolean
+  systemDisabledReason?: string
+  mutuallyExclusiveWith?: string
   repeatRole: TerraformingDraftRepeatRole
   reasons: string[]
   dependencies: string[]
   statLines: TerraformingStatLineModel[]
 }
 
+export interface TerraformingGoalEntry {
+  id: string
+  kind: TerraformingGoalKind
+  label: string
+  targetProjectId: string | null
+  targetStatId: string | null
+  targetStatConditionIndex?: number
+  position: number
+  satisfied: boolean
+  hasRisk: boolean
+  riskReason?: string
+  dependentTaskIds: string[]
+}
+
+export interface TerraformingGoalDisplayEntry {
+  id: string
+  kind: TerraformingGoalKind
+  label: string
+  satisfied: boolean
+  hasRisk: boolean
+  riskReason?: string
+  isFilterActive: boolean
+  statGoalModel?: TerraformingStatGoalLineModel
+}
+
+export type TerraformingGoalPlanDisplayEntry =
+  | { type: 'task'; entry: TerraformingDraftTimelineEntry }
+  | { type: 'goal'; entry: TerraformingGoalDisplayEntry }
+
+export interface TerraformingStatGoalLineModel extends TerraformingStatScaleModel {
+  hasRanges: boolean
+  targetValue: number
+  ranges: TerraformingScaleRange[]
+  requirementSegments: Array<{ startIndex: number; endIndex: number }>
+  effectDirection: TerraformingStatEffectDirection
+  effectFromValue: number
+  effectToValue: number
+  numericText: string | null
+  satisfied: boolean
+}
+
 export interface TerraformingQueueEditState {
   editing: ComputedRef<boolean>
   canComplete: ComputedRef<boolean>
-  invalidCount: ComputedRef<number>
-  draftEntries: ComputedRef<TerraformingDraftTimelineEntry[]>
+  unsatisfiedGoalCount: ComputedRef<number>
+  planEntries: ComputedRef<TerraformingGoalPlanDisplayEntry[]>
 }
 
 export interface TerraformingResourcePanelProps {
@@ -228,13 +274,12 @@ export interface TerraformingPresenterEmits {
   startQueueEdit: () => void
   cancelQueueEdit: () => void
   completeQueueEdit: () => void
-  setDraftEntryEnabled: (entryId: string, enabled: boolean) => void
-  deleteDraftEntry: (entryId: string) => void
+  removeDraftEntry: (entryId: string) => void
+  removeAllDraftEntries: () => void
+  clickGoal: (goalId: string) => void
   copyDraftEntry: (entryId: string) => void
   moveDraftEntry: (entryId: string, targetIndex: number) => void
   reorderDraftEntries: (entries: TerraformingDraftTimelineEntry[]) => void
-  disableAllDraftEntries: () => void
-  enableAllDraftEntries: () => void
 }
 
 export interface UseTerraformingPresenterReturn {
@@ -318,7 +363,7 @@ function buildConditionScaleModel(
 ): TerraformingConditionScaleModel | null {
   const statDef = data.stats.find(s => s.id === condition.stat)
   if (!statDef) return null
-  if (!(condition.stat in currentStats)) return null
+    if (!isStatInRuntime(currentStats, condition.stat)) return null
   const currentValue = currentStats[condition.stat] ?? 0
   const currentRange = getCurrentRange(statDef, currentValue)
   const ranges = toScaleRanges(statDef)
@@ -363,7 +408,7 @@ function buildNeutralizeScaleModel(
 ): TerraformingConditionScaleModel | null {
   const statDef = data.stats.find(s => s.id === statId)
   if (!statDef) return null
-  if (!(statId in currentStats)) return null
+  if (!isStatInRuntime(currentStats, statId)) return null
   const currentValue = currentStats[statId] ?? 0
   const currentRange = getCurrentRange(statDef, currentValue)
   const ranges = toScaleRanges(statDef)
@@ -426,7 +471,7 @@ function buildTaskStatLineModels(
 
   for (const stat of data.stats) {
     if (!statIds.has(stat.id)) continue
-    if (!(stat.id in currentStats)) continue
+    if (!isStatInRuntime(currentStats, stat.id)) continue
 
     const statName = getStatName(stat.id, data, i18nLookup)
     const currentValue = currentStats[stat.id] ?? 0
@@ -884,6 +929,23 @@ function formatDependencyExpressionLines(
   }
   if ('any' in dependency) {
     const isLeaf = (dep: TerraformingProjectDependency): boolean => 'completed' in dep || 'notCompleted' in dep
+    if (dependency.any.every(child => 'completed' in child) && dependency.any.length > 0) {
+      const branchInfo = dependency.any.map(child => {
+        if (!('completed' in child)) return null
+        if (runtimeProjectIds && !runtimeProjectIds.has(child.completed)) return null
+        return {
+          text: projectDisplayName(child.completed, projectNames),
+          blocked: (completedProjects.get(child.completed) ?? 0) <= 0,
+        }
+      }).filter((x): x is { text: string; blocked: boolean } => x !== null)
+      if (branchInfo.length === 0) return []
+      const anyBlocked = branchInfo.every(b => b.blocked)
+      return [{
+        label: labels.depends,
+        value: `${labels.anyOf}${branchInfo.map(b => b.text).join(' | ')}`,
+        blocked: anyBlocked,
+      }]
+    }
     if (dependency.any.every(isLeaf) && dependency.any.length > 0 && dependency.any.some(d => 'notCompleted' in d)) {
       const branchInfo = dependency.any.map(child => {
         if ('notCompleted' in child) {
@@ -979,11 +1041,16 @@ function isRepeatable(project: TerraformingProject | undefined): boolean {
   return (project?.repeatCooldown ?? null) !== null
 }
 
+function isStatInRuntime(stats: Record<string, number>, statId: string): boolean {
+  return statId in stats
+}
+
 export function useTerraformingPresenter(store: TerraformingPresenterStore): UseTerraformingPresenterReturn {
   const vI18nLookup: I18nLookup = (key: string) => (i18n.global.t(key) as string) || ''
   const isQueueEditing = ref(false)
   const draftExecutionLog = ref<TerraformingDraftExecutionEntry[]>([])
   const draftSequence = ref(0)
+  const activeGoalFilterIds = ref<Set<string>>(new Set())
 
   const hqArchiveStation = computed(() => store.terraformingHqArchiveStation.value)
 
@@ -1129,36 +1196,341 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     }
   }
 
-  const draftReplayEntries = computed<TerraformingDraftTimelineEntry[]>(() => {
+  function extractCompletedLeavesFromDependency(
+    dependency: TerraformingProjectDependency | undefined,
+  ): string[] {
+    if (!dependency) return []
+    if ('all' in dependency) {
+      return dependency.all.flatMap(child => extractCompletedLeavesFromDependency(child))
+    }
+    if ('any' in dependency) {
+      const isLeaf = (dep: TerraformingProjectDependency): boolean => 'completed' in dep || 'notCompleted' in dep
+      if (dependency.any.every(isLeaf) && dependency.any.some(d => 'notCompleted' in d)) {
+        return dependency.any.filter(d => 'completed' in d).flatMap(d => 'completed' in d ? [d.completed] : [])
+      }
+      return dependency.any.flatMap(child => extractCompletedLeavesFromDependency(child))
+    }
+    if ('completed' in dependency) return [dependency.completed]
+    return []
+  }
+
+  function extractUnmetDependencyGoals(
+    dependency: TerraformingProjectDependency | undefined,
+    completedProjects: Map<string, number>,
+    projectMap: Map<string, TerraformingProject>,
+    runtimeProjectIds: Set<string>,
+  ): { targetProjectId: string; isRisk: boolean }[] {
+    if (!dependency) return []
+    if ('all' in dependency) {
+      return dependency.all.flatMap(child => extractUnmetDependencyGoals(child, completedProjects, projectMap, runtimeProjectIds))
+    }
+    if ('any' in dependency) {
+      const isLeaf = (dep: TerraformingProjectDependency): boolean => 'completed' in dep || 'notCompleted' in dep
+      if (dependency.any.every(isLeaf) && dependency.any.some(d => 'notCompleted' in d)) {
+        const notCompletedIds = dependency.any.filter(d => 'notCompleted' in d).map(d => (d as { notCompleted: string }).notCompleted)
+        const completedIds = dependency.any.filter(d => 'completed' in d).map(d => (d as { completed: string }).completed)
+        const allNotCompletedSatisfied = notCompletedIds.every(pid => (completedProjects.get(pid) ?? 0) <= 0)
+        if (allNotCompletedSatisfied) return []
+        const unsatisfied = completedIds.filter(pid => runtimeProjectIds.has(pid) && (completedProjects.get(pid) ?? 0) <= 0)
+        return unsatisfied.map(pid => ({ targetProjectId: pid, isRisk: false }))
+      }
+      const branchResults = dependency.any.map(child =>
+        extractUnmetDependencyGoals(child, completedProjects, projectMap, runtimeProjectIds)
+      )
+      if (branchResults.some(r => r.length === 0)) return []
+      return branchResults.flat()
+    }
+    if ('completed' in dependency) {
+      if (!runtimeProjectIds.has(dependency.completed)) return []
+      if ((completedProjects.get(dependency.completed) ?? 0) > 0) return []
+      return [{ targetProjectId: dependency.completed, isRisk: false }]
+    }
+    return []
+  }
+
+  function checkStatConditionMet(
+    condition: StatCondition,
+    cumulativeStats: Record<string, number>,
+    statDefs: TerraformingStat[],
+  ): boolean {
+    const currentVal = cumulativeStats[condition.stat]
+    if (currentVal === undefined) return false
+    const statDef = statDefs.find(s => s.id === condition.stat)
+    if (!statDef) return false
+    if (condition.usesValueBounds || condition.minvalue !== undefined || condition.maxvalue !== undefined) {
+      if (condition.minvalue !== undefined && currentVal < condition.minvalue) return false
+      if (condition.maxvalue !== undefined && currentVal > condition.maxvalue) return false
+      return true
+    }
+    if (condition.usesStateBounds) {
+      const currentRange = getCurrentRange(statDef, currentVal)
+      const currentState = currentRange?.state ?? 0
+      if (condition.min !== undefined && currentState < condition.min) return false
+      if (condition.max !== undefined && currentState > condition.max) return false
+      return true
+    }
+    const currentRange = getCurrentRange(statDef, currentVal)
+    const currentState = currentRange?.state ?? 0
+    if (condition.min !== undefined && currentState < condition.min) return false
+    if (condition.max !== undefined && currentState > condition.max) return false
+    return true
+  }
+
+  function generateGoalEntries(
+    draftEntries: TerraformingDraftExecutionEntry[],
+    cluster: TerraformingCluster,
+    data: TerraformingData,
+    pmap: Map<string, TerraformingProject>,
+    projectNames: Map<string, string>,
+    statNames: Map<string, string>,
+    initialStats: Record<string, number>,
+  ): TerraformingGoalEntry[] {
+    let goalSeq = 0
+    const nextGoalId = () => `goal-${++goalSeq}`
+
+    // 1. Replay: compute cumulative state through all non-disabled entries
+    let cumulativeStats = { ...initialStats }
+    let cumulativeCompleted = new Map<string, number>()
+
+    interface CandidateGoal {
+      id?: string
+      targetProjectId: string | null
+      targetStatId: string | null
+      targetStatConditionIndex?: number
+      dependentTaskIds: Set<string>
+    }
+
+    const projectGoalCandidates = new Map<string, CandidateGoal>()
+    const statGoalCandidates = new Map<string, CandidateGoal & { statCondition: StatCondition }>()
+
+    for (const entry of draftEntries) {
+      if (entry.systemDisabled) continue
+      const project = pmap.get(entry.projectId)
+      if (!project) continue
+
+      const lastCumulativeCompleted = new Map(cumulativeCompleted)
+
+      // Check project's stat conditions met by cumulative state BEFORE this entry
+      for (let ci = 0; ci < project.conditions.length; ci++) {
+        const condition = project.conditions[ci]!
+        if (!isStatInRuntime(cumulativeStats, condition.stat)) continue
+        if (!checkStatConditionMet(condition, cumulativeStats, data.stats)) {
+          const key = `stat:${condition.stat}:${ci}`
+          const existing = statGoalCandidates.get(key)
+          if (existing) {
+            existing.dependentTaskIds.add(entry.id)
+          } else {
+            statGoalCandidates.set(key, {
+              targetProjectId: null,
+              targetStatId: condition.stat,
+              targetStatConditionIndex: ci,
+              dependentTaskIds: new Set([entry.id]),
+              statCondition: condition,
+            })
+          }
+        }
+      }
+
+      // Check dependency expression for unmet project goals
+      const entryRuntimePids = new Set(
+        getRuntimeTerraformingProjectIds(cluster, cumulativeStats, cumulativeCompleted, data),
+      )
+      const depGoals = extractUnmetDependencyGoals(
+        project.dependencies,
+        lastCumulativeCompleted,
+        pmap,
+        entryRuntimePids,
+      )
+      for (const dg of depGoals) {
+        const key = `project:${dg.targetProjectId}`
+        const existing = projectGoalCandidates.get(key)
+        if (existing) {
+          existing.dependentTaskIds.add(entry.id)
+        } else {
+          projectGoalCandidates.set(key, {
+            targetProjectId: dg.targetProjectId,
+            targetStatId: null,
+            dependentTaskIds: new Set([entry.id]),
+          })
+        }
+      }
+
+      // Apply this entry's effects to cumulative state
+      cumulativeCompleted.set(entry.projectId, (cumulativeCompleted.get(entry.projectId) ?? 0) + 1)
+      cumulativeStats = computeTerraformingRuntimeStats(cluster, cumulativeCompleted, data)
+    }
+
+    // 2. Generate cluster root goals from unmet objectives
+    const clusterGoals: TerraformingGoalEntry[] = []
+    if (cluster.objectives) {
+      for (let oi = 0; oi < cluster.objectives.length; oi++) {
+        const obj = cluster.objectives[oi]!
+        let satisfied = false
+        if (obj.action === 'objective.build_project') {
+          const projMatch = obj.textId.match(/^terraforming\.project\.(\w+)\.name$/)
+          if (projMatch) {
+            satisfied = (cumulativeCompleted.get(projMatch[1]!) ?? 0) > 0
+          }
+        } else {
+          satisfied = true
+        }
+        if (!satisfied) {
+          const projMatch = obj.textId.match(/^terraforming\.project\.(\w+)\.name$/)
+          let label = obj.textId
+          if (projMatch && data) {
+            const project = pmap.get(projMatch[1]!)
+            label = project ? (projectNames.get(projMatch[1]!) || project.name || projMatch[1]!) : label
+          }
+          clusterGoals.push({
+            id: nextGoalId(),
+            kind: 'cluster',
+            label,
+            targetProjectId: projMatch?.[1] ?? null,
+            targetStatId: null,
+            position: -1,
+            satisfied: false,
+            hasRisk: false,
+            dependentTaskIds: [],
+          })
+        }
+      }
+    }
+
+    // 3. Merge: project goals → one per project
+    const mergedGoals: TerraformingGoalEntry[] = []
+
+    for (const [, cg] of projectGoalCandidates) {
+      mergedGoals.push({
+        id: nextGoalId(),
+        kind: 'project',
+        label: projectNames.get(cg.targetProjectId!) || cg.targetProjectId!,
+        targetProjectId: cg.targetProjectId,
+        targetStatId: null,
+        position: -1,
+        satisfied: false,
+        hasRisk: false,
+        dependentTaskIds: [...cg.dependentTaskIds],
+      })
+    }
+
+    // 4. Merge: stat goals → one per stat+condition combination
+    for (const [, cg] of statGoalCandidates) {
+      const statName = statNames.get(cg.targetStatId!) || cg.targetStatId!
+      mergedGoals.push({
+        id: nextGoalId(),
+        kind: 'stat',
+        label: statName,
+        targetProjectId: null,
+        targetStatId: cg.targetStatId,
+        targetStatConditionIndex: cg.targetStatConditionIndex,
+        position: -1,
+        satisfied: false,
+        hasRisk: false,
+        dependentTaskIds: [...cg.dependentTaskIds],
+      })
+    }
+
+    // 5. Add cluster goals at the end
+    mergedGoals.push(...clusterGoals)
+
+    // 6. Position: find earliest dependent task index for each goal
+    const entryIndexMap = new Map<string, number>()
+    draftEntries.forEach((e, i) => entryIndexMap.set(e.id, i))
+
+    for (const goal of mergedGoals) {
+      let minIndex = Infinity
+      for (const depId of goal.dependentTaskIds) {
+        const idx = entryIndexMap.get(depId)
+        if (idx !== undefined && idx < minIndex) minIndex = idx
+      }
+      if (goal.kind === 'cluster') {
+        goal.position = draftEntries.length // after all tasks
+      } else if (minIndex !== Infinity) {
+        goal.position = minIndex
+      } else {
+        goal.position = draftEntries.length
+      }
+    }
+
+    // 7. Lifecycle filter: check if project goals are satisfied by replay BEFORE their position
+    const filteredGoals: TerraformingGoalEntry[] = []
+    for (const goal of mergedGoals) {
+      if (goal.kind === 'project' && goal.targetProjectId) {
+        // Replay cumulative state at the goal position to check satisfaction
+        let replayCompleted = new Map<string, number>()
+        for (let i = 0; i < goal.position && i < draftEntries.length; i++) {
+          const entry = draftEntries[i]!
+          if (!entry.systemDisabled) {
+            replayCompleted.set(entry.projectId, (replayCompleted.get(entry.projectId) ?? 0) + 1)
+          }
+        }
+        if ((replayCompleted.get(goal.targetProjectId) ?? 0) > 0) {
+          continue // Skip: satisfied before position
+        }
+        goal.satisfied = false
+        filteredGoals.push(goal)
+      } else if (goal.kind === 'stat') {
+        // Check stat satisfaction at goal position
+        if (goal.targetStatId) {
+          let replayCompleted = new Map<string, number>()
+          for (let i = 0; i < goal.position && i < draftEntries.length; i++) {
+            const entry = draftEntries[i]!
+            if (!entry.systemDisabled) {
+              replayCompleted.set(entry.projectId, (replayCompleted.get(entry.projectId) ?? 0) + 1)
+            }
+          }
+          const replayStats = computeTerraformingRuntimeStats(cluster, replayCompleted, data)
+          const project = pmap.get(draftEntries.find(e => e.id === [...goal.dependentTaskIds][0])?.projectId || '')
+          if (project && goal.targetStatConditionIndex !== undefined) {
+            const condition = project.conditions[goal.targetStatConditionIndex]
+            if (condition) {
+              goal.satisfied = checkStatConditionMet(condition, replayStats, data.stats)
+            }
+          }
+          if (goal.dependentTaskIds.length === 0) goal.satisfied = true
+        }
+        filteredGoals.push(goal)
+      } else {
+        filteredGoals.push(goal)
+      }
+    }
+
+    filteredGoals.sort((a, b) => a.position - b.position)
+    return filteredGoals
+  }
+
+  function computePlanDraftEntries(): { replayEntries: TerraformingDraftTimelineEntry[]; goals: TerraformingGoalEntry[] } {
     const data = store.terraformingData.value
     const cluster = store.terraformingSelectedCluster.value
-    if (!data || !cluster) return []
-
-    let completedProjects = new Map<string, number>()
     const entries: TerraformingDraftTimelineEntry[] = []
+    if (!data || !cluster) return { replayEntries: entries, goals: [] }
+
     const projectNames = projectDisplayNames.value
     const translatedGroupNames = groupNames.value
+    const pmap = projectMap.value
+    const statNames = statDisplayNames.value
+    let completedProjects = new Map<string, number>()
 
     for (let index = 0; index < draftExecutionLog.value.length; index += 1) {
       const entry = draftExecutionLog.value[index]!
-      const project = projectMap.value.get(entry.projectId)
+      const project = pmap.get(entry.projectId)
       const beforeStats = computeTerraformingRuntimeStats(cluster, completedProjects, data)
       const { clusterProjects } = buildRuntimeClusterForReplay(cluster, beforeStats, completedProjects, data)
       const runtimePidSet = new Set(clusterProjects.map(p => p.id))
-      const evaluation = entry.enabled
-        ? evaluateTerraformingProjectExecution(project, { stats: beforeStats, completedProjects }, projectMap.value, clusterProjects, data.stats)
-        : { valid: false, reasons: [] }
+      const evaluation = !entry.systemDisabled
+        ? evaluateTerraformingProjectExecution(project, { stats: beforeStats, completedProjects }, pmap, clusterProjects, data.stats)
+        : { valid: false, reasons: entry.systemDisabledReason ? [entry.systemDisabledReason] : [] }
       const relevantStatIds = project ? getProjectSnapshotStatIds(project) : []
       const nextCompletedProjects = new Map(completedProjects)
-      if (entry.enabled && evaluation.valid) {
+      if (!entry.systemDisabled) {
         nextCompletedProjects.set(entry.projectId, (nextCompletedProjects.get(entry.projectId) ?? 0) + 1)
       }
       const afterStats = computeTerraformingRuntimeStats(cluster, nextCompletedProjects, data)
       const statLines = relevantStatIds
-        .filter(statId => statId in beforeStats)
+        .filter(statId => isStatInRuntime(beforeStats, statId))
         .map(statId => ({
           statId,
-          statName: statDisplayNames.value.get(statId) || statId,
+          statName: statNames.get(statId) || statId,
           beforeValue: beforeStats[statId] ?? 0,
           afterValue: afterStats[statId] ?? 0,
         }))
@@ -1179,8 +1551,9 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
         projectId: entry.projectId,
         projectName: projectNames.get(entry.projectId) || project?.name || entry.projectId,
         projectGroupName: translatedGroupNames.get(project?.group || '') || project?.group || '',
-        enabled: entry.enabled,
-        state: !entry.enabled ? 'disabled' : evaluation.valid ? 'enabled-valid' : 'enabled-invalid',
+        systemDisabled: entry.systemDisabled || false,
+        systemDisabledReason: entry.systemDisabledReason,
+        mutuallyExclusiveWith: entry.mutuallyExclusiveWith,
         repeatRole,
         reasons: translateEvaluationReasons(evaluation.reasons, data, vI18nLookup),
         dependencies: formatDependencyExpression(project?.dependencies, projectNames, {
@@ -1195,13 +1568,37 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
       completedProjects = nextCompletedProjects
     }
 
-    return entries
+    const initialStats = computeTerraformingRuntimeStats(cluster, new Map(), data)
+    const goals = generateGoalEntries(
+      draftExecutionLog.value,
+      cluster,
+      data,
+      pmap,
+      projectNames,
+      statNames,
+      initialStats,
+    )
+
+    return { replayEntries: entries, goals }
+  }
+
+  const combinedReplayResult = computed(() => {
+    if (!isQueueEditing.value) return { replayEntries: [] as TerraformingDraftTimelineEntry[], goals: [] as TerraformingGoalEntry[] }
+    return computePlanDraftEntries()
+  })
+
+  const draftReplayEntries = computed<TerraformingDraftTimelineEntry[]>(() => {
+    return combinedReplayResult.value.replayEntries
+  })
+
+  const generatedGoals = computed<TerraformingGoalEntry[]>(() => {
+    return combinedReplayResult.value.goals
   })
 
   const draftCompletedProjectCounts = computed<Map<string, number>>(() => {
     const counts = new Map<string, number>()
     for (const entry of draftReplayEntries.value) {
-      if (entry.state !== 'enabled-valid') continue
+      if (entry.systemDisabled) continue
       counts.set(entry.projectId, (counts.get(entry.projectId) ?? 0) + 1)
     }
     return counts
@@ -1402,7 +1799,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     if (!data) return map
 
     for (const stat of data.stats) {
-      if (!(stat.id in currentStats)) continue
+      if (!isStatInRuntime(currentStats, stat.id)) continue
       const currentValue = currentStats[stat.id] ?? 0
       const currentRange = getCurrentRange(stat, currentValue)
       map.set(stat.id, {
@@ -1712,39 +2109,302 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     return result
   })
 
-  const invalidDraftCount = computed(() => draftReplayEntries.value.filter(entry => entry.state === 'enabled-invalid').length)
-  const canCompleteQueueEdit = computed(() => isQueueEditing.value && invalidDraftCount.value === 0)
+  const goalDisplayEntries = computed<TerraformingGoalDisplayEntry[]>(() => {
+    const goals = generatedGoals.value
+    const activeFilter = activeGoalFilterIds.value
+    const statModels = statGoalLineModels.value
+
+    return goals.map(goal => {
+      const statModel = goal.kind === 'stat' ? statModels.get(goal.id) : undefined
+      return {
+        id: goal.id,
+        kind: goal.kind,
+        label: goal.label,
+        satisfied: goal.satisfied,
+        hasRisk: goal.hasRisk,
+        riskReason: goal.riskReason,
+        isFilterActive: activeFilter.has(goal.id),
+        statGoalModel: statModel,
+      }
+    })
+  })
+
+  const planDisplayEntries = computed<TerraformingGoalPlanDisplayEntry[]>(() => {
+    const tasks = draftReplayEntries.value
+    const goals = generatedGoals.value
+    const displayGoals = goalDisplayEntries.value
+    const goalMap = new Map(displayGoals.map(g => [g.id, g]))
+
+    const entries: TerraformingGoalPlanDisplayEntry[] = []
+
+    // Insert goals at their position in the task queue
+    let goalIndex = 0
+    for (let ti = 0; ti < tasks.length; ti++) {
+      // Insert all goals that should appear before this task
+      while (goalIndex < goals.length && goals[goalIndex]!.position <= ti) {
+        const goal = goals[goalIndex]!
+        const display = goalMap.get(goal.id)
+        if (display) {
+          entries.push({ type: 'goal', entry: display })
+        }
+        goalIndex++
+      }
+      entries.push({ type: 'task', entry: tasks[ti]! })
+    }
+    // Insert remaining goals (cluster goals at end)
+    while (goalIndex < goals.length) {
+      const goal = goals[goalIndex]!
+      const display = goalMap.get(goal.id)
+      if (display) {
+        entries.push({ type: 'goal', entry: display })
+      }
+      goalIndex++
+    }
+
+    return entries
+  })
+
+  const goalCanSatisfyTaskIds = computed<Map<string, string[]>>(() => {
+    const data = store.terraformingData.value
+    const cluster = store.terraformingSelectedCluster.value
+    const goals = generatedGoals.value
+    const result = new Map<string, string[]>()
+
+    if (!data || !cluster) return result
+
+    const allProjects = data.projects
+    for (const goal of goals) {
+      const satisfiers: string[] = []
+      for (const project of allProjects) {
+        if (goal.kind === 'project' && goal.targetProjectId) {
+          if (project.id === goal.targetProjectId) {
+            satisfiers.push(project.id)
+          }
+        } else if (goal.kind === 'stat' && goal.targetStatId) {
+          for (const effect of project.effects) {
+            if (effect.stat === goal.targetStatId) {
+              satisfiers.push(project.id)
+              break
+            }
+          }
+          if (!satisfiers.includes(project.id)) {
+            for (const se of project.sideEffects) {
+              if (se.stat === goal.targetStatId) {
+                satisfiers.push(project.id)
+                break
+              }
+            }
+          }
+        } else if (goal.kind === 'cluster' && goal.targetProjectId) {
+          if (project.id === goal.targetProjectId) satisfiers.push(project.id)
+        }
+      }
+      result.set(goal.id, satisfiers)
+    }
+    return result
+  })
+
+  const goalFilteredTaskIds = computed<Set<string> | null>(() => {
+    const activeFilter = activeGoalFilterIds.value
+    if (activeFilter.size === 0) return null
+
+    const satisfiers = goalCanSatisfyTaskIds.value
+    const tree = taskTree.value
+    const result = new Set<string>()
+
+    for (const goalId of activeFilter) {
+      const directSatisfiers = satisfiers.get(goalId) || []
+      for (const pid of directSatisfiers) {
+        result.add(pid)
+        // Add tree parents
+        if (tree) {
+          let current: string | null = pid
+          for (let depth = 0; depth < 20 && current; depth++) {
+            for (const [, nodes] of tree.groups) {
+              for (const node of nodes) {
+                if (node.children.some(c => c.id === current)) {
+                  result.add(node.id)
+                  current = node.id
+                  break
+                }
+              }
+              if (current !== pid) break
+            }
+          }
+        }
+      }
+    }
+
+    return result.size > 0 ? result : null
+  })
+
+  const statGoalLineModels = computed<Map<string, TerraformingStatGoalLineModel>>(() => {
+    const data = store.terraformingData.value
+    const cluster = store.terraformingSelectedCluster.value
+    const goals = generatedGoals.value
+    const pmap = projectMap.value
+    const map = new Map<string, TerraformingStatGoalLineModel>()
+
+    if (!data || !cluster) return map
+
+    let cumulativeCompleted = new Map<string, number>()
+    let cumulativeStats = computeTerraformingRuntimeStats(cluster, cumulativeCompleted, data)
+
+    // Pre-compute cumulative state at each entry index
+    const cumulativeStateAt: Array<{ completed: Map<string, number>; stats: Record<string, number> }> = []
+    for (let i = 0; i < draftExecutionLog.value.length; i++) {
+      const entry = draftExecutionLog.value[i]!
+      cumulativeStateAt.push({
+        completed: new Map(cumulativeCompleted),
+        stats: { ...cumulativeStats },
+      })
+      if (!entry.systemDisabled) {
+        cumulativeCompleted.set(entry.projectId, (cumulativeCompleted.get(entry.projectId) ?? 0) + 1)
+        cumulativeStats = computeTerraformingRuntimeStats(cluster, cumulativeCompleted, data)
+      }
+    }
+
+    for (const goal of goals) {
+      if (goal.kind !== 'stat' || !goal.targetStatId) continue
+
+      const statDef = data.stats.find(s => s.id === goal.targetStatId)
+      if (!statDef) continue
+
+      // Get cumulative state at goal's position
+      const pos = Math.min(goal.position, cumulativeStateAt.length)
+      const stateAt = pos > 0 ? cumulativeStateAt[pos - 1]! : { completed: new Map<string, number>(), stats: computeTerraformingRuntimeStats(cluster, new Map(), data) }
+      const currentValue = stateAt.stats[goal.targetStatId] ?? 0
+      const ranges = toScaleRanges(statDef)
+      const hasRanges = ranges.length > 0
+
+      // Derive targetValue from the stat condition
+      let targetValue = currentValue
+      let effectDirection: TerraformingStatEffectDirection = 'none'
+      let effectFromValue = currentValue
+      let effectToValue = currentValue
+      let requirementSegments: Array<{ startIndex: number; endIndex: number }> = []
+
+      if (goal.targetStatConditionIndex !== undefined) {
+        const depTaskId = goal.dependentTaskIds[0]
+        const depEntry = draftExecutionLog.value.find(e => e.id === depTaskId)
+        const depProject = depEntry ? pmap.get(depEntry.projectId) : null
+        if (depProject) {
+          const condition = depProject.conditions[goal.targetStatConditionIndex]
+          if (condition) {
+            if (condition.minvalue !== undefined || condition.maxvalue !== undefined) {
+              if (condition.minvalue !== undefined && currentValue < condition.minvalue) {
+                targetValue = condition.minvalue
+              } else if (condition.maxvalue !== undefined && currentValue > condition.maxvalue) {
+                targetValue = condition.maxvalue
+              }
+            }
+            if (targetValue > currentValue) {
+              effectDirection = 'increase'
+              effectToValue = targetValue
+              effectFromValue = currentValue
+            } else if (targetValue < currentValue) {
+              effectDirection = 'decrease'
+              effectToValue = targetValue
+              effectFromValue = currentValue
+            }
+
+            if (hasRanges && condition.usesStateBounds) {
+              const minState = condition.min ?? Math.min(...ranges.map(r => r.state))
+              const maxState = condition.max ?? Math.max(...ranges.map(r => r.state))
+              requirementSegments = ranges
+                .filter(r => r.state >= minState && r.state <= maxState)
+                .map(r => ({
+                  startIndex: ranges.indexOf(r),
+                  endIndex: ranges.indexOf(r),
+                }))
+            }
+          }
+        }
+      }
+
+      const currentRange = getCurrentRange(statDef, currentValue)
+      const statName = statDisplayNames.value.get(goal.targetStatId) || goal.targetStatId
+
+      let numericText: string | null = null
+      if (!hasRanges) {
+        const diff = effectToValue - effectFromValue
+        if (diff !== 0) {
+          const sign = diff > 0 ? '+' : ''
+          numericText = `${currentValue.toLocaleString()} → ${effectToValue.toLocaleString()} (${sign}${diff})`
+        } else {
+          numericText = currentValue.toLocaleString()
+        }
+      }
+
+      map.set(goal.id, {
+        statId: goal.targetStatId,
+        statName,
+        currentValue,
+        currentState: currentRange?.state ?? null,
+        ranges,
+        hasRanges,
+        targetValue,
+        requirementSegments,
+        effectDirection,
+        effectFromValue,
+        effectToValue,
+        numericText,
+        satisfied: goal.satisfied,
+      })
+    }
+
+    return map
+  })
+
+  const unsatisfiedDerivedGoalCount = computed(() => {
+    return generatedGoals.value.filter(g => g.kind !== 'cluster' && !g.satisfied).length
+  })
+
+  const canCompleteQueueEdit = computed(() => isQueueEditing.value && unsatisfiedDerivedGoalCount.value === 0)
 
   function startQueueEdit() {
     draftExecutionLog.value = store.terraformingExecutionLog.value.map(entry => ({
       ...entry,
-      enabled: true,
-      source: 'committed',
+      source: 'committed' as const,
+      systemDisabled: false,
     }))
+    activeGoalFilterIds.value = new Set()
     isQueueEditing.value = true
   }
 
   function cancelQueueEdit() {
     draftExecutionLog.value = []
+    activeGoalFilterIds.value = new Set()
     isQueueEditing.value = false
   }
 
   function completeQueueEdit() {
     if (!canCompleteQueueEdit.value) return
     const committed = draftExecutionLog.value
-      .filter(entry => entry.enabled)
+      .filter(entry => !entry.systemDisabled)
       .map(entry => ({ id: entry.source === 'committed' ? entry.id : '', projectId: entry.projectId }))
     store.replaceTerraformingExecutionLog(committed)
     draftExecutionLog.value = []
+    activeGoalFilterIds.value = new Set()
     isQueueEditing.value = false
   }
 
-  function setDraftEntryEnabled(entryId: string, enabled: boolean) {
-    draftExecutionLog.value = draftExecutionLog.value.map(entry => entry.id === entryId ? { ...entry, enabled } : entry)
+  function removeDraftEntry(entryId: string) {
+    draftExecutionLog.value = draftExecutionLog.value.filter(entry => entry.id !== entryId)
   }
 
-  function deleteDraftEntry(entryId: string) {
-    draftExecutionLog.value = draftExecutionLog.value.filter(entry => entry.id !== entryId)
+  function removeAllDraftEntries() {
+    draftExecutionLog.value = []
+  }
+
+  function clickGoal(goalId: string) {
+    const next = new Set(activeGoalFilterIds.value)
+    if (next.has(goalId)) {
+      next.delete(goalId)
+    } else {
+      next.add(goalId)
+    }
+    activeGoalFilterIds.value = next
   }
 
   function copyDraftEntry(entryId: string) {
@@ -1757,8 +2417,8 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     next.splice(index + 1, 0, {
       id: nextDraftId(),
       projectId: source.projectId,
-      enabled: true,
       source: 'draft',
+      systemDisabled: false,
     })
     draftExecutionLog.value = next
   }
@@ -1781,37 +2441,128 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
       .filter((e): e is TerraformingDraftExecutionEntry => e !== undefined)
   }
 
-  function disableAllDraftEntries() {
-    draftExecutionLog.value = draftExecutionLog.value.map(entry => ({ ...entry, enabled: false }))
+  function resolveInsertIndex(projectId: string): number {
+    const goals = generatedGoals.value
+    const pGoals = goals.filter(g => g.kind === 'project' && g.targetProjectId)
+    const sGoals = goals.filter(g => g.kind === 'stat')
+
+    const project = projectMap.value.get(projectId)
+    if (!project) return draftExecutionLog.value.length
+
+    const relevantGoalPositions: number[] = []
+
+    for (const goal of pGoals) {
+      if (!goal.targetProjectId) continue
+      const depLeaves = extractCompletedLeavesFromDependency({
+        all: [
+          { completed: goal.targetProjectId },
+        ] as TerraformingProjectDependency[],
+      } as any)
+      if (project.id === goal.targetProjectId || depLeaves.includes(goal.targetProjectId)) {
+        relevantGoalPositions.push(goal.position)
+        continue
+      }
+      const pDepLeaves = extractCompletedLeavesFromDependency(project.dependencies)
+      const pBlockLeaves: string[] = []
+      if (pDepLeaves.includes(goal.targetProjectId) || pBlockLeaves.includes(goal.targetProjectId)) {
+        relevantGoalPositions.push(goal.position)
+      }
+    }
+
+    for (const goal of sGoals) {
+      if (!goal.targetStatId) continue
+      let affectsStat = false
+      for (const effect of project.effects) {
+        if (effect.stat === goal.targetStatId) { affectsStat = true; break }
+      }
+      if (affectsStat) {
+        relevantGoalPositions.push(goal.position)
+      }
+    }
+
+    if (relevantGoalPositions.length > 0) {
+      return Math.min(...relevantGoalPositions)
+    }
+
+    return draftExecutionLog.value.length
   }
 
-  function enableAllDraftEntries() {
-    draftExecutionLog.value = draftExecutionLog.value.map(entry => ({ ...entry, enabled: true }))
+  function computeMutualExclusionForEntry(projectId: string): { disabled: boolean; reason?: string; mutuallyExclusive?: string } {
+    const project = projectMap.value.get(projectId)
+    if (!project || !project.dependencies) return { disabled: false }
+
+    const existing = draftExecutionLog.value.filter(e => !e.systemDisabled)
+    const completedProjects = new Map<string, number>()
+    for (const e of existing) {
+      completedProjects.set(e.projectId, (completedProjects.get(e.projectId) ?? 0) + 1)
+    }
+
+    function checkExclusion(dep: TerraformingProjectDependency): string | null {
+      if (!dep) return null
+      if ('all' in dep) {
+        for (const child of dep.all) {
+          const result = checkExclusion(child)
+          if (result) return result
+        }
+        return null
+      }
+      if ('any' in dep) {
+        const isLeaf = (d: TerraformingProjectDependency) => 'completed' in d || 'notCompleted' in d
+        if (dep.any.every(isLeaf) && dep.any.some(d => 'notCompleted' in d)) {
+          const notCompleted = dep.any.find(d => 'notCompleted' in d) as any
+          if (notCompleted && notCompleted.notCompleted) {
+            if ((completedProjects.get(notCompleted.notCompleted) ?? 0) > 0) {
+              return notCompleted.notCompleted
+            }
+          }
+        }
+        return null
+      }
+      if ('notCompleted' in dep) {
+        if ((completedProjects.get(dep.notCompleted) ?? 0) > 0) {
+          return dep.notCompleted
+        }
+      }
+      return null
+    }
+
+    const exclusive = checkExclusion(project.dependencies)
+    if (exclusive) {
+      return { disabled: true, reason: `Mutually exclusive with ${projectDisplayNames.value.get(exclusive) || exclusive}`, mutuallyExclusive: exclusive }
+    }
+    return { disabled: false }
   }
 
   function appendDraftProject(projectId: string) {
     const project = projectMap.value.get(projectId)
-    if (project?.repeatCooldown === null && draftExecutionLog.value.some(entry => entry.projectId === projectId && entry.enabled)) {
+    if (project?.repeatCooldown === null && draftExecutionLog.value.some(entry => entry.projectId === projectId && !entry.systemDisabled)) {
       return
     }
-    draftExecutionLog.value = [
-      ...draftExecutionLog.value,
-      { id: nextDraftId(), projectId, enabled: true, source: 'draft' },
-    ]
+
+    const exclusion = computeMutualExclusionForEntry(projectId)
+    const insertIndex = resolveInsertIndex(projectId)
+
+    const newEntry: TerraformingDraftExecutionEntry = {
+      id: nextDraftId(),
+      projectId,
+      source: 'draft',
+      systemDisabled: exclusion.disabled,
+      systemDisabledReason: exclusion.reason,
+      mutuallyExclusiveWith: exclusion.mutuallyExclusive,
+    }
+
+    const next = [...draftExecutionLog.value]
+    next.splice(insertIndex, 0, newEntry)
+    draftExecutionLog.value = next
   }
 
   function removeLastDraftProject(projectId: string) {
     const index = [...draftExecutionLog.value].reverse().findIndex(entry => entry.projectId === projectId)
     if (index < 0) return
     const actualIndex = draftExecutionLog.value.length - 1 - index
-    const entry = draftExecutionLog.value[actualIndex]
-    if (!entry) return
-    const previous = draftExecutionLog.value[actualIndex - 1]
-    if (previous?.projectId === projectId) {
-      deleteDraftEntry(entry.id)
-      return
-    }
-    setDraftEntryEnabled(entry.id, false)
+    const next = [...draftExecutionLog.value]
+    next.splice(actualIndex, 1)
+    draftExecutionLog.value = next
   }
 
   function canAppendCommittedProject(projectId: string): boolean {
@@ -1875,6 +2626,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
       projectDisplayNames,
       wareNames: store.wareNames,
       moduleGroupNames: store.moduleGroupNames,
+      goalFilteredTaskIds,
     },
     resourcePanel: {
       selectedClusterId,
@@ -1882,8 +2634,8 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
       queueEditState: {
         editing: computed(() => isQueueEditing.value),
         canComplete: canCompleteQueueEdit,
-        invalidCount: invalidDraftCount,
-        draftEntries: draftReplayEntries,
+        unsatisfiedGoalCount: unsatisfiedDerivedGoalCount,
+        planEntries: planDisplayEntries,
       },
       getCancelValidation: getExecutionCancelValidation,
       deliveryShipMap,
@@ -1939,13 +2691,12 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     startQueueEdit,
     cancelQueueEdit,
     completeQueueEdit,
-    setDraftEntryEnabled,
-    deleteDraftEntry,
+    removeDraftEntry,
+    removeAllDraftEntries,
+    clickGoal,
     copyDraftEntry,
     moveDraftEntry,
     reorderDraftEntries,
-    disableAllDraftEntries,
-    enableAllDraftEntries,
   }
 
   return { props, emits }

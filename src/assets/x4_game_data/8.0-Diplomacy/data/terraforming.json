@@ -1190,18 +1190,22 @@
       "dependencies": {
         "all": [
           {
-            "completed": "bio_toxicfruit_genemod"
-          },
-          {
-            "completed": "bio_toxicfruit_cull"
-          },
-          {
             "any": [
               {
                 "notCompleted": "ind_refineries_cheap"
               },
               {
                 "completed": "ind_refineries_retrofit"
+              }
+            ]
+          },
+          {
+            "any": [
+              {
+                "completed": "bio_toxicfruit_genemod"
+              },
+              {
+                "completed": "bio_toxicfruit_cull"
               }
             ]
           }

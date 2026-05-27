@@ -13,6 +13,7 @@ const { t } = useI18n()
 interface Props {
   node: TaskNode
   isChild?: boolean
+  isEditing?: boolean
   completedProjectCounts: Map<string, number>
   projectMap: Map<string, TerraformingProject>
   projectDisplayNames: Map<string, string>
@@ -97,7 +98,7 @@ function getStatusIcon(projectId: string, available: boolean): string {
 
 function handleSetCount(node: { id: string; available: boolean }, newCount: number) {
   const current = props.completedProjectCounts.get(node.id) ?? 0
-  if (newCount > current && !node.available) return
+  if (newCount > current && !node.available && !props.isEditing) return
   emit('setProjectCount', node.id, newCount)
 }
 </script>
@@ -126,7 +127,7 @@ function handleSetCount(node: { id: string; available: boolean }, newCount: numb
               :model-value="completedProjectCounts.get(node.id) ?? 0"
               :min="0"
               :max="99"
-              :disabled="!node.available && (completedProjectCounts.get(node.id) ?? 0) === 0"
+              :disabled="!node.available && (completedProjectCounts.get(node.id) ?? 0) === 0 && !isEditing"
               width-class="w-14"
               @update:model-value="handleSetCount(node, $event)"
             />
@@ -135,7 +136,7 @@ function handleSetCount(node: { id: string; available: boolean }, newCount: numb
             v-else
             class="toggle-btn"
             :class="{ toggled: (completedProjectCounts.get(node.id) ?? 0) > 0 }"
-            :disabled="!node.available && (completedProjectCounts.get(node.id) ?? 0) === 0"
+            :disabled="!node.available && (completedProjectCounts.get(node.id) ?? 0) === 0 && !isEditing"
             @click="emit('toggleProject', node.id)"
           >
             {{ (completedProjectCounts.get(node.id) ?? 0) > 0 ? t('terraforming.undo') : t('terraforming.complete') }}
@@ -183,6 +184,7 @@ function handleSetCount(node: { id: string; available: boolean }, newCount: numb
         :key="child.id"
         :node="child"
         :is-child="true"
+        :is-editing="isEditing"
         :completed-project-counts="completedProjectCounts"
         :project-map="projectMap"
         :project-display-names="projectDisplayNames"

@@ -6,6 +6,7 @@ import type {
   TerraformingCancelValidation,
   TerraformingDraftTimelineEntry,
   TerraformingExecutionTimelineEntry,
+  TerraformingGoalPlanDisplayEntry,
 } from '@/components/empire/presenters/useTerraformingPresenter'
 import type { DeliveryShip } from '@/store/logic/terraformingTaskResolver'
 import { useX4I18n } from '@/utils/UseX4I18n'
@@ -18,8 +19,8 @@ interface Props {
   queueEditState: {
     editing: boolean
     canComplete: boolean
-    invalidCount: number
-    draftEntries: TerraformingDraftTimelineEntry[]
+    unsatisfiedGoalCount: number
+    planEntries: TerraformingGoalPlanDisplayEntry[]
   }
   getCancelValidation: (entryId: string) => TerraformingCancelValidation
   deliveryShipMap: Map<string, DeliveryShip>
@@ -35,13 +36,12 @@ const emit = defineEmits<{
   (e: 'startEdit'): void
   (e: 'cancelEdit'): void
   (e: 'completeEdit'): void
-  (e: 'setDraftEnabled', entryId: string, enabled: boolean): void
-  (e: 'deleteDraft', entryId: string): void
+  (e: 'removeDraft', entryId: string): void
+  (e: 'removeAllDraft'): void
   (e: 'copyDraft', entryId: string): void
   (e: 'updateDraftEntries', entries: TerraformingDraftTimelineEntry[]): void
-  (e: 'disableAllDraft'): void
-  (e: 'enableAllDraft'): void
   (e: 'clickStat', statId: string): void
+  (e: 'clickGoal', goalId: string): void
 }>()
 
 const { t } = useI18n()
@@ -50,10 +50,20 @@ const gameDataStore = useGameDataStore()
 const expandedEntryId = ref<string | null>(null)
 const panelContentRef = ref<HTMLElement | null>(null)
 const cancelValidationCache = ref<Record<string, TerraformingCancelValidation>>({})
-const internalDraftEntries = computed({
-  get: () => props.queueEditState.draftEntries,
-  set: (val: TerraformingDraftTimelineEntry[]) => emit('updateDraftEntries', val),
+
+const internalPlanEntries = computed({
+  get: () => props.queueEditState.planEntries,
+  set: (val: TerraformingGoalPlanDisplayEntry[]) => {
+    const tasks = val
+      .filter((pe): pe is { type: 'task'; entry: TerraformingDraftTimelineEntry } => pe.type === 'task')
+      .map(pe => pe.entry)
+    emit('updateDraftEntries', tasks)
+  },
 })
+
+function planEntryKey(pe: TerraformingGoalPlanDisplayEntry): string {
+  return pe.type === 'goal' ? `goal-${pe.entry.id}` : pe.entry.id
+}
 
 let prevTimelineLength = 0
 
@@ -167,8 +177,8 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
     <div class="panel-header">
       {{ t('terraforming.taskQueue') }}
       <span v-if="showNoDockWarning" class="text-amber-400 text-[11px] ml-2">⚠ {{ t('terraforming.noBuildDock') }}</span>
-      <span v-if="queueEditState.editing && queueEditState.invalidCount > 0" class="text-red-400 text-[11px] ml-2">
-        {{ queueEditState.invalidCount }} {{ t('terraforming.invalidTasks') || 'invalid' }}
+      <span v-if="queueEditState.editing && queueEditState.unsatisfiedGoalCount > 0" class="text-red-400 text-[11px] ml-2">
+        {{ queueEditState.unsatisfiedGoalCount }} {{ t('terraforming.unmetDependencies') || 'unmet dependencies' }}
       </span>
       <button
         v-if="!queueEditState.editing"
@@ -198,80 +208,112 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
       </div>
 
       <div v-else-if="queueEditState.editing" class="timeline-list">
+        <div v-if="showNoDockWarning" class="text-amber-400 text-[11px]">⚠ {{ t('terraforming.noBuildDock') }}</div>
         <div class="bulk-edit-card">
-          <button class="draft-btn" @click="emit('disableAllDraft')">{{ t('terraforming.disableAll') || 'Disable all' }}</button>
-          <button class="draft-btn" @click="emit('enableAllDraft')">{{ t('terraforming.enableAll') || 'Enable all' }}</button>
+          <button class="draft-btn danger" @click="emit('removeAllDraft')">{{ t('terraforming.removeAll') || 'Remove all' }}</button>
         </div>
 
-        <div v-if="queueEditState.draftEntries.length === 0" class="empty-state">
+        <div v-if="queueEditState.planEntries.length === 0" class="empty-state">
           {{ t('terraforming.noExecutionTimeline') }}
         </div>
 
         <draggable
           v-else
-          v-model="internalDraftEntries"
-          item-key="id"
+          v-model="internalPlanEntries"
+          :item-key="planEntryKey"
           ghost-class="drag-ghost"
           handle=".drag-handle"
+          filter=".goal-entry"
           class="draggable-container"
         >
-          <template #item="{ element }">
-            <div class="timeline-item draft-item" :class="[element.state]">
-              <div class="timeline-head">
-                <button class="timeline-main" @click="toggleEntry(element.id)">
-                  <span class="drag-handle">↕</span>
-                  <span class="entry-order">#{{ element.order }}</span>
-                  <span class="entry-name">{{ element.projectName }}</span>
-                  <span class="draft-state">{{ t(`terraforming.queueState.${element.state}`) || element.state }}</span>
-                </button>
-                <div class="draft-actions">
-                  <button
-                    v-if="element.repeatRole === 'duplicate'"
-                    class="draft-btn danger"
-                    @click="emit('deleteDraft', element.id)"
-                  >
-                    {{ t('terraforming.undo') }}
-                  </button>
-                  <button
-                    v-else
-                    class="draft-btn"
-                    @click="emit('setDraftEnabled', element.id, !element.enabled)"
-                  >
-                    {{ element.enabled ? (t('terraforming.disable') || 'Disable') : (t('terraforming.enable') || 'Enable') }}
-                  </button>
-                  <button
-                    v-if="element.repeatRole !== 'single'"
-                    class="draft-btn"
-                    @click="emit('copyDraft', element.id)"
-                  >
-                    {{ t('terraforming.copy') || 'Copy' }}
-                  </button>
+          <template #item="{ element: planEntry }">
+            <div
+              :class="planEntry.type === 'goal'
+                ? ['goal-entry', {
+                    'goal-filter-active': planEntry.entry.isFilterActive,
+                    'goal-satisfied': planEntry.entry.satisfied,
+                    'goal-unsatisfied': !planEntry.entry.satisfied,
+                    'goal-has-risk': planEntry.entry.hasRisk,
+                  }]
+                : ['timeline-item', 'draft-item', {
+                    'system-disabled': planEntry.entry.systemDisabled,
+                  }]"
+              @click="planEntry.type === 'goal' ? emit('clickGoal', planEntry.entry.id) : undefined"
+            >
+              <template v-if="planEntry.type === 'goal'">
+                <div class="goal-head">
+                  <span class="goal-icon">{{ planEntry.entry.kind === 'cluster' ? '🎯' : planEntry.entry.kind === 'stat' ? '📊' : '📋' }}</span>
+                  <span class="goal-label">{{ planEntry.entry.label }}</span>
+                  <span v-if="planEntry.entry.kind === 'cluster'" class="goal-kind-tag">{{ t('terraforming.goal.clusterGoal') || 'Cluster Goal' }}</span>
+                  <span v-else-if="planEntry.entry.kind === 'stat'" class="goal-kind-tag">{{ t('terraforming.goal.statGoal') || 'Stat Goal' }}</span>
+                  <span v-else class="goal-kind-tag">{{ t('terraforming.goal.projectGoal') || 'Goal' }}</span>
+                  <span v-if="planEntry.entry.satisfied" class="goal-status done">✓</span>
+                  <span v-else class="goal-status pending">○</span>
                 </div>
-              </div>
-              <div
-                v-if="element.dependencies.length > 0 || element.statLines.length > 0 || element.reasons.length > 0"
-                class="timeline-body draft-body"
-              >
-                <div v-if="element.dependencies.length > 0" class="detail-section">
-                  <div class="section-title">{{ t('terraforming.depends') }}</div>
-                  <div v-for="dep in element.dependencies" :key="`${element.id}-${dep}`" class="detail-text">{{ dep }}</div>
-                </div>
-                <div v-if="element.statLines.length > 0" class="detail-section">
-                  <div class="section-title">{{ t('terraforming.statChanges') }}</div>
+                <div v-if="planEntry.entry.statGoalModel" class="goal-stat-display">
                   <TerraformingStatScale
-                    v-for="line in element.statLines"
-                    :key="`${element.id}-draft-stat-${line.statId}`"
-                    :model="line"
+                    v-if="planEntry.entry.statGoalModel.hasRanges"
+                    :model="planEntry.entry.statGoalModel"
                     compact
                     mode="impact"
                     @click-stat="emit('clickStat', $event)"
                   />
+                  <div v-else class="goal-stat-text">{{ planEntry.entry.statGoalModel.numericText }}</div>
                 </div>
-                <div v-if="element.reasons.length > 0" class="detail-section">
-                  <div class="section-title">{{ t('terraforming.invalidReason') || 'Invalid reason' }}</div>
-                  <div v-for="reason in element.reasons" :key="`${element.id}-${reason}`" class="detail-text text-red-300">{{ reason }}</div>
+                <div v-if="planEntry.entry.riskReason" class="goal-risk-text">{{ planEntry.entry.riskReason }}</div>
+              </template>
+
+              <template v-else>
+                <div class="timeline-head">
+                  <button class="timeline-main" @click.stop="toggleEntry(planEntry.entry.id)">
+                    <span class="drag-handle">↕</span>
+                    <span class="entry-order">#{{ planEntry.entry.order }}</span>
+                    <span class="entry-name">{{ planEntry.entry.projectName }}</span>
+                    <span v-if="planEntry.entry.systemDisabled" class="draft-state disabled">
+                      {{ planEntry.entry.systemDisabledReason || t('terraforming.mutuallyExclusive') }}
+                    </span>
+                  </button>
+                  <div class="draft-actions">
+                    <button
+                      class="draft-btn danger"
+                      @click.stop="emit('removeDraft', planEntry.entry.id)"
+                    >
+                      {{ t('terraforming.remove') || 'Remove' }}
+                    </button>
+                    <button
+                      v-if="planEntry.entry.repeatRole === 'duplicate'"
+                      class="draft-btn"
+                      @click.stop="emit('copyDraft', planEntry.entry.id)"
+                    >
+                      {{ t('terraforming.copy') || 'Copy' }}
+                    </button>
+                  </div>
                 </div>
-              </div>
+                <div
+                  v-if="planEntry.entry.dependencies.length > 0 || planEntry.entry.statLines.length > 0 || planEntry.entry.reasons.length > 0"
+                  class="timeline-body draft-body"
+                >
+                  <div v-if="planEntry.entry.dependencies.length > 0" class="detail-section">
+                    <div class="section-title">{{ t('terraforming.depends') }}</div>
+                    <div v-for="dep in planEntry.entry.dependencies" :key="`${planEntry.entry.id}-${dep}`" class="detail-text">{{ dep }}</div>
+                  </div>
+                  <div v-if="planEntry.entry.statLines.length > 0" class="detail-section">
+                    <div class="section-title">{{ t('terraforming.statChanges') }}</div>
+                    <TerraformingStatScale
+                      v-for="line in planEntry.entry.statLines"
+                      :key="`${planEntry.entry.id}-draft-stat-${line.statId}`"
+                      :model="line"
+                      compact
+                      mode="impact"
+                      @click-stat="emit('clickStat', $event)"
+                    />
+                  </div>
+                  <div v-if="planEntry.entry.reasons.length > 0" class="detail-section">
+                    <div class="section-title">{{ t('terraforming.invalidReason') || 'Invalid reason' }}</div>
+                    <div v-for="reason in planEntry.entry.reasons" :key="`${planEntry.entry.id}-${reason}`" class="detail-text text-red-300">{{ reason }}</div>
+                  </div>
+                </div>
+              </template>
             </div>
           </template>
         </draggable>
@@ -484,8 +526,82 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
   @apply bg-slate-950/40 border border-slate-700 rounded-lg p-2 flex gap-2;
 }
 
-.draft-item.enabled-valid {
-  @apply border-emerald-700/50;
+.draft-item.system-disabled {
+  @apply opacity-60 border-red-700/50;
+}
+
+/* Goal entry styles */
+.goal-entry {
+  @apply border border-amber-700/50 rounded-lg bg-amber-950/20 px-3 py-2 cursor-pointer transition-colors;
+  @apply hover:bg-amber-950/40 hover:border-amber-600/60;
+}
+
+.goal-entry.goal-filter-active {
+  @apply border-sky-500/80 bg-sky-950/30 ring-1 ring-sky-400/30;
+}
+
+.goal-entry.goal-satisfied {
+  @apply border-emerald-700/50 bg-emerald-950/20;
+}
+
+.goal-entry.goal-has-risk {
+  @apply border-red-700/60;
+}
+
+.goal-head {
+  @apply flex items-center gap-2;
+}
+
+.goal-icon {
+  @apply text-xs;
+}
+
+.goal-label {
+  @apply text-xs text-amber-200 font-medium;
+}
+
+.goal-goal-entry.goal-satisfied .goal-label {
+  @apply text-emerald-300;
+}
+
+.goal-kind-tag {
+  @apply text-[10px] px-1.5 py-0.5 rounded bg-amber-900/40 text-amber-300;
+}
+
+.goal-status {
+  @apply ml-auto text-xs;
+}
+
+.goal-status.done {
+  @apply text-emerald-400;
+}
+
+.goal-status.pending {
+  @apply text-amber-400;
+}
+
+.goal-stat-display {
+  @apply mt-1;
+}
+
+.goal-stat-text {
+  @apply text-xs text-slate-300;
+}
+
+.goal-risk-text {
+  @apply text-[11px] text-red-300 mt-1;
+}
+
+.draft-actions {
+  @apply flex gap-1;
+}
+
+.draft-btn {
+  @apply text-[11px] px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700;
+}
+
+.draft-btn.danger {
+  @apply border-red-800 text-red-300 bg-red-950/30;
 }
 
 .draft-item.enabled-invalid {

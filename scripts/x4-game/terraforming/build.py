@@ -116,6 +116,36 @@ def _build_dependency_expressions(projects: List[Dict[str, Any]]) -> None:
                 blockers.append(blocker_id)
         return blockers
 
+    def mutually_exclusive_projects(left_id: str, right_id: str) -> bool:
+        left = project_by_id.get(left_id)
+        right = project_by_id.get(right_id)
+        if not left or not right:
+            return False
+        return (
+            right_id in left.get("removedProjects", [])
+            or left_id in right.get("removedProjects", [])
+        )
+
+    def blocker_dependency_exprs(blocker_ids: List[str]) -> List[DependencyExpr]:
+        remaining = list(dict.fromkeys(blocker_ids))
+        expressions: List[DependencyExpr] = []
+        while remaining:
+            seed = remaining.pop(0)
+            group = [seed]
+            changed = True
+            while changed:
+                changed = False
+                for blocker_id in list(remaining):
+                    if any(mutually_exclusive_projects(blocker_id, grouped_id) for grouped_id in group):
+                        group.append(blocker_id)
+                        remaining.remove(blocker_id)
+                        changed = True
+            if len(group) == 1:
+                expressions.append({"completed": group[0]})
+            else:
+                expressions.append({"any": [{"completed": blocker_id} for blocker_id in group]})
+        return expressions
+
     for project in projects:
         project.pop("dependencyConditions", None)
 
@@ -194,6 +224,7 @@ def _build_dependency_expressions(projects: List[Dict[str, Any]]) -> None:
 
         project["predecessors"] = retained_predecessors
 
+        plain_blocker_ids: List[str] = []
         for blocker in projects:
             blocker_id = blocker.get("id", "")
             if not blocker_id:
@@ -217,7 +248,9 @@ def _build_dependency_expressions(projects: List[Dict[str, Any]]) -> None:
                     })
                 continue
 
-            expressions.append({"completed": blocker_id})
+            plain_blocker_ids.append(blocker_id)
+
+        expressions.extend(blocker_dependency_exprs(plain_blocker_ids))
 
         for remover in projects:
             remover_id = remover.get("id", "")

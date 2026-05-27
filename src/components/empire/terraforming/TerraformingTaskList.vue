@@ -24,6 +24,7 @@ interface Props {
   statFilter: Set<string>
   isEditing: boolean
   statDisplayNames: Map<string, string>
+  goalFilteredTaskIds: Set<string> | null
 }
 
 const props = defineProps<Props>()
@@ -35,37 +36,47 @@ const emit = defineEmits<{
 }>()
 
 const filteredTaskIds = computed(() => {
-  if (props.statFilter.size === 0) return null
+  const hasStatFilter = props.statFilter.size > 0
+  const hasGoalFilter = props.goalFilteredTaskIds !== null && props.goalFilteredTaskIds.size > 0
+  if (!hasStatFilter && !hasGoalFilter) return null
+
   const ids = new Set<string>()
 
-  const parentMap = new Map<string, string>()
-  function collectParents(nodes: { id: string; children: { id: string; children: any[] }[] }[]) {
-    for (const node of nodes) {
-      for (const child of node.children) {
-        parentMap.set(child.id, node.id)
-        collectParents([child])
+  if (hasGoalFilter && props.goalFilteredTaskIds) {
+    for (const id of props.goalFilteredTaskIds) ids.add(id)
+  }
+
+  if (hasStatFilter) {
+    const parentMap = new Map<string, string>()
+    function collectParents(nodes: { id: string; children: { id: string; children: any[] }[] }[]) {
+      for (const node of nodes) {
+        for (const child of node.children) {
+          parentMap.set(child.id, node.id)
+          collectParents([child])
+        }
       }
     }
-  }
-  if (props.taskTree) {
-    for (const nodes of props.taskTree.groups.values()) {
-      collectParents(nodes)
+    if (props.taskTree) {
+      for (const nodes of props.taskTree.groups.values()) {
+        collectParents(nodes)
+      }
+    }
+
+    for (const [projectId, display] of props.taskNodeDisplays) {
+      if (display.statLines.some(
+        line => props.statFilter.has(line.statId) && line.effectToValue !== null
+      )) {
+        ids.add(projectId)
+        let parentId = parentMap.get(projectId)
+        while (parentId) {
+          ids.add(parentId)
+          parentId = parentMap.get(parentId)
+        }
+      }
     }
   }
 
-  for (const [projectId, display] of props.taskNodeDisplays) {
-    if (display.statLines.some(
-      line => props.statFilter.has(line.statId) && line.effectToValue !== null
-    )) {
-      ids.add(projectId)
-      let parentId = parentMap.get(projectId)
-      while (parentId) {
-        ids.add(parentId)
-        parentId = parentMap.get(parentId)
-      }
-    }
-  }
-  return ids.size > 0 ? ids : null
+  return ids
 })
 
 function isTaskVisible(nodeId: string): boolean {
@@ -277,6 +288,7 @@ function getStatLines(projectId: string): TerraformingStatLineModel[] {
                 v-for="node in taskTree.groups.get(group)?.filter(n => topLevelNodeIds.has(n.id) && isTaskVisible(n.id))"
                 :key="node.id"
                 :node="node"
+                :is-editing="isEditing"
                 :completed-project-counts="completedProjectCounts"
                 :project-map="projectMap"
                 :project-display-names="projectDisplayNames"
