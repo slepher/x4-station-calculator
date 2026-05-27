@@ -53,6 +53,7 @@ const panelContentRef = ref<HTMLElement | null>(null)
 const cancelValidationCache = ref<Record<string, TerraformingCancelValidation>>({})
 
 const displayPlanEntries = ref<TerraformingGoalPlanDisplayEntry[]>([])
+const dropCount = ref(0)
 
 watch(() => props.queueEditState.planEntries, (val) => {
   const hasClone = displayPlanEntries.value.some((pe: any) => pe._type === 'drag-clone')
@@ -71,16 +72,18 @@ function onExternalDrop(e: any) {
   displayPlanEntries.value = displayPlanEntries.value.filter(
     (pe: any) => pe._type !== 'drag-clone'
   )
+  dropCount.value++
   emit('dropTask', projectId, targetIdx)
 }
 
 function onDragChange(e: any) {
+  // Only handle external (cross-list) drags
+  if (!e.from || !e.to || e.from === e.to) return
   const newIndex = e.moved?.newIndex ?? e.newIndex
   if (newIndex === undefined || newIndex < 0) return
   const item = e.item || e.moved?.element
   const projectName = item?.dataset?.projectName || ''
   if (!projectName) return
-  // Remove old preview, insert new one at hover position
   const list = displayPlanEntries.value.filter((pe: any) => pe._type !== 'drag-clone')
   list.splice(newIndex, 0, {
     projectName,
@@ -93,6 +96,7 @@ function onDragEnd() {
   displayPlanEntries.value = displayPlanEntries.value.filter(
     (pe: any) => pe._type !== 'drag-clone'
   )
+  dropCount.value++
 }
 
 function onInternalReorder() {
@@ -264,6 +268,7 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
 
         <draggable
           v-else
+          :key="`log-drag-${dropCount}`"
           v-model="displayPlanEntries"
           :item-key="planEntryKey"
           :group="{ name: 'terraforming-tasks', pull: false, put: () => true }"
