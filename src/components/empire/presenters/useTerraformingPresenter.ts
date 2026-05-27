@@ -2558,7 +2558,8 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
 
     const exclusive = checkExclusion(project.dependencies)
     if (exclusive) {
-      return { disabled: true, reason: `Mutually exclusive with ${projectDisplayNames.value.get(exclusive) || exclusive}`, mutuallyExclusive: exclusive }
+      const prefix = vI18nLookup('terraforming.mutuallyExclusive') || 'Mutually exclusive'
+      return { disabled: true, reason: `${prefix} ${projectDisplayNames.value.get(exclusive) || exclusive}`, mutuallyExclusive: exclusive }
     }
     return { disabled: false }
   }

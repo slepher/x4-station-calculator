@@ -270,7 +270,7 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
                     <span class="entry-order">#{{ planEntry.entry.order }}</span>
                     <span class="entry-name">{{ planEntry.entry.projectName }}</span>
                     <span v-if="planEntry.entry.systemDisabled" class="draft-state disabled">
-                      {{ planEntry.entry.systemDisabledReason || t('terraforming.mutuallyExclusive') }}
+                      {{ t('terraforming.queueState.disabled') || 'Disabled' }}
                     </span>
                   </button>
                   <div class="draft-actions">
