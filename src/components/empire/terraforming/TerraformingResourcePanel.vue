@@ -548,7 +548,7 @@ function buildDraftWaresTooltip(wares: Array<{ name: string; amount: number }>):
                   <span>{{ t('terraforming.executionTime') }}</span>
                   <span>{{ formatTime(entry.projectDuration) }}</span>
                 </div>
-                <div v-if="entry.projectDuration > 0 && getTotalBuildTime(entry) > 0" class="detail-row detail-total">
+                <div v-if="entry.projectDuration > 0 && getTotalBuildTime(entry) > 0" class="detail-row">
                   <span>{{ t('terraforming.totalDuration') }}</span>
                   <span>{{ formatTime(getTotalBuildTime(entry) + entry.projectDuration) }}</span>
                 </div>
