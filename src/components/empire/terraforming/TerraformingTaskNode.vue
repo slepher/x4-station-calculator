@@ -109,6 +109,12 @@ function buildWaresTooltip(projectId: string): string {
   return `<div class='tooltip-wares'>${lines.join('')}</div>`
 }
 
+function getDescription(projectId: string): string {
+  const proj = props.projectMap.get(projectId)
+  if (!proj?.descriptionId) return ''
+  return t(proj.descriptionId) || ''
+}
+
 function getStatusIcon(projectId: string, available: boolean): string {
   const count = props.completedProjectCounts.get(projectId) ?? 0
   if (count > 0) return '✅'
@@ -139,6 +145,11 @@ function handleSetCount(node: { id: string; available: boolean }, newCount: numb
         <div class="task-title">
           <span class="task-status-icon">{{ getStatusIcon(node.id, node.available) }}</span>
           <span class="task-name">{{ getNodeName(node.id, node.name) }}</span>
+          <span
+            v-if="getDescription(node.id)"
+            class="task-desc-icon"
+            v-tippy="{ content: getDescription(node.id), allowHTML: false, placement: 'top', theme: 'material', maxWidth: 360 }"
+          >ⓘ</span>
           <span v-if="getRepeatTagData(node.id).typeLabel" class="task-repeat">{{ getRepeatTagData(node.id).typeLabel }}</span>
           <span v-if="getRepeatTagData(node.id).durationLabel" class="task-repeat">{{ getRepeatTagData(node.id).durationLabel }}</span>
           <span v-if="getRepeatTagData(node.id).cooldownLabel" class="task-repeat">{{ getRepeatTagData(node.id).cooldownLabel }}</span>
@@ -292,6 +303,10 @@ function handleSetCount(node: { id: string; available: boolean }, newCount: numb
 
 .task-info-icon {
   @apply text-[11px] text-slate-600 shrink-0 cursor-help hover:text-slate-400;
+}
+
+.task-desc-icon {
+  @apply text-[11px] text-slate-600 shrink-0 cursor-help hover:text-slate-400 ml-0.5;
 }
 
 .task-repeat {

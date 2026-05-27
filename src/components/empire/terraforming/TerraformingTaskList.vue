@@ -176,6 +176,12 @@ function getNodeName(projectId: string, fallback: string): string {
   return getNodeDisplay(projectId)?.name || fallback
 }
 
+function getEventDescription(projectId: string): string {
+  const proj = props.projectMap.get(projectId)
+  if (!proj?.descriptionId) return ''
+  return t(proj.descriptionId) || ''
+}
+
 function getDependencyLines(projectId: string) {
   return getNodeDisplay(projectId)?.dependencyLines || []
 }
@@ -247,7 +253,12 @@ function getStatLines(projectId: string): TerraformingStatLineModel[] {
                 <div class="task-head">
                     <div class="task-title">
                       <span class="task-status-icon">⚠️</span>
-                  <span class="task-name">{{ getNodeName(e.id, e.name) }}</span>
+                      <span class="task-name">{{ getNodeName(e.id, e.name) }}</span>
+                      <span
+                        v-if="getEventDescription(e.id)"
+                        class="task-desc-icon"
+                        v-tippy="{ content: getEventDescription(e.id), allowHTML: false, placement: 'top', theme: 'material', maxWidth: 360 }"
+                      >ⓘ</span>
                   <span v-if="getRepeatTagData(e.id, projectMap).typeLabel" class="task-repeat">{{ getRepeatTagData(e.id, projectMap).typeLabel }}</span>
                   <span v-if="getRepeatTagData(e.id, projectMap).durationLabel" class="task-repeat">{{ getRepeatTagData(e.id, projectMap).durationLabel }}</span>
                   <span v-if="getRepeatTagData(e.id, projectMap).cooldownLabel" class="task-repeat">{{ getRepeatTagData(e.id, projectMap).cooldownLabel }}</span>
@@ -432,5 +443,8 @@ function getStatLines(projectId: string): TerraformingStatLineModel[] {
 .drag-to-log {
   @apply text-slate-500 cursor-grab text-sm px-1 select-none;
   @apply hover:text-slate-300 active:cursor-grabbing;
+}
+.task-desc-icon {
+  @apply text-[11px] text-slate-600 shrink-0 cursor-help hover:text-slate-400 ml-0.5;
 }
 </style>
