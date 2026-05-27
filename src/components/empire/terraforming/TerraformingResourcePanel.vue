@@ -241,7 +241,19 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
           @add="onExternalDrop"
         >
           <template #item="{ element: planEntry }">
+            <!-- Drag clone preview -->
             <div
+              v-if="planEntry._type === 'drag-clone'"
+              class="drag-preview-entry"
+            >
+              <div class="goal-head">
+                <span class="drag-handle">↧</span>
+                <span class="goal-label">{{ planEntry.projectName || planEntry.projectId }}</span>
+              </div>
+            </div>
+
+            <div
+              v-else
               :class="planEntry.type === 'goal'
                 ? ['goal-entry', {
                     'goal-filter-active': planEntry.entry.isFilterActive,
@@ -628,6 +640,14 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
 
 .drag-ghost {
   @apply opacity-30 bg-slate-700 border-sky-500 border-dashed border-2;
+}
+
+.drag-preview-entry {
+  @apply border-2 border-dashed border-sky-500/80 rounded-lg bg-sky-950/30 px-3 py-2;
+}
+
+.drag-preview-entry .goal-label {
+  @apply text-sky-300;
 }
 
 .draggable-container {

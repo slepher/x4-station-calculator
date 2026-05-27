@@ -289,10 +289,11 @@ function getStatLines(projectId: string): TerraformingStatLineModel[] {
                 :model-value="taskTree.groups.get(group)?.filter(n => topLevelNodeIds.has(n.id) && isTaskVisible(n.id)) || []"
                 :group="{ name: 'terraforming-tasks', pull: 'clone', put: false }"
                 :sort="false"
-                :clone="(n: any) => ({ projectId: n.id, _type: 'drag-clone' })"
+                :clone="(n: any) => ({ projectId: n.id, projectName: n.name, _type: 'drag-clone' })"
                 item-key="id"
                 :disabled="!isEditing"
                 ghost-class="drag-ghost"
+                handle=".drag-to-log"
                 class="task-node-list"
               >
                 <template #item="{ element: node }">
