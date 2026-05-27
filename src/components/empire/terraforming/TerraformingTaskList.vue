@@ -86,13 +86,30 @@ function onTaskDragStart(event: any) {
   const node = event.item?._underlying_vm_
   let projectId = ''
   let projectName = ''
-  if (event.item?.dataset?.projectId) projectId = event.item.dataset.projectId
-  else if (node?.id) projectId = node.id
 
-  if (event.item?.dataset?.projectName) projectName = event.item.dataset.projectName
-  else if (projectId) projectName = getNodeName(projectId, node?.name || projectId)
+  const target = event.originalEvent?.target as HTMLElement | undefined
+  const closest = target?.closest('[data-project-id]') as HTMLElement | undefined
+  if (closest?.dataset.projectId) {
+    projectId = closest.dataset.projectId!
+    projectName = closest.dataset.projectName || ''
+  }
 
-  if (projectId && projectName) emit('startDragTask', projectId, projectName)
+  if (!projectId && event.item?.dataset?.projectId) projectId = event.item.dataset.projectId
+  if (!projectId && node?.id) projectId = node.id
+
+  if (!projectName && event.item?.dataset?.projectName) projectName = event.item.dataset.projectName
+  if (!projectName && projectId) projectName = getNodeName(projectId, node?.name || projectId)
+
+  if (projectId && projectName) {
+    const ghost = event.item as HTMLElement | undefined
+    if (ghost) {
+      const nameEl = ghost.querySelector('.entry-name') || ghost.querySelector('.task-name')
+      if (nameEl) nameEl.textContent = projectName
+      ghost.dataset.projectId = projectId
+      ghost.dataset.projectName = projectName
+    }
+    emit('startDragTask', projectId, projectName)
+  }
 }
 
 function isTaskVisible(nodeId: string): boolean {
