@@ -237,6 +237,16 @@ UI 操作调整：
 - Log 区域 goal entry 在 vuedraggable 中通过 `filter=".goal-entry"` 排除拖拽能力，task entry 通过 `handle=".drag-handle"` 保留拖拽排序。
 - 本变更修改并取代 `terraforming-log-edit` 的编辑模式行为，新目标驱动模型不与旧 draft 三态模型并存。
 
+## 拖拽 Task 到 Log 区域
+
+编辑模式下中列 terraforming task 支持拖拽到右侧 log 区域以添加任务。
+
+- TaskNode 右侧显示 `↔` 拖拽手柄（class `drag-to-log`），仅编辑模式可见。
+- TerraformingTaskList 中每个 group 的 top-level nodes 包一层 vuedraggable：`group: 'terraforming-tasks'`、`pull: 'clone'`、`handle: '.drag-to-log'`。
+- 目标区域 TerraformingResourcePanel 的 vuedraggable 接受 `terraforming-tasks` group drop（`put: () => true`）。
+- 落点预览：拖拽悬停时在目标列表插入位置显示预览 entry，与 log entry 的 head 行样式一致（虚线蓝色边框、半透明背景、单行项目名）。实现方式参照 `drag.md`。
+- 松手后在插入位置调用 `appendDraftProject`（含互斥检查与 goal 定位）。
+
 ## 非目标
 
 - 不改变正式非编辑模式的真实 execution log 存储结构。
