@@ -353,8 +353,7 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
                   <span v-else-if="planEntry.entry.kind === 'stat'" class="goal-kind-tag">{{ t('terraforming.goal.statGoal') || 'Stat Goal' }}</span>
                   <span v-else class="goal-kind-tag">{{ t('terraforming.goal.projectGoal') || 'Goal' }}</span>
                   <span v-if="planEntry.entry.satisfied" class="goal-status done">✓</span>
-                  <span v-else-if="planEntry.entry.hasExistingTask" class="goal-status pending">○</span>
-                  <span v-else class="goal-status pending">○</span>
+                  <span v-else-if="!planEntry.entry.hasExistingTask" class="goal-status pending">○</span>
                   <button
                     v-if="planEntry.entry.hasExistingTask"
                     class="goal-move-btn"
