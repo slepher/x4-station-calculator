@@ -1315,7 +1315,34 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
         const condition = project.conditions[ci]!
         if (!isStatInRuntime(cumulativeStats, condition.stat)) continue
         if (!checkStatConditionMet(condition, cumulativeStats, data.stats)) {
-          const key = `stat:${condition.stat}:${ci}`
+          // Compute targetValue for dedup key
+          const statDef = data.stats.find(s => s.id === condition.stat)
+          let tv = 0
+          if (statDef) {
+            const mode = getConditionMode(condition, statDef)
+            const cv = cumulativeStats[condition.stat] ?? 0
+            if (mode === 'value-range') {
+              if (condition.minvalue !== undefined && cv < condition.minvalue) tv = condition.minvalue
+              else if (condition.maxvalue !== undefined && cv > condition.maxvalue) tv = condition.maxvalue
+              else tv = cv
+            } else {
+              const ranges = toScaleRanges(statDef)
+              const currentRange = getCurrentRange(statDef, cv)
+              const currentState = currentRange?.state ?? 0
+              const minState = condition.min
+              const maxState = condition.max
+              if (minState !== undefined && currentState < minState) {
+                const targetRange = ranges.find(r => r.state === minState)
+                tv = targetRange ? targetRange.start : cv
+              } else if (maxState !== undefined && currentState > maxState) {
+                const targetRange = [...ranges].reverse().find(r => r.state === maxState)
+                tv = targetRange ? targetRange.end : cv
+              } else {
+                tv = cv
+              }
+            }
+          }
+          const key = `statGoal:${condition.stat}:${tv}`
           const existing = statGoalCandidates.get(key)
           if (existing) {
             existing.dependentTaskIds.add(entry.id)
@@ -2321,13 +2348,39 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
         if (depProject) {
           const condition = depProject.conditions[goal.targetStatConditionIndex]
           if (condition) {
-            if (condition.minvalue !== undefined || condition.maxvalue !== undefined) {
+            const mode = getConditionMode(condition, statDef)
+
+            if (mode === 'value-range') {
               if (condition.minvalue !== undefined && currentValue < condition.minvalue) {
                 targetValue = condition.minvalue
               } else if (condition.maxvalue !== undefined && currentValue > condition.maxvalue) {
                 targetValue = condition.maxvalue
               }
+            } else {
+              const currentRange = getCurrentRange(statDef, currentValue)
+              const currentState = currentRange?.state ?? 0
+              const minState = condition.min
+              const maxState = condition.max
+              const needsBelow = minState !== undefined && currentState < minState
+              const needsAbove = maxState !== undefined && currentState > maxState
+              if (needsBelow) {
+                const targetRange = ranges.find(r => r.state === minState)
+                if (targetRange) targetValue = targetRange.start
+              } else if (needsAbove) {
+                const targetRange = [...ranges].reverse().find(r => r.state === maxState)
+                if (targetRange) targetValue = targetRange.end
+              }
+
+              const minS = minState ?? Math.min(...ranges.map(r => r.state))
+              const maxS = maxState ?? Math.max(...ranges.map(r => r.state))
+              requirementSegments = ranges
+                .filter(r => r.state >= minS && r.state <= maxS)
+                .map(r => ({
+                  startIndex: ranges.indexOf(r),
+                  endIndex: ranges.indexOf(r),
+                }))
             }
+
             if (targetValue > currentValue) {
               effectDirection = 'increase'
               effectToValue = targetValue
@@ -2336,17 +2389,6 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
               effectDirection = 'decrease'
               effectToValue = targetValue
               effectFromValue = currentValue
-            }
-
-            if (hasRanges && condition.usesStateBounds) {
-              const minState = condition.min ?? Math.min(...ranges.map(r => r.state))
-              const maxState = condition.max ?? Math.max(...ranges.map(r => r.state))
-              requirementSegments = ranges
-                .filter(r => r.state >= minState && r.state <= maxState)
-                .map(r => ({
-                  startIndex: ranges.indexOf(r),
-                  endIndex: ranges.indexOf(r),
-                }))
             }
           }
         }

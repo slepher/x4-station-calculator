@@ -81,7 +81,7 @@ Goal 生成时必须过滤 cluster 不可达的依赖，采用两个可复用函
 ### 同类合并
 
 - 相同 `completed(projectId)` 合并为同一 project goal。
-- 相同 stat 条件合并为同一 stat goal。
+- 相同 stat goal 按 **stat + targetValue** 合并：同一 stat 追求相同数值目标则合并为一个 goal，targetValue 不同则各自独立。targetValue 在生成阶段计算（取离当前值最近的满足边界）。
 - 复合 blocker 只在当前 replay 状态下需要正向修复时，生成其可执行正向分支 goal。
 - `completed(project)` 与 `notCompleted(project)` 不合并；后者仅参与互斥标记。
 
