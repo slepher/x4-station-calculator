@@ -62,28 +62,37 @@ watch(() => props.queueEditState.planEntries, (val) => {
 }, { immediate: true })
 
 function onExternalDrop(e: any) {
-  const projectId = e.item?._underlying_vm_?.projectId || e.item?.projectId
+  const itemDom = e.item || e.moved?.element
+  const projectId = itemDom?.dataset?.projectId
+    || e.item?._underlying_vm_?.projectId
+    || e.item?.projectId
   if (!projectId) return
-  const targetIdx = e.newIndex
-  // Remove the clone from display list
+  const targetIdx = e.newIndex ?? e.moved?.newIndex
   displayPlanEntries.value = displayPlanEntries.value.filter(
     (pe: any) => pe._type !== 'drag-clone'
-  )
-  // Sync real plan entries back to presenter
-  emit('updateDraftEntries',
-    displayPlanEntries.value
-      .filter((pe): pe is { type: 'task'; entry: TerraformingDraftTimelineEntry } => pe.type === 'task')
-      .map(pe => pe.entry)
   )
   emit('dropTask', projectId, targetIdx)
 }
 
+function onDragChange(e: any) {
+  const newIndex = e.moved?.newIndex ?? e.newIndex
+  if (newIndex === undefined || newIndex < 0) return
+  const item = e.item || e.moved?.element
+  const projectName = item?.dataset?.projectName || ''
+  if (!projectName) return
+  // Remove old preview, insert new one at hover position
+  const list = displayPlanEntries.value.filter((pe: any) => pe._type !== 'drag-clone')
+  list.splice(newIndex, 0, {
+    projectName,
+    _type: 'drag-clone',
+  } as any)
+  displayPlanEntries.value = [...list]
+}
+
 function onDragEnd() {
-  // Clean up any stray clones (drag cancelled)
-  const hasClone = displayPlanEntries.value.some((pe: any) => pe._type === 'drag-clone')
-  if (hasClone) {
-    displayPlanEntries.value = [...props.queueEditState.planEntries] as TerraformingGoalPlanDisplayEntry[]
-  }
+  displayPlanEntries.value = displayPlanEntries.value.filter(
+    (pe: any) => pe._type !== 'drag-clone'
+  )
 }
 
 function onInternalReorder() {
@@ -263,6 +272,7 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
           filter=".goal-entry"
           class="draggable-container"
           @add="onExternalDrop"
+          @change="onDragChange"
           @end="onDragEnd"
           @update:model-value="onInternalReorder"
         >
@@ -670,27 +680,13 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
   @apply opacity-30 bg-slate-700 border-sky-500 border-dashed border-2;
 }
 
-/* SortableJS ghost during external drag-in: strip children, show name */
+/* Hide default SortableJS ghost during external drag; Vue renders preview instead */
 :deep(.sortable-ghost) {
-  @apply border-2 border-dashed border-sky-500/70 bg-sky-950/20 rounded opacity-80;
-  max-height: 2rem !important;
-  overflow: hidden !important;
-  padding: 0.25rem 0.75rem !important;
-}
-
-:deep(.sortable-ghost) > * {
   display: none !important;
 }
 
-:deep(.sortable-ghost)::after {
-  content: attr(data-project-name);
-  color: #bae6fd;
-  font-size: 0.75rem;
-  line-height: 1.5rem;
-}
-
 .drag-preview-entry {
-  @apply border-2 border-dashed border-sky-500/70 bg-sky-950/20 opacity-80;
+  @apply border-2 border-dashed border-sky-500/70 bg-sky-950/20 rounded opacity-80 max-h-8 overflow-hidden;
 }
 
 .draggable-container {
