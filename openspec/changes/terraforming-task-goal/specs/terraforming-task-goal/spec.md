@@ -340,7 +340,79 @@ Goal entry MUST 支持点击切换过滤状态，并由过滤状态驱动中列�
 
 **并且** goal 生成器 MUST NOT 为单纯负向分支生成 goal
 
-### Requirement: 完成编辑 MUST 阻止未满足的 Task 衍生 Goal
+### Requirement: Goal MUST 仅对 Cluster 可达依赖生成
+
+Goal 生成 MUST 过滤 cluster 不可达的 stat 和 project 依赖，不得为无关 stat 或不可见 project 生成 goal。
+
+#### Scenario: Cluster 不存在的 stat 不生成 goal
+
+**前提** project 的 stat condition 引用 cluster 运行时 stats 中不存在的 stat（如月之舟没有 temperature/humidity/airpressure）
+
+**当** 系统生成 goal
+
+**那么** 系统 MUST NOT 为该 stat condition 生成 goal
+
+**并且** stat 可用性判断 MUST 复用 `isStatInRuntime(stats, statId)` 函数
+
+#### Scenario: Cluster 不可见的 project 不生成 project goal
+
+**前提** dependency expression 的 `completed(projectId)` leaf 引用的 project 不在 `getRuntimeTerraformingProjectIds` 返回集合中
+
+**当** 系统提取未满足 dependency goal
+
+**那么** 系统 MUST NOT 为该 project 生成 goal
+
+**并且** 判断使用当前 cumulative 状态调用 `getRuntimeTerraformingProjectIds`，确保动态可见 project 也能被正确识别
+
+### Requirement: housing Cluster Goal MUST 按 population stat 过滤
+
+cluster 的 `objective.build_housing` 生成的 cluster goal MUST 存储 `targetStatId: 'population'`，使点击过滤时能匹配 effects 命中 population 的 project。
+
+#### Scenario: 点击 housing goal 过滤
+
+**前提** 编辑模式存在未满足的 housing cluster goal
+
+**当** 用户点击该 goal
+
+**那么** 中列 MUST 显示 effects 中包含 population stat 的 project
+
+**并且** 中列 MUST 显示这些 project 在当前任务树上的父节点
+
+### Requirement: Goal 过滤 MUST 只包含直接实现者及其祖先
+
+点击 goal 后的过滤结果 MUST 只包含能直接实现 goal 的 project（satisfier）及其在当前任务树上的祖先节点，MUST NOT 包含 satisfier 的消费者（依赖该 goal project 的其他 project）。
+
+#### Scenario: 过滤不包含消费者
+
+**前提** goal G 的目标 project 为 A
+
+**并且** project B 的 dependency 中包含 `completed(A)`
+
+**并且** 用户点击 goal G
+
+**当** 中列任务列表渲染
+
+**那么** A MUST 可见（A 是直接实现者）
+
+**并且** B MUST NOT 因 goal 过滤而可见（B 是消费者，不实现 A）
+
+### Requirement: 编辑模式 MUST 在 UI 层放宽前置条件检查
+
+编辑模式下 MUST 将 `isEditing` prop 传递到 `TerraformingTaskNode`（含递归子节点），使 task toggle 按钮和 number input 的 `:disabled` 条件中包含 `&& !isEditing`。
+
+#### Scenario: 编辑模式未满足前置的 task 按钮可点击
+
+**前提** 系统处于编辑模式
+
+**并且** task node 的前置条件未满足
+
+**当** UI 渲染该 task node
+
+**那么** 按钮的 `:disabled` MUST 为 false
+
+**并且** `handleSetCount` MUST 不因 `!node.available` 而阻止数值增加
+
+### Requirement: 旧启用禁用 Draft UI MUST 被移除
 
 完成编辑 MUST 允许 cluster root goal 未满足，但 MUST 阻止 task 衍生 goal 未满足的计划提交。
 

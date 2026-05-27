@@ -60,7 +60,7 @@ Goal 生成是派生过程，不直接存储为用户可排序数据。
 
 ```
 用户 task queue
-  ├─ replay 累计 project count / stats
+  ├─ replay 累计 project count / stats（所有非 systemDisabled 的 entry）
   ├─ 对每个 task 读取未满足依赖
   ├─ 将每条未满足依赖转成候选 goal
   ├─ 追加 cluster root goals
@@ -68,6 +68,15 @@ Goal 生成是派生过程，不直接存储为用户可排序数据。
   ├─ 根据最早依赖者定位 goal
   └─ 根据生命周期规则过滤已满足 goal
 ```
+
+### 可用性过滤
+
+Goal 生成时必须过滤 cluster 不可达的依赖，采用两个可复用函数：
+
+- `isStatInRuntime(stats, statId)` — stat 是否存在于当前 cluster 的运行时 stats 中（底层为 `computeTerraformingRuntimeStats`）。stat condition 不满足此条件时不生成 goal。
+- `getRuntimeTerraformingProjectIds(cluster, stats, completed, data)` — 返回 cluster 当前运行时可见的 project 集合。`completed(projectId)` 依赖 leaf 不在此集合内时不生成 goal。
+
+这两个过滤器保证 cluster 无关的 stat（如月之舟没有 temperature）和不可见的 project（如需特定 stat 阈值才出现的动态 project）不会产生无效 goal。
 
 ### 同类合并
 
@@ -152,15 +161,16 @@ activeGoalFilterIds: Set<string>
 - 如果 goal 已激活，则从 `activeGoalFilterIds` 移除。
 - Vue 根据 presenter 输出的 `isFilterActive` 修改 goal 样式。
 
-多个激活 goal 以 OR 形式过滤中列任务：
+多个激活 goal 以 OR 形式过滤中列任务。过滤结果的 satisfier 定义：
 
-```
-visibleTasks =
-  canSatisfy(goalA)
-  OR treeParentsOf(canSatisfy(goalA))
-  OR canSatisfy(goalB)
-  OR treeParentsOf(canSatisfy(goalB))
-```
+| Goal 类型 | satisfier | 说明 |
+|-----------|-----------|------|
+| project | `goal.targetProjectId` 匹配的 project 自身 | 完成该 project 即满足 goal |
+| stat | effects 命中 `goal.targetStatId` 的 project | 执行后改变对应 stat |
+| cluster (project) | `goal.targetProjectId` 匹配的 project | 同 project goal |
+| cluster (housing) | effects 命中 `population` stat 的 project | housing goal 存储 `targetStatId: 'population'` |
+
+过滤可见集合 = satisfier + satisfier 在当前任务树上的祖先节点（递归向上）。不包含 satisfier 的消费者（依赖 satisfier 的 project）。
 
 过滤只改变可见性，不改变 task 插入决策。没有激活过滤时，中列恢复正常任务列表。
 
@@ -194,7 +204,10 @@ visibleTasks =
 
 该系统禁用状态不同于旧 draft queue 中的用户启用/禁用操作。用户不能通过“启用”强行启用互斥后加入项，只能移除冲突项后重新选择路线。
 
-复合条件 blocker 需要先按当前 replay 状态求值。对 `all` / `any` 嵌套表达式，goal 生成器应基于 evaluator 结果提取可执行的正向缺口；单纯负向分支不生成 goal。例如：
+复合条件 blocker 需要先按当前 replay 状态求值。对 `all` / `any` 嵌套表达式，goal 生成器应基于 evaluator 结果提取可执行的正向缺口；单纯负向分支不生成 goal。
+
+- 对纯 `completed` leaf 的 `any(A, B, ...)`：当所有分支均未满足时，返回全部未满足 leaf 的 goal（flat），不限于第一分支。用户可看到所有可选路径。
+- 对含 `notCompleted` 的混合 `any(notCompleted(A), completed(B))`：A 未完成时表达式满足，不生成 goal；A 已完成且 B 未完成时，生成 `completed(B)` 的 project goal。
 
 ```
 any(notCompleted(A), completed(B))
@@ -220,6 +233,8 @@ UI 操作调整：
 - 批量操作从全部启用/全部禁用改为移除全部。
 - 完成编辑时提交非系统禁用的 task entry，自动丢弃 goal entry。
 - 完成编辑时允许 cluster root goal 仍未满足，但 task 衍生的 project/stat goal 必须全部满足。
+- 编辑模式下中列任务列表的 add/undo 按钮不再校验前置条件。`isEditing` prop 从 `TerraformingTaskList` 传入 `TerraformingTaskNode`（含递归子节点），按钮 `:disabled` 和 `handleSetCount` 按 `!node.available && count === 0 && !isEditing` 判断。
+- Log 区域 goal entry 在 vuedraggable 中通过 `filter=".goal-entry"` 排除拖拽能力，task entry 通过 `handle=".drag-handle"` 保留拖拽排序。
 - 本变更修改并取代 `terraforming-log-edit` 的编辑模式行为，新目标驱动模型不与旧 draft 三态模型并存。
 
 ## 非目标
