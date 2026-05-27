@@ -1369,6 +1369,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
         let satisfied = false
         let label = ''
         let targetProjectId: string | null = null
+        let targetStatId: string | null = null
 
         if (obj.action === 'objective.build_project') {
           const projMatch = obj.textId.match(/^terraforming\.project\.(\w+)\.name$/)
@@ -1384,6 +1385,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
         } else if (obj.action === 'objective.build_housing') {
           if (housingTarget !== null) {
             satisfied = (cumulativeStats.population ?? 0) >= housingTarget
+            targetStatId = 'population'
             const td = data!
             label = resolveTerraformingText(obj.textId, td, vI18nLookup)
             if (obj.textReplaces) {
@@ -1405,7 +1407,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
             kind: 'cluster',
             label: label || obj.textId,
             targetProjectId,
-            targetStatId: null,
+            targetStatId,
             position: -1,
             satisfied: false,
             hasRisk: false,
@@ -2214,8 +2216,17 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
               }
             }
           }
-        } else if (goal.kind === 'cluster' && goal.targetProjectId) {
-          if (project.id === goal.targetProjectId) satisfiers.push(project.id)
+        } else if (goal.kind === 'cluster') {
+          if (goal.targetProjectId) {
+            if (project.id === goal.targetProjectId) satisfiers.push(project.id)
+          } else if (goal.targetStatId) {
+            for (const effect of project.effects) {
+              if (effect.stat === goal.targetStatId) {
+                satisfiers.push(project.id)
+                break
+              }
+            }
+          }
         }
       }
       result.set(goal.id, satisfiers)
