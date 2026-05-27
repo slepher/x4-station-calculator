@@ -258,11 +258,18 @@ export interface TerraformingResourcePanelProps {
   hqBuildDocks: ComputedRef<{ totalSlots: number } | null>
 }
 
+export interface TerraformingTaskDragState {
+  isDragging: ComputedRef<boolean>
+  projectId: ComputedRef<string>
+  projectName: ComputedRef<string>
+}
+
 export interface TerraformingPresenterProps {
   toolbar: TerraformingToolbarProps
   sectorPanel: TerraformingSectorPanelProps
   taskList: TerraformingTaskListProps
   resourcePanel: TerraformingResourcePanelProps
+  taskDrag: TerraformingTaskDragState
 }
 
 export interface TerraformingPresenterEmits {
@@ -278,6 +285,8 @@ export interface TerraformingPresenterEmits {
   removeAllDraftEntries: () => void
   clickGoal: (goalId: string) => void
   appendDraftTask: (projectId: string, targetIndex?: number) => void
+  startDraggingTask: (projectId: string, projectName: string) => void
+  endDraggingTask: () => void
   copyDraftEntry: (entryId: string) => void
   moveDraftEntry: (entryId: string, targetIndex: number) => void
   reorderDraftEntries: (entries: TerraformingDraftTimelineEntry[]) => void
@@ -1049,6 +1058,9 @@ function isStatInRuntime(stats: Record<string, number>, statId: string): boolean
 export function useTerraformingPresenter(store: TerraformingPresenterStore): UseTerraformingPresenterReturn {
   const vI18nLookup: I18nLookup = (key: string) => (i18n.global.t(key) as string) || ''
   const isQueueEditing = ref(false)
+  const dragTaskId = ref('')
+  const dragTaskName = ref('')
+  const isDraggingTask = computed(() => dragTaskId.value !== '')
   const draftExecutionLog = ref<TerraformingDraftExecutionEntry[]>([])
   const draftSequence = ref(0)
   const activeGoalFilterIds = ref<Set<string>>(new Set())
@@ -2714,7 +2726,12 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
       getCancelValidation: getExecutionCancelValidation,
       deliveryShipMap,
       hqBuildDocks,
-    }
+    },
+    taskDrag: {
+      isDragging: isDraggingTask,
+      projectId: computed(() => dragTaskId.value),
+      projectName: computed(() => dragTaskName.value),
+    },
   }
 
   const emits: TerraformingPresenterEmits = {
@@ -2771,17 +2788,14 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     copyDraftEntry,
     moveDraftEntry,
     reorderDraftEntries,
-    appendDraftTask: (projectId: string, targetIndex?: number) => {
-      appendDraftProject(projectId)
-      if (targetIndex !== undefined && targetIndex >= 0 && targetIndex < draftExecutionLog.value.length) {
-        const lastIdx = draftExecutionLog.value.length - 1
-        const [moved] = draftExecutionLog.value.splice(lastIdx, 1)
-        if (moved) {
-          const next = [...draftExecutionLog.value]
-          next.splice(targetIndex, 0, moved)
-          draftExecutionLog.value = next
-        }
-      }
+    appendDraftTask: appendDraftProject,
+    startDraggingTask: (projectId: string, projectName: string) => {
+      dragTaskId.value = projectId
+      dragTaskName.value = projectName
+    },
+    endDraggingTask: () => {
+      dragTaskId.value = ''
+      dragTaskName.value = ''
     },
   }
 

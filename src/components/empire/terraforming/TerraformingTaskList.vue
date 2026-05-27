@@ -34,6 +34,8 @@ const emit = defineEmits<{
   (e: 'toggleProject', projectId: string): void
   (e: 'setProjectCount', projectId: string, count: number): void
   (e: 'clickStat', statId: string): void
+  (e: 'startDragTask', projectId: string, projectName: string): void
+  (e: 'endDragTask'): void
 }>()
 
 const filteredTaskIds = computed(() => {
@@ -295,6 +297,8 @@ function getStatLines(projectId: string): TerraformingStatLineModel[] {
                 ghost-class="drag-ghost"
                 handle=".drag-to-log"
                 class="task-node-list"
+                @start="(e: any) => { const node = e.item?._underlying_vm_ || e.item; if (node?.id && node?.name) emit('startDragTask', node.id, node.name) }"
+                @end="emit('endDragTask')"
               >
                 <template #item="{ element: node }">
                   <TerraformingTaskNode

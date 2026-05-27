@@ -296,6 +296,8 @@ function toggleStatFilter(statId: string) {
         @click-stat="toggleStatFilter"
         @toggle-project="terraformingPresenter.emits.toggleProject"
         @set-project-count="terraformingPresenter.emits.setProjectCount"
+        @start-drag-task="terraformingPresenter.emits.startDraggingTask"
+        @end-drag-task="terraformingPresenter.emits.endDraggingTask"
       />
     </div>
 
@@ -313,6 +315,7 @@ function toggleStatFilter(statId: string) {
         :delivery-ship-map="terraformingPresenter.props.resourcePanel.deliveryShipMap.value"
         :hq-build-docks="terraformingPresenter.props.resourcePanel.hqBuildDocks.value"
         :floating="terraformingFloating.resourcePanel"
+        :task-drag="terraformingPresenter.props.taskDrag"
         @click-stat="toggleStatFilter"
         @cancel-execution="terraformingPresenter.emits.cancelExecution"
         @clear-all="terraformingPresenter.emits.clearExecutionQueue"

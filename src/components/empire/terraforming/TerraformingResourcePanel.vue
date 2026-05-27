@@ -7,6 +7,7 @@ import type {
   TerraformingDraftTimelineEntry,
   TerraformingExecutionTimelineEntry,
   TerraformingGoalPlanDisplayEntry,
+  TerraformingTaskDragState,
 } from '@/components/empire/presenters/useTerraformingPresenter'
 import type { DeliveryShip } from '@/store/logic/terraformingTaskResolver'
 import { useX4I18n } from '@/utils/UseX4I18n'
@@ -26,6 +27,7 @@ interface Props {
   deliveryShipMap: Map<string, DeliveryShip>
   hqBuildDocks: { totalSlots: number } | null
   floating: boolean
+  taskDrag: TerraformingTaskDragState
 }
 
 const props = defineProps<Props>()
@@ -52,66 +54,53 @@ const expandedEntryId = ref<string | null>(null)
 const panelContentRef = ref<HTMLElement | null>(null)
 const cancelValidationCache = ref<Record<string, TerraformingCancelValidation>>({})
 
-const displayPlanEntries = ref<TerraformingGoalPlanDisplayEntry[]>([])
-const dropCount = ref(0)
+const dragHoverIndex = ref(-1)
 
-watch(() => props.queueEditState.planEntries, (val) => {
-  const hasClone = displayPlanEntries.value.some((pe: any) => pe._type === 'drag-clone')
-  if (!hasClone) {
-    displayPlanEntries.value = [...val] as TerraformingGoalPlanDisplayEntry[]
+const displayPlanEntries = computed(() => {
+  const entries = [...props.queueEditState.planEntries] as TerraformingGoalPlanDisplayEntry[]
+  if (props.taskDrag.isDragging.value && dragHoverIndex.value >= 0 && dragHoverIndex.value <= entries.length) {
+    entries.splice(dragHoverIndex.value, 0, {
+      projectName: props.taskDrag.projectName.value,
+      _type: 'drag-clone',
+    } as any)
   }
-}, { immediate: true })
+  return entries
+})
+
+watch(() => props.taskDrag.isDragging.value, (dragging) => {
+  if (!dragging) dragHoverIndex.value = -1
+})
 
 function onExternalDrop(e: any) {
-  const itemDom = e.item || e.moved?.element
-  const projectId = itemDom?.dataset?.projectId
-    || e.item?._underlying_vm_?.projectId
-    || e.item?.projectId
-  if (!projectId) return
   const targetIdx = e.newIndex ?? e.moved?.newIndex
-  displayPlanEntries.value = displayPlanEntries.value.filter(
-    (pe: any) => pe._type !== 'drag-clone'
-  )
-  dropCount.value++
+  const projectId = props.taskDrag.projectId.value
+  if (!projectId) return
+  dragHoverIndex.value = -1
   emit('dropTask', projectId, targetIdx)
 }
 
 function onDragChange(e: any) {
-  // Only handle external (cross-list) drags
   if (!e.from || !e.to || e.from === e.to) return
-  const newIndex = e.moved?.newIndex ?? e.newIndex
-  if (newIndex === undefined || newIndex < 0) return
-  const item = e.item || e.moved?.element
-  const projectName = item?.dataset?.projectName || ''
-  if (!projectName) return
-  const list = displayPlanEntries.value.filter((pe: any) => pe._type !== 'drag-clone')
-  list.splice(newIndex, 0, {
-    projectName,
-    _type: 'drag-clone',
-  } as any)
-  displayPlanEntries.value = [...list]
-}
-
-function onDragEnd() {
-  displayPlanEntries.value = displayPlanEntries.value.filter(
-    (pe: any) => pe._type !== 'drag-clone'
-  )
-  dropCount.value++
-}
-
-function onInternalReorder() {
-  const hasClone = displayPlanEntries.value.some((pe: any) => pe._type === 'drag-clone')
-  if (!hasClone) {
-    emit('updateDraftEntries',
-      displayPlanEntries.value
-        .filter((pe): pe is { type: 'task'; entry: TerraformingDraftTimelineEntry } => pe.type === 'task')
-        .map(pe => pe.entry)
-    )
+  const added = e.added
+  if (added?.newIndex !== undefined) {
+    dragHoverIndex.value = added.newIndex
+  } else if (e.newIndex !== undefined) {
+    dragHoverIndex.value = e.newIndex
   }
 }
 
-function planEntryKey(pe: TerraformingGoalPlanDisplayEntry): string {
-  return pe.type === 'goal' ? `goal-${pe.entry.id}` : pe.entry.id
+function onInternalReorder() {
+  dragHoverIndex.value = -1
+  const tasks = displayPlanEntries.value
+    .filter((pe): pe is { type: 'task'; entry: TerraformingDraftTimelineEntry } => pe.type === 'task')
+    .map(pe => pe.entry)
+  emit('updateDraftEntries', tasks)
+}
+
+function planEntryKey(pe: any): string {
+  if (pe._type === 'drag-clone') return `drag-preview-${dragHoverIndex.value}`
+  if (pe.type === 'goal') return `goal-${pe.entry.id}`
+  return pe.entry?.id || ''
 }
 
 let prevTimelineLength = 0
@@ -268,7 +257,6 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
 
         <draggable
           v-else
-          :key="`log-drag-${dropCount}`"
           v-model="displayPlanEntries"
           :item-key="planEntryKey"
           :group="{ name: 'terraforming-tasks', pull: false, put: () => true }"
@@ -278,7 +266,6 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
           class="draggable-container"
           @add="onExternalDrop"
           @change="onDragChange"
-          @end="onDragEnd"
           @update:model-value="onInternalReorder"
         >
           <template #item="{ element: planEntry }">
@@ -685,8 +672,11 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
   @apply opacity-30 bg-slate-700 border-sky-500 border-dashed border-2;
 }
 
-/* Hide default SortableJS ghost during external drag; Vue renders preview instead */
+/* Hide default SortableJS ghost; Vue renders preview via computed displayPlanEntries */
 :deep(.sortable-ghost) {
+  display: none !important;
+}
+:deep(.sortable-fallback) {
   display: none !important;
 }
 
