@@ -461,3 +461,65 @@ cluster 的 `objective.build_housing` 生成的 cluster goal MUST 存储 `target
 **并且** UI MUST NOT 提供全部启用或全部禁用操作
 
 **并且** 系统 MUST NOT 使用“启用且有效 / 启用但失效 / 禁用”的 draft 三态作为编辑主模型
+
+
+### Requirement: Predecessors MUST 生成 project goal
+
+系统 MUST 从 `project.predecessors` 中提取未满足目标，方法与 `project.dependencies` 相同。
+
+格式：`{ref: string, type: 'project'|'group', any: boolean}`。
+
+- any-group predecessors：若任一项已完成 → 跳过该组；若皆未完成 → 为组内全体成员生成 goal
+- 非 any predecessors：每个未满足项生成一个 goal
+
+分组逻辑 MUST 遵循 `terraformingTaskResolver.ts` 中 `checkPredecessors()` 的语义。
+
+#### Scenario: bio_cyanobacteria 的 predecessors
+
+**前提** bio_cyanobacteria 的 `predecessors: [{ref: bio_tailored, any: true}, {ref: bio_jumpstart, any: true}]` 且 `dependencies: null`
+
+**当** goal 生成处理 bio_cyanobacteria 且无任何完成项
+
+**那么** `bio_tailored` 与 `bio_jumpstart` 的 goal MUST 均被生成
+
+### Requirement: Goal MUST 检测现有 draft task
+
+Goal 生成 MUST 检查该 goal 的目标 project 是否已作为 draft task entry 存在于队列中。
+
+#### Scenario: Goal 已存在 task 但顺序错误
+
+**前提** task A 依赖 B，且 B 在 draft 队列中但排在 A 之后
+
+**当** goal 生成
+
+**那么** B 对应的 goal MUST 具有 `hasExistingTask: true` 且 `existingDraftEntryId` 设为 B 的 draft entry ID
+
+**并且** 该 goal MUST NOT 支持点击过滤（因为 task 已在队列中）
+
+**并且** 该 goal MUST 显示不同的视觉样式（sky 边框）
+
+**并且** 该 goal MUST 显示"移动到依赖项之前"按钮，可将 B 移至 A 之前
+
+### Requirement: Cluster goal MUST 处理 build_housing
+
+当 cluster 的目标 `objective.build_housing` 未达成时，MUST 生成 cluster root goal。
+
+#### Scenario: 未满足的 housing objective
+
+**前提** cluster 存在 `objective.build_housing` 且目标人口未达到
+
+**当** 生成 cluster root goals
+
+**那么** MUST 为 build_housing 生成 cluster goal，并使用已解析的 objective 标签文本
+
+### Requirement: Draft entry MUST 暴露 price 和 wares
+
+`TerraformingDraftTimelineEntry` MUST 包含 `price: number` 和 `wares: Array<{name: string, amount: number}>`，供 UI 显示。
+
+#### Scenario: Price 和 wares 可用
+
+**前提** draft 队列包含 project entries
+
+**当** draft replay 计算 display entries
+
+**那么** 每个 entry MUST 具有来自 `project.resources.price` 的 `price` 和本地化的 ware 名称

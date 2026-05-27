@@ -355,6 +355,73 @@
 
 **那么** 除 cluster 级匹配外，还需验证 HQ sector 的 `nameId` 与 objective 已解析的 `$LOCATION$` nameId 一致
 
+
+
+### Requirement: Task price MUST 在操作按钮前显示
+
+每个 task entry 在 task list 和 edit log 中 MUST 在操作按钮/输入框之前显示 material price。
+
+#### Scenario: Task list 中的 price
+
+**前提** task 的 `resources.price > 0`
+
+**当** task list 渲染 task node
+
+**那么** price 格式化为 `1,000,000 Cr` MUST 出现在 task-actions 区域的 toggle/input 左侧
+
+#### Scenario: Edit log 中的 price
+
+**前提** draft entry 的 price > 0
+
+**当** edit log 渲染 draft task entry
+
+**那么** price 格式化为 `1,000,000 Cr` MUST 出现在 draft-actions 区域的 remove/copy 按钮左侧
+
+### Requirement: Wares 信息图标与 tooltip
+
+一个带圆圈的 i 图标 MUST 出现在 price 之后，hover 时显示材料列表 tooltip。
+
+#### Scenario: Hover 显示 tooltip
+
+**前提** project 有 wares
+
+**当** 用户 hover ⓘ 图标
+
+**那么** 一个 tippy tooltip MUST 向上弹出（placement: top），显示：
+- 每个 ware 名称（i18n 翻译）和数量
+- flex 布局：ware 名称左对齐，数量右对齐
+
+**并且** price MUST NOT 在 tooltip 中重复显示
+
+### Requirement: Events MUST 可从 task list 拖拽
+
+Task list 中的 event tasks（group: 'events'）MUST 可拖拽至 edit log 队列。
+
+#### Scenario: Events 拖拽支持
+
+**前提** 编辑模式已激活，task list 有可见 events
+
+**当** events 区块渲染
+
+**那么** events MUST 被包裹在 draggable 中，使用与普通 task 相同的 group `terraforming-tasks` 和 clone 配置
+
+**并且** 每个 event card MUST 具有 `.drag-to-log` 手柄，位于 `task-actions` 中，位置与 TerraformingTaskNode 一致
+
+### Requirement: Drag-to-log 手柄 hover 样式
+
+Drag-to-log 手柄 MUST 具有 hover 和 grab 光标 CSS。
+
+#### Scenario: 手柄外观
+
+**前提** 编辑模式已激活
+
+**当** 用户 hover drag-to-log 手柄
+
+**那么** 光标 MUST 为 `grab`，文字颜色 MUST 变为浅色调
+
+**当** 用户正在拖拽
+
+**那么** 光标 MUST 为 `grabbing`
 ## MODIFIED Requirements
 
 ### Requirement: 星区面板 List/Item 双模式
