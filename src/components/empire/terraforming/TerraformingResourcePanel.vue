@@ -53,22 +53,35 @@ const panelContentRef = ref<HTMLElement | null>(null)
 const cancelValidationCache = ref<Record<string, TerraformingCancelValidation>>({})
 const isDragOver = ref(false)
 const dropTargetIndex = ref(-1)
+
+function getTaskDropIndex(pe: TerraformingGoalPlanDisplayEntry, listIndex: number): number {
+  // Convert plan-entry listIndex to draftExecutionLog index
+  // Count task entries before this position
+  let taskCount = 0
+  for (let i = 0; i < listIndex; i++) {
+    if (props.queueEditState.planEntries[i]?.type === 'task') taskCount++
+  }
+  if (pe.type === 'task') return taskCount + 1 // insert after this task
+  return taskCount // insert before the next task (at this goal's position)
+}
+
 let dragCounter = 0
 
 function onPanelDragOver(e: DragEvent) {
   e.preventDefault()
   isDragOver.value = true
   if (e.currentTarget instanceof HTMLElement) {
-    const entries = e.currentTarget.querySelectorAll('.draggable-insert-target')
+    const entries = e.currentTarget.querySelectorAll('[data-drop-index]')
     let closestIdx = -1
     let closestDist = Infinity
-    entries.forEach((el, i) => {
+    entries.forEach((el) => {
       const rect = el.getBoundingClientRect()
       const midY = rect.top + rect.height / 2
       const dist = Math.abs(e.clientY - midY)
-      if (dist < closestDist) {
+      const dropIdx = parseInt(el.getAttribute('data-drop-index') || '-1')
+      if (dropIdx >= 0 && dist < closestDist) {
         closestDist = dist
-        closestIdx = i
+        closestIdx = dropIdx
       }
     })
     dropTargetIndex.value = closestIdx
@@ -263,8 +276,11 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
       @dragleave="onPanelDragLeave"
       @drop="onPanelDrop"
     >
-      <div v-if="isDragOver" class="drop-placeholder">
-        {{ t('terraforming.dropToEnd') || 'Drop to insert task' }}
+      <div
+        v-if="isDragOver && queueEditState.planEntries.length === 0"
+        class="drop-placeholder"
+      >
+        ↧ Drop to add task
       </div>
       <div v-if="!selectedClusterId" class="empty-state">
         {{ t('terraforming.selectClusterForResources') }}
@@ -289,16 +305,17 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
           filter=".goal-entry"
           class="draggable-container"
         >
-          <template #item="{ element: planEntry }">
+          <template #item="{ element: planEntry, index: listIndex }">
             <div
+              :data-drop-index="getTaskDropIndex(planEntry, listIndex)"
               :class="planEntry.type === 'goal'
-                ? ['goal-entry', 'draggable-insert-target', {
+                ? ['goal-entry', {
                     'goal-filter-active': planEntry.entry.isFilterActive,
                     'goal-satisfied': planEntry.entry.satisfied,
                     'goal-unsatisfied': !planEntry.entry.satisfied,
                     'goal-has-risk': planEntry.entry.hasRisk,
                   }]
-                : ['timeline-item', 'draft-item', 'draggable-insert-target', {
+                : ['timeline-item', 'draft-item', {
                     'system-disabled': planEntry.entry.systemDisabled,
                   }]"
               @click="planEntry.type === 'goal' ? emit('clickGoal', planEntry.entry.id) : undefined"
