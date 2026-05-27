@@ -52,24 +52,16 @@ const expandedEntryId = ref<string | null>(null)
 const panelContentRef = ref<HTMLElement | null>(null)
 const cancelValidationCache = ref<Record<string, TerraformingCancelValidation>>({})
 const isDragOver = ref(false)
-let dragCounter = 0
 
-function onPanelDragEnter(e: DragEvent) {
-  e.preventDefault()
-  dragCounter++
+function onPanelDragOver() {
   isDragOver.value = true
 }
 
 function onPanelDragLeave() {
-  dragCounter--
-  if (dragCounter <= 0) {
-    dragCounter = 0
-    isDragOver.value = false
-  }
+  isDragOver.value = false
 }
 
 function onPanelDrop(e: DragEvent) {
-  dragCounter = 0
   isDragOver.value = false
   const projectId = e.dataTransfer?.getData('terraforming-project-id')
   if (projectId) emit('dropTask', projectId)
@@ -197,16 +189,12 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
 </script>
 
 <template>
-  <div class="panel-card" :class="{ 'panel-floating': floating }">
+  <div class="panel-card" :class="{ 'panel-floating': floating, 'drag-target': isDragOver }">
     <div
       class="panel-header"
       :class="{ 'drag-over': isDragOver }"
-      @dragover.prevent
-      @dragenter="onPanelDragEnter"
-      @dragleave="onPanelDragLeave"
-      @drop="onPanelDrop"
     >
-      <span v-if="isDragOver" class="drop-hint">{{ t('terraforming.dropToEnd') || 'Drop here' }}</span>
+      <span v-if="isDragOver" class="drop-hint">↧ {{ t('terraforming.dropToEnd') || 'Drop here' }}</span>
       <span v-else>{{ t('terraforming.taskQueue') }}</span>
       <span v-if="showNoDockWarning" class="text-amber-400 text-[11px] ml-2">⚠ {{ t('terraforming.noBuildDock') }}</span>
       <span v-if="queueEditState.editing && queueEditState.unsatisfiedGoalCount > 0" class="text-red-400 text-[11px] ml-2">
@@ -234,7 +222,17 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
         </div>
       </template>
     </div>
-    <div ref="panelContentRef" class="panel-content">
+    <div
+      ref="panelContentRef"
+      class="panel-content"
+      @dragover.prevent="onPanelDragOver"
+      @dragenter.prevent="onPanelDragOver"
+      @dragleave="onPanelDragLeave"
+      @drop="onPanelDrop"
+    >
+      <div v-if="isDragOver" class="drop-placeholder">
+        {{ t('terraforming.dropToEnd') || 'Drop task here to add' }}
+      </div>
       <div v-if="!selectedClusterId" class="empty-state">
         {{ t('terraforming.selectClusterForResources') }}
       </div>
@@ -488,7 +486,11 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
 
 <style scoped>
 .panel-card {
-  @apply bg-slate-900/40 rounded-lg border border-slate-800 shadow-xl overflow-hidden;
+  @apply bg-slate-900/40 rounded-lg border border-slate-800 shadow-xl overflow-hidden transition-colors;
+}
+
+.panel-card.drag-target {
+  @apply border-sky-500/60;
 }
 
 .panel-card.panel-floating {
@@ -514,6 +516,11 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
 
 .panel-content {
   @apply p-3 flex flex-col gap-2;
+}
+
+.drop-placeholder {
+  @apply border-2 border-dashed border-sky-500/60 rounded-lg py-6 text-center;
+  @apply text-sky-300 text-sm bg-sky-950/20;
 }
 
 .panel-floating .panel-content {
