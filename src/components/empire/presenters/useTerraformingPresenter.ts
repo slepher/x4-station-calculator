@@ -1956,7 +1956,18 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
         }
       }
 
+      // Skip user-added event entries that were already auto-generated
+      if (entry.projectId.startsWith('evt_')) {
+        if (insertedEventIds.has(entry.projectId)) continue
+        insertedEventIds.add(entry.projectId)
+      }
+
       pushTaskEntry(entry, index)
+
+      // Mark user-added events as inserted to prevent auto-duplication
+      if (entry.projectId.startsWith('evt_')) {
+        insertedEventIds.add(entry.projectId)
+      }
 
       if (!eventBlocked) {
         const stats = computeTerraformingRuntimeStats(c, completedProjects, d)

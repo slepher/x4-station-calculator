@@ -155,6 +155,8 @@ describe('terraforming event timing — FrontierEdge', () => {
     p.emits.appendDraftTask('ame_resort_winter')
 
     const planEntries = p.props.resourcePanel.queueEditState.planEntries.value
+    const flow = planEntries.filter(e => e.type !== 'goal').map(e => ({ type: e.type, pid: e.entry.projectId }))
+    console.log('task+event flow:', JSON.stringify(flow, null, 2))
     const statGoalIds = planEntries
       .filter(e => e.type === 'goal' && e.entry.kind === 'stat')
       .map(e => e.entry.statGoalModel?.statId)
