@@ -135,3 +135,33 @@ describe('terraforming event timing — OceanOfFantasy', () => {
     expect(si).toBeLessThan(vi)
   })
 })
+
+describe('terraforming event timing — FrontierEdge', () => {
+  beforeEach(async () => { setActivePinia(createPinia()); const { useGameDataStore } = await import('@/store/useGameDataStore'); const g = useGameDataStore(); g.waresMap = {} as any; g.moduleGroupNames = {} as any; g.localizedModulesMap = {} as any; g.modulesMap = {} as any; g.wareNames = computed(() => new Map()) })
+
+  it('edit mode: no airpressure stat goal', () => {
+    const cluster = findCluster('FrontierEdge')
+    const { store } = makeStore(cluster)
+    const p = useTerraformingPresenter(store)
+    p.emits.startQueueEdit()
+
+    p.emits.appendDraftTask('ter_tectonic_scaffolding')
+    p.emits.appendDraftTask('tmp_blackdust')
+    p.emits.appendDraftTask('evt_icemelt')
+    p.emits.appendDraftTask('bio_tailored')
+    p.emits.appendDraftTask('agr_fertilize')
+    p.emits.appendDraftTask('agr_fields_wheat')
+    p.emits.appendDraftTask('agr_forestation')
+    p.emits.appendDraftTask('ame_resort_winter')
+
+    const planEntries = p.props.resourcePanel.queueEditState.planEntries.value
+    const statGoalIds = planEntries
+      .filter(e => e.type === 'goal' && e.entry.kind === 'stat')
+      .map(e => e.entry.statGoalModel?.statId)
+
+    // Should not have airpressure stat goal
+    console.log('statGoalIds:', statGoalIds); expect(statGoalIds.filter(s => s === 'airpressure')).toEqual([])
+    // Should have population stat goal (housing)
+    expect(statGoalIds.filter(s => s === 'population').length).toBeGreaterThan(0)
+  })
+})

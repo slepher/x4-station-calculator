@@ -1460,6 +1460,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     statNames: Map<string, string>,
     initialStats: Record<string, number>,
     finalStats?: Record<string, number>,
+    cumulativeStateAt?: Array<{ stats: Record<string, number> }>,
   ): TerraformingGoalEntry[] {
     let goalSeq = 0
     const nextGoalId = () => `goal-${++goalSeq}`
@@ -1481,24 +1482,28 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     const projectGoalCandidates = new Map<string, CandidateGoal>()
     const statGoalCandidates = new Map<string, CandidateGoal & { statCondition: StatCondition }>()
 
-    for (const entry of draftEntries) {
+    for (let entryIdx = 0; entryIdx < draftEntries.length; entryIdx++) {
+      const entry = draftEntries[entryIdx]!
       if (entry.systemDisabled) continue
       const project = pmap.get(entry.projectId)
       if (!project) continue
 
       const lastCumulativeCompleted = new Map(cumulativeCompleted)
 
+      // Use cumulativeStateAt (main replay includes auto-events) for stat condition checking
+      const checkStats = (cumulativeStateAt && cumulativeStateAt[entryIdx]) ? cumulativeStateAt[entryIdx]!.stats : cumulativeStats
+
       // Check project's stat conditions met by cumulative state BEFORE this entry
       for (let ci = 0; ci < project.conditions.length; ci++) {
         const condition = project.conditions[ci]!
-        if (!isStatInRuntime(cumulativeStats, condition.stat)) continue
-        if (!checkStatConditionMet(condition, cumulativeStats, data.stats)) {
+        if (!isStatInRuntime(checkStats, condition.stat)) continue
+        if (!checkStatConditionMet(condition, checkStats, data.stats)) {
           // Compute targetValue for dedup key
           const statDef = data.stats.find(s => s.id === condition.stat)
           let tv = 0
           if (statDef) {
             const mode = getConditionMode(condition, statDef)
-            const cv = cumulativeStats[condition.stat] ?? 0
+            const cv = checkStats[condition.stat] ?? 0
             if (mode === 'value-range') {
               if (condition.minvalue !== undefined && cv < condition.minvalue) tv = condition.minvalue
               else if (condition.maxvalue !== undefined && cv > condition.maxvalue) tv = condition.maxvalue
@@ -1800,11 +1805,12 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
   function computePlanDraftEntries(): {
     replayEntries: TerraformingDraftTimelineEntry[]
     goals: TerraformingGoalEntry[]
+    cumulativeStateAt: Array<{ stats: Record<string, number> }>
   } {
     const data = store.terraformingData.value
     const cluster = store.terraformingSelectedCluster.value
     const entries: TerraformingDraftTimelineEntry[] = []
-    if (!data || !cluster) return { replayEntries: entries, goals: [] }
+    if (!data || !cluster) return { replayEntries: entries, goals: [], cumulativeStateAt: [] }
 
     const c = cluster
     const d = data
@@ -1822,6 +1828,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     const blockedStatIds = new Set<string>()
     const insertedEventIds = new Set<string>()
     let orderSeq = 0
+    const cumulativeStateAt: Array<{ stats: Record<string, number> }> = []
 
     function pushTaskEntry(entry: TerraformingDraftExecutionEntry, index: number) {
       const project = pmap.get(entry.projectId)
@@ -1938,6 +1945,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
       const entry = draftExecutionLog.value[index]!
       const project = pmap.get(entry.projectId)
       const preStats = computeTerraformingRuntimeStats(c, completedProjects, data)
+      cumulativeStateAt.push({ stats: { ...preStats } })
 
       if (!eventBlocked && project && index > 0) {
         for (const cond of project.conditions) {
@@ -1985,13 +1993,14 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
       statNames,
       computeTerraformingRuntimeStats(cluster, new Map(), data),
       endStats,
+      cumulativeStateAt,
     )
 
-    return { replayEntries: entries, goals }
+    return { replayEntries: entries, goals, cumulativeStateAt }
   }
 
   const combinedReplayResult = computed(() => {
-    if (!isQueueEditing.value) return { replayEntries: [] as TerraformingDraftTimelineEntry[], goals: [] as TerraformingGoalEntry[] }
+    if (!isQueueEditing.value) return { replayEntries: [] as TerraformingDraftTimelineEntry[], goals: [] as TerraformingGoalEntry[], cumulativeStateAt: [] as Array<{ stats: Record<string, number> }> }
     return computePlanDraftEntries()
   })
 
@@ -2691,20 +2700,31 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
 
     if (!data || !cluster) return map
 
-    let cumulativeCompleted = new Map<string, number>()
-    let cumulativeStats = computeTerraformingRuntimeStats(cluster, cumulativeCompleted, data)
+    // Use cumulative state from main replay (includes auto-events)
+    const replayState = combinedReplayResult.value.cumulativeStateAt
 
-    // Pre-compute cumulative state at each entry index
+    // Pre-compute cumulative state at each entry index (fallback for non-edit mode)
     const cumulativeStateAt: Array<{ completed: Map<string, number>; stats: Record<string, number> }> = []
-    for (let i = 0; i < draftExecutionLog.value.length; i++) {
-      const entry = draftExecutionLog.value[i]!
-      cumulativeStateAt.push({
-        completed: new Map(cumulativeCompleted),
-        stats: { ...cumulativeStats },
-      })
-      if (!entry.systemDisabled) {
-        cumulativeCompleted.set(entry.projectId, (cumulativeCompleted.get(entry.projectId) ?? 0) + 1)
-        cumulativeStats = computeTerraformingRuntimeStats(cluster, cumulativeCompleted, data)
+    if (replayState.length > 0) {
+      for (let i = 0; i < replayState.length; i++) {
+        cumulativeStateAt.push({
+          completed: new Map(),  // not needed for stat goal models
+          stats: { ...replayState[i]!.stats },
+        })
+      }
+    } else {
+      let cumulativeCompleted = new Map<string, number>()
+      let cumulativeStats = computeTerraformingRuntimeStats(cluster, cumulativeCompleted, data)
+      for (let i = 0; i < draftExecutionLog.value.length; i++) {
+        const entry = draftExecutionLog.value[i]!
+        cumulativeStateAt.push({
+          completed: new Map(cumulativeCompleted),
+          stats: { ...cumulativeStats },
+        })
+        if (!entry.systemDisabled) {
+          cumulativeCompleted.set(entry.projectId, (cumulativeCompleted.get(entry.projectId) ?? 0) + 1)
+          cumulativeStats = computeTerraformingRuntimeStats(cluster, cumulativeCompleted, data)
+        }
       }
     }
 
@@ -2717,7 +2737,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
       // Get cumulative state at goal's position
       const pos = Math.min(goal.position, cumulativeStateAt.length)
       const stateAt = goal.kind === 'preventive'
-        ? { completed: cumulativeCompleted, stats: { ...cumulativeStats } }
+        ? { completed: new Map<string, number>(), stats: replayState.length > 0 && replayState[replayState.length - 1] ? replayState[replayState.length - 1]!.stats : computeTerraformingRuntimeStats(cluster, new Map(), data) }
         : pos > 0 ? cumulativeStateAt[pos - 1]! : { completed: new Map<string, number>(), stats: computeTerraformingRuntimeStats(cluster, new Map(), data) }
       const currentValue = stateAt.stats[goal.targetStatId] ?? 0
       const ranges = toScaleRanges(statDef)
