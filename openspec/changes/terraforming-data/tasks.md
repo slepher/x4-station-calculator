@@ -128,3 +128,12 @@
 - [x] 15.5 验证 `AtiyasMisfortune`、`OceanOfFantasy`、`GetsuFune` 三类 cluster 的 ignore / warming / dynamic rules 均可被消费方识别
 - [x] 15.6 `parse_md.py`: 解析 cluster cue / patch 中的 `remove_terraforming_stat`，输出 `removedStats`
 - [x] 15.7 runtime 消费方将 `removedStats` 与 `Ignore*` 合并，统一视为 stat 不存在
+
+## 16. Cluster 奖励提取
+
+- [x] 16.1 `parse_md.py`: 新增 `_extract_cluster_rewards(cue)` — 遍历子 cue 提取 milestone/completion 中的 faction、blueprint、NPC 奖励
+- [x] 16.2 `parse_md.py`: 新增 `_extract_reward_actions()` — 解析单个 milestone cue 的 `<actions>` + `<patch>` 中的奖励动作
+- [x] 16.3 `parse_md.py`: 新增 `_resolve_npc_nameid()` — 从 `create_cue_actor` 映射 actor 变量到 locale nameId
+- [x] 16.4 `build.py`: 新增 `_build_cluster_rewards()` — 将 raw reward 数据转为最终 `factionRewards` / `rewards` 字段，nameId 加入 i18n_collector
+- [x] 16.5 重建 `terraforming.json`（8.0 和 9.0 版本）
+- [x] 16.6 TypeScript 类型: `TerraformingFactionReward`, `TerraformingClusterRewardItem`, 扩展 `TerraformingCluster`

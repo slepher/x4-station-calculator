@@ -459,3 +459,41 @@ evt_salinization: salinity≤2, humidity≥2 → salinity+1
 - `terraformingRuntime.ts` 删除 `getRuntimeTerraformingProjectIds` 和相关逻辑
 - 任务树构建直接使用 `cluster.taskProjectIds`
 - 不再有"动态增删 project"的行为——所有 project 对 cluster 要么始终可见，要么始终不可见
+
+### Cluster 奖励提取
+
+从 MD XML 的 milestone / MissionComplete cues 中提取奖励数据：
+
+#### 提取源
+
+- `_Milestone_N` 子 cue 或 `_MissionComplete` 子 cue 的 `<actions>` + `<patch>`
+
+#### 提取动作
+
+| MD 动作 | 输出字段 | 语义 |
+|--------|---------|------|
+| `add_faction_relation` | `factionRewards[].type="add"` | 关系叠加 |
+| `set_faction_relation` + `friend` | `factionRewards[].type="unlock"` | 关系解锁（SCA 专属） |
+| `add_blueprints wares="..."` | `rewards[].type="blueprint"` | 蓝图奖励 |
+| `add_actor_to_room` + `set_owner faction.player` | `rewards[].type="npc"` | NPC 加入 HQ |
+
+#### 数据结构
+
+```json
+{
+  "factionRewards": [
+    { "faction": "scaleplate", "type": "unlock", "milestone": 1 },
+    { "faction": "antigone", "type": "add", "value": 0.1, "milestone": 2 },
+    { "faction": "argon", "type": "add", "value": 0.1, "milestone": "complete" }
+  ],
+  "rewards": [
+    { "type": "blueprint", "id": "welfare_bor_artacademy_01", "milestone": "complete" },
+    { "type": "npc", "nameId": "{30507,102}", "milestone": "complete" }
+  ]
+}
+```
+
+- `milestone`: `1 | 2 | ... | "complete"`
+- `type="unlock"` 表示该 milestone 后 faction 关系从锁定变为 friend
+- NPC 名称从 `create_cue_actor` 映射到 locale nameId
+- 蓝图 `id` 对应 modules.json 中 module ID，前端通过 gameData 查找翻译

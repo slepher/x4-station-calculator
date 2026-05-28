@@ -390,6 +390,46 @@ LiveProductionWorkbenchView
 - `terraforming.mutuallyExclusive` i18n: "互斥" / "Mutually exclusive"
 - 不要让效果区回退为散落的文字渲染
 
+## 补充 — 星区奖励显示
+
+### 数据来源
+
+- `terraforming-data` change 在 cluster 数据中输出了 `factionRewards` 和 `rewards` 字段
+- `useTerraformingPresenter.clusterRewardDisplays` computed 将结构化奖励转为展示文本
+
+### 展示规则
+
+- 在 SectorPanel item 模式 Objectives 下方新增 Rewards section
+- Faction 名称通过 `gameDataStore.factions` → nameId → i18n 解析
+- Blueprint 名称通过 `gameDataStore.modulesMap[moduleId]` 查找 `localeName` / `name`
+- NPC 名称通过 `vI18nLookup(nameId)` 解析
+- 仅当 `clusterRewardDisplays.length > 0` 时显示 Rewards section
+
+### 里程碑标签
+
+| milestone 值 | 标签 |
+|-------------|------|
+| 1, 2, ... | `M1`, `M2`, ... |
+| `"complete"` | `◆` |
+
+### 布局
+
+```
+┌─ Objectives ──────────────────────┐
+│ 1. [relocate] Relocate HQ   ✅   │
+│ 2. [neutralize] Radiation   ⬜   │
+└───────────────────────────────────┘
+┌─ Rewards ─────────────────────────┐
+│ M1  SCA 声望解锁                  │
+│ M2  ANT +0.1                     │
+│ ◆   蓝图: Pheromone Art Gallery   │
+│ ◆   Menika Giorno 加入 HQ         │
+└───────────────────────────────────┘
+┌─ Stats ───────────────────────────┐
+│ ...                               │
+└───────────────────────────────────┘
+```
+
 ## 补充 — 材料价格显示
 
 - `TerraformingTaskNode` 和 `TerraformingResourcePanel` draft entry 中在操作按钮前显示 `price.toLocaleString() Cr`。

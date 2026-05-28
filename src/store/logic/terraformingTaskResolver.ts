@@ -39,6 +39,23 @@ export interface TerraformingCluster {
   objectives?: ClusterObjective[]
   values?: Record<string, string>
   variableTexts?: Record<string, { source: string; replaces: Array<{ from: string; to: string }> }>
+  factionRewards?: TerraformingFactionReward[]
+  rewards?: TerraformingClusterRewardItem[]
+}
+
+export interface TerraformingFactionReward {
+  faction: string
+  type: 'add' | 'unlock'
+  value?: number
+  milestone: number | 'complete'
+  conditionLabel: string
+}
+
+export interface TerraformingClusterRewardItem {
+  type: 'blueprint' | 'npc'
+  id?: string
+  nameId?: string
+  milestone: number | 'complete'
 }
 
 export interface ClusterObjective {

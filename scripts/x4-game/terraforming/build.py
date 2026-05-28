@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from scripts.x4_data_processor import X4PrecisionLoader  # type: ignore
 
 from .parse_library import parse_stats, parse_project_groups, parse_projects
-from .parse_md import parse_md, resolve_cluster_objective_texts
+from .parse_md import parse_md, resolve_cluster_objective_texts, _extract_cluster_rewards
 
 
 DependencyExpr = Dict[str, Any]
@@ -463,6 +463,70 @@ def _build_library_descriptions(
             proj["descriptions"] = descs
 
 
+def _merge_dlc_cluster_rewards(
+    clusters: List[Dict[str, Any]],
+    raw_path: str,
+    ware_index: dict,
+    i18n_collector: set,
+) -> None:
+    """Parse DLC MD files and merge reward data into existing clusters."""
+    cluster_map = {c["id"]: c for c in clusters}
+
+    md_dir = os.path.join(raw_path, "md", "terraforming")
+    dlc_files = ["dlc_boron.xml", "dlc_terran.xml", "dlc_split.xml", "dlc_pirate.xml"]
+    for dlc_file in dlc_files:
+        dlc_path = os.path.join(md_dir, dlc_file)
+        if not os.path.exists(dlc_path):
+            continue
+        try:
+            dlc_tree = ET.parse(dlc_path)
+            dlc_root = dlc_tree.getroot()
+            for cue in dlc_root.findall(".//cue"):
+                name = cue.get("name", "")
+                if not name.startswith("Terraforming_"):
+                    continue
+                cluster_id = name.replace("Terraforming_", "")
+                if "_" in cluster_id:
+                    cluster_id = cluster_id.rsplit("_", 1)[0]
+                if cluster_id not in cluster_map:
+                    continue
+                dlc_rewards = _extract_cluster_rewards(cue)
+                cluster = cluster_map[cluster_id]
+                if dlc_rewards.get("blueprintWares"):
+                    existing = cluster.setdefault("blueprintWares", [])
+                    existing.extend(dlc_rewards["blueprintWares"])
+                if dlc_rewards.get("npcNameIds"):
+                    existing = cluster.setdefault("npcNameIds", [])
+                    existing.extend(dlc_rewards["npcNameIds"])
+        except Exception:
+            pass
+
+
+def _build_cluster_rewards(
+    cluster: Dict[str, Any],
+    ware_index: dict,
+    i18n_collector: set,
+) -> None:
+    """Build the rewards array from extracted reward data and resolve nameIds."""
+    rewards: List[Dict[str, Any]] = []
+
+    for npc in cluster.pop("npcNameIds", []):
+        nid = npc.get("nameId")
+        if nid:
+            i18n_collector.add(nid)
+            rewards.append({"type": "npc", "nameId": nid, "milestone": npc["milestone"]})
+
+    for bw in cluster.pop("blueprintWares", []):
+        ware_id = bw["ware"].replace("ware.", "")
+        if ware_id and not any(r.get("id") == ware_id and r.get("type") == "blueprint" for r in rewards):
+            rewards.append({"type": "blueprint", "id": ware_id, "milestone": bw["milestone"]})
+
+    cluster.pop("rewardNameIds", None)
+
+    if rewards:
+        cluster["rewards"] = rewards
+
+
 def build_terraforming_data(
     raw_path: str,
     component_to_ware: dict,
@@ -520,6 +584,10 @@ def build_terraforming_data(
             raise e
 
     clusters = [c for c in clusters if len(c.get("projectIds", [])) > 0]
+
+    # Resolve blueprint nameIds from ware_index and build rewards array
+    for cluster in clusters:
+        _build_cluster_rewards(cluster, ware_index, i18n_collector)
 
     cluster_name_map = _load_cluster_name_ids(raw_path)
 

@@ -5,6 +5,7 @@ import type { TerraformingCluster } from '@/store/logic/terraformingTaskResolver
 import type {
   TerraformingConditionScaleModel,
   TerraformingStatScaleModel,
+  TerraformingRewardDisplayItem,
 } from '@/components/empire/presenters/useTerraformingPresenter'
 import TerraformingStatScale from '@/components/empire/terraforming/TerraformingStatScale.vue'
 
@@ -26,6 +27,7 @@ interface Props {
   currentStats: Record<string, number>
   statDisplayNames: Map<string, string>
   activeRebates: string[]
+  clusterRewardDisplays: TerraformingRewardDisplayItem[]
   floating: boolean
 }
 
@@ -145,6 +147,19 @@ function formatPartName(partName: string): string {
                 {{ obj.completed ? '✅' : '⬜' }}
               </span>
             </div>
+          </div>
+        </div>
+
+        <!-- Rewards -->
+        <div v-if="clusterRewardDisplays.length > 0" class="section-block">
+          <div class="section-title">{{ t('terraforming.rewardsTitle') }}</div>
+          <div
+            v-for="(rw, i) in clusterRewardDisplays"
+            :key="`reward-${i}`"
+            class="reward-row"
+          >
+            <span class="reward-milestone">{{ rw.milestone }}</span>
+            <span class="reward-text">{{ rw.text }}</span>
           </div>
         </div>
 
@@ -296,5 +311,18 @@ function formatPartName(partName: string): string {
 
 .effect-list-item {
   @apply rounded border px-2 py-1.5 text-xs border-emerald-700/40 bg-emerald-950/20 text-emerald-400;
+}
+
+.reward-row {
+  @apply flex items-center gap-2 py-0.5 text-xs;
+}
+
+.reward-milestone {
+  @apply text-amber-400 font-mono flex-shrink-0;
+  min-width: 5rem;
+}
+
+.reward-text {
+  @apply text-slate-300;
 }
 </style>

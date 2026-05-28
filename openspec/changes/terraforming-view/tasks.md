@@ -131,3 +131,14 @@
 ## I18n 新增
 
 - [x] `terraforming.backToList` / `terraforming.statsTitle` / `terraforming.rebatesTitle`
+- [x] `terraforming.rewardsTitle`
+
+## 星区奖励显示
+
+- [x] `useTerraformingPresenter`: 新增 `TerraformingRewardDisplayItem` 类型
+- [x] `useTerraformingPresenter`: 新增 `clusterRewardDisplays` computed — 将 factionRewards + rewards 转为展示文本
+- [x] `useTerraformingPresenter`: Faction 名称通过 `gameDataStore.factions` → nameId → i18n 解析
+- [x] `useTerraformingPresenter`: Blueprint 名称通过 `gameDataStore.modulesMap` 查找
+- [x] `useTerraformingPresenter`: NPC 名称通过 `vI18nLookup(nameId)` 解析
+- [x] `TerraformingSectorPanel`: 在 Objectives 下方新增 Rewards section，仅当有奖励时显示
+- [x] `LiveProductionWorkbenchView`: 透传 `clusterRewardDisplays` prop

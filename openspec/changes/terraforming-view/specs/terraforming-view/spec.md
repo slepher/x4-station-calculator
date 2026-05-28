@@ -567,6 +567,32 @@ Mutually exclusive dependency labels SHALL use exclusionary wording.
 
 **那么** 中文显示"互斥: 项目名"，英文显示 "Mutually exclusive: ProjectName"
 
+### Requirement: 星区奖励显示
+
+SectorPanel item 模式 MUST 在 Objectives 下方显示 Rewards section。
+
+#### Scenario: Cluster 有奖励
+
+**前提** 已选中星区且 `cluster.factionRewards` 或 `cluster.rewards` 非空
+
+**当** SectorPanel 处于 item 模式
+
+**那么** MUST 在 Objectives 和 Stats 之间显示 Rewards section
+
+**并且** 每个 faction 奖励显示为 `M{n} 势力名 +/-数值` 或 `M{n} 势力名 声望解锁`
+
+**并且** 每个 blueprint 奖励显示为 `◆ 蓝图: 模块名`（模块名从 gameDataStore.modulesMap 获取）
+
+**并且** 每个 NPC 奖励显示为 `◆ {NPC名} 加入 HQ`（名称经 i18n 翻译）
+
+#### Scenario: Cluster 无奖励
+
+**前提** 已选中星区但 `factionRewards` 和 `rewards` 均为空或不存在
+
+**当** SectorPanel 处于 item 模式
+
+**那么** MUST NOT 显示 Rewards section
+
 ### Requirement: 三栏布局始终可见
 
 The three-column layout SHALL persist regardless of display mode.

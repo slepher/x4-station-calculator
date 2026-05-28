@@ -46,6 +46,15 @@ def parse_md(root: ET.Element) -> Tuple[List[Dict[str, Any]], Dict[str, List[Dic
         if cluster:
             cluster["objectives"] = _extract_objectives(cue)
             cluster["variableTexts"] = _extract_variable_texts(cue)
+            cluster_rewards = _extract_cluster_rewards(cue)
+            if cluster_rewards["factionRewards"]:
+                cluster["factionRewards"] = cluster_rewards["factionRewards"]
+            if cluster_rewards["rewardNameIds"]:
+                cluster["rewardNameIds"] = cluster_rewards["rewardNameIds"]
+            if cluster_rewards["blueprintWares"]:
+                cluster["blueprintWares"] = cluster_rewards["blueprintWares"]
+            if cluster_rewards["npcNameIds"]:
+                cluster["npcNameIds"] = cluster_rewards["npcNameIds"]
             clusters.append(cluster)
 
     # Merge global predecessors into the map (library-level predecessors)
@@ -879,6 +888,163 @@ def _extract_primary_recruitment_skill(actions: ET.Element) -> str:
         return ""
     primary = max(skills.keys(), key=lambda k: skills[k]["max"])
     return _skill_type_to_name(primary)
+
+
+def _clean_faction(faction: str) -> str:
+    """Remove 'faction.' prefix from faction identifier."""
+    return faction.replace("faction.", "")
+
+
+def _is_player_owner(actions_elem: ET.Element, actor_var: str) -> bool:
+    """Check if set_owner action exists in the element for the given actor to faction.player."""
+    for elem in actions_elem.iter("set_owner"):
+        obj = elem.get("object", "")
+        fac = elem.get("faction", "")
+        if obj == actor_var and "faction.player" in fac:
+            return True
+    return False
+
+
+def _milestone_condition_label(sub_cue: ET.Element) -> str:
+    """Extract a human-readable condition label from a milestone cue's conditions."""
+    conds = sub_cue.find("conditions")
+    if conds is None:
+        return ""
+
+    text = ET.tostring(conds, encoding="unicode")
+
+    if "event_terraforming_stat_changed" in text:
+        if "habitable" in text:
+            return "habitable"
+        if "population" in text:
+            return "population"
+        if "temperature" in text:
+            return "temperature_improved"
+        if "toxicity" in text:
+            return "stat_changed"
+        return "stat_changed"
+
+    if "event_terraforming_project_succeeded" in text:
+        return "first_project"
+
+    if "event_terraforming_project_completed" in text:
+        return "basic_projects"
+
+    return ""
+
+
+def _extract_reward_actions(
+    elem: ET.Element,
+    milestone,
+    faction_rewards: list,
+    blueprint_wares: list,
+    npc_name_ids: list,
+    cast_map: dict,
+    condition_label: str = "",
+):
+    """Extract reward actions from a single milestone/completion element."""
+    label = condition_label
+    if milestone == "complete":
+        label = "mission_complete"
+    actions = elem
+    if elem.tag in ("cue", "patch"):
+        actions = elem.find("actions")
+    if actions is None:
+        return
+
+    for action in actions.iter():
+        tag = action.tag
+        if tag == "add_faction_relation":
+            faction = _clean_faction(action.get("faction", ""))
+            val_str = action.get("value", "0")
+            try:
+                val = float(val_str)
+                faction_rewards.append({"faction": faction, "type": "add", "value": val, "milestone": milestone, "conditionLabel": label})
+            except ValueError:
+                pass
+        elif tag == "set_faction_relation":
+            faction = _clean_faction(action.get("faction", ""))
+            val_str = action.get("value", "")
+            if "friend" in val_str.lower():
+                faction_rewards.append({"faction": faction, "type": "unlock", "milestone": milestone, "conditionLabel": label})
+        elif tag == "add_blueprints":
+            wares = action.get("wares", "")
+            if wares:
+                for w in wares.strip().split():
+                    w = w.strip().lstrip("[")
+                    if w.startswith("ware."):
+                        blueprint_wares.append({"ware": w, "milestone": milestone, "conditionLabel": label})
+        elif tag == "add_actor_to_room":
+            actor_var = action.get("actor", "")
+            if actor_var and actor_var in cast_map and _is_player_owner(actions, actor_var):
+                name_id = cast_map[actor_var]
+                npc_name_ids.append({"nameId": name_id, "milestone": milestone, "conditionLabel": label})
+
+
+def _resolve_npc_nameid(cue: ET.Element, actor_var: str) -> Optional[str]:
+    """Resolve NPC nameId from the cluster's mission page cast section.
+
+    Uses a hardcoded mapping based on known terraforming NPC rewards.
+    """
+    cluster_name = cue.get("name", "")
+    if "_BlackHoleSun" in cluster_name and "Contact_1" in actor_var:
+        return "{30507,102}"
+    return None
+
+
+def _extract_cluster_rewards(cue: ET.Element) -> Dict[str, Any]:
+    """Extract faction rewards, blueprints, and NPC rewards from milestone/completion cues."""
+    faction_rewards: List[Dict[str, Any]] = []
+    blueprint_wares: List[Dict[str, Any]] = []
+    npc_name_ids: List[Dict[str, Any]] = []
+    cast_map: Dict[str, str] = {}
+
+    for cca in cue.iter("create_cue_actor"):
+        actor_name = cca.get("name", "")
+        if actor_name and actor_name.startswith("$"):
+            npc = _resolve_npc_nameid(cue, actor_name)
+            if npc:
+                cast_map[actor_name] = npc
+
+    sub_cues = cue.find("cues")
+    if sub_cues is None:
+        return {"factionRewards": [], "blueprintWares": [], "npcNameIds": [], "rewardNameIds": []}
+
+    for sub_cue in sub_cues:
+        sub_name = sub_cue.get("name", "")
+        if sub_name is None:
+            continue
+
+        milestone = None
+        if "_Milestone_" in sub_name:
+            parts = sub_name.split("_")
+            for p in reversed(parts):
+                if p.isdigit():
+                    milestone = int(p)
+                    break
+        elif sub_name.endswith("_MissionComplete"):
+            milestone = "complete"
+
+        if milestone is None:
+            continue
+
+        cond_label = _milestone_condition_label(sub_cue)
+        _extract_reward_actions(sub_cue, milestone, faction_rewards, blueprint_wares, npc_name_ids, cast_map, cond_label)
+
+        for patch in sub_cue.findall("patch"):
+            _extract_reward_actions(patch, milestone, faction_rewards, blueprint_wares, npc_name_ids, cast_map)
+
+    reward_name_ids: List[str] = []
+    for npc in npc_name_ids:
+        if npc["nameId"]:
+            reward_name_ids.append(npc["nameId"])
+
+    return {
+        "factionRewards": faction_rewards,
+        "blueprintWares": blueprint_wares,
+        "npcNameIds": npc_name_ids,
+        "rewardNameIds": reward_name_ids,
+    }
 
 
 def _int_or(val: Optional[str], default: Optional[int] = None) -> Optional[int]:

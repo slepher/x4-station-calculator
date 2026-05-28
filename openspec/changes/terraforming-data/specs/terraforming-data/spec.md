@@ -309,3 +309,29 @@ Cluster 数据 MUST 在生成时预计算 `taskProjectIds` — 该 planet 为"�
 **那么** MUST 使用 `cluster.taskProjectIds` 作为 project 候选集合
 
 **并且** MUST NOT 在运行时根据 `currentStats` 或 `completedProjects` 动态增删 project
+
+### Requirement: Cluster 奖励提取
+
+Cluster 数据 MUST 包含 `factionRewards` 和 `rewards` 字段，从 MD XML 的 milestone / MissionComplete cues 中提取。
+
+#### Scenario: Faction 关系奖励
+
+**前提** MD 中某 milestone cue 包含 `add_faction_relation` 或 `set_faction_relation`
+
+**当** parse_md 解析该 cue
+
+**那么** `factionRewards[]` 中 MUST 包含对应条目，`type` 为 `"add"` 或 `"unlock"`
+
+**并且** `milestone` 字段标识所属阶段（`1 | 2 | "complete"`）
+
+#### Scenario: Blueprint/NPC 奖励
+
+**前提** MD 中某 completion cue 包含 `add_blueprints` 或 `add_actor_to_room` + `set_owner faction.player`
+
+**当** build.py 构建 cluster 数据
+
+**那么** `rewards[]` 中 MUST 包含对应条目：
+- blueprint: `{ type: "blueprint", id: "<module_id>", milestone: "complete" }`
+- npc: `{ type: "npc", nameId: "<locale_key>", milestone: "complete" }`
+
+**并且** NPC 的 nameId MUST 加入 i18n_collector 管线

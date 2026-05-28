@@ -273,6 +273,7 @@ function toggleStatFilter(statId: string) {
         :current-stats="terraformingPresenter.props.sectorPanel.currentStats.value"
         :stat-display-names="terraformingPresenter.props.sectorPanel.statDisplayNames.value"
         :active-rebates="terraformingPresenter.props.sectorPanel.activeRebates.value"
+        :cluster-reward-displays="terraformingPresenter.props.sectorPanel.clusterRewardDisplays.value"
         :floating="terraformingFloating.sectorPanel"
         @click-stat="toggleStatFilter"
         @select-cluster="terraformingPresenter.emits.selectCluster"

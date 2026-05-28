@@ -32,6 +32,7 @@ import type { ArchiveStationData } from '@/types/saveArchive'
 import type { SavedModule, X4MapCluster, X4MapSector, X4Module } from '@/types/x4'
 import i18n from '@/i18n'
 import { useGameDataStore } from '@/store/useGameDataStore'
+import { useX4I18n } from '@/utils/UseX4I18n'
 
 export interface TerraformingToolbarProps {
   hqStationName: ComputedRef<string>
@@ -43,6 +44,11 @@ export interface TerraformingToolbarProps {
   sectorSunlight: ComputedRef<number>
   singleBerthThroughput: ComputedRef<number>
   hasHqStation: ComputedRef<boolean>
+}
+
+export interface TerraformingRewardDisplayItem {
+  milestone: string
+  text: string
 }
 
 export interface TerraformingSectorPanelProps {
@@ -61,6 +67,7 @@ export interface TerraformingSectorPanelProps {
   currentStats: ComputedRef<Record<string, number>>
   statDisplayNames: ComputedRef<Map<string, string>>
   activeRebates: ComputedRef<string[]>
+  clusterRewardDisplays: ComputedRef<TerraformingRewardDisplayItem[]>
 }
 
 export interface TerraformingScaleRange {
@@ -1305,6 +1312,63 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
         neutralizeScale
       }
     })
+  })
+
+  const _FACTION_NAMEIDS: Record<string, string> = {}
+
+  function _loadFactionNameIds() {
+    if (Object.keys(_FACTION_NAMEIDS).length > 0) return
+    const gameData = useGameDataStore()
+    for (const f of gameData.factions) {
+      if (f.id && f.nameId) _FACTION_NAMEIDS[f.id] = f.nameId
+    }
+  }
+
+  function _factionDisplayName(factionId: string): string {
+    _loadFactionNameIds()
+    const nameId = _FACTION_NAMEIDS[factionId]
+    return nameId ? (vI18nLookup(nameId) || factionId) : factionId
+  }
+
+  const clusterRewardDisplays = computed<TerraformingRewardDisplayItem[]>(() => {
+    const rewards: TerraformingRewardDisplayItem[] = []
+    const td = store.terraformingData.value
+    const cid = selectedClusterId.value
+    if (!td || !cid) return rewards
+    const cluster = td.clusters.find(c => c.id === cid)
+    if (!cluster) return rewards
+
+    const milestoneLabel = (m: number | string, label: string) => {
+      if (m === 'complete') return vI18nLookup('terraforming.milestone.complete') || '完成'
+      return vI18nLookup(`terraforming.milestone.${label}`) || label || `M${m}`
+    }
+
+    const gameData = useGameDataStore()
+
+    for (const fr of cluster.factionRewards ?? []) {
+      const factionName = _factionDisplayName(fr.faction)
+      const label = milestoneLabel(fr.milestone, fr.conditionLabel)
+      if (fr.type === 'unlock') {
+        rewards.push({ milestone: label, text: `${factionName} ${vI18nLookup('terraforming.reward.factionUnlock')}` })
+      } else {
+        const sign = (fr.value ?? 0) >= 0 ? '+' : ''
+        rewards.push({ milestone: label, text: `${factionName} ${vI18nLookup('terraforming.reward.factionAdd') || 'rep'} ${sign}${fr.value}` })
+      }
+    }
+
+    for (const r of cluster.rewards ?? []) {
+      const label = milestoneLabel(r.milestone, 'mission_complete')
+      if (r.type === 'blueprint' && r.id) {
+        const mod = gameData.modulesMap[r.id] as X4Module | undefined
+        const bpName = mod ? useX4I18n().translateModule(mod) : r.id
+        rewards.push({ milestone: label, text: `${vI18nLookup('terraforming.reward.blueprint') || 'BP'}: ${bpName}` })
+      } else if (r.type === 'npc' && r.nameId) {
+        const npcName = vI18nLookup(r.nameId)
+        rewards.push({ milestone: label, text: `${npcName} ${vI18nLookup('terraforming.reward.npcJoin')}` })
+      }
+    }
+
+    return rewards
   })
 
   function buildRuntimeClusterForReplay(
@@ -3206,6 +3270,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
       currentStats: effectiveCurrentStats,
       statDisplayNames,
       activeRebates,
+      clusterRewardDisplays,
     },
     taskList: {
       taskTree,
