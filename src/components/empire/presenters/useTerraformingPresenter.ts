@@ -1819,6 +1819,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     const runtimeProjectIds = new Set(getRuntimeTerraformingProjectIds(cluster))
     const statAffectingEvents = data.projects.filter(p => p.group === 'events' && isStatAffectingEvent(p) && runtimeProjectIds.has(p.id))
     let eventBlocked = false
+    const blockedStatIds = new Set<string>()
     const insertedEventIds = new Set<string>()
     let orderSeq = 0
 
@@ -1940,8 +1941,8 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
 
       if (!eventBlocked && project && index > 0) {
         for (const cond of project.conditions) {
-          if (eventStatIds.has(cond.stat) && !checkStatConditionMet(cond, preStats, d.stats)) {
-            eventBlocked = true
+          if (eventStatIds.has(cond.stat) && isStatInRuntime(preStats, cond.stat) && !checkStatConditionMet(cond, preStats, d.stats)) {
+            blockedStatIds.add(cond.stat)
             break
           }
         }
@@ -1950,9 +1951,11 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
       pushTaskEntry(entry, index)
 
       if (!eventBlocked) {
-        const stats = computeTerraformingRuntimeStats(c, completedProjects, data)
+        const stats = computeTerraformingRuntimeStats(c, completedProjects, d)
         for (const event of statAffectingEvents) {
-          if (!insertedEventIds.has(event.id) && checkAllConditions(event.conditions, stats, d.stats)) {
+          if (insertedEventIds.has(event.id)) continue
+          if (event.conditions.some(c => blockedStatIds.has(c.stat))) continue
+          if (checkAllConditions(event.conditions, stats, d.stats)) {
             pushEventEntry(event)
           }
         }
@@ -1963,7 +1966,9 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     {
       const stats = computeTerraformingRuntimeStats(c, completedProjects, data)
       for (const event of statAffectingEvents) {
-        if (!insertedEventIds.has(event.id) && checkAllConditions(event.conditions, stats, d.stats)) {
+        if (insertedEventIds.has(event.id)) continue
+        if (event.conditions.some(c => blockedStatIds.has(c.stat))) continue
+        if (checkAllConditions(event.conditions, stats, d.stats)) {
           pushEventEntry(event)
         }
       }
