@@ -2152,8 +2152,8 @@
     <t id="8556">Vitesse de glissement horizontal</t>
     <t id="8557">Accélération vertical</t>
     <t id="8558">Accélération horizontal</t>
-    <t id="8559">Vitesse de glissement</t>
-    <t id="8560">Accélération de glissement</t>
+    <t id="8559">Vitesse latérale</t>
+    <t id="8560">Accélération latérale</t>
     <t id="8561">Supprimer l'équipement</t>
     <t id="8562">L'amélioration actuelle ne peut être réinstallée une fois supprimée. Etes-vous sûr de vouloir continuer ?</t>
     <t id="8563">Il n'y a pas de module de construction fonctionnel pour ce vaisseau en ce moment \(cela est peut-être dû à une attaque ou un piratage\). La construction ou l'amélioration peut donc prendre plus de temps.</t>
@@ -2944,7 +2944,7 @@
     <t id="11153">Écraser la file d'attente</t>
     <t id="11154">Amarrer sur le Hall d'exposition</t>
     <t id="11155">Ordonner au vaisseau de s'amarrer ici</t>
-    <t id="11161">Repeat Last Order</t>
+    <t id="11161">Répéter le dernier ordre</t>
     <t id="11200">Rôle</t>
     <t id="11201">Voulez-vous vraiment virer cette personne ?</t>
     <t id="11202">Virer %s</t>
@@ -3756,10 +3756,10 @@
     <t id="12788">AMD FSR</t>
     <t id="12789">Si c'est votre première plongée dans X4, nous vous suggérons d'essayer quelques tutoriels avant de commencer votre voyage dans l'univers de X4.</t>
     <t id="12790">Commencer un nouvel univers ouvert</t>
-    <t id="12791">Creator Credit for Uploads</t>
-    <t id="12792">Choose whether to include your forum username when uploading data \(e.g. ships\).</t>
-    <t id="12793">Submit Anonymously</t>
-    <t id="12794">Credit My Forum Username</t>
+    <t id="12791">Inclure le pseudonyme pour les partages</t>
+    <t id="12792">Choisissez si vous souhaitez inclure votre pseudonyme du forum lors du partage de données \(e.g. les vaisseaux\).</t>
+    <t id="12793">Soumettre anonymement</t>
+    <t id="12794">Créditer mon pseudonyme</t>
     <t id="12800">(Diplomacy menu)</t>
     <t id="12801">Actions de l'ambassade</t>
     <t id="12803">Diplomate</t>
@@ -9304,7 +9304,7 @@
     <t id="911">Visiter les stations</t>
     <t id="912">Visiter les stations importantes appartenant à diverses factions.</t>
     <t id="921">Prospecter</t>
-    <t id="922">Recherchez les zones de ressources, marquez-les avec des sondes de ressources, récupérez et redéployez les sondes obsolètes.</t>
+    <t id="922">Trouver des zones de ressources et les marquer avec des sondes de ressources.</t>
     <t id="10000">Annuler le chemin</t>
     <t id="10001">Bientôt terminé</t>
     <t id="10002">Activer la patrouille</t>
@@ -57923,10 +57923,10 @@
     <t id="41602">Bombardez les vaisseaux de ligne qui menacent le commandant de ce vaisseau.</t>
     <t id="41603">Bombarder pour</t>
     <t id="41604">Bombarder pour le commandant</t>
-    <t id="41701">Prospector</t>
-    <t id="41702">Prospect for resources needed by this ship's commander.</t>
-    <t id="41703">Prospect for</t>
-    <t id="41704">Prospect for commander</t>
+    <t id="41701">Prospecteur</t>
+    <t id="41702">Localise les ressources requises par le commandant du vaisseau.</t>
+    <t id="41703">Prospecter pour</t>
+    <t id="41704">Prospecter pour le commandant</t>
     <t id="50000">(***Tiers***)</t>
     <t id="50101">Apprenti</t>
     <t id="50201">Membre d'équipage capable</t>
@@ -62528,7 +62528,7 @@
     <t id="113">{20104,150101}(Wide Area Sensor Array)</t>
     <t id="114">Réseaux de capteurs à portée étendue</t>
     <t id="200">Destination : $DESTINATION$ \(à l'endroit indiqué\)</t>
-    <t id="201">Destination: $DESTINATION$</t>
+    <t id="201">Emplacement : $DESTINATION$</t>
     <t id="300">Pour être valide en tant que station de défense, l'un des modules de défense doit être un centre administratif</t>
     <t id="301">Les dépenses seront généreusement compensées, dans les limites du raisonnable.</t>
     <t id="302">Coût de construction minimum estimé</t>

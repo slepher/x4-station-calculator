@@ -3114,14 +3114,8 @@
       <connection name="con_m_turret_06" tags="mandatory medium ship_gen_m_yacht_01 turret unhittable "/>
       <connection name="con_weapon_01" tags="mandatory medium ship_gen_m_yacht_01 weapon symmetry symmetry_left "/>
       <connection name="con_weapon_02" tags="mandatory medium ship_gen_m_yacht_01 weapon symmetry symmetry_right "/>
+      <connection name="Connection02" tags="animation detail_l engineeffect fx nocollision part speedscale_forward textureanimation "/>
       <connection name="Connection09" group=" pilotcontrol" tags="envmap_cockpit part "/>
-      <connection name="Connection10" group=" pilotcontrol" tags="envmap_cockpit part " parent="part_chair_01"/>
-      <connection name="Connection11" group=" pilotcontrol" tags="envmap_cockpit part " parent="part_chair_02"/>
-      <connection name="Connection12" group=" pilotcontrol" tags="envmap_cockpit part " parent="part_chair_03"/>
-      <connection name="Connection13" group=" pilotcontrol" tags="envmap_cockpit part " parent="part_chair_04"/>
-      <connection name="Connection14" group=" pilotcontrol" tags="envmap_cockpit part " parent="part_chair_07"/>
-      <connection name="Connection15" group=" pilotcontrol" tags="envmap_cockpit part " parent="part_chair_04"/>
-      <connection name="Connection16" group=" pilotcontrol" tags="envmap_cockpit part " parent="part_chair_05"/>
       <connection name="Connection100" tags="envmap_cockpit forceoutline nocollision part "/>
       <connection name="Connection101" tags="detail_m envmap_cockpit forceoutline nocollision part "/>
       <connection name="Connection102" tags="detail_m envmap_cockpit forceoutline nocollision part "/>
@@ -3131,22 +3125,10 @@
       <connection name="Connection106" tags="detail_m envmap_cockpit forceoutline nocollision part "/>
       <connection name="Connection107" tags="envmap_cockpit forceoutline nocollision part "/>
       <connection name="Connection108" group=" transporter_02" tags="envmap_cockpit location_cockpit part "/>
-      <connection name="Connection109" group=" transporter_02" tags="envmap_cockpit iklink part " parent="part_main001"/>
       <connection name="Connection110" group=" transporter_02" tags="animation envmap_cockpit part "/>
-      <connection name="Connection111" group=" transporter_02" tags="envmap_cockpit iklink part " parent="anim_door_left001"/>
-      <connection name="Connection112" group=" transporter_02" tags="envmap_cockpit part " parent="anim_door_left001"/>
       <connection name="Connection113" group=" transporter_02" tags="animation envmap_cockpit part "/>
-      <connection name="Connection114" group=" transporter_02" tags="envmap_cockpit iklink part " parent="anim_door_right001"/>
-      <connection name="Connection115" group=" transporter_02" tags="envmap_cockpit part " parent="anim_door_right001"/>
       <connection name="Connection116" group=" transporter_02" tags="envmap_cockpit part "/>
       <connection name="Connection118" group=" navigationcontrol" tags="envmap_cockpit part "/>
-      <connection name="Connection119" group=" navigationcontrol" tags="envmap_cockpit part " parent="part_chair_01003"/>
-      <connection name="Connection120" group=" navigationcontrol" tags="envmap_cockpit part " parent="part_chair_02003"/>
-      <connection name="Connection121" group=" navigationcontrol" tags="envmap_cockpit part " parent="part_chair_03003"/>
-      <connection name="Connection122" group=" navigationcontrol" tags="envmap_cockpit part " parent="part_chair_04003"/>
-      <connection name="Connection123" group=" navigationcontrol" tags="envmap_cockpit part " parent="part_chair_05003"/>
-      <connection name="Connection124" group=" navigationcontrol" tags="envmap_cockpit part " parent="part_chair_04003"/>
-      <connection name="Connection125" group=" navigationcontrol" tags="envmap_cockpit part " parent="part_chair_07003"/>
       <connection name="Connection126" tags="detail_m envmap_cockpit forceoutline nocollision part "/>
       <connection name="Connection127" group="bedroom_01" tags="animation detail_xl envmap_cockpit forceoutline part platformcollision trigger_interact ui "/>
       <connection name="Connection128" group="bedroom_01" tags="animation detail_m envmap_cockpit nocollision part textureanimation "/>
@@ -3157,30 +3139,12 @@
       <connection name="Connection133" tags="animation detail_xl envmap_cockpit forceoutline nocollision part "/>
       <connection name="Connection134" tags="detail_l envmap_cockpit forceoutline nocollision part "/>
       <connection name="Connection17" group=" gunnercontrol" tags="envmap_cockpit part "/>
-      <connection name="Connection18" group=" gunnercontrol" tags="envmap_cockpit part " parent="part_chair_01002"/>
-      <connection name="Connection19" group=" gunnercontrol" tags="envmap_cockpit part " parent="part_chair_02002"/>
-      <connection name="Connection20" group=" gunnercontrol" tags="envmap_cockpit part " parent="part_chair_03002"/>
-      <connection name="Connection21" group=" gunnercontrol" tags="envmap_cockpit part " parent="part_chair_04002"/>
-      <connection name="Connection22" group=" gunnercontrol" tags="envmap_cockpit part " parent="part_chair_05002"/>
-      <connection name="Connection23" group=" gunnercontrol" tags="envmap_cockpit part " parent="part_chair_04002"/>
-      <connection name="Connection24" group=" gunnercontrol" tags="envmap_cockpit part " parent="part_chair_07002"/>
       <connection name="Connection25" group=" commscontrol" tags="envmap_cockpit part "/>
-      <connection name="Connection26" group=" commscontrol" tags="envmap_cockpit part " parent="part_chair_01001"/>
-      <connection name="Connection27" group=" commscontrol" tags="envmap_cockpit part " parent="part_chair_02001"/>
-      <connection name="Connection28" group=" commscontrol" tags="envmap_cockpit part " parent="part_chair_03001"/>
-      <connection name="Connection29" group=" commscontrol" tags="envmap_cockpit part " parent="part_chair_04001"/>
-      <connection name="Connection30" group=" commscontrol" tags="envmap_cockpit part " parent="part_chair_05001"/>
-      <connection name="Connection31" group=" commscontrol" tags="envmap_cockpit part " parent="part_chair_04001"/>
-      <connection name="Connection32" group=" commscontrol" tags="envmap_cockpit part " parent="part_chair_07001"/>
       <connection name="Connection34" group=" transporter_01" tags="envmap_cockpit location_exit part "/>
-      <connection name="Connection35" group=" transporter_01" tags="envmap_cockpit iklink part " parent="part_main"/>
       <connection name="Connection36" group=" transporter_01" tags="animation envmap_cockpit part "/>
-      <connection name="Connection37" group=" transporter_01" tags="envmap_cockpit iklink part " parent="anim_door_left"/>
-      <connection name="Connection38" group=" transporter_01" tags="envmap_cockpit iklink nocollision part " parent="anim_door_left"/>
       <connection name="Connection39" group=" transporter_01" tags="animation envmap_cockpit part "/>
-      <connection name="Connection40" group=" transporter_01" tags="envmap_cockpit iklink part " parent="anim_door_right"/>
-      <connection name="Connection41" group=" transporter_01" tags="envmap_cockpit part " parent="anim_door_right"/>
       <connection name="Connection42" group=" transporter_01" tags="envmap_cockpit part "/>
+      <connection name="Connection55" tags="animation engineeffect part walk_exclude "/>
       <connection name="Connection63" tags="anim_dockdoor animation detail_xl forceoutline nocollision part "/>
       <connection name="Connection64" tags="detail_m envmap_cockpit forceoutline nocollision part "/>
       <connection name="Connection65" tags="detail_m envmap_cockpit forceoutline nocollision part "/>
@@ -3203,6 +3167,44 @@
       <connection name="Connection96" tags="detail_s envmap_cockpit forceoutline nocollision part "/>
       <connection name="Connection97" tags="animation detail_l envmap_cockpit nocollision part textureanimation "/>
       <connection name="Connection98" tags="anim_cockpit animation detail_xl forceoutline part platformcollision "/>
+      <connection name="Connection10" group=" pilotcontrol" tags="envmap_cockpit part " parent="part_chair_01"/>
+      <connection name="Connection11" group=" pilotcontrol" tags="envmap_cockpit part " parent="part_chair_02"/>
+      <connection name="Connection12" group=" pilotcontrol" tags="envmap_cockpit part " parent="part_chair_03"/>
+      <connection name="Connection13" group=" pilotcontrol" tags="envmap_cockpit part " parent="part_chair_04"/>
+      <connection name="Connection14" group=" pilotcontrol" tags="envmap_cockpit part " parent="part_chair_07"/>
+      <connection name="Connection15" group=" pilotcontrol" tags="envmap_cockpit part " parent="part_chair_04"/>
+      <connection name="Connection16" group=" pilotcontrol" tags="envmap_cockpit part " parent="part_chair_05"/>
+      <connection name="Connection109" group=" transporter_02" tags="envmap_cockpit iklink part " parent="part_main001"/>
+      <connection name="Connection111" group=" transporter_02" tags="envmap_cockpit iklink part " parent="anim_door_left001"/>
+      <connection name="Connection112" group=" transporter_02" tags="envmap_cockpit part " parent="anim_door_left001"/>
+      <connection name="Connection114" group=" transporter_02" tags="envmap_cockpit iklink part " parent="anim_door_right001"/>
+      <connection name="Connection115" group=" transporter_02" tags="envmap_cockpit part " parent="anim_door_right001"/>
+      <connection name="Connection119" group=" navigationcontrol" tags="envmap_cockpit part " parent="part_chair_01003"/>
+      <connection name="Connection120" group=" navigationcontrol" tags="envmap_cockpit part " parent="part_chair_02003"/>
+      <connection name="Connection121" group=" navigationcontrol" tags="envmap_cockpit part " parent="part_chair_03003"/>
+      <connection name="Connection122" group=" navigationcontrol" tags="envmap_cockpit part " parent="part_chair_04003"/>
+      <connection name="Connection123" group=" navigationcontrol" tags="envmap_cockpit part " parent="part_chair_05003"/>
+      <connection name="Connection124" group=" navigationcontrol" tags="envmap_cockpit part " parent="part_chair_04003"/>
+      <connection name="Connection125" group=" navigationcontrol" tags="envmap_cockpit part " parent="part_chair_07003"/>
+      <connection name="Connection18" group=" gunnercontrol" tags="envmap_cockpit part " parent="part_chair_01002"/>
+      <connection name="Connection19" group=" gunnercontrol" tags="envmap_cockpit part " parent="part_chair_02002"/>
+      <connection name="Connection20" group=" gunnercontrol" tags="envmap_cockpit part " parent="part_chair_03002"/>
+      <connection name="Connection21" group=" gunnercontrol" tags="envmap_cockpit part " parent="part_chair_04002"/>
+      <connection name="Connection22" group=" gunnercontrol" tags="envmap_cockpit part " parent="part_chair_05002"/>
+      <connection name="Connection23" group=" gunnercontrol" tags="envmap_cockpit part " parent="part_chair_04002"/>
+      <connection name="Connection24" group=" gunnercontrol" tags="envmap_cockpit part " parent="part_chair_07002"/>
+      <connection name="Connection26" group=" commscontrol" tags="envmap_cockpit part " parent="part_chair_01001"/>
+      <connection name="Connection27" group=" commscontrol" tags="envmap_cockpit part " parent="part_chair_02001"/>
+      <connection name="Connection28" group=" commscontrol" tags="envmap_cockpit part " parent="part_chair_03001"/>
+      <connection name="Connection29" group=" commscontrol" tags="envmap_cockpit part " parent="part_chair_04001"/>
+      <connection name="Connection30" group=" commscontrol" tags="envmap_cockpit part " parent="part_chair_05001"/>
+      <connection name="Connection31" group=" commscontrol" tags="envmap_cockpit part " parent="part_chair_04001"/>
+      <connection name="Connection32" group=" commscontrol" tags="envmap_cockpit part " parent="part_chair_07001"/>
+      <connection name="Connection35" group=" transporter_01" tags="envmap_cockpit iklink part " parent="part_main"/>
+      <connection name="Connection37" group=" transporter_01" tags="envmap_cockpit iklink part " parent="anim_door_left"/>
+      <connection name="Connection38" group=" transporter_01" tags="envmap_cockpit iklink nocollision part " parent="anim_door_left"/>
+      <connection name="Connection40" group=" transporter_01" tags="envmap_cockpit iklink part " parent="anim_door_right"/>
+      <connection name="Connection41" group=" transporter_01" tags="envmap_cockpit part " parent="anim_door_right"/>
     </connections>
   </component>
   <component name="ship_gen_s_fighter_01" class="ship_s">

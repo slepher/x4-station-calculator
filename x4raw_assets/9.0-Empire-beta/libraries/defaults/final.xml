@@ -374,11 +374,11 @@
         <max>
           <hull value="708000.028133"/>
           <shield value="1363629.538249" delay="19.000000" rate="5189.599609"/>
-          <weapon burst="572899.708603" sustained="45627.993296"/>
+          <weapon burst="572899.708603" sustained="45817.062694"/>
           <turret burst="0.000000" sustained="0.000000"/>
           <groups>
-            <shield value="57834.001622" delay="16.600000" rate="832.649963"/>
-            <turret burst="21100.805739" sustained="21100.805739"/>
+            <shield value="57834.001622" delay="15.400000" rate="923.649963"/>
+            <turret burst="21229.315372" sustained="21229.315372"/>
           </groups>
           <dock ship_m="4" ship_s="21"/>
           <engine forward="654.197083" acceleration="240.461624" yaw="0.106842" pitch="0.106842" roll="0.098501"/>
@@ -500,8 +500,8 @@
           <weapon burst="20552.023199" sustained="12338.136097"/>
           <turret burst="0.000000" sustained="0.000000"/>
           <groups>
-            <shield value="38556.001081" delay="16.600000" rate="555.099976"/>
-            <turret burst="7388.213044" sustained="7388.213044"/>
+            <shield value="38556.001081" delay="15.400000" rate="615.766663"/>
+            <turret burst="7393.740340" sustained="7393.740340"/>
           </groups>
           <dock ship_m="1" ship_s="8"/>
           <engine forward="739.066040" acceleration="199.581970" yaw="0.617508" pitch="0.617508" roll="0.654893"/>
@@ -611,8 +611,8 @@
       <statistics>
         <max>
           <hull value="49200.001955"/>
-          <shield value="65620.001841" delay="16.600000" rate="713.699951"/>
-          <weapon burst="31000.345813" sustained="7625.688953"/>
+          <shield value="65620.001841" delay="16.000000" rate="791.699951"/>
+          <weapon burst="31085.288207" sustained="7710.631348"/>
           <turret burst="1202.400035" sustained="1202.400035"/>
           <groups>
             <shield value="0.000000" delay="0.000000" rate="0.000000"/>
@@ -715,8 +715,8 @@
       <statistics>
         <max>
           <hull value="7680.000305"/>
-          <shield value="16768.800470" delay="18.500000" rate="2189.199951"/>
-          <weapon burst="11422.800330" sustained="5550.764252"/>
+          <shield value="16768.800470" delay="18.000000" rate="2189.199951"/>
+          <weapon burst="11422.800330" sustained="5635.706646"/>
           <turret burst="0.000000" sustained="0.000000"/>
           <groups>
             <shield value="0.000000" delay="0.000000" rate="0.000000"/>
