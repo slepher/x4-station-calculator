@@ -2944,7 +2944,7 @@
     <t id="11153">Nahradit frontu příkazů</t>
     <t id="11154">Zakotvit v předváděcím hangáru</t>
     <t id="11155">Požádat loď, aby zde zakotvila</t>
-    <t id="11161">Repeat Last Order</t>
+    <t id="11161">Opakovat poslední objednávku</t>
     <t id="11200">(map range 32xx and 83xx continued)Úkol</t>
     <t id="11201">Opravdu chceš propustit tuto osobu?</t>
     <t id="11202">Propustit %s($NPC_NAME$)</t>
@@ -3756,10 +3756,10 @@
     <t id="12788">AMD FSR</t>
     <t id="12789">Pokud hrajete v X4 poprvé, doporučujeme vám, abyste si před začátkem cesty do otevřeného vesmíru X4 vyzkoušeli několik tutoriálů.</t>
     <t id="12790">Spustit nový otevřený vesmír</t>
-    <t id="12791">Creator Credit for Uploads</t>
-    <t id="12792">Choose whether to include your forum username when uploading data \(e.g. ships\).</t>
-    <t id="12793">Submit Anonymously</t>
-    <t id="12794">Credit My Forum Username</t>
+    <t id="12791">Uvedení autora u nahrávek</t>
+    <t id="12792">Zvolte, zda chcete při nahrávání dat uvést své uživatelské jméno na fóru \(např. ships\).</t>
+    <t id="12793">Anonymní odeslání</t>
+    <t id="12794">Uvádět mé uživatelské jméno z fóra</t>
     <t id="12800">(Diplomacy menu)</t>
     <t id="12801">Akce velvyslanectví</t>
     <t id="12803">Diplomat</t>
@@ -9304,7 +9304,7 @@
     <t id="911">Návštěva stanic</t>
     <t id="912">Navštivte důležité stanice různých frakcí.</t>
     <t id="921">Průzkum nalezišť</t>
-    <t id="922">Najděte oblasti se surovinami, označte je sondami, seberte a přemístěte staré sondy.</t>
+    <t id="922">Najděte oblasti se surovinami a označte je sondami na suroviny.</t>
     <t id="10000">Zrušit cestu</t>
     <t id="10001">Před dokončením</t>
     <t id="10002">Aktivní hlídka</t>
@@ -57923,10 +57923,10 @@
     <t id="41602">Bombardování kapitálních lodí ohrožujících velitele této lodi.</t>
     <t id="41603">Bombardovat jako</t>
     <t id="41604">Bombardovat lodě ohrožující velitele</t>
-    <t id="41701">Prospector</t>
-    <t id="41702">Prospect for resources needed by this ship's commander.</t>
-    <t id="41703">Prospect for</t>
-    <t id="41704">Prospect for commander</t>
+    <t id="41701">Prospektor</t>
+    <t id="41702">Hledání surovin potřebných pro velitele této lodi.</t>
+    <t id="41703">Vyhledat suroviny</t>
+    <t id="41704">Hledat pro velitele</t>
     <t id="50000">(***Tiers***)</t>
     <t id="50101">Nováček</t>
     <t id="50201">Člen posádky</t>
@@ -62528,7 +62528,7 @@
     <t id="113">{20104,150101}(Wide Area Sensor Array)</t>
     <t id="114">Rozsáhlé senzorové pole</t>
     <t id="200">Umístění: $DESTINATION$ \(na určeném místě\)</t>
-    <t id="201">Destination: $DESTINATION$</t>
+    <t id="201">Místo určení: $DESTINATION$</t>
     <t id="300">Aby se jednalo o platnou obrannou stanici, musí být jeden z obranných modulů správním střediskem.</t>
     <t id="301">Výdaje budou v rámci možností hrazeny velkoryse.</t>
     <t id="302">Odhadované minimální stavební náklady</t>

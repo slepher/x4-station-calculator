@@ -52,7 +52,7 @@
   </component>
   <component name="engine_gen_m_yacht_01_mk1" class="engine">
     <connections>
-      <connection name="con_engine_01" tags="engine medium ship_gen_m_yacht_01 mandatory component "/>
+      <connection name="con_engine_01" tags="component engine mandatory medium ship_gen_m_yacht_01 "/>
     </connections>
   </component>
   <component name="engine_gen_s_racer_01" class="engine">
