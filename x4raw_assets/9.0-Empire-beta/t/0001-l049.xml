@@ -2719,7 +2719,7 @@
     <t id="9654">Produktionsmodul</t>
     <t id="9655">Boost-Beschleunigungs\-multiplikator</t>
     <t id="9656">Stört Wiederaufladung von L- und XL-Schilden</t>
-    <t id="9657">Unknown production method</t>
+    <t id="9657">Unbekannte Produktionsmethode</t>
     <t id="9700">(User question)</t>
     <t id="9701">Hacking</t>
     <t id="9702">Du stehst kurz davor zu hacken</t>
@@ -2944,7 +2944,7 @@
     <t id="11153">Befehlsliste ersetzen</t>
     <t id="11154">An Showroom andocken</t>
     <t id="11155">Andock\-anforderung senden</t>
-    <t id="11161">Repeat Last Order</t>
+    <t id="11161">Letzten Befehl wiederholen</t>
     <t id="11200">(map range 32xx and 83xx continued)Rolle</t>
     <t id="11201">Möchtest du diese Person wirklich entlassen?</t>
     <t id="11202">%s($NPC_NAME$) entlassen</t>
@@ -3338,11 +3338,11 @@
     <t id="11692">Ab sofort kannst du Modifikatortasten nutzen, um eingereihte \(%s($INPUT_MODIFIER_ICON$)\) und Prioritäts-\(%s($INPUT_MODIFIER_ICON$)\) Befehle direkt über die Karte oder das Interaktionsmenü zu erteilen. Standardmäßig überschreiben Befehle, die du ohne diese Modifikator-Tasten an Schiffe gibst, nun alle zuvor eingereihten Befehle.</t>
     <t id="11693">Wenn du das alte Verhalten bevorzugst, kannst du die Einstellung für das Standard-Befehlsverhalten im Menü Spieleinstellungen auf Warteschlange ändern. Dann wird durch Drücken von %s($INPUT_MODIFIER_ICON$) im Interaktionsmenü der Befehl überschrieben statt an die Warteschlange angehängt.</t>
     <t id="11694">Klicke auf Ja, wenn du das neue Standardverhalten für Modifikatoren ausprobieren möchtest, oder auf Nein, wenn du das alte Verhalten beibehalten und %s($INPUT_MODIFIER_ICON$) zum Überschreiben von Befehlen nutzen willst.</t>
-    <t id="11695">Towable Wreck</t>
-    <t id="11696">Dismantlable Wreck</t>
-    <t id="11697">Resource Probe coverage</t>
+    <t id="11695">Abschleppbares Wrack</t>
+    <t id="11696">Zerlegbares Wrack</t>
+    <t id="11697">Abdeckung der Ressourcensonde</t>
     <t id="11698">{1001,11697}</t>
-    <t id="11699">(resource type)Solid</t>
+    <t id="11699">(resource type)Feststoff</t>
     <t id="11700">(Options menu range 26xx, 48xx, 72xx and 89xx continued)</t>
     <t id="11701">Offline speichern</t>
     <t id="11702">Offline-Spielstand überschreiben</t>
@@ -3756,10 +3756,10 @@
     <t id="12788">AMD FSR</t>
     <t id="12789">Wenn du zum ersten Mal in X4 bist, willkommen an Bord, und wir empfehlen dir, ein paar Tutorials zu machen, ehe du deine Reise ins Offene Universum von X4 startest. </t>
     <t id="12790">Neues Offenes Universum starten</t>
-    <t id="12791">Creator Credit for Uploads</t>
-    <t id="12792">Choose whether to include your forum username when uploading data \(e.g. ships\).</t>
-    <t id="12793">Submit Anonymously</t>
-    <t id="12794">Credit My Forum Username</t>
+    <t id="12791">Ersteller-Nennung für Uploads</t>
+    <t id="12792">Wähle aus, ob dein Forum-Benutzername beim Hochladen von Daten \(z. B. Schiffen\) angegeben werden soll.</t>
+    <t id="12793">Anonym übermitteln</t>
+    <t id="12794">Meinen Forum-Benutzernamen nennen</t>
     <t id="12800">(Diplomacy menu)</t>
     <t id="12801">Botschafts\-aktionen</t>
     <t id="12803">Diplomat</t>
@@ -3937,9 +3937,9 @@
     <t id="13226">Aktuell bearbeitetes Schiff hat inkompatible Raketen.</t>
     <t id="13227">Reiseantriebs\-stabilität</t>
     <t id="13300">(Input bar)</t>
-    <t id="13301">Verschieben</t>
+    <t id="13301">Ansicht verschieben</t>
     <t id="13302">Position zurücksetzen</t>
-    <t id="13303">Drehen</t>
+    <t id="13303">Ansicht drehen</t>
     <t id="13304">Drehung zurücksetzen</t>
     <t id="13305">Zoom</t>
     <t id="13306">Emulierter Mauszeiger</t>
@@ -3964,10 +3964,10 @@
     <t id="13325">Modulauswahl abbrechen</t>
     <t id="13326">Stationsmodell fokussieren</t>
     <t id="13327">Eingereihter Prioritätsbefehl</t>
-    <t id="13328">Gather Rate(of resources; header item for table column)</t>
+    <t id="13328">Sammelrate(of resources; header item for table column)</t>
     <t id="13400">(map range 32xx, 83xx, 112xx and 116xx continued)</t>
     <t id="13401">(resource type)Gas</t>
-    <t id="13402">(resource type)Scrap</t>
+    <t id="13402">(resource type)Schrott</t>
   </page>
   <page id="1002" title="Player Choices" descr="General Player Choices in Conversations - Remember to look for text from XRDB before adding new" voice="no">
     <t id="2">Auf Wiedersehen</t>
@@ -7699,7 +7699,7 @@
     <t id="1000">Standard</t>
     <t id="1001">Standard - Tastatur &amp; Maus / Controller</t>
     <t id="1011">Standard - Joystick</t>
-    <t id="1021">Standard - Controller \(Alternative 1\)</t>
+    <t id="1021">Standard - Controller \(Alternative\)</t>
     <t id="1031">Standard - Joystick \(OSX/Linux\)</t>
     <t id="1040">Thrustmaster HOTAS Warthog</t>
     <t id="1041">{1023,1000} - {1023,1040}</t>
@@ -7720,7 +7720,7 @@
     <t id="1120">VPC Constellation Alpha Prime</t>
     <t id="1121">{1023,1000} - {1023,1120} \(Single\)</t>
     <t id="1122">{1023,1000} - {1023,1120} \(Dual\)</t>
-    <t id="1131">Default - WASD Keyboard &amp; Mouse \(Alternative\)</t>
+    <t id="1131">Standard - WASD-Tastatur &amp; Maus \(Alternative\)</t>
     <t id="2001">Sony DUALSHOCK3 Wireless Controller</t>
     <t id="2011">Sony DUALSHOCK4 Wireless Controller</t>
     <t id="2021">Sony DualSense Wireless Controller</t>
@@ -9304,7 +9304,7 @@
     <t id="911">Stationen besuchen</t>
     <t id="912">Besuche wichtige Stationen verschiedener Fraktionen.</t>
     <t id="921">Prospektieren</t>
-    <t id="922">Finden Sie Ressourcen\-gebiete, markieren Sie sie mit Ressourcen\-sonden und sammeln Sie veraltete Sonden ein, um sie erneut aufzustellen.</t>
+    <t id="922">Finde Ressourcen\-gebiete und markiere sie mit Ressourcen\-sonden.</t>
     <t id="10000">Weg abbrechen</t>
     <t id="10001">Abschluss steht kurz bevor</t>
     <t id="10002">Aktive Patrouille</t>
@@ -11499,18 +11499,18 @@
     <t id="116">Du kannst deine Vorwärtsgeschwindigkeit mit den Tasten X und Y, dem Mausrad oder dem Schubhebel einstellen.</t>
     <t id="117">Sobald du ein Ziel ausgewählt hast, versucht das Zielsystem, es aufzuschalten. Sobald das Aufschalten erfolgt ist, kannst du mit der Taste R oder der Sekundärfeuertaste eine Rakete abfeuern.</t>
     <t id="200">(Tradeshow Playground Scenario)</t>
-    <t id="201">Welcome to X4: Foundations, a living universe with hundreds of sectors connected by gates. These sectors can be explored, and contain thousands of ships and stations operating within a fully simulated economy. You can own and command everything, ranging from a single tiny fighter to a grand empire with merchant fleets and powerful capital ships, to shape your story.</t>
-    <t id="202">This scenario places you near one of the many hundreds of bustling space stations you'll find in our living universe, with traders delivering wares and miners gathering resources. \nRecently there have been skirmishes with the machine intelligence known as the Xenon pouring in from the nearby gate, disrupting the trade.</t>
-    <t id="211">(explore explanation)Leaving the station behind, you are free to explore the other sectors and factions. The full X-Universe contains hundreds of unique sectors inhabited by various factions and species, all with rich history.</t>
-    <t id="212">(fight explanation)The Gate network is not always safe. Between the machine intelligence known as the Xenon, pirates, warring factions and the occasional war profiteering opportunist, you will see clashes ranging from small skirmishes to giant fleet brawls.</t>
-    <t id="213">(mining explanation)Ships like these mine the raw resources that the majority of the economy is based on. Once delivered they are refined, moved to factories and eventually turned into the wares that can be used to build the ships and stations you see.</t>
-    <t id="214">(trading explanation)Traders, haulers and merchants transport wares between stations. They buy where goods are plentiful and sell them where they are scarce, keeping the gears of the economy turning.</t>
-    <t id="215">(shipyard construction)This ship is currently under construction using the wares created by other stations. It will soon defend this sector from any further incursions.</t>
-    <t id="216">(launch tube explanation)The station is launching fighters from its launch tubes to defend itself from incoming attackers.</t>
-    <t id="217">(station attack explanation)A hostile Xenon force is approaching. If they damage the station, the production of new ships could be severely limited.</t>
-    <t id="218">(criminal explanation)Criminals try to capitalise on transporting illicit wares for great profits by hiding in traffic around stations. These criminals can even run organised operations with their own stations and masked freighters.</t>
-    <t id="219">(explore suggestion)There are more sights to see and things to do. Try flying around and targeting different objects.</t>
-    <t id="220">X4: Foundations has so much more to offer. You can quickly earn enough money to own a fleet of ships. You can hire other pilots to work for you, and follow your orders. Let them trade or mine to earn you money, while you follow one of the many plot lines or carry out standalone missions that can be found throughout the vast universe.</t>
+    <t id="201">Willkommen bei X4: Foundations - einem lebendigen Universum mit Hunderten von durch Sprungtore verbundenen Sektoren. Erforsche diese Sektoren und begegne Tausenden von Schiffen und Stationen in einer komplett simulierten Wirtschaft. Du kannst alles besitzen und kommandieren: vom einzelnen kleinen Jäger bis zum großen Imperium mit eigenen Handelsflotten und mächtigen Großschiffen. Gestalte deine eigene Geschichte!</t>
+    <t id="202">In diesem Szenario bist du nahe einer der vielen hundert geschäftigen Raumstationen unseres lebendigen Universums, mit Händlern, die Waren liefern und Schürfern, die Ressourcen abbauen. \nIn letzter Zeit kam es vermehrt zu Scharmützeln mit den Xenon, einer gefährlichen Maschinenintelligenz, die durch das nahe Sprungtor hereinströmen und den Handel massiv stören.</t>
+    <t id="211">(explore explanation)Wenn du die Station hinter dir lässt, kannst du die anderen Sektoren und Fraktionen völlig frei erkunden. Das facettenreiche X-Universum umfasst Hunderte einzigartiger Sektoren, bewohnt von verschiedenen Fraktionen und Spezies, alle mit einer geschichtsträchtigen Vergangenheit.</t>
+    <t id="212">(fight explanation)Das Tornetzwerk ist durchaus nicht immer sicher: Die als Xenon bekannte Maschinenintelligenz, Piraten, verfeindete Fraktionen und Kriegsgewinnler liefern sich Kämpfe, von kleinen Scharmützeln bis hin zu gigantischen Flottenschlachten.</t>
+    <t id="213">(mining explanation)Schiffe wie diese bauen die Rohstoffe ab, auf denen der Großteil der Wirtschaft basiert. Nach der Lieferung werden sie raffiniert, in Fabriken transportiert und schließlich zu den Waren verarbeitet, aus denen die Schiffe und Stationen entstehen, die du siehst.</t>
+    <t id="214">(trading explanation)Händler, Frachter und Kaufleute transportieren Waren zwischen den Stationen. Sie kaufen, wo Güter im Überfluss vorhanden sind, verkaufen, wo Mangel herrscht, und halten so die Zahnräder der Wirtschaft am Laufen.</t>
+    <t id="215">(shipyard construction)Dieses Schiff befindet sich derzeit im Bau und nutzt von anderen Stationen hergestellte Waren. Schon bald wird es diesen Sektor vor weiteren Übergriffen schützen.</t>
+    <t id="216">(launch tube explanation)Die Station startet Jäger von ihren Startrampen, um sich gegen anrückende Angreifer zu verteidigen.</t>
+    <t id="217">(station attack explanation)Eine feindliche Streitmacht der Xenon nähert sich. Sollten sie die Station beschädigen, könnte die Produktion neuer Schiffe massiv einbrechen.</t>
+    <t id="218">(criminal explanation)Kriminelle versuchen, großen Profit aus dem Transport illegaler Waren zu schlagen, indem sie sich im Verkehr rund um Stationen verstecken. Diese Kriminellen betreiben teils sogar organisierte Operationen mit eigenen Stationen und maskierten Frachtern.</t>
+    <t id="219">(explore suggestion)Es gibt noch mehr zu entdecken und zu tun. Versuche herumzufliegen und verschiedene Objekte aufzuschalten.</t>
+    <t id="220">X4: Foundations hat noch viel mehr zu bieten. Verdiene schnell genug Geld für eine eigene Schiffsflotte und heuere Piloten an, die deine Befehle ausführen. Lass sie für dich handeln oder Bergbau betreiben, während du Handlungssträngen folgst oder eigenständige Missionen im weitläufigen Universum absolvierst.</t>
   </page>
   <page id="10098" title="Torus Computer" descr="0" voice="yes">
     <t id="30224000">(Pioneer Terraforming Mission)</t>
@@ -57923,10 +57923,10 @@
     <t id="41602">Bombardiere Großschiffe, die den Kommandanten dieses Schiffes bedrohen.</t>
     <t id="41603">Bombardieren für</t>
     <t id="41604">Bombardieren für Kommandanten</t>
-    <t id="41701">Prospector</t>
-    <t id="41702">Prospect for resources needed by this ship's commander.</t>
-    <t id="41703">Prospect for</t>
-    <t id="41704">Prospect for commander</t>
+    <t id="41701">Prospektor</t>
+    <t id="41702">Prospektiere Ressourcen, die der Kommandant dieses Schiffs benötigt.</t>
+    <t id="41703">Prospektiere </t>
+    <t id="41704">Prospektiere für Kommandant</t>
     <t id="50000">(***Tiers***)</t>
     <t id="50101">Lehrling</t>
     <t id="50201">Gefreiter</t>
@@ -62007,14 +62007,14 @@
     <t id="5107">(objective.wait)auf ankommende Passagierin(female)</t>
     <t id="5200">(build station)</t>
     <t id="5201">(objective1)Finde passenden Ort</t>
-    <t id="5202">(objective2)Beanspruche Bauplatz</t>
+    <t id="5202">(objective2)Kaufe Bauplatz</t>
     <t id="5203">(objective4)Übertrage Kontrolle</t>
     <t id="5210">(objective3)Baue Station</t>
     <t id="5211">(objective3)Baue Verteidigungsstation</t>
     <t id="5212">(objective3)Baue Fabrik</t>
-    <t id="5213">(objective)Beanspruche Bauplatz an spezifischem Ort</t>
+    <t id="5213">(objective)Kaufe Bauplatz an spezifischem Ort</t>
     <t id="5214">(objective Extend:)Erweitere den Bauplatz auf die erforderliche Größe</t>
-    <t id="5215">(objective)Buy plot in specified sector</t>
+    <t id="5215">(objective)Kaufe Bauplatz in angegebenem Sektor</t>
     <t id="5220">(mission briefing text)</t>
     <t id="5221">Blaupausen kauft man bei Fraktions\-repräsentanten und Diplomaten.</t>
     <t id="5300">(build and deliver fleet)</t>
@@ -62528,7 +62528,7 @@
     <t id="113">{20104,150101}(Wide Area Sensor Array)</t>
     <t id="114">Weitbereich\-sensor\-bündel</t>
     <t id="200">Ziel: $DESTINATION$ \(an spezifischem Ort\)</t>
-    <t id="201">Destination: $DESTINATION$</t>
+    <t id="201">Ziel: $DESTINATION$</t>
     <t id="300">Für eine richtige Verteidigungsstation muss eins der Verteidigungsmodule ein Administrationszentrum sein.</t>
     <t id="301">Auslagen werden im angemessenen Rahmen großzügig erstattet.</t>
     <t id="302">Geschätzte Mindest\-bau\-kosten</t>

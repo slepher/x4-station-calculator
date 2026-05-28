@@ -21325,7 +21325,7 @@
           "amount": 4
         },
         {
-          "ref": "sphere_large_rawscrap_verylow_slow",
+          "ref": "sphere_large_rawscrap_low_slow",
           "amount": 1
         }
       ],
@@ -21344,9 +21344,9 @@
         },
         {
           "ware": "rawscrap",
-          "reserve": 5000,
-          "respawn": 15000,
-          "rating": 2
+          "reserve": 50000,
+          "respawn": 75000,
+          "rating": 3
         }
       ],
       "areas": [
@@ -21393,14 +21393,14 @@
           ]
         },
         {
-          "ref": "sphere_large_rawscrap_verylow_slow",
+          "ref": "sphere_large_rawscrap_low_slow",
           "amount": 1,
           "resources": [
             {
               "ware": "rawscrap",
-              "reserve": 5000,
-              "respawn": 15000,
-              "delay": 20.0,
+              "reserve": 50000,
+              "respawn": 75000,
+              "delay": 40.0,
               "rating": 6.0,
               "objectyieldfactor": 0.5
             }

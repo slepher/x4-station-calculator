@@ -189,6 +189,7 @@
       <xs:enumeration value="extrarepair" />
       <xs:enumeration value="hidden" />
       <xs:enumeration value="noblueprintsale" />
+      <xs:enumeration value="nobuildunits" />
       <xs:enumeration value="nodiplomacyselection" />
       <xs:enumeration value="nolicencesale" />
       <xs:enumeration value="noplayerbuyships" />

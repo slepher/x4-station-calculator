@@ -1430,6 +1430,7 @@
       <engine macro="engine_tel_s_combat_01_mk3_macro" path="../con_engine_04"/>
       <weapon macro="weapon_gen_s_laser_01_mk2_macro" path="../con_weapon_05"/>
       <weapon macro="weapon_gen_s_laser_01_mk2_macro" path="../con_weapon_04"/>
+      <weapon macro="weapon_gen_s_laser_01_mk2_macro" path="../con_weapon_03"/>
       <weapon macro="weapon_gen_s_guided_02_mk1_macro" path="../con_missilelauncher_01"/>
       <weapon macro="weapon_gen_s_laser_01_mk2_macro" path="../con_weapon_02"/>
       <weapon macro="weapon_gen_s_laser_01_mk2_macro" path="../con_weapon_01"/>
@@ -1437,7 +1438,7 @@
     </macros>
     <ammunition>
       <ammunition macro="countermeasure_flares_01_macro" exact="4"/>
-      <ammunition macro="missile_guided_light_mk1_story_macro" exact="22"/>
+      <ammunition macro="missile_guided_light_mk1_story_macro" exact="30"/>
     </ammunition>
     <software>
       <software ware="software_dockmk2"/>
@@ -1459,6 +1460,7 @@
       <engine macro="engine_tel_s_combat_01_mk3_macro" path="../con_engine_04"/>
       <weapon macro="weapon_gen_s_beam_01_mk2_macro" path="../con_weapon_05"/>
       <weapon macro="weapon_gen_s_beam_01_mk2_macro" path="../con_weapon_04"/>
+      <weapon macro="weapon_gen_s_laser_01_mk2_macro" path="../con_weapon_03"/>
       <weapon macro="weapon_gen_s_guided_02_mk1_macro" path="../con_missilelauncher_01"/>
       <weapon macro="weapon_gen_s_beam_01_mk2_macro" path="../con_weapon_02"/>
       <weapon macro="weapon_gen_s_beam_01_mk2_macro" path="../con_weapon_01"/>
