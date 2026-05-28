@@ -141,9 +141,21 @@ function onModelValueUpdate(entries: TerraformingGoalPlanDisplayEntry[]) {
   emit('updateDraftEntries', tasks)
 }
 
+function handleMove(evt: any) {
+  const el = evt.dragged
+  if (el.classList.contains('auto-event-entry') || el.classList.contains('goal-entry')) {
+    return false
+  }
+  const related = evt.related
+  if (related && (related.classList.contains('auto-event-entry') || related.classList.contains('goal-entry'))) {
+    return false
+  }
+}
+
 function planEntryKey(pe: any): string {
   if (pe._type === 'drag-clone') return `drag-preview-${dragHoverIndex.value}`
   if (pe.type === 'goal') return `goal-${pe.entry.id}`
+  if (pe.type === 'auto-event') return `auto-event-${pe.entry.id || pe.entry.projectId}`
   return pe.entry?.id || ''
 }
 
@@ -314,13 +326,14 @@ function buildDraftWaresTooltip(wares: Array<{ name: string; amount: number }>):
           :group="{ name: 'terraforming-tasks', pull: false, put: () => true }"
           ghost-class="drag-ghost"
           handle=".drag-handle"
-          filter=".goal-entry"
+          filter=".goal-entry,.auto-event-entry"
           class="draggable-container"
           @add="onExternalDrop"
           @change="onDragChange"
           @dragover.prevent="updateHoverIndexFromPointer"
           @mousemove="updateHoverIndexFromPointer"
           @mouseleave="clearHoverIndex"
+          @move="handleMove"
           @update:model-value="onModelValueUpdate"
         >
           <template #item="{ element: planEntry }">
@@ -346,7 +359,10 @@ function buildDraftWaresTooltip(wares: Array<{ name: string; amount: number }>):
                     'goal-unsatisfied': !planEntry.entry.satisfied,
                     'goal-has-risk': planEntry.entry.hasRisk,
                     'goal-has-task': planEntry.entry.hasExistingTask,
+                    'goal-preventive': planEntry.entry.kind === 'preventive',
                   }]
+                : planEntry.type === 'auto-event'
+                ? ['timeline-item', 'draft-item', 'auto-event-entry']
                 : ['timeline-item', 'draft-item', {
                     'system-disabled': planEntry.entry.systemDisabled,
                   }]"
@@ -354,9 +370,10 @@ function buildDraftWaresTooltip(wares: Array<{ name: string; amount: number }>):
             >
               <template v-if="planEntry.type === 'goal'">
                 <div class="goal-head">
-                  <span class="goal-icon">{{ planEntry.entry.kind === 'cluster' ? '🎯' : planEntry.entry.kind === 'stat' ? '📊' : '📋' }}</span>
+                  <span class="goal-icon">{{ planEntry.entry.kind === 'cluster' ? '🎯' : planEntry.entry.kind === 'preventive' ? '⚠️' : planEntry.entry.kind === 'stat' ? '📊' : '📋' }}</span>
                   <span class="goal-label">{{ planEntry.entry.label }}</span>
                   <span v-if="planEntry.entry.kind === 'cluster'" class="goal-kind-tag">{{ t('terraforming.goal.clusterGoal') || 'Cluster Goal' }}</span>
+                  <span v-else-if="planEntry.entry.kind === 'preventive'" class="goal-kind-tag goal-kind-tag-preventive">{{ t('terraforming.goal.preventiveGoal') || 'Preventive' }}</span>
                   <span v-else-if="planEntry.entry.kind === 'stat'" class="goal-kind-tag">{{ t('terraforming.goal.statGoal') || 'Stat Goal' }}</span>
                   <span v-else class="goal-kind-tag">{{ t('terraforming.goal.projectGoal') || 'Goal' }}</span>
                   <span v-if="planEntry.entry.satisfied" class="goal-status done">✓</span>
@@ -383,6 +400,30 @@ function buildDraftWaresTooltip(wares: Array<{ name: string; amount: number }>):
                   <div v-else class="goal-stat-text">{{ planEntry.entry.statGoalModel.numericText }}</div>
                 </div>
                 <div v-if="planEntry.entry.riskReason" class="goal-risk-text">{{ planEntry.entry.riskReason }}</div>
+              </template>
+
+              <template v-else-if="planEntry.type === 'auto-event'">
+                <div class="timeline-head">
+                  <button class="timeline-main" disabled style="cursor:default">
+                    <span class="drag-placeholder">◇</span>
+                    <span class="entry-order">#{{ planEntry.entry.order }}</span>
+                    <span class="entry-name">{{ planEntry.entry.projectName }}</span>
+                    <span class="event-tag">{{ t('terraforming.event.tag') || 'EVENT' }}</span>
+                  </button>
+                </div>
+                <div v-if="planEntry.entry.statLines.length > 0" class="timeline-body draft-body">
+                  <div class="detail-section">
+                    <div class="section-title">{{ t('terraforming.statChanges') }}</div>
+                    <TerraformingStatScale
+                      v-for="line in planEntry.entry.statLines"
+                      :key="`${planEntry.entry.id}-auto-stat-${line.statId}`"
+                      :model="line"
+                      compact
+                      mode="impact"
+                      @click-stat="emit('clickStat', $event)"
+                    />
+                  </div>
+                </div>
               </template>
 
               <template v-else>
@@ -464,8 +505,10 @@ function buildDraftWaresTooltip(wares: Array<{ name: string; amount: number }>):
                 <span class="expand-icon">{{ expandedEntryId === entry.id ? '▼' : '▶' }}</span>
                 <span class="entry-order">#{{ entry.order }}</span>
                 <span class="entry-name">{{ entry.projectName }}</span>
+                <span v-if="entry.projectGroupId === 'events'" class="event-tag">{{ t('terraforming.event.tag') || 'EVENT' }}</span>
               </button>
               <button
+                v-if="entry.projectGroupId !== 'events'"
                 class="cancel-btn"
                 :class="{ disabled: !getValidation(entry.id).canCancel }"
                 :disabled="!getValidation(entry.id).canCancel"
@@ -793,6 +836,10 @@ function buildDraftWaresTooltip(wares: Array<{ name: string; amount: number }>):
   @apply text-slate-500 cursor-grab;
 }
 
+.drag-placeholder {
+  @apply inline-block w-3.5 text-center cursor-default;
+}
+
 .draft-state {
   @apply text-[11px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-300;
 }
@@ -880,6 +927,30 @@ function buildDraftWaresTooltip(wares: Array<{ name: string; amount: number }>):
 
 .rebate-dot {
   @apply text-emerald-400 mr-1 shrink-0;
+}
+
+.auto-event-entry {
+  @apply opacity-80;
+}
+
+.auto-event-entry .event-head {
+  @apply flex items-center gap-2;
+}
+
+.event-tag {
+  @apply text-xs px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 font-medium;
+}
+
+.auto-event-entry .event-drag-placeholder {
+  @apply inline-block w-3.5 text-center opacity-30 cursor-default;
+}
+
+.goal-preventive {
+  @apply border-l-4 border-amber-500/60;
+}
+
+.goal-kind-tag-preventive {
+  @apply bg-amber-500/20 text-amber-400;
 }
 </style>
 

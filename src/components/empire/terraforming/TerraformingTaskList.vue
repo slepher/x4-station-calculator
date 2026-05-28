@@ -8,7 +8,6 @@ import type {
   TerraformingStatLineModel,
   TerraformingTaskNodeDisplay,
 } from '@/components/empire/presenters/useTerraformingPresenter'
-import X4NumberInput from '@/components/common/X4NumberInput.vue'
 import TerraformingStatScale from '@/components/empire/terraforming/TerraformingStatScale.vue'
 import TerraformingTaskNode from '@/components/empire/terraforming/TerraformingTaskNode.vue'
 
@@ -179,12 +178,6 @@ function formatDuration(duration: number | null): string {
   return [hours, minutes, seconds].map(part => String(part).padStart(2, '0')).join(':')
 }
 
-function handleEventSetCount(event: { id: string; available: boolean }, newCount: number) {
-  const current = props.completedProjectCounts.get(event.id) ?? 0
-  if (newCount > current && !event.available) return
-  emit('setProjectCount', event.id, newCount)
-}
-
 function getNodeDisplay(projectId: string): TerraformingTaskNodeDisplay | null {
   return props.taskNodeDisplays.get(projectId) || null
 }
@@ -246,16 +239,12 @@ function getStatLines(projectId: string): TerraformingStatLineModel[] {
           <div class="group-header">{{ groupNames.get('events') || 'Events' }}</div>
           <draggable
             :model-value="visibleEvents"
-            :group="{ name: 'terraforming-tasks', pull: 'clone', put: false }"
+            :group="{ name: 'terraforming-tasks', pull: false, put: false }"
             :sort="false"
-            :clone="(n: any) => ({ projectId: n.id, projectName: getNodeName(n.id, n.name), _type: 'drag-clone' })"
             item-key="id"
-            :disabled="!isEditing"
+            :disabled="true"
             ghost-class="drag-ghost"
-            handle=".drag-to-log"
             class="task-node-list"
-            @start="onTaskDragStart"
-            @end="emit('endDragTask')"
           >
             <template #item="{ element: e }">
               <div
@@ -282,27 +271,16 @@ function getStatLines(projectId: string): TerraformingStatLineModel[] {
                   <span v-if="getRepeatTagData(e.id, projectMap).cooldownLabel" class="task-repeat">{{ getRepeatTagData(e.id, projectMap).cooldownLabel }}</span>
                 </div>
                 <div class="task-actions">
-                  <template v-if="isRepeatableProject(e.id, projectMap)">
-                    <X4NumberInput
-                      :model-value="completedProjectCounts.get(e.id) ?? 0"
-                      :min="0"
-                      :max="99"
-                      :disabled="!e.available && (completedProjectCounts.get(e.id) ?? 0) === 0"
-                      width-class="w-14"
-                      @update:model-value="handleEventSetCount(e, $event)"
-                    />
-                  </template>
-                  <button
-                    v-else
-                    class="toggle-btn"
-                    :class="{ toggled: (completedProjectCounts.get(e.id) ?? 0) > 0 }"
-                    :disabled="!e.available && (completedProjectCounts.get(e.id) ?? 0) === 0"
-                    @click="emit('toggleProject', e.id)"
-                  >
-                    {{ (completedProjectCounts.get(e.id) ?? 0) > 0 ? t('terraforming.undo') : t('terraforming.complete') }}
-                  </button>
-                    <span v-if="isEditing" class="drag-to-log">↔</span>
-                  </div>
+                  <span
+                    v-if="isRepeatableProject(e.id, projectMap) && (completedProjectCounts.get(e.id) ?? 0) > 0"
+                    class="event-count-tag"
+                  >{{ (completedProjectCounts.get(e.id) ?? 0).toLocaleString() + t('terraforming.event.times') }}</span>
+                  <span
+                    v-else-if="(completedProjectCounts.get(e.id) ?? 0) > 0"
+                    class="event-triggered-tag"
+                  >{{ t('terraforming.event.triggered') || 'Triggered' }}</span>
+                  <span v-if="isEditing" class="event-drag-placeholder">&nbsp;</span>
+                </div>
               </div>
               <div class="task-body">
                 <div v-if="getStatLines(e.id).length > 0" class="stat-impact-list">
@@ -422,6 +400,9 @@ function getStatLines(projectId: string): TerraformingStatLineModel[] {
 .task-card { @apply px-2 py-1.5; }
 .task-head { @apply flex items-start justify-between gap-3; }
 .task-actions { @apply flex items-center gap-1 flex-shrink-0; }
+.event-drag-placeholder { @apply text-xs text-slate-600 opacity-40 cursor-default w-6 inline-block; }
+.event-count-tag { @apply text-xs px-2 py-0.5 rounded bg-slate-700/50 text-slate-400 min-w-[3.5rem] text-center; }
+.event-triggered-tag { @apply text-xs px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 min-w-[3.5rem] text-center; }
 .task-title { @apply flex min-w-0 items-center gap-1.5 flex-wrap; }
 .task-body { @apply mt-1 flex flex-col gap-1; }
 .stat-impact-list { @apply mt-1.5 flex flex-col gap-1; }
