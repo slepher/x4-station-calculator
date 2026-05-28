@@ -1165,6 +1165,7 @@
   "terraforming.oneTime": "一次性",
   "terraforming.repeatable": "可重复",
   "terraforming.cooldown": "冷却",
+  "terraforming.resilient": "抗震",
   "terraforming.setback": "进度损失",
   "terraforming.duration": "耗时",
   "terraforming.effect.allTrainees": "全体学员",

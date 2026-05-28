@@ -244,6 +244,14 @@ src/components/empire/
 
 effect-list 对所有项目节点生效（events + 普通节点 + 子节点），不再仅 events 组展示 sideEffects。
 
+### resilient 标签
+
+`resilient` 属性定义在 `terraforming-data` change 中（`terraforming.xsd:571`），语义为项目施工不受 setback（地震等）影响。在任务节点标题行，紧随一次性/可重复/耗时/冷却标签之后显示 `抗震` 标签：
+
+- 文本: `t('terraforming.resilient')` → "抗震" / "Resilient"
+- 仅当 `project.resilient === true` 时显示
+- 复用现有 `.task-repeat` class 风格
+
 ## 当前已知关注点
 
 - stat 展示语义依赖 `terraforming-blocks` change，后续若调整方块细节，应在该 change 中维护

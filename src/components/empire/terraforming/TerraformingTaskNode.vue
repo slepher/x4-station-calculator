@@ -63,6 +63,10 @@ function getRepeatTagData(projectId: string): RepeatTagData {
   return { typeLabel, durationLabel, cooldownLabel }
 }
 
+function isResilientProject(projectId: string): boolean {
+  return props.projectMap.get(projectId)?.resilient === true
+}
+
 function isRepeatableProject(projectId: string): boolean {
   const proj = props.projectMap.get(projectId)
   return (proj?.repeatCooldown ?? null) !== null
@@ -173,17 +177,8 @@ function onChildDragStart(event: any) {
             class="task-desc-icon"
             v-tippy="{ content: getDescription(node.id), allowHTML: false, placement: 'top', theme: 'material', maxWidth: 360 }"
           >ⓘ</span>
-          <span v-if="getRepeatTagData(node.id).typeLabel" class="task-repeat">{{ getRepeatTagData(node.id).typeLabel }}</span>
-          <span v-if="getRepeatTagData(node.id).durationLabel" class="task-repeat">{{ getRepeatTagData(node.id).durationLabel }}</span>
-          <span v-if="getRepeatTagData(node.id).cooldownLabel" class="task-repeat">{{ getRepeatTagData(node.id).cooldownLabel }}</span>
         </div>
         <div class="task-actions">
-          <span v-if="getPrice(node.id) > 0" class="task-price">{{ getPrice(node.id).toLocaleString() }} Cr</span>
-          <span
-            v-if="getPrice(node.id) > 0"
-            class="task-info-icon"
-            v-tippy="{ content: buildWaresTooltip(node.id), allowHTML: true, placement: 'top', theme: 'material' }"
-          >ⓘ</span>
           <template v-if="isRepeatableProject(node.id)">
             <X4NumberInput
               :model-value="completedProjectCounts.get(node.id) ?? 0"
@@ -207,6 +202,22 @@ function onChildDragStart(event: any) {
         </div>
       </div>
       <div class="task-body">
+        <div class="task-meta">
+          <div class="task-tags">
+            <span v-if="getRepeatTagData(node.id).typeLabel" class="task-repeat">{{ getRepeatTagData(node.id).typeLabel }}</span>
+            <span v-if="getRepeatTagData(node.id).durationLabel" class="task-repeat">{{ getRepeatTagData(node.id).durationLabel }}</span>
+            <span v-if="getRepeatTagData(node.id).cooldownLabel" class="task-repeat">{{ getRepeatTagData(node.id).cooldownLabel }}</span>
+            <span v-if="isResilientProject(node.id)" class="task-repeat">{{ t('terraforming.resilient') }}</span>
+          </div>
+          <div class="task-meta-right">
+            <span v-if="getPrice(node.id) > 0" class="task-price">{{ getPrice(node.id).toLocaleString() }} Cr</span>
+            <span
+              v-if="getPrice(node.id) > 0"
+              class="task-info-icon"
+              v-tippy="{ content: buildWaresTooltip(node.id), allowHTML: true, placement: 'top', theme: 'material' }"
+            >ⓘ</span>
+          </div>
+        </div>
         <div v-if="getStatLines(node.id).length > 0" class="stat-impact-list">
           <TerraformingStatScale
             v-for="line in getStatLines(node.id)"
@@ -342,15 +353,28 @@ function onChildDragStart(event: any) {
 }
 
 .task-title {
-  @apply flex min-w-0 items-center gap-1.5 flex-wrap;
+  @apply flex min-w-0 items-center gap-1.5;
+}
+
+.task-meta {
+  @apply flex items-center justify-between gap-2 flex-wrap;
+  @apply rounded border border-slate-700/40 bg-slate-950/30 px-2 py-1.5;
+}
+
+.task-tags {
+  @apply flex items-center gap-1 flex-wrap;
+}
+
+.task-meta-right {
+  @apply flex items-center gap-0.5 flex-shrink-0;
 }
 
 .task-body {
-  @apply mt-1 flex flex-col gap-1;
+  @apply mt-1.5 flex flex-col gap-1.5;
 }
 
 .stat-impact-list {
-  @apply mt-1.5 flex flex-col gap-1;
+  @apply flex flex-col gap-1;
 }
 
 .task-status-icon {
@@ -378,7 +402,7 @@ function onChildDragStart(event: any) {
 }
 
 .effect-list {
-  @apply mt-1.5 flex flex-col gap-1.5;
+  @apply flex flex-col gap-1.5;
 }
 
 .effect-list-item {
@@ -402,7 +426,7 @@ function onChildDragStart(event: any) {
 }
 
 .condition-list {
-  @apply mt-1.5 flex flex-col gap-1.5;
+  @apply flex flex-col gap-1.5;
 }
 
 .condition-dependency {

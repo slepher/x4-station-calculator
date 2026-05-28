@@ -447,6 +447,30 @@ Task 和 Event 名称后 MUST 显示 ⓘ 图标，hover 时通过 v-tippy 向上
 
 **那么** 行为与普通 task 一致
 
+### Requirement: Resilient 属性标签
+
+Project 的 `resilient` 属性 MUST 在任务节点标题行显示为标签。
+
+#### Scenario: Project 为 resilient
+
+**前提** `project.resilient === true`
+
+**当** 任务节点渲染标题行
+
+**那么** MUST 在一次性/可重复标签和耗时/冷却标签之后显示 resilient 标签
+
+**并且** 文本为 `t('terraforming.resilient')`
+
+**并且** 复用 `.task-repeat` class 样式
+
+#### Scenario: Project 非 resilient
+
+**前提** `project.resilient === false` 或未定义
+
+**当** 任务节点渲染标题行
+
+**那么** MUST NOT 显示 resilient 标签
+
 ## MODIFIED Requirements
 
 ### Requirement: 星区面板 List/Item 双模式

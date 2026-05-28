@@ -93,6 +93,7 @@
 - [x] 项目已完成时 sideEffect 概率显示为 100%
 - [x] effect-list 对所有节点生效（events + 普通 + 子节点），不再仅 events 展示 sideEffects
 - [x] rebate 名称通过 `module_groups.json` 或 `wares.json` 的 `nameId` 经 i18n 解析
+- [x] `resilient` 属性作为标签在一次性/可重复/耗时/冷却之后显示（复用 `.task-repeat` class），仅当 `project.resilient === true` 时出现
 
 ### 视觉一致性
 

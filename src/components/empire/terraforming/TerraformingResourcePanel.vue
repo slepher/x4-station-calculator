@@ -576,7 +576,7 @@ function buildDraftWaresTooltip(entry: { wares: Array<{ name: string; amount: nu
                 </template>
               </div>
 
-              <div v-if="entry.cumulativeRebates.length > 0" class="detail-section">
+              <div v-if="entry.cumulativeRebates.length > 0 && entry.projectGroupId !== 'events'" class="detail-section">
                 <div class="section-title">{{ t('terraforming.cumulativeRebates') }}</div>
                 <div
                   v-for="(rb, i) in entry.cumulativeRebates"

@@ -1164,6 +1164,7 @@
   "terraforming.oneTime": "One-time",
   "terraforming.repeatable": "Repeatable",
   "terraforming.cooldown": "Cooldown",
+  "terraforming.resilient": "Resilient",
   "terraforming.setback": "setback",
   "terraforming.duration": "Duration",
   "terraforming.effect.allTrainees": "all trainees",
