@@ -210,9 +210,32 @@ function onCancel(entry: TerraformingExecutionTimelineEntry) {
 }
 
 function getWareName(wareId: string): string {
+  const gameDataStore = useGameDataStore()
   const ware = gameDataStore.waresMap[wareId] as any
   if (!ware) return wareId
   return translateWare(ware)
+}
+
+function getDiscountedWaresMap(entry: TerraformingExecutionTimelineEntry): Map<string, { original: number; discount: number; final: number }> {
+  const map = new Map<string, { original: number; discount: number; final: number }>()
+  for (const dw of entry.discountedWares) {
+    map.set(dw.wareId, dw)
+  }
+  return map
+}
+
+function getWareDiscount(entry: TerraformingExecutionTimelineEntry, wareId: string): string {
+  const dw = getDiscountedWaresMap(entry).get(wareId)
+  if (!dw || dw.discount <= 0) return ''
+  return '\u2212' + dw.discount.toLocaleString()
+}
+
+function getWareConsumed(entry: TerraformingExecutionTimelineEntry, wareId: string): number {
+  const qty = entry.wares.find(w => w.ware === wareId)?.actualAmount
+    ?? entry.wares.find(w => w.ware === wareId)?.amount
+    ?? 0
+  const dw = getDiscountedWaresMap(entry).get(wareId)
+  return dw ? dw.final : qty
 }
 
 function getTotalVolume(entry: TerraformingExecutionTimelineEntry): number {
@@ -265,10 +288,12 @@ function getTotalBuildTime(entry: TerraformingExecutionTimelineEntry): number {
   return entry.deliveryDetails[0]?.totalTime ?? 0
 }
 
-function buildDraftWaresTooltip(wares: Array<{ name: string; amount: number }>): string {
-  const lines = wares.map(w =>
-    `<div class='tooltip-ware-row'><span class='tooltip-ware-name'>${w.name}</span><span class='tooltip-ware-amount'>${w.amount.toLocaleString()}</span></div>`
-  )
+function buildDraftWaresTooltip(entry: { wares: Array<{ name: string; amount: number }>; discountedWares: Array<{ name: string; discount: number; final: number }> }): string {
+  const dwMap = new Map(entry.discountedWares.map(d => [d.name, d]))
+  const lines = entry.wares.map(w => {
+    const d = dwMap.get(w.name)
+    return `<div class='tooltip-ware-row'><span class='tooltip-ware-name'>${w.name}</span><span class='tooltip-ware-amount'>${(d ? d.final : w.amount).toLocaleString()}</span></div>`
+  })
   return `<div class='tooltip-wares'>${lines.join('')}</div>`
 }
 </script>
@@ -437,11 +462,11 @@ function buildDraftWaresTooltip(wares: Array<{ name: string; amount: number }>):
                     </span>
                   </button>
                   <div class="draft-actions">
-                    <span v-if="planEntry.entry.price > 0" class="entry-price">{{ planEntry.entry.price.toLocaleString() }} Cr</span>
+                    <span v-if="planEntry.entry.price > 0" class="entry-price">{{ (planEntry.entry.discountAmount > 0 ? planEntry.entry.price - planEntry.entry.discountAmount : planEntry.entry.price).toLocaleString() }} Cr</span>
                     <span
                       v-if="planEntry.entry.price > 0 && planEntry.entry.wares.length > 0"
                       class="entry-info-icon"
-                      v-tippy="{ content: buildDraftWaresTooltip(planEntry.entry.wares), allowHTML: true, placement: 'top', theme: 'material' }"
+                      v-tippy="{ content: buildDraftWaresTooltip(planEntry.entry), allowHTML: true, placement: 'top', theme: 'material' }"
                     >ⓘ</span>
                     <button
                       class="draft-btn danger"
@@ -459,15 +484,10 @@ function buildDraftWaresTooltip(wares: Array<{ name: string; amount: number }>):
                   </div>
                 </div>
                 <div
-                  v-if="planEntry.entry.dependencies.length > 0 || planEntry.entry.statLines.length > 0 || planEntry.entry.reasons.length > 0"
+                  v-if="planEntry.entry.statLines.length > 0 || planEntry.entry.reasons.length > 0"
                   class="timeline-body draft-body"
                 >
-                  <div v-if="planEntry.entry.dependencies.length > 0" class="detail-section">
-                    <div class="section-title">{{ t('terraforming.depends') }}</div>
-                    <div v-for="dep in planEntry.entry.dependencies" :key="`${planEntry.entry.id}-${dep}`" class="detail-text">{{ dep }}</div>
-                  </div>
                   <div v-if="planEntry.entry.statLines.length > 0" class="detail-section">
-                    <div class="section-title">{{ t('terraforming.statChanges') }}</div>
                     <TerraformingStatScale
                       v-for="line in planEntry.entry.statLines"
                       :key="`${planEntry.entry.id}-draft-stat-${line.statId}`"
@@ -521,13 +541,32 @@ function buildDraftWaresTooltip(wares: Array<{ name: string; amount: number }>):
             <div v-if="expandedEntryId === entry.id" class="timeline-body">
               <div v-if="entry.wares.length > 0" class="detail-section">
                 <div class="section-title">{{ t('terraforming.materialPrice') }}</div>
-                <div v-for="ware in entry.wares" :key="`${entry.id}-ware-${ware.ware}`" class="detail-row">
-                  <span>{{ getWareName(ware.ware) }}</span>
-                  <span>{{ (ware.actualAmount ?? ware.amount).toLocaleString() }}</span>
+                <div class="detail-row detail-header">
+                  <span class="col-name">{{ t('terraforming.wareName') || 'Name' }}</span>
+                  <span class="col-qty">{{ t('terraforming.wareQty') || 'Qty' }}</span>
+                  <span class="col-discount">{{ t('terraforming.discount') || 'Discount' }}</span>
+                  <span class="col-consumed">{{ t('terraforming.consumed') || 'Consumed' }}</span>
                 </div>
-                <div class="detail-row detail-total">
+                <div v-for="ware in entry.wares" :key="`${entry.id}-ware-${ware.ware}`" class="detail-row">
+                  <span class="col-name">{{ getWareName(ware.ware) }}</span>
+                  <span class="col-qty">{{ (ware.actualAmount ?? ware.amount).toLocaleString() }}</span>
+                  <span class="col-discount">{{ getWareDiscount(entry, ware.ware) }}</span>
+                  <span class="col-consumed">{{ getWareConsumed(entry, ware.ware).toLocaleString() }}</span>
+                </div>
+                <div class="detail-row detail-separator"></div>
+                <template v-if="entry.discountAmount > 0">
+                  <div class="detail-row">
+                    <span>{{ t('terraforming.projectPrice') || 'Project Price' }}</span>
+                    <span>{{ entry.price.toLocaleString() }} Cr</span>
+                  </div>
+                  <div class="detail-row text-amber-400">
+                    <span>{{ t('terraforming.discount') || 'Discount' }}</span>
+                    <span>-{{ entry.discountAmount.toLocaleString() }} Cr</span>
+                  </div>
+                </template>
+                <div class="detail-row detail-total-sep">
                   <span>{{ t('terraforming.credits') }}</span>
-                  <span>{{ entry.price.toLocaleString() }} Cr</span>
+                  <span>{{ (entry.discountAmount > 0 ? entry.price - entry.discountAmount : entry.price).toLocaleString() }} Cr</span>
                 </div>
                 <template v-if="getTotalVolume(entry) > 0">
                   <div v-for="[type, vol] in Object.entries(getVolumeByTransport(entry)).filter(([,v]) => v > 0)" :key="type" class="detail-row volume-row">
@@ -535,18 +574,6 @@ function buildDraftWaresTooltip(wares: Array<{ name: string; amount: number }>):
                     <span>{{ vol.toLocaleString() }} m³</span>
                   </div>
                 </template>
-              </div>
-
-              <div v-if="entry.returnedWares.length > 0" class="detail-section">
-                <div class="section-title">{{ t('terraforming.return') || 'Return' }}</div>
-                <div
-                  v-for="rw in entry.returnedWares"
-                  :key="`${entry.id}-rtw-${rw.name}`"
-                  class="detail-row text-emerald-400"
-                >
-                  <span>{{ rw.name }}</span>
-                  <span>×{{ rw.amount.toLocaleString() }}</span>
-                </div>
               </div>
 
               <div v-if="entry.cumulativeRebates.length > 0" class="detail-section">
@@ -909,9 +936,18 @@ function buildDraftWaresTooltip(wares: Array<{ name: string; amount: number }>):
   @apply flex items-center justify-between gap-3 text-xs text-slate-300;
 }
 
-.detail-row.detail-total {
-  @apply border-t border-slate-700/40 pt-1 mt-0.5 text-slate-200;
+.detail-row .col-name { @apply flex-1 min-w-0; }
+.detail-row .col-qty { @apply w-16 text-right; }
+.detail-row .col-discount { @apply w-16 text-right text-amber-400; }
+.detail-row .col-consumed { @apply w-16 text-right; }
+.detail-row.detail-header { @apply text-slate-500 text-[11px]; }
+.detail-row.detail-separator {
+  @apply border-t border-slate-700/40 my-1;
+  height: 0;
+  padding: 0;
 }
+
+.detail-row.detail-total-sep {}
 
 .detail-row.volume-row {
   @apply mt-0;
@@ -951,6 +987,16 @@ function buildDraftWaresTooltip(wares: Array<{ name: string; amount: number }>):
 
 .goal-kind-tag-preventive {
   @apply bg-amber-500/20 text-amber-400;
+}
+</style>
+
+<style>
+.tooltip-ware-disc {
+  @apply text-amber-400 ml-1;
+}
+
+.tooltip-ware-amount {
+  @apply ml-auto;
 }
 </style>
 

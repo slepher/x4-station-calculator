@@ -703,7 +703,7 @@ function fmtProjectDetails(
           : r.wareGroup || r.ware || ''
       return `${target} ${r.value}%`
     })
-    lines.push(`↩️ 返还: ${parts.join(', ')}`)
+    lines.push(`折扣: ${parts.join(', ')}`)
   }
 
   return lines

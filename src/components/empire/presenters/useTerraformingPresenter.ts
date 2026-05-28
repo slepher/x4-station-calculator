@@ -166,10 +166,11 @@ export interface TerraformingExecutionTimelineEntry {
   dockModules: Array<{ name: string; count: number; slots: number }>
   totalSlots: number
   price: number
+  discountAmount: number
   projectRebates: Array<{ name: string; value: number }>
   cumulativeRebates: Array<{ name: string; value: number }>
   rebateChanges: Array<{ name: string; before: number; after: number }>
-  returnedWares: Array<{ name: string; amount: number }>
+  discountedWares: Array<{ wareId: string; name: string; original: number; discount: number; final: number }>
   statLines: TerraformingStatLineModel[]
   beforeStats: TerraformingTimelineStatSnapshot[]
   afterStats: TerraformingTimelineStatSnapshot[]
@@ -204,6 +205,8 @@ export interface TerraformingDraftTimelineEntry {
   statLines: TerraformingStatLineModel[]
   price: number
   wares: Array<{ name: string; amount: number }>
+  discountAmount: number
+  discountedWares: Array<{ wareId: string; name: string; original: number; discount: number; final: number }>
   isEvent: boolean
   source?: 'committed' | 'draft'
 }
@@ -927,6 +930,43 @@ function computeCumulativeRebates(
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([name, value]) => ({ name, value }))
   return { entries, aggregatedByGroup: aggregated }
+}
+
+type DiscountedWareEntry = { wareId: string; name: string; original: number; discount: number; final: number }
+
+function computeProjectDiscount(
+  projectResources: { wares: Array<{ ware: string; amount: number; actualAmount?: number }> } | undefined,
+  cumulativeEntries: Array<{ name: string; value: number }>,
+  wareGroupMap: ComputedRef<Map<string, string>>,
+  moduleGroupNames: ComputedRef<Map<string, string>>,
+  wareNames: ComputedRef<Map<string, string>>,
+  waresMap: Record<string, { maxPrice?: number }>,
+): { discountedWares: DiscountedWareEntry[]; discountAmount: number } {
+  const wares = projectResources?.wares || []
+  const dw: DiscountedWareEntry[] = []
+  let da = 0
+  if (wares.length === 0 || cumulativeEntries.length === 0) return { discountedWares: dw, discountAmount: da }
+  const seen = new Set<string>()
+  for (const rb of cumulativeEntries) {
+    const pct = rb.value / 100
+    for (const w of wares) {
+      const amount = w.actualAmount ?? w.amount
+      if (amount <= 0) continue
+      const groupId = wareGroupMap.value.get(w.ware)
+      const translatedGroup = groupId ? (moduleGroupNames.value.get(groupId) || groupId) : ''
+      if (translatedGroup !== rb.name && w.ware !== rb.name) continue
+      if (seen.has(w.ware)) continue
+      seen.add(w.ware)
+      const wareName = wareNames.value.get(w.ware) || w.ware
+      const discAmt = Math.floor(amount * pct)
+      if (discAmt > 0) dw.push({ wareId: w.ware, name: wareName, original: amount, discount: discAmt, final: amount - discAmt })
+    }
+  }
+  for (const e of dw) {
+    const unitPrice = waresMap[e.wareId]?.maxPrice ?? 0
+    if (unitPrice > 0 && e.discount > 0) da += unitPrice * e.discount
+  }
+  return { discountedWares: dw, discountAmount: da }
 }
 
 function translateEvaluationReasons(
@@ -1814,6 +1854,15 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
         repeatRole = previous?.projectId === entry.projectId ? 'duplicate' : 'first'
       }
 
+      const entryCumulative = computeCumulativeRebates(completedProjects, d, store.moduleGroupNames.value, store.wareNames.value)
+      const { discountedWares: entryDw, discountAmount: entryDiscAmt } = computeProjectDiscount(
+        project?.resources,
+        entryCumulative.entries,
+        store.wareGroupMap,
+        store.moduleGroupNames,
+        store.wareNames,
+        useGameDataStore().waresMap,
+      )
       entries.push({
         id: entry.id,
         order: ++orderSeq,
@@ -1837,6 +1886,8 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
           name: store.wareNames.value.get(w.ware) || w.ware,
           amount: w.actualAmount ?? w.amount,
         })),
+        discountAmount: entryDiscAmt,
+        discountedWares: entryDw,
         isEvent: false,
         source: entry.source,
       })
@@ -1863,6 +1914,8 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
         statLines,
         price: 0,
         wares: [],
+        discountAmount: 0,
+        discountedWares: [],
         isEvent: true,
         source: 'draft',
       })
@@ -2281,6 +2334,15 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
         return name ? { name, value: rb.value } : null
       }).filter((r): r is { name: string; value: number } => r !== null) || []
 
+      const { discountedWares: discountedWaresData, discountAmount: discountAmountVal } = computeProjectDiscount(
+        project?.resources,
+        cumulative.entries,
+        store.wareGroupMap,
+        store.moduleGroupNames,
+        store.wareNames,
+        useGameDataStore().waresMap,
+      )
+
       results.push({
         id: entry.id,
         order: index + 1,
@@ -2323,26 +2385,8 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
         projectRebates,
         rebateChanges,
         cumulativeRebates: cumulative.entries,
-        returnedWares: (() => {
-          const rw: Array<{ name: string; amount: number }> = []
-          const seen = new Set<string>()
-          for (const rb of cumulative.entries) {
-            const pct = rb.value / 100
-            for (const w of (project?.resources?.wares || [])) {
-              const amount = w.actualAmount ?? w.amount
-              if (amount <= 0) continue
-              const groupId = store.wareGroupMap.value.get(w.ware)
-              const translatedGroup = groupId ? (store.moduleGroupNames.value.get(groupId) || groupId) : ''
-              if (translatedGroup !== rb.name && w.ware !== rb.name) continue
-              if (seen.has(w.ware)) continue
-              seen.add(w.ware)
-              const wareName = store.wareNames.value.get(w.ware) || w.ware
-              const returned = Math.floor(amount * pct)
-              if (returned > 0) rw.push({ name: wareName, amount: returned })
-            }
-          }
-          return rw
-        })(),
+        discountedWares: discountedWaresData,
+        discountAmount: discountAmountVal,
         statLines,
         beforeStats: beforeStatsList,
         afterStats: beforeStatsList,
