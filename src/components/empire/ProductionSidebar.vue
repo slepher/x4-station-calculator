@@ -105,7 +105,7 @@ const getTabIconClass = (tab: ProductionTabItem): string => {
 const getTabIcon = (tab: ProductionTabItem): string => {
   if (tab.id === 'overview') return playerhqIconUrl
   if (tab.id === 'terraforming' || tab.id === 'tech-tree') return playerhqIconUrl
-  if (tab.type === 'transit') return playerhqIconUrl
+  if (tab.type === 'transit') return factoryIconUrl
   const iconTag = getPoiIconTag(tab)
   if (iconTag) return SAVE_POI_ICON_MAP[iconTag] || factoryIconUrl
   return factoryIconUrl
@@ -319,15 +319,25 @@ onUnmounted(() => {
 
             <template v-if="isSectorExpanded(sector.id)">
               <div
-                v-for="item in dynamicItems.filter(d => d.sectorId === sector.id)"
+                v-for="item in dynamicItems.filter(d => d.sectorId === sector.id && d.type === 'transit')"
                 :key="item.id"
                 class="sidebar-item station-item"
-                :class="{
-                  active: isTabActive(item.id),
-                  'pl-8': true
-                }"
-                :data-testid="item.type === 'transit' ? 'sidebar-transit' : 'sidebar-station'"
-                :data-station-id="item.type === 'station' ? item.id : undefined"
+                :class="{ active: isTabActive(item.id) }"
+                data-testid="sidebar-transit"
+                @click="handleTabClick(item)"
+                @contextmenu.stop="openMenu(item.id, item.type, $event)"
+              >
+                <div class="sidebar-item-active-bar"></div>
+                <img class="sidebar-item-icon" :class="getTabIconClass(item)" :src="getTabIcon(item)" alt="" />
+                <span class="sidebar-item-label">{{ item.name }}</span>
+              </div>
+              <div
+                v-for="item in dynamicItems.filter(d => d.sectorId === sector.id && d.type === 'station')"
+                :key="item.id"
+                class="sidebar-item station-item pl-8"
+                :class="{ active: isTabActive(item.id) }"
+                data-testid="sidebar-station"
+                :data-station-id="item.id"
                 @click="handleTabClick(item)"
                 @contextmenu.stop="openMenu(item.id, item.type, $event)"
               >
