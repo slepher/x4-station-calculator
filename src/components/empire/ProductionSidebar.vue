@@ -423,7 +423,7 @@ onUnmounted(() => {
 }
 
 .sidebar-scroll {
-  @apply flex-1 overflow-y-auto;
+  @apply flex-1 overflow-y-auto overflow-x-hidden;
 }
 
 .sidebar-section {
