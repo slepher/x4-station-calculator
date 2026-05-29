@@ -72,16 +72,16 @@ const groupSectors = computed<Array<{ id: string; name: string; hasChildren: boo
 })
 
 const findTabById = (id: string): ProductionTabItem | undefined => {
-  return props.tabs.find(t => t.id === id || t.name === id)
+  const tab = props.tabs.find(t => t.id === id || t.name === id)
+  if (tab) return tab
+  return undefined
 }
 
 const findSectorForTabId = (tabId: string | null): string | undefined => {
   if (!tabId || !props.hasSectors) return undefined
   const tab = findTabById(tabId)
+  console.log('[sidebar] findSectorForTabId tabId:', tabId, 'found:', !!tab, 'tabs:', props.tabs.map(t => ({ id: t.id, name: t.name, sectorId: t.sectorId, type: t.type })))
   if (tab?.sectorId) return tab.sectorId
-  for (const t of props.tabs) {
-    if ((t.id === tabId || t.name === tabId) && t.sectorId) return t.sectorId
-  }
   return undefined
 }
 
