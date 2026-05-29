@@ -149,9 +149,7 @@ export function useProductionSidebarPresenter(store: SidebarPresenterStore): Use
         name: sector.name,
         sectorId: sector.id
       })
-      if (store.expandedSectorId === sector.id) {
-        result.push(...(grouped.get(sector.id) || []))
-      }
+      result.push(...(grouped.get(sector.id) || []))
     })
 
     return result

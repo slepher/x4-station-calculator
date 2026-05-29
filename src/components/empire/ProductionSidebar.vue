@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { ProductionTabItem } from '@/types/production-ui'
 import { SAVE_POI_ICON_MAP } from '@/components/map/utils/style'
@@ -44,6 +44,27 @@ const menuTabId = ref<string | null>(null)
 const menuTabType = ref<'station' | 'transit'>('station')
 const showDeleteConfirm = ref(false)
 const stationToDelete = ref<string | null>(null)
+const collapsedSectors = ref(new Set<string>())
+
+// init: all collapsed, expand active tab's sector
+if (hasSectors) {
+  const allSectorIds = groupSectors.value.map(s => s.id)
+  const activeTab = props.tabs.find(t => t.id === props.activeTabId)
+  const activeSectorId = activeTab?.sectorId
+  const next = new Set(allSectorIds)
+  if (activeSectorId) next.delete(activeSectorId)
+  collapsedSectors.value = next
+}
+
+watch(() => props.activeTabId, (tabId) => {
+  if (!tabId || !hasSectors) return
+  const tab = props.tabs.find(t => t.id === tabId)
+  if (tab?.sectorId) {
+    const next = new Set(collapsedSectors.value)
+    next.delete(tab.sectorId)
+    collapsedSectors.value = next
+  }
+})
 
 const fixedItems = computed<ProductionTabItem[]>(() => {
   const result = props.tabs.filter(t => t.type === 'overview')
@@ -142,12 +163,38 @@ const getSectorName = (sectorId: string): string => {
   return transitTab?.name || sectorId
 }
 
+const isSectorActive = (sectorId: string): boolean => {
+  if (isTabActive('transit:' + sectorId)) return true
+  return dynamicItems.value.some(d => d.sectorId === sectorId && d.type === 'station' && isTabActive(d.id))
+}
+
 const hasSectorChildren = (sectorId: string): boolean => {
   return props.tabs.some(t => t.type === 'station' && t.sectorId === sectorId)
 }
 
 const isSectorExpanded = (sectorId: string): boolean => {
-  return props.expandedSectorId === sectorId
+  return !collapsedSectors.value.has(sectorId)
+}
+
+const handleSectorClick = (sectorId: string) => {
+  emit('selectTransit', sectorId)
+}
+
+const toggleSectorCollapse = (sectorId: string) => {
+  const next = new Set(collapsedSectors.value)
+  if (next.has(sectorId)) {
+    next.delete(sectorId)
+  } else {
+    next.add(sectorId)
+  }
+  collapsedSectors.value = next
+}
+
+const handleFixedClick = (tab: ProductionTabItem) => {
+  if (hasSectors) {
+    collapsedSectors.value = new Set(groupSectors.value.map(s => s.id))
+  }
+  handleTabClick(tab)
 }
 
 const groupSectors = computed<Array<{ id: string; name: string; hasChildren: boolean }>>(() => {
@@ -305,7 +352,7 @@ onUnmounted(() => {
           <template v-for="sector in groupSectors" :key="sector.id">
             <div
               class="sidebar-item sector-header"
-              :class="{ expanded: isSectorExpanded(sector.id), active: isTabActive('transit:' + sector.id) }"
+              :class="{ expanded: isSectorExpanded(sector.id), active: isSectorActive(sector.id) }"
               @click="handleSectorClick(sector.id)"
             >
               <div class="sidebar-item-active-bar"></div>
@@ -319,7 +366,7 @@ onUnmounted(() => {
                 stroke-width="2.5"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                @click.stop="emit('expandSector', isSectorExpanded(sector.id) ? null : sector.id)"
+                @click.stop="toggleSectorCollapse(sector.id)"
               >
                 <path d="m9 18 6-6-6-6"></path>
               </svg>
