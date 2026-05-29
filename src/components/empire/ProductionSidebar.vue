@@ -96,12 +96,9 @@ const dynamicItems = computed<ProductionTabItem[]>(() => {
   sectorGroups.forEach((items, sectorId) => {
     const transitTab = items.find(i => i.type === 'transit')
     if (transitTab) result.push(transitTab)
-
-    if (props.expandedSectorId === sectorId) {
-      items.filter(i => i.type === 'station').forEach(stationTab => {
-        result.push(stationTab)
-      })
-    }
+    items.filter(i => i.type === 'station').forEach(stationTab => {
+      result.push(stationTab)
+    })
   })
 
   return result
