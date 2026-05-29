@@ -13,7 +13,8 @@
         "ship_blueprints": "x4_ship_blueprints",
         "setting": "x4-setting",
         "save_archives": "x4_save_archives",
-        "build_plan_goals": "x4_build_plan_goals"
+        "build_plan_goals": "x4_build_plan_goals",
+        "terraforming": "x4_terraforming_data"
       },
       "indexeddb_name": "x4_save_archive_db"
     },
@@ -30,7 +31,8 @@
         "ship_blueprints": "x4_ship_blueprints_v9_beta",
         "setting": "x4-setting_v9_beta",
         "save_archives": "x4_save_archives_v9_beta",
-        "build_plan_goals": "x4_build_plan_goals_v9_beta"
+        "build_plan_goals": "x4_build_plan_goals_v9_beta",
+        "terraforming": "x4_terraforming_data_v9_beta"
       },
       "indexeddb_name": "x4_save_archive_db_v9_beta"
     }
