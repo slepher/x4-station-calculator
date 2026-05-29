@@ -502,7 +502,7 @@ function toggleStatFilter(statId: string) {
 }
 
 .main-layout {
-  @apply grid grid-cols-12 gap-8 items-start;
+  @apply grid grid-cols-12 gap-8 items-start pr-4 pt-2;
 }
 
 .overview-left-panel {
