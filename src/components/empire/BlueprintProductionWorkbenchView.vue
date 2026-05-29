@@ -111,6 +111,13 @@ const terraformingPresenter = useTerraformingPresenter({
     return map
   }),
 })
+
+const isQueueEditing = computed(() => terraformingPresenter.props.resourcePanel.queueEditState.editing.value)
+const terraformingFloating = computed(() => ({
+  sectorPanel: true,
+  taskList: isQueueEditing.value,
+  resourcePanel: !isQueueEditing.value,
+}))
 </script>
 
 <template>
@@ -187,7 +194,7 @@ const terraformingPresenter = useTerraformingPresenter({
         :stat-display-names="terraformingPresenter.props.sectorPanel.statDisplayNames.value"
         :active-rebates="terraformingPresenter.props.sectorPanel.activeRebates.value"
         :cluster-reward-displays="terraformingPresenter.props.sectorPanel.clusterRewardDisplays.value"
-        :floating="false"
+        :floating="terraformingFloating.sectorPanel"
         @click-stat="() => {}"
         @select-cluster="terraformingPresenter.emits.selectCluster"
         @display-mode-change="() => {}"
@@ -202,7 +209,7 @@ const terraformingPresenter = useTerraformingPresenter({
         :completed-project-counts="terraformingPresenter.props.taskList.completedProjectCounts.value"
         :project-map="terraformingPresenter.props.taskList.projectMap.value"
         :project-display-names="terraformingPresenter.props.taskList.projectDisplayNames.value"
-        :floating="false"
+        :floating="terraformingFloating.sectorPanel"
         :stat-filter="new Set()"
         :is-editing="false"
         :stat-display-names="terraformingPresenter.props.sectorPanel.statDisplayNames.value"
@@ -228,7 +235,7 @@ const terraformingPresenter = useTerraformingPresenter({
         :get-cancel-validation="terraformingPresenter.props.resourcePanel.getCancelValidation"
         :delivery-ship-map="terraformingPresenter.props.resourcePanel.deliveryShipMap.value"
         :hq-build-docks="terraformingPresenter.props.resourcePanel.hqBuildDocks.value"
-        :floating="false"
+        :floating="terraformingFloating.sectorPanel"
         :task-drag="terraformingPresenter.props.taskDrag"
         @click-stat="() => {}"
         @cancel-execution="terraformingPresenter.emits.cancelExecution"
