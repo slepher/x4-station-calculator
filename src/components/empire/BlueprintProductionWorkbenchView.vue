@@ -71,7 +71,7 @@ const buildPlanPresenter = useBuildPlanPresenter({
       @expand-sector="() => {}"
       @jump-to-binding="() => {}"
     />
-    <div class="production-content">
+    <div class="production-content custom-scrollbar">
       <BlueprintContextToolbar
     :station="toolbarPresenter.props.station.value"
     :workbench-mode="toolbarPresenter.props.workbenchMode.value"

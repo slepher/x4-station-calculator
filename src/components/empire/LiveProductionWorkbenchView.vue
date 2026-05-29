@@ -183,7 +183,7 @@ function toggleStatFilter(statId: string) {
       @expand-sector="sidebarPresenter.emits.expandSector"
       @jump-to-binding="(tabId, tabType) => sidebarPresenter.emits.jumpToBinding(tabId, tabType)"
     />
-    <div class="production-content">
+    <div class="production-content custom-scrollbar">
   
   <LiveOverviewToolbar
     v-if="toolbarPresenter.props.workbenchMode.value === 'overview' && toolbarPresenter.props.hasActiveBinding.value"

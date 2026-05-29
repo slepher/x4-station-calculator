@@ -244,7 +244,7 @@ onUnmounted(() => {
       </div>
     </button>
     <div class="sidebar-inner">
-      <div class="sidebar-scroll">
+      <div class="sidebar-scroll custom-scrollbar">
         <div class="sidebar-section sidebar-fixed">
           <div
             v-for="item in fixedItems"
@@ -425,21 +425,6 @@ onUnmounted(() => {
 
 .sidebar-scroll {
   @apply flex-1 overflow-y-auto;
-  scrollbar-width: thin;
-  scrollbar-color: #334155 transparent;
-}
-
-.sidebar-scroll::-webkit-scrollbar {
-  width: 4px;
-}
-
-.sidebar-scroll::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.sidebar-scroll::-webkit-scrollbar-thumb {
-  background-color: #334155;
-  border-radius: 2px;
 }
 
 .sidebar-section {
