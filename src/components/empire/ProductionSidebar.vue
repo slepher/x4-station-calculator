@@ -309,7 +309,6 @@ onUnmounted(() => {
                 <path d="m9 18 6-6-6-6"></path>
               </svg>
               <span class="sidebar-item-label">{{ sector.name }}</span>
-              <span v-if="!sector.hasChildren" class="sidebar-item-hint">{{ t('sector.no_stations') }}</span>
             </div>
 
             <template v-if="isSectorExpanded(sector.id)">
@@ -471,19 +470,6 @@ onUnmounted(() => {
 
 .sidebar-item-label {
   @apply text-xs font-medium truncate;
-}
-
-.sidebar-item-hint {
-  @apply text-[10px] text-slate-600 ml-auto;
-}
-
-.sector-header {
-  @apply font-semibold text-slate-300;
-}
-
-.sector-chevron {
-  @apply text-slate-500 transition-transform duration-150;
-  flex-shrink: 0;
 }
 
 .sector-chevron.rotated {
