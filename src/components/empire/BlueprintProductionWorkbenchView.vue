@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useBlueprintProductionStore } from '@/store/useBlueprintProductionStore'
 import { useTerraformingStore } from '@/store/useTerraformingStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
@@ -33,6 +33,15 @@ const gameDataStore = useGameDataStore()
 
 const gameDataMaps = computed(() => gameDataStore.maps)
 
+const panelMaxHeight = ref('calc(100vh - 8rem)')
+
+function updatePanelMaxHeight() {
+  const h = window.innerHeight
+  const margin = 32
+  const maxH = h - margin
+  panelMaxHeight.value = `${maxH}px`
+}
+
 onMounted(() => {
   terraformingStore.init()
   const empireId = activeViewStore.activeEmpireId
@@ -42,6 +51,12 @@ onMounted(() => {
   if (empireId) {
     terraformingStore.ensurePlanForContext('blueprint', empireId)
   }
+  window.addEventListener('resize', updatePanelMaxHeight)
+  requestAnimationFrame(() => updatePanelMaxHeight())
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', updatePanelMaxHeight)
 })
 
 watch(() => activeViewStore.activeEmpireId, (newId) => {
@@ -181,7 +196,7 @@ const terraformingFloating = computed(() => ({
     @close="toolbarPresenter.emits.closeImport"
   />
 
-  <div v-if="toolbarPresenter.props.workbenchMode.value === 'terraforming'" class="main-layout">
+  <div v-if="toolbarPresenter.props.workbenchMode.value === 'terraforming'" class="main-layout" :style="{ '--panel-max-h': panelMaxHeight }">
     <div class="col-span-12 lg:col-span-3" :class="{ 'sticky top-2 z-10': terraformingFloating.sectorPanel }">
       <TerraformingSectorPanel
         :clusters="terraformingPresenter.props.sectorPanel.clusters.value"
