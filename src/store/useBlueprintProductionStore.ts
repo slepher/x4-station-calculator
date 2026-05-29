@@ -537,6 +537,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
 
   function selectStation(stationId: string | null) {
     isTerraformingMode.value = false
+    saveTerraformingMode()
     activeStationId.value = stationId
   }
 
@@ -762,6 +763,7 @@ function updateStationModules(stationId: string, modules: SavedModule[]) {
         initializeAllStationDerived()
 
         fallbackToFirstEmpire()
+        loadTerraformingMode()
 
         isReady.value = true
         console.log('[BlueprintProductionStore] Loaded saved empires')
@@ -774,6 +776,7 @@ function updateStationModules(stationId: string, modules: SavedModule[]) {
       }
       isReady.value = true
       console.log('[BlueprintProductionStore] Initialized with new empire')
+      loadTerraformingMode()
 
     } catch (e) {
       console.error('[BlueprintProductionStore] Initialization failed:', e)
@@ -808,6 +811,21 @@ function updateStationModules(stationId: string, modules: SavedModule[]) {
   const titlePlaceholder = computed(() => i18n.global.t('sector.new_sector_name'))
 
   const isTerraformingMode = ref(false)
+
+  // persist terraforming mode per empire
+  function saveTerraformingMode() {
+    if (activeEmpire.value?.id) {
+      localStorage.setItem('x4_bp_terraforming_' + activeEmpire.value.id, String(isTerraformingMode.value))
+    }
+  }
+  function loadTerraformingMode() {
+    if (activeEmpire.value?.id) {
+      const stored = localStorage.getItem('x4_bp_terraforming_' + activeEmpire.value.id)
+      if (stored === 'true') {
+        isTerraformingMode.value = true
+      }
+    }
+  }
 
   const capabilities: ProductionWorkbenchCapabilities = {
     uniqueWorkbench: false,
@@ -1078,6 +1096,7 @@ function updateStationModules(stationId: string, modules: SavedModule[]) {
     updateStationName: updateStationNameFromActive,
     selectTerraforming() {
       isTerraformingMode.value = true
+      saveTerraformingMode()
       activeStationId.value = null
     },
     updateWareflowViewMode: (value: WareFlowViewMode) => { wareflowViewMode.value = value },
