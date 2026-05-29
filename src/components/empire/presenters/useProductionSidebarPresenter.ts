@@ -158,8 +158,10 @@ export function useProductionSidebarPresenter(store: SidebarPresenterStore): Use
   })
 
   const hasSectors = store.capabilities.hasSectors
-  const showTerraforming = !!store.selectTerraforming
-  const showTechTree = !!store.selectTechTree
+  // 蓝图显示地球化；实况暂隐藏（恢复：!!store.selectTerraforming）
+  const showTerraforming = !hasSectors
+  // 暂隐藏（恢复：!!store.selectTechTree）
+  const showTechTree = false
 
   const props: SidebarPresenterProps = {
     tabs,
