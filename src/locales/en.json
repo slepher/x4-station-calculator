@@ -1201,5 +1201,6 @@
   "terraforming.skill.management": "Management",
   "terraforming.skill.morale": "Morale",
   "terraforming.role.marine": "marines",
-  "terraforming.role.pilot": "pilots"
+  "terraforming.role.pilot": "pilots",
+  "techTree.placeholder": "Tech Tree - Under Development"
 }

@@ -1202,5 +1202,6 @@
   "terraforming.skill.management": "管理",
   "terraforming.skill.morale": "士气",
   "terraforming.role.marine": "陆战队员",
-  "terraforming.role.pilot": "飞行员"
+  "terraforming.role.pilot": "飞行员",
+  "techTree.placeholder": "科技树 开发中"
 }

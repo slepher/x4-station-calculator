@@ -22,8 +22,8 @@ const isMapsView = computed(() => shipBuildStore.activeView === 'maps')
 
 <template>
   <div
-    class="main-workbench w-full max-w-[1600px] mx-auto p-4 text-sm relative flex flex-col"
-    :class="{ 'maps-mode': isMapsView }"
+    class="main-workbench w-full max-w-[1600px] mx-auto px-4 text-sm flex flex-col h-screen overflow-hidden"
+    :class="{ 'maps-mode': isMapsView, 'pl-0': isBlueprintProduction || isLiveProduction }"
   >
     <div id="debug-ready-marker" v-if="blueprintStore.isReady" class="hidden">READY</div>
 
@@ -45,12 +45,11 @@ const isMapsView = computed(() => shipBuildStore.activeView === 'maps')
       <MapWorkbenchView />
     </div>
 
-    <div v-else class="flow-layout flex flex-col gap-6">
+    <div v-else class="flow-layout flex flex-col gap-6 flex-1 min-h-0">
       <LogicFlowWorkbenchView />
     </div>
 
     <StatusMonitor />
-
   </div>
 </template>
 

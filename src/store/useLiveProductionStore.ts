@@ -466,8 +466,22 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     }
   })
 
-  const workbenchMode = computed<'station' | 'transit' | 'overview' | 'terraforming'>(() => {
+  const isTechTreeMode = computed({
+    get: () => activeViewStore.activeBindingWorkbench === 'tech-tree',
+    set: (val: boolean) => {
+      if (val) {
+        activeViewStore.activeBindingWorkbench = 'tech-tree'
+      } else {
+        if (activeViewStore.activeBindingWorkbench === 'tech-tree') {
+          activeViewStore.activeBindingWorkbench = 'overview'
+        }
+      }
+    }
+  })
+
+  const workbenchMode = computed<'station' | 'transit' | 'overview' | 'terraforming' | 'tech-tree'>(() => {
     if (isTerraformingMode.value) return 'terraforming'
+    if (isTechTreeMode.value) return 'tech-tree'
     return activeTransitSectorId.value ? 'transit' : (activeStationId.value ? 'station' : 'overview')
   })
 
@@ -1443,6 +1457,11 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     activeStationId.value = null
   }
 
+  function selectTechTree() {
+    isTechTreeMode.value = true
+    activeStationId.value = null
+  }
+
   function jumpToMapBinding(tabId: string, tabType: 'station' | 'transit') {
     const gameGuid = activeBinding.value?.gameGuid
     if (!gameGuid) return
@@ -2046,6 +2065,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     duplicateStation: () => null,
     selectStation,
     selectTerraforming,
+    selectTechTree,
     terraformingHqStationCode,
     terraformingHqStationName,
     terraformingHqArchiveStation,

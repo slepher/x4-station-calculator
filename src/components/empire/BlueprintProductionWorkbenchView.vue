@@ -3,14 +3,14 @@ import { onMounted, watch } from 'vue'
 import { useBlueprintProductionStore } from '@/store/useBlueprintProductionStore'
 import { useBuildPlanStore } from '@/store/useBuildPlanStore'
 import { useActiveViewStore } from '@/store/useActiveViewStore'
-import { useProductionTabbarPresenter } from '@/components/empire/presenters/useProductionTabbarPresenter'
+import { useProductionSidebarPresenter } from '@/components/empire/presenters/useProductionSidebarPresenter'
 import { useProductionToolbarPresenter } from '@/components/empire/presenters/useProductionToolbarPresenter'
 import { useProductionPlanningPresenter } from '@/components/empire/presenters/useProductionPlanningPresenter'
 import { useProductionWareflowPresenter } from '@/components/empire/presenters/useProductionWareflowPresenter'
 import { useProductionDashboardPresenter } from '@/components/empire/presenters/useProductionDashboardPresenter'
 import StationPlanningPanel from '@/components/empire/StationPlanningPanel.vue'
 import StationDashboard from '@/components/empire/StationDashboard.vue'
-import StationTabBar from '@/components/empire/StationTabBar.vue'
+import ProductionSidebar from '@/components/empire/ProductionSidebar.vue'
 import BlueprintContextToolbar from '@/components/empire/context_toolbar/BlueprintContextToolbar.vue'
 import StationWareFlowsDashboard from '@/components/empire/StationWareFlowsDashboard.vue'
 import ImportPlanModal from '@/components/empire/ImportPlanModal.vue'
@@ -36,7 +36,7 @@ watch(() => activeViewStore.activeEmpireId, (newId) => {
   }
 })
 
-const tabbarPresenter = useProductionTabbarPresenter(blueprintStore)
+const sidebarPresenter = useProductionSidebarPresenter(blueprintStore)
 const toolbarPresenter = useProductionToolbarPresenter(blueprintStore)
 const planningPresenter = useProductionPlanningPresenter(blueprintStore)
 const wareflowPresenter = useProductionWareflowPresenter(blueprintStore)
@@ -48,20 +48,31 @@ const buildPlanPresenter = useBuildPlanPresenter({
 </script>
 
 <template>
-  <StationTabBar
-    :tabs="tabbarPresenter.props.tabs.value"
-    :active-tab-id="tabbarPresenter.props.activeTabId.value"
-    :expanded-sector-id="tabbarPresenter.props.expandedSectorId.value"
-    :can-create-station="tabbarPresenter.props.canCreateStation"
-    :can-open-context-menu="tabbarPresenter.props.canOpenContextMenu"
-    @select-overview="tabbarPresenter.emits.selectOverview"
-    @select-station="tabbarPresenter.emits.selectStation"
-    @create-station="tabbarPresenter.emits.createStation"
-    @rename-station="tabbarPresenter.emits.renameStation"
-    @duplicate-station="tabbarPresenter.emits.duplicateStation"
-    @delete-station="tabbarPresenter.emits.deleteStation"
-  />
-  <BlueprintContextToolbar
+  <div class="production-layout">
+    <ProductionSidebar
+      :tabs="sidebarPresenter.props.tabs.value"
+      :active-tab-id="sidebarPresenter.props.activeTabId.value"
+      :expanded-sector-id="sidebarPresenter.props.expandedSectorId.value"
+      :has-sectors="sidebarPresenter.props.hasSectors"
+      :show-terraforming="sidebarPresenter.props.showTerraforming"
+      :show-tech-tree="sidebarPresenter.props.showTechTree"
+      :can-create-station="sidebarPresenter.props.canCreateStation"
+      :can-open-context-menu="sidebarPresenter.props.canOpenContextMenu"
+      :context-menu-mode="sidebarPresenter.props.contextMenuMode"
+      @select-overview="sidebarPresenter.emits.selectOverview"
+      @select-station="sidebarPresenter.emits.selectStation"
+      @create-station="sidebarPresenter.emits.createStation"
+      @rename-station="sidebarPresenter.emits.renameStation"
+      @duplicate-station="sidebarPresenter.emits.duplicateStation"
+      @delete-station="sidebarPresenter.emits.deleteStation"
+      @select-terraforming="() => {}"
+      @select-tech-tree="() => {}"
+      @select-transit="() => {}"
+      @expand-sector="() => {}"
+      @jump-to-binding="() => {}"
+    />
+    <div class="production-content">
+      <BlueprintContextToolbar
     :station="toolbarPresenter.props.station.value"
     :workbench-mode="toolbarPresenter.props.workbenchMode.value"
     :title-model="toolbarPresenter.props.titleModel.value"
@@ -97,7 +108,7 @@ const buildPlanPresenter = useBuildPlanPresenter({
     @close="toolbarPresenter.emits.closeImport"
   />
 
-  <div v-if="toolbarPresenter.props.workbenchMode.value === 'station'" class="main-layout mt-6">
+  <div v-if="toolbarPresenter.props.workbenchMode.value === 'station'" class="main-layout">
     <div class="col-span-12 lg:col-span-3">
       <StationPlanningPanel
         :planned-modules="planningPresenter.props.plannedModules.value"
@@ -155,7 +166,7 @@ const buildPlanPresenter = useBuildPlanPresenter({
     </div>
   </div>
 
-  <div v-if="toolbarPresenter.props.workbenchMode.value === 'overview'" class="main-layout mt-6">
+  <div v-if="toolbarPresenter.props.workbenchMode.value === 'overview'" class="main-layout">
     <div class="col-span-12 lg:col-span-3">
       <BuildPlanConstraintsPanel
         :goals="buildPlanPresenter.props.goals.value"
@@ -211,11 +222,21 @@ const buildPlanPresenter = useBuildPlanPresenter({
         @update:sell-multiplier="blueprintStore.overviewSellMultiplier = $event"
       />
     </div>
+    </div>
   </div>
+</div>
 
 </template>
 
 <style scoped>
+.production-layout {
+  @apply flex flex-1 min-h-0;
+}
+
+.production-content {
+  @apply flex-1 flex flex-col min-w-0 overflow-y-auto;
+}
+
 .main-layout {
   @apply grid grid-cols-12 gap-8 items-start;
 }

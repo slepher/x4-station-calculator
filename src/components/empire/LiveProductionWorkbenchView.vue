@@ -5,7 +5,7 @@ import { useLiveProductionStore } from '@/store/useLiveProductionStore'
 import { useTerraformingStore } from '@/store/useTerraformingStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useActiveViewStore } from '@/store/useActiveViewStore'
-import { useProductionTabbarPresenter } from '@/components/empire/presenters/useProductionTabbarPresenter'
+import { useProductionSidebarPresenter } from '@/components/empire/presenters/useProductionSidebarPresenter'
 import { useProductionToolbarPresenter } from '@/components/empire/presenters/useProductionToolbarPresenter'
 import { useProductionPlanningPresenter } from '@/components/empire/presenters/useProductionPlanningPresenter'
 import { useProductionWareflowPresenter } from '@/components/empire/presenters/useProductionWareflowPresenter'
@@ -13,7 +13,7 @@ import { useProductionDashboardPresenter } from '@/components/empire/presenters/
 import { useTerraformingPresenter } from '@/components/empire/presenters/useTerraformingPresenter'
 import StationPlanningPanelWrapper from '@/components/empire/StationPlanningPanelWrapper.vue'
 import StationDashboard from '@/components/empire/StationDashboard.vue'
-import SectorStationTabBar from '@/components/empire/SectorStationTabBar.vue'
+import ProductionSidebar from '@/components/empire/ProductionSidebar.vue'
 import LiveOverviewToolbar from '@/components/empire/context_toolbar/LiveOverviewToolbar.vue'
 import LiveTransitToolbar from '@/components/empire/context_toolbar/LiveTransitToolbar.vue'
 import LiveStationToolbar from '@/components/empire/context_toolbar/LiveStationToolbar.vue'
@@ -29,6 +29,7 @@ import ArchiveModuleList from '@/components/empire/ArchiveModuleList.vue'
 import ImportPlanModal from '@/components/empire/ImportPlanModal.vue'
 import SaveUploadPanel from '@/components/save/SaveUploadPanel.vue'
 import SaveList from '@/components/save/SaveList.vue'
+import TechTreePlaceholder from '@/components/empire/TechTreePlaceholder.vue'
 
 const liveStore = useLiveProductionStore()
 const terraformingStore = useTerraformingStore()
@@ -74,7 +75,7 @@ watch(() => activeViewStore.activeBinding, (newGuid) => {
   }
 })
 
-const tabbarPresenter = useProductionTabbarPresenter(liveStore)
+const sidebarPresenter = useProductionSidebarPresenter(liveStore)
 const toolbarPresenter = useProductionToolbarPresenter(liveStore)
 
 watch(() => toolbarPresenter.props.workbenchMode.value, (mode) => {
@@ -159,24 +160,30 @@ function toggleStatFilter(statId: string) {
 </script>
 
 <template>
-  <SectorStationTabBar
-    :tabs="tabbarPresenter.props.tabs.value"
-    :active-tab-id="tabbarPresenter.props.activeTabId.value"
-    :expanded-sector-id="tabbarPresenter.props.expandedSectorId.value"
-    :can-create-station="tabbarPresenter.props.canCreateStation"
-    :can-open-context-menu="tabbarPresenter.props.canOpenContextMenu"
-    :context-menu-mode="tabbarPresenter.props.contextMenuMode"
-    :can-delete-station="tabbarPresenter.props.canDeleteStation"
-    @select-overview="tabbarPresenter.emits.selectOverview"
-    @select-terraforming="tabbarPresenter.emits.selectTerraforming"
-    @select-transit="tabbarPresenter.emits.selectTransit"
-    @select-station="tabbarPresenter.emits.selectStation"
-    @create-station="tabbarPresenter.emits.createStation"
-    @rename-station="tabbarPresenter.emits.renameStation"
-    @delete-station="tabbarPresenter.emits.deleteStation"
-    @expand-sector="tabbarPresenter.emits.expandSector"
-    @jump-to-binding="(tabId, tabType) => tabbarPresenter.emits.jumpToBinding(tabId, tabType)"
-  />
+  <div class="production-layout">
+    <ProductionSidebar
+      :tabs="sidebarPresenter.props.tabs.value"
+      :active-tab-id="sidebarPresenter.props.activeTabId.value"
+      :expanded-sector-id="sidebarPresenter.props.expandedSectorId.value"
+      :has-sectors="sidebarPresenter.props.hasSectors"
+      :show-terraforming="sidebarPresenter.props.showTerraforming"
+      :show-tech-tree="sidebarPresenter.props.showTechTree"
+      :can-create-station="sidebarPresenter.props.canCreateStation"
+      :can-open-context-menu="sidebarPresenter.props.canOpenContextMenu"
+      :context-menu-mode="sidebarPresenter.props.contextMenuMode"
+      @select-overview="sidebarPresenter.emits.selectOverview"
+      @select-terraforming="sidebarPresenter.emits.selectTerraforming"
+      @select-tech-tree="sidebarPresenter.emits.selectTechTree"
+      @select-transit="sidebarPresenter.emits.selectTransit"
+      @select-station="sidebarPresenter.emits.selectStation"
+      @create-station="sidebarPresenter.emits.createStation"
+      @rename-station="sidebarPresenter.emits.renameStation"
+      @duplicate-station="sidebarPresenter.emits.duplicateStation"
+      @delete-station="sidebarPresenter.emits.deleteStation"
+      @expand-sector="sidebarPresenter.emits.expandSector"
+      @jump-to-binding="(tabId, tabType) => sidebarPresenter.emits.jumpToBinding(tabId, tabType)"
+    />
+    <div class="production-content">
   
   <LiveOverviewToolbar
     v-if="toolbarPresenter.props.workbenchMode.value === 'overview' && toolbarPresenter.props.hasActiveBinding.value"
@@ -263,7 +270,7 @@ function toggleStatFilter(statId: string) {
     @close="toolbarPresenter.emits.closeImport"
   />
 
-  <div v-if="toolbarPresenter.props.workbenchMode.value === 'terraforming'" class="main-layout mt-6" :style="{ '--panel-max-h': panelMaxHeight }">
+  <div v-if="toolbarPresenter.props.workbenchMode.value === 'terraforming'" class="main-layout" :style="{ '--panel-max-h': panelMaxHeight }">
     <div class="col-span-12 lg:col-span-3" :class="{ 'sticky top-2 z-10': terraformingFloating.sectorPanel }">
       <TerraformingSectorPanel
         :clusters="terraformingPresenter.props.sectorPanel.clusters.value"
@@ -336,8 +343,12 @@ function toggleStatFilter(statId: string) {
     </div>
   </div>
 
+  <div v-else-if="toolbarPresenter.props.workbenchMode.value === 'tech-tree'" class="">
+    <TechTreePlaceholder />
+  </div>
+
   <template v-else-if="toolbarPresenter.props.workbenchMode.value === 'overview' || toolbarPresenter.props.workbenchMode.value === 'transit'">
-    <div v-if="toolbarPresenter.props.workbenchMode.value === 'transit'" class="main-layout mt-6">
+    <div v-if="toolbarPresenter.props.workbenchMode.value === 'transit'" class="main-layout">
       <div class="col-span-12 lg:col-span-3">
         <ArchiveModuleList
           v-if="showArchiveModuleList"
@@ -382,7 +393,7 @@ function toggleStatFilter(statId: string) {
       </div>
     </div>
 
-    <div v-else-if="toolbarPresenter.props.workbenchMode.value === 'overview'" class="main-layout mt-6">
+    <div v-else-if="toolbarPresenter.props.workbenchMode.value === 'overview'" class="main-layout">
       <div class="col-span-12 lg:col-span-3">
         <div class="overview-left-panel panel-card">
           <div class="panel-header">{{ t('save_import.title') }}</div>
@@ -407,7 +418,7 @@ function toggleStatFilter(statId: string) {
     </div>
   </template>
 
-  <div v-else class="main-layout mt-6">
+  <div v-else class="main-layout">
     <div class="col-span-12 lg:col-span-3">
       <StationPlanningPanelWrapper
         :planned-modules="planningPresenter.props.plannedModules.value"
@@ -477,9 +488,19 @@ function toggleStatFilter(statId: string) {
       />
     </div>
   </div>
+    </div>
+  </div>
 </template>
 
 <style scoped>
+.production-layout {
+  @apply flex flex-1 min-h-0;
+}
+
+.production-content {
+  @apply flex-1 flex flex-col min-w-0 overflow-y-auto;
+}
+
 .main-layout {
   @apply grid grid-cols-12 gap-8 items-start;
 }
