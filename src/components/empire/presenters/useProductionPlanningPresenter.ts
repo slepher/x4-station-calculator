@@ -104,9 +104,9 @@ export function useProductionPlanningPresenter(store: PlanningPresenterStore): U
     const recommendedIds = new Set(recommendedModules.value.map((module) => module.id))
     const visibleExplicitModules = plannedModules.value.filter((module) => !recommendedIds.has(module.id))
     if (shouldLogPlanningDebug) {
-      console.log('[planDisplay] plannedModules:', plannedModules.value.map(m => `${m.id} x${m.count}`).join(', ') || '(empty)')
-      console.log('[planDisplay] recommendedModules:', recommendedModules.value.map(m => `${m.id} x${m.count}`).join(', ') || '(empty)')
-      console.log('[planDisplay] visibleExplicitModules:', visibleExplicitModules.map(m => `${m.id} x${m.count}`).join(', ') || '(empty)')
+      // console.log('[planDisplay] plannedModules:', plannedModules.value.map(m => `${m.id} x${m.count}`).join(', ') || '(empty)')
+      // console.log('[planDisplay] recommendedModules:', recommendedModules.value.map(m => `${m.id} x${m.count}`).join(', ') || '(empty)')
+      // console.log('[planDisplay] visibleExplicitModules:', visibleExplicitModules.map(m => `${m.id} x${m.count}`).join(', ') || '(empty)')
     }
     return visibleExplicitModules.map((module) => {
       if (!store.archiveStation) return { id: module.id, count: module.count }
@@ -148,6 +148,7 @@ export function useProductionPlanningPresenter(store: PlanningPresenterStore): U
       const remainingArchive = Math.max(0, archiveTotal - explicitPlanned)
       const diff = module.count - remainingArchive
       if (shouldLogPlanningDebug) {
+        /*
         const info = gameDataStore.modulesMap[module.id] as X4Module | undefined
         console.log('[autoDisplayDiff]', {
           moduleId: module.id,
@@ -160,6 +161,7 @@ export function useProductionPlanningPresenter(store: PlanningPresenterStore): U
           diff,
           filteredRecommended: recommendedIds?.has(module.id) ?? false
         })
+        */
       }
       if (diff === 0) return { id: module.id, count: module.count }
       return { id: module.id, count: module.count, diffAnnotation: `${diff > 0 ? '+' : ''}${diff}` }
