@@ -70,7 +70,7 @@ export interface PlanningPresenterStore {
 
 export function useProductionPlanningPresenter(store: PlanningPresenterStore): UseProductionPlanningPresenterReturn {
   const gameDataStore = useGameDataStore()
-  const shouldLogPlanningDebug = globalThis?.location?.href?.includes('localhost')
+  const shouldLogPlanningDebug = false
   const liveModules = computed(() => store.archiveStation?.modules || [])
   const liveBuildingModules = computed(() => store.archiveStation?.building?.modules || [])
 
