@@ -43,7 +43,7 @@ const isMapsView = computed(() => shipBuildStore.activeView === 'maps')
       </div>
     </template>
 
-    <div v-else-if="isMapsView" class="maps-slot overflow-y-auto px-4 pt-4 custom-scrollbar">
+    <div v-else-if="isMapsView" class="maps-slot overflow-y-auto px-4 pt-4 mb-4 custom-scrollbar">
       <MapWorkbenchView />
     </div>
 
