@@ -317,20 +317,21 @@ onUnmounted(() => {
               <span class="sidebar-item-label">{{ sector.name }}</span>
             </div>
 
+            <div
+              v-for="item in dynamicItems.filter(d => d.sectorId === sector.id && d.type === 'transit')"
+              :key="item.id"
+              class="sidebar-item station-item"
+              :class="{ active: isTabActive(item.id) }"
+              data-testid="sidebar-transit"
+              @click="handleTabClick(item)"
+              @contextmenu.stop="openMenu(item.id, item.type, $event)"
+            >
+              <div class="sidebar-item-active-bar"></div>
+              <img class="sidebar-item-icon" :class="getTabIconClass(item)" :src="getTabIcon(item)" alt="" />
+              <span class="sidebar-item-label">{{ item.name }}</span>
+            </div>
+
             <template v-if="isSectorExpanded(sector.id)">
-              <div
-                v-for="item in dynamicItems.filter(d => d.sectorId === sector.id && d.type === 'transit')"
-                :key="item.id"
-                class="sidebar-item station-item"
-                :class="{ active: isTabActive(item.id) }"
-                data-testid="sidebar-transit"
-                @click="handleTabClick(item)"
-                @contextmenu.stop="openMenu(item.id, item.type, $event)"
-              >
-                <div class="sidebar-item-active-bar"></div>
-                <img class="sidebar-item-icon" :class="getTabIconClass(item)" :src="getTabIcon(item)" alt="" />
-                <span class="sidebar-item-label">{{ item.name }}</span>
-              </div>
               <div
                 v-for="item in dynamicItems.filter(d => d.sectorId === sector.id && d.type === 'station')"
                 :key="item.id"
