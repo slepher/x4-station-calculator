@@ -536,6 +536,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
   }
 
   function selectStation(stationId: string | null) {
+    isTerraformingMode.value = false
     activeStationId.value = stationId
   }
 
