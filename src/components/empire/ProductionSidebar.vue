@@ -71,15 +71,29 @@ const groupSectors = computed<Array<{ id: string; name: string; hasChildren: boo
   return result
 })
 
+const findTabById = (id: string): ProductionTabItem | undefined => {
+  return props.tabs.find(t => t.id === id || t.name === id)
+}
+
+const findSectorForTabId = (tabId: string | null): string | undefined => {
+  if (!tabId || !props.hasSectors) return undefined
+  const tab = findTabById(tabId)
+  if (tab?.sectorId) return tab.sectorId
+  for (const t of props.tabs) {
+    if ((t.id === tabId || t.name === tabId) && t.sectorId) return t.sectorId
+  }
+  return undefined
+}
+
 const collapsedSectors = ref(new Set(
   (() => {
     if (!props.hasSectors) return [] as string[]
     const allIds = groupSectors.value.map(s => s.id)
-    const activeTab = props.tabs.find(t => t.id === props.activeTabId)
-    console.log('[sidebar] init activeTabId:', props.activeTabId, 'activeTab:', activeTab, 'allIds:', allIds)
-    if (activeTab?.sectorId) {
-      const result = allIds.filter(id => id !== activeTab.sectorId)
-      console.log('[sidebar] init expanding sector:', activeTab.sectorId, 'collapsed:', result)
+    const activeSectorId = findSectorForTabId(props.activeTabId)
+    console.log('[sidebar] init activeTabId:', props.activeTabId, 'activeSectorId:', activeSectorId, 'allIds:', allIds)
+    if (activeSectorId) {
+      const result = allIds.filter(id => id !== activeSectorId)
+      console.log('[sidebar] init expanding sector:', activeSectorId, 'collapsed:', result)
       return result
     }
     console.log('[sidebar] init all collapsed')
@@ -90,12 +104,12 @@ const collapsedSectors = ref(new Set(
 watch(() => props.activeTabId, (tabId) => {
   console.log('[sidebar] watch activeTabId changed to:', tabId)
   if (!tabId || !props.hasSectors) return
-  const tab = props.tabs.find(t => t.id === tabId)
-  console.log('[sidebar] watch tab:', tab)
-  if (tab?.sectorId) {
+  const activeSectorId = findSectorForTabId(tabId)
+  console.log('[sidebar] watch activeSectorId:', activeSectorId)
+  if (activeSectorId) {
     const next = new Set(collapsedSectors.value)
-    next.delete(tab.sectorId)
-    console.log('[sidebar] watch expanding sector:', tab.sectorId, 'collapsed after:', [...next])
+    next.delete(activeSectorId)
+    console.log('[sidebar] watch expanding sector:', activeSectorId, 'collapsed after:', [...next])
     collapsedSectors.value = next
   }
 })
