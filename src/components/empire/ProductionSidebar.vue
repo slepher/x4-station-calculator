@@ -168,9 +168,6 @@ const toggleSectorCollapse = (sectorId: string) => {
 }
 
 const handleFixedClick = (tab: ProductionTabItem) => {
-  if (props.hasSectors) {
-    collapsedSectors.value = new Set(groupSectors.value.map(s => s.id))
-  }
   handleTabClick(tab)
 }
 
