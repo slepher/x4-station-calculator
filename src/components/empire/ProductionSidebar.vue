@@ -44,7 +44,25 @@ const menuTabId = ref<string | null>(null)
 const menuTabType = ref<'station' | 'transit'>('station')
 const showDeleteConfirm = ref(false)
 const stationToDelete = ref<string | null>(null)
-const collapsedSectors = ref(new Set<string>())
+
+const groupSectors = computed<Array<{ id: string; name: string; hasChildren: boolean }>>(() => {
+  if (!props.hasSectors) return []
+  const seen = new Set<string>()
+  const result: Array<{ id: string; name: string; hasChildren: boolean }> = []
+  props.tabs.forEach(tab => {
+    if (tab.sectorId && !seen.has(tab.sectorId)) {
+      seen.add(tab.sectorId)
+      result.push({
+        id: tab.sectorId,
+        name: getSectorName(tab.sectorId),
+        hasChildren: hasSectorChildren(tab.sectorId)
+      })
+    }
+  })
+  return result
+})
+
+const collapsedSectors = ref(new Set(groupSectors.value.map(s => s.id)))
 
 watch(() => props.activeTabId, (tabId) => {
   if (!tabId || !props.hasSectors) return
@@ -170,23 +188,6 @@ const toggleSectorCollapse = (sectorId: string) => {
 const handleFixedClick = (tab: ProductionTabItem) => {
   handleTabClick(tab)
 }
-
-const groupSectors = computed<Array<{ id: string; name: string; hasChildren: boolean }>>(() => {
-  if (!props.hasSectors) return []
-  const seen = new Set<string>()
-  const result: Array<{ id: string; name: string; hasChildren: boolean }> = []
-  props.tabs.forEach(tab => {
-    if (tab.sectorId && !seen.has(tab.sectorId)) {
-      seen.add(tab.sectorId)
-      result.push({
-        id: tab.sectorId,
-        name: getSectorName(tab.sectorId),
-        hasChildren: hasSectorChildren(tab.sectorId)
-      })
-    }
-  })
-  return result
-})
 
 const isTabActive = (tabId: string): boolean => {
   return props.activeTabId === tabId
