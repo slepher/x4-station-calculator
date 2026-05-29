@@ -270,7 +270,7 @@ function toggleStatFilter(statId: string) {
     @close="toolbarPresenter.emits.closeImport"
   />
 
-  <div v-if="toolbarPresenter.props.workbenchMode.value === 'terraforming'" class="main-layout" :style="{ '--panel-max-h': panelMaxHeight }">
+  <div v-if="toolbarPresenter.props.workbenchMode.value === 'terraforming'" class="main-layout pb-6" :style="{ '--panel-max-h': panelMaxHeight }">
     <div class="col-span-12 lg:col-span-3" :class="{ 'sticky top-2 z-10': terraformingFloating.sectorPanel }">
       <TerraformingSectorPanel
         :clusters="terraformingPresenter.props.sectorPanel.clusters.value"
