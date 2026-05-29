@@ -58,6 +58,54 @@
 **当** 视图挂载时
 **那么** sidebar 默认为展开状态
 
+### Requirement: Sidebar 星区展开/折叠
+
+星区展开/折叠为纯前端行为，由 sidebar 内部 `collapsedSectors` Set 控制，不依赖 store。
+
+**核心规则**：只展开不收起。选中站或 transit 时自动展开对应星区，永不自动折叠。箭头是唯一收起入口。
+
+#### Scenario: 默认初始化
+
+**前提** 用户进入 live-production 视图
+**当** sidebar 挂载时
+**那么** `collapsedSectors` 初始包含所有星区 ID（全部折叠）
+**并且** watcher (`immediate: false`) 检测 `activeTabId` 变化时展开对应星区
+**并且** 同时监听 `tabs.length` 变化以处理 stores 延迟加载
+
+#### Scenario: 站 ID 匹配
+
+**前提** `activeTabId` 可能是站名（V1 数据）或 UUID
+**当** 查找 tab 匹配时
+**那么** 使用 `findTabById` 同时匹配 `tab.id` 和 `tab.name`
+**并且** 遍历所有 tabs 查找对应的 `sectorId`
+
+#### Scenario: 选中站/transit 自动展开
+
+**前提** 用户选中某空间站或 transit-hub
+**当** `activeTabId` 变化时
+**那么** watcher 从 `collapsedSectors` 移除该站对应的 `sectorId`
+**并且** 该星区 header 高亮（`isSectorActive` 匹配 transit 或站所属星区）
+
+#### Scenario: 切换总览/地球化/科技树
+
+**前提** 用户点击固定项（概览、地球化、科技树）
+**当** `activeTabId` 变化且无 `sectorId`
+**那么** `collapsedSectors` 保持不变
+
+#### Scenario: 箭头点击
+
+**前提** 某星区当前为展开/折叠状态
+**当** 用户点击箭头按钮（24x24 独立点击区域，`@click.stop`）
+**那么** `toggleSectorCollapse` 切换该星区在 `collapsedSectors` 中的状态
+
+#### Scenario: 点击区域分离
+
+**前提** 星区 header 或 station 行渲染
+**当** 用户交互时
+**那么** 箭头区域仅触发展开/折叠
+**并且** 图标+名称区域触发选中
+**并且** 整行可右键打开上下文菜单
+
 ### Requirement: 科技树 workbenchMode 空壳
 
 系统 SHALL 在 `workbenchMode` 中新增 `'tech-tree'` 模式，并为其提供占位渲染。
