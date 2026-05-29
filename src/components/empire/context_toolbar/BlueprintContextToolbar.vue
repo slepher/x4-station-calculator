@@ -288,7 +288,7 @@ const handleOpenImport = () => {
 }
 
 .toolbar-import-slot {
-  @apply ml-auto flex items-center h-10;
+  @apply ml-auto flex items-center;
 }
 
 .icon-btn {
