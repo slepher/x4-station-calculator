@@ -47,14 +47,18 @@ const stationToDelete = ref<string | null>(null)
 const collapsedSectors = ref(new Set<string>())
 
 watch(() => props.activeTabId, (tabId) => {
-  if (!tabId || !props.hasSectors) return
+  if (!tabId || !props.hasSectors) {
+    const allSectorIds = groupSectors.value.map(s => s.id)
+    collapsedSectors.value = new Set(allSectorIds)
+    return
+  }
   const tab = props.tabs.find(t => t.id === tabId)
   if (tab?.sectorId) {
     const next = new Set(collapsedSectors.value)
     next.delete(tab.sectorId)
     collapsedSectors.value = next
   }
-})
+}, { immediate: true })
 
 const fixedItems = computed<ProductionTabItem[]>(() => {
   const result = props.tabs.filter(t => t.type === 'overview')
@@ -253,14 +257,6 @@ const addNewStation = () => {
 
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
-  if (props.hasSectors) {
-    const allSectorIds = groupSectors.value.map(s => s.id)
-    const activeTab = props.tabs.find(t => t.id === props.activeTabId)
-    const activeSectorId = activeTab?.sectorId
-    const next = new Set(allSectorIds)
-    if (activeSectorId) next.delete(activeSectorId)
-    collapsedSectors.value = next
-  }
 })
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside)
