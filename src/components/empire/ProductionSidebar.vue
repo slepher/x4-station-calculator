@@ -45,6 +45,15 @@ const menuTabType = ref<'station' | 'transit'>('station')
 const showDeleteConfirm = ref(false)
 const stationToDelete = ref<string | null>(null)
 
+const getSectorName = (sectorId: string): string => {
+  const transitTab = props.tabs.find(t => t.type === 'transit' && t.sectorId === sectorId)
+  return transitTab?.name || sectorId
+}
+
+const hasSectorChildren = (sectorId: string): boolean => {
+  return props.tabs.some(t => t.type === 'station' && t.sectorId === sectorId)
+}
+
 const groupSectors = computed<Array<{ id: string; name: string; hasChildren: boolean }>>(() => {
   if (!props.hasSectors) return []
   const seen = new Set<string>()
@@ -153,18 +162,9 @@ const handleTabClick = (tab: ProductionTabItem) => {
   }
 }
 
-const getSectorName = (sectorId: string): string => {
-  const transitTab = props.tabs.find(t => t.type === 'transit' && t.sectorId === sectorId)
-  return transitTab?.name || sectorId
-}
-
 const isSectorActive = (sectorId: string): boolean => {
   if (isTabActive('transit:' + sectorId)) return true
   return dynamicItems.value.some(d => d.sectorId === sectorId && d.type === 'station' && isTabActive(d.id))
-}
-
-const hasSectorChildren = (sectorId: string): boolean => {
-  return props.tabs.some(t => t.type === 'station' && t.sectorId === sectorId)
 }
 
 const isSectorExpanded = (sectorId: string): boolean => {
