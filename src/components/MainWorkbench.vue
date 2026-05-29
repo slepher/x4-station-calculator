@@ -47,7 +47,7 @@ const isMapsView = computed(() => shipBuildStore.activeView === 'maps')
       <MapWorkbenchView />
     </div>
 
-    <div v-else class="flow-layout flex flex-col gap-6 flex-1 min-h-0 overflow-y-auto px-4 pt-4">
+    <div v-else class="flow-layout flex flex-col flex-1 min-h-0 overflow-y-auto px-4 pt-4">
       <LogicFlowWorkbenchView />
     </div>
 
