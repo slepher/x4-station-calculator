@@ -76,19 +76,26 @@ const collapsedSectors = ref(new Set(
     if (!props.hasSectors) return [] as string[]
     const allIds = groupSectors.value.map(s => s.id)
     const activeTab = props.tabs.find(t => t.id === props.activeTabId)
+    console.log('[sidebar] init activeTabId:', props.activeTabId, 'activeTab:', activeTab, 'allIds:', allIds)
     if (activeTab?.sectorId) {
-      return allIds.filter(id => id !== activeTab.sectorId)
+      const result = allIds.filter(id => id !== activeTab.sectorId)
+      console.log('[sidebar] init expanding sector:', activeTab.sectorId, 'collapsed:', result)
+      return result
     }
+    console.log('[sidebar] init all collapsed')
     return allIds
   })()
 ))
 
 watch(() => props.activeTabId, (tabId) => {
+  console.log('[sidebar] watch activeTabId changed to:', tabId)
   if (!tabId || !props.hasSectors) return
   const tab = props.tabs.find(t => t.id === tabId)
+  console.log('[sidebar] watch tab:', tab)
   if (tab?.sectorId) {
     const next = new Set(collapsedSectors.value)
     next.delete(tab.sectorId)
+    console.log('[sidebar] watch expanding sector:', tab.sectorId, 'collapsed after:', [...next])
     collapsedSectors.value = next
   }
 })
