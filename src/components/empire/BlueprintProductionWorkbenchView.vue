@@ -33,11 +33,11 @@ const gameDataStore = useGameDataStore()
 
 const gameDataMaps = computed(() => gameDataStore.maps)
 
-const panelMaxHeight = ref('calc(100vh - 4rem)')
+const panelMaxHeight = ref('calc(100vh - 5rem)')
 
 function updatePanelMaxHeight() {
   const h = window.innerHeight
-  const margin = 64
+  const margin = 80
   const maxH = h - margin
   panelMaxHeight.value = `${maxH}px`
 }

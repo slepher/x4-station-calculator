@@ -40,11 +40,11 @@ const { t } = useI18n()
 const gameDataMaps = computed(() => gameDataStore.maps)
 
 const terraformingSectorMode = ref<'list' | 'item'>('list')
-const panelMaxHeight = ref('calc(100vh - 4rem)')
+const panelMaxHeight = ref('calc(100vh - 5rem)')
 
 function updatePanelMaxHeight() {
   const h = window.innerHeight
-  const margin = 64
+  const margin = 80
   const maxH = h - margin
   console.log(`[panelMaxHeight] innerHeight=${h} margin=${margin} → ${maxH}px`)
   panelMaxHeight.value = `${maxH}px`
