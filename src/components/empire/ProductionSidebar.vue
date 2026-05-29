@@ -46,18 +46,8 @@ const showDeleteConfirm = ref(false)
 const stationToDelete = ref<string | null>(null)
 const collapsedSectors = ref(new Set<string>())
 
-// init: all collapsed, expand active tab's sector
-if (hasSectors) {
-  const allSectorIds = groupSectors.value.map(s => s.id)
-  const activeTab = props.tabs.find(t => t.id === props.activeTabId)
-  const activeSectorId = activeTab?.sectorId
-  const next = new Set(allSectorIds)
-  if (activeSectorId) next.delete(activeSectorId)
-  collapsedSectors.value = next
-}
-
 watch(() => props.activeTabId, (tabId) => {
-  if (!tabId || !hasSectors) return
+  if (!tabId || !props.hasSectors) return
   const tab = props.tabs.find(t => t.id === tabId)
   if (tab?.sectorId) {
     const next = new Set(collapsedSectors.value)
@@ -148,16 +138,6 @@ const handleTabClick = (tab: ProductionTabItem) => {
   }
 }
 
-const handleSectorClick = (sectorId: string) => {
-  emit('selectTransit', sectorId)
-  emit('expandSector', sectorId)
-}
-
-const handleFixedClick = (tab: ProductionTabItem) => {
-  emit('expandSector', null)
-  handleTabClick(tab)
-}
-
 const getSectorName = (sectorId: string): string => {
   const transitTab = props.tabs.find(t => t.type === 'transit' && t.sectorId === sectorId)
   return transitTab?.name || sectorId
@@ -191,7 +171,7 @@ const toggleSectorCollapse = (sectorId: string) => {
 }
 
 const handleFixedClick = (tab: ProductionTabItem) => {
-  if (hasSectors) {
+  if (props.hasSectors) {
     collapsedSectors.value = new Set(groupSectors.value.map(s => s.id))
   }
   handleTabClick(tab)
@@ -279,6 +259,14 @@ const addNewStation = () => {
 
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
+  if (props.hasSectors) {
+    const allSectorIds = groupSectors.value.map(s => s.id)
+    const activeTab = props.tabs.find(t => t.id === props.activeTabId)
+    const activeSectorId = activeTab?.sectorId
+    const next = new Set(allSectorIds)
+    if (activeSectorId) next.delete(activeSectorId)
+    collapsedSectors.value = next
+  }
 })
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside)
