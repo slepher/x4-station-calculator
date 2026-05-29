@@ -218,6 +218,74 @@ const workbenchMode = computed(() => {
 
 在 `LiveProductionWorkbenchView.vue` 中按 `workbenchMode === 'tech-tree'` 条件渲染。
 
+## 星区展开/折叠设计
+
+### 状态管理
+
+```ts
+// ProductionSidebar.vue 内部状态
+const collapsedSectors = ref(new Set<string>())
+```
+
+### 初始化
+
+```ts
+const collapsedSectors = ref(new Set(
+  (() => {
+    if (!props.hasSectors) return [] as string[]
+    const allIds = groupSectors.value.map(s => s.id)
+    const activeSectorId = findSectorForTabId(props.activeTabId)
+    if (activeSectorId) {
+      return allIds.filter(id => id !== activeSectorId)
+    }
+    return allIds
+  })()
+))
+```
+
+- 初始所有星区折叠，展开当前活跃 tab 对应的星区
+- 通过 `findTabById` 匹配 `id` 或 `name`（兼容 V1 站名 ID）
+
+### 运行时更新
+
+```ts
+watch([() => props.activeTabId, () => props.tabs.length], ([tabId]) => {
+  if (!tabId || !props.hasSectors) return
+  const activeSectorId = findSectorForTabId(tabId)
+  if (activeSectorId) {
+    const next = new Set(collapsedSectors.value)
+    next.delete(activeSectorId)
+    collapsedSectors.value = next
+  }
+})
+```
+
+- 监听 `activeTabId` 变化（选中站/transit）自动展开对应星区
+- 额外监听 `tabs.length`（stores 延迟加载完成后重新评估）
+- **只展开不收起**：切换总览/地球化/科技树不动 `collapsedSectors`
+
+### 手动交互
+
+```ts
+const toggleSectorCollapse = (sectorId: string) => {
+  const next = new Set(collapsedSectors.value)
+  if (next.has(sectorId)) next.delete(sectorId)
+  else next.add(sectorId)
+  collapsedSectors.value = next
+}
+```
+
+- 箭头按钮（24x24 独立点击区域）调用 `toggleSectorCollapse`
+- 使用 `@click.stop` 防止冒泡触发 sector 选中
+
+### 点击区域分离
+
+| 元素 | 行为 |
+|---|---|
+| 箭头 `<button>` (24x24) | 展开/折叠 |
+| 图标+名称 `<span>` | 选中 transit/station |
+| 整行 | 右键上下文菜单 |
+
 ## 样式约定
 
 - 使用 Tailwind CSS 实现 sidebar 布局
