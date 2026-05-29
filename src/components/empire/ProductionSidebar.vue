@@ -47,11 +47,7 @@ const stationToDelete = ref<string | null>(null)
 const collapsedSectors = ref(new Set<string>())
 
 watch(() => props.activeTabId, (tabId) => {
-  if (!tabId || !props.hasSectors) {
-    const allSectorIds = groupSectors.value.map(s => s.id)
-    collapsedSectors.value = new Set(allSectorIds)
-    return
-  }
+  if (!tabId || !props.hasSectors) return
   const tab = props.tabs.find(t => t.id === tabId)
   if (tab?.sectorId) {
     const next = new Set(collapsedSectors.value)
