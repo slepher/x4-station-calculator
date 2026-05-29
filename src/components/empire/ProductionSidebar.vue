@@ -90,7 +90,9 @@ const collapsedSectors = ref(new Set(
     if (!props.hasSectors) return [] as string[]
     const allIds = groupSectors.value.map(s => s.id)
     const activeSectorId = findSectorForTabId(props.activeTabId)
-    console.log('[sidebar] init activeTabId:', props.activeTabId, 'tabIds:', props.tabs.map(t => t.id), 'activeSectorId:', activeSectorId)
+    const tabIds = props.tabs.map(t => t.id).slice(0, 10)
+    const tabNames = props.tabs.filter(t => t.type === 'station').slice(0, 5).map(t => ({ id: t.id.slice(0, 8), name: t.name }))
+    console.log('[sidebar] init activeTabId:', props.activeTabId, 'tabIds:', tabIds, 'stationSamples:', tabNames, 'activeSectorId:', activeSectorId)
     if (activeSectorId) {
       return allIds.filter(id => id !== activeSectorId)
     }
