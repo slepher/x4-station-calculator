@@ -98,7 +98,7 @@ const collapsedSectors = ref(new Set(
   })()
 ))
 
-watch(() => props.activeTabId, (tabId) => {
+watch([() => props.activeTabId, () => props.tabs.length], ([tabId]) => {
   if (!tabId || !props.hasSectors) return
   const activeSectorId = findSectorForTabId(tabId)
   if (activeSectorId) {
