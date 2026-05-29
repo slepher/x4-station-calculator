@@ -5,6 +5,7 @@ import type { ProductionTabItem } from '@/types/production-ui'
 import { SAVE_POI_ICON_MAP } from '@/components/map/utils/style'
 import { getPoiIconTag } from '@/store/logic/stationPoiSemantics'
 import playerhqIconUrl from '@/components/icons/playerhq.svg'
+import tradestationIconUrl from '@/components/icons/tradestation.svg'
 import factoryIconUrl from '@/components/icons/factory.svg'
 
 const props = defineProps<{
@@ -99,13 +100,14 @@ const getTabIconClass = (tab: ProductionTabItem): string => {
   if (tab.type === 'overview' || tab.type === 'terraforming' || (tab.id && (tab.id === 'overview' || tab.id === 'terraforming' || tab.id === 'tech-tree'))) {
     return 'icon-green'
   }
-  return 'icon-cyan'
+  if (tab.type === 'transit') return 'icon-orange'
+  return 'icon-green'
 }
 
 const getTabIcon = (tab: ProductionTabItem): string => {
   if (tab.id === 'overview') return playerhqIconUrl
   if (tab.id === 'terraforming' || tab.id === 'tech-tree') return playerhqIconUrl
-  if (tab.type === 'transit') return factoryIconUrl
+  if (tab.type === 'transit') return tradestationIconUrl
   const iconTag = getPoiIconTag(tab)
   if (iconTag) return SAVE_POI_ICON_MAP[iconTag] || factoryIconUrl
   return factoryIconUrl
@@ -126,7 +128,13 @@ const handleTabClick = (tab: ProductionTabItem) => {
 }
 
 const handleSectorClick = (sectorId: string) => {
-  emit('expandSector', props.expandedSectorId === sectorId ? null : sectorId)
+  emit('selectTransit', sectorId)
+  emit('expandSector', sectorId)
+}
+
+const handleFixedClick = (tab: ProductionTabItem) => {
+  emit('expandSector', null)
+  handleTabClick(tab)
 }
 
 const getSectorName = (sectorId: string): string => {
@@ -258,7 +266,7 @@ onUnmounted(() => {
             class="sidebar-item"
             :class="{ active: isTabActive(item.id) }"
             :data-testid="item.id === 'overview' ? 'sidebar-overview' : item.id === 'terraforming' ? 'sidebar-terraforming' : 'sidebar-tech-tree'"
-            @click="handleTabClick(item)"
+            @click="handleFixedClick(item)"
           >
             <div class="sidebar-item-active-bar"></div>
             <img class="sidebar-item-icon" :class="getTabIconClass(item)" :src="getTabIcon(item)" alt="" />
@@ -297,7 +305,7 @@ onUnmounted(() => {
           <template v-for="sector in groupSectors" :key="sector.id">
             <div
               class="sidebar-item sector-header"
-              :class="{ expanded: isSectorExpanded(sector.id) }"
+              :class="{ expanded: isSectorExpanded(sector.id), active: isTabActive('transit:' + sector.id) }"
               @click="handleSectorClick(sector.id)"
             >
               <div class="sidebar-item-active-bar"></div>
@@ -311,24 +319,12 @@ onUnmounted(() => {
                 stroke-width="2.5"
                 stroke-linecap="round"
                 stroke-linejoin="round"
+                @click.stop="emit('expandSector', isSectorExpanded(sector.id) ? null : sector.id)"
               >
                 <path d="m9 18 6-6-6-6"></path>
               </svg>
+              <img class="sidebar-item-icon icon-orange w-5 h-5 flex-shrink-0" :src="tradestationIconUrl" alt="" />
               <span class="sidebar-item-label">{{ sector.name }}</span>
-            </div>
-
-            <div
-              v-for="item in dynamicItems.filter(d => d.sectorId === sector.id && d.type === 'transit')"
-              :key="item.id"
-              class="sidebar-item station-item"
-              :class="{ active: isTabActive(item.id) }"
-              data-testid="sidebar-transit"
-              @click="handleTabClick(item)"
-              @contextmenu.stop="openMenu(item.id, item.type, $event)"
-            >
-              <div class="sidebar-item-active-bar"></div>
-              <img class="sidebar-item-icon" :class="getTabIconClass(item)" :src="getTabIcon(item)" alt="" />
-              <span class="sidebar-item-label">{{ item.name }}</span>
             </div>
 
             <template v-if="isSectorExpanded(sector.id)">
@@ -339,7 +335,7 @@ onUnmounted(() => {
                 :class="{ active: isTabActive(item.id) }"
                 data-testid="sidebar-station"
                 :data-station-id="item.id"
-                @click="handleTabClick(item)"
+            @click="handleFixedClick(item)"
                 @contextmenu.stop="openMenu(item.id, item.type, $event)"
               >
                 <div class="sidebar-item-active-bar"></div>
@@ -491,6 +487,10 @@ onUnmounted(() => {
 
 .icon-green {
   filter: brightness(0) saturate(100%) invert(64%) sepia(60%) saturate(450%) hue-rotate(84deg) brightness(92%) contrast(91%);
+}
+
+.icon-orange {
+  filter: brightness(0) saturate(100%) invert(76%) sepia(45%) saturate(650%) hue-rotate(7deg) brightness(99%) contrast(91%);
 }
 
 .icon-cyan {
