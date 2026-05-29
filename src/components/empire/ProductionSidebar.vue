@@ -71,7 +71,17 @@ const groupSectors = computed<Array<{ id: string; name: string; hasChildren: boo
   return result
 })
 
-const collapsedSectors = ref(new Set(groupSectors.value.map(s => s.id)))
+const collapsedSectors = ref(new Set(
+  (() => {
+    if (!props.hasSectors) return [] as string[]
+    const allIds = groupSectors.value.map(s => s.id)
+    const activeTab = props.tabs.find(t => t.id === props.activeTabId)
+    if (activeTab?.sectorId) {
+      return allIds.filter(id => id !== activeTab.sectorId)
+    }
+    return allIds
+  })()
+))
 
 watch(() => props.activeTabId, (tabId) => {
   if (!tabId || !props.hasSectors) return
@@ -81,7 +91,7 @@ watch(() => props.activeTabId, (tabId) => {
     next.delete(tab.sectorId)
     collapsedSectors.value = next
   }
-}, { immediate: true })
+})
 
 const fixedItems = computed<ProductionTabItem[]>(() => {
   const result = props.tabs.filter(t => t.type === 'overview')
