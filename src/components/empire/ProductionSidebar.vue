@@ -355,25 +355,30 @@ onUnmounted(() => {
             <div
               class="sidebar-item sector-header"
               :class="{ expanded: isSectorExpanded(sector.id), active: isSectorActive(sector.id) }"
-              @click="handleSectorClick(sector.id)"
             >
               <div class="sidebar-item-active-bar"></div>
-              <svg
-                class="sector-chevron w-3 h-3"
-                :class="{ rotated: isSectorExpanded(sector.id) }"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                @click.stop="toggleSectorCollapse(sector.id)"
+              <button
+                class="sector-chevron-btn"
+                @click="toggleSectorCollapse(sector.id)"
               >
-                <path d="m9 18 6-6-6-6"></path>
-              </svg>
-              <img class="sidebar-item-icon icon-orange w-5 h-5 flex-shrink-0" :src="tradestationIconUrl" alt="" />
-              <span class="sidebar-item-label">{{ sector.name }}</span>
+                <svg
+                  class="sector-chevron w-3 h-3"
+                  :class="{ rotated: isSectorExpanded(sector.id) }"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="m9 18 6-6-6-6"></path>
+                </svg>
+              </button>
+              <span class="sector-click-area flex items-center gap-2 flex-1 min-w-0" @click="handleSectorClick(sector.id)">
+                <img class="sidebar-item-icon icon-orange w-5 h-5 flex-shrink-0" :src="tradestationIconUrl" alt="" />
+                <span class="sidebar-item-label">{{ sector.name }}</span>
+              </span>
             </div>
 
             <template v-if="isSectorExpanded(sector.id)">
@@ -384,12 +389,13 @@ onUnmounted(() => {
                 :class="{ active: isTabActive(item.id) }"
                 data-testid="sidebar-station"
                 :data-station-id="item.id"
-            @click="handleFixedClick(item)"
                 @contextmenu.stop="openMenu(item.id, item.type, $event)"
               >
                 <div class="sidebar-item-active-bar"></div>
-                <img class="sidebar-item-icon" :class="getTabIconClass(item)" :src="getTabIcon(item)" alt="" />
-                <span class="sidebar-item-label">{{ item.name }}</span>
+                <span class="flex items-center gap-2 flex-1 min-w-0" @click="handleFixedClick(item)">
+                  <img class="sidebar-item-icon" :class="getTabIconClass(item)" :src="getTabIcon(item)" alt="" />
+                  <span class="sidebar-item-label">{{ item.name }}</span>
+                </span>
               </div>
             </template>
           </template>
@@ -550,8 +556,22 @@ onUnmounted(() => {
   @apply text-xs font-medium truncate;
 }
 
+.sector-chevron-btn {
+  @apply flex items-center justify-center w-6 h-6 rounded flex-shrink-0;
+  @apply text-slate-500 hover:text-slate-300 transition-colors;
+}
+
+.sector-click-area {
+  @apply cursor-pointer;
+}
+
 .sector-chevron.rotated {
   @apply rotate-90;
+}
+
+.sector-chevron {
+  @apply transition-transform duration-150;
+  flex-shrink: 0;
 }
 
 .sidebar-add-btn {
