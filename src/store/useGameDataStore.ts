@@ -133,12 +133,14 @@ export const useGameDataStore = defineStore('gameData', () => {
     codename?: string,
     miniVersion?: number
   ): string {
+    const config = versionsConfig.value.find(v => v.version === version && v.beta === beta)
     const resolvedCodename = codename
-      || versionsConfig.value.find(v => v.version === version && v.beta === beta)?.codename
+      || config?.codename
       || currentVersionConfig.value?.codename
       || ''
+    const betaType = config?.beta_type || 'beta'
     const miniSuffix = miniVersion !== undefined ? `-${miniVersion}` : ''
-    return `${version}${resolvedCodename ? `-${resolvedCodename}` : ''}${beta ? '-beta' : ''}${miniSuffix}`
+    return `${version}${resolvedCodename ? `-${resolvedCodename}` : ''}${beta ? `-${betaType}` : ''}${miniSuffix}`
   }
 
   function displayFullVersion(
@@ -150,8 +152,9 @@ export const useGameDataStore = defineStore('gameData', () => {
     const config = isCurrentVersion
       ? currentVersionConfig.value
       : versionsConfig.value.find(v => v.version === version && v.beta === beta)
+    const betaType = config?.beta_type || 'beta'
     const miniSuffix = showMiniVersion && config?.mini_version !== undefined ? `-${config.mini_version}` : ''
-    return `${version}${beta ? '-beta' : ''}${miniSuffix}`
+    return `${version}${beta ? `-${betaType}` : ''}${miniSuffix}`
   }
 
   const versionOptions = computed(() => {

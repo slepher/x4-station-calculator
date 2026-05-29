@@ -53246,12 +53246,12 @@
     "crew": {
       "capacity": 75
     },
-    "hull": 110000,
+    "hull": 104000,
     "physics": {
       "mass": 174.0,
       "drag": {
-        "forward": 52.64,
-        "reverse": 237.0,
+        "forward": 51.06,
+        "reverse": 230.0,
         "horizontal": 37.0,
         "vertical": 37.0,
         "pitch": 82.0,

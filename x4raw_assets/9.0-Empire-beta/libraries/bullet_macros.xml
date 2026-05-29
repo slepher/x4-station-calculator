@@ -2109,8 +2109,8 @@
   <macro name="bullet_ter_l_gatling_01_mk1_macro" class="bullet">
     <component ref="bullet_ter_l_gatling_01_mk1"/>
     <properties>
-      <bullet speed="1500" lifetime="5.333" amount="1" barrelamount="1" icon="weapon_gatling_mk1" timediff="0.08" angle="0.55" maxhits="1" scale="0" attach="0"/>
-      <heat value="140"/>
+      <bullet speed="1500" lifetime="5.467" amount="1" barrelamount="1" icon="weapon_gatling_mk1" timediff="0.08" angle="0.55" maxhits="1" scale="0" attach="0"/>
+      <heat value="130"/>
       <reload rate="4.3"/>
       <damage value="530" shielddisruption="10" repair="0"/>
       <effects>
@@ -2664,7 +2664,7 @@
   <macro name="bullet_xen_turret_m_beam_01_mk1_macro" class="bullet">
     <component ref="bullet_gen_m_beam_01_mk1"/>
     <properties>
-      <bullet speed="2.997925e+08" lifetime="1" range="2900" amount="1" barrelamount="2" icon="weapon_beam_mk1" angle="0.28" maxhits="1" scale="1" attach="1"/>
+      <bullet speed="2.997925e+08" lifetime="1" range="2900" amount="1" barrelamount="2" icon="weapon_beam_mk1" angle="0.16" maxhits="1" scale="1" attach="1"/>
       <reload time="3.4"/>
       <damage value="64" shield="22" repair="0"/>
       <effects>
@@ -2679,8 +2679,8 @@
   <macro name="bullet_xen_turret_m_gatling_01_mk1_macro" class="bullet">
     <component ref="bullet_xen_s_gatling_01_mk1"/>
     <properties>
-      <ammunition value="22" reload="5"/>
-      <bullet speed="2270" lifetime="1.5" amount="1" barrelamount="1" timediff="0.1" angle="0.3" maxhits="1" ricochet="0" restitution="1" scale="0" attach="0"/>
+      <ammunition value="23" reload="5"/>
+      <bullet speed="2270" lifetime="1.5" amount="1" barrelamount="1" timediff="0.1" angle="0.24" maxhits="1" ricochet="0" restitution="1" scale="0" attach="0"/>
       <reload rate="5"/>
       <damage value="50" repair="0"/>
       <effects>
@@ -2694,10 +2694,10 @@
   <macro name="bullet_xen_turret_m_laser_01_mk1_macro" class="bullet">
     <component ref="bullet_xen_s_laser_01_mk1"/>
     <properties>
-      <ammunition value="7" reload="1"/>
-      <bullet speed="2500" lifetime="1.52" amount="1" barrelamount="2" timediff="0.021" angle="0.2" maxhits="1" ricochet="0" scale="0" attach="0"/>
+      <ammunition value="8" reload="1"/>
+      <bullet speed="2500" lifetime="1.52" amount="1" barrelamount="2" timediff="0.021" angle="0.18" maxhits="1" ricochet="0" scale="0" attach="0"/>
       <reload rate="4"/>
-      <damage value="17" repair="0"/>
+      <damage value="18" repair="0"/>
       <effects>
         <bigobjectimpact inside="impact_xen_s_laser_01_mk1_bigobject_inside" ref="impact_xen_s_laser_01_mk1_bigobject"/>
         <impact inside="impact_xen_s_laser_01_mk1_inside" ref="impact_xen_s_laser_01_mk1"/>

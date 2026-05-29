@@ -903,6 +903,7 @@ export interface ConnectionValue {
 export interface VersionConfig {
   version: string
   beta: boolean
+  beta_type?: string
   codename: string
   mini_version?: number
   folder_name: string

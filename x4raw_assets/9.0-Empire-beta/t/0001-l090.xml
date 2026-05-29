@@ -43,8 +43,8 @@
     <t id="40">Kaynak</t>
     <t id="41">Kaynaklar</t>
     <t id="42">x</t>
-    <t id="43">Birlik</t>
-    <t id="44">Birlikler</t>
+    <t id="43">Fraksiyon</t>
+    <t id="44">Fraksiyonlar</t>
     <t id="45">Mal</t>
     <t id="46">Mallar</t>
     <t id="47">İnsanlar</t>
@@ -351,7 +351,7 @@
     <t id="2200">Status Menu</t>
     <t id="2201">Flight Time</t>
     <t id="2202">Inventory</t>
-    <t id="2203">Faction Relations and Licences</t>
+    <t id="2203">FraksiyonLisansları ve Diplomatik İlişkileri</t>
     <t id="2204">Show Inventory</t>
     <t id="2205">Your Inventory</t>
     <t id="2206">Credits due from trades</t>
@@ -379,7 +379,7 @@
     <t id="2415">Storage Type</t>
     <t id="2416">Show Encyclopedia Entry</t>
     <t id="2417">Military</t>
-    <t id="2418">There are no known licences for this faction.</t>
+    <t id="2418">Bu fraksiyon için bililen lisans yoktur.</t>
     <t id="2419">Rotation Speed</t>
     <t id="2420">Unit Capacity</t>
     <t id="2421">Production Modules</t>
@@ -397,7 +397,7 @@
     <t id="2433">Carrying Licences</t>
     <t id="2434">Inventory Items</t>
     <t id="2435">Illegal Wares</t>
-    <t id="2436">There are no known illegal wares for this faction.</t>
+    <t id="2436">Bu fraksiyon için bilinen yasadışı mal bulunmamaktadır.</t>
     <t id="2437">Illegal to</t>
     <t id="2438">Scan Level</t>
     <t id="2439">Build Modules</t>
@@ -416,7 +416,7 @@
     <t id="2452">Dock Modules</t>
     <t id="2453">Other Modules</t>
     <t id="2454">Venture Modules</t>
-    <t id="2455">Governing Faction</t>
+    <t id="2455">Yönetimdeki Fraksiyon</t>
     <t id="2456">Station Workforce</t>
     <t id="2457">Available from</t>
     <t id="2458">Minimum relation needed</t>
@@ -460,7 +460,7 @@
     <t id="2496">Ceremony</t>
     <t id="2497">Awarded</t>
     <t id="2498">Automatically</t>
-    <t id="2499">Main Factions</t>
+    <t id="2499">Ana Fraksiyonlar</t>
     <t id="2500">Statistics</t>
     <t id="2501">Show Statistics</t>
     <t id="2510">Achievements</t>
@@ -659,7 +659,7 @@
     <t id="2949">in zone</t>
     <t id="2950">Trade Ships</t>
     <t id="2951">at(station)</t>
-    <t id="2952">of(faction)</t>
+    <t id="2952">ait olduğu Fraksiyon</t>
     <t id="2953">in(zone)</t>
     <t id="2954">Buying</t>
     <t id="2955">Selling</t>
@@ -857,9 +857,9 @@
     <t id="3328">No mission</t>
     <t id="3329">Guidance Mission</t>
     <t id="3330">See Active Mission</t>
-    <t id="3331">Guild Mission Offers</t>
+    <t id="3331">Lonca Görevleri Teklifleri</t>
     <t id="3332">Other Mission Offers</t>
-    <t id="3333">Guild Missions</t>
+    <t id="3333">Lonca Görevleri</t>
     <t id="3334">Other Missions</t>
     <t id="3335">\(1 offer\)</t>
     <t id="3336">\(%u($OFFER_AMOUNT$) offers\)</t>
@@ -879,7 +879,7 @@
     <t id="3408">Show on Map</t>
     <t id="3409">Mission data was not found</t>
     <t id="3410">No Objectives</t>
-    <t id="3411">Opposing Faction</t>
+    <t id="3411">Karşı Fraksiyon</t>
     <t id="3412">Licence required</t>
     <t id="3413">Set to inactive</t>
     <t id="3414">Mission Name</t>
@@ -895,8 +895,8 @@
     <t id="3424">(Coming after order name, e.g. Attack: )Multiple targets</t>
     <t id="3425">Time passed(: Stopwatch display)</t>
     <t id="3426">Are you sure you want to abort this mission?</t>
-    <t id="3427">Abort Guild Mission</t>
-    <t id="3428">Are you sure you want to abort this guild mission?</t>
+    <t id="3427">Lonca Görevini İptal Et</t>
+    <t id="3428">Bu lonca görevini iptal etmek istediğinizden emin misiniz?</t>
     <t id="3500">Hire Staff</t>
     <t id="3501">Hire Fee</t>
     <t id="3502">Basic Hire Fee</t>
@@ -980,7 +980,7 @@
     <t id="4100">Select hull value</t>
     <t id="4200">Working on</t>
     <t id="4201">Ships controlled</t>
-    <t id="4202">Restrict trade to other factions</t>
+    <t id="4202">Diğer Fraksiyonlar ile ticareti kısıtla</t>
     <t id="4203">Managing %s($STATION_NAME$) with a budget of %s($MONEY_AMOUNT$)</t>
     <t id="4204">Managing %s($STATION_NAME$)</t>
     <t id="4205">Set Buy Price</t>
@@ -1152,7 +1152,7 @@
     <t id="5105">LOCK</t>
     <t id="5106">FLR</t>
     <t id="5107">Immobile</t>
-    <t id="5200">(faction text displayed in the eventmonitor's notoriety bar - stating the given faction relation)Owned</t>
+    <t id="5200">Sahip ???</t>
     <t id="5201">Enemy</t>
     <t id="5202">Neutral</t>
     <t id="5203">Allied</t>
@@ -1162,13 +1162,13 @@
     <t id="5207">Unassigned</t>
     <t id="5208">Passenger</t>
     <t id="5209">INFORMATION</t>
-    <t id="5210">(Used for civilian object that used to belong to a faction)$OBJECTNAME$ \($FACTIONNAME$\)</t>
+    <t id="5210">$OBJECTNAME$ \($FACTIONNAME$\)</t>
     <t id="5211">Press %s</t>
-    <t id="5212">(faction text displayed in the eventmonitor's notoriety bar - stating the given faction relation, continued)Hostile(either your ship or theirs will actively attack)</t>
+    <t id="5212">Düşman</t>
     <t id="5213">Processable Wares:(followed by ware and quantity on new line)</t>
     <t id="5214">Total price offered</t>
     <t id="5215">Friendly</t>
-    <t id="5216">Cover active as(: $FACTION_NAME$)</t>
+    <t id="5216">(: $FACTION_NAME$) olarak örtü etkin</t>
     <t id="5217">Location near %s($OBJECT_NAME$)</t>
     <t id="5218">Location in %s($SPACE_NAME$)</t>
     <t id="5219">(vault status)Locked</t>
@@ -1508,7 +1508,7 @@
     <t id="7700">(Player Info Text)</t>
     <t id="7701">Crafting</t>
     <t id="7702">Transaction Log</t>
-    <t id="7703">Factions and Relations</t>
+    <t id="7703">Fraksiyonlar ve Diplomatik İlişkiler</t>
     <t id="7704">%s($CREDIT_AMOUNT$) due from trades</t>
     <t id="7705">Drop Item</t>
     <t id="7706">Craft Item</t>
@@ -1557,10 +1557,10 @@
     <t id="7749">Relation</t>
     <t id="7750">Declare war</t>
     <t id="7751">Declaration of War</t>
-    <t id="7752">Are you sure you want to declare war on this faction? This action is not reversible.</t>
+    <t id="7752">Bu fraksiyona savaş ilan etmek istediğinizden emin misiniz? Bu eylem geri alınamaz.</t>
     <t id="7753">Fire Authorisation Overrides</t>
     <t id="7754">Create New Override</t>
-    <t id="7755">Fire Authorisation Overrides allow you to determine the Rules of Engagement per faction independent from your current relation. Overrides can be defined globally or per ship.</t>
+    <t id="7755">Ateş Açma Yetkisi İzinleri şu anki diplomatik ilişki seviyesinden bağımsız olarak her fraksiyon için ayrı şekilde muharebe esaslarını değiştirmenizi sağlar. İzinler kapsamlı olarak veya her gemi için bireysel olarak belirlenebilir.</t>
     <t id="7756">Fire Authorisation Override</t>
     <t id="7757">Delete override</t>
     <t id="7758">Save override</t>
@@ -1589,7 +1589,7 @@
     <t id="7781">Trade Sale</t>
     <t id="7782">Trade Purchase</t>
     <t id="7783">Sold ships</t>
-    <t id="7784">This faction does not seek to claim sector ownership.</t>
+    <t id="7784">Bu fraksiyonun sektör sahiplenme girişimi bulunmamaktadır.</t>
     <t id="7785">Default setting for trade loop cargo reservations</t>
     <t id="7786">Evrensel Kalıcı Emirleri Sıfırla</t>
     <t id="7787">Reset Notification Settings</t>
@@ -2026,7 +2026,7 @@
     <t id="8400">(Logical Station Overview)</t>
     <t id="8401">Mantıksal Genel Bakış</t>
     <t id="8402">Automatic pricing</t>
-    <t id="8403">Restrict trade with other factions</t>
+    <t id="8403">Diğer fraksiyonlar ile ticareti kısıtla</t>
     <t id="8404">Create Sell Offer</t>
     <t id="8405">Remove Sell Offer</t>
     <t id="8406">Create Buy Offer</t>
@@ -2047,8 +2047,8 @@
     <t id="8421">Ship construction budget</t>
     <t id="8422">Production and ship construction budget</t>
     <t id="8423">Supply budget</t>
-    <t id="8424">Restrict orders from other factions</t>
-    <t id="8425">Construction prices for other factions</t>
+    <t id="8424">Diğer fraksiyonlardan siparişleri kısıtla</t>
+    <t id="8425">Diğer fraksiyonlar için inşaat ücretleri</t>
     <t id="8426">The module has been hacked!</t>
     <t id="8427">The module has been destroyed!</t>
     <t id="8428">Destroyed modules</t>
@@ -2068,7 +2068,7 @@
     <t id="8442">Buy amount</t>
     <t id="8443">Sell amount</t>
     <t id="8444">Automatically allocated capacity</t>
-    <t id="8445">Restricted Factions</t>
+    <t id="8445">Yasaklanmış Fraksiyonlar</t>
     <t id="8446">Edit Restrictions</t>
     <t id="8447">Trade Ware Budget</t>
     <t id="8448">Paused modules</t>
@@ -2236,7 +2236,7 @@
     <t id="8640">Enable Cover</t>
     <t id="8641">Disable Cover</t>
     <t id="8642">Stance</t>
-    <t id="8643">Faction Cover</t>
+    <t id="8643">Fraksiyon Kimliği</t>
     <t id="8644">(stance)Neutral</t>
     <t id="8700">(Help Menu)</t>
     <t id="8701">Tutorials and Help</t>
@@ -2512,9 +2512,9 @@
     <t id="9151">Civilian Ships</t>
     <t id="9152">Sectors containing dangerous regions</t>
     <t id="9153">Sectors owned by enemies</t>
-    <t id="9154">Sectors owned by the following factions</t>
+    <t id="9154">Seçilen Fraksiyonlar tarafından kontrol edilen Sektörler</t>
     <t id="9155">Specific sectors</t>
-    <t id="9156">Add / Remove Faction</t>
+    <t id="9156">Fraksiyon Ekle / Çıkar</t>
     <t id="9157">Add / Remove Sector</t>
     <t id="9158">Blacklists enable you to block access of your ships to certain areas.\n\nShips can violate this restriction if they are ordered explicitly by you or their commander.</t>
     <t id="9159">Blacklist</t>
@@ -2534,10 +2534,10 @@
     <t id="9173">Civilian</t>
     <t id="9174">Military</t>
     <t id="9175">Both</t>
-    <t id="9176">Select Factions</t>
+    <t id="9176">Fraksiyonları Seçin</t>
     <t id="9177">Select Sectors</t>
     <t id="9178">Blacklists for Subordinates</t>
-    <t id="9179">Restrict trade with the following factions</t>
+    <t id="9179">Sıralanan fraksiyonlar ile ticareti kısıtla</t>
     <t id="9180">Government</t>
     <t id="9181">Sectors</t>
     <t id="9182">You can set which wares are considered illegal in sectors that are policed by you.</t>
@@ -2553,8 +2553,8 @@
     <t id="9192">Notification Sound</t>
     <t id="9193">Notification Interval</t>
     <t id="9194">Force Repeat</t>
-    <t id="9195">Object Faction</t>
-    <t id="9196">Any( faction)</t>
+    <t id="9195">Nesnenin ait olduğu Fraksiyon</t>
+    <t id="9196">Herhangi</t>
     <t id="9197">Object Class</t>
     <t id="9198">Any Object</t>
     <t id="9199">Object Purpose</t>
@@ -2757,7 +2757,7 @@
     <t id="9805">Wharf</t>
     <t id="9806">Mineral Region</t>
     <t id="9807">Gas Region</t>
-    <t id="9808">Faction Headquarters</t>
+    <t id="9808">Fraksiyon Karargahı</t>
     <t id="9809">Jump Gate Connection</t>
     <t id="9810">Superhighway Gate</t>
     <t id="9811">Keşif Noktası</t>
@@ -2796,8 +2796,8 @@
     <t id="9907">\(Male\)</t>
     <t id="9908">Select Research</t>
     <t id="9909">Deselect Research</t>
-    <t id="9910">Set relation to this faction</t>
-    <t id="9911">Show relations for faction</t>
+    <t id="9910">Bu fraksiyona karşı tutum belirle</t>
+    <t id="9911">Bu fraksiyon için ilişki seviyesini göster</t>
     <t id="9912">Known to Player</t>
     <t id="9913">Select Blueprints</t>
     <t id="9914">Add / Remove Blueprints</t>
@@ -2854,7 +2854,7 @@
     <t id="11009">Notification Text</t>
     <t id="11010">Trade Rules</t>
     <t id="11011">Create New Trade Rule</t>
-    <t id="11012">Trade Rules enable you to block access by other factions or your own ships to your trade offers.</t>
+    <t id="11012">Ticaret Kuralları diğer fraksiyonların veya kendi gemilerinizin ticaret tekliflerine erişimini engellemenizi mümkün kılar.</t>
     <t id="11013">Trade Rule</t>
     <t id="11014">Delete Trade Rule</t>
     <t id="11015">Save Trade Rule</t>
@@ -2862,14 +2862,14 @@
     <t id="11017">Station Trades</t>
     <t id="11018">Station Supply</t>
     <t id="11019">Sale of Ships</t>
-    <t id="11020">Restrict all factions</t>
-    <t id="11021">Additionally restricted factions</t>
-    <t id="11022">Additionally allowed factions</t>
+    <t id="11020">Tüm Fraksiyonları Engelle</t>
+    <t id="11021">Ek olarak engelli fraksiyonlar</t>
+    <t id="11022">Ek olarak izin verilen fraksiyonlar</t>
     <t id="11023">(Defaults: )All</t>
     <t id="11024">No restriction</t>
     <t id="11025">Use station setting</t>
-    <t id="11026">Restricted factions</t>
-    <t id="11027">Allowed factions</t>
+    <t id="11026">Engellenmiş fraksiyonları</t>
+    <t id="11027">İzin verilen fraksiyonlar</t>
     <t id="11028">Only my property may trade</t>
     <t id="11029">Ship Building Rule #%d($COUNT$)</t>
     <t id="11030">Trade Rule for Supplies</t>
@@ -2882,11 +2882,11 @@
     <t id="11037">Workplace</t>
     <t id="11038">Personnel Search</t>
     <t id="11039">Located in</t>
-    <t id="11040">Allow sectors owned by the following factions</t>
-    <t id="11041">Allow trade with the following factions</t>
+    <t id="11040">Sıralanan fraksiyonlar tarafından kontrol edilen Sektörlere izin ver</t>
+    <t id="11041">Sıralanan fraksiyonlar ile ticarete izin ver</t>
     <t id="11042">Allow specific sectors</t>
     <t id="11043">Restrict all sectors</t>
-    <t id="11044">You have blocked your own faction from trading. None of your property will interact with trade offers where this rule applies!</t>
+    <t id="11044">Kendi fraksiyonunuz ile ticareti engellediniz. Mülkünüzden hiçbiri bu kuralın geçerli olduğu durumlarda ticaret teklifleri ile etkileşime geçmeyecektir!</t>
     <t id="11045">Allographyne Usage</t>
     <t id="11100">(Context menu range 78xx continued)Select group</t>
     <t id="11101">Arm turrets</t>
@@ -2948,10 +2948,10 @@
     <t id="11200">(map range 32xx and 83xx continued)Role</t>
     <t id="11201">Are you sure you want to fire this person?</t>
     <t id="11202">Fire %s($NPC_NAME$)</t>
-    <t id="11203">Show Faction Colours</t>
+    <t id="11203">Fraksiyon Renklerini Görüntüle</t>
     <t id="11204">Diplomacy</t>
     <t id="11205">Your Trade Offers</t>
-    <t id="11206">All factions</t>
+    <t id="11206">Tüm Fraksiyonlar</t>
     <t id="11207">Yours only</t>
     <t id="11208">Others only</t>
     <t id="11209">This option sets whether you see all buy offers, only your buy offers or only other buy offers.</t>
@@ -3036,11 +3036,11 @@
     <t id="11290">Show Galaxy Map</t>
     <t id="11292">Chance of Ship Damage</t>
     <t id="11293">Risk Assessment</t>
-    <t id="11294">Available ventures for guild</t>
+    <t id="11294">Lonca için mevcut maceralar</t>
     <t id="11296">Workforce Availability Bonus</t>
     <t id="11297">Automatic Release( of a sync point)</t>
     <t id="11298">Preferred Build Method</t>
-    <t id="11299">You cannot transfer the captain of your ship to another faction's property.</t>
+    <t id="11299">Kaptanınızı bir başka fraksiyonun malvarlığına transfer edemezsiniz.</t>
     <t id="11300">(Online)Join the Multiverse Team Season</t>
     <t id="11301">Go to Online Features and connect with your Egosoft account</t>
     <t id="11302">Load your favourite current save or start a new game</t>
@@ -3247,7 +3247,7 @@
     <t id="11601">Quantity to keep</t>
     <t id="11602">The trade offer information is out of date. Refresh your data before initiating a trade order. You can use the Dock to Trade option to make the selected ship dock at the station and update the trade data.</t>
     <t id="11603">Cover active</t>
-    <t id="11604">Disable cover faction mode</t>
+    <t id="11604">Fraksiyon Örtü Modunu Devredışı bırak</t>
     <t id="11605">This option allows you to temporarily use the map without the restrictions from being covered.</t>
     <t id="11606">(object state)Inactive</t>
     <t id="11607">You cannot assign a pilot to this ship, because it it is required for an important task that can only be performed by you personally.</t>
@@ -3287,9 +3287,9 @@
     <t id="11641">Reserve cargo space</t>
     <t id="11642">Trade Loop Cargo Reservations</t>
     <t id="11643">On</t>
-    <t id="11644">Showing entries from your logbook relating to this object owned by %s($FACTION_NAME$).</t>
+    <t id="11644">%s($FACTION_NAME$) tarafından sahip olunan bu nesneye ilişkin kayıt defteri girdileri görüntüleniyor.</t>
     <t id="11645">Showing entries from your logbook relating to this ownerless object.</t>
-    <t id="11646">Showing entries from your logbook relating to this sector owned by %s($FACTION_NAME$).</t>
+    <t id="11646">%s($FACTION_NAME$) fraksiyonu tarafından kontrol edilen bu sektör ile ilişkin kayıt defterinden girdiler görüntüleniyor.</t>
     <t id="11647">Showing entries from your logbook relating to this ownerless sector.</t>
     <t id="11648">Team Chat</t>
     <t id="11649">Weapon and Turret Range</t>
@@ -3321,9 +3321,9 @@
     <t id="11675">Global trade restriction: "%s($TRADERESTRICTION_NAME$)"</t>
     <t id="11676">Out of Gravidar range</t>
     <t id="11677">Outside of max travel range</t>
-    <t id="11678">Use Faction Colours for Map</t>
-    <t id="11679">Use Faction Colours for Gravidar</t>
-    <t id="11680">Use Faction Colours for HUD</t>
+    <t id="11678">Harita İçin Fraksiyon Renklerini Kullan</t>
+    <t id="11679">Gravidar İçin Fraksiyon Renklerini Kullan</t>
+    <t id="11680">HUD İçin Fraksiyon Renklerini Kullan</t>
     <t id="11681">Priority( order)</t>
     <t id="11682">The default behaviour for giving orders has changed. Instead of new orders being queued, the default is now to replace the order queue.</t>
     <t id="11683">Orders can still be queued or made priority by using input modifiers.</t>
@@ -3415,7 +3415,7 @@
     <t id="11769">Show Mouse Steering Direction</t>
     <t id="11770">Online Autosave</t>
     <t id="11771">Online Saves</t>
-    <t id="11772">Allow private messages from all users</t>
+    <t id="11772">Allow Private Messages from All Users</t>
     <t id="11773">This option allows all users to send you private messages. If disabled, only users on your contact list can send you messages.</t>
     <t id="11774">You need to enable the Venture Extension in order to be able to access some exclusive Venture Inventory objects.</t>
     <t id="11775">Enable Venture Extension Objects</t>
@@ -3765,14 +3765,14 @@
     <t id="12803">Diplomat</t>
     <t id="12804">Implications of Current Relations</t>
     <t id="12805">Expansion(striving for sector ownership)</t>
-    <t id="12806">This faction seeks to claim sector ownership</t>
-    <t id="12807">This faction does not seek to claim sector ownership</t>
+    <t id="12806">Bu fraksiyonun sektör ele geçirme girişimleri mevcuttur.</t>
+    <t id="12807">Bu fraksiyonun sektör sahiplenme girişimi bulunmamaktadır.</t>
     <t id="12808">General Access</t>
     <t id="12809">Requires relation of at least</t>
     <t id="12810">Your relation is below</t>
     <t id="12811">Requires licence</t>
     <t id="12812">Vacant(diplomat position)</t>
-    <t id="12813">Not available(faction does not accept diplomat)</t>
+    <t id="12813">Mevcut değil(fraksiyon izin vermiyor)</t>
     <t id="12814">Influence</t>
     <t id="12815">Level of influence</t>
     <t id="12816">Agent Actions</t>
@@ -3801,10 +3801,10 @@
     <t id="12839">Ongoing</t>
     <t id="12840">Concluded</t>
     <t id="12841">Diplomatic Event</t>
-    <t id="12842">Faction Relations</t>
+    <t id="12842">Fraksiyon İlişkileri</t>
     <t id="12843">Select Diplomatic Action Target</t>
     <t id="12844">Interference</t>
-    <t id="12845">Manage your influence within the gate network by recruiting and directing Agents. Deploy them to negotiate agreements, gather intelligence, spy on enemies and allies, or stir up tensions between factions.</t>
+    <t id="12845">Ajanları işe alarak ve onları yönlendirerek geçit ağındaki nüfuzunuzu yönetin. Onları anlaşmalar yapmak, müzakere etmek, istihbarat toplamak, düşmanları ve müttefikleri gözlemlemek veya fraksiyonlar arasındaki gerilimi kışkırtmak için görevlendirin.</t>
     <t id="12846">Assign Agent</t>
     <t id="12847">Your level of influence</t>
     <t id="12848">No agent selected</t>
@@ -3832,8 +3832,8 @@
     <t id="12870">Default</t>
     <t id="12871">Name</t>
     <t id="12872">Relation</t>
-    <t id="12873">Unreceptive Factions</t>
-    <t id="12874">Faction Diplomat</t>
+    <t id="12873">İletişime Kapalı Fraksiyonlar</t>
+    <t id="12874">Fraksiyon Diplomatı</t>
     <t id="12876">Friends</t>
     <t id="12877">Neutrals</t>
     <t id="12878">Shipyard</t>
@@ -3863,7 +3863,7 @@
     <t id="12902">Agent Succeeded</t>
     <t id="12903">Agent Failed</t>
     <t id="12904">Outcome</t>
-    <t id="12905">This faction offers no licences.</t>
+    <t id="12905">Bu fraksiyon hiçbir lisans sunmuyor.</t>
     <t id="12906">There are no known sectors.</t>
     <t id="12907">No focus selected</t>
     <t id="12908">Idle</t>
@@ -3871,7 +3871,7 @@
     <t id="12910">Handling event</t>
     <t id="12911">Locked(diplomat position)</t>
     <t id="12912">This Agent Action can only be assigned to one Agent at a time</t>
-    <t id="12913">This Agent Action can only be assigned to one Agent at a time, for any given faction</t>
+    <t id="12913">Bu Ajan Eylemi, herhangi bir fraksiyon için aynı anda sadece bir Ajana atanabilir</t>
     <t id="12914">Recommended Negotiation Experience</t>
     <t id="12915">Recommended Espionage Experience</t>
     <t id="12916">(diplomacy agent state)Injured</t>
@@ -3886,7 +3886,7 @@
     <t id="12925">Downtime is required before this action can be repeated</t>
     <t id="12926">You are about to cancel this Agent Action.</t>
     <t id="12927">This will trigger a downtime for the action.</t>
-    <t id="12928">This will trigger a downtime for the selected faction.</t>
+    <t id="12928">Bu, seçilen fraksiyon için bir bekleme süresini tetikleyecektir.</t>
     <t id="12929">Yes - Cancel Action</t>
     <t id="12930">No - Proceed with Action</t>
     <t id="12931">No Agent Involvement</t>
@@ -3900,10 +3900,10 @@
     <t id="12947">(agent state)Deceased</t>
     <t id="12948">When starting this Agent Action, required inventory items will be removed from your Headquarters' Safe Deposit Storage, if possible. Any items not available there will be taken from your personal inventory.</t>
     <t id="12949">When setting this Agent Focus, required inventory items will be removed from your Headquarters' Safe Deposit Storage, if possible. Any items not available there will be taken from your personal inventory.</t>
-    <t id="12950">Faction Agent</t>
-    <t id="12951">Faction of Origin</t>
-    <t id="12952">Available( faction agent)</t>
-    <t id="12953">Unavailable( faction agent)</t>
+    <t id="12950">Fraksiyon Ajanı</t>
+    <t id="12951">Etnik Fraksiyon Kökeni</t>
+    <t id="12952">Mevcut</t>
+    <t id="12953">Mevcut Değil</t>
     <t id="13000">(Player Info range 77xx continued)</t>
     <t id="13100">(Promo UI)</t>
     <t id="13101">Do not show this message again</t>
@@ -4002,7 +4002,7 @@
     <t id="2058">Alabildiğin kadar satın al</t>
     <t id="2059">Satabildiğin kadar sat</t>
     <t id="2060">Bu ticareti geç</t>
-    <t id="2062">Gemiyi birliğimiz adına ele geçir et</t>
+    <t id="2062">Gemiyi fraksiyonumuz adına ele geçir</t>
     <t id="2063">Gemiyi haritada işaretle</t>
     <t id="2064">Gemiyi koru</t>
     <t id="2065">Kitli kasayı topla</t>
@@ -4094,7 +4094,7 @@
     <t id="3000405">I would like to stop.</t>
     <t id="3000406">Is there some work going?</t>
     <t id="3000407">Join \($CREDITS$ {1001,101}\)</t>
-    <t id="3000408">I'm here about the trade guild.</t>
+    <t id="3000408">Ticaret Loncası için gelmiştim.</t>
     <t id="3000409">Deliver: $AMOUNT$x $WARE$</t>
     <t id="3000410">Let's discuss this in person later.</t>
     <t id="3000411">Let's discuss this later.</t>
@@ -4182,7 +4182,7 @@
     <t id="39">Time spent in SETA mode</t>
     <t id="49">Dropped containers with illegal content collected</t>
     <t id="50">Cases, trunks and lockers opened</t>
-    <t id="51">Highest reputation with any faction</t>
+    <t id="51">Herhangi bir fraksiyon ile erişilen en yüksek itibar seviyesi</t>
     <t id="52">Time spent using autopilot</t>
     <t id="53">Time spent in a spacesuit</t>
     <t id="55">Distance travelled using autopilot</t>
@@ -4343,7 +4343,7 @@
     <t id="83">Retreat(from battlefield, to safe distance)</t>
     <t id="84">Observe(object or event)</t>
     <t id="85">Defeat(an enemy)</t>
-    <t id="86">Contact(a faction or organisation)</t>
+    <t id="86">İrtibata Geç:</t>
     <t id="87">Use Spacesuit</t>
     <t id="88">Trigger(Emp/Bomb)</t>
     <t id="89">Build(housing after terraforming)</t>
@@ -4354,8 +4354,8 @@
     <t id="94">Confirm Delivery</t>
     <t id="95">{1010,4}(contact ship via comm - refers to the context menu entry, can be translated differently if that makes more sense for a specific language)</t>
     <t id="96">Embark</t>
-    <t id="97">(custom action)Improve relations with: $FACTION$ to: $RELATION$(i.e.: Improve relations with: Terran Protectorate to: Neutral (-9))</t>
-    <t id="98">(custom action)Diminish relations with: $FACTION$ to: $RELATION$(i.e.: Diminish relations with: Terran Protectorate to: Neutral (-9))</t>
+    <t id="97">$FACTION$ ile aranı $RELATION$ seviyesine yükselt.</t>
+    <t id="98">$FACTION$ ile aranı $RELATION$ seviyesine düşür.</t>
     <t id="99">Acquire blueprint</t>
     <t id="100">Look at(object or person)</t>
     <t id="101">Hold position</t>
@@ -4386,7 +4386,7 @@
     <t id="1031">(extend)$OBJECT$ to $SEQUENCE$ - $STAGE$</t>
     <t id="1032">(build)$OBJECT$ in $AREA$</t>
     <t id="1040">(scan)$PERCENTAGE$% of $OBJECT$</t>
-    <t id="1050">(destroy)$FACTION$ Ships</t>
+    <t id="1050">$FACTION$ fraksiyonuna ait gemiler</t>
     <t id="1051">(destroy)Enemies</t>
     <t id="1060">(enter)Scanner Drone</t>
     <t id="1061">(enter)Hacker Drone</t>
@@ -5236,9 +5236,9 @@
     <t id="520">You can claim an unmanned ship by bringing a pilot.</t>
     <t id="521">Claim a ship by targeting it and using the interact menu \($INPUT_STATE_INTERACTION_MENU$\).</t>
     <t id="522">You can order mining ship captains to gather resources in an area.</t>
-    <t id="523">When your relationship with a faction decreases, they will increase prices, eventually stop trading with you and might even become hostile.</t>
-    <t id="524">When your relationship with a faction increases, they will be more willing to trade with you and might even give you discounts.</t>
-    <t id="525">Shoot enemy mass-traffic near a station to gain reputation with the faction of that station.</t>
+    <t id="523">Bir fraksiyon ile diplomatik seviyeniz düştüğünde, size sunulan fiyatları yükseltebilirler ve kötüleşmenin devamı durumunda tamamen ticareti kesebilir hatta saldırabilirler.</t>
+    <t id="524">Bir fraksiyon ile diplomatik seviyeniz yükseldiğinde, sizinle ticaret yapmaya daha eğilimli olurlar ve hatta indirim bile sunabilirler.</t>
+    <t id="525">Bir istasyonun yakınında düşman trafiğine saldırmanız durumunda istasyona sahip olan fraksiyona karşı olumlu itibar kazanabilirsiniz.</t>
     <t id="526">Engines involve a compromise between speed and manoeuvrability.</t>
     <t id="527">You can build your own ships at a shipyard by docking and talking to the ship dealer.</t>
     <t id="528">The property menu shows an overview of ships and stations owned by you.</t>
@@ -5266,9 +5266,9 @@
     <t id="802">Building the HQ dock will take some time.</t>
     <t id="803">Use this time to find OTHER MISSIONS.</t>
     <t id="804">Explore the universe and improve your REPUTATION.</t>
-    <t id="810">Get your REPUTATION with at least one faction to LEVEL $REPUTATION$.</t>
+    <t id="810">En az bir fraksiyon ile DİPLOMATİK İLİŞKİ seviyenizi $REPUTATION$ değerine çekmeye çalışın.</t>
     <t id="811">Follow their INVITATION mission for your PROMOTION ceremony.</t>
-    <t id="812">Talk to the FACTION REPRESENTATIVE of that faction.</t>
+    <t id="812">O fraksiyona ait FRAKSİYON ELÇİSİ ile konuşun.</t>
     <t id="813">(Boron Story Ch3)You placed this Nav Beacon out of range of the gates and other previously deployed Nav Beacons. {30253,3020}</t>
     <t id="814">(Boron Story Ch3)Sanctuary of Darkness is a system known for its many hazards.\n\nStay in the Mineral Regions marked on your map to avoid your ship taking damage.</t>
     <t id="815">(Boron Story Ch3)Additionally, you can also identify these Mineral Regions visually by paying attention to where asteroids are located in space.</t>
@@ -5288,7 +5288,7 @@
     <t id="842">("Windfall" is a place, same as {20005,9057})Congratulations, you have fulfilled your contract and are now free to conduct your own business in Windfall!</t>
     <t id="843">Try trading between the stations that are already known to you, searching for mission offers, or simply exploring your surroundings.</t>
     <t id="844">You may also want to learn how to identify profitable trades with the help of the map. Once you have talked to, and hired, a relief pilot, open the Help menu with $INPUT_ACTION_HELP$ and start the '{30191,1}' tutorial.</t>
-    <t id="845">(Maestro same as {30252,101} but add the definite article here)Without the Maestro's careful planning, boarding would be an illegal act of aggression, and would significantly impact on your reputation with the faction whose ship you board.</t>
+    <t id="845">Maestro'nun dikkatli planlaması olmadan, gemiye binmek yasadışı bir saldırı eylemi olur ve gemisine bindiğin fraksiyonla olan itibarını önemli ölçüde etkiler.</t>
     <t id="846">When working alone, you can lessen this impact by engaging your target when it is far away from its allies or, better still, in a lawless sector.</t>
     <t id="847">Start the boarding operation once you have committed all available Marines to the attack.</t>
     <t id="848">You can open the boarding menu at any time to monitor the progress of the operation.</t>
@@ -5312,7 +5312,7 @@
     <t id="866">To detonate a Spacesuit EMP(Spacesuit EMP same as {20201,12301}), use your secondary weapon with $INPUT_STATE_FIRE_SECONDARY_WEAPON$.</t>
     <t id="867">Alternatively, select the Spacesuit EMP(Spacesuit EMP same as {20201,12301}), open its context menu with $INPUT_STATE_INTERACTION_MENU$ and select Trigger EMP Bomb(Trigger EMP Bomb same as {1010,51}).</t>
     <t id="868">You do not currently own any BLUEPRINTS for DOCK MODULES.</t>
-    <t id="869">You can acquire BLUEPRINTS from FACTION REPRESENTATIVES.</t>
+    <t id="869">ŞEMA'ları FRAKSİYON TEMSİLCİLERİ'nden alabilirsiniz.</t>
     <t id="870">Select the Dock Modules section on the left.(Dock Modules same as {1001,2452})</t>
     <t id="871">Select a DOCK MODULE to construct.</t>
     <t id="872">You have selected a DOCK AREA module. These are used by small and medium ships to dock at stations.</t>
@@ -5361,7 +5361,7 @@
     <t id="917">Your ship has been destroyed, Emergency Eject been activated, and you are now in your spacesuit. If you cannot reach a station, and don't have another ship to come and rescue you before your oxygen runs out, then your options may be very limited.</t>
     <t id="918">To learn about missions and other activities, open the '{1001,8701}' menu with $INPUT_ACTION_HELP$ and select a tutorial.</t>
     <t id="919">There is a Signal Leak nearby, which could contain a hidden mission offer. To learn more about this activity, open the '{1001,8701}' menu with $INPUT_ACTION_HELP$ and select the '{30196,1}' tutorial.</t>
-    <t id="920">You were invited by a faction representative to be rewarded.</t>
+    <t id="920">Bir fraksiyon temsilcisi tarafından ödüllendirilmek üzere davet edildiniz.</t>
     <t id="921">Open your mission interface to activate the invitation mission.</t>
     <t id="922">You can search the map for specific ships in areas for which you have live satellite coverage.</t>
     <t id="923">No weapons assigned to the active weapon group.\n{1012,7130}</t>
@@ -5377,8 +5377,8 @@
     <t id="934">(gamepad)Press $INPUT_ACTION_OPEN_COCKPIT_MENU$ to open menus.</t>
     <t id="935">To learn about missions and other activities, press $INPUT_ACTION_OPEN_COCKPIT_MENU$ and then open the '{1001,8701}' menu.</t>
     <t id="936">There is a Signal Leak nearby, which could contain a hidden mission offer. To learn more about this activity, press $INPUT_ACTION_OPEN_COCKPIT_MENU$, open the '{1001,8701}' menu and select the '{30196,1}' tutorial.</t>
-    <t id="937">Your ship has the ability to cover as a different faction. To try this out, open the Ship Interactions menu with $INPUT_ACTION_OPEN_COCKPIT_MENU$.(Ship Interactions same as {1001,8601})</t>
-    <t id="938">Use the highlighted button in the Ship Interactions menu to enable and disable cover, but be aware that this will temporarily change your faction relations.\n\nAlternatively, close this hint box.(Ship Interactions same as {1001,8601})</t>
+    <t id="937">Geminiz farklı bir fraksiyon olarak örtünme yeteneğine sahiptir. Bunu denemek için Gemi Etkileşimleri menüsünü $INPUT_ACTION_OPEN_COCKPIT_MENU$ ile açın.(Gemi Etkileşimleri {1001,8601} ile aynı)</t>
+    <t id="938">Örtüyü etkinleştirmek ve devre dışı bırakmak için Gemi Etkileşimleri menüsündeki vurgulanan düğmeyi kullanın, ancak bunun fraksiyon ilişkilerinizi geçici olarak değiştireceğini unutmayın.\n\nVeya bu ipucu kutusunu kapatın.</t>
     <t id="940">(gamepad)Select the OPTIONS tab using $INPUT_ACTION_WIDGET_TABSCROLL_LEFT$,$INPUT_ACTION_WIDGET_TABSCROLL_RIGHT$.</t>
     <t id="941">(gamepad)Select the PLAYER INFORMATION tab using $INPUT_ACTION_WIDGET_TABSCROLL_LEFT$,$INPUT_ACTION_WIDGET_TABSCROLL_RIGHT$.</t>
     <t id="942">(gamepad)Select the SHIP INTERACTIONS tab using $INPUT_ACTION_WIDGET_TABSCROLL_LEFT$,$INPUT_ACTION_WIDGET_TABSCROLL_RIGHT$.</t>
@@ -5439,7 +5439,7 @@
     <t id="1069">{1012,1060}\n{1012,1061}</t>
     <t id="1070">{1012,1060}\n{1012,1066}</t>
     <t id="1071">Remember that you can pause the game at any time with $INPUT_ACTION_PAUSE$.</t>
-    <t id="1072">This is the Embassy(same as {20007,1612}).\n\nDiplomats from friendly factions, that you have invited, will congregate here. Like faction representatives, they can perform promotion ceremonies and offer blueprints for sale.</t>
+    <t id="1072">Burası Büyük Elçilik.\n\nDost fraksiyonlardan davet ettiğiniz diplomatlar burada toplanacak. Fraksiyon temsilcileri gibi, terfi törenleri düzenleyebilir ve satış için şemalar sunabilirler.({20007,1612})</t>
     <t id="2000">(Flight school)</t>
     <t id="2001">Hold $INPUT_STATE_TOGGLEMOUSESTEERING$ to steer towards your mouse cursor.</t>
     <t id="2002">Use $INPUT_RANGE_STEERING_PRIMARY$ to steer, $INPUT_RANGE_STRAFE_LEFT_RIGHT$ to strafe left-right and $INPUT_RANGE_STRAFE_UP_DOWN$ to strafe up-down.</t>
@@ -5857,7 +5857,7 @@
     <t id="10042">One for longer mission chains.</t>
     <t id="10043">And one for upkeep tasks concerning your ships and stations.</t>
     <t id="10045">It has four categories:</t>
-    <t id="10046">'Guild Missions' are specialised jobs offered by various factions after you reach a certain reputation with them.</t>
+    <t id="10046">'Lonca Görevleri', çeşitli fraksiyonlar tarafından belirli bir itibara ulaştıktan sonra sunulan özel işlerdir.</t>
     <t id="10047">The 'Other Missions' tab will list missions encountered during your travels. Keep an eye on your 'Mission Offers' tab for any jobs nearby.</t>
     <t id="10048">'Upkeep Missions' are tasks to help notify you when there are issues with a ship or station.</t>
     <t id="10049">And if you have set guidance to an object or position, the 'Guidance Mission' tab will show the current destination.</t>
@@ -5883,9 +5883,9 @@
     <t id="10313">Now follow the instructions to finish this mission.</t>
     <t id="10314">{1012,10311} {1012,10312}</t>
     <t id="10350">Accept many missions and play them parallel to maximise your progress.</t>
-    <t id="10351">Find larger plot missions by befriending a faction above level 10 and join one of their organisations.</t>
+    <t id="10351">Bir fraksiyon ile 10. seviye ve üstünde arkadaş olarak daha büyük hikaye görevleri bulun ve onların organizasyonlarından birine katılın.(plot mission needs clarification ???)</t>
     <t id="10360">Or find secret missions with your scanner.</t>
-    <t id="10361">To find larger plot missions, befriend a faction above level 10 and join one of their organisations, or find secret missions with your scanner.</t>
+    <t id="10361">Bir fraksiyon ile 10. seviye ve üstünde arkadaş olarak daha büyük hikaye görevleri bulabilir ve onların organizasyonlarından birine katılabilirsiniz Alternatif olarak tarayıcınız ile gizli görevleri bulabilirsiniz.(plot mission needs clarification ???)</t>
     <t id="10370">Upkeep missions for your stations are often only a suggestion...</t>
     <t id="10371">...only a blocking task or a threat like an attack on one of your stations, would have a high priority.</t>
     <t id="10372">Upkeep missions for your stations are often only a suggestion. Only a blocking task or a threat like an attack on one of your stations is a high priority.</t>
@@ -5905,7 +5905,7 @@
     <t id="11120">To start planning a station, select the "{1001,3226}(manage plot)" icon.</t>
     <t id="11130">You may need to pay a fee for your first plot.</t>
     <t id="11131">Only plots placed in dangerous regions are for free.</t>
-    <t id="11132">Not paying is seen as an aggression by most factions.</t>
+    <t id="11132">Ödeme yapmamak çoğu fraksiyon tarafından düşmancıl bir hamle olarak görülür.</t>
     <t id="11133">A plot right next to a gate or highway is very expensive.</t>
     <t id="11134">The more remote your plot, the cheaper it gets.</t>
     <t id="11135">A good location for your first factory may be a remote outskirt.</t>
@@ -5972,7 +5972,7 @@
     <t id="11612">Cancel your changes.</t>
     <t id="11700">(Blueprints)</t>
     <t id="11701">Get more BLUEPRINTS for many lucrative station expansions.</t>
-    <t id="11702">Buy BLUEPRINTS from faction administrators.</t>
+    <t id="11702">Fraksiyon yöneticilerinden ŞEMA satın alın.</t>
     <t id="11703">Or by SCANNING stations or the RESEARCH MISSION (name of plot mission?).</t>
     <t id="11704">Go back to build mode with the DESIGN STATION action.</t>
     <t id="11705">Cancel your plot by selecting the X.</t>
@@ -6153,7 +6153,7 @@
     <t id="15341">Change the parameter to see how they influence the chances.</t>
     <t id="15342">Stage 3 - Assault: Marines fight against the target ship crew.</t>
     <t id="15343">You cannot influence the outcome of this stage through ship-to-ship combat. It is entirely determined by the number and competence of your marines.</t>
-    <t id="15344">Boarding is illegal and will significantly impact your reputation with the faction of the ship you attack.</t>
+    <t id="15344">Gemi baskını/bordolamak yasa dışıdır ve saldırdığınız geminin fraksiyonu nezdindeki itibarınızı önemli ölçüde etkileyecektir.</t>
     <t id="15350">You can cancel this menu without consequences now.</t>
     <t id="16000">(Joystick, Hotas, Gamepad mapping)</t>
     <t id="16001">Controls can be customised for many input devices.</t>
@@ -6241,8 +6241,8 @@
     <t id="18001">This tutorial requires you to have a station and at least 500,000,000 credits.</t>
     <t id="18002">This tutorial requires you to have a station and at least 1,000,000,000 credits.</t>
     <t id="18003">This tutorial requires you to have a station and at least 4,000,000,000 credits.</t>
-    <t id="18100">Gain enough reputation with one of the major factions in order to become their ally.</t>
-    <t id="18140">Buy blueprints for one or more of the build modules from an allied faction representative.</t>
+    <t id="18100">Müttefikleri olmak için büyük fraksiyonlardan biriyle yeterince itibar kazanın.</t>
+    <t id="18140">Bir müttefik fraksiyon temsilcisinden bir veya daha fazla yapı modülü için şema satın alın.</t>
     <t id="18150">To be able to construct a wharf, purchase blueprints for '{20104,61301}'.</t>
     <t id="18151">To be able to construct a shipyard, purchase blueprints for '{20104,60301}' or '{20104,60401}'.</t>
     <t id="18160">(wharf)Purchase blueprints for '{20104,61301}'.</t>
@@ -6279,10 +6279,10 @@
     <t id="18430">Enabling the 'restock automatically' checkbox per each drone type will let your station try and maintain the selected amount.</t>
     <t id="18431">Disabling the 'restock automatically' checkbox will result in a one-time purchase to match the selected amount.</t>
     <t id="18500">You can build your own ships now via the station's context menu '{1001,7875}'(build ships).</t>
-    <t id="18510">Go to '{1001,7903}'(LSO) to change settings about trading with other factions and prices</t>
-    <t id="18511">By default other factions can order ships; enable '{1001,8424}'(restrict orders from other factions) to block this.</t>
-    <t id="18520">Other factions purchasing something from your station will pay into the station's account.</t>
-    <t id="18550">Get additional blueprints for constructing ships and equipment from the faction representatives.</t>
+    <t id="18510">Diğer fraksiyonlarla ticaret ve fiyatlarla ilgili ayarları değiştirmek için '{1001,7903}' arayüzünü kullanın.</t>
+    <t id="18511">Varsayılan olarak diğer fraksiyonlar gemi sipariş edebilir; bunu engellemek için '{1001,8424}' seçeneğini etkinleştirin.</t>
+    <t id="18520">İstasyonunuzdan hizmet veya ürün satın alan diğer fraksiyonlar istasyonun hesabına ödeme yapacaktır.</t>
+    <t id="18550">Fraksiyon temsilcilerinden gemi ve ekipman inşa etmek için ek şemalar elde edebilirsiniz.</t>
     <t id="19000">(Resupply tutorial)</t>
     <t id="19001">This tutorial requires you to have a fleet.</t>
     <t id="19003">This fleet should consist of at least one S/M ship and a resupply ship, which can be a Carrier or Auxiliary ship.</t>
@@ -7161,7 +7161,7 @@
     <t id="4">Equipment</t>
     <t id="5">Property</t>
     <t id="6">Crew</t>
-    <t id="7">Faction Relations</t>
+    <t id="7">Fraksiyon İlişkileri</t>
     <t id="8">Name</t>
     <t id="9">Gender(: Male/Female/Other)</t>
     <t id="10">Starting Ships</t>
@@ -7173,7 +7173,7 @@
     <t id="33">(unlock condition)Unlocked by story progression</t>
     <t id="40">???</t>
     <t id="41">None</t>
-    <t id="42">(Faction Relations:)Standard Relations</t>
+    <t id="42">Standart İlişki</t>
     <t id="43">Simulation</t>
     <t id="44">Attempt each Nodus at least once</t>
     <t id="45">Achieve a total rating of $REQUIRED$ within this Graph \(current rating: $CURRENT$\)</t>
@@ -7473,7 +7473,7 @@
     <t id="10002">Player</t>
     <t id="10003">Starting Ship</t>
     <t id="10004">Research</t>
-    <t id="10005">Faction Relations</t>
+    <t id="10005">Fraksiyon İlişkileri</t>
     <t id="10006">Story States</t>
     <t id="11000">(Custom gamestart properties)</t>
     <t id="11001">Start sector</t>
@@ -7486,7 +7486,7 @@
     <t id="11008">Ship</t>
     <t id="11009">Inventory</t>
     <t id="11010">Blueprints</t>
-    <t id="11011">Known Factions</t>
+    <t id="11011">Bilinen Fraksiyonlar</t>
     <t id="11012">Known Sectors</t>
     <t id="11013">Known Stations</t>
     <t id="11014">Use Spacesuit</t>
@@ -7546,9 +7546,9 @@
     <t id="12641">Escalation: {30220,9001}</t>
     <t id="12642">The Paranid peace negotiations have been successfully sabotaged. The Apotheosis, the symbol of Paranid unity, has been destroyed, and with it the irreplaceable cocoons of the Paranid high priests - or so it may seem. As tensions between the Godrealm of the Paranid and the Holy Order of the Pontifex rise, the Duke's Buccaneers are keen to seize the opportunity and escalate the war.</t>
     <t id="12651">Escalation: {30220,9101}</t>
-    <t id="12652">While the Paranid Civil War rages on, the Duke's Buccaneers have begun to plunder the territories of the Godrealm of the Paranid and the Holy Order of the Pontifex. They require assistance to gain a permanent foothold from where they can more effectively harass the Paranid factions.</t>
+    <t id="12652">Paranid İç Savaşı devam ederken, Duke'ün Korsanları Paranid Tanrıdiyarı ve Pontifex'in Kutsal Tarikatı topraklarını yağmalamaya başladı. Paranid fraksiyonlarını daha etkili bir şekilde yağmalayabilecekleri kalıcı bir yer edinmek için yardıma ihtiyaçları var.</t>
     <t id="12661">Escalation: {30220,9201}</t>
-    <t id="12662">The Duke's Buccaneers have established a base of operations close to Paranid territory. They are struggling to maintain control while constantly attacking the supply lines of the Godrealm of the Paranid and the Holy Order of the Pontifex, who are themselves locked in perpetual conflict. The Pirate Duke is planning an all-out offensive to eradicate the last vestiges of civility between the Paranid factions.</t>
+    <t id="12662">Duke'ün Korsanları, Paranid topraklarına yakın bir operasyon üssü kurmuştur. Sürekli çatışma halinde olan Paranid Tanrıdiyarı ve Pontifeks'in Kutsal Tarikatı'nın ikmal hatlarına sürekli saldırırken bir yandan da kontrolü ellerinde tutmak için mücadele ediyorlar. Korsan Duke, Paranid grupları arasındaki son uygarlık kalıntılarını da ortadan kaldırmak için topyekûn bir saldırı planlıyor.</t>
     <t id="12671">Escalation: Complete</t>
     <t id="12672">The Duke's Buccaneers have become the Duke's Tempest. They have increased the size of their military fleets, and have formally declared war on the Godrealm of the Paranid and the Holy Order of the Pontifex. The Paranid Civil War has reached its apex, and non-military assets are no longer safe from aggression.</t>
     <t id="12700">(Custom gamestart Split story budgets)</t>
@@ -7556,7 +7556,7 @@
     <t id="12702">The Split Patriarch Zyarth was victorious in crushing the Cabal of Curbs and establishes his realm into Free Families space.</t>
     <t id="12711">Curbs: Victory for the Curbs</t>
     <t id="12712">The Court of Curbs have risen up to force the Patriarchy out of key sectors and establish themselves as a major power. The property of Family Zyarth has been seized by Family Rhak.</t>
-    <t id="12721">Split Faction Decision</t>
+    <t id="12721">Split Fraksiyonu Kararı</t>
     <t id="12722">Your trusted friend, Dal Busta, awaits your decision on whom to support; the Zyarth Patriarchy or the Court of Curbs.</t>
     <t id="12731">Curbs: Declaration of Curbs</t>
     <t id="12732">The so-called 'Curbs' of the Split Free Families have conspired to create a separatist movement. Their declared aim is to unite the Free Families' forces and fight back against the Zyarth Patriarchy occupation.</t>
@@ -7570,7 +7570,7 @@
     <t id="12811">Argon Schism</t>
     <t id="12812">Relations between the Argon Federation and the Antigone Republic have fallen to a new low.</t>
     <t id="12821">Status quo</t>
-    <t id="12822">No actions were taken to destabilise the situation, and the wary peace between the Argon and Terran factions continues.</t>
+    <t id="12822">Durumu istikrarsızlaştıracak herhangi bir eylemde bulunulmadı ve Argon ile Terra fraksiyonları arasındaki soğuk barış durumu devam ediyor.</t>
     <t id="12831">Network Established</t>
     <t id="12832">You researched the Diplomacy Network and unlocked the Embassy at the Headquarters.(Diplomacy Network, same as {20216,3401})</t>
     <t id="12841">Protocol Null Activated</t>
@@ -7962,7 +7962,7 @@
     <t id="2201">View statistics associated with your activities.</t>
     <t id="2202">The amount of money expected from your pending trades.</t>
     <t id="2203">The zone in which you are currently located.</t>
-    <t id="2204">Your current relationship with this faction \(range: -30 to 30\).</t>
+    <t id="2204">Bu fraksiyon ile mevcut ilişki seviyeniz \(aralık: -30 ile 30\).</t>
     <t id="2300">(Production Menu)View the encyclopedia entry for this station.</t>
     <t id="2301">The completion percentage of the current production cycle.</t>
     <t id="2302">The time remaining for the current production cycle.</t>
@@ -7974,9 +7974,9 @@
     <t id="2308">Certain station modules and secondary resources increase the production efficiency of your stations.</t>
     <t id="2309">The production efficiency bonus provided by the selected effect.</t>
     <t id="2400">(Encyclopedia)Show more details for this encyclopedia entry.</t>
-    <t id="2401">(Factions are hostile)Assets belonging to these factions will attack each other on sight.</t>
-    <t id="2402">(Factions are enemies)These factions do not trade with each other. There may be invasions into the other faction's territory and military ships can be attacked.</t>
-    <t id="2403">(Factions are allies)These factions are close allies. They may decide to send patrol ships into each other's territory.</t>
+    <t id="2401">(Fraksiyon düşmancadır)Bu fraksiyonlara ait varlıklar görüldükleri yerde birbirlerine saldıracaklardır.</t>
+    <t id="2402">Bu fraksiyonlar birbirleriyle ticaret yapmazlar. Diğer fraksiyonun uzayına saldırılar olabilir ve askeri gemiler saldırıya uğrayabilir.</t>
+    <t id="2403">Bu fraksiyonlar yakın müttefiktir. Birbirlerinin bölgesine devriye gemileri göndermeye karar verebilirler.</t>
     <t id="2600">(Options Menu)Switch mouse steering mode on and off. In mouse steering mode, the ship turns towards the mouse cursor without the need to keep a button pressed.</t>
     <t id="2601">Flight assist mode makes controlling the ship easier. It can be disabled to allow more extreme aerobatic manoeuvres but this will require more skill to master.</t>
     <t id="2602">View details of your current target.</t>
@@ -8152,8 +8152,8 @@
     <t id="3253">Travelling through this sector is blacklisted for this ship.</t>
     <t id="3254">Trading in this sector is blacklisted.</t>
     <t id="3255">Trading in this sector is blacklisted for this ship.</t>
-    <t id="3256">Trading with this station's faction is blacklisted.</t>
-    <t id="3257">Trading with this station's faction is blacklisted for this ship.</t>
+    <t id="3256">Bu istasyonun fraksiyonu ile ticaret kara listededir.</t>
+    <t id="3257">Bu istasyonun fraksiyonuyla ticaret yapmak bu gemi için kara listeye alınmıştır.</t>
     <t id="3258">Confirming the trade will override this setting.</t>
     <t id="3259">This information is not currently available.</t>
     <t id="3260">Select a ware first.</t>
@@ -8241,7 +8241,7 @@
     <t id="4208">View details of the ship on which this person is working.</t>
     <t id="4209">View details of the station on which this person is working.</t>
     <t id="4210">Adjust the amount of money this individual has in their account.</t>
-    <t id="4211">Adjust the restrictions applied to this station when trading with other factions.</t>
+    <t id="4211">Diğer fraksiyonlarla ticaret yaparken bu istasyona uygulanan kısıtlamaları ayarlayın.</t>
     <t id="4212">Manage the prices at which resources are bought and products sold at this station.</t>
     <t id="4213">Determine whether the Manager should automatically restock with trading drones when required.</t>
     <t id="4214">Determine the operational range of trading ships owned by this station.</t>
@@ -8250,7 +8250,7 @@
     <t id="4217">A manager is required to set supply options.</t>
     <t id="4300">(Albion Skunk Crew List Menu)View the encyclopedia entry for the Albion Skunk.</t>
     <t id="4301">Open communications with the selected employee.</t>
-    <t id="4600">(Trade Restriction Menu)Determine whether trading at this station should be restricted for other factions.</t>
+    <t id="4600">(Ticaret Kısıtlama Menüsü)Bu istasyondaki ticaretin diğer fraksiyonlar için kısıtlanıp kısıtlanmayacağını belirleyin.</t>
     <t id="4601">Determine whether trading in specific resources at this station should be restricted.</t>
     <t id="4602">Determine whether trading in specific products at this station should be restricted.</t>
     <t id="4800">(Options menu range 26xx continued)</t>
@@ -8422,7 +8422,7 @@
     <t id="7403">The research module has been hacked.</t>
     <t id="7700">(Player Info Menu mouse-overs)</t>
     <t id="7701">Return to the map.</t>
-    <t id="7702">You are already at war with this faction.</t>
+    <t id="7702">Bu fraksiyonla zaten savaş halindesiniz.</t>
     <t id="7703">Save changes to the override.</t>
     <t id="7704">Revert changes to the override.</t>
     <t id="7705">This will delete the Fire Authorisation Override. All ships using this override will revert to their commander's behaviour or the default.</t>
@@ -8509,9 +8509,9 @@
     <t id="7862">Ships in this group are allowed to leave their positions temporarily to reinforce other groups.</t>
     <t id="7863">This role can only be assigned to existing groups.</t>
     <t id="7864">There is no space available for additional crew.</t>
-    <t id="7865">This faction does not sell or upgrade ships directly.</t>
-    <t id="7866">This faction does not trade using trade offers.</t>
-    <t id="7867">Ships in this group will respond to distress calls from stations belonging to their faction in their assigned sector.</t>
+    <t id="7865">Bu fraksiyon doğrudan gemi satmaz veya yükseltmez.</t>
+    <t id="7866">Bu fraksiyon ticaret teklifleri kullanarak ticaret yapmaz.</t>
+    <t id="7867">Bu fraksiyondaki gemiler, kendilerine tahsis edilen sektördeki kendi fraksiyonlarına ait istasyonlardan gelen imdat çağrılarına yanıt verecektir.</t>
     <t id="7868">Ships in this group will respond to distress calls in their assigned sector.</t>
     <t id="7869">Requires a station with an administration module and subordinates assigned to defend the station.</t>
     <t id="7870">Behaviour Inspection Mode is already active for this object.</t>
@@ -8627,12 +8627,12 @@
     <t id="8608">This ship will only be able to trade solid or liquid wares.</t>
     <t id="8609">The selected ships include mining ships, which will only be able to trade solid or liquid wares.</t>
     <t id="8610">The group contains ships which cannot tow.</t>
-    <t id="8611">Cover as(: $FACTION_NAME$)</t>
+    <t id="8611">Örtü kimliği(: $FACTION_NAME$)</t>
     <t id="8612">Stance change is in progress.</t>
     <t id="9100">(Empire Menu)</t>
     <t id="9101">This blacklist type controls whether ships can travel through certain sectors.</t>
     <t id="9102">This blacklist type controls whether ships can perform activities like trading or mining in certain sectors.</t>
-    <t id="9103">This blacklist type controls whether ships can trade with certain factions.</t>
+    <t id="9103">Bu karaliste türü, gemilerin belirli fraksiyonlarla ticaret yapıp yapamayacağını kontrol eder.</t>
     <t id="9104">The blacklist type can only be changed when creating the list.</t>
     <t id="9105">Saving the Blacklist will make its type permanent.</t>
     <t id="9106">This will delete the Blacklist. All ships using this list will revert to their commander's behaviour or the default.</t>
@@ -8668,7 +8668,7 @@
     <t id="9917">Increase your money budget by trading, buying ships, and building station modules.</t>
     <t id="9918">Your personnel budget increases with the skill levels of your pilots and managers.</t>
     <t id="9919">Exploring new systems, finding interesting items and locations, and unlocking timeline entries, all reward you with an increased knowledge budget.</t>
-    <t id="9920">Your relation budget can be increased by joining a faction's trade guild or assisting them with a war. Promotion ceremonies also contribute to this budget.</t>
+    <t id="9920">İlişki bütçeniz bir fraksiyonun ticaret loncasına katılarak veya bir savaşta onlara yardım ederek artırılabilir. Terfi törenleri de bu bütçeye katkıda bulunur.</t>
     <t id="9921">You can unlock items in your story budget by completing the corresponding stories.</t>
     <t id="9922">Technologies are unlocked when you have previously researched them.</t>
     <t id="9923">Your personnel budget increases with the skill levels of your pilots and managers, and the number of crew on your ships.</t>
@@ -8692,7 +8692,7 @@
     <t id="12800">(diplomacy menu)</t>
     <t id="12801">A diplomat cannot be accepted due to your reputation being too low.</t>
     <t id="12802">View in Encyclopedia</t>
-    <t id="12803">View Faction Details</t>
+    <t id="12803">Fraksiyon Ayrıntılarını Görüntüle</t>
     <t id="12804">Unassign this ship.</t>
     <t id="12805">You cannot change the agent's ship while they have an assignment.</t>
     <t id="12806">You cannot assign this ship to an agent while it has a commander.</t>
@@ -8788,7 +8788,7 @@
   </page>
   <page id="1028" title="Help Overlay Texts" descr="0" voice="no">
     <t id="2400">(Encyclopedia)</t>
-    <t id="2401">The Encyclopedia contains information on all interesting locations and factions that you have discovered. It also contains detailed information about station modules, ships and equipment.</t>
+    <t id="2401">Ansiklopedi, keşfettiğiniz tüm ilginç konumlar ve fraksiyonlar hakkında bilgi içerir. Ayrıca istasyon modülleri, gemiler ve ekipmanlar hakkında ayrıntılı bilgiler içerir.</t>
     <t id="2402">The Timeline lists videos relating to historical events that you have discovered.</t>
     <t id="2403">The Ship Comparison menu allows you to compare the parameters of up to 3 different ships and loadouts.</t>
     <t id="3200">(Map)</t>
@@ -8811,7 +8811,7 @@
     <t id="3224">This category only shows ships without a commander.</t>
     <t id="3225">This category only shows ships where the captain has inventory.</t>
     <t id="3226">This category only shows deployables.</t>
-    <t id="3227">All Guild Mission Offers currently available to you are listed here. These missions are more complex and may require you to advance your reputation with other factions first.</t>
+    <t id="3227">Şu anda kullanabileceğiniz tüm Lonca Görev Teklifleri burada listelenmiştir. Bu görevler daha karmaşıktır ve önce diğer fraksiyonlarla itibarınızı geliştirmenizi gerektirebilir.</t>
     <t id="3228">Other Mission Offers that are currently available. These change over time and with your location.</t>
     <t id="3229">Accepted Guild Missions are listed here. You can read the briefing and activate or deactivate guidance.</t>
     <t id="3230">Other accepted Missions are tracked here.</t>
@@ -8862,7 +8862,7 @@
     <t id="7711">The logbook stores recent events sorted by category.</t>
     <t id="7712">All messages you have received from news networks and your contacts.</t>
     <t id="7713">Account Management allows you to assign budgets to your stations and transfer any profits to your account.</t>
-    <t id="7715">Displays your relations with other factions, including your standing, docking permission and granted licences.</t>
+    <t id="7715">Mevcut ilişki seviyeniz, iniş izniniz ve verilen lisanslar dahil olmak üzere diğer fraksiyonlarla olan irtibatınızı görüntüler.</t>
     <t id="7717">Statistics about your progress.</t>
     <t id="7718">Personnel Management allows you to view and transfer all personnel working in your empire.</t>
     <t id="7719">All transactions on your personal account are listed here.</t>
@@ -8871,7 +8871,7 @@
     <t id="8100">(Top Level)</t>
     <t id="8101">The Options menu lets you change settings and save/load the game.</t>
     <t id="8102">The Research menu shows you your current research progress and lets you start new projects.</t>
-    <t id="8103">The Player Information menu contains details about your inventory, property, faction relationships and much more.</t>
+    <t id="8103">Oyuncu Bilgileri menüsü envanteriniz, mülkünüz, fraksiyon ilişkileriniz ve çok daha fazlası hakkında ayrıntılar içerir.</t>
     <t id="8104">Interact with your location while docked.</t>
     <t id="8105">Interact with your ship while flying.</t>
     <t id="8106">The Map allows you to see known space, give orders to your ships, build stations, accept missions, and much more.</t>
@@ -8879,17 +8879,17 @@
     <t id="8108">Tutorials can be started here. Also provides links to external documentation and videos.</t>
     <t id="8109">See and change the status of your terraforming project here.</t>
     <t id="8110">The Multiverse Map allows you to see the known multiverse, current season information, and much more.</t>
-    <t id="8111">The Diplomacy menu contains details about your faction relationships and available diplomatic actions.</t>
+    <t id="8111">Diplomasi menüsü, fraksiyon ilişkileriniz ve mevcut diplomatik eylemleriniz hakkında ayrıntılar içerir.</t>
     <t id="8112">The Player Information menu contains details about your inventory, property and much more.</t>
     <t id="8700">(Tutorials and help)</t>
     <t id="8701">This category lists tutorials for game features.</t>
     <t id="8702">This category provides links to external documentation and videos.</t>
     <t id="9000">(Generic Conversation Choices)</t>
-    <t id="9001">Faction reputation too low to invite a diplomat.</t>
-    <t id="9002">A diplomat from this faction has already been invited.</t>
-    <t id="9003">Invites a diplomat from this faction to your headquarters.</t>
-    <t id="9004">Faction diplomat cannot be invited.</t>
-    <t id="9005">You will not be able to hire another agent from $FACTIONSHORTNAME$ for a while.</t>
+    <t id="9001">Fraksiyonun itibarı bir diplomatı davet edemeyecek kadar düşük.</t>
+    <t id="9002">Bu fraksiyondan bir diplomat çoktan davet edildi.</t>
+    <t id="9003">Bu fraksiyondan bir diplomatı karargahınıza davet eder.</t>
+    <t id="9004">Fraksiyon diplomatı davet edilemez.</t>
+    <t id="9005">Bir süre için $FACTIONSHORTNAME$ tarafından başka bir temsilci işe alamayacaksınız.</t>
     <t id="12800">(Diplomacy)</t>
     <t id="12801">Displays your possible embassy actions and the current status of your agents.</t>
     <t id="12802">Displays the status and outcome of current and past diplomatic interferences.</t>
@@ -8921,7 +8921,7 @@
     <t id="122">Local inventory trade discount and commission obtained!</t>
     <t id="131">Hack to disable the radar</t>
     <t id="132">Radar disabled!</t>
-    <t id="141">Interact to reveal nearby ships using cover factions</t>
+    <t id="141">Fraksiyon örtüsü kullanarak yakındaki gemileri ortaya çıkarmak için etkileşime geçin</t>
     <t id="151">Interact to change the music</t>
     <t id="161">Interact to show dock area security camera</t>
     <t id="171">Interact to show external camera</t>
@@ -9008,10 +9008,10 @@
     <t id="100">(*** Signals ***)</t>
     <t id="101">Pirate Harassment</t>
     <t id="102">Ship has been requested to halt for scanning by pirates</t>
-    <t id="103">%s(ship name) %s(ship ID code) in %s(sector name)\nAccosted by %s(faction name) pirate ship\n%s(ship name) %s(ship ID code).</t>
+    <t id="103">%s(sector name) sektöründeki %s(ship name) %s(ship ID code) kimlikli gemi\n %s(faction name) fraksiyonuna ait %s(ship name) %s(ship ID code) kimlikli korsan gemisi tarafından yolu kesildi. (I am pretty proud of this one)</t>
     <t id="111">Police Interdiction</t>
     <t id="112">Ship has been requested to halt for scanning by police</t>
-    <t id="113">%s(ship name) %s(ship ID code) in %s(sector name)\nOrdered by %s(faction name) police to stop and be inspected.</t>
+    <t id="113">%s(sector name) sektöründeki %s(ship name) %s(ship ID code) kimlikli gemi\n %s(faction name) fraksiyonuna ait %s(ship name) %s(ship ID code) kimlikli polis aracı tarafından denetlenmek üzere durduruldu. (I am pretty proud of this one too)</t>
     <t id="121">Found Abandoned Ship</t>
     <t id="122">Ship has found an abandoned ship</t>
     <t id="123">%s(ship name) %s(ship ID code) in %s(sector name)\nFound abandoned ship %s(ship name) %s(ship ID code).</t>
@@ -9302,7 +9302,7 @@
     <t id="901">Rescue people in range</t>
     <t id="902">Rescue people stranded in space suits in the specified area.</t>
     <t id="911">Visit stations</t>
-    <t id="912">Visit important stations belonging to various factions.</t>
+    <t id="912">Çeşitli fraksiyonlara ait önemli istasyonları ziyaret edin.</t>
     <t id="921">Prospect</t>
     <t id="922">Find resource areas and mark them with resource probes.</t>
     <t id="10000">Abort path</t>
@@ -9693,13 +9693,13 @@
     <t id="7061">Spymaster</t>
   </page>
   <page id="1047" title="Diplomacy Exclusion Reasons" descr="Text for diplomacy exclusion reasons between factions. Base 1-20, DLC1 101-104, DLC2 201-204 e.t.c" voice="no">
-    <t id="1">(base_1, factions already in event)These factions are already engaged in diplomatic negotiations with each other.</t>
-    <t id="2">(base_2, Paranid Story)These factions are locked in conflict, but this may change after an investigation by a third party.</t>
-    <t id="3">(base_3, integrated faction)These factions are inextricably linked and their relations cannot be influenced.</t>
+    <t id="1">(base_1, factions already in event)Bu fraksiyonlar halihazırda birbirleriyle diplomatik müzakereler yürütmektedir.</t>
+    <t id="2">(base_2, Paranid Hikayesi)Bu fraksiyonlar çatışmaya kilitlenmiş durumda, ancak bu durum üçüncü bir tarafın soruşturmasından sonra değişebilir.</t>
+    <t id="3">(base_3, integrated faction)Bu fraksiyonlar ayrılmaz bir şekilde birbirine bağlıdır ve ilişkileri etkilenemez.</t>
     <t id="101">(dlc1_1, Split Story){1047,2}</t>
-    <t id="201">(dlc2_1, CovOps)Covert operations are currently maintaining the status quo between these factions.</t>
-    <t id="401">(dlc4_1, Herald Missions)Boron Heralds first need to establish relations between these factions.</t>
-    <t id="402">(dlc4_2, Bilateral Group)These factions have such strong historic ties that their relations cannot be influenced.</t>
+    <t id="201">(dlc2_1, CovOps)Gizli operasyonlar şu anda bu fraksiyonlar arasındaki statükoyu koruyor.</t>
+    <t id="401">(dlc4_1, Herald Görevleri)Boron Habercileri'nin öncelikle bu fraksiyonlar arasında diplomatik ilişki kurması gerekir.</t>
+    <t id="402">(dlc4_2, Bilateral Group)Bu fraksiyonların ilişkileri etkilenemeyecek kadar güçlü tarihi bağları vardır.</t>
   </page>
   <page id="1048" title="Stances" descr="Text for ship stances" voice="no">
     <t id="1">Cloak</t>
@@ -9747,7 +9747,7 @@
   <page id="1098" title="Demo Texts" descr="0" voice="no">
     <t id="1">Oyunu başlatmak için $INPUT_ACTION_START_GAME$ tuşuna basın.</t>
     <t id="2">Başlıyor...</t>
-    <t id="101">X4 Split Vendetta, X4: Foundations hikayesinin bir sonraki bölümü ve ilk büyük ek paketidir. Q1 2020'de yayınlanacak.\n\n\nÖzellikler:\n- Daha büyük oyun evreni\n- İki yeni Split hanı\n- Yeni gemiler, silahlar ve istasyon modülleri\n- Yeni görevler ve maceralar</t>
+    <t id="101">X4: Foundations demosunu oynadığınız için teşekkürler!\n\nOyunun tam sürümünde, seçimlerinizin her şeyi şekillendirdiği uçsuz bucaksız, yaşayan bir evrene adım atacaksınız. Çevik avcı gemilerden büyük savaş gemilerine kadar istediğiniz gemiyi uçurun. Dinamik sistemler ve değişen fraksiyon güçleri arasında ticaret yapın, inşa edin, keşfedin ve savaşın.</t>
     <t id="102">Başarılı X serisinin uzun zamandır beklenen devam oyunu X4: FOUNDATIONS, şimdiye kadarki en sofistike evren SİMÜLASYONUNU sunuyor.\n\nHer gemiyi uçurun, uzayı KEŞFEDİN veya bir imparatorluğu yönetin; destansı bir yolculuğa çıkarken TİCARET YAPIN, SAVAŞIN, İNŞA EDİN ve PLANLAYIN.</t>
   </page>
   <page id="1099" title="Quotes" descr="0" voice="no">
@@ -10075,9 +10075,9 @@
     <t id="812">Mission information</t>
     <t id="813">(New mission | Mission information )received.</t>
     <t id="814">(Mission information )updated.</t>
-    <t id="815">Faction</t>
-    <t id="816">(Faction )relation status improved.</t>
-    <t id="817">(Faction )relation status deteriorated.</t>
+    <t id="815">Fraksiyon</t>
+    <t id="816">(Faction ) ilişki durumu gelişti.</t>
+    <t id="817">(Faction ) ilişki durumu geriledi.</t>
     <t id="818">Reason:</t>
     <t id="900">Long Range Scanner activated.</t>
     <t id="901">Mineral Scanner activated.</t>
@@ -10112,17 +10112,17 @@
     <t id="1041">Sensor range reduced.</t>
     <t id="1050">Anomaly detected.</t>
     <t id="1501">Cover activated.</t>
-    <t id="1502">Cover activated:( Faction)</t>
+    <t id="1502">Örtü etkinleştirildi:( Faction)</t>
     <t id="1503">Cover active.</t>
-    <t id="1504">Covering as:( Faction)</t>
+    <t id="1504">Fraksiyon örtüsü:</t>
     <t id="1505">Cover deactivated.</t>
     <t id="1506">Cover exposed.</t>
     <t id="1507">Cover available.</t>
-    <t id="1508">Cover available:( Faction)</t>
+    <t id="1508">Örtü kullanıma hazır:( Faction)</t>
     <t id="1509">Cover permanently lost.</t>
-    <t id="1510">Cover permanently lost:( Faction)</t>
+    <t id="1510">Örtü kalıcı olarak kaybedildi:( Faction)</t>
     <t id="1511">No cover available.</t>
-    <t id="1512">Multiple cover factions available.</t>
+    <t id="1512">Birden fazla fraksiyon için Örtü kullanıma hazır.</t>
     <t id="2001">(research )researched.</t>
     <t id="2002">(discount | comission )unlocked.</t>
     <t id="2003">Encyclopedia entry</t>
@@ -12295,8 +12295,8 @@
     <t id="30211011">Savaş görevlerinden inşaat işlerine kadar çok farklı görevler mevcut. Duruma bağlı olarak, aralarından seçim yapabileceğiniz çeşitli görevleriniz olacaktır.</t>
     <t id="30211012">Size ayrılan görevleri tamamladıkça ödeme alacaksınız. Hatta sonunda potansiyel bir bonus bile olabilir.</t>
     <t id="30211013">Bir Paranid olarak eminim ayrıntıları bizden iyi biliyorsunuzdur, ama yine de olayı size bizim tarafımızdan anlatayım.</t>
-    <t id="30211014">Bu aslında bir Paranid iç savaşı. Geçitler kapatılırken, birkaç Paranid grubu kendilerini liderleri Pontifex Maximus'tan yoksun buldu. Peki, lideriniz olmadığında ne yaparsınız? Paniğe kapılır ve yeni bir otorite bulursunuz.</t>
-    <t id="30211015">Bu durum gayet iyi gitti, ta ki Geçitler yeniden bağlanana ve her birlik kendi Pontifex'ini tek gerçek kral olarak öne sürene kadar. Şu anda bildiğimiz kadarıyla sadece iki Pontifex kaldı. Tanrıdiyarı'nki ve Kutsal Tarikat'ınki.</t>
+    <t id="30211014">Bu aslında bir Paranid iç savaşı. Geçitler kapatılırken, birkaç Paranid grubu kendilerini liderleri Pontifeks Maximus'tan yoksun buldu. Peki, lideriniz olmadığında ne yaparsınız? Paniğe kapılır ve yeni bir otorite bulursunuz.</t>
+    <t id="30211015">Bu durum gayet iyi gitti, ta ki Geçitler yeniden bağlanana ve her birlik kendi Pontifeks'ini tek gerçek lider olarak öne sürene kadar. Şu anda bildiğimiz kadarıyla sadece iki Pontifeks kaldı. Tanrıdiyarı'nki ve Kutsal Tarikat'ınki.</t>
     <t id="30211016">Federasyon ve Tanrıdiyarı'nın her zaman aynı görüşte olmadığı bir sır değil, ancak şu anda dostane ilişkiler içindeyiz.</t>
     <t id="30211017">Bu durum Kutsal Tarikat'ın canını sıkıyor çünkü onlar kıyasla ciddi oranda yabancı düşmanı bir perspektife sahip ve Tanrıdiyarı'na bir bütün olarak nasıl karşı çıktıkları göz önüne alındığında, mevcut ilişkilerimizi bir zayıflık olarak vurgulamaktan çekinmiyorlar.</t>
     <t id="30211018">Antigone Cumhuriyeti ile birlikte onların uzayımıza yaptıkları saldırıların çoğunu püskürtmeyi başardık.</t>
@@ -18824,13 +18824,13 @@
     <t id="30200210">Her adım ciddi yatırım ve kararlı eylem gerektirecektir. Değişimin bir düğmeye basmakla gerçekleşmesini beklememeliyiz.</t>
     <t id="30200211">Siyasi ve ekonomik sonuçları tahmin etmek için her zaman elimden geleni yapacağım, böylece zamanımıza ve uğraşlarımıza değip değmeyeceğini ölçebilirsin.</t>
     <t id="30200212">Kararsız kalırsan brifingine ve kişisel defterine bir göz at; her adım tamamlanmadan önce ve sonra birkaç yorum katacağım aralara.</t>
-    <t id="30200213">Elbette sonuçlardan memnun kalman durumunda her zaman geri çekilip ve ilgili Birlikleri kendi hallerine bırakabilirsin.</t>
+    <t id="30200213">Elbette sonuçlardan memnun kalman durumunda her zaman geri çekilip ve ilgili Fraksiyonları kendi hallerine bırakabilirsin.</t>
     <t id="30200214">Sürecin tamamı boyunca sürekli çalışmamızı gerektirecek bir durum yok. Hatta hiçbir şey yapmasak bile olur.</t>
     <t id="30200215">Efsane! Hadi bakalım şu anki durum nasılmış.</t>
     <t id="30200250">Mevcut olan siyasi durumu istediğimiz şekilde etkilemek için eşsiz bir fırsata sahibiz.</t>
     <t id="30200251">Yeterli zaman ve çaba ile bu çatışmanın sonucunu Atahanlar'ın ya da Zincirliler'in lehine çevirebiliriz.</t>
     <t id="30200252">Ancak şimdilik biraz ara verip keşfimiz üzerine kara kara düşünebiliriz.</t>
-    <t id="30200253">Her iki Birlik için de önemli yatırımlarla desteklemeye hazır olduğunda beni nerede bulacağını biliyorsun.</t>
+    <t id="30200253">Her iki Fraksiyon için de önemli yatırımlarla desteklemeye hazır olduğunda beni nerede bulacağını biliyorsun.</t>
     <t id="30200260">Seçeneklerimizi değerlendirmeli ve hangi tarafı destekleyeceğimize karar vermeliyiz.</t>
     <t id="30202000">(Diplomatic Mentor Mission)</t>
     <t id="30202001">Reen, gelen metal taşıma gemisiyle ilgili bir durumumuz var.</t>
@@ -19066,7 +19066,7 @@
     <t id="30202231">Navigasyon veritabanına potansiyel bir hedef ekledim.</t>
     <t id="30202232">Yakınlarda bir Pullu Zırh Paktı istasyonu olup olmadığını görmek için haritana bir göz at.</t>
     <t id="30220000">(Paranid Diplomatic Mission - Prerequisites - Dal Busta)</t>
-    <t id="30220001">Görünüşe göre iki Paranid birliğinden birisiyle samimi durumdasın.</t>
+    <t id="30220001">Görünüşe göre iki Paranid fraksiyonundan birisiyle samimi durumdasın.</t>
     <t id="30220002">(spoken to female player 'you'){10111,30220001}</t>
     <t id="30220003">Gerçi çok şaşırtıcı sayılmaz, senin de bir Paranid olduğunu düşünürsek.</t>
     <t id="30220004">Aslında bu Tanrıdiyar ve Kutsal Tarikat arasındaki bitmek bilmeyen İç Savaş'ı hep çok ilgi çekici bulmuşumdur.</t>
@@ -19126,7 +19126,7 @@
     <t id="30220112">Paranid uzayından sadece birkaç sıçrama uzaktayız ve bu istasyonun iletişim modülü daha önce karşılaştığım hiçbir şeye benzemiyor.</t>
     <t id="30220113">Doğal olarak ben de kapasitesini test etmek zorundaydım.</t>
     <t id="30220114">Anlaşıldığı üzere, Tanrıdiyar ve Kutsal Tarikat sık sık ve açık bir şekilde birbirlerini vatandaşlarını yozlaştırmakla suçluyor.</t>
-    <t id="30220115">They would never allow a foreign government to accept the other faction as legitimate.</t>
+    <t id="30220115">Yabancı bir hükümetin diğer fraksiyonu meşru olarak kabul etmesine asla izin vermezler.</t>
     <t id="30220116">However, they're surprisingly reluctant to condemn independent individuals, much less those who simply want the best of both worlds.</t>
     <t id="30220117">If you know what I'm saying.</t>
     <t id="30220118">(spoken to female player 'you'){10111,30220117}</t>
@@ -19537,7 +19537,7 @@
     <t id="30220901">A unified Paranid Empire would have been a real menace on the galactic stage but, thanks to our intervention, such a bleak prospect will hopefully not become a reality in our lifetimes.</t>
     <t id="30220902">Now, with the negotiations having failed spectacularly, the symbol of Paranid tradition having been destroyed, and the cocoons of their future leaders... (slight pause before 'vaporised')'vaporised', conspiracy theories are running rampant.</t>
     <t id="30220903">Kromancketslat is already busy rallying his followers to stoke the chaos.</t>
-    <t id="30220904">His new faction will require a sizeable fleet to be taken seriously though.</t>
+    <t id="30220904">Yine de yeni fraksiyonun ciddiye alınması için büyük bir filoya ihtiyacı olacak.</t>
     <t id="30220905">Kromancketslat has already scouted a suitable sector to claim as staging post for his insurgence.</t>
     <t id="30220906">You are to look for... (slight pause before 'unaffiliated')unaffiliated individuals in that area, and either bring them into the fold or convince them to leave.</t>
     <t id="30220907">(spoken to female player 'you'){10111,30220906}</t>
@@ -20045,7 +20045,7 @@
     <t id="30224752">Nonetheless, it will certainly prove useful in our shaping of the Gate network.</t>
     <t id="30226501">(urgently)There's more to this than meets the eye!</t>
     <t id="30226502">(proud)Allow me to introduce myself: Dal Busta, political analyst, private tutor and bon vivant extraordinaire.</t>
-    <t id="30226503">(musing about)Look, if you want these two factions at each others' throats right this instant, who am I to judge?</t>
+    <t id="30226503">Eğer bu iki fraksiyonun da şu anda birbirini boğazlamasını istiyorsan, yargılamak bana düşmez.</t>
     <t id="30226504">(musing about)Nobody likes pirates, and helping the Terrans wipe out the Yaki would certainly put an end to their shenanigans.</t>
     <t id="30226505">(musing about, then becoming serious again)All it will take is for someone to inform your precious Mission Command about this dire threat... but what if you tell them the exact opposite?</t>
     <t id="30226506">No Yaki threat, no Terran military response, no fuel for the Yaki hard-liners. It all unravels and the Yaki are back to square one.</t>
@@ -20123,7 +20123,7 @@
     <t id="30227204">Sometimes you can find them in the wreckage of destroyed ships, or you can craft one yourself, if you've got the right resources.</t>
     <t id="30227205">To craft one, you will need five AGI Heuristic Cores(see {20201,16501}), a Decryption Module(see {20201,10101}), and an Interface Unit(see {20201,11101}).</t>
     <t id="30227206">To craft one, you will need specific materials. I've sent you a list so that you can refer to it when you need it.</t>
-    <t id="30227207">Be careful, though. Most factions don't really tolerate people using this kind of hacking equipment, so don't let yourself get caught with one of them.</t>
+    <t id="30227207">Yine de dikkatli ol. Çoğu fraksiyon, bu tür hack ekipmanlarını kullananlara gerçekten tolerans göstermez, bu yüzden onlardan biri üstündeyken yakalanma.</t>
     <t id="30227208">(Weary)From what we've seen so far, we shouldn't expect our Terran friends to have our backs out here.</t>
     <t id="30227209">(Biraz endişeli)Biliyorsun, Argon Federasyonu'nun o veri aktarım istasyonunun yerini ifşa etme konusunda dikkatli olmasının bir nedeni var.</t>
     <t id="30227210">Sandwell Arşivleri Argon teknolojisi, mesaj kayıtları, bordro bilgileri, ticari işlemler ve benzerleri hakkında kritik bilgiler içermektedir.</t>
@@ -20220,7 +20220,7 @@
     <t id="30227607">You meet with Delilah, and you turn over all of the intel to her.</t>
     <t id="30227608">The Terran Protectorate gains their leverage and we get paid.</t>
     <t id="30227609">From what I have gathered they'll use the data to sow distrust between the Argon Federation and the Antigone Republic.</t>
-    <t id="30227610">The manufactured tension would lead to a complete cessation of trade between the two factions, but the Terran Protectorate won't use this intelligence to escalate the situation.</t>
+    <t id="30227610">Ortaya çıkan gerilim iki fraksiyon arasındaki ticaretin tamamen durmasına yol açacaktır, ancak Terra Protektorası bu istihbaratı durumu daha da kızıştırmak için kullanmayacaktır.</t>
     <t id="30227611">The Terrans' first priority is still the Xenon, so this leverage is more like long-term insurance to keep their rivals weak.</t>
     <t id="30227612">We contact Saman Red, the Antigone Republic official.</t>
     <t id="30227613">He is already involved in investigating the Protectorate, so all we need to do is hand over the evidence of Terran involvement.</t>
@@ -20233,7 +20233,7 @@
     <t id="30227620">The Terrans don't know for certain that we managed to access the servers, just that we docked at the station.</t>
     <t id="30227621">All we have to do is tell them we didn't get anything from the servers, and quietly erase all the data we did get our hands on.</t>
     <t id="30227622">Sure, we won't get paid, and the Terrans will probably just hire someone else to do their dirty work, but we come out clean.</t>
-    <t id="30227623">More importantly, the relations between factions won't change, for better or for worse. Business as usual.</t>
+    <t id="30227623">Daha da önemlisi, gruplar arasındaki ilişkiler iyi ya da kötü yönde değişmeyecek. Durum her zamanki gibi değişmeden devam eder.</t>
     <t id="30227624">(Anxiously awaiting decision)So, what are we going to do?</t>
     <t id="30227625">OK.</t>
     <t id="30227626">Just go through with the final debriefing.</t>
@@ -20274,14 +20274,14 @@
     <t id="30229101">(1/3)Oh, dear Boso, ever the investigator!</t>
     <t id="30229102">(2/3)The real question is, what is stopping us from relieving them of their cargo right here, right now?</t>
     <t id="30229103">(3a/3)Sure, we got an arrangement with Gride, but these guys don't seem to be part of the same crew as her, if you know what I'm saying.(mischievous, talking to player)</t>
-    <t id="30229104">(3b/3)With Gride gone, Buccaneer leadership is already in a shambles. Time to take out the trash!(gung-ho, talking to player, "Gride" refers to the female character "Gride Orrian", same as {30220,101}, "Buccaneer" refers to the faction "Duke's Buccaneers", same as {20203,2401})</t>
+    <t id="30229104">(3b/3)Gride aradan çekilince Korsan liderliği zaten darmadağın olmuş durumda. Çöpü dışarı atma zamanı!(gung-ho, oyuncuyla konuşuyor, "Gride" kadın karakter "Gride Orrian "ı ifade eder, {30220,101} ile aynı, "Buccaneer" fraksiyon "Duke's Buccaneers "ı ifade eder, {20203,2401} ile aynı)</t>
     <t id="30229105">(3c/3)Our good friend, the Duke, might take offence if he learns about it, but who says that he has to? He seems rather busy with taking over the world.(talking to player, give your best megalomaniac impression when saying "taking over the world")</t>
     <t id="30229200">(Buccaneer stash station first encounter)</t>
     <t id="30229201">(1/4)Uh, yes, supremely evil, of course.(a bit perplexed)</t>
     <t id="30229202">(2/4)Well, you heard the Boron. Consider whether taking these wares into your custody would be a profitable... I mean, the morally right thing to do.(talking to player)</t>
-    <t id="30229203">(3a/4)This seems to be an independent branch of the Buccaneers, so I'm sure that Gride would turn a blind eye to whatever you're about to do.(lowered voice, talking to player, "Buccaneers" refers to the faction "Duke's Buccaneers", same as {20203,2401}, "Gride" refers to the character "Gride Orrian", same as {30220,101})</t>
+    <t id="30229203">(3a/4)Bu, Korsanların bağımsız bir dalı gibi görünüyor, bu yüzden Gride'ın yapmak üzere olduğun şeyi görmezden geleceğinden eminim(alçak sesle, oyuncuyla konuşurken, "Korsanlar", "Duke's Buccaneers" fraksiyonunu ifade eder, {20203,2401} ile aynıdır, "Gride", "Gride Orrian" karakterini ifade eder, {30220,101} ile aynıdır).</t>
     <t id="30229204">(3b/4)I'm fairly sure that this stash is just one of their many contingency plans, though. You know how they are.(lowered voice, talking to player)</t>
-    <t id="30229205">(3c/4)Remember that whatever you do here will reflect on your standing with the Duke's faction as a whole, so plan accordingly.(lowered voice, talking to player)</t>
+    <t id="30229205">(3c/4)Burada yapacağın her şeyin bir bütün olarak Duke'ün gözündeki konumuna yansıyacağını unutma, bu nedenle buna göre plan yap(alçak sesle, oyuncuyla konuşur).</t>
     <t id="30229206">(4/4)In case you're wondering, all the goodies are piled up in the storage modules. Cracking them will require some serious firepower.(talking to player)</t>
     <t id="30251700">(Twin Plot - Chapter 7)</t>
     <t id="30251701">Partner, I've got the feeling you have just been hustled.</t>
@@ -20386,8 +20386,8 @@
     <t id="302960228">Use that to your advantage and endow your agents with high-value, high-prestige ships.</t>
     <t id="302960229">You will find that this expedites your objectives substantially!</t>
     <t id="302960230">Hello partner. You're gaining influence and are starting to get noticed!</t>
-    <t id="302960231">This might be a good time to carefully begin interfering with the relations between foreign factions.</t>
-    <t id="302960232">It didn't escape my attention that you've been proactively manipulating factions for some time! But have you heard of Protocol Null?</t>
+    <t id="302960231">Bu, yabancı gruplar arasındaki ilişkilere dikkatlice müdahale etmeye başlamak için iyi bir zaman olabilir.</t>
+    <t id="302960232">Bir süredir proaktif olarak fraksiyonları manipüle ettiğin de dikkatimden kaçmadı! Ama Protokol Null'u hiç duymuş muydun?</t>
     <t id="302960233">It allows your agents to do their work independently, creating a constantly shifting political landscape.</t>
     <t id="302960234">If you like, we could ask Boso Ta to cook up a research plan. Let me know!</t>
     <t id="302960235">Hello. The Protocol Null research has concluded - congratulations! Now you can send an agent to put it into action.</t>
@@ -20431,7 +20431,7 @@
     <t id="3002">(Diplomat Arrival Confirmation)I have arrived at your embassy, and am looking forward to doing business with you.</t>
     <t id="3003">(Player deteriorates relations, diplomat leaves)You will regret crossing the Vigor Syndicate!</t>
     <t id="3004">Askeri destek sağlamak için birkaç akıncı göndereceğiz.</t>
-    <t id="3005">(Faction military support has ended)While aiding you in combat has been a welcome diversion, our forces need to get back to what really matters...</t>
+    <t id="3005">Savaşta size yardım etmek bizim için keyifli bir eğlence olsa da, kuvvetlerimizin önemli operasyonlara geri dönmesi gerekiyor...</t>
     <t id="12106">Zaman ayırıp beni şahsen görmeye geldiğiniz için teşekkür ederim.</t>
     <t id="12107">Aramızdan birçoğu çalışmalarınızı büyük bir ilgiyle izliyor ve bunun için sizi ödüllendirmek istiyor.</t>
     <t id="12108">Bizimle birlikte çalışmaya devam ettiğiniz için mutluyuz ve bu zor zamanlarda devam eden yardımlarınız için sizi ödüllendirmek istiyoruz.</t>
@@ -20454,7 +20454,7 @@
     <t id="3002">(Diplomat Arrival Confirmation)I've made it to your embassy.</t>
     <t id="3003">(Player deteriorates relations, diplomat leaves)We cannot work alongside someone who treats us so poorly.</t>
     <t id="3004">(Player requests military support)We'll see what sort of military support we can muster.</t>
-    <t id="3005">(Faction military support has ended)There is nothing else the Riptide Rakers can do for you at the moment, militarily speaking.</t>
+    <t id="3005">Şu anda Harapdalgası Tırmıkçıları'nın askeri açıdan size sunabileceği bir destek elimizde kalmadı.</t>
     <t id="12106">Zaman ayırıp beni şahsen görmeye geldiğiniz için teşekkür ederim.</t>
     <t id="12107">Aramızdan birçoğu çalışmalarınızı büyük bir ilgiyle izliyor ve bunun için sizi ödüllendirmek istiyor.</t>
     <t id="12108">Bizimle birlikte çalışmaya devam ettiğiniz için mutluyuz ve bu zor zamanlarda devam eden yardımlarınız için sizi ödüllendirmek istiyoruz.</t>
@@ -20477,7 +20477,7 @@
     <t id="3002">(Diplomat Arrival Confirmation)I have arrived at your embassy.</t>
     <t id="3003">(Player deteriorates relations, diplomat leaves)We are no longer willing to deal with unreliable partners!</t>
     <t id="3004">(Player requests military support)You are asking us for military support? I'll see what support our trading league can muster.</t>
-    <t id="3005">(Faction military support has ended)The Hatikvah Free League needs to withdraw its military support for the time being.</t>
+    <t id="3005">Hatikvah Özgür Topluluk şu an için askeri desteğini çekmesi gerekmektedir.</t>
     <t id="12106">Şahsen gelmenize sevindim.</t>
     <t id="12107">Hatikvah başarılarınızı büyük bir ilgiyle izliyor. Bunlar kesinlikle takdir edilmeye değer şeyler.</t>
     <t id="12108">Bizimle birlikte yolumuza devam ettiğiniz için mutluyuz ve çabalarınız için sizi ödüllendirmek istiyoruz.</t>
@@ -21627,7 +21627,7 @@
     <t id="30220221">To an outsider, it might seem as though this war has just been going back and forth, with no prospect of a resolution.</t>
     <t id="30220222">That's not an entirely inaccurate assessment, but it's not the whole picture.</t>
     <t id="30220223">It's no accident that military supplies for this conflict have become one of the safest investments at this end of the gate network.</t>
-    <t id="30220224">You see, the two factions aren't (emphasize 'really')really fighting over territory or resources.</t>
+    <t id="30220224">Anlayacağın üzere, bu iki fraksiyonun savaşı tam olarak bölge veya kaynak kazanmak değil.</t>
     <t id="30220225">(spoken to female player 'you'){10151,30220224}</t>
     <t id="30220226">In the minds of their leaders, elimination of their opponents would actually be a tragic outcome.</t>
     <t id="30220227">That's because they're fighting for the hearts and minds of their people.</t>
@@ -22171,7 +22171,7 @@
     <t id="30224311">Regardless, we could do with a little more of your assistance.</t>
     <t id="30224313">You'll be helping one of our associates in acquiring research that is vital to Project Genesis.(Project Genesis same as {30224,1})</t>
     <t id="30224314">In short: Our future.</t>
-    <t id="30224315">The Segaris Pioneers aspire to take a step up in the galactic community.(Segaris Pioneers same as Faction {20203,2901})</t>
+    <t id="30224315">Segaris Öncüleri galaktik toplulukta bir adım öne çıkmayı hedeflemektedir.(Segaris Pioneers same as Faction {20203,2901})</t>
     <t id="30224316">Project Genesis will help us build a foundation for our new future.(Project Genesis same as {30224,1})</t>
     <t id="30224317">An independent scientist. Let me contact them.(Paranid Gender)</t>
     <t id="30224318">Greetings.</t>
@@ -22644,7 +22644,7 @@
   </page>
   <page id="10158" title="Mission Argon/Terran NPC Male 4 / Terran Cadet Gamestart Character" descr="Lines for Mission Argon NPC Male 4" voice="yes">
     <t id="99900">(* Gamestart Narration *)</t>
-    <t id="99901">Birleşik Uzay Komutanlığı ile Gezegenler Topluluğu arasında tırmanan ve Torus Aeternal'in yok edilmesiyle sonuçlanan gerilimin ardından, güneş sisteminin insanları Sıçrama Geçidinin kapatılmasının beraberinde getirdiği inzivayı memnuniyetle karşıladılar. İzolasyon içinde zenginleştiler ve kısa süre içinde geçmişin travmatik olaylarını geride bırakarak iyileşmeye başladılar. Başlarda yaşanan istikrarsızlık döneminden sonra BLK hükümeti yeniden yapılandırıldı ve eskinin enkazından Terra Protektorası doğdu. Şimdi, Geçit ağıyla yeniden temas kuran bizler, Protektora vatandaşları ile Xenon tehdidi arasında cesurca duran bir kalkanız. Diğer birlikler bizi henüz üstün koruyucular olarak tanımıyor olabilirler ama tanıyacaklar.</t>
+    <t id="99901">Birleşik Uzay Komutanlığı ile Gezegenler Topluluğu arasında tırmanan ve Torus Aeternal'in yok edilmesiyle sonuçlanan gerilimin ardından, güneş sisteminin insanları Sıçrama Geçidinin kapatılmasının beraberinde getirdiği inzivayı memnuniyetle karşıladılar. İzolasyon içinde zenginleştiler ve kısa süre içinde geçmişin travmatik olaylarını geride bırakarak iyileşmeye başladılar. Başlarda yaşanan istikrarsızlık döneminden sonra BLK hükümeti yeniden yapılandırıldı ve eskinin enkazından Terra Protektorası doğdu. Şimdi, Geçit ağıyla yeniden temas kuran bizler, Protektora vatandaşları ile Xenon tehdidi arasında cesurca duran bir kalkanız. Diğer fraksiyonlar bizi henüz üstün koruyucular olarak tanımıyor olabilirler ama tanıyacaklar.</t>
     <t id="99902">Kendimi bildim bileli, türümüzün mütevazı kökeni olan Dünya'yı yakından görmeyi hayal etmişimdir. Koruyucu Devlet politikasına göre Titan'ın uzak yörüngesindeki bir ticaret gemisinde doğduğum için güneş sisteminin çekirdeği ulaşamayacağım bir yer olarak kaldı. Ta ki kendime bir isim yapana kadar. Harp Okulu'ndan yeni mezun oldum ve bunu yapmayı hedefliyorum.</t>
     <t id="30223000">(HQ Discovery Mission)</t>
     <t id="30223001">Uydu... Neden hep uydu olmak zorunda?</t>
@@ -22750,7 +22750,7 @@
     <t id="30227116">(Hayal kırıklığına uğramış bir tonda)Artık Terra kibiri hepimizin başına bela olacak.</t>
     <t id="30227117">Argon Federasyonu ile Terra yetkilileri arasındaki ilişkilerin tarihsel olarak gergin olduğu bir sır değil.</t>
     <t id="30227118">Ve son zamanlarda, Terra Protektorası Antigone'nin egemenliğini de açıkça hiçe saydıklarını gösterdiler.</t>
-    <t id="30227119">(Endişeli) Olayların kızışması halinde halkımın iki birlik arasındaki çapraz ateşte kaldığını görmek bana acı verir.</t>
+    <t id="30227119">(Endişeli) Olayların kızışması halinde halkımın iki fraksiyon arasındaki çapraz ateşte kaldığını görmek bana acı verir.</t>
     <t id="30227120">(Şaşkın, konuşmanın devam etmesini bekleyerek)Evet, ne oldu? Ne diyordunuz?</t>
     <t id="30227121">(Şüpheli)İyi misin? Hemen gidiyor musun?</t>
     <t id="30227122">Hmm, tekrar mı geldiniz?</t>
@@ -23364,7 +23364,7 @@
     <t id="12103">Varlığınla şeref verdin yoldaş!</t>
     <t id="12106">Seni aramızda görmekten çok mutluyuz!</t>
     <t id="12107">(Terfi töreni - cntd, dostça)Halkımıza verdiğin destek gözümünden kaçmadı ve seni ödüllendirmeye hak kazandı.</t>
-    <t id="12108">(Terfi töreni - cntd, müttefik)Tırmıkçılara verdiğin desteği izledikten sonra, çabaların için seni ödüllendirmeye hevesliyiz (Rakerler grup adıyla aynı)</t>
+    <t id="12108">(Terfi töreni - cntd, müttefik)Tırmıkçılara verdiğin desteği izledikten sonra, çabaların için seni ödüllendirmeye hevesliyiz. (Rakerler grup adıyla aynı)</t>
     <t id="12109">(Terfi töreni - 'madalya' verilmesi, dostça)Harapdalgası ile dolu bu sistemi aşma yeteneğini kanıtladığın için, seni Dalga Sürenler arasına kabul etmekten memnuniyet duyuyorum. (Gelgit Koşucusu {20207,5361} ile aynı)</t>
     <t id="12110">(Terfi töreni - 'madalya' verilmesi, müttefik)Dalga'ya karşı dayanıklı olduğunu kanıtladığın için, sana yeni Dalga Kıran rütbesini takdim etmekten onur duyuyorum. (Gelgit Kırıcı {20207,5371} ile aynı)</t>
     <t id="12111">(Terfi töreni)Tabii ki, bu rütbe potansiyellerini de beraberinde getiriyor.</t>
@@ -23952,8 +23952,8 @@
     <t id="3020">Bu mod, erişimin olan nesneler arasında otomatik olarak geçiş yapar.</t>
     <t id="3021">Sahip olduğun nesneler arasında geçiş yapan kişisel kanalınla başlar.</t>
     <t id="3022">Şu anda sadece bir gemiye sahip olduğun için henüz çok heyecan verici bir kanal değil.</t>
-    <t id="3023">Başka bir Birliğin kanalının erişimini de açtım.</t>
-    <t id="3024">O Birlikteki mevkin yükseldikçe bunlara erişim elde edeceksin.</t>
+    <t id="3023">Başka bir Fraksiyonun kanalının erişimini de açtım.</t>
+    <t id="3024">O Fraksiyondaki mevkin yükseldikçe bunlara erişim elde edeceksin.</t>
     <t id="3025">Kanalın otomatik olarak değişmesini bekleyebilir ya da ekranın sağ üst köşesindeki kontrolleri kullanarak bunu kendin de yapabilirsin.</t>
     <t id="3026">Bu kontrollerle, modun değişmesini önlemek için bir kanalı veya nesneyi de kilitleyebilirsin.</t>
     <t id="3027">Rıhtıma geçmek için kontrolleri kullan, ardından da kanalı kilitle.</t>
@@ -24197,7 +24197,7 @@
     <t id="13042">Kalkan kapasiten ve şarj oranın iki katına çıktı.</t>
     <t id="13043">Şimdi Silahları seç.</t>
     <t id="13044">Bunların çoğunu henüz satın almana izin verilmiyor.</t>
-    <t id="13045">Bunun nedeni, uygun askeri teçhizat için özel bir lisansa ihtiyacının olmasıdır; bu ruhsat, belli bir mevkiye ulaştığında bir Birlik tarafından sana sunulur.</t>
+    <t id="13045">Bunun nedeni, uygun askeri teçhizat için özel bir lisansa ihtiyacının olmasıdır; bu ruhsat, belli bir mevkiye ulaştığında bir Fraksiyon tarafından sana sunulur.</t>
     <t id="13046">Bu işlerin nasıl yürüdüğünü açıklayan farklı bir ders var.</t>
     <t id="13047">Şimdilik, beyaz renkte gösterilen silahlardan herhangi birini seçmen yeterli.</t>
     <t id="13048">Alttaki istatistikler yine değişti.</t>
@@ -24274,27 +24274,27 @@
     <t id="16008">Mal varlığına genel bir bakışla başlıyoruz.</t>
     <t id="16009">Yasal adını ve kuruluşunun adını da buradan değiştirebilirsin.</t>
     <t id="16010">Bu, karşılaştığın tüm birliklerin ve seninle olan ilişkilerinin bir listesidir.</t>
-    <t id="16011">Bir Birlik seçtiğinde, onların hangi lisanslarına sahip olduğunu ve mevcut ilişkinin gerçekte ne anlama geldiğini görebilirsin.</t>
+    <t id="16011">Bir fraksiyon seçtiğinde, onların hangi lisanslarına sahip olduğunu ve mevcut ilişkinin gerçekte ne anlama geldiğini görebilirsin.</t>
     <t id="16012">Argon Federasyonu'nu seç.</t>
     <t id="16013">Onlardaki mevcut rütben temel ekipman, istasyon modülleri ve gemiler satın almanı sağlar.</t>
     <t id="16014">Ayrıca iniş yapmana ve dolayısıyla onlarla ticaret yapmana da izin verilir.</t>
     <t id="16015">Askeri varlıklara erişmek için daha yüksek bir rütbeye ihtiyacın var.</t>
-    <t id="16016">Bir birlik için görev yapmak itibarını artırmanın en kolay yollarından biridir.</t>
+    <t id="16016">Bir fraksiyon için görev yapmak itibarını artırmanın en kolay yollarından biridir.</t>
     <t id="16017">Onların düşmanlarını, istasyonlarının yakınında yok etmek de çok yardımcı olur. Yeterince ticaret yapmak bile sana güvenmelerini sağlayabilir.</t>
     <t id="16018">Yeni bir rütbe kazandığında, bir temsilciyle şahsen görüşmen için bir davetiye alırsın.</t>
     <t id="16019">Burada listelenen lisanslara erişebilir ve ücret karşılığı olanları satın alma seçeneğine sahip olabilirsin.</t>
-    <t id="16020">Örneğin polis lisansı, bu birliğin uzayını güvende tutmayı planlıyorsan çok kullanışlıdır.</t>
+    <t id="16020">Örneğin polis lisansı, bu fraksiyonun uzayını güvende tutmayı planlıyorsan çok kullanışlıdır.</t>
     <t id="16021">İstasyonlarından birinin yakınında yok ettiğin her düşman için bir ödül ödenir.</t>
     <t id="16022">Ayrıca onların uzayından geçen gemileri taramana da yasal olarak izin verilir.</t>
-    <t id="16023">Ticaret teklifi aboneliği sana bu birliğin tüm ticaret tekliflerine kalıcı erişim sağlayacaktır.</t>
+    <t id="16023">Ticaret teklifi aboneliği sana bu fraksiyonun tüm ticaret tekliflerine kalıcı erişim sağlayacaktır.</t>
     <t id="16024">Bu temsilci aynı zamanda sana istasyon modülleri, gemiler ve ekipmanlar için şemalar satacak olan kişidir.</t>
-    <t id="16025">Şimdi diğer Birlik olan Hatikvah Özgür Topluluk'u seç.</t>
+    <t id="16025">Şimdi diğer Fraksiyon olan Hatikvah Özgür Topluluk'u seç.</t>
     <t id="16026">Argon Federasyonu'ndan çok daha küçük bir birliktir.</t>
     <t id="16027">Örneğin polis lisansı yok ve ticari teklif abonelikleri önemli ölçüde daha ucuz.</t>
     <t id="16028">Ayrıca biraz şaibelidirler ve senden gerçekten memnun kalmadıkları sürece seni ve gemilerini yağmalayabilirler.</t>
     <t id="16029">Eğer onlara yakın bir yerde faaliyet göstermek istiyorsan, onların gözüne girmen faydalı olabilir.</t>
     <t id="16030">Ben kendi adıma onların yolundan uzak durmayı tercih ediyorum.</t>
-    <t id="16031">Argon Federasyonu birliği varsayılan olarak seçilidir.</t>
+    <t id="16031">Argon Federasyonu fraksiyonu varsayılan olarak seçilidir.</t>
     <t id="16032">Hatikvah Özgür Topluluk'u çoktan seçtiğini görüyorum.</t>
     <t id="17000">(Inventory and Crafting)</t>
     <t id="17001">Bugün üzerinde taşıdığın eşyalar hakkında bilgi edineceğiz.</t>
@@ -27774,9 +27774,9 @@
     <t id="302960105">Splendid! You have now completed all required research and obtained the necessary certifications to engage in diplomatic affairs at the Embassy.</t>
     <t id="302960106">I look forward to your contributions to interstellar relations!</t>
     <t id="302960107">I hope this finds you well!</t>
-    <t id="302960108">With your newly acquired expertise, you may now invite diplomats from friendly factions to your Headquarters.</t>
+    <t id="302960108">Yeni edindiğin uzmanlıkla, artık dost fraksiyonlardan diplomatları Karargahına davet edebilirsin.</t>
     <t id="302960109">Diplomats are authorised by their governments to ratify blueprint sales.</t>
-    <t id="302960110">They may also organise promotional ceremonies on behalf of their factions - this means you would be climbing the ladder!</t>
+    <t id="302960110">Ayrıca fraksiyonları adına terfi törenleri de düzenleyebilirler - bu da onların gözünde mevki atlayabileceğin anlamına gelir!</t>
     <t id="302960111">Good-faith participation is, of course, anticipated; should relations deteriorate, foreign diplomats may be recalled.</t>
   </page>
   <page id="10202" title="Boron NPC 2 / Boron Trader" descr="Lines for Boron NPC 2 and Boron Trader" voice="yes">
@@ -33383,8 +33383,8 @@
     <t id="30212012">You will be paid as you complete your allocated tasks, and should we see fit, you will be further awarded.</t>
     <t id="30212013">It is rare for one such as yourself to be so interested in Paranid matters. I will indulge you.</t>
     <t id="30212014">Is it a rather deplorable situation. During the time of the deactivated Jump Gates, many Paranid found themselves cut off from our home systems.</t>
-    <t id="30212015">Without the Pontifex Maximus to guide them, a number of factions took the action to hatch a replacement. It was a desperate act, but somewhat understandable.</t>
-    <t id="30212016">However, on reconnecting with us, several factions refused to submit to the true Pontifex leading us to strike them down.</t>
+    <t id="30212015">Kendilerine rehberlik edecek Pontifeks Maximus'tan yoksun kalan bazı gruplar, yerlerine yeni birisini bulmak için harekete geçti. Bu umutsuz bir hareketti ama düşününce sebebini anlamak mümkündü.</t>
+    <t id="30212016">Ancak, bizimle yeniden bağlantı kurduklarında, birkaç grup gerçek Pontifeks'e boyun eğmeyi reddetti ve bu da bizim onları vurmamıza neden oldu.</t>
     <t id="30212017">And now, only the heretics of the 'Holy Order' remain. Even when shunned by many, they still find the means to wage a war against us.</t>
     <t id="30212018">Should they concede and put their capabilities to use in the Empire, we would find ourselves unmatched.</t>
     <t id="30212019">Shall we begin?</t>
@@ -36080,7 +36080,7 @@
     <t id="30253000">(Chapter 0)</t>
     <t id="30253001">(1/3)The Alliance of the Word seeks enquiring minds. Interested scientists should convene at our expedition staging grounds in Heretic's End.(as a broadcast, not just addressed to the player)</t>
     <t id="30253002">(2/3)We intend to illuminate the mysteries of Jump Gate technology.</t>
-    <t id="30253003">(3/3)All are welcome. Science knows no boundaries of race or faction.</t>
+    <t id="30253003">(3/3)Herkese kapımız açık. Bilimin ırk ya da ulus gibi sınırları yoktur.</t>
     <t id="30253004">(1/4)This automated message is being broadcast exclusively in the proximity of Heretic's End.(as a broadcast)</t>
     <t id="30253005">(2/4)Signs indicate that we will imminently witness the extraordinarily rare reactivation of a Jump Gate.</t>
     <t id="30253006">(3/4)The Alliance of the Word has assembled an expedition to study this rare event.</t>
@@ -36393,7 +36393,7 @@
     <t id="30253624">(4a)You can find your current tasks in your mission manager.</t>
     <t id="30253625">(5a)Choose which to pursue first, and activate it for further guidance.</t>
     <t id="30253626">(4b)It seems that you have managed to find the tasks in your mission manager.</t>
-    <t id="30253627">(5b)Let us see. Which faction will you visit first on Her Majesty's behalf?</t>
+    <t id="30253627">(5b)Bir bakalım. Majesteleri adına ilk olarak hangi fraksiyonu ziyaret edeceksiniz?</t>
     <t id="30253630">(1/5)Ah, the Hatikvah Free League! A shadow of their once glorious forebears.</t>
     <t id="30253631">(2/5)Although support from the Queendom stems their decline, the League will still have far to go.</t>
     <t id="30253632">(3/5)You are to supply them with a wing of Boron fighters.</t>
@@ -36403,7 +36403,7 @@
     <t id="30253636">(2/2)Once the politicians ratify a follow-up agreement, I will ensure that you receive the announcement.</t>
     <t id="30253637">Excellent! We can check the Free League off our list.</t>
     <t id="30253640">(1/6)Ah, my Paranid brethren!</t>
-    <t id="30253641">(2/6)Paranid governments have a troubled history with the Queendom, but major factions try to maintain diplomatic relations even if they are, at times, strained.</t>
+    <t id="30253641">(2/6)Paranid hükümetlerinin Kraliçelik ile sorunlu bir geçmişi var, ancak büyük fraksiyonlar zaman zaman gergin olsa da diplomatik ilişkileri sürdürmeye çalışır.</t>
     <t id="30253642">(3a/6)The Queendom initiated a diplomatic exchange with both the Holy Order of the Pontifex and the Godrealm of the Paranid.</t>
     <t id="30253643">(4a/6)However, the Godrealm emissary never arrived.</t>
     <t id="30253644">(3b/6)The Queendom has already commenced exchanging diplomats with the Realm of the Trinity.</t>
@@ -36439,7 +36439,7 @@
     <t id="30253676">(3/4)Our task is to establish a modest Queendom station in Teladi space.</t>
     <t id="30253677">(4/4)Once they are selling their wares to the station, Teladi relations will start to warm.</t>
     <t id="30253678">(1/2)However, you are missing some station module blueprints.</t>
-    <t id="30253679">(2/2)Before you can build the station, you will need to purchase the blueprints from a Faction Representative.</t>
+    <t id="30253679">(2/2)İstasyonu inşa etmeden önce, şemaları bir Fraksiyon Temsilcisinden satın almanız gerekecektir.</t>
     <t id="30253680">Excellent! You have acquired all the necessary station module blueprints.</t>
     <t id="30253681">(1/2)I have provided a station construction plan, containing all the required modules, which you can select.</t>
     <t id="30253682">(2/2)One more thing. Submit your receipts when you transfer the station, and Her Majesty's Treasury will process a reimbursement.</t>
@@ -36682,7 +36682,7 @@
     <t id="3002">(Diplomat Arrival Confirmation)Two-eyed creature, I have made my way to your embassy.</t>
     <t id="3003">(Player deteriorates relations, diplomat leaves)We will not allow ourselves to be insulted like that, especially not by a contemptible heathen such as yourself!</t>
     <t id="3004">(Player requests military support)The Godrealm is prepared to offer military assistance.</t>
-    <t id="3005">(Faction military support has ended)The military support that we have so far graciously extended to you, is required to fight back against infidels elsewhere.</t>
+    <t id="3005">(Fraksiyonun askeri desteği sona erdi)Şimdiye kadar size nezaketle verdiğimiz askeri destek, başka yerlerdeki kafirlere karşı savaşmak için gerekmektedir.</t>
     <t id="12106">(Promotion ceremony - intro)You have done well to approach us in person.</t>
     <t id="12107">(Promotion ceremony - cntd, friendly)We have been observing you and your activities with some interest. Some have called for you to be recognised.</t>
     <t id="12108">(Promotion ceremony - cntd, allied)It pleases us that you have continued down this path. As such, you will be suitably rewarded.</t>
@@ -36705,7 +36705,7 @@
     <t id="3002">(Diplomat Arrival Confirmation)The one true Pontifex's representative has arrived at your embassy.</t>
     <t id="3003">(Player deteriorates relations, diplomat leaves)You will regret defying the will of the one true Pontifex! Heathen!</t>
     <t id="3004">(Player requests military support)The Holy Order will humour your request for our superior military support.</t>
-    <t id="3005">(Faction military support has ended)The time has come to turn our attention towards more meaningful pursuits. As such, we shall pause our military aid.</t>
+    <t id="3005">(Fraksiyon askeri desteği sona erdi)Dikkatimizi daha anlamlı arayışlara yöneltmenin zamanı geldi. Bu nedenle, askeri yardımımızı durduracağız.</t>
     <t id="12106">(Promotion ceremony - intro)It pleases us that you have come in person.</t>
     <t id="12107">(Promotion ceremony - cntd, friendly)We have watched as you have performed a great number of exploits within our space. Our Order finds you worthy of some recognition.</t>
     <t id="12108">(Promotion ceremony - cntd, allied)We remain moved that such fire burns within one such as yourself. It is something worthy of a grand gesture, of which we can bestow.</t>
@@ -36728,7 +36728,7 @@
     <t id="3002">(Diplomat Arrival Confirmation)I have arrived at your fascinating installation.</t>
     <t id="3003">(Player deteriorates relations, diplomat leaves)It is most shameful that you seem to put your own base interest above the pursuit of knowledge.</t>
     <t id="3004">(Player requests military support)While the Alliance of the Word is not a military organisation, we shall see what we can do.</t>
-    <t id="3005">(Faction military support has ended)There is only so much our organisation can do for you. It is time for the Alliance of the Word to turn its attention towards more fruitful endeavours again.</t>
+    <t id="3005">(Hizip askeri desteği sona erdi)Kuruluşumuzun sizin için yapabileceği şeylerin sınırları vardır. Haberciler Birliği'nin dikkatini yeniden daha verimli çabalara yöneltmesinin zamanı geldi.</t>
     <t id="12106">(Promotion ceremony - intro)We are honoured for you to approach in person.</t>
     <t id="12107">(Promotion ceremony - cntd, friendly)You are among the few who appears to have the clarity to see our goals as something worth pursuing. Our group wishes to encourage those such as you to continue.</t>
     <t id="12108">(Promotion ceremony - cntd, allied)The path you have chosen remains clear and we are happy to walk it with you. The quest for knowledge must be rewarded and recognised by your peers.</t>
@@ -36751,7 +36751,7 @@
     <t id="3002">(Diplomat Arrival Confirmation)The representative of all united Paranid has passed your threshold.</t>
     <t id="3003">(Player deteriorates relations, diplomat leaves)You have strayed from the path too far! Retribution will find you eventually!</t>
     <t id="3004">(Player requests military support)The Realm of the Trinity is prepared to come to your aid, as long as the Pontifices look upon you favourably.</t>
-    <t id="3005">(Faction military support has ended)Faithful servant! Our military support must come to an end - for the time being.</t>
+    <t id="3005">(Fraksiyon askeri desteği sona erdi)Sadık hizmetkar! Askeri desteğimiz şimdilik sona ermelidir.</t>
     <t id="12100">(* Faction Representative *)</t>
     <t id="12101">(Neutral greeting)Be welcome at our threshold.</t>
     <t id="12102">(Friendly greeting)Stars' light upon you.</t>
@@ -36779,7 +36779,7 @@
     <t id="3002">(Diplomat Arrival Confirmation)The Buccaneers have taken up quarters at your embassy.</t>
     <t id="3003">(Player deteriorates relations, diplomat leaves)Inconceivable! You shall be met by our righteous Duke's fury for this affront!</t>
     <t id="3004">(Player requests military support)The Buccaneers shall answer your call! A fleet is heading out as we speak.</t>
-    <t id="3005">(Faction military support has ended)Our military support has ended. The Duke's forces are needed elsewhere.</t>
+    <t id="3005">(Fraksiyon askeri desteği sona erdi)Askeri desteğimiz sona erdi. Duke'ün kuvvetlerine başka yerde ihtiyaç var.</t>
     <t id="12100">(* Faction Representative *)</t>
     <t id="12101">(Neutral greeting)Speak, creature.</t>
     <t id="12102">(Friendly greeting)Duke's blessings upon you.</t>
@@ -36840,7 +36840,7 @@
     <t id="302540224">We bid our farewell unto you.</t>
     <t id="302540225">{,2001}</t>
     <t id="302540226">The design of the ship you call Hyperion was so ahead of its time that a decision has been made to put a modernised version into mass production.</t>
-    <t id="302540227">You may expect to find the frame available for sale at the shipyard, the blueprints at our faction representative, and Hyperion class ships traversing the void of space.</t>
+    <t id="302540227">Tersanede satışa sunulan framı, fraksiyon temsilcimizde şemaları ve uzayın boşluğunda dolaşan Hyperion sınıfı gemileri bulabilirsiniz.</t>
     <t id="302540228">One of those new Hyperion ships will be your reward.</t>
     <t id="302540229">However, we do have another request for you.</t>
     <t id="302540230">During the decades that the Hyperion's AGI Core commanded the ship, its neural pathways ingrained themselves deeply into the vessel's systems, and now resist extraction.</t>
@@ -41628,7 +41628,7 @@
     <t id="3002">(Diplomat Arrival Confirmation)Split arrived. Ready to take up diplomatic duties.</t>
     <t id="3003">(Player deteriorates relations, diplomat leaves)Creature will regret this!</t>
     <t id="3004">(Player requests military support)Yes. Split send ships to tear apart your enemies.</t>
-    <t id="3005">(Faction military support has ended)Split no longer want to give military support to creature.</t>
+    <t id="3005">(Fraksiyon askeri desteği sona erdi)Split artık yaratığa askeri destek vermek istememek.</t>
     <t id="12106">(Promotion ceremony - intro)I see you come in person. This is good.</t>
     <t id="12107">(Promotion ceremony - cntd, friendly)Split have been watching your actions with interest. A suitable reward is deserved.</t>
     <t id="12108">(Promotion ceremony - cntd, allied)Split are happy with your continued loyalty and honour. Many among us wish to show gratitude.</t>
@@ -41651,7 +41651,7 @@
     <t id="3002">(Diplomat Arrival Confirmation)Split made it to creature's station.</t>
     <t id="3003">(Player deteriorates relations, diplomat leaves)Free Families will not tolerate such insults. Split take leave now!</t>
     <t id="3004">(Player requests military support)Free Families will send military support. Fight for creature!</t>
-    <t id="3005">(Faction military support has ended)Free Families no longer able to sustain collaborative military efforts!</t>
+    <t id="3005">(Fraksiyon askeri desteği sona erdi)Özgür Hanlar artık ortak askeri çabaları sürdüremez!</t>
     <t id="12106">(Promotion ceremony - intro)It is good of you to come in person.</t>
     <t id="12107">(Promotion ceremony - cntd, friendly)We've been watching your work with great interest, and wanted to reward you for it.</t>
     <t id="12108">(Promotion ceremony - cntd, allied)We're happy that you've continued to work alongside us, and wanted to reward you for your efforts.</t>
@@ -41674,7 +41674,7 @@
     <t id="3002">(Diplomat Arrival Confirmation)Split arrived. Will occupy seat now!</t>
     <t id="3003">(Player deteriorates relations, diplomat leaves)Split wished this turned out different. You betray Curb trust!</t>
     <t id="3004">(Player requests military support)Curbs will dispatch military assistance!</t>
-    <t id="3005">(Faction military support has ended)Curb need to withdraw military support to focus on own objectives.</t>
+    <t id="3005">(Fraksiyon askeri desteği sona erdi)Split kendi hedeflerine odaklanmak, artık askeri desteği geri çekme ihtiyacı olmak.</t>
     <t id="12106">(Promotion ceremony - intro)It is good of you to come in person.</t>
     <t id="12107">(Promotion ceremony - cntd, friendly)We've been watching your work with great interest, and wanted to reward you for it.</t>
     <t id="12108">(Promotion ceremony - cntd, allied)We're happy that you've continued to work alongside us, and wanted to reward you for your efforts.</t>
@@ -46306,8 +46306,8 @@
     <t id="30251334">Wonderful! Thank you kindly!</t>
     <t id="30251400">(Twin Plot - Chapter 4)</t>
     <t id="30251401">Greetings, friend!</t>
-    <t id="30251402">(1a/4)I am currently at a Riptide station, and will talk to the manager soon about trade and profitsss.(Riptide faction name same as {20203,3204})</t>
-    <t id="30251403">(1b/4)I am currently at a station, and will talk to the manager soon about trade and profitsss.(Riptide faction name same as {20203,3204})</t>
+    <t id="30251402">(1a/4)Şu anda bir Tırmıkçı istasyonundayım ve yakında müdürle ticaret ve kârlar hakkında konuşşşacağım (Tırmıkçı fraksiyon adı {20203,3204} ile aynı).</t>
+    <t id="30251403">(1a/4)Şu anda bir istasyonundayım ve yakında müdürle ticaret ve kârlar hakkında konuşşşacağım.</t>
     <t id="30251404">(2/4)After my eager consumption of negotiation technique guides, I am sure to strike a great deal!</t>
     <t id="30251405">(3/4)You should come too!</t>
     <t id="30251406">(4/4)There is profit to be made, and I may be able to teach you a thing or two about trade negotiations.</t>

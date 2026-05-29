@@ -166,6 +166,7 @@ function toggleStatFilter(statId: string) {
     :can-create-station="tabbarPresenter.props.canCreateStation"
     :can-open-context-menu="tabbarPresenter.props.canOpenContextMenu"
     :context-menu-mode="tabbarPresenter.props.contextMenuMode"
+    :can-delete-station="tabbarPresenter.props.canDeleteStation"
     @select-overview="tabbarPresenter.emits.selectOverview"
     @select-terraforming="tabbarPresenter.emits.selectTerraforming"
     @select-transit="tabbarPresenter.emits.selectTransit"
@@ -174,6 +175,7 @@ function toggleStatFilter(statId: string) {
     @rename-station="tabbarPresenter.emits.renameStation"
     @delete-station="tabbarPresenter.emits.deleteStation"
     @expand-sector="tabbarPresenter.emits.expandSector"
+    @jump-to-binding="(tabId, tabType) => tabbarPresenter.emits.jumpToBinding(tabId, tabType)"
   />
   
   <LiveOverviewToolbar

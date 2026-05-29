@@ -11,6 +11,7 @@ export interface TabbarPresenterProps {
   canCreateStation: boolean
   canOpenContextMenu: boolean
   contextMenuMode: 'full' | 'delete-only'
+  canDeleteStation: (stationId: string) => boolean
 }
 
 export interface TabbarPresenterEmits {
@@ -23,6 +24,7 @@ export interface TabbarPresenterEmits {
   duplicateStation: (stationId: string) => unknown
   deleteStation: (stationId: string) => void
   expandSector: (sectorId: string | null) => void
+  jumpToBinding: (tabId: string, tabType: 'station' | 'transit') => void
 }
 
 export interface UseProductionTabbarPresenterReturn {
@@ -68,6 +70,8 @@ export interface TabbarPresenterStore {
   duplicateStation(stationId: string): unknown
   deleteStation(stationId: string): void
   setExpandedSector?(sectorId: string | null): void
+  jumpToMapBinding?(tabId: string, tabType: 'station' | 'transit'): void
+  canDeleteStation?(stationId: string): boolean
 }
 
 function getFallbackTagForStationType(type?: StationType): string | undefined {
@@ -167,7 +171,8 @@ export function useProductionTabbarPresenter(store: TabbarPresenterStore): UsePr
     expandedSectorId: computed(() => store.expandedSectorId ?? null),
     canCreateStation: !store.capabilities.uniqueStation,
     canOpenContextMenu: !store.capabilities.uniqueStation || (store.capabilities.uniqueStation && !store.archiveStation),
-    contextMenuMode: store.capabilities.uniqueStation ? 'delete-only' : 'full'
+    contextMenuMode: store.capabilities.uniqueStation ? 'delete-only' : 'full',
+    canDeleteStation: (stationId: string) => store.canDeleteStation?.(stationId) ?? !store.capabilities.uniqueStation
   }
 
   const emits: TabbarPresenterEmits = {
@@ -179,7 +184,10 @@ export function useProductionTabbarPresenter(store: TabbarPresenterStore): UsePr
     renameStation: (stationId: string) => store.renameStation(stationId, ''),
     duplicateStation: (stationId: string) => store.duplicateStation(stationId),
     deleteStation: (stationId: string) => store.deleteStation(stationId),
-    expandSector: (sectorId: string | null) => (store.setExpandedSector || (() => {}))(sectorId)
+    expandSector: (sectorId: string | null) => (store.setExpandedSector || (() => {}))(sectorId),
+    jumpToBinding: (tabId: string, tabType: 'station' | 'transit') => {
+      ;(store.jumpToMapBinding || (() => {}))(tabId, tabType)
+    }
   }
 
   return { props, emits }

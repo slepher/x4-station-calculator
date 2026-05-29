@@ -15,6 +15,7 @@ const props = defineProps<{
   canCreateStation: boolean
   canOpenContextMenu: boolean
   contextMenuMode?: 'full' | 'delete-only'
+  canDeleteStation?: (stationId: string) => boolean
 }>()
 
 const emit = defineEmits<{
@@ -27,13 +28,15 @@ const emit = defineEmits<{
   duplicateStation: [stationId: string]
   deleteStation: [stationId: string]
   expandSector: [sectorId: string | null]
+  jumpToBinding: [tabId: string, tabType: 'station' | 'transit']
 }>()
 
 const { t } = useI18n()
 
 const showMenu = ref(false)
 const menuPosition = ref({ x: 0, y: 0 })
-const menuStationId = ref<string | null>(null)
+const menuTabId = ref<string | null>(null)
+const menuTabType = ref<'station' | 'transit'>('station')
 const showDeleteConfirm = ref(false)
 const stationToDelete = ref<string | null>(null)
 const tabsScrollAreaRef = ref<HTMLElement | null>(null)
@@ -84,10 +87,10 @@ const selectStationWithExpand = (stationId: string) => {
   emit('selectStation', stationId)
 }
 
-const openMenu = (stationId: string, event: MouseEvent) => {
-  if (!props.canOpenContextMenu) return
+const openMenu = (tabId: string, tabType: 'station' | 'transit', event: MouseEvent) => {
   event.preventDefault()
-  menuStationId.value = stationId
+  menuTabId.value = tabId
+  menuTabType.value = tabType
   
   const x = Math.min(event.clientX, window.innerWidth - 180)
   const y = Math.min(event.clientY, window.innerHeight - 200)
@@ -98,7 +101,7 @@ const openMenu = (stationId: string, event: MouseEvent) => {
 
 const closeMenu = () => {
   showMenu.value = false
-  menuStationId.value = null
+  menuTabId.value = null
 }
 
 const handleClickOutside = () => {
@@ -142,27 +145,27 @@ watch(
 )
 
 onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
+  document.addEventListener('mousedown', handleClickOutside)
   window.addEventListener('resize', handleWindowResize)
   nextTick(() => updateTabsScrollState())
 })
 onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside)
+  document.removeEventListener('mousedown', handleClickOutside)
   window.removeEventListener('resize', handleWindowResize)
 })
 
 const renameStation = () => {
-  if (menuStationId.value) emit('renameStation', menuStationId.value)
+  if (menuTabId.value) emit('renameStation', menuTabId.value)
   closeMenu()
 }
 
 const duplicateStation = () => {
-  if (menuStationId.value) emit('duplicateStation', menuStationId.value)
+  if (menuTabId.value) emit('duplicateStation', menuTabId.value)
   closeMenu()
 }
 
 const confirmDelete = () => {
-  stationToDelete.value = menuStationId.value
+  stationToDelete.value = menuTabId.value
   showDeleteConfirm.value = true
   closeMenu()
 }
@@ -176,6 +179,11 @@ const deleteStation = () => {
 const cancelDelete = () => {
   showDeleteConfirm.value = false
   stationToDelete.value = null
+}
+
+const jumpToBinding = () => {
+  if (menuTabId.value) emit('jumpToBinding', menuTabId.value, menuTabType.value)
+  closeMenu()
 }
 
 const tabsToShow = computed(() => {
@@ -243,7 +251,7 @@ const tabsToShow = computed(() => {
         :data-tag="tab.tag"
         :data-factory-group="tab.factoryGroup"
         @click="tab.type === 'overview' ? openOverview() : tab.type === 'terraforming' ? emit('selectTerraforming') : tab.type === 'transit' ? openSupply(tab.sectorId!) : selectStationWithExpand(tab.id)"
-        @contextmenu.stop="tab.type === 'station' ? openMenu(tab.id, $event) : undefined"
+        @contextmenu.stop="tab.type === 'station' ? openMenu(tab.id, 'station', $event) : tab.type === 'transit' ? openMenu(tab.id, 'transit', $event) : undefined"
       >
         <div class="tab-highlight"></div>
         <div class="tab-content">
@@ -276,28 +284,41 @@ const tabsToShow = computed(() => {
         v-if="showMenu" 
         class="context-menu"
         :style="{ top: `${menuPosition.y}px`, left: `${menuPosition.x}px` }"
+        @mousedown.stop
         @click.stop
       >
         <div class="menu-header">{{ t('sector.menu_operations') }}</div>
         
-        <template v-if="props.contextMenuMode !== 'delete-only'">
-          <div class="menu-item" @click="renameStation">
-            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-            <span>{{ t('sector.rename_station') }}</span>
-          </div>
-          
-          <div class="menu-item" @click="duplicateStation">
-            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-            <span>{{ t('sector.duplicate_station') }}</span>
-          </div>
-
-          <div class="menu-divider"></div>
-        </template>
-        
-        <div class="menu-item danger" @click="confirmDelete">
-          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-          <span>{{ t('sector.delete_station') }}</span>
+        <div class="menu-item" @click="jumpToBinding">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10.5 13.5L13.5 10.5" />
+            <path d="M8.25 15.75a3.182 3.182 0 0 1-4.5 0 3.182 3.182 0 0 1 0-4.5l3-3a3.182 3.182 0 0 1 4.5 0" />
+            <path d="M15.75 8.25a3.182 3.182 0 0 1 4.5 0 3.182 3.182 0 0 1 0 4.5l-3 3a3.182 3.182 0 0 1-4.5 0" />
+          </svg>
+          <span>{{ t('sector.jump_to_binding') }}</span>
         </div>
+
+        <template v-if="menuTabType === 'station'">
+          <template v-if="props.contextMenuMode !== 'delete-only' && props.canOpenContextMenu">
+            <div class="menu-divider"></div>
+            <div class="menu-item" @click="renameStation">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+              <span>{{ t('sector.rename_station') }}</span>
+            </div>
+            
+            <div class="menu-item" @click="duplicateStation">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              <span>{{ t('sector.duplicate_station') }}</span>
+            </div>
+
+            <div class="menu-divider"></div>
+          </template>
+          
+          <div v-if="!props.canDeleteStation || props.canDeleteStation(menuTabId!)" class="menu-item danger" @click="confirmDelete">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            <span>{{ t('sector.delete_station') }}</span>
+          </div>
+        </template>
       </div>
     </Teleport>
 
