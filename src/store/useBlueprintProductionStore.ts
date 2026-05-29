@@ -806,6 +806,8 @@ function updateStationModules(stationId: string, modules: SavedModule[]) {
   const titleValue = computed(() => activeEmpire.value?.name || '')
   const titlePlaceholder = computed(() => i18n.global.t('sector.new_sector_name'))
 
+  const isTerraformingMode = ref(false)
+
   const capabilities: ProductionWorkbenchCapabilities = {
     uniqueWorkbench: false,
     uniqueStation: false,
@@ -881,11 +883,11 @@ function updateStationModules(stationId: string, modules: SavedModule[]) {
   })
 
   const session = computed<ProductionSessionState>(() => ({
-    workbenchMode: activeStation.value ? 'station' : 'overview',
-    entityType: activeStation.value ? 'station' : 'overview',
+    workbenchMode: isTerraformingMode.value ? 'terraforming' : (activeStation.value ? 'station' : 'overview'),
+    entityType: isTerraformingMode.value ? 'terraforming' : (activeStation.value ? 'station' : 'overview'),
     mode: 'planning',
     visualMode: 'planning',
-    activeStationId: activeStationId.value,
+    activeStationId: isTerraformingMode.value ? null : activeStationId.value,
     activeTransitSectorId: null,
     activeBinding: activeEmpire.value?.id || null,
     canToggle: false,
@@ -1073,6 +1075,10 @@ function updateStationModules(stationId: string, modules: SavedModule[]) {
     moduleActions,
     updateTitle,
     updateStationName: updateStationNameFromActive,
+    selectTerraforming() {
+      isTerraformingMode.value = true
+      activeStationId.value = null
+    },
     updateWareflowViewMode: (value: WareFlowViewMode) => { wareflowViewMode.value = value },
     updateBuildPriceMultiplier: (value: number) => { buildPriceMultiplier.value = value },
     toggleMineral: toggleMineralFromActive,
