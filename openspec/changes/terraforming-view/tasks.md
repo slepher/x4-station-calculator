@@ -132,13 +132,16 @@
 
 - [x] `terraforming.backToList` / `terraforming.statsTitle` / `terraforming.rebatesTitle`
 - [x] `terraforming.rewardsTitle`
+- [x] `terraforming.milestone.*` — condition-based milestone labels (first_project, habitable, population, complete, etc.)
+- [x] `terraforming.reward.*` — factionUnlock, factionAdd, blueprint, npcJoin
 
 ## 星区奖励显示
 
 - [x] `useTerraformingPresenter`: 新增 `TerraformingRewardDisplayItem` 类型
 - [x] `useTerraformingPresenter`: 新增 `clusterRewardDisplays` computed — 将 factionRewards + rewards 转为展示文本
 - [x] `useTerraformingPresenter`: Faction 名称通过 `gameDataStore.factions` → nameId → i18n 解析
-- [x] `useTerraformingPresenter`: Blueprint 名称通过 `gameDataStore.modulesMap` 查找
+- [x] `useTerraformingPresenter`: Blueprint 名称通过 `useX4I18n().translateModule()` 翻译
 - [x] `useTerraformingPresenter`: NPC 名称通过 `vI18nLookup(nameId)` 解析
+- [x] `useTerraformingPresenter`: 里程碑标签从 `conditionLabel` 映射 `terraforming.milestone.*` i18n
 - [x] `TerraformingSectorPanel`: 在 Objectives 下方新增 Rewards section，仅当有奖励时显示
 - [x] `LiveProductionWorkbenchView`: 透传 `clusterRewardDisplays` prop

@@ -401,33 +401,37 @@ LiveProductionWorkbenchView
 
 - 在 SectorPanel item 模式 Objectives 下方新增 Rewards section
 - Faction 名称通过 `gameDataStore.factions` → nameId → i18n 解析
-- Blueprint 名称通过 `gameDataStore.modulesMap[moduleId]` 查找 `localeName` / `name`
+- Blueprint 名称通过 `useX4I18n().translateModule(mod)` 翻译
 - NPC 名称通过 `vI18nLookup(nameId)` 解析
+- 所有文案（faction 解锁/叠加、blueprint 前缀、NPC 加入）均走 i18n
 - 仅当 `clusterRewardDisplays.length > 0` 时显示 Rewards section
 
 ### 里程碑标签
 
-| milestone 值 | 标签 |
-|-------------|------|
-| 1, 2, ... | `M1`, `M2`, ... |
-| `"complete"` | `◆` |
+标签从 MD 的 milestone conditions 提取 `conditionLabel`，经 i18n 翻译：
+
+| conditionLabel | i18n key | 中文 |
+|---------------|----------|------|
+| `first_project` | `terraforming.milestone.first_project` | 完成首个项目 |
+| `basic_projects` | `terraforming.milestone.basic_projects` | 完成基础项目 |
+| `habitable` | `terraforming.milestone.habitable` | 星球宜居 |
+| `temperature_improved` | `terraforming.milestone.temperature_improved` | 温度改善 |
+| `population` | `terraforming.milestone.population` | 人口达标 |
+| `stat_changed` | `terraforming.milestone.stat_changed` | 数值达标 |
+| `mission_complete` | `terraforming.milestone.complete` | 任务完成 |
 
 ### 布局
 
 ```
-┌─ Objectives ──────────────────────┐
-│ 1. [relocate] Relocate HQ   ✅   │
-│ 2. [neutralize] Radiation   ⬜   │
-└───────────────────────────────────┘
-┌─ Rewards ─────────────────────────┐
-│ M1  SCA 声望解锁                  │
-│ M2  ANT +0.1                     │
-│ ◆   蓝图: Pheromone Art Gallery   │
-│ ◆   Menika Giorno 加入 HQ         │
-└───────────────────────────────────┘
-┌─ Stats ───────────────────────────┐
-│ ...                               │
-└───────────────────────────────────┘
+┌─ Objectives ───────────────────────────┐
+│ 1. [relocate] Relocate HQ   ✅        │
+└────────────────────────────────────────┘
+┌─ Rewards ──────────────────────────────┐
+│ 完成首个项目  SCA 声望解锁              │
+│ 星球宜居      ANT 声望 +0.1            │
+│ 任务完成      蓝图: Pheromone Art Gallery│
+│ 任务完成      Menika Giorno 加入 HQ    │
+└────────────────────────────────────────┘
 ```
 
 ## 补充 — 材料价格显示

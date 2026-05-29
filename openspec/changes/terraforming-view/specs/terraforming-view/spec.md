@@ -579,11 +579,15 @@ SectorPanel item 模式 MUST 在 Objectives 下方显示 Rewards section。
 
 **那么** MUST 在 Objectives 和 Stats 之间显示 Rewards section
 
-**并且** 每个 faction 奖励显示为 `M{n} 势力名 +/-数值` 或 `M{n} 势力名 声望解锁`
+**并且** 每个 faction 奖励显示为 `{条件标签} {势力名} {声望解锁}` 或 `{条件标签} {势力名} 声望 ±{数值}`
 
-**并且** 每个 blueprint 奖励显示为 `◆ 蓝图: 模块名`（模块名从 gameDataStore.modulesMap 获取）
+**并且** 每个 blueprint 奖励显示为 `{条件标签} 蓝图: {模块名}`（模块名通过 `useX4I18n().translateModule` 翻译）
 
-**并且** 每个 NPC 奖励显示为 `◆ {NPC名} 加入 HQ`（名称经 i18n 翻译）
+**并且** 每个 NPC 奖励显示为 `{条件标签} {NPC名} 加入 HQ`（名称经 i18n 翻译）
+
+**并且** 条件标签从 `factionRewards[].conditionLabel` 取 i18n key，经 `terraforming.milestone.*` 翻译
+
+**并且** 所有文案（声望解锁/声望/蓝图/加入 HQ）均通过 `terraforming.reward.*` i18n 获取
 
 #### Scenario: Cluster 无奖励
 
