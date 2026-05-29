@@ -9,7 +9,20 @@
 - [x] 1.3 实现默认选中态高亮样式（`bg-slate-800` + 左侧色条）
 - [x] 1.4 实现固定区和动态区之间的分隔线
 - [x] 1.5 实现星区展开/折叠箭头
+  - 箭头为 24x24 独立 button，`@click.stop` 防止冒泡
+  - 星区点击区域分离：箭头=展开/折叠，图标+名称=选中 transit/station，整行=右键菜单
 - [x] 1.6 实现 station tab 右键菜单（depends on contextMenuMode）
+  - jump-to-binding / rename / duplicate / delete，按 mode 和菜单类型控制显示
+
+## 1b. 星区展开/折叠逻辑
+
+- [x] 1b.1 `collapsedSectors` 局部 Set 状态，不依赖 store
+- [x] 1b.2 初始化：全部折叠，展开活跃 tab 所在星区（`findTabById` 同时匹配 id 和 name）
+- [x] 1b.3 watcher 监听 `activeTabId` + `tabs.length`，选中站/transit 自动展开对应星区
+- [x] 1b.4 只展开不收起：切换总览/地球化/科技树不动 `collapsedSectors`
+- [x] 1b.5 `groupSectors` / `getSectorName` / `hasSectorChildren` 声明顺序前置，解决初始化错误
+- [x] 1b.6 `tabs` 全量载入（presenter 层移除 `expandedSectorId` 过滤，sidebar `dynamicItems` 无条件输出）
+- [x] 1b.7 transit-hub 为星区折叠菜单主体：图标 `tradestationIconUrl` + `icon-orange`，星区 header 高亮跟随站选中
 
 ## 2. 重构 Presenter
 
