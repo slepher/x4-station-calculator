@@ -133,7 +133,7 @@ const scopeClass = computed(() => {
 
 <template>
   <div class="live-toolbar">
-    <div class="toolbar-content w-full flex items-center">
+    <div class="toolbar-content w-full flex items-center h-full">
       
       <div class="toolbar-section">
         <div class="input-group">

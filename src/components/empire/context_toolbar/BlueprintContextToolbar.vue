@@ -106,7 +106,7 @@ const handleOpenImport = () => {
 
 <template>
   <div class="context-toolbar">
-    <div v-if="isOverview" class="toolbar-content w-full flex items-center">
+    <div v-if="isOverview" class="toolbar-content w-full flex items-center h-full">
       <div class="toolbar-section">
         <div class="input-group">
           <label class="group-label">{{ t('sector.blueprint_name') }}</label>
@@ -130,7 +130,7 @@ const handleOpenImport = () => {
       </div>
     </div>
 
-    <div v-else class="toolbar-content w-full flex items-center">
+    <div v-else class="toolbar-content w-full flex items-center h-full">
       <div class="toolbar-section">
         <div class="input-group">
           <label class="group-label">{{ t('toolbar.station_name') }}</label>
