@@ -127,6 +127,7 @@ const showArchiveModuleList = computed(() => {
       :can-create-station="sidebarPresenter.props.canCreateStation"
       :can-open-context-menu="sidebarPresenter.props.canOpenContextMenu"
       :context-menu-mode="sidebarPresenter.props.contextMenuMode"
+      :can-delete-station="sidebarPresenter.props.canDeleteStation"
       @select-overview="sidebarPresenter.emits.selectOverview"
       @select-terraforming="sidebarPresenter.emits.selectTerraforming"
       @select-tech-tree="sidebarPresenter.emits.selectTechTree"

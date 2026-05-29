@@ -17,6 +17,7 @@ const props = defineProps<{
   canCreateStation: boolean
   canOpenContextMenu: boolean
   contextMenuMode: 'full' | 'delete-only'
+  canDeleteStation: (stationId: string) => boolean
 }>()
 
 const emit = defineEmits<{
@@ -212,6 +213,11 @@ const doRename = () => {
   closeMenu()
 }
 
+const jumpToBinding = () => {
+  if (menuTabId.value) emit('jumpToBinding', menuTabId.value, menuTabType.value)
+  closeMenu()
+}
+
 const addNewStation = () => {
   emit('createStation')
 }
@@ -377,7 +383,7 @@ onUnmounted(() => {
             <div class="menu-divider"></div>
           </template>
 
-          <div class="menu-item danger" @click="confirmDelete">
+          <div v-if="!props.canDeleteStation || props.canDeleteStation(menuTabId!)" class="menu-item danger" @click="confirmDelete">
             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
             <span>{{ t('sector.delete_station') }}</span>
           </div>

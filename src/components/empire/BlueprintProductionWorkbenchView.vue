@@ -67,6 +67,7 @@ const buildPlanPresenter = useBuildPlanPresenter({
       :can-create-station="sidebarPresenter.props.canCreateStation"
       :can-open-context-menu="sidebarPresenter.props.canOpenContextMenu"
       :context-menu-mode="sidebarPresenter.props.contextMenuMode"
+      :can-delete-station="sidebarPresenter.props.canDeleteStation"
       @select-overview="sidebarPresenter.emits.selectOverview"
       @select-station="sidebarPresenter.emits.selectStation"
       @create-station="sidebarPresenter.emits.createStation"
