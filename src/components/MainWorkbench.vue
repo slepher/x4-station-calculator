@@ -38,14 +38,16 @@ const isMapsView = computed(() => shipBuildStore.activeView === 'maps')
     </template>
 
     <template v-else-if="isShipBuildView">
-      <ShipBuildView />
+      <div class="flex-1 min-h-0 overflow-y-auto">
+        <ShipBuildView />
+      </div>
     </template>
 
-    <div v-else-if="isMapsView" class="maps-slot">
+    <div v-else-if="isMapsView" class="maps-slot overflow-y-auto">
       <MapWorkbenchView />
     </div>
 
-    <div v-else class="flow-layout flex flex-col gap-6 flex-1 min-h-0">
+    <div v-else class="flow-layout flex flex-col gap-6 flex-1 min-h-0 overflow-y-auto">
       <LogicFlowWorkbenchView />
     </div>
 
