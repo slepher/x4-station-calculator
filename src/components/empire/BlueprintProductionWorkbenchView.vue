@@ -33,14 +33,14 @@ onMounted(() => {
     blueprintStore.loadEmpire(empireId)
   }
   if (empireId) {
-    terraformingStore.ensurePlanForContext('blueprint', empireId)
+    terraformingStore.ensurePlanForContext('blueprint', '__default__')
   }
 })
 
 watch(() => activeViewStore.activeEmpireId, (newId) => {
   if (newId && newId !== blueprintStore.activeEmpire?.id) {
     blueprintStore.loadEmpire(newId)
-    terraformingStore.ensurePlanForContext('blueprint', newId)
+    terraformingStore.ensurePlanForContext('blueprint', '__default__')
   }
 })
 

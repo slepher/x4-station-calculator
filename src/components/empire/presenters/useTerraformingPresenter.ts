@@ -2717,9 +2717,17 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
           }
         } else if (goal.kind === 'preventive' && goal.targetStatId) {
           for (const effect of project.effects) {
-            if (effect.stat === goal.targetStatId && effect.change !== undefined && effect.change < 0) {
+            if (effect.stat === goal.targetStatId) {
               satisfiers.push(project.id)
               break
+            }
+          }
+          if (!satisfiers.includes(project.id)) {
+            for (const se of project.sideEffects) {
+              if (se.stat === goal.targetStatId) {
+                satisfiers.push(project.id)
+                break
+              }
             }
           }
         }
