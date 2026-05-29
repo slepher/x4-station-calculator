@@ -80,7 +80,7 @@ const findTabById = (id: string): ProductionTabItem | undefined => {
 const findSectorForTabId = (tabId: string | null): string | undefined => {
   if (!tabId || !props.hasSectors) return undefined
   const tab = findTabById(tabId)
-  console.log('[sidebar] findSectorForTabId tabId:', tabId, 'found:', !!tab, 'tabs:', props.tabs.map(t => ({ id: t.id, name: t.name, sectorId: t.sectorId, type: t.type })))
+  console.log('[sidebar] findSectorForTabId tabId:', tabId, 'found:', !!tab, 'tabIds:', props.tabs.map(t => t.id))
   if (tab?.sectorId) return tab.sectorId
   return undefined
 }
@@ -90,26 +90,20 @@ const collapsedSectors = ref(new Set(
     if (!props.hasSectors) return [] as string[]
     const allIds = groupSectors.value.map(s => s.id)
     const activeSectorId = findSectorForTabId(props.activeTabId)
-    console.log('[sidebar] init activeTabId:', props.activeTabId, 'activeSectorId:', activeSectorId, 'allIds:', allIds)
+    console.log('[sidebar] init activeTabId:', props.activeTabId, 'tabIds:', props.tabs.map(t => t.id), 'activeSectorId:', activeSectorId)
     if (activeSectorId) {
-      const result = allIds.filter(id => id !== activeSectorId)
-      console.log('[sidebar] init expanding sector:', activeSectorId, 'collapsed:', result)
-      return result
+      return allIds.filter(id => id !== activeSectorId)
     }
-    console.log('[sidebar] init all collapsed')
     return allIds
   })()
 ))
 
 watch(() => props.activeTabId, (tabId) => {
-  console.log('[sidebar] watch activeTabId changed to:', tabId)
   if (!tabId || !props.hasSectors) return
   const activeSectorId = findSectorForTabId(tabId)
-  console.log('[sidebar] watch activeSectorId:', activeSectorId)
   if (activeSectorId) {
     const next = new Set(collapsedSectors.value)
     next.delete(activeSectorId)
-    console.log('[sidebar] watch expanding sector:', activeSectorId, 'collapsed after:', [...next])
     collapsedSectors.value = next
   }
 })
