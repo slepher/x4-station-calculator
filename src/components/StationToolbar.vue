@@ -347,7 +347,7 @@ const handleExport = () => {
 }
 
 .toolbar-panel {
-  @apply flex flex-wrap gap-4 justify-between items-center mb-4 bg-slate-800 py-3 px-4 border-y border-slate-700 shadow-2xl rounded-none;
+  @apply flex flex-wrap gap-4 justify-between items-center bg-slate-800 py-3 px-4 border-y border-slate-700 shadow-2xl rounded-none;
 }
 
 .btn-tool-placeholder {
