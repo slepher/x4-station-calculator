@@ -389,10 +389,9 @@ function closeDetail() {
 .chain-layer {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  min-width: 180px;
-  position: relative;
-  z-index: 1;
+  gap: 0.75rem;
+  width: 200px;
+  flex-shrink: 0;
 }
 
 .research-node {
@@ -402,8 +401,8 @@ function closeDetail() {
   padding: 0.75rem;
   cursor: pointer;
   transition: border-color 0.2s;
-  min-width: 180px;
-  max-width: 220px;
+  width: 200px;
+  flex-shrink: 0;
 }
 
 .research-row-wrap.has-edges .research-node {
