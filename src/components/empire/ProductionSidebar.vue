@@ -7,6 +7,8 @@ import { getPoiIconTag } from '@/store/logic/stationPoiSemantics'
 import playerhqIconUrl from '@/components/icons/playerhq.svg'
 import tradestationIconUrl from '@/components/icons/tradestation.svg'
 import factoryIconUrl from '@/components/icons/factory.svg'
+import researchIconUrl from '@/components/icons/tlt_research.svg'
+import terraformingIconUrl from '@/components/icons/tlt_terraforming.svg'
 
 const props = defineProps<{
   tabs: ProductionTabItem[]
@@ -182,7 +184,8 @@ const getTabIconClass = (tab: ProductionTabItem): string => {
 
 const getTabIcon = (tab: ProductionTabItem): string => {
   if (tab.id === 'overview') return playerhqIconUrl
-  if (tab.id === 'terraforming' || tab.id === 'tech-tree' || tab.id === 'research') return playerhqIconUrl
+  if (tab.id === 'terraforming' || tab.id === 'tech-tree') return terraformingIconUrl
+  if (tab.id === 'research') return researchIconUrl
   if (tab.type === 'transit') return tradestationIconUrl
   const iconTag = getPoiIconTag(tab)
   if (iconTag) return SAVE_POI_ICON_MAP[iconTag] || factoryIconUrl
