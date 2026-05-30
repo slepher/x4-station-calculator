@@ -1,16 +1,11 @@
 <script setup lang="ts">
-import { ref, computed, nextTick, onBeforeUnmount, onMounted, watch } from 'vue'
-import type { ComponentPublicInstance } from 'vue'
+import { ref, computed } from 'vue'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import i18n from '@/i18n'
 import type { X4ResearchItem } from '@/types/x4'
-import {
-  buildResearchLayoutGroups,
-  getNodeConnectionSides,
-  makeOrthogonalEdgePath,
-  resolveEdgePointsInContainer,
-} from './researchLayout'
+import { buildResearchLayoutGroups, getNodeConnectionSides } from './researchLayout'
 import type { LayoutGroup, LayoutNode, LayoutRow } from './researchLayout'
+import ResearchEdgeLayer from './ResearchEdgeLayer.vue'
 
 const gameData = useGameDataStore()
 const t = i18n.global.t.bind(i18n.global)
@@ -35,22 +30,6 @@ const itemMap = computed(() => {
 })
 
 const layoutGroups = computed(() => buildResearchLayoutGroups(items.value))
-
-interface RenderedEdge {
-  key: string
-  path: string
-}
-
-interface RowMetric {
-  width: number
-  height: number
-}
-
-const rowElements = new Map<string, HTMLElement>()
-const nodeElements = new Map<string, HTMLElement>()
-const renderedEdges = ref<Record<string, RenderedEdge[]>>({})
-const rowMetrics = ref<Record<string, RowMetric>>({})
-let animationFrameId: number | null = null
 
 const selectedItem = computed(() => {
   if (!selectedItemId.value) return null
@@ -88,97 +67,7 @@ function makeRowKey(groupId: string, row: LayoutRow, index: number): string {
 }
 
 function makeNodeKey(rowKey: string, nodeId: string): string {
-  return `${rowKey}:${nodeId}`
-}
-
-function setRowElement(key: string, value: Element | ComponentPublicInstance | null) {
-  const element = resolveElement(value)
-  if (element === null) {
-    rowElements.delete(key)
-  } else {
-    rowElements.set(key, element)
-  }
-  scheduleEdgeRefresh()
-}
-
-function setNodeElement(key: string, value: Element | ComponentPublicInstance | null) {
-  const element = resolveElement(value)
-  if (element === null) {
-    nodeElements.delete(key)
-  } else {
-    nodeElements.set(key, element)
-  }
-  scheduleEdgeRefresh()
-}
-
-function resolveElement(value: Element | ComponentPublicInstance | null): HTMLElement | null {
-  if (value === null) return null
-  if (value instanceof Element) {
-    if (value instanceof HTMLElement) return value
-    return null
-  }
-  const vueElement = value.$el
-  if (vueElement instanceof HTMLElement) return vueElement
-  return null
-}
-
-function scheduleEdgeRefresh() {
-  if (typeof window === 'undefined') return
-  if (animationFrameId !== null) {
-    window.cancelAnimationFrame(animationFrameId)
-  }
-  animationFrameId = window.requestAnimationFrame(() => {
-    animationFrameId = null
-    refreshEdges()
-  })
-}
-
-function refreshEdges() {
-  const nextEdges: Record<string, RenderedEdge[]> = {}
-  const nextMetrics: Record<string, RowMetric> = {}
-
-  for (const group of layoutGroups.value) {
-    group.rows.forEach((row, index) => {
-      const key = makeRowKey(group.id, row, index)
-      const rowElement = rowElements.get(key)
-      if (rowElement === undefined) return
-
-      const rowRect = rowElement.getBoundingClientRect()
-      nextMetrics[key] = {
-        width: rowRect.width,
-        height: rowRect.height,
-      }
-
-      const edges: RenderedEdge[] = []
-      row.edges.forEach(([sourceId, targetId]) => {
-        const sourceElement = nodeElements.get(makeNodeKey(key, sourceId))
-        const targetElement = nodeElements.get(makeNodeKey(key, targetId))
-        if (sourceElement === undefined || targetElement === undefined) return
-
-        const sourceRect = sourceElement.getBoundingClientRect()
-        const targetRect = targetElement.getBoundingClientRect()
-        edges.push({
-          key: `${sourceId}:${targetId}`,
-          path: makeOrthogonalEdgePath(resolveEdgePointsInContainer(
-            rowRect,
-            sourceRect,
-            targetRect,
-            rowElement,
-          )),
-        })
-      })
-      nextEdges[key] = edges
-    })
-  }
-
-  rowMetrics.value = nextMetrics
-  renderedEdges.value = nextEdges
-}
-
-function getRenderedEdges(key: string): RenderedEdge[] {
-  const edges = renderedEdges.value[key]
-  if (edges === undefined) return []
-  return edges
+  return `research-node:${rowKey}:${nodeId}`
 }
 
 function nodeConnectionClasses(row: LayoutRow, nodeId: string) {
@@ -188,36 +77,6 @@ function nodeConnectionClasses(row: LayoutRow, nodeId: string) {
     'has-outgoing': sides.outgoing,
   }
 }
-
-function rowMetricStyle(key: string) {
-  const metric = rowMetrics.value[key]
-  if (metric === undefined) {
-    return {
-      width: '0px',
-      height: '0px',
-    }
-  }
-  return {
-    width: `${metric.width}px`,
-    height: `${metric.height}px`,
-  }
-}
-
-watch(layoutGroups, () => {
-  nextTick(() => scheduleEdgeRefresh())
-}, { flush: 'post' })
-
-onMounted(() => {
-  nextTick(() => scheduleEdgeRefresh())
-  window.addEventListener('resize', scheduleEdgeRefresh)
-})
-
-onBeforeUnmount(() => {
-  if (animationFrameId !== null) {
-    window.cancelAnimationFrame(animationFrameId)
-  }
-  window.removeEventListener('resize', scheduleEdgeRefresh)
-})
 
 function displayName(item: X4ResearchItem): string {
   return t(item.nameId)
@@ -319,7 +178,6 @@ function closeDetail() {
             <div
               v-for="ln in row.nodes"
               :key="ln.id"
-              :ref="(el) => setNodeElement(makeNodeKey(makeRowKey(group.id, row, ri), ln.id), el)"
               class="research-node"
               :class="{ 'is-selected': selectedItemId === ln.id, 'is-conditional': itemMap.get(ln.id)?.category === 'conditional' }"
               @click.stop="selectItem(ln.id)"
@@ -340,34 +198,19 @@ function closeDetail() {
           </div>
           <div
             v-else
-            :ref="(el) => setRowElement(makeRowKey(group.id, row, ri), el)"
-            class="research-chain-canvas"
+            class="research-chain-surface"
           >
-            <svg
-              class="research-edge-layer"
-              :style="rowMetricStyle(makeRowKey(group.id, row, ri))"
-              aria-hidden="true"
-            >
-              <defs>
-                <filter :id="`research-edge-glow-${group.id}-${ri}`" x="-20%" y="-20%" width="140%" height="140%">
-                  <feDropShadow dx="0" dy="0" stdDeviation="1.2" flood-color="#cfeaff" flood-opacity="0.75" />
-                </filter>
-              </defs>
-              <path
-                v-for="edge in getRenderedEdges(makeRowKey(group.id, row, ri))"
-                :key="edge.key"
-                class="research-edge-line"
-                :d="edge.path"
-                :filter="`url(#research-edge-glow-${group.id}-${ri})`"
-              />
-            </svg>
+            <ResearchEdgeLayer
+              :row-key="makeRowKey(group.id, row, ri)"
+              :edges="row.edges"
+            />
             <div class="research-chain">
               <template v-for="(layerNodes, li) in makeLayers(row)" :key="li">
                 <div class="chain-layer">
                   <div
                     v-for="ln in layerNodes"
                     :key="ln.id"
-                    :ref="(el) => setNodeElement(makeNodeKey(makeRowKey(group.id, row, ri), ln.id), el)"
+                    :data-tag-id="makeNodeKey(makeRowKey(group.id, row, ri), ln.id)"
                     class="research-node"
                     :class="[
                       {
@@ -515,10 +358,10 @@ function closeDetail() {
   gap: 0.75rem;
 }
 
-.research-chain-canvas {
+.research-chain-surface {
+  display: inline-block;
   position: relative;
   width: max-content;
-  min-width: min-content;
   padding: 0.5rem 0;
   overflow: visible;
 }
@@ -539,26 +382,6 @@ function closeDetail() {
   min-width: 180px;
   position: relative;
   z-index: 1;
-}
-
-.research-edge-layer {
-  position: absolute;
-  top: 0;
-  left: 0;
-  pointer-events: none;
-  z-index: 0;
-  overflow: visible;
-  min-width: 100%;
-  min-height: 100%;
-}
-
-.research-edge-line {
-  fill: none;
-  stroke: rgba(235, 246, 255, 0.92);
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  vector-effect: non-scaling-stroke;
 }
 
 .research-node {
