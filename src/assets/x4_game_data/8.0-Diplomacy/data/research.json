@@ -855,7 +855,7 @@
       "unlock": {
         "key": "xenon_crisis_01"
       },
-      "description": "033#text_error#Warning: May lead to an overwhelming crisis. 033X n nTaking advantage of the extensive presence of your ships throughout the Jump Gate network, this research will pool and analyse vast amounts of data in the hope of unravelling the mysteries of the universe."
+      "description": "Warning: May lead to an overwhelming crisis. Taking advantage of the extensive presence of your ships throughout the Jump Gate network, this research will pool and analyse vast amounts of data in the hope of unravelling the mysteries of the universe."
     },
     {
       "id": "research_xenon_crisis_02",
@@ -876,7 +876,7 @@
       "unlock": {
         "key": "xenon_crisis_02"
       },
-      "description": "The data from the previous Xenon-Kha'ak crisis has been exhausted of all reasonable usefulness. To gain more insight into such Xenon behaviour an attack signal could be encoded with the CPU ship's signature to trigger another phase of aggression. Whether the actual CPU ship halts or commits to these new assaults is unknown. n n 033#text_error#Warning: Research may lead to; criminal charges, extinction, incarceration, heightened blood-pressure , injury and loss of property. 033X"
+      "description": "The data from the previous Xenon-Kha'ak crisis has been exhausted of all reasonable usefulness. To gain more insight into such Xenon behaviour an attack signal could be encoded with the CPU ship's signature to trigger another phase of aggression. Whether the actual CPU ship halts or commits to these new assaults is unknown. Warning: Research may lead to; criminal charges, extinction, incarceration, heightened blood-pressure , injury and loss of property."
     },
     {
       "id": "research_tf_tech",
