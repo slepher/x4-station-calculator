@@ -338,22 +338,35 @@ onUnmounted(() => {
             <div class="sidebar-item-active-bar"></div>
             <img class="sidebar-item-icon" :class="getTabIconClass(item)" :src="getTabIcon(item)" alt="" />
             <span class="sidebar-item-label">{{ item.id === 'overview' ? t('sector.overview') : item.name }}</span>
+            <svg
+              v-if="item.id === 'terraforming'"
+              class="sidebar-expand-arrow"
+              :class="{ expanded: expandedTerraforming }"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            ><path d="m9 18 6-6-6-6"/></svg>
           </div>
         </div>
 
-        <div v-if="props.showTerraforming && expandedTerraforming" class="sidebar-section sidebar-terraform-clusters">
-          <div
-            v-for="item in terraformClusterItems"
-            :key="item.id"
-            class="sidebar-item terraform-cluster-item"
-            :class="{ active: props.activeTerraformingClusterId && item.id === `terraforming:${props.activeTerraformingClusterId}` }"
-            @click="handleTabClick(item)"
-          >
-            <div class="sidebar-item-active-bar"></div>
-            <img class="sidebar-item-icon sidebar-icon-indented" :src="getTabIcon(item)" alt="" />
-            <span class="sidebar-item-label">{{ item.name }}</span>
+        <div
+          v-if="props.showTerraforming && expandedTerraforming"
+          class="sidebar-terraform-clusters"
+        >
+            <div
+              v-for="item in terraformClusterItems"
+              :key="item.id"
+              class="sidebar-item terraform-cluster-item"
+              :class="{ active: props.activeTerraformingClusterId && item.id === `terraforming:${props.activeTerraformingClusterId}` }"
+              @click="handleTabClick(item)"
+            >
+              <div class="sidebar-item-active-bar"></div>
+              <img class="sidebar-item-icon sidebar-icon-indented" :src="getTabIcon(item)" alt="" />
+              <span class="sidebar-item-label">{{ item.name }}</span>
+            </div>
           </div>
-        </div>
 
         <div class="sidebar-divider"></div>
 
@@ -669,5 +682,32 @@ onUnmounted(() => {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+.sidebar-expand-arrow {
+  width: 16px;
+  height: 16px;
+  margin-left: auto;
+  color: var(--color-text-secondary, #888);
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+
+.sidebar-expand-arrow.expanded {
+  transform: rotate(90deg);
+}
+
+.sidebar-terraform-clusters {
+  padding-left: 20px;
+}
+
+.terraform-cluster-item {
+  padding-left: 12px;
+}
+
+.sidebar-icon-indented {
+  opacity: 0.6;
+  width: 16px;
+  height: 16px;
 }
 </style>
