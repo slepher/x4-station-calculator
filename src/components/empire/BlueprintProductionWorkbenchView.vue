@@ -14,6 +14,7 @@ import StationDashboard from '@/components/empire/StationDashboard.vue'
 import ProductionSidebar from '@/components/empire/ProductionSidebar.vue'
 import BlueprintContextToolbar from '@/components/empire/context_toolbar/BlueprintContextToolbar.vue'
 import TerraformingWorkbench from '@/components/empire/TerraformingWorkbench.vue'
+import ResearchWorkbench from '@/components/empire/ResearchWorkbench.vue'
 import StationWareFlowsDashboard from '@/components/empire/StationWareFlowsDashboard.vue'
 import ImportPlanModal from '@/components/empire/ImportPlanModal.vue'
 import { useBuildPlanPresenter } from '@/components/empire/presenters/useBuildPlanPresenter'
@@ -64,6 +65,7 @@ const buildPlanPresenter = useBuildPlanPresenter({
       :has-sectors="sidebarPresenter.props.hasSectors"
       :show-terraforming="sidebarPresenter.props.showTerraforming"
       :show-tech-tree="sidebarPresenter.props.showTechTree"
+      :show-research="sidebarPresenter.props.showResearch"
       :can-create-station="sidebarPresenter.props.canCreateStation"
       :can-open-context-menu="sidebarPresenter.props.canOpenContextMenu"
       :context-menu-mode="sidebarPresenter.props.contextMenuMode"
@@ -76,6 +78,7 @@ const buildPlanPresenter = useBuildPlanPresenter({
       @delete-station="sidebarPresenter.emits.deleteStation"
       @select-terraforming="sidebarPresenter.emits.selectTerraforming"
       @select-tech-tree="() => {}"
+      @select-research="sidebarPresenter.emits.selectResearch"
       @select-transit="() => {}"
       @expand-sector="() => {}"
       @jump-to-binding="() => {}"
@@ -119,6 +122,7 @@ const buildPlanPresenter = useBuildPlanPresenter({
   />
 
   <TerraformingWorkbench v-if="toolbarPresenter.props.workbenchMode.value === 'terraforming'" />
+  <ResearchWorkbench v-if="toolbarPresenter.props.workbenchMode.value === 'research'" />
 
   <div v-if="toolbarPresenter.props.workbenchMode.value === 'station'" class="main-layout">
     <div class="col-span-12 lg:col-span-3">

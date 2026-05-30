@@ -1290,3 +1290,38 @@ export interface ResolvedGroupSaveBinding extends GroupSaveBinding {
 export interface ResolvedStationSaveBinding extends StationSaveBinding {
   status: 'ok' | 'missing_at_selected_time'
 }
+
+export interface X4ResearchUnlockParams {
+  sectorMacro?: string
+  sectorNameId?: string
+  shipWareId?: string
+  shipNameId?: string
+  itemWareId?: string
+  itemNameId?: string
+  npcNameId?: string
+  count?: number
+}
+
+export interface X4ResearchUnlock {
+  key: string
+  params?: X4ResearchUnlockParams
+}
+
+export interface X4ResearchItem {
+  id: string
+  nameId: string
+  name: string
+  descriptionId?: string
+  description?: string
+  dlcTag: string
+  tags: string[]
+  category: 'default' | 'abandoned' | 'mission_progress' | 'conditional'
+  researchTime: number
+  cost: Record<string, number>
+  dependencies: string[]
+  unlock?: X4ResearchUnlock
+}
+
+export interface X4ResearchData {
+  items: X4ResearchItem[]
+}

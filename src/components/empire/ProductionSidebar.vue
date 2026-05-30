@@ -14,6 +14,7 @@ const props = defineProps<{
   expandedSectorId: string | null
   hasSectors: boolean
   showTerraforming: boolean
+  showResearch: boolean
   showTechTree: boolean
   canCreateStation: boolean
   canOpenContextMenu: boolean
@@ -25,6 +26,7 @@ const emit = defineEmits<{
   selectOverview: []
   selectTerraforming: []
   selectTechTree: []
+  selectResearch: []
   selectTransit: [sectorId: string]
   selectStation: [stationId: string]
   createStation: []
@@ -108,6 +110,9 @@ watch([() => props.activeTabId, () => props.tabs.length], ([tabId]) => {
 
 const fixedItems = computed<ProductionTabItem[]>(() => {
   const result = props.tabs.filter(t => t.type === 'overview')
+  if (props.showResearch) {
+    result.push({ id: 'research', type: 'research' as const, name: '研究' })
+  }
   if (props.showTerraforming) {
     result.push({ id: 'terraforming', type: 'terraforming' as const, name: '地球化' })
   }
@@ -164,7 +169,7 @@ const getTabIconClass = (tab: ProductionTabItem): string => {
 
 const getTabIcon = (tab: ProductionTabItem): string => {
   if (tab.id === 'overview') return playerhqIconUrl
-  if (tab.id === 'terraforming' || tab.id === 'tech-tree') return playerhqIconUrl
+  if (tab.id === 'terraforming' || tab.id === 'tech-tree' || tab.id === 'research') return playerhqIconUrl
   if (tab.type === 'transit') return tradestationIconUrl
   const iconTag = getPoiIconTag(tab)
   if (iconTag) return SAVE_POI_ICON_MAP[iconTag] || factoryIconUrl
@@ -178,6 +183,8 @@ const handleTabClick = (tab: ProductionTabItem) => {
     emit('selectTerraforming')
   } else if (tab.id === 'tech-tree') {
     emit('selectTechTree')
+  } else if (tab.id === 'research') {
+    emit('selectResearch')
   } else if (tab.type === 'transit') {
     emit('selectTransit', tab.sectorId!)
   } else {

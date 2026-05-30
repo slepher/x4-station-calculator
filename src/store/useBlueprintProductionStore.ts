@@ -881,17 +881,30 @@ function updateStationModules(stationId: string, modules: SavedModule[]) {
     }
   })
 
-  const session = computed<ProductionSessionState>(() => ({
-    workbenchMode: activeViewStore.activeEmpireWorkbench === 'terraforming' ? 'terraforming' : (activeStation.value ? 'station' : 'overview'),
-    entityType: activeViewStore.activeEmpireWorkbench === 'terraforming' ? 'terraforming' : (activeStation.value ? 'station' : 'overview'),
-    mode: 'planning',
-    visualMode: 'planning',
-    activeStationId: activeViewStore.activeEmpireWorkbench === 'terraforming' ? null : activeStationId.value,
-    activeTransitSectorId: null,
-    activeBinding: activeEmpire.value?.id || null,
-    canToggle: false,
-    wareflowViewMode: wareflowViewMode.value
-  }))
+  function resolveWorkbenchType(): 'overview' | 'station' | 'terraforming' | 'research' {
+    switch (activeViewStore.activeEmpireWorkbench) {
+      case 'terraforming': return 'terraforming'
+      case 'research': return 'research'
+      default: return activeStation.value ? 'station' : 'overview'
+    }
+  }
+
+  const session = computed<ProductionSessionState>(() => {
+    const wb = resolveWorkbenchType()
+    const isSpecialView = activeViewStore.activeEmpireWorkbench === 'terraforming'
+      || activeViewStore.activeEmpireWorkbench === 'research'
+    return {
+      workbenchMode: wb,
+      entityType: wb,
+      mode: 'planning',
+      visualMode: 'planning',
+      activeStationId: isSpecialView ? null : activeStationId.value,
+      activeTransitSectorId: null,
+      activeBinding: activeEmpire.value?.id || null,
+      canToggle: false,
+      wareflowViewMode: wareflowViewMode.value
+    }
+  })
 
   const context = computed<ProductionContextState>(() => {
     const sectorId = activeStation.value?.sectorId
@@ -1076,6 +1089,10 @@ function updateStationModules(stationId: string, modules: SavedModule[]) {
     updateStationName: updateStationNameFromActive,
     selectTerraforming() {
       activeViewStore.activeEmpireWorkbench = 'terraforming'
+      activeStationId.value = null
+    },
+    selectResearch() {
+      activeViewStore.activeEmpireWorkbench = 'research'
       activeStationId.value = null
     },
     updateWareflowViewMode: (value: WareFlowViewMode) => { wareflowViewMode.value = value },

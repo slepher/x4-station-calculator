@@ -11,6 +11,7 @@ export interface SidebarPresenterProps {
   hasSectors: boolean
   showTerraforming: boolean
   showTechTree: boolean
+  showResearch: boolean
   canCreateStation: boolean
   canOpenContextMenu: boolean
   contextMenuMode: 'full' | 'delete-only'
@@ -21,6 +22,7 @@ export interface SidebarPresenterEmits {
   selectOverview: () => void
   selectTerraforming: () => void
   selectTechTree: () => void
+  selectResearch: () => void
   selectTransit: (sectorId: string) => void
   selectStation: (stationId: string) => void
   createStation: () => unknown
@@ -38,7 +40,7 @@ export interface UseProductionSidebarPresenterReturn {
 
 export interface SidebarPresenterStore {
   session: {
-    workbenchMode: 'overview' | 'station' | 'transit' | 'terraforming' | 'tech-tree'
+    workbenchMode: 'overview' | 'station' | 'transit' | 'terraforming' | 'tech-tree' | 'research'
     activeStationId: string | null
     activeTransitSectorId: string | null
   }
@@ -69,6 +71,7 @@ export interface SidebarPresenterStore {
   selectStation(stationId: string | null): void
   selectTerraforming?(): void
   selectTechTree?(): void
+  selectResearch?(): void
   selectTransitSector?(sectorId: string | null): void
   createStation(name?: string): unknown
   renameStation(stationId: string, name: string): void
@@ -160,12 +163,14 @@ export function useProductionSidebarPresenter(store: SidebarPresenterStore): Use
   const showTerraforming = !hasSectors
   // 暂隐藏（恢复：!!store.selectTechTree）
   const showTechTree = false
+  const showResearch = !hasSectors
 
   const props: SidebarPresenterProps = {
     tabs,
     activeTabId: computed(() => {
       if (store.session.workbenchMode === 'terraforming') return 'terraforming'
       if (store.session.workbenchMode === 'tech-tree') return 'tech-tree'
+      if (store.session.workbenchMode === 'research') return 'research'
       if (store.session.workbenchMode === 'transit' && store.session.activeTransitSectorId) {
         return `transit:${store.session.activeTransitSectorId}`
       }
@@ -176,6 +181,7 @@ export function useProductionSidebarPresenter(store: SidebarPresenterStore): Use
     hasSectors,
     showTerraforming,
     showTechTree,
+    showResearch,
     canCreateStation: !store.capabilities.uniqueStation,
     canOpenContextMenu: !store.capabilities.uniqueStation || (store.capabilities.uniqueStation && !store.archiveStation),
     contextMenuMode: store.capabilities.uniqueStation ? 'delete-only' : 'full',
@@ -186,6 +192,7 @@ export function useProductionSidebarPresenter(store: SidebarPresenterStore): Use
     selectOverview: () => store.selectStation(null),
     selectTerraforming: () => (store.selectTerraforming || (() => {}))(),
     selectTechTree: () => (store.selectTechTree || (() => {}))(),
+    selectResearch: () => (store.selectResearch || (() => {}))(),
     selectTransit: (sectorId: string) => (store.selectTransitSector || (() => {}))(sectorId),
     selectStation: (stationId: string) => store.selectStation(stationId),
     createStation: () => store.createStation(),
