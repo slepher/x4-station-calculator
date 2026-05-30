@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { TerraformingCluster } from '@/store/logic/terraformingTaskResolver'
 import type {
@@ -35,38 +34,8 @@ const props = defineProps<Props>()
 
 const emit = defineEmits<{
   (e: 'selectCluster', clusterId: string): void
-  (e: 'displayModeChange', mode: 'list' | 'item'): void
   (e: 'clickStat', statId: string): void
 }>()
-
-const displayMode = ref<'list' | 'item'>('list')
-
-onMounted(() => {
-  if (props.selectedClusterId) {
-    displayMode.value = 'item'
-  }
-})
-
-watch(() => props.selectedClusterId, (newId) => {
-  if (newId) {
-    displayMode.value = 'item'
-  } else {
-    displayMode.value = 'list'
-  }
-})
-
-function handleClusterClick(clusterId: string) {
-  if (displayMode.value === 'list') {
-    emit('selectCluster', clusterId)
-    displayMode.value = 'item'
-    emit('displayModeChange', 'item')
-  }
-}
-
-function handleBackClick() {
-  displayMode.value = 'list'
-  emit('displayModeChange', 'list')
-}
 
 function getActionLabel(action: string): string {
   const labels: Record<string, string> = {
@@ -85,114 +54,72 @@ function formatPartName(partName: string): string {
 
 <template>
   <div class="panel-card" :class="{ 'panel-floating': floating }">
-    <!-- Item Mode Header -->
-    <div v-if="displayMode === 'item'" class="panel-header item-header">
-      <button
-        class="back-btn"
-        :title="t('terraforming.backToList')"
-        :aria-label="t('terraforming.backToList')"
-        @click="handleBackClick"
-      >
-        <svg class="back-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M15 3h6v6" />
-          <path stroke-linecap="round" stroke-linejoin="round" d="M10 14L21 3" />
-          <path stroke-linecap="round" stroke-linejoin="round" d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-        </svg>
-      </button>
+    <div class="panel-header item-header">
       <span class="header-title">{{ selectedClusterId ? (clusterDisplayNames.get(selectedClusterId) || selectedClusterId) : '' }}</span>
     </div>
 
-    <!-- List Mode Header -->
-    <div v-else class="panel-header">{{ t('terraforming.sectorPanel') }}</div>
-
     <div class="panel-content">
-      <!-- ============ List Mode ============ -->
-      <template v-if="displayMode === 'list'">
-        <div v-if="clusters.length === 0" class="text-slate-500 text-sm text-center py-4">
-          {{ t('terraforming.noSectors') }}
+      <!-- Objectives -->
+      <div class="section-block">
+        <div class="section-title">{{ t('terraforming.objectivesTitle') }}</div>
+        <div
+          v-for="obj in objectivesProgress"
+          :key="obj.step"
+          class="objective-row"
+        >
+          <div class="objective-main">
+            <span class="objective-step">{{ obj.step }}.</span>
+            <span class="objective-action">[{{ getActionLabel(obj.action) }}]</span>
+            <span class="objective-text">{{ obj.text }}</span>
+            <span class="objective-status" :class="{ completed: obj.completed }">
+              {{ obj.completed ? '✅' : '⬜' }}
+            </span>
+          </div>
         </div>
-        <div v-for="cluster in clusters" :key="cluster.id">
+      </div>
+
+      <!-- Rewards -->
+      <div v-if="clusterRewardDisplays.length > 0" class="section-block">
+        <div class="section-title">{{ t('terraforming.rewardsTitle') }}</div>
+        <div
+          v-for="(rw, i) in clusterRewardDisplays"
+          :key="`reward-${i}`"
+          class="reward-row"
+        >
+          <span class="reward-milestone">{{ rw.milestone }}</span>
+          <span class="reward-text">{{ rw.text }}</span>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div v-if="selectedClusterId && Object.keys(currentStats).length > 0" class="section-block">
+        <div class="section-title">{{ t('terraforming.statsTitle') }}</div>
+        <div class="stats-grid">
+          <TerraformingStatScale
+            v-for="[statId, model] in statScaleModels"
+            :key="statId"
+            :model="model"
+            compact
+            centered
+            mode="status"
+            @click-stat="emit('clickStat', $event)"
+          />
+        </div>
+      </div>
+
+      <!-- Rebates -->
+      <div v-if="selectedClusterId && activeRebates.length > 0" class="section-block">
+        <div class="section-title">{{ t('terraforming.rebatesTitle') }}</div>
+        <div class="effect-list">
           <div
-            class="cluster-item"
-            :class="{ 'active': selectedClusterId === cluster.id }"
-            @click="handleClusterClick(cluster.id)"
+            v-for="(text, i) in activeRebates"
+            :key="`active-rebate-${i}`"
+            class="effect-list-item effect-rebate"
           >
-            <div class="flex items-center gap-2">
-              <span class="cluster-name">{{ clusterDisplayNames.get(cluster.id) || cluster.id }}</span>
-              <span
-                v-if="clusterMatchesHq[cluster.id]"
-                class="hq-pill"
-              >{{ t('terraforming.currentSector') }}</span>
-            </div>
-            <span class="cluster-part">{{ formatPartName(cluster.partName) }}</span>
+            {{ text }}
           </div>
         </div>
-      </template>
-
-      <!-- ============ Item Mode ============ -->
-      <template v-else>
-        <!-- Objectives -->
-        <div class="section-block">
-          <div class="section-title">{{ t('terraforming.objectivesTitle') }}</div>
-          <div
-            v-for="obj in objectivesProgress"
-            :key="obj.step"
-            class="objective-row"
-          >
-            <div class="objective-main">
-              <span class="objective-step">{{ obj.step }}.</span>
-              <span class="objective-action">[{{ getActionLabel(obj.action) }}]</span>
-              <span class="objective-text">{{ obj.text }}</span>
-              <span class="objective-status" :class="{ completed: obj.completed }">
-                {{ obj.completed ? '✅' : '⬜' }}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Rewards -->
-        <div v-if="clusterRewardDisplays.length > 0" class="section-block">
-          <div class="section-title">{{ t('terraforming.rewardsTitle') }}</div>
-          <div
-            v-for="(rw, i) in clusterRewardDisplays"
-            :key="`reward-${i}`"
-            class="reward-row"
-          >
-            <span class="reward-milestone">{{ rw.milestone }}</span>
-            <span class="reward-text">{{ rw.text }}</span>
-          </div>
-        </div>
-
-        <!-- Stats -->
-        <div v-if="selectedClusterId && Object.keys(currentStats).length > 0" class="section-block">
-          <div class="section-title">{{ t('terraforming.statsTitle') }}</div>
-          <div class="stats-grid">
-            <TerraformingStatScale
-              v-for="[statId, model] in statScaleModels"
-              :key="statId"
-              :model="model"
-              compact
-              centered
-              mode="status"
-              @click-stat="emit('clickStat', $event)"
-            />
-          </div>
-        </div>
-
-        <!-- Rebates -->
-        <div v-if="selectedClusterId && activeRebates.length > 0" class="section-block">
-          <div class="section-title">{{ t('terraforming.rebatesTitle') }}</div>
-          <div class="effect-list">
-            <div
-              v-for="(text, i) in activeRebates"
-              :key="`active-rebate-${i}`"
-              class="effect-list-item effect-rebate"
-            >
-              {{ text }}
-            </div>
-          </div>
-        </div>
-      </template>
+      </div>
     </div>
   </div>
 </template>
@@ -223,49 +150,7 @@ function formatPartName(partName: string): string {
   @apply truncate;
 }
 
-.back-btn {
-  @apply flex items-center justify-center w-7 h-7 rounded transition-colors text-slate-400 hover:text-slate-200 hover:bg-slate-700/50 flex-shrink-0;
-}
-
-.back-icon {
-  @apply h-3.5 w-3.5;
-}
-
 .panel-content {
-  @apply flex flex-col gap-0;
-}
-
-.panel-floating .panel-content {
-  @apply flex-1 min-h-0 overflow-y-auto;
-}
-
-.panel-floating .panel-content::-webkit-scrollbar { width: 6px; }
-.panel-floating .panel-content::-webkit-scrollbar-track { background: rgba(30, 41, 59, 0.5); }
-.panel-floating .panel-content::-webkit-scrollbar-thumb { background: rgba(71, 85, 105, 0.8); border-radius: 3px; }
-.panel-floating .panel-content::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 1); }
-
-.cluster-item {
-  @apply flex flex-col px-3 py-2 cursor-pointer transition-colors border-b border-slate-700/20;
-  @apply hover:bg-sky-500/10 text-slate-400 hover:text-slate-200;
-}
-
-.cluster-item.active {
-  @apply bg-sky-500/20 text-sky-400 border-sky-500/30;
-}
-
-.cluster-name {
-  @apply text-sm font-bold;
-}
-
-.cluster-part {
-  @apply text-xs text-slate-500 mt-0.5;
-}
-
-.hq-pill {
-  @apply text-xs px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex-shrink-0;
-}
-
-.section-block {
   @apply px-3 py-2 border-b border-slate-700/20;
 }
 
@@ -296,6 +181,16 @@ function formatPartName(partName: string): string {
 .objective-status {
   @apply flex w-6 flex-shrink-0 justify-center text-base text-center;
 }
+
+.panel-content {
+  @apply flex flex-col gap-0;
+}
+
+.panel-floating .panel-content {
+  @apply flex-1 min-h-0 overflow-y-auto;
+}
+
+.panel-floating .panel-content::-webkit-scrollbar { width: 6px; }
 
 .objective-status.completed {
   @apply text-emerald-400;

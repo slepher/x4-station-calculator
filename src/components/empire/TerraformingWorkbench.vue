@@ -12,7 +12,6 @@ const gameDataStore = useGameDataStore()
 
 const gameDataMaps = computed(() => gameDataStore.maps)
 
-const terraformingSectorMode = ref<'list' | 'item'>('list')
 const panelMaxHeight = ref('calc(100vh - 5rem)')
 
 function updatePanelMaxHeight() {
@@ -25,9 +24,6 @@ function updatePanelMaxHeight() {
 onMounted(() => {
   window.addEventListener('resize', updatePanelMaxHeight)
   requestAnimationFrame(() => updatePanelMaxHeight())
-  if (terraformingStore.activePlan?.selectedClusterId) {
-    terraformingSectorMode.value = 'item'
-  }
 })
 
 onUnmounted(() => {
@@ -118,7 +114,6 @@ function toggleStatFilter(statId: string) {
         :floating="terraformingFloating.sectorPanel"
         @click-stat="toggleStatFilter"
         @select-cluster="terraformingPresenter.emits.selectCluster"
-        @display-mode-change="(mode) => terraformingSectorMode = mode"
       />
     </div>
 

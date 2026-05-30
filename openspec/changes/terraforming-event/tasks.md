@@ -63,3 +63,12 @@
 - [x] 9.1 `completeQueueEdit` 从 `draftReplayEntries` 写出
 - [x] 9.2 `npm run build` 无编译错误
 - [x] 9.3 TDD 测试 3/3 通过
+
+## 10. Bug 修复：auto-event 重触发 & 顺序 stats 重放
+
+- [x] 10.1 `executeAutoEvents()` 改用 `computeSequentialStatsFromLog` 按执行顺序重放 stats，解决 repeatable 事件在 interleaved 场景（cloud→warming→cloud→warming）下不能重触发
+- [x] 10.2 `executionTimeline` 的 `evaluateEntry` 改用顺序 stats 计算 `beforeStats`，使 second occurrence 的条件显示不从累积态取错误值
+- [x] 10.3 `executionTimeline` 的 `statLines` 改用顺序 stats 计算 before/after 值
+- [x] 10.4 `computePlanDraftEntries` 中 `insertedEventIds` 改用 `repeatCooldown === null` 判断，允许 repeatable 事件重复插入
+- [x] 10.5 `computePlanDraftEntries` 的条件检查改用 `getSequentialStats()` 替代累积 `computeTerraformingRuntimeStats`
+- [x] 10.6 `terraformingRuntime.ts` 新增 `computeSequentialStatsFromLog(cluster, log, data)` 和 `applyProjectToStats`

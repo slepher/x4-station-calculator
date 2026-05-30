@@ -78,3 +78,9 @@
 - [x] 8.5 确认目标驱动模型取代 `terraforming-log-edit` 旧编辑模式且不与旧三态并存
 - [x] 8.6 运行 `npm run build`
 - [x] 8.7 若出现编译错误，修复后重新运行 `npm run build`
+
+## 9. Bug 修复：goal 生成路径顺序 stats 重放
+
+- [x] 9.1 `generateGoalEntries` 的 stat goal satisfaction 回放改用 `computeSequentialStatsFromLog(slice)` 替代累积 `computeTerraformingRuntimeStats`
+- [x] 9.2 `generateGoalEntries` 的 fallback `checkStats` 改用增量顺序 `sequentialGoalStats` 替代 `cumulativeStats`
+- [x] 9.3 `generateGoalEntries` 新增 `goalProjectMap` / `goalIgnoredStats` / `sequentialGoalStats` 追踪

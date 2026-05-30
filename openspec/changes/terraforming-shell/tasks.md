@@ -67,3 +67,14 @@
 ## 10. 构建验证
 
 - [x] 10.1 `npm run build` 无编译错误
+
+## 11. Sidebar 图标与集群子项
+
+- [x] 11.1 地球化星区子项使用 `tlt_terraforming.svg` 作图标（替代 factory 图标）
+- [x] 11.2 父级「地球化」tab 隐藏图标（`v-if="item.id !== 'terraforming'"`）
+- [x] 11.3 星区子项图标按 `initialStats.temperature` 的 state（0-4）着色，无 temperature 时默认 state=2
+- [x] 11.4 新增 CSS `icon-temp-state-1` ~ `icon-temp-state-4` 滤镜类
+- [x] 11.5 `terraformingClusters` prop 增加 `temperatureState`，view 层预计算
+- [x] 11.6 `ProductionTabItem` 增加 `temperatureState?: number`
+- [x] 11.7 进入星区界面时自动展开子项列表（watch `activeTerraformingClusterId` with `immediate: true`）
+- [x] 11.8 SVG 图标重建：径向渐隐替代硬截断避免扩散，`<circle>` 重绘规整外环（r=440, stroke-width=100）

@@ -70,3 +70,10 @@
 
 - [x] 7.1 `npm run build` 通过
 - [x] 7.2 若出现编译错误，修复后重新运行 `npm run build`
+
+## 8. Bug 修复：replay 顺序 stats 重放
+
+- [x] 8.1 `computePlanDraftEntries` 的 `cumulativeStateAt` 改用 `getSequentialStats()` 替代累积 `computeTerraformingRuntimeStats`，使 stat snapshot 反映 interleaved 执行顺序
+- [x] 8.2 `computePlanDraftEntries` 的 `endStats` 改用 `getSequentialStats()`
+- [x] 8.3 `pushTaskEntry` / `pushEventEntry` 的 `statLines` 改用顺序 stats 计算 before/after 值
+- [x] 8.4 备选 `cumulativeStateAt` 回退路径（`buildStatGoalModels` 中）改用顺序 apply
