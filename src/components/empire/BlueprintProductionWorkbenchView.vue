@@ -85,7 +85,7 @@ const buildPlanPresenter = useBuildPlanPresenter({
     />
     <div class="production-content custom-scrollbar">
       <BlueprintContextToolbar
-        v-if="toolbarPresenter.props.workbenchMode.value !== 'terraforming'"
+        v-if="toolbarPresenter.props.workbenchMode.value !== 'terraforming' && toolbarPresenter.props.workbenchMode.value !== 'research'"
     :station="toolbarPresenter.props.station.value"
     :workbench-mode="toolbarPresenter.props.workbenchMode.value"
     :title-model="toolbarPresenter.props.titleModel.value"
