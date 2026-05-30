@@ -364,9 +364,9 @@ function closeDetail() {
 }
 
 .research-row.flat-nodes {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2.5rem;
 }
 
 .research-chain-surface {
