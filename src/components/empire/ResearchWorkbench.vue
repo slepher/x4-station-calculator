@@ -26,7 +26,7 @@ function nodeConnectionClasses(row: LayoutRow, nodeId: string) {
 }
 
 function makeNodeKey(prefix: string, nodeId: string): string {
-  return `${prefix}:${nodeId}`
+  return `research-node:${prefix}:${nodeId}`
 }
 </script>
 
