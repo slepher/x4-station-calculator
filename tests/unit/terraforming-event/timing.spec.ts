@@ -167,3 +167,79 @@ describe('terraforming event timing — FrontierEdge', () => {
     expect(statGoalIds.filter(s => s === 'population').length).toBeGreaterThan(0)
   })
 })
+
+describe('terraforming event timing — BlackHoleSun', () => {
+  beforeEach(async () => { setActivePinia(createPinia()); const { useGameDataStore } = await import('@/store/useGameDataStore'); const g = useGameDataStore(); g.waresMap = {} as any; g.moduleGroupNames = {} as any; g.localizedModulesMap = {} as any; g.modulesMap = {} as any; g.wareNames = computed(() => new Map()) })
+
+  it('wat_import + cloud (→ warming) + cloud → warming again', () => {
+    const { store } = makeStore(findCluster('BlackHoleSun'))
+    const p = useTerraformingPresenter(store)
+    p.emits.setProjectCount('wat_import', 1)
+    p.emits.setProjectCount('tmp_cloudparticles', 1)
+    p.emits.setProjectCount('tmp_cloudparticles', 2)
+    expect(p.props.resourcePanel.executionTimeline.value.map(e => e.projectId)).toEqual([
+      'wat_import',
+      'tmp_cloudparticles', 'evt_globalwarming_methane',
+      'tmp_cloudparticles', 'evt_globalwarming_methane',
+    ])
+  })
+
+  it('timeline afterStats respects interleaved order', () => {
+    const { store } = makeStore(findCluster('BlackHoleSun'))
+    const p = useTerraformingPresenter(store)
+    p.emits.setProjectCount('wat_import', 1)
+    p.emits.setProjectCount('tmp_cloudparticles', 1)
+    p.emits.setProjectCount('tmp_cloudparticles', 2)
+
+    const timeline = p.props.resourcePanel.executionTimeline.value
+    // Entry 3 (0-indexed): 2nd cloud particle, should show temp dropping 6→5
+    const secondCloud = timeline[3]!
+    expect(secondCloud.projectId).toBe('tmp_cloudparticles')
+    const tempSnapshot = secondCloud.afterStats.find(s => s.statId === 'temperature')
+    expect(tempSnapshot).toBeDefined()
+    expect(tempSnapshot!.afterValue).toBe(5)
+  })
+
+  it('edit mode: cloud → warming → cloud → warming again', () => {
+    const { store } = makeStore(findCluster('BlackHoleSun'))
+    const p = useTerraformingPresenter(store)
+    p.emits.setProjectCount('wat_import', 1)
+    p.emits.startQueueEdit()
+    p.emits.appendDraftTask('tmp_cloudparticles')
+    p.emits.appendDraftTask('tmp_cloudparticles')
+
+    const plan = p.props.resourcePanel.queueEditState.planEntries.value
+    const ids = plan.filter(e => e.type !== 'goal').map(e => e.entry.projectId)
+    expect(ids).toEqual([
+      'wat_import',
+      'tmp_cloudparticles', 'evt_globalwarming_methane',
+      'tmp_cloudparticles', 'evt_globalwarming_methane',
+    ])
+  })
+
+  it('edit mode: 2nd cloud and 2nd warming show stat changes', () => {
+    const { store } = makeStore(findCluster('BlackHoleSun'))
+    const p = useTerraformingPresenter(store)
+    p.emits.setProjectCount('wat_import', 1)
+    p.emits.startQueueEdit()
+    p.emits.appendDraftTask('tmp_cloudparticles')
+    p.emits.appendDraftTask('tmp_cloudparticles')
+
+    const plan = p.props.resourcePanel.queueEditState.planEntries.value
+    // 2nd cloud (index 3 in non-goal entries): temp should show 6→5
+    const secondCloud = plan.filter(e => e.type !== 'goal')[3]!
+    expect(secondCloud.entry.projectId).toBe('tmp_cloudparticles')
+    const cloudStatLine = secondCloud.entry.statLines.find(l => l.statId === 'temperature')
+    expect(cloudStatLine).toBeDefined()
+    expect(cloudStatLine!.effectFromValue).toBe(6)
+    expect(cloudStatLine!.effectToValue).toBe(5)
+
+    // 2nd warming (index 4 in non-goal entries): temp should show 5→6
+    const secondWarming = plan.filter(e => e.type !== 'goal')[4]!
+    expect(secondWarming.entry.projectId).toBe('evt_globalwarming_methane')
+    const warmingStatLine = secondWarming.entry.statLines.find(l => l.statId === 'temperature')
+    expect(warmingStatLine).toBeDefined()
+    expect(warmingStatLine!.effectFromValue).toBe(5)
+    expect(warmingStatLine!.effectToValue).toBe(6)
+  })
+})

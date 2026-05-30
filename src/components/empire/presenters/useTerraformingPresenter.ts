@@ -26,6 +26,12 @@ import {
 import {
   computeTerraformingRuntimeStats,
   getRuntimeTerraformingProjectIds,
+  applyProjectEffectsToTerraformingStats,
+  computeSequentialStatsFromLog,
+  deriveAirPressure,
+  getTerraformingIgnoredStats,
+  buildTerraformingBaseStats,
+  buildProjectMap,
   type TerraformingExecutionEntry,
 } from '@/store/logic/terraformingRuntime'
 import type { ArchiveStationData } from '@/types/saveArchive'
@@ -1532,6 +1538,9 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     // 1. Replay: compute cumulative state through all non-disabled entries
     let cumulativeStats = { ...initialStats }
     let cumulativeCompleted = new Map<string, number>()
+    const goalProjectMap = buildProjectMap(data)
+    const goalIgnoredStats = getTerraformingIgnoredStats(cluster)
+    let sequentialGoalStats = { ...initialStats }
 
     const clusterProjectIds = new Set(getRuntimeTerraformingProjectIds(cluster))
 
@@ -1555,7 +1564,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
       const lastCumulativeCompleted = new Map(cumulativeCompleted)
 
       // Use cumulativeStateAt (main replay includes auto-events) for stat condition checking
-      const checkStats = (cumulativeStateAt && cumulativeStateAt[entryIdx]) ? cumulativeStateAt[entryIdx]!.stats : cumulativeStats
+      const checkStats = (cumulativeStateAt && cumulativeStateAt[entryIdx]) ? cumulativeStateAt[entryIdx]!.stats : sequentialGoalStats
 
       // Check project's stat conditions met by cumulative state BEFORE this entry
       for (let ci = 0; ci < project.conditions.length; ci++) {
@@ -1662,7 +1671,13 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
 
       // Apply this entry's effects to cumulative state
       cumulativeCompleted.set(entry.projectId, (cumulativeCompleted.get(entry.projectId) ?? 0) + 1)
-      cumulativeStats = computeTerraformingRuntimeStats(cluster, cumulativeCompleted, data)
+      sequentialGoalStats = applyProjectEffectsToTerraformingStats(
+        sequentialGoalStats,
+        new Map([[entry.projectId, 1]]),
+        goalProjectMap,
+        goalIgnoredStats,
+      )
+      sequentialGoalStats = deriveAirPressure(cluster, sequentialGoalStats, goalIgnoredStats)
     }
 
     // 2. Generate cluster root goals from unmet objectives
@@ -1814,14 +1829,9 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
       } else if (goal.kind === 'stat') {
         // Check stat satisfaction at goal position
         if (goal.targetStatId) {
-          let replayCompleted = new Map<string, number>()
-          for (let i = 0; i < goal.position && i < draftEntries.length; i++) {
-            const entry = draftEntries[i]!
-            if (!entry.systemDisabled) {
-              replayCompleted.set(entry.projectId, (replayCompleted.get(entry.projectId) ?? 0) + 1)
-            }
-          }
-          const replayStats = computeTerraformingRuntimeStats(cluster, replayCompleted, data)
+          const slice = draftEntries.slice(0, Math.min(goal.position, draftEntries.length))
+            .filter(e => !e.systemDisabled)
+          const replayStats = computeSequentialStatsFromLog(cluster, slice, data)
           const project = pmap.get(draftEntries.find(e => e.id === [...goal.dependentTaskIds][0])?.projectId || '')
           if (project && goal.targetStatConditionIndex !== undefined) {
             const condition = project.conditions[goal.targetStatConditionIndex]
@@ -1884,6 +1894,13 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     const pmap = projectMap.value
     const statNames = statDisplayNames.value
     let completedProjects = new Map<string, number>()
+    const ignoredStats = getTerraformingIgnoredStats(cluster!)
+    const projectMapForReplay = buildProjectMap(data)
+    let sequentialStats = buildTerraformingBaseStats(cluster)
+
+    function getSequentialStats() {
+      return deriveAirPressure(c, { ...sequentialStats }, ignoredStats)
+    }
 
     const eventStatIds = getEventStatIds(data)
     const runtimeProjectIds = new Set(getRuntimeTerraformingProjectIds(cluster))
@@ -1897,6 +1914,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     function pushTaskEntry(entry: TerraformingDraftExecutionEntry, index: number) {
       const project = pmap.get(entry.projectId)
       const beforeStats = computeTerraformingRuntimeStats(c, completedProjects, d)
+      const seqBefore = getSequentialStats()
       const { clusterProjects } = buildRuntimeClusterForReplay(c, d)
       const runtimePidSet = new Set(clusterProjects.map(p => p.id))
       const evaluation = !entry.systemDisabled
@@ -1907,14 +1925,24 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
       if (!entry.systemDisabled) {
         nextCompletedProjects.set(entry.projectId, (nextCompletedProjects.get(entry.projectId) ?? 0) + 1)
       }
-      const afterStats = computeTerraformingRuntimeStats(c, nextCompletedProjects, data)
+      const seqAfter = entry.systemDisabled
+        ? seqBefore
+        : deriveAirPressure(c,
+            applyProjectEffectsToTerraformingStats(
+              sequentialStats,
+              new Map([[entry.projectId, 1]]),
+              projectMapForReplay,
+              ignoredStats,
+            ),
+            ignoredStats,
+          )
       const statLines = relevantStatIds
-        .filter(statId => isStatInRuntime(beforeStats, statId))
+        .filter(statId => isStatInRuntime(seqBefore, statId))
         .map(statId => ({
           statId,
           statName: statNames.get(statId) || statId,
-          beforeValue: beforeStats[statId] ?? 0,
-          afterValue: afterStats[statId] ?? 0,
+          beforeValue: seqBefore[statId] ?? 0,
+          afterValue: seqAfter[statId] ?? 0,
         }))
         .filter(snapshot => snapshot.beforeValue !== snapshot.afterValue)
         .map(snapshot => buildTimelineStatLineModel(snapshot, d))
@@ -1965,12 +1993,26 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
       })
 
       completedProjects = nextCompletedProjects
+      if (!entry.systemDisabled) {
+        sequentialStats = applyProjectEffectsToTerraformingStats(
+          sequentialStats,
+          new Map([[entry.projectId, 1]]),
+          projectMapForReplay,
+          ignoredStats,
+        )
+      }
     }
 
     function pushEventEntry(event: TerraformingProject) {
-      const evtBeforeStats = computeTerraformingRuntimeStats(cluster!, completedProjects, data!)
+      const evtBeforeStats = getSequentialStats()
       completedProjects.set(event.id, (completedProjects.get(event.id) ?? 0) + 1)
-      const evtAfterStats = computeTerraformingRuntimeStats(cluster!, completedProjects, data!)
+      sequentialStats = applyProjectEffectsToTerraformingStats(
+        sequentialStats,
+        new Map([[event.id, 1]]),
+        projectMapForReplay,
+        ignoredStats,
+      )
+      const evtAfterStats = getSequentialStats()
       const statLines = buildAutoEventStatLines(event, evtBeforeStats, evtAfterStats, data!, statNames)
 
       entries.push({
@@ -1996,19 +2038,18 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
 
     // Check initial state
     for (const event of statAffectingEvents) {
-      if (!insertedEventIds.has(event.id)) {
-        if (event.repeatCooldown === null && (completedProjects.get(event.id) ?? 0) > 0) continue
-        const stats = computeTerraformingRuntimeStats(c, completedProjects, data)
-        if (checkAllConditions(event.conditions, stats, d.stats)) {
-          pushEventEntry(event)
-        }
+      if (event.repeatCooldown === null && insertedEventIds.has(event.id)) continue
+      if (event.repeatCooldown === null && (completedProjects.get(event.id) ?? 0) > 0) continue
+      const stats = getSequentialStats()
+      if (checkAllConditions(event.conditions, stats, d.stats)) {
+        pushEventEntry(event)
       }
     }
 
     for (let index = 0; index < draftExecutionLog.value.length; index += 1) {
       const entry = draftExecutionLog.value[index]!
       const project = pmap.get(entry.projectId)
-      const preStats = computeTerraformingRuntimeStats(c, completedProjects, data)
+      const preStats = getSequentialStats()
       cumulativeStateAt.push({ stats: { ...preStats } })
 
       if (!eventBlocked && project && index > 0) {
@@ -2034,9 +2075,9 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
       }
 
       if (!eventBlocked) {
-        const stats = computeTerraformingRuntimeStats(c, completedProjects, d)
+        const stats = getSequentialStats()
         for (const event of statAffectingEvents) {
-          if (insertedEventIds.has(event.id)) continue
+          if (event.repeatCooldown === null && insertedEventIds.has(event.id)) continue
           if (event.conditions.some(c => blockedStatIds.has(c.stat))) continue
           if (checkAllConditions(event.conditions, stats, d.stats)) {
             pushEventEntry(event)
@@ -2047,9 +2088,9 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
 
     // End of queue
     {
-      const stats = computeTerraformingRuntimeStats(c, completedProjects, data)
+      const stats = getSequentialStats()
       for (const event of statAffectingEvents) {
-        if (insertedEventIds.has(event.id)) continue
+        if (event.repeatCooldown === null && insertedEventIds.has(event.id)) continue
         if (event.conditions.some(c => blockedStatIds.has(c.stat))) continue
         if (checkAllConditions(event.conditions, stats, d.stats)) {
           pushEventEntry(event)
@@ -2057,7 +2098,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
       }
     }
 
-    const endStats = computeTerraformingRuntimeStats(cluster, completedProjects, data)
+    const endStats = getSequentialStats()
 
     const goals = generateGoalEntries(
       draftExecutionLog.value,
@@ -2342,8 +2383,9 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     const evaluateEntry = (
       entry: TerraformingExecutionEntry,
       completedProjects: Map<string, number>,
+      seqStats: Record<string, number>,
     ) => {
-      const beforeStats = computeTerraformingRuntimeStats(cluster, completedProjects, data)
+      const beforeStats = seqStats
       const beforeProjectIds = getRuntimeTerraformingProjectIds(cluster)
       const runtimeCluster: TerraformingCluster = {
         ...cluster,
@@ -2362,10 +2404,13 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
 
     let completedProjects = new Map<string, number>()
     let previousGroupId: string | null = null
+    const ignoredStats = getTerraformingIgnoredStats(cluster)
+    const projectMapInstance = buildProjectMap(data)
+    let sequentialStats = buildTerraformingBaseStats(cluster)
 
     for (let index = 0; index < log.length; index += 1) {
       const entry = log[index]!
-      const evaluated = evaluateEntry(entry, completedProjects)
+      const evaluated = evaluateEntry(entry, completedProjects, { ...sequentialStats })
       const project = projectMap.value.get(entry.projectId)
       const projectName = translatedProjectNames.get(entry.projectId) || project?.name || entry.projectId
       const projectGroupId = project?.group || evaluated.node?.group || 'unknown'
@@ -2374,13 +2419,23 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
       const nextCompletedProjects = new Map(completedProjects)
       nextCompletedProjects.set(entry.projectId, (nextCompletedProjects.get(entry.projectId) ?? 0) + 1)
       const afterStats = computeTerraformingRuntimeStats(cluster, nextCompletedProjects, data)
+
+      const sequentialBefore = deriveAirPressure(cluster, { ...sequentialStats }, ignoredStats)
+      sequentialStats = applyProjectEffectsToTerraformingStats(
+        sequentialStats,
+        new Map([[entry.projectId, 1]]),
+        projectMapInstance,
+        ignoredStats,
+      )
+      const sequentialAfter = sequentialStats
+
       const beforeStatsList = relevantStatIds
-        .filter((statId) => statId in evaluated.beforeStats)
+        .filter((statId) => statId in sequentialBefore)
         .map((statId) => ({
           statId,
           statName: translatedStatNames.get(statId) || statId,
-          beforeValue: evaluated.beforeStats[statId] ?? 0,
-          afterValue: afterStats[statId] ?? 0,
+          beforeValue: sequentialBefore[statId] ?? 0,
+          afterValue: sequentialAfter[statId] ?? 0,
         }))
         .filter(snapshot => snapshot.beforeValue !== snapshot.afterValue)
       const statLines = beforeStatsList
@@ -2796,8 +2851,10 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
         })
       }
     } else {
+      const csProjectMap = buildProjectMap(data)
+      const csIgnoredStats = getTerraformingIgnoredStats(cluster)
       let cumulativeCompleted = new Map<string, number>()
-      let cumulativeStats = computeTerraformingRuntimeStats(cluster, cumulativeCompleted, data)
+      let cumulativeStats = buildTerraformingBaseStats(cluster)
       for (let i = 0; i < draftExecutionLog.value.length; i++) {
         const entry = draftExecutionLog.value[i]!
         cumulativeStateAt.push({
@@ -2806,7 +2863,13 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
         })
         if (!entry.systemDisabled) {
           cumulativeCompleted.set(entry.projectId, (cumulativeCompleted.get(entry.projectId) ?? 0) + 1)
-          cumulativeStats = computeTerraformingRuntimeStats(cluster, cumulativeCompleted, data)
+          cumulativeStats = applyProjectEffectsToTerraformingStats(
+            cumulativeStats,
+            new Map([[entry.projectId, 1]]),
+            csProjectMap,
+            csIgnoredStats,
+          )
+          cumulativeStats = deriveAirPressure(cluster, cumulativeStats, csIgnoredStats)
         }
       }
     }
@@ -3224,7 +3287,6 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
 
     const runtimeProjectIds = new Set(getRuntimeTerraformingProjectIds(cluster))
     const statAffectingEvents = data.projects.filter(p => p.group === 'events' && isStatAffectingEvent(p) && runtimeProjectIds.has(p.id))
-    const completedProjects = new Map(store.terraformingCompletedProjects.value)
     let triggered = true
     const maxIterations = 20
     let iteration = 0
@@ -3232,13 +3294,16 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     while (triggered && iteration < maxIterations) {
       triggered = false
       iteration++
+
+      const sequentialStats = computeSequentialStatsFromLog(cluster, store.terraformingExecutionLog.value, data)
+      const completedCounts = store.terraformingCompletedProjects.value
+
       for (const event of statAffectingEvents) {
-        if (event.repeatCooldown === null && (completedProjects.get(event.id) ?? 0) > 0) continue
-        const stats = computeTerraformingRuntimeStats(cluster, completedProjects, data)
-        if (checkAllConditions(event.conditions, stats, data.stats)) {
+        if (event.repeatCooldown === null && (completedCounts.get(event.id) ?? 0) > 0) continue
+        if (checkAllConditions(event.conditions, sequentialStats, data.stats)) {
           store.appendTerraformingProjectExecution(event.id, 1)
-          completedProjects.set(event.id, (completedProjects.get(event.id) ?? 0) + 1)
           triggered = true
+          break
         }
       }
     }

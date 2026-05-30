@@ -33,6 +33,7 @@ const gameDataStore = useGameDataStore()
 
 const terraformingClusters = computed(() => {
   const clusters = gameDataStore.terraformingData?.clusters ?? []
+  const stats = gameDataStore.terraformingData?.stats ?? []
   const mapsData = gameDataStore.maps
   const t = i18n.global.t.bind(i18n.global)
   return clusters.map(c => {
@@ -50,7 +51,17 @@ const terraformingClusters = computed(() => {
       }
     }
     const resolvedName = nameId ? t(nameId) : c.id
-    return { id: c.id, name: resolvedName, nameId }
+    const temperatureStat = stats.find(s => s.id === 'temperature')
+    let temperatureState = 2
+    if (temperatureStat && c.initialStats?.temperature != null) {
+      const tempValue = c.initialStats.temperature
+      const range = temperatureStat.ranges.find(r => {
+        const start = r.start ?? 0
+        return tempValue >= start && tempValue <= r.end
+      })
+      if (range) temperatureState = range.state
+    }
+    return { id: c.id, name: resolvedName, nameId, temperatureState }
   })
 })
 

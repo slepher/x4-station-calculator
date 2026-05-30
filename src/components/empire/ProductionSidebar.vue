@@ -18,7 +18,7 @@ const props = defineProps<{
   showTerraforming: boolean
   showResearch: boolean
   showTechTree: boolean
-  terraformingClusters: { id: string; name: string; nameId: string }[]
+  terraformingClusters: { id: string; name: string; nameId: string; temperatureState: number }[]
   activeTerraformingClusterId: string | null
   canCreateStation: boolean
   canOpenContextMenu: boolean
@@ -63,13 +63,30 @@ const hasSectorChildren = (sectorId: string): boolean => {
 
 const expandedTerraforming = ref(false)
 
+watch(() => props.activeTerraformingClusterId, (clusterId) => {
+  if (clusterId) expandedTerraforming.value = true
+}, { immediate: true })
+
 const terraformClusterItems = computed<ProductionTabItem[]>(() => {
   return props.terraformingClusters.map(c => ({
     id: `terraforming:${c.id}`,
     type: 'terraforming' as const,
     name: c.name,
+    temperatureState: c.temperatureState,
   }))
 })
+
+const getTerraformClusterIconClass = (item: { temperatureState?: number }): string => {
+  if (item.temperatureState == null) return ''
+  switch (item.temperatureState) {
+    case 0: return ''
+    case 1: return 'icon-temp-state-1'
+    case 2: return 'icon-temp-state-2'
+    case 3: return 'icon-temp-state-3'
+    case 4: return 'icon-temp-state-4'
+    default: return ''
+  }
+}
 
 const groupSectors = computed<Array<{ id: string; name: string; hasChildren: boolean }>>(() => {
   if (!props.hasSectors) return []
@@ -184,7 +201,8 @@ const getTabIconClass = (tab: ProductionTabItem): string => {
 
 const getTabIcon = (tab: ProductionTabItem): string => {
   if (tab.id === 'overview') return playerhqIconUrl
-  if (tab.id === 'terraforming' || tab.id === 'tech-tree') return terraformingIconUrl
+  if (tab.type === 'terraforming') return terraformingIconUrl
+  if (tab.id === 'tech-tree') return terraformingIconUrl
   if (tab.id === 'research') return researchIconUrl
   if (tab.type === 'transit') return tradestationIconUrl
   const iconTag = getPoiIconTag(tab)
@@ -361,7 +379,7 @@ onUnmounted(() => {
               class="sector-click-area flex items-center gap-2 flex-1 min-w-0"
               @click="handleFixedClick(item)"
             >
-              <img class="sidebar-item-icon" :class="getTabIconClass(item)" :src="getTabIcon(item)" alt="" />
+              <img v-if="item.id !== 'terraforming'" class="sidebar-item-icon" :class="getTabIconClass(item)" :src="getTabIcon(item)" alt="" />
               <span class="sidebar-item-label">{{ item.id === 'overview' ? t('sector.overview') : item.name }}</span>
             </span>
           </div>
@@ -379,7 +397,7 @@ onUnmounted(() => {
               @click="handleTabClick(item)"
             >
               <div class="sidebar-item-active-bar"></div>
-              <img class="sidebar-item-icon sidebar-icon-indented" :src="getTabIcon(item)" alt="" />
+              <img class="sidebar-item-icon sidebar-icon-indented" :class="getTerraformClusterIconClass(item)" :src="getTabIcon(item)" alt="" />
               <span class="sidebar-item-label">{{ item.name }}</span>
             </div>
           </div>
@@ -454,7 +472,7 @@ onUnmounted(() => {
               >
                 <div class="sidebar-item-active-bar"></div>
                 <span class="flex items-center gap-2 flex-1 min-w-0" @click="handleFixedClick(item)">
-                  <img class="sidebar-item-icon" :class="getTabIconClass(item)" :src="getTabIcon(item)" alt="" />
+              <img v-if="item.id !== 'terraforming'" class="sidebar-item-icon" :class="getTabIconClass(item)" :src="getTabIcon(item)" alt="" />
                   <span class="sidebar-item-label">{{ item.name }}</span>
                 </span>
               </div>
@@ -611,6 +629,22 @@ onUnmounted(() => {
 
 .icon-cyan {
   filter: brightness(0) saturate(100%) invert(71%) sepia(38%) saturate(722%) hue-rotate(155deg) brightness(97%) contrast(93%);
+}
+
+.icon-temp-state-2 {
+  filter: brightness(0) saturate(100%) invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%);
+}
+
+.icon-temp-state-1 {
+  filter: brightness(0) saturate(100%) invert(79%) sepia(20%) saturate(1111%) hue-rotate(141deg) brightness(87%) contrast(86%);
+}
+
+.icon-temp-state-3 {
+  filter: brightness(0) saturate(100%) invert(59%) sepia(60%) saturate(5033%) hue-rotate(1deg) brightness(102%) contrast(105%);
+}
+
+.icon-temp-state-4 {
+  filter: brightness(0) saturate(100%) invert(16%) sepia(100%) saturate(7419%) hue-rotate(4deg) brightness(89%) contrast(117%);
 }
 
 .sidebar-item-label {

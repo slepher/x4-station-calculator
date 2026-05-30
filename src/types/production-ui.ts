@@ -10,6 +10,7 @@ export interface ProductionTabItem {
   stationType?: StationType
   tag?: string
   factoryGroup?: string
+  temperatureState?: number
 }
 
 export interface StationTabBarProps {

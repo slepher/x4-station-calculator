@@ -137,6 +137,44 @@ export function computeTerraformingRuntimeStats(
   return deriveAirPressure(cluster, effectStats, ignoredStats)
 }
 
+export function applyProjectToStats(
+  stats: Record<string, number>,
+  projectId: string,
+  cluster: TerraformingCluster,
+  data: TerraformingData,
+): Record<string, number> {
+  const projectMap = buildProjectMap(data)
+  const ignoredStats = getTerraformingIgnoredStats(cluster)
+  const updated = applyProjectEffectsToTerraformingStats(
+    stats,
+    new Map([[projectId, 1]]),
+    projectMap,
+    ignoredStats,
+  )
+  return deriveAirPressure(cluster, updated, ignoredStats)
+}
+
+export function computeSequentialStatsFromLog(
+  cluster: TerraformingCluster | null,
+  log: Array<{ projectId: string }>,
+  data: TerraformingData | null,
+): Record<string, number> {
+  const baseStats = buildTerraformingBaseStats(cluster)
+  if (!cluster || !data) return baseStats
+  const projectMap = buildProjectMap(data)
+  const ignoredStats = getTerraformingIgnoredStats(cluster)
+  let stats = baseStats
+  for (const entry of log) {
+    stats = applyProjectEffectsToTerraformingStats(
+      stats,
+      new Map([[entry.projectId, 1]]),
+      projectMap,
+      ignoredStats,
+    )
+  }
+  return deriveAirPressure(cluster, stats, ignoredStats)
+}
+
 export function getRuntimeTerraformingProjectIds(
   cluster: TerraformingCluster | null,
 ): string[] {
