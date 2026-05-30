@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, watch } from 'vue'
+import { onMounted, watch, computed } from 'vue'
 import { useBlueprintProductionStore } from '@/store/useBlueprintProductionStore'
 import { useTerraformingStore } from '@/store/useTerraformingStore'
 import { useBuildPlanStore } from '@/store/useBuildPlanStore'
@@ -22,10 +22,34 @@ import BuildPlanConstraintsPanel from '@/components/empire/BuildPlanConstraintsP
 import BuildPlanPanel from '@/components/empire/BuildPlanPanel.vue'
 import EmpireWareFlowsDashboard from '@/components/empire/EmpireWareFlowsDashboard.vue'
 
+import { useGameDataStore } from '@/store/useGameDataStore'
+
 const blueprintStore = useBlueprintProductionStore()
 const terraformingStore = useTerraformingStore()
 const buildPlanStore = useBuildPlanStore()
 const activeViewStore = useActiveViewStore()
+const gameDataStore = useGameDataStore()
+
+const terraformingClusters = computed(() => {
+  const clusters = gameDataStore.terraformingData?.clusters ?? []
+  const mapsData = gameDataStore.maps
+  return clusters.map(c => {
+    const macro = c.macro?.replace('macro.', '')
+    let nameId = ''
+    if (mapsData && macro) {
+      const clusterInfo = mapsData.clusters[macro]
+      if (clusterInfo) {
+        const sectorList = clusterInfo.sectors ?? []
+        if (sectorList.length === 1 && sectorList[0]) {
+          nameId = mapsData.sectors[sectorList[0]]?.nameId ?? ''
+        } else {
+          nameId = clusterInfo.nameId ?? ''
+        }
+      }
+    }
+    return { id: c.id, nameId: nameId || c.id }
+  })
+})
 
 onMounted(() => {
   terraformingStore.init()
@@ -66,6 +90,8 @@ const buildPlanPresenter = useBuildPlanPresenter({
       :show-terraforming="sidebarPresenter.props.showTerraforming"
       :show-tech-tree="sidebarPresenter.props.showTechTree"
       :show-research="sidebarPresenter.props.showResearch"
+      :terraforming-clusters="terraformingClusters"
+      :active-terraforming-cluster-id="activeViewStore.activeTerraformingClusterId"
       :can-create-station="sidebarPresenter.props.canCreateStation"
       :can-open-context-menu="sidebarPresenter.props.canOpenContextMenu"
       :context-menu-mode="sidebarPresenter.props.contextMenuMode"
@@ -79,6 +105,11 @@ const buildPlanPresenter = useBuildPlanPresenter({
       @select-terraforming="sidebarPresenter.emits.selectTerraforming"
       @select-tech-tree="() => {}"
       @select-research="sidebarPresenter.emits.selectResearch"
+      @select-terraforming-cluster="(clusterId: string) => {
+        activeViewStore.activeEmpireWorkbench = 'terraforming'
+        activeViewStore.activeTerraformingClusterId = clusterId
+        terraformingStore.selectCluster(clusterId)
+      }"
       @select-transit="() => {}"
       @expand-sector="() => {}"
       @jump-to-binding="() => {}"

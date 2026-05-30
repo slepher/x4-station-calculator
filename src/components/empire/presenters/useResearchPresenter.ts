@@ -14,7 +14,7 @@ export function useResearchPresenter(store: {
   dlcs: Ref<X4Dlc[]>
 }) {
   const t = i18n.global.t.bind(i18n.global)
-  const showConditional = ref(false)
+  const showConditional = ref(true)
   const selectedItemId = ref<string | null>(null)
 
   const filteredItems = computed<X4ResearchItem[]>(() => {

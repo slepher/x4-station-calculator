@@ -33,12 +33,6 @@ function makeNodeKey(prefix: string, nodeId: string): string {
 <template>
   <div class="research-workbench">
     <div class="research-main">
-      <div class="research-toolbar">
-        <label class="toggle-label">
-          <input type="checkbox" v-model="p.showConditional.value" />
-          {{ p.t('research.show_conditional') }}
-        </label>
-      </div>
       <div v-if="p.filteredItems.value.length === 0" class="research-empty">
         {{ p.t('research.loading') }}
       </div>
@@ -170,24 +164,6 @@ function makeNodeKey(prefix: string, nodeId: string): string {
 
 .research-main {
   padding: 1rem;
-}
-
-.research-toolbar {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid var(--color-border, #333);
-}
-
-.toggle-label {
-  font-size: 0.85rem;
-  color: var(--color-text, #ccc);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
 }
 
 .research-empty {

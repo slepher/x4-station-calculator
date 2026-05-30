@@ -16,6 +16,8 @@ const props = defineProps<{
   showTerraforming: boolean
   showResearch: boolean
   showTechTree: boolean
+  terraformingClusters: { id: string; nameId: string }[]
+  activeTerraformingClusterId: string | null
   canCreateStation: boolean
   canOpenContextMenu: boolean
   contextMenuMode: 'full' | 'delete-only'
@@ -27,6 +29,7 @@ const emit = defineEmits<{
   selectTerraforming: []
   selectTechTree: []
   selectResearch: []
+  selectTerraformingCluster: [clusterId: string]
   selectTransit: [sectorId: string]
   selectStation: [stationId: string]
   createStation: []
@@ -55,6 +58,16 @@ const getSectorName = (sectorId: string): string => {
 const hasSectorChildren = (sectorId: string): boolean => {
   return props.tabs.some(t => t.type === 'station' && t.sectorId === sectorId)
 }
+
+const expandedTerraforming = ref(false)
+
+const terraformClusterItems = computed<ProductionTabItem[]>(() => {
+  return props.terraformingClusters.map(c => ({
+    id: `terraforming:${c.id}`,
+    type: 'terraforming' as const,
+    name: c.nameId,
+  }))
+})
 
 const groupSectors = computed<Array<{ id: string; name: string; hasChildren: boolean }>>(() => {
   if (!props.hasSectors) return []
@@ -180,7 +193,9 @@ const handleTabClick = (tab: ProductionTabItem) => {
   if (tab.id === 'overview') {
     emit('selectOverview')
   } else if (tab.id === 'terraforming') {
-    emit('selectTerraforming')
+    expandedTerraforming.value = !expandedTerraforming.value
+  } else if (tab.id.startsWith('terraforming:')) {
+    emit('selectTerraformingCluster', tab.id.replace('terraforming:', ''))
   } else if (tab.id === 'tech-tree') {
     emit('selectTechTree')
   } else if (tab.id === 'research') {
@@ -323,6 +338,20 @@ onUnmounted(() => {
             <div class="sidebar-item-active-bar"></div>
             <img class="sidebar-item-icon" :class="getTabIconClass(item)" :src="getTabIcon(item)" alt="" />
             <span class="sidebar-item-label">{{ item.id === 'overview' ? t('sector.overview') : item.name }}</span>
+          </div>
+        </div>
+
+        <div v-if="props.showTerraforming && expandedTerraforming" class="sidebar-section sidebar-terraform-clusters">
+          <div
+            v-for="item in terraformClusterItems"
+            :key="item.id"
+            class="sidebar-item terraform-cluster-item"
+            :class="{ active: props.activeTerraformingClusterId && item.id === `terraforming:${props.activeTerraformingClusterId}` }"
+            @click="handleTabClick(item)"
+          >
+            <div class="sidebar-item-active-bar"></div>
+            <img class="sidebar-item-icon sidebar-icon-indented" :src="getTabIcon(item)" alt="" />
+            <span class="sidebar-item-label">{{ item.name }}</span>
           </div>
         </div>
 

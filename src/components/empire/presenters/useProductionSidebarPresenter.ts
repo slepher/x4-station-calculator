@@ -13,6 +13,8 @@ export interface SidebarPresenterProps {
   showTechTree: boolean
   showResearch: boolean
   canCreateStation: boolean
+  terraformingClusters: ComputedRef<{ id: string; nameId: string }[]>
+  activeTerraformingClusterId: ComputedRef<string | null>
   canOpenContextMenu: boolean
   contextMenuMode: 'full' | 'delete-only'
   canDeleteStation: (stationId: string) => boolean
@@ -24,6 +26,7 @@ export interface SidebarPresenterEmits {
   selectTechTree: () => void
   selectResearch: () => void
   selectTransit: (sectorId: string) => void
+  selectTerraformingCluster: (clusterId: string) => void
   selectStation: (stationId: string) => void
   createStation: () => unknown
   renameStation: (stationId: string) => void
@@ -185,7 +188,9 @@ export function useProductionSidebarPresenter(store: SidebarPresenterStore): Use
     canCreateStation: !store.capabilities.uniqueStation,
     canOpenContextMenu: !store.capabilities.uniqueStation || (store.capabilities.uniqueStation && !store.archiveStation),
     contextMenuMode: store.capabilities.uniqueStation ? 'delete-only' : 'full',
-    canDeleteStation: (stationId: string) => store.canDeleteStation?.(stationId) ?? !store.capabilities.uniqueStation
+    canDeleteStation: (stationId: string) => store.canDeleteStation?.(stationId) ?? !store.capabilities.uniqueStation,
+    terraformingClusters: computed(() => []),
+    activeTerraformingClusterId: computed(() => null),
   }
 
   const emits: SidebarPresenterEmits = {
@@ -193,6 +198,7 @@ export function useProductionSidebarPresenter(store: SidebarPresenterStore): Use
     selectTerraforming: () => (store.selectTerraforming || (() => {}))(),
     selectTechTree: () => (store.selectTechTree || (() => {}))(),
     selectResearch: () => (store.selectResearch || (() => {}))(),
+    selectTerraformingCluster: () => {},
     selectTransit: (sectorId: string) => (store.selectTransitSector || (() => {}))(sectorId),
     selectStation: (stationId: string) => store.selectStation(stationId),
     createStation: () => store.createStation(),
