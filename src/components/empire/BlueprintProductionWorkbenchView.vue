@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, watch, computed } from 'vue'
+import i18n from '@/i18n'
 import { useBlueprintProductionStore } from '@/store/useBlueprintProductionStore'
 import { useTerraformingStore } from '@/store/useTerraformingStore'
 import { useBuildPlanStore } from '@/store/useBuildPlanStore'
@@ -33,6 +34,7 @@ const gameDataStore = useGameDataStore()
 const terraformingClusters = computed(() => {
   const clusters = gameDataStore.terraformingData?.clusters ?? []
   const mapsData = gameDataStore.maps
+  const t = i18n.global.t.bind(i18n.global)
   return clusters.map(c => {
     const macro = c.macro?.replace('macro.', '')
     let nameId = ''
@@ -47,7 +49,8 @@ const terraformingClusters = computed(() => {
         }
       }
     }
-    return { id: c.id, nameId: nameId || c.id }
+    const resolvedName = nameId ? t(nameId) : c.id
+    return { id: c.id, name: resolvedName, nameId }
   })
 })
 

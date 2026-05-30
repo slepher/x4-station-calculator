@@ -16,7 +16,7 @@ const props = defineProps<{
   showTerraforming: boolean
   showResearch: boolean
   showTechTree: boolean
-  terraformingClusters: { id: string; nameId: string }[]
+  terraformingClusters: { id: string; name: string; nameId: string }[]
   activeTerraformingClusterId: string | null
   canCreateStation: boolean
   canOpenContextMenu: boolean
@@ -65,7 +65,7 @@ const terraformClusterItems = computed<ProductionTabItem[]>(() => {
   return props.terraformingClusters.map(c => ({
     id: `terraforming:${c.id}`,
     type: 'terraforming' as const,
-    name: c.nameId,
+    name: c.name,
   }))
 })
 
@@ -333,21 +333,34 @@ onUnmounted(() => {
             class="sidebar-item"
             :class="{ active: isTabActive(item.id) }"
             :data-testid="item.id === 'overview' ? 'sidebar-overview' : item.id === 'terraforming' ? 'sidebar-terraforming' : 'sidebar-tech-tree'"
-            @click="handleFixedClick(item)"
           >
             <div class="sidebar-item-active-bar"></div>
-            <img class="sidebar-item-icon" :class="getTabIconClass(item)" :src="getTabIcon(item)" alt="" />
-            <span class="sidebar-item-label">{{ item.id === 'overview' ? t('sector.overview') : item.name }}</span>
-            <svg
+            <button
               v-if="item.id === 'terraforming'"
-              class="sidebar-expand-arrow"
-              :class="{ expanded: expandedTerraforming }"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            ><path d="m9 18 6-6-6-6"/></svg>
+              class="sector-chevron-btn"
+              @click.stop="expandedTerraforming = !expandedTerraforming"
+            >
+              <svg
+                class="sector-chevron w-3 h-3"
+                :class="{ rotated: expandedTerraforming }"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="m9 18 6-6-6-6"></path>
+              </svg>
+            </button>
+            <span
+              class="sector-click-area flex items-center gap-2 flex-1 min-w-0"
+              @click="handleFixedClick(item)"
+            >
+              <img class="sidebar-item-icon" :class="getTabIconClass(item)" :src="getTabIcon(item)" alt="" />
+              <span class="sidebar-item-label">{{ item.id === 'overview' ? t('sector.overview') : item.name }}</span>
+            </span>
           </div>
         </div>
 
@@ -682,19 +695,6 @@ onUnmounted(() => {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
-}
-
-.sidebar-expand-arrow {
-  width: 16px;
-  height: 16px;
-  margin-left: auto;
-  color: var(--color-text-secondary, #888);
-  transition: transform 0.2s;
-  flex-shrink: 0;
-}
-
-.sidebar-expand-arrow.expanded {
-  transform: rotate(90deg);
 }
 
 .sidebar-terraform-clusters {
