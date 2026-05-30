@@ -110,7 +110,7 @@
       "tags": [
         "research"
       ],
-      "category": "default",
+      "category": "abandoned",
       "researchTime": 0,
       "cost": {},
       "dependencies": [],
@@ -155,7 +155,7 @@
         "hidden",
         "research"
       ],
-      "category": "default",
+      "category": "abandoned",
       "researchTime": 600,
       "cost": {},
       "dependencies": [
@@ -281,7 +281,7 @@
         "hidden",
         "research"
       ],
-      "category": "default",
+      "category": "abandoned",
       "researchTime": 600,
       "cost": {},
       "dependencies": [],

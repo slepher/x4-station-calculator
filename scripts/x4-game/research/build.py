@@ -82,15 +82,17 @@ def _split_tags(tags_str: str) -> List[str]:
     return [t for t in tags_str.split() if t]
 
 
-def _classify(ware_id: str, tags: List[str]) -> str:
-    if ware_id in DEFAULT_SET:
-        return "default"
+def _classify(ware_id: str, tags: List[str], research_time: int, cost: Dict[str, int]) -> str:
     is_hidden = "hidden" in tags
     is_missiononly = "missiononly" in tags
-    if is_hidden and not is_missiononly:
-        return "abandoned"
-    if is_missiononly:
+    if is_hidden or is_missiononly:
+        if is_hidden and not is_missiononly:
+            return "abandoned"
         return "mission_progress"
+    if ware_id in DEFAULT_SET:
+        if research_time == 0 and not cost:
+            return "abandoned"
+        return "default"
     return "conditional"
 
 
@@ -157,7 +159,7 @@ def build_research_data(
                     if dep_ware.startswith("research_") and dep_ware not in dependencies:
                         dependencies.append(dep_ware)
 
-        category = _classify(w_id, tags)
+        category = _classify(w_id, tags, research_time, cost)
 
         item: Dict[str, Any] = {
             "id": w_id,

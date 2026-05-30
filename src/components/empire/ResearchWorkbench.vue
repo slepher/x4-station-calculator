@@ -4,7 +4,7 @@ import { useGameDataStore } from '@/store/useGameDataStore'
 import i18n from '@/i18n'
 import type { X4ResearchItem } from '@/types/x4'
 import { buildResearchLayoutGroups, getNodeConnectionSides } from './researchLayout'
-import type { LayoutGroup, LayoutNode, LayoutRow } from './researchLayout'
+import type { LayoutNode, LayoutRow } from './researchLayout'
 import ResearchEdgeLayer from './ResearchEdgeLayer.vue'
 
 const gameData = useGameDataStore()
@@ -35,16 +35,6 @@ const selectedItem = computed(() => {
   if (!selectedItemId.value) return null
   return itemMap.value.get(selectedItemId.value) ?? null
 })
-
-function getVisibleDeps(itemId: string, group: LayoutGroup): X4ResearchItem[] {
-  const visibleIds = new Set(group.rows.flatMap(r => r.nodes).map(n => n.id))
-  const item = itemMap.value.get(itemId)
-  if (!item) return []
-  return item.dependencies
-    .filter(d => visibleIds.has(d))
-    .map(d => itemMap.value.get(d))
-    .filter(Boolean) as X4ResearchItem[]
-}
 
 function makeLayers(row: LayoutRow): LayoutNode[][] {
   const layerMap = new Map<number, LayoutNode[]>()
@@ -98,10 +88,16 @@ function getMissionProgressNotes(item: X4ResearchItem): string[] {
   for (const depId of item.dependencies) {
     const dep = gameData.researchData.items.find(i => i.id === depId)
     if (dep && dep.category === 'mission_progress') {
-      notes.push(`${t('research.note.mission_progress')}: ${displayName(dep)}`)
+      notes.push(displayName(dep))
     }
   }
   return notes
+}
+
+function getMissionProgressTooltip(item: X4ResearchItem): string {
+  const notes = getMissionProgressNotes(item)
+  if (!notes.length) return ''
+  return `${t('research.note.mission_progress')}:\n${notes.join('\n')}`
 }
 
 function getItemDependencies(item: X4ResearchItem): X4ResearchItem[] {
@@ -182,18 +178,19 @@ function closeDetail() {
               :class="{ 'is-selected': selectedItemId === ln.id, 'is-conditional': itemMap.get(ln.id)?.category === 'conditional' }"
               @click.stop="selectItem(ln.id)"
             >
-              <div class="research-node-name">{{ displayName(itemMap.get(ln.id)!) }}</div>
-              <div class="research-node-meta">
-                <span v-if="itemMap.get(ln.id)!.researchTime > 0" class="research-node-time">{{ itemMap.get(ln.id)!.researchTime }}s</span>
-                <span v-if="Object.keys(itemMap.get(ln.id)!.cost).length > 0" class="research-node-cost">{{ Object.keys(itemMap.get(ln.id)!.cost).length }}{{ t('research.resource_count') }}</span>
-                <span v-if="itemMap.get(ln.id)?.category === 'conditional'" class="research-node-cond-tag">{{ t('research.tag_conditional') }}</span>
-              </div>
-              <div v-if="getVisibleDeps(ln.id, group).length > 0" class="research-node-deps">
-                {{ t('research.deps_prefix') }}: {{ getVisibleDeps(ln.id, group).map(d => displayName(d)).join(', ') }}
-              </div>
-              <div v-for="note in getMissionProgressNotes(itemMap.get(ln.id)!)" :key="note" class="research-node-note">
-                {{ note }}
-              </div>
+            <div class="research-node-name">
+              {{ displayName(itemMap.get(ln.id)!) }}
+              <span
+                v-if="getMissionProgressNotes(itemMap.get(ln.id)!).length > 0"
+                class="research-info-icon"
+                v-tippy="{ content: getMissionProgressTooltip(itemMap.get(ln.id)!), placement: 'top', theme: 'material' }"
+              >ⓘ</span>
+            </div>
+            <div class="research-node-meta">
+              <span v-if="itemMap.get(ln.id)!.researchTime > 0" class="research-node-time">{{ itemMap.get(ln.id)!.researchTime }}s</span>
+              <span v-if="Object.keys(itemMap.get(ln.id)!.cost).length > 0" class="research-node-cost">{{ Object.keys(itemMap.get(ln.id)!.cost).length }}{{ t('research.resource_count') }}</span>
+              <span v-if="itemMap.get(ln.id)?.category === 'conditional'" class="research-node-cond-tag">{{ t('research.tag_conditional') }}</span>
+            </div>
             </div>
           </div>
           <div
@@ -221,17 +218,17 @@ function closeDetail() {
                     ]"
                     @click.stop="selectItem(ln.id)"
                   >
-                    <div class="research-node-name">{{ displayName(itemMap.get(ln.id)!) }}</div>
+                    <div class="research-node-name">{{ displayName(itemMap.get(ln.id)!) }}
+                      <span
+                        v-if="getMissionProgressNotes(itemMap.get(ln.id)!).length > 0"
+                        class="research-info-icon"
+                        v-tippy="{ content: getMissionProgressTooltip(itemMap.get(ln.id)!), placement: 'top', theme: 'material' }"
+                      >ⓘ</span>
+                    </div>
                     <div class="research-node-meta">
                       <span v-if="itemMap.get(ln.id)!.researchTime > 0" class="research-node-time">{{ itemMap.get(ln.id)!.researchTime }}s</span>
                       <span v-if="Object.keys(itemMap.get(ln.id)!.cost).length > 0" class="research-node-cost">{{ Object.keys(itemMap.get(ln.id)!.cost).length }}{{ t('research.resource_count') }}</span>
                       <span v-if="itemMap.get(ln.id)?.category === 'conditional'" class="research-node-cond-tag">{{ t('research.tag_conditional') }}</span>
-                    </div>
-                    <div v-if="getVisibleDeps(ln.id, group).length > 0" class="research-node-deps">
-                      {{ t('research.deps_prefix') }}: {{ getVisibleDeps(ln.id, group).map(d => displayName(d)).join(', ') }}
-                    </div>
-                    <div v-for="note in getMissionProgressNotes(itemMap.get(ln.id)!)" :key="note" class="research-node-note">
-                      {{ note }}
                     </div>
                   </div>
                 </div>
@@ -344,8 +341,22 @@ function closeDetail() {
 
 .research-row-wrap.has-edges {
   overflow-x: auto;
-  position: relative;
-  scrollbar-width: none;
+  padding-bottom: 8px;
+  scrollbar-color: var(--color-border, #444) transparent;
+  scrollbar-width: thin;
+}
+
+.research-row-wrap.has-edges::-webkit-scrollbar {
+  height: 6px;
+}
+
+.research-row-wrap.has-edges::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.research-row-wrap.has-edges::-webkit-scrollbar-thumb {
+  background: var(--color-border, #444);
+  border-radius: 3px;
 }
 
 .research-row-wrap.has-edges::-webkit-scrollbar {
@@ -457,17 +468,19 @@ function closeDetail() {
   font-size: 0.7rem;
 }
 
-.research-node-deps {
-  font-size: 0.7rem;
-  color: var(--color-text-secondary, #666);
-  margin-top: 0.35rem;
-}
-
 .research-node-note {
   font-size: 0.7rem;
   color: var(--color-text-secondary, #555);
   margin-top: 0.25rem;
   font-style: italic;
+}
+
+.research-info-icon {
+  font-size: 0.85rem;
+  color: var(--color-accent, #66aaff);
+  margin-left: 0.35rem;
+  cursor: help;
+  vertical-align: text-top;
 }
 
 .research-overlay {
