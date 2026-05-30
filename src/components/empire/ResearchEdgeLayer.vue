@@ -9,6 +9,10 @@ const props = defineProps<{
 interface RoutedEdge {
   id: string
   d: string
+  x1: number
+  y1: number
+  x2: number
+  y2: number
 }
 
 const svgRef = ref<SVGSVGElement | null>(null)
@@ -60,6 +64,7 @@ function recalculate() {
     nextLines.push({
       id: `${sourceId}:${targetId}`,
       d,
+      x1, y1, x2, y2,
     })
   }
 
@@ -130,6 +135,17 @@ watch(() => props.edges, () => {
       class="research-edge-line"
       :d="line.d"
     />
+    <circle
+      v-for="dot in lines.flatMap(l => [
+        { key: l.id + ':s', cx: l.x1, cy: l.y1 },
+        { key: l.id + ':e', cx: l.x2, cy: l.y2 }
+      ])"
+      :key="dot.key"
+      class="research-edge-dot"
+      :cx="dot.cx"
+      :cy="dot.cy"
+      r="3"
+    />
   </svg>
 </template>
 
@@ -151,5 +167,10 @@ watch(() => props.edges, () => {
   stroke-linejoin: round;
   vector-effect: non-scaling-stroke;
   filter: drop-shadow(0 0 2px rgba(220, 242, 255, 0.85));
+}
+
+.research-edge-dot {
+  fill: rgba(235, 246, 255, 0.95);
+  filter: drop-shadow(0 0 3px rgba(220, 242, 255, 0.9));
 }
 </style>

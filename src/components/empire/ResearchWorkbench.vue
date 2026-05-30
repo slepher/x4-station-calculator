@@ -267,30 +267,6 @@ function makeNodeKey(prefix: string, nodeId: string): string {
   position: relative;
 }
 
-.research-chain-surface .research-node.has-incoming::before,
-.research-chain-surface .research-node.has-outgoing::after {
-  content: '';
-  position: absolute;
-  background: var(--color-accent, #66aaff);
-  opacity: 0.2;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.research-chain-surface .research-node.has-incoming::before {
-  left: -2.5rem;
-  top: 50%;
-  width: 2.5rem;
-  height: 1px;
-}
-
-.research-chain-surface .research-node.has-outgoing::after {
-  right: -2.5rem;
-  top: 50%;
-  width: 2.5rem;
-  height: 1px;
-}
-
 .research-node {
   background: var(--color-bg, #222244);
   border: 1px solid var(--color-border, #333);
