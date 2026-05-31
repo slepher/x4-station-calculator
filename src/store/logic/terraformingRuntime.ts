@@ -407,13 +407,15 @@ export function replayExecutionLog(
     }
 
     // 2. Stat condition goals: apply delta to runningStats
-    // Process airpressure last (derived stat: fixing gases first adjusts airpressure)
+    // Sort: airpressure after its gas contributors (oxygen, methane, CO2)
+    const DERIVED_FROM = new Set(['oxygen', 'methane', 'carbondioxide'])
     const apBeforeLoop = runningStats['airpressure']
     const sortedConditions = project.conditions
       .map((c, i) => ({ condition: c, originalIndex: i }))
       .sort((a, b) => {
-        if (a.condition.stat === 'airpressure') return 1
-        if (b.condition.stat === 'airpressure') return -1
+        if (a.condition.stat === b.condition.stat) return 0
+        if (a.condition.stat === 'airpressure' && DERIVED_FROM.has(b.condition.stat)) return 1
+        if (b.condition.stat === 'airpressure' && DERIVED_FROM.has(a.condition.stat)) return -1
         return 0
       })
     for (const { condition, originalIndex } of sortedConditions) {
