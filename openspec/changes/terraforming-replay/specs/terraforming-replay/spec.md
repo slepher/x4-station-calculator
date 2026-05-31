@@ -347,6 +347,58 @@ Presenter 的 `executionTimeline` 和其他 display 逻辑 MUST 从引擎 step �
 
 **并且** 若 `ReplayResult.steps` 的末尾新增了 auto-event steps（未在原始 log 中），MUST 将其追加到 store
 
+### Requirement: event 阻断 MUST 基于 stat goal 阻止后续 auto-inject
+
+引擎 MUST 维护 `blockedStatIds`（事件条件涉及且已被 goal 阻断的 stat 集合）。
+
+**前提** `flags.goals === true`
+
+**并且** 某 entry 的 evaluation invalid
+
+**当** 该 entry 的 conditions 中有未被满足的 stat，且该 stat 在 `eventStatIds`（来自所有事件的 condition stat 集合）中
+
+**那么** 该 stat MUST 被加入 `blockedStatIds`
+
+**并且** 后续的 per-entry 和 end-of-queue 的 `injectEventsAtPosition` MUST 跳过条件涉及已阻断 stat 的事件
+
+**并且** 初始 phase 的 injection（`injectEventsAtPosition(true)`）MUST NOT 受阻断影响
+
+### Requirement: deriveAirPressure MUST 在 airpressure goal 后调节
+
+引擎在 `generateGoalsForEntry` 中 MUST：
+
+**前提** airpressure 为派生 stat（由氧气+甲烷+CO2 的 `floor(总和/4)` 贡献）
+
+**当** stat conditions 按「氧气/甲烷/CO2 在前，airpressure 在后」顺序处理后
+
+**并且** `runningStats['airpressure']` 在 goal 循环中被修改
+
+**那么** MUST 计算当前气体贡献：`currentContrib = floor((oxygen + methane + CO2) / 4)`，initialContrib = `floor(初始气体/4)`
+
+**并且** MUST 设置 `runningStats['airpressure'] = runningStats['airpressure'] - (currentContrib - initialContrib)`，使随后的 `deriveAirPressure` 将值准确推到目标 state
+
+### Requirement: predecessors MUST 生成 project goal
+
+引擎的 `generateGoalsForEntry` MUST 检查 `project.predecessors`（非仅 `dependencies`）：
+
+**前提** project 有 type=`project` 的 predecessors
+
+**当** `any` predecessors 均未完成
+
+**那么** MUST 为每个 any predecessor 生成 projectGoal（目标 `ref`）
+
+**当** 非-`any` predecessor 未完成
+
+**那么** MUST 为该 predecessor 生成 projectGoal
+
+### Requirement: GoalEntry.statGoal MUST 包含 targetStatConditionIndex
+
+`GoalEntry.statGoal` MUST 包含 `targetStatConditionIndex: number` 字段，记录该 stat goal 对应 project 的 conditions 数组中第几个 condition。presenter 的 `statGoalLineModels` 依赖此字段定位条件定义。
+
+### Requirement: 预防型 goal satisfier MUST 插入队列最前端
+
+`resolveInsertIndex` MUST 检查预防型 goal（`kind === 'preventive'`），若待插入的 project 的 effects 命中预防型 goal 的 `targetStatId`，MUST 返回 0（队列最前端）。
+
 ## REMOVED Requirements
 
 ### Requirement: computeSequentialStatsFromLog MUST 删除

@@ -12,7 +12,11 @@ terraformingRuntime.ts (引擎层 — 纯函数)
 │   │   │   ├── valid → 正常 push step + apply effects
 │   │   │   └── invalid + goals flag
 │   │   │       ├── project dependency unmet → projectGoal (虚拟满足，不应用 effects)
+│   │   │       ├── project predecessor unmet → projectGoal (同上)
+│   │   │       ├── event stat blocking: 首次 unmet → 停止后续同 stat 事件的 auto-inject
 │   │   │       ├── stat condition unmet → statGoal (计算 delta，应用到 runningStats)
+│   │   │       │   └── airpressure goal 额外处理: 减除 gas contribution 后重设,
+│   │   │       │       使 deriveAirPressure 叠加回目标值
 │   │   │       ├── 重新评估 entry → 有效 → 应用 entry 的 effects
 │   │   │       └── push step (标记 valid)
 │   │   │   └── invalid + !goals flag
@@ -44,7 +48,7 @@ terraformingRuntime.ts (引擎层 — 纯函数)
     │   ├── kind: 'stat' | 'project'
     │   ├── position                 // 发生位置 (对应 steps index)
     │   ├── dependentTaskIds         // 依赖此 goal 的 entry.id 列表
-    │   ├── statGoal?: { statId, currentValue, targetValue }
+    │   ├── statGoal?: { statId, currentValue, targetValue, targetStatConditionIndex }
     │   └── projectGoal?: { targetProjectId }
     │
     ├── finalStats                   // 最终 stats
@@ -101,6 +105,12 @@ useTerraformingPresenter (消费层)
 14. **cluster goal** 不进入引擎循环。原因是 cluster objective 只依赖最终状态，不依赖中间步骤。presenter 从 `replayResult.finalStats` / `replayResult.finalCompleted` 判断 `cluster.objectives` 是否满足，不满足则生成 clusterGoal。与现状一致。
 15. **预防型 goal** 同上，不进入引擎循环。presenter 从 `replayResult.finalStats` 检测非 stat 影响的重复事件（如地震）的条件是否满足，满足则生成 `kind: 'preventive'` goal。
 16. **插入到 goal 对应位置**（`resolveInsertIndex`）不受影响。新引擎的 `GoalEntry.position` 语义与现状 `generatedGoals[i].position` 一致（无效 entry 在 steps 中的 index），presenter 交叉比对逻辑不变。
+17. **预防型 goal** 对应的 task 插入到队列最前端（position 0），通过 `resolveInsertIndex` 检查预防型 goal 的 `targetStatId` 并返回 0。
+18. **event 阻断**: 引擎维护 `blockedStatIds`。当 goals flag 开启且某 entry 有未满足的 stat condition 且该 stat 属于 `eventStatIds`（事件的条件 stat），该 stat 被加入 `blockedStatIds`。后续 per-entry 和 end-of-queue 的 auto-event injection 会跳过条件涉及已阻断 stat 的事件。初始 phase 的 injection 不受影响。
+19. **deriveAirPressure 处理**: airpressure 是派生 stat（由氧气+甲烷+CO2 算出）。engine 在 `generateGoalsForEntry` 中（1）按依赖关系排序 conditions（airpressure 排在氧气/甲烷/CO2 之后），（2）在 stat goal for-loop 后：若 airpressure 曾被 goal 修改，减除当前 gas contribution（`floor(气体总和/4)`），使得随后的 `deriveAirPressure` 重算时恰好落在目标值。
+20. **predecessors**: engine 的 `generateGoalsForEntry` 不仅检查 `project.dependencies`，也检查 `project.predecessors`：
+     - `type: 'project', any: true` → 需至少一个已完成，若均未完成则生成所有成员的 projectGoal
+     - `type: 'project', any: false` → 每个未完成成员独立生成 projectGoal
 
 ### 操作行为影响评估
 
