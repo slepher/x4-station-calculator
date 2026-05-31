@@ -388,6 +388,29 @@ export function replayExecutionLog(
     const depGoals = extractUnmetDependencyGoals(
       project.dependencies, runningCompleted, projectMap, clusterProjectIds,
     )
+
+    // Also check predecessors for unmet project goals
+    if (project.predecessors) {
+      const projectPreds = project.predecessors.filter(p => p.type === 'project' && clusterProjectIds.has(p.ref))
+      const anyPreds = projectPreds.filter(p => p.any)
+      const allPreds = projectPreds.filter(p => !p.any)
+      // any: need at least one met; if none met, all become goals
+      if (anyPreds.length > 0) {
+        const anyMet = anyPreds.some(p => (runningCompleted.get(p.ref) ?? 0) > 0)
+        if (!anyMet) {
+          for (const pred of anyPreds) {
+            depGoals.push({ targetProjectId: pred.ref, isRisk: false })
+          }
+        }
+      }
+      // all: each must be met
+      for (const pred of allPreds) {
+        if ((runningCompleted.get(pred.ref) ?? 0) <= 0) {
+          depGoals.push({ targetProjectId: pred.ref, isRisk: false })
+        }
+      }
+    }
+
     const depIdsChosen: string[] = []
     for (const dg of depGoals) {
       const existing = goalEntries.find(g => g.projectGoal?.targetProjectId === dg.targetProjectId)

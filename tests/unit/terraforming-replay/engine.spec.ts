@@ -173,6 +173,19 @@ describe('replayExecutionLog — FrontierEdge', () => {
     expect(apGoal).toBeDefined()
     expect(apGoal!.statGoal!.targetValue).toBe(5)
   })
+
+  it('single afforestation: generates fertilize project goal from predecessor', () => {
+    const cluster = findCluster('FrontierEdge')
+    const draftLog: Array<{ projectId: string }> = [
+      { projectId: 'agr_forestation' },
+    ]
+    const r = run(draftLog, cluster, { evaluations: true, stepSnapshots: true, goals: true })
+    // agr_forestation has agr_fertilize as a predecessor
+    const projGoals = r.goalEntries.filter(g => g.kind === 'project')
+    expect(projGoals.length).toBeGreaterThanOrEqual(1)
+    const fertilizeGoal = projGoals.find(g => g.projectGoal?.targetProjectId === 'agr_fertilize')
+    expect(fertilizeGoal).toBeDefined()
+  })
 })
 
 describe('replayExecutionLog — BlackHoleSun', () => {
