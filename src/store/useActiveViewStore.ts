@@ -125,6 +125,9 @@ export const useActiveViewStore = defineStore('activeView', () => {
   const activeBindingWorkbench = computed<ActiveViewState['activeBindingWorkbench']>({
     get: () => state.value.activeBindingWorkbench,
     set: (val) => {
+      if (val !== 'terraforming') {
+        state.value.activeTerraformingClusterId = null
+      }
       state.value.activeBindingWorkbench = val
       saveToStorage(state.value)
     }
