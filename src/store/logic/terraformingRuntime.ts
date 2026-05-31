@@ -408,6 +408,7 @@ export function replayExecutionLog(
 
     // 2. Stat condition goals: apply delta to runningStats
     // Process airpressure last (derived stat: fixing gases first adjusts airpressure)
+    const apBeforeLoop = runningStats['airpressure']
     const sortedConditions = project.conditions
       .map((c, i) => ({ condition: c, originalIndex: i }))
       .sort((a, b) => {
@@ -441,35 +442,9 @@ export function replayExecutionLog(
       runningStats[condition.stat] = targetValue
     }
 
-    const apBeforeLoop = runningStats['airpressure']
-    for (const { condition, originalIndex } of sortedConditions) {
-      const ci = originalIndex
-      if (!isStatInRuntime(runningStats, condition.stat)) continue
-      if (checkStatConditionMet(condition, currentStats(), data.stats)) continue
-
-      const targetValue = computeTargetValue(condition, currentStats(), data.stats)
-      const currentValue = currentStats()[condition.stat] ?? 0
-
-      const existing = goalEntries.find(
-        g => g.kind === 'stat' && g.statGoal?.statId === condition.stat && g.statGoal?.targetValue === targetValue,
-      )
-      if (existing) {
-        if (!existing.dependentTaskIds.includes(projectId)) {
-          existing.dependentTaskIds.push(projectId)
-        }
-      } else {
-        goalEntries.push({
-          id: `goal-${++goalSeq}`, kind: 'stat', position: stepIndex,
-          dependentTaskIds: [projectId],
-          statGoal: { statId: condition.stat, currentValue, targetValue, targetStatConditionIndex: ci },
-        })
-      }
-
-      runningStats[condition.stat] = targetValue
-    }
-
-    // After applying goals, adjust airpressure to account for derive offset.
-    // Only adjust if airpressure was actually modified by a goal in this loop.
+    // After applying goals, adjust airpressure if it was modified by a goal.
+    // Only adjust when a stat goal actually changed airpressure, to avoid
+    // affecting subsequent entries. deriveAirPressure adds the gas contribution.
     if (apBeforeLoop !== undefined && runningStats['airpressure'] !== undefined
         && runningStats['airpressure'] !== apBeforeLoop) {
       const gases = ['oxygen', 'methane', 'carbondioxide'] as const
