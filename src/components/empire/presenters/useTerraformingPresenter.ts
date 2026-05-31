@@ -24,15 +24,11 @@ import {
   type I18nLookup
 } from '@/store/logic/terraformingTaskResolver'
 import {
-  computeTerraformingRuntimeStats,
   getRuntimeTerraformingProjectIds,
-  applyProjectEffectsToTerraformingStats,
-  computeSequentialStatsFromLog,
-  deriveAirPressure,
-  getTerraformingIgnoredStats,
-  buildTerraformingBaseStats,
-  buildProjectMap,
+  replayExecutionLog,
   type TerraformingExecutionEntry,
+  type GoalEntry,
+  type TerraformingReplayResult,
 } from '@/store/logic/terraformingRuntime'
 import type { ArchiveStationData } from '@/types/saveArchive'
 import type { SavedModule, X4MapCluster, X4MapSector, X4Module } from '@/types/x4'
@@ -720,13 +716,9 @@ function extractHousingTarget(cluster: TerraformingCluster, objectives: ClusterO
   return null
 }
 
-function findTaskNodeById(tree: TaskTree, projectId: string): TaskNode | null {
-  for (const nodes of tree.groups.values()) {
-    for (const node of nodes) {
-      if (node.id === projectId) return node
-    }
-  }
-  return null
+function resolveRebateName(key: string, type: 'wareGroup' | 'ware', moduleGroupNames?: Map<string, string>, wareNames?: Map<string, string>): string {
+  if (type === 'wareGroup') return moduleGroupNames?.get(key) || key
+  return wareNames?.get(key) || key
 }
 
 function getProjectSnapshotStatIds(project: TerraformingProject): string[] {
@@ -910,39 +902,6 @@ function buildEffectItems(
   }
 
   return items
-}
-
-interface CumulativeRebateResult {
-  entries: Array<{ name: string; value: number }>
-  aggregatedByGroup: Record<string, number>
-}
-
-function computeCumulativeRebates(
-  completed: Map<string, number>,
-  data: TerraformingData,
-  moduleGroupNames: Map<string, string>,
-  wareNames: Map<string, string>,
-): CumulativeRebateResult {
-  const aggregated: Record<string, number> = {}
-  for (const [projectId, count] of completed) {
-    if (count <= 0) continue
-    const project = data.projects.find(p => p.id === projectId)
-    if (!project?.rebates) continue
-    for (const rb of project.rebates) {
-      let name = ''
-      if (rb.wareGroup) {
-        name = moduleGroupNames.get(rb.wareGroup) || rb.wareGroup
-      } else if (rb.ware) {
-        name = wareNames.get(rb.ware) || rb.ware
-      }
-      if (!name) continue
-      aggregated[name] = (aggregated[name] ?? 0) + rb.value
-    }
-  }
-  const entries = Object.entries(aggregated)
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([name, value]) => ({ name, value }))
-  return { entries, aggregatedByGroup: aggregated }
 }
 
 type DiscountedWareEntry = { wareId: string; name: string; original: number; discount: number; final: number }
@@ -1411,39 +1370,6 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     return []
   }
 
-  function extractUnmetDependencyGoals(
-    dependency: TerraformingProjectDependency | undefined,
-    completedProjects: Map<string, number>,
-    projectMap: Map<string, TerraformingProject>,
-    runtimeProjectIds: Set<string>,
-  ): { targetProjectId: string; isRisk: boolean }[] {
-    if (!dependency) return []
-    if ('all' in dependency) {
-      return dependency.all.flatMap(child => extractUnmetDependencyGoals(child, completedProjects, projectMap, runtimeProjectIds))
-    }
-    if ('any' in dependency) {
-      const isLeaf = (dep: TerraformingProjectDependency): boolean => 'completed' in dep || 'notCompleted' in dep
-      if (dependency.any.every(isLeaf) && dependency.any.some(d => 'notCompleted' in d)) {
-        const notCompletedIds = dependency.any.filter(d => 'notCompleted' in d).map(d => (d as { notCompleted: string }).notCompleted)
-        const completedIds = dependency.any.filter(d => 'completed' in d).map(d => (d as { completed: string }).completed)
-        const allNotCompletedSatisfied = notCompletedIds.every(pid => (completedProjects.get(pid) ?? 0) <= 0)
-        if (allNotCompletedSatisfied) return []
-        const unsatisfied = completedIds.filter(pid => runtimeProjectIds.has(pid) && (completedProjects.get(pid) ?? 0) <= 0)
-        return unsatisfied.map(pid => ({ targetProjectId: pid, isRisk: false }))
-      }
-      const branchResults = dependency.any.map(child =>
-        extractUnmetDependencyGoals(child, completedProjects, projectMap, runtimeProjectIds)
-      )
-      if (branchResults.some(r => r.length === 0)) return []
-      return branchResults.flat()
-    }
-    if ('completed' in dependency) {
-      if (!runtimeProjectIds.has(dependency.completed)) return []
-      if ((completedProjects.get(dependency.completed) ?? 0) > 0) return []
-      return [{ targetProjectId: dependency.completed, isRisk: false }]
-    }
-    return []
-  }
 
   function checkStatConditionMet(
     condition: StatCondition,
@@ -1473,20 +1399,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     return true
   }
 
-  function isStatAffectingEvent(project: TerraformingProject): boolean {
-    return project.effects.length > 0
-  }
 
-  function getEventStatIds(data: TerraformingData): Set<string> {
-    const ids = new Set<string>()
-    for (const project of data.projects) {
-      if (project.group !== 'events') continue
-      for (const cond of project.conditions) {
-        ids.add(cond.stat)
-      }
-    }
-    return ids
-  }
 
   function checkAllConditions(
     conditions: StatCondition[],
@@ -1496,30 +1409,6 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     return conditions.every(c => checkStatConditionMet(c, stats, statDefs))
   }
 
-  function buildAutoEventStatLines(
-    event: TerraformingProject,
-    beforeStats: Record<string, number>,
-    afterStats: Record<string, number>,
-    data: TerraformingData,
-    statNames: Map<string, string>,
-  ): TerraformingStatLineModel[] {
-    return event.effects
-      .map(effect => {
-        const beforeValue = beforeStats[effect.stat] ?? 0
-        const afterValue = afterStats[effect.stat] ?? 0
-        if (beforeValue === afterValue) return null
-        return buildTimelineStatLineModel(
-          {
-            statId: effect.stat,
-            statName: statNames.get(effect.stat) || effect.stat,
-            beforeValue,
-            afterValue,
-          },
-          data,
-        )
-      })
-      .filter((m): m is TerraformingStatLineModel => m !== null)
-  }
 
   function generateGoalEntries(
     draftEntries: TerraformingDraftExecutionEntry[],
@@ -1528,162 +1417,50 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     pmap: Map<string, TerraformingProject>,
     projectNames: Map<string, string>,
     statNames: Map<string, string>,
-    initialStats: Record<string, number>,
-    finalStats?: Record<string, number>,
-    cumulativeStateAt?: Array<{ stats: Record<string, number> }>,
+    engineGoals: GoalEntry[],
+    replayResult: TerraformingReplayResult,
   ): TerraformingGoalEntry[] {
     let goalSeq = 0
     const nextGoalId = () => `goal-${++goalSeq}`
 
-    // 1. Replay: compute cumulative state through all non-disabled entries
-    let cumulativeStats = { ...initialStats }
-    let cumulativeCompleted = new Map<string, number>()
-    const goalProjectMap = buildProjectMap(data)
-    const goalIgnoredStats = getTerraformingIgnoredStats(cluster)
-    let sequentialGoalStats = { ...initialStats }
+    const goals: TerraformingGoalEntry[] = []
+    for (const eg of engineGoals) {
+      let position = draftEntries.length
+      let minIdx = Infinity
+      for (const depId of eg.dependentTaskIds) {
+        const idx = draftEntries.findIndex(e => e.projectId === depId)
+        if (idx >= 0 && idx < minIdx) minIdx = idx
+      }
+      if (minIdx < Infinity) position = minIdx
 
-    const clusterProjectIds = new Set(getRuntimeTerraformingProjectIds(cluster))
-
-    interface CandidateGoal {
-      id?: string
-      targetProjectId: string | null
-      targetStatId: string | null
-      targetStatConditionIndex?: number
-      dependentTaskIds: Set<string>
+      if (eg.kind === 'stat') {
+        goals.push({
+          id: nextGoalId(), kind: 'stat',
+          label: eg.statGoal ? (statNames.get(eg.statGoal.statId) || eg.statGoal.statId) : '',
+          targetProjectId: null, targetStatId: eg.statGoal?.statId ?? null,
+          position, satisfied: false, hasRisk: false,
+          dependentTaskIds: eg.dependentTaskIds.map(id => draftEntries.find(e => e.projectId === id)?.id ?? id),
+          hasExistingTask: false,
+        })
+      } else if (eg.kind === 'project') {
+        const tid = eg.projectGoal?.targetProjectId ?? ''
+        const draftTask = draftEntries.find(e => e.projectId === tid)
+        goals.push({
+          id: nextGoalId(), kind: 'project',
+          label: projectNames.get(tid) || tid,
+          targetProjectId: tid, targetStatId: null,
+          position, satisfied: false, hasRisk: false,
+          dependentTaskIds: eg.dependentTaskIds.map(id => draftEntries.find(e => e.projectId === id)?.id ?? id),
+          hasExistingTask: !!draftTask, existingDraftEntryId: draftTask?.id,
+        })
+      }
     }
 
-    const projectGoalCandidates = new Map<string, CandidateGoal>()
-    const statGoalCandidates = new Map<string, CandidateGoal & { statCondition: StatCondition }>()
-
-    for (let entryIdx = 0; entryIdx < draftEntries.length; entryIdx++) {
-      const entry = draftEntries[entryIdx]!
-      if (entry.systemDisabled) continue
-      const project = pmap.get(entry.projectId)
-      if (!project) continue
-
-      const lastCumulativeCompleted = new Map(cumulativeCompleted)
-
-      // Use cumulativeStateAt (main replay includes auto-events) for stat condition checking
-      const checkStats = (cumulativeStateAt && cumulativeStateAt[entryIdx]) ? cumulativeStateAt[entryIdx]!.stats : sequentialGoalStats
-
-      // Check project's stat conditions met by cumulative state BEFORE this entry
-      for (let ci = 0; ci < project.conditions.length; ci++) {
-        const condition = project.conditions[ci]!
-        if (!isStatInRuntime(checkStats, condition.stat)) continue
-        if (!checkStatConditionMet(condition, checkStats, data.stats)) {
-          // Compute targetValue for dedup key
-          const statDef = data.stats.find(s => s.id === condition.stat)
-          let tv = 0
-          if (statDef) {
-            const mode = getConditionMode(condition, statDef)
-            const cv = checkStats[condition.stat] ?? 0
-            if (mode === 'value-range') {
-              if (condition.minvalue !== undefined && cv < condition.minvalue) tv = condition.minvalue
-              else if (condition.maxvalue !== undefined && cv > condition.maxvalue) tv = condition.maxvalue
-              else tv = cv
-            } else {
-              const ranges = toScaleRanges(statDef)
-              const currentRange = getCurrentRange(statDef, cv)
-              const currentState = currentRange?.state ?? 0
-              const minState = condition.min
-              const maxState = condition.max
-              if (minState !== undefined && currentState < minState) {
-                const targetRange = ranges.find(r => r.state === minState)
-                tv = targetRange ? targetRange.start : cv
-              } else if (maxState !== undefined && currentState > maxState) {
-                const targetRange = [...ranges].reverse().find(r => r.state === maxState)
-                tv = targetRange ? targetRange.end : cv
-              } else {
-                tv = cv
-              }
-            }
-          }
-          const key = `statGoal:${condition.stat}:${tv}`
-          const existing = statGoalCandidates.get(key)
-          if (existing) {
-            existing.dependentTaskIds.add(entry.id)
-          } else {
-            statGoalCandidates.set(key, {
-              targetProjectId: null,
-              targetStatId: condition.stat,
-              targetStatConditionIndex: ci,
-              dependentTaskIds: new Set([entry.id]),
-              statCondition: condition,
-            })
-          }
-        }
-      }
-
-      // Check dependency expression for unmet project goals
-      const depGoals = extractUnmetDependencyGoals(
-        project.dependencies,
-        lastCumulativeCompleted,
-        pmap,
-        clusterProjectIds,
-      )
-      for (const dg of depGoals) {
-        const key = `project:${dg.targetProjectId}`
-        const existing = projectGoalCandidates.get(key)
-        if (existing) {
-          existing.dependentTaskIds.add(entry.id)
-        } else {
-          projectGoalCandidates.set(key, {
-            targetProjectId: dg.targetProjectId,
-            targetStatId: null,
-            dependentTaskIds: new Set([entry.id]),
-          })
-        }
-      }
-
-      // Check predecessors for unmet project goals
-      if (project.predecessors) {
-        const projectPreds = project.predecessors.filter(p => p.type === 'project' && clusterProjectIds.has(p.ref))
-        const anyPreds = projectPreds.filter(p => p.any)
-        const allPreds = projectPreds.filter(p => !p.any)
-
-        let predsToAdd: typeof anyPreds = []
-        if (anyPreds.length > 0) {
-          const anyMet = anyPreds.some(p => (lastCumulativeCompleted.get(p.ref) ?? 0) > 0)
-          if (!anyMet) {
-            predsToAdd.push(...anyPreds)
-          }
-        }
-        for (const pred of allPreds) {
-          if ((lastCumulativeCompleted.get(pred.ref) ?? 0) <= 0) {
-            predsToAdd.push(pred)
-          }
-        }
-
-        for (const pred of predsToAdd) {
-          const key = `project:${pred.ref}`
-          const existing = projectGoalCandidates.get(key)
-          if (existing) {
-            existing.dependentTaskIds.add(entry.id)
-          } else {
-            projectGoalCandidates.set(key, {
-              targetProjectId: pred.ref,
-              targetStatId: null,
-              dependentTaskIds: new Set([entry.id]),
-            })
-          }
-        }
-      }
-
-      // Apply this entry's effects to cumulative state
-      cumulativeCompleted.set(entry.projectId, (cumulativeCompleted.get(entry.projectId) ?? 0) + 1)
-      sequentialGoalStats = applyProjectEffectsToTerraformingStats(
-        sequentialGoalStats,
-        new Map([[entry.projectId, 1]]),
-        goalProjectMap,
-        goalIgnoredStats,
-      )
-      sequentialGoalStats = deriveAirPressure(cluster, sequentialGoalStats, goalIgnoredStats)
-    }
-
-    // 2. Generate cluster root goals from unmet objectives
-    const clusterGoals: TerraformingGoalEntry[] = []
+    // Cluster goals from objectives
     if (cluster.objectives) {
       const housingTarget = extractHousingTarget(cluster, cluster.objectives)
+      const finalStats = replayResult.finalStats
+      const finalCompleted = replayResult.finalCompleted
       for (let oi = 0; oi < cluster.objectives.length; oi++) {
         const obj = cluster.objectives[oi]!
         let satisfied = false
@@ -1694,186 +1471,50 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
         if (obj.action === 'objective.build_project') {
           const projMatch = obj.textId.match(/^terraforming\.project\.(\w+)\.name$/)
           if (projMatch) {
-            satisfied = (cumulativeCompleted.get(projMatch[1]!) ?? 0) > 0
+            satisfied = (finalCompleted.get(projMatch[1]!) ?? 0) > 0
             targetProjectId = projMatch[1]!
             const project = pmap.get(targetProjectId)
             label = project ? (projectNames.get(targetProjectId) || project.name || targetProjectId) : obj.textId
-          } else {
-            satisfied = true
-            continue
-          }
+          } else { satisfied = true; continue }
         } else if (obj.action === 'objective.build_housing') {
           if (housingTarget !== null) {
-            satisfied = (cumulativeStats.population ?? 0) >= housingTarget
+            satisfied = (finalStats.population ?? 0) >= housingTarget
             targetStatId = 'population'
-            const td = data!
-            label = resolveTerraformingText(obj.textId, td, vI18nLookup)
-            if (obj.textReplaces) {
-              label = resolveWithReplaces(label, obj.textReplaces, td, vI18nLookup)
-            }
-            label = label.replace(/\b\d{4,}\b/g, (m) => parseInt(m, 10).toLocaleString())
-          } else {
-            satisfied = true
-            continue
-          }
-        } else {
-          satisfied = true
-          continue
-        }
+            label = resolveTerraformingText(obj.textId, data, vI18nLookup)
+            if (obj.textReplaces) label = resolveWithReplaces(label, obj.textReplaces, data, vI18nLookup)
+            label = label.replace(/\b\d{4,}\b/g, (m: string) => parseInt(m, 10).toLocaleString())
+          } else { satisfied = true; continue }
+        } else { satisfied = true; continue }
 
         if (!satisfied) {
-          clusterGoals.push({
-            id: nextGoalId(),
-            kind: 'cluster',
-            label: label || obj.textId,
-            targetProjectId,
-            targetStatId,
-            position: -1,
-            satisfied: false,
-            hasRisk: false,
-            dependentTaskIds: [],
-            hasExistingTask: false,
+          goals.push({
+            id: nextGoalId(), kind: 'cluster', label: label || obj.textId,
+            targetProjectId, targetStatId, position: draftEntries.length,
+            satisfied: false, hasRisk: false, dependentTaskIds: [], hasExistingTask: false,
           })
         }
       }
     }
 
-    // 3. Merge: project goals → one per project
-    const mergedGoals: TerraformingGoalEntry[] = []
-
-    for (const [, cg] of projectGoalCandidates) {
-      mergedGoals.push({
-        id: nextGoalId(),
-        kind: 'project',
-        label: projectNames.get(cg.targetProjectId!) || cg.targetProjectId!,
-        targetProjectId: cg.targetProjectId,
-        targetStatId: null,
-        position: -1,
-        satisfied: false,
-        hasRisk: false,
-        dependentTaskIds: [...cg.dependentTaskIds],
-        hasExistingTask: false,
-      })
-    }
-
-    // 4. Merge: stat goals → one per stat+condition combination
-    for (const [, cg] of statGoalCandidates) {
-      const statName = statNames.get(cg.targetStatId!) || cg.targetStatId!
-      mergedGoals.push({
-        id: nextGoalId(),
-        kind: 'stat',
-        label: statName,
-        targetProjectId: null,
-        targetStatId: cg.targetStatId,
-        targetStatConditionIndex: cg.targetStatConditionIndex,
-        position: -1,
-        satisfied: false,
-        hasRisk: false,
-        dependentTaskIds: [...cg.dependentTaskIds],
-        hasExistingTask: false,
-      })
-    }
-
-    // 5. Add cluster goals at the end
-    mergedGoals.push(...clusterGoals)
-
-    // 6. Position: find earliest dependent task index for each goal
-    const entryIndexMap = new Map<string, number>()
-    draftEntries.forEach((e, i) => entryIndexMap.set(e.id, i))
-
-    for (const goal of mergedGoals) {
-      let minIndex = Infinity
-      for (const depId of goal.dependentTaskIds) {
-        const idx = entryIndexMap.get(depId)
-        if (idx !== undefined && idx < minIndex) minIndex = idx
-      }
-      if (goal.kind === 'cluster') {
-        goal.position = draftEntries.length // after all tasks
-      } else if (minIndex !== Infinity) {
-        goal.position = minIndex
-      } else {
-        goal.position = draftEntries.length
-      }
-    }
-
-    // 6.5 Detect goals whose target project already exists as a task in the queue
-    const draftProjectMap = new Map<string, { entryId: string; index: number }>()
-    draftEntries.forEach((e, i) => draftProjectMap.set(e.projectId, { entryId: e.id, index: i }))
-    for (const goal of mergedGoals) {
-      if (goal.targetProjectId) {
-        const draftTask = draftProjectMap.get(goal.targetProjectId)
-        if (draftTask) {
-          goal.hasExistingTask = true
-          goal.existingDraftEntryId = draftTask.entryId
-        }
-      }
-    }
-
-    // 7. Lifecycle filter: check if project goals are satisfied by replay BEFORE their position
-    const filteredGoals: TerraformingGoalEntry[] = []
-    for (const goal of mergedGoals) {
-      if (goal.kind === 'project' && goal.targetProjectId) {
-        // Replay cumulative state at the goal position to check satisfaction
-        let replayCompleted = new Map<string, number>()
-        for (let i = 0; i < goal.position && i < draftEntries.length; i++) {
-          const entry = draftEntries[i]!
-          if (!entry.systemDisabled) {
-            replayCompleted.set(entry.projectId, (replayCompleted.get(entry.projectId) ?? 0) + 1)
-          }
-        }
-        if ((replayCompleted.get(goal.targetProjectId) ?? 0) > 0) {
-          continue // Skip: satisfied before position
-        }
-        goal.satisfied = false
-        filteredGoals.push(goal)
-      } else if (goal.kind === 'stat') {
-        // Check stat satisfaction at goal position
-        if (goal.targetStatId) {
-          const slice = draftEntries.slice(0, Math.min(goal.position, draftEntries.length))
-            .filter(e => !e.systemDisabled)
-          const replayStats = computeSequentialStatsFromLog(cluster, slice, data)
-          const project = pmap.get(draftEntries.find(e => e.id === [...goal.dependentTaskIds][0])?.projectId || '')
-          if (project && goal.targetStatConditionIndex !== undefined) {
-            const condition = project.conditions[goal.targetStatConditionIndex]
-            if (condition) {
-              goal.satisfied = checkStatConditionMet(condition, replayStats, data.stats)
-            }
-          }
-          if (goal.dependentTaskIds.length === 0) goal.satisfied = true
-        }
-        filteredGoals.push(goal)
-      } else {
-        filteredGoals.push(goal)
-      }
-    }
-
-    // 8. Preventive goals for non-stat-affecting repeatable events (quakes)
-    const endStats = finalStats ?? cumulativeStats
+    // Preventive goals
+    const endStats = replayResult.finalStats
     const nonStatRepeatableEvents = data.projects.filter(
-      p => p.group === 'events' && !isStatAffectingEvent(p) && p.repeatCooldown !== null
+      p => p.group === 'events' && p.effects.length === 0 && p.repeatCooldown !== null
     )
     for (const event of nonStatRepeatableEvents) {
       if (!checkAllConditions(event.conditions, endStats, data.stats)) continue
-
       const eventName = projectNames.get(event.id) || event.name || event.id
-      filteredGoals.push({
-        id: nextGoalId(),
-        kind: 'preventive',
-        label: `${eventName}`,
-        targetProjectId: null,
-        targetStatId: 'seismicactivity',
-        position: -1,
-        satisfied: false,
-        hasRisk: true,
-        riskReason: undefined,
-        dependentTaskIds: [],
-        hasExistingTask: false,
+      goals.push({
+        id: nextGoalId(), kind: 'preventive', label: eventName,
+        targetProjectId: null, targetStatId: 'seismicactivity',
+        position: -1, satisfied: false, hasRisk: true,
+        riskReason: undefined, dependentTaskIds: [], hasExistingTask: false,
         relatedEventId: event.id,
       })
     }
 
-    filteredGoals.sort((a, b) => a.position - b.position)
-    return filteredGoals
+    goals.sort((a, b) => a.position - b.position)
+    return goals
   }
 
   function computePlanDraftEntries(): {
@@ -1883,233 +1524,86 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
   } {
     const data = store.terraformingData.value
     const cluster = store.terraformingSelectedCluster.value
-    const entries: TerraformingDraftTimelineEntry[] = []
-    if (!data || !cluster) return { replayEntries: entries, goals: [], cumulativeStateAt: [] }
+    if (!data || !cluster) return { replayEntries: [] as TerraformingDraftTimelineEntry[], goals: [], cumulativeStateAt: [] }
 
-    const c = cluster
-    const d = data
+    const log = draftExecutionLog.value.map(e => ({ projectId: e.projectId }))
+    const result = replayExecutionLog(log, cluster, data, {
+      flags: { evaluations: true, stepSnapshots: true, goals: true },
+    })
 
+    const pmap = projectMap.value
     const projectNames = projectDisplayNames.value
     const translatedGroupNames = groupNames.value
-    const pmap = projectMap.value
-    const statNames = statDisplayNames.value
-    let completedProjects = new Map<string, number>()
-    const ignoredStats = getTerraformingIgnoredStats(cluster!)
-    const projectMapForReplay = buildProjectMap(data)
-    let sequentialStats = buildTerraformingBaseStats(cluster)
 
-    function getSequentialStats() {
-      return deriveAirPressure(c, { ...sequentialStats }, ignoredStats)
-    }
-
-    const eventStatIds = getEventStatIds(data)
-    const runtimeProjectIds = new Set(getRuntimeTerraformingProjectIds(cluster))
-    const statAffectingEvents = data.projects.filter(p => p.group === 'events' && isStatAffectingEvent(p) && runtimeProjectIds.has(p.id))
-    let eventBlocked = false
-    const blockedStatIds = new Set<string>()
-    const insertedEventIds = new Set<string>()
+    const entries: TerraformingDraftTimelineEntry[] = []
     let orderSeq = 0
-    const cumulativeStateAt: Array<{ stats: Record<string, number> }> = []
 
-    function pushTaskEntry(entry: TerraformingDraftExecutionEntry, index: number) {
-      const project = pmap.get(entry.projectId)
-      const beforeStats = computeTerraformingRuntimeStats(c, completedProjects, d)
-      const seqBefore = getSequentialStats()
-      const { clusterProjects } = buildRuntimeClusterForReplay(c, d)
-      const runtimePidSet = new Set(clusterProjects.map(p => p.id))
-      const evaluation = !entry.systemDisabled
-        ? evaluateTerraformingProjectExecution(project, { stats: beforeStats, completedProjects }, pmap, clusterProjects, d.stats)
-        : { valid: false, reasons: entry.systemDisabledReason ? [entry.systemDisabledReason] : [] }
-      const relevantStatIds = project ? getProjectSnapshotStatIds(project) : []
-      const nextCompletedProjects = new Map(completedProjects)
-      if (!entry.systemDisabled) {
-        nextCompletedProjects.set(entry.projectId, (nextCompletedProjects.get(entry.projectId) ?? 0) + 1)
-      }
-      const seqAfter = entry.systemDisabled
-        ? seqBefore
-        : deriveAirPressure(c,
-            applyProjectEffectsToTerraformingStats(
-              sequentialStats,
-              new Map([[entry.projectId, 1]]),
-              projectMapForReplay,
-              ignoredStats,
-            ),
-            ignoredStats,
-          )
-      const statLines = relevantStatIds
-        .filter(statId => isStatInRuntime(seqBefore, statId))
+    for (let i = 0; i < result.steps.length; i++) {
+      const step = result.steps[i]!
+      const project = pmap.get(step.projectId)
+      const draftEntry = draftExecutionLog.value.find(e => e.projectId === step.projectId)
+      const entryId = draftEntry?.id ?? step.projectId
+
+      const beforeStats = step.statsBefore ?? {}
+      const afterStatsObj = step.statsAfter ?? {}
+      const statLines = (project ? getProjectSnapshotStatIds(project) : [])
+        .filter(statId => statId in beforeStats)
         .map(statId => ({
-          statId,
-          statName: statNames.get(statId) || statId,
-          beforeValue: seqBefore[statId] ?? 0,
-          afterValue: seqAfter[statId] ?? 0,
+          statId, statName: (statDisplayNames.value.get(statId) || statId),
+          beforeValue: beforeStats[statId] ?? 0, afterValue: afterStatsObj[statId] ?? 0,
         }))
         .filter(snapshot => snapshot.beforeValue !== snapshot.afterValue)
-        .map(snapshot => buildTimelineStatLineModel(snapshot, d))
+        .map(snapshot => buildTimelineStatLineModel(snapshot, data))
         .filter((model): model is TerraformingStatLineModel => model !== null)
 
-      const previous = draftExecutionLog.value[index - 1]
       let repeatRole: TerraformingDraftRepeatRole = 'single'
       if (isRepeatable(project)) {
-        repeatRole = previous?.projectId === entry.projectId ? 'duplicate' : 'first'
+        const prevTask = entries.filter(e => !e.isEvent).pop()
+        repeatRole = prevTask?.projectId === step.projectId ? 'duplicate' : 'first'
       }
 
-      const entryCumulative = computeCumulativeRebates(completedProjects, d, store.moduleGroupNames.value, store.wareNames.value)
+      const cumulativeRebatesDisplay = (step.cumulativeRebatesAfter ?? []).map(rb => ({
+        name: resolveRebateName(rb.id, rb.type, store.moduleGroupNames.value, store.wareNames.value),
+        value: rb.value,
+      }))
+
       const { discountedWares: entryDw, discountAmount: entryDiscAmt } = computeProjectDiscount(
-        project?.resources,
-        entryCumulative.entries,
-        store.wareGroupMap,
-        store.moduleGroupNames,
-        store.wareNames,
-        useGameDataStore().waresMap,
+        project?.resources, cumulativeRebatesDisplay,
+        store.wareGroupMap, store.moduleGroupNames, store.wareNames, useGameDataStore().waresMap,
       )
+
+      const runtimePidSet = new Set(getRuntimeTerraformingProjectIds(cluster))
+
       entries.push({
-        id: entry.id,
-        order: ++orderSeq,
-        projectId: entry.projectId,
-        projectName: projectNames.get(entry.projectId) || project?.name || entry.projectId,
+        id: entryId, order: ++orderSeq, projectId: step.projectId,
+        projectName: projectNames.get(step.projectId) || project?.name || step.projectId,
         projectGroupName: translatedGroupNames.get(project?.group || '') || project?.group || '',
-        systemDisabled: entry.systemDisabled || false,
-        systemDisabledReason: entry.systemDisabledReason,
-        mutuallyExclusiveWith: entry.mutuallyExclusiveWith,
+        systemDisabled: !step.valid, systemDisabledReason: step.evaluation?.reasons?.join('; '),
+        mutuallyExclusiveWith: draftEntry?.mutuallyExclusiveWith,
         repeatRole,
-        reasons: translateEvaluationReasons(evaluation.reasons, d, vI18nLookup),
+        reasons: step.evaluation ? translateEvaluationReasons(step.evaluation.reasons, data, vI18nLookup) : [],
         dependencies: formatDependencyExpression(project?.dependencies, projectNames, {
           mutuallyExclusive: vI18nLookup('terraforming.mutuallyExclusive') || 'Mutually exclusive',
           notCompletedBranch: vI18nLookup('terraforming.branch.notCompleted') || 'not ',
           completedBranch: vI18nLookup('terraforming.branch.completed') || '',
           or: vI18nLookup('terraforming.or') || ' or ',
         }, runtimePidSet),
-        statLines,
-        price: project?.resources?.price ?? 0,
+        statLines, price: project?.resources?.price ?? 0,
         wares: (project?.resources?.wares || []).map(w => ({
-          name: store.wareNames.value.get(w.ware) || w.ware,
-          amount: w.actualAmount ?? w.amount,
+          name: store.wareNames.value.get(w.ware) || w.ware, amount: w.actualAmount ?? w.amount,
         })),
-        discountAmount: entryDiscAmt,
-        discountedWares: entryDw,
-        isEvent: false,
-        source: entry.source,
+        discountAmount: entryDiscAmt, discountedWares: entryDw,
+        isEvent: step.type === 'auto-event', source: draftEntry?.source ?? 'draft',
       })
-
-      completedProjects = nextCompletedProjects
-      if (!entry.systemDisabled) {
-        sequentialStats = applyProjectEffectsToTerraformingStats(
-          sequentialStats,
-          new Map([[entry.projectId, 1]]),
-          projectMapForReplay,
-          ignoredStats,
-        )
-      }
     }
 
-    function pushEventEntry(event: TerraformingProject) {
-      const evtBeforeStats = getSequentialStats()
-      completedProjects.set(event.id, (completedProjects.get(event.id) ?? 0) + 1)
-      sequentialStats = applyProjectEffectsToTerraformingStats(
-        sequentialStats,
-        new Map([[event.id, 1]]),
-        projectMapForReplay,
-        ignoredStats,
-      )
-      const evtAfterStats = getSequentialStats()
-      const statLines = buildAutoEventStatLines(event, evtBeforeStats, evtAfterStats, data!, statNames)
-
-      entries.push({
-        id: nextDraftId(),
-        order: ++orderSeq,
-        projectId: event.id,
-        projectName: projectNames.get(event.id) || event.name || event.id,
-        projectGroupName: translatedGroupNames.get(event.group) || event.group,
-        systemDisabled: false,
-        repeatRole: 'single',
-        reasons: [],
-        dependencies: [],
-        statLines,
-        price: 0,
-        wares: [],
-        discountAmount: 0,
-        discountedWares: [],
-        isEvent: true,
-        source: 'draft',
-      })
-      insertedEventIds.add(event.id)
-    }
-
-    // Check initial state
-    for (const event of statAffectingEvents) {
-      if (event.repeatCooldown === null && insertedEventIds.has(event.id)) continue
-      if (event.repeatCooldown === null && (completedProjects.get(event.id) ?? 0) > 0) continue
-      const stats = getSequentialStats()
-      if (checkAllConditions(event.conditions, stats, d.stats)) {
-        pushEventEntry(event)
-      }
-    }
-
-    for (let index = 0; index < draftExecutionLog.value.length; index += 1) {
-      const entry = draftExecutionLog.value[index]!
-      const project = pmap.get(entry.projectId)
-      const preStats = getSequentialStats()
-      cumulativeStateAt.push({ stats: { ...preStats } })
-
-      if (!eventBlocked && project && index > 0) {
-        for (const cond of project.conditions) {
-          if (eventStatIds.has(cond.stat) && isStatInRuntime(preStats, cond.stat) && !checkStatConditionMet(cond, preStats, d.stats)) {
-            blockedStatIds.add(cond.stat)
-            break
-          }
-        }
-      }
-
-      // Skip user-added event entries that were already auto-generated
-      if (entry.projectId.startsWith('evt_')) {
-        if (insertedEventIds.has(entry.projectId)) continue
-        insertedEventIds.add(entry.projectId)
-      }
-
-      pushTaskEntry(entry, index)
-
-      // Mark user-added events as inserted to prevent auto-duplication
-      if (entry.projectId.startsWith('evt_')) {
-        insertedEventIds.add(entry.projectId)
-      }
-
-      if (!eventBlocked) {
-        const stats = getSequentialStats()
-        for (const event of statAffectingEvents) {
-          if (event.repeatCooldown === null && insertedEventIds.has(event.id)) continue
-          if (event.conditions.some(c => blockedStatIds.has(c.stat))) continue
-          if (checkAllConditions(event.conditions, stats, d.stats)) {
-            pushEventEntry(event)
-          }
-        }
-      }
-    }
-
-    // End of queue
-    {
-      const stats = getSequentialStats()
-      for (const event of statAffectingEvents) {
-        if (event.repeatCooldown === null && insertedEventIds.has(event.id)) continue
-        if (event.conditions.some(c => blockedStatIds.has(c.stat))) continue
-        if (checkAllConditions(event.conditions, stats, d.stats)) {
-          pushEventEntry(event)
-        }
-      }
-    }
-
-    const endStats = getSequentialStats()
+    const cumulativeStateAt = result.steps
+      .filter(s => s.type === 'task' && s.statsBefore)
+      .map(s => ({ stats: s.statsBefore! }))
 
     const goals = generateGoalEntries(
-      draftExecutionLog.value,
-      cluster,
-      data,
-      pmap,
-      projectNames,
-      statNames,
-      computeTerraformingRuntimeStats(cluster, new Map(), data),
-      endStats,
-      cumulativeStateAt,
+      draftExecutionLog.value, cluster, data, pmap, projectNames, statDisplayNames.value,
+      result.goalEntries, result,
     )
 
     return { replayEntries: entries, goals, cumulativeStateAt }
@@ -2138,14 +1632,23 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
   })
 
   const effectiveCompletedProjects = computed<Map<string, number>>(() => {
-    return isQueueEditing.value ? draftCompletedProjectCounts.value : store.terraformingCompletedProjects.value
+    const data = store.terraformingData.value
+    const cluster = store.terraformingSelectedCluster.value
+    if (!data || !cluster) return new Map()
+    const log = isQueueEditing.value
+      ? draftExecutionLog.value.filter(e => !e.systemDisabled).map(e => ({ projectId: e.projectId }))
+      : store.terraformingExecutionLog.value.map(e => ({ projectId: e.projectId }))
+    return replayExecutionLog(log, cluster, data).finalCompleted
   })
 
   const effectiveCurrentStats = computed<Record<string, number>>(() => {
     const data = store.terraformingData.value
     const cluster = store.terraformingSelectedCluster.value
-    if (!data || !cluster) return store.terraformingCurrentStats.value
-    return computeTerraformingRuntimeStats(cluster, effectiveCompletedProjects.value, data)
+    if (!data || !cluster) return {}
+    const log = isQueueEditing.value
+      ? draftExecutionLog.value.filter(e => !e.systemDisabled).map(e => ({ projectId: e.projectId }))
+      : store.terraformingExecutionLog.value.map(e => ({ projectId: e.projectId }))
+    return replayExecutionLog(log, cluster, data).finalStats
   })
 
   const taskTree = computed<TaskTree | null>(() => {
@@ -2375,135 +1878,76 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     if (!data || !cluster) return []
 
     const log = store.terraformingExecutionLog.value
+    if (log.length === 0) return []
+
+    const result = replayExecutionLog(log.map(e => ({ projectId: e.projectId })), cluster, data, {
+      flags: { evaluations: true, stepSnapshots: true },
+    })
+
     const translatedGroupNames = groupNames.value
     const translatedProjectNames = projectDisplayNames.value
     const translatedStatNames = statDisplayNames.value
     const results: TerraformingExecutionTimelineEntry[] = []
-
-    const evaluateEntry = (
-      entry: TerraformingExecutionEntry,
-      completedProjects: Map<string, number>,
-      seqStats: Record<string, number>,
-    ) => {
-      const beforeStats = seqStats
-      const beforeProjectIds = getRuntimeTerraformingProjectIds(cluster)
-      const runtimeCluster: TerraformingCluster = {
-        ...cluster,
-        projectIds: beforeProjectIds,
-      }
-      const tree = resolveAvailableTasks(runtimeCluster, {
-        stats: beforeStats,
-        completedProjects,
-      }, data)
-      return {
-        beforeStats,
-        tree,
-        node: findTaskNodeById(tree, entry.projectId),
-      }
-    }
-
-    let completedProjects = new Map<string, number>()
     let previousGroupId: string | null = null
-    const ignoredStats = getTerraformingIgnoredStats(cluster)
-    const projectMapInstance = buildProjectMap(data)
-    let sequentialStats = buildTerraformingBaseStats(cluster)
+    let order = 0
 
-    for (let index = 0; index < log.length; index += 1) {
-      const entry = log[index]!
-      const evaluated = evaluateEntry(entry, completedProjects, { ...sequentialStats })
-      const project = projectMap.value.get(entry.projectId)
-      const projectName = translatedProjectNames.get(entry.projectId) || project?.name || entry.projectId
-      const projectGroupId = project?.group || evaluated.node?.group || 'unknown'
+    for (const step of result.steps) {
+      const project = projectMap.value.get(step.projectId)
+      const projectName = translatedProjectNames.get(step.projectId) || project?.name || step.projectId
+      const projectGroupId = project?.group || 'unknown'
       const projectGroupName = translatedGroupNames.get(projectGroupId) || projectGroupId
-      const relevantStatIds = project ? getProjectSnapshotStatIds(project) : []
-      const nextCompletedProjects = new Map(completedProjects)
-      nextCompletedProjects.set(entry.projectId, (nextCompletedProjects.get(entry.projectId) ?? 0) + 1)
-      const afterStats = computeTerraformingRuntimeStats(cluster, nextCompletedProjects, data)
 
-      const sequentialBefore = deriveAirPressure(cluster, { ...sequentialStats }, ignoredStats)
-      sequentialStats = applyProjectEffectsToTerraformingStats(
-        sequentialStats,
-        new Map([[entry.projectId, 1]]),
-        projectMapInstance,
-        ignoredStats,
-      )
-      const sequentialAfter = sequentialStats
-
-      const beforeStatsList = relevantStatIds
-        .filter((statId) => statId in sequentialBefore)
-        .map((statId) => ({
-          statId,
-          statName: translatedStatNames.get(statId) || statId,
-          beforeValue: sequentialBefore[statId] ?? 0,
-          afterValue: sequentialAfter[statId] ?? 0,
-        }))
-        .filter(snapshot => snapshot.beforeValue !== snapshot.afterValue)
+      const beforeStats = step.statsBefore ?? {}
+      const afterStatsObj = step.statsAfter ?? {}
+      const beforeStatsList: TerraformingTimelineStatSnapshot[] = []
+      for (const statId of Object.keys(beforeStats)) {
+        const bv = beforeStats[statId] ?? 0
+        const av = afterStatsObj[statId] ?? 0
+        if (bv !== av) {
+          beforeStatsList.push({ statId, statName: translatedStatNames.get(statId) || statId, beforeValue: bv, afterValue: av })
+        }
+      }
       const statLines = beforeStatsList
         .map(snapshot => buildTimelineStatLineModel(snapshot, data))
         .filter((model): model is TerraformingStatLineModel => model !== null)
 
-      // Compute rebates
-      const cumulative = computeCumulativeRebates(
-        completedProjects,
-        data,
-        store.moduleGroupNames.value,
-        store.wareNames.value,
-      )
-      const afterCumulative = computeCumulativeRebates(
-        nextCompletedProjects,
-        data,
-        store.moduleGroupNames.value,
-        store.wareNames.value,
-      )
-      const rebateChanges: Array<{ name: string; before: number; after: number }> = []
-      for (const ae of afterCumulative.entries) {
-        const before = cumulative.aggregatedByGroup[ae.name] ?? 0
-        const after = ae.value
-        if (before !== after) {
-          rebateChanges.push({ name: ae.name, before, after })
-        }
-      }
-      for (const be of cumulative.entries) {
-        if (!afterCumulative.aggregatedByGroup[be.name]) {
-          rebateChanges.push({ name: be.name, before: be.value, after: 0 })
-        }
-      }
+      const cumulativeRebateEntries = (step.cumulativeRebatesAfter ?? []).map(rb => ({
+        name: resolveRebateName(rb.id, rb.type, store.moduleGroupNames.value, store.wareNames.value),
+        value: rb.value,
+      }))
+
+      const rebateChanges = (step.rebateChanges ?? []).map(rc => ({
+        name: resolveRebateName(rc.key.id, rc.key.type, store.moduleGroupNames.value, store.wareNames.value),
+        before: rc.before,
+        after: rc.after,
+      }))
+
       const projectRebates = project?.rebates?.map(rb => {
-        let name = ''
-        if (rb.wareGroup) {
-          name = store.moduleGroupNames.value.get(rb.wareGroup) || rb.wareGroup
-        } else if (rb.ware) {
-          name = store.wareNames.value.get(rb.ware) || rb.ware
-        }
+        const name = resolveRebateName(rb.wareGroup ?? rb.ware ?? '', rb.wareGroup ? 'wareGroup' : 'ware', store.moduleGroupNames.value, store.wareNames.value)
         return name ? { name, value: rb.value } : null
       }).filter((r): r is { name: string; value: number } => r !== null) || []
 
       const { discountedWares: discountedWaresData, discountAmount: discountAmountVal } = computeProjectDiscount(
         project?.resources,
-        cumulative.entries,
+        cumulativeRebateEntries,
         store.wareGroupMap,
         store.moduleGroupNames,
         store.wareNames,
         useGameDataStore().waresMap,
       )
 
+      const logEntry = log.find(e => e.projectId === step.projectId && e.id)
+
       results.push({
-        id: entry.id,
-        order: index + 1,
-        projectId: entry.projectId,
+        id: logEntry?.id ?? step.projectId,
+        order: ++order,
+        projectId: step.projectId,
         projectName,
         projectGroupId,
         projectGroupName,
         showGroupMarker: projectGroupId !== previousGroupId,
-        wares: project?.resources?.wares?.map(w => ({
-          ware: w.ware,
-          amount: w.amount,
-          actualAmount: w.actualAmount,
-        })) || [],
-        deliveries: (project?.deliveries || []).map(d => ({
-          macro: d.macro,
-          amount: d.amount,
-        })),
+        wares: project?.resources?.wares?.map(w => ({ ware: w.ware, amount: w.amount, actualAmount: w.actualAmount })) || [],
+        deliveries: (project?.deliveries || []).map(d => ({ macro: d.macro, amount: d.amount })),
         deliveryDetails: (() => {
           const allDeliveries = (project?.deliveries || []).map(d => {
             const ds = deliveryShipMap.value.get(d.macro)
@@ -2514,10 +1958,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
           const slots = hqBuildDocks.value?.totalSlots ?? 0
           if (slots > 0) {
             const totalWork = allDeliveries.reduce((s, d) => s + d.totalTime, 0)
-            const parallel = Math.ceil(totalWork / slots)
-            for (const dd of allDeliveries) {
-              dd.totalTime = parallel
-            }
+            for (const dd of allDeliveries) dd.totalTime = Math.ceil(totalWork / slots)
           } else {
             for (const dd of allDeliveries) dd.totalTime = 0
           }
@@ -2528,19 +1969,18 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
         price: project?.resources?.price || 0,
         projectRebates,
         rebateChanges,
-        cumulativeRebates: cumulative.entries,
+        cumulativeRebates: cumulativeRebateEntries,
         discountedWares: discountedWaresData,
         discountAmount: discountAmountVal,
         statLines,
         beforeStats: beforeStatsList,
         afterStats: beforeStatsList,
-        availableBeforeExecution: evaluated.node?.available ?? false,
-        blockedReason: evaluated.node?.available === false ? (evaluated.node.blockedReason || null) : null,
+        availableBeforeExecution: step.valid,
+        blockedReason: step.evaluation?.reasons?.join('; ') || null,
         projectDuration: project?.duration ?? 0,
       })
 
       previousGroupId = projectGroupId
-      completedProjects = nextCompletedProjects
     }
 
     return results
@@ -2568,38 +2008,20 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     }
 
     const translatedProjectNames = projectDisplayNames.value
-    const nextLog = log.filter((_, index) => index !== targetIndex)
-    let replayCounts = new Map<string, number>()
+    const remainingLog = log.filter((_, index) => index !== targetIndex).map(e => ({ projectId: e.projectId }))
+    const result = replayExecutionLog(remainingLog, cluster, data, {
+      flags: { evaluations: true, stepSnapshots: false },
+    })
+
     const affectedEntryIds: string[] = []
     const reasons: string[] = []
-
-    const evaluateEntry = (
-      entry: TerraformingExecutionEntry,
-      completedProjects: Map<string, number>,
-    ) => {
-      const beforeStats = computeTerraformingRuntimeStats(cluster, completedProjects, data)
-      const { clusterProjects } = buildRuntimeClusterForReplay(cluster, data)
-      return evaluateTerraformingProjectExecution(
-        projectMap.value.get(entry.projectId),
-        { stats: beforeStats, completedProjects },
-        projectMap.value,
-        clusterProjects,
-        data.stats,
-      )
-    }
-
-    for (let index = 0; index < nextLog.length; index += 1) {
-      const entry = nextLog[index]!
-      const evaluation = evaluateEntry(entry, replayCounts)
-      if (!evaluation.valid) {
-        if (index >= targetIndex) {
-          affectedEntryIds.push(entry.id)
-          reasons.push(`${translatedProjectNames.get(entry.projectId) || entry.projectId}: ${translateEvaluationReasons(evaluation.reasons, data, vI18nLookup).join('; ') || (vI18nLookup('terraforming.projectBlockedAfterCancel') || 'Blocked after cancel')}`)
-        }
-        continue
+    for (let i = targetIndex; i < result.steps.length; i++) {
+      const step = result.steps[i]!
+      if (!step.valid) {
+        const logEntry = log.find(e => e.id && step.projectId === e.projectId)
+        affectedEntryIds.push(logEntry?.id ?? step.projectId)
+        reasons.push(`${translatedProjectNames.get(step.projectId) || step.projectId}: ${step.evaluation ? translateEvaluationReasons(step.evaluation.reasons, data, vI18nLookup).join('; ') : (vI18nLookup('terraforming.projectBlockedAfterCancel') || 'Blocked after cancel')}`)
       }
-      replayCounts = new Map(replayCounts)
-      replayCounts.set(entry.projectId, (replayCounts.get(entry.projectId) ?? 0) + 1)
     }
 
     return {
@@ -2851,25 +2273,12 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
         })
       }
     } else {
-      const csProjectMap = buildProjectMap(data)
-      const csIgnoredStats = getTerraformingIgnoredStats(cluster)
-      let cumulativeCompleted = new Map<string, number>()
-      let cumulativeStats = buildTerraformingBaseStats(cluster)
-      for (let i = 0; i < draftExecutionLog.value.length; i++) {
-        const entry = draftExecutionLog.value[i]!
-        cumulativeStateAt.push({
-          completed: new Map(cumulativeCompleted),
-          stats: { ...cumulativeStats },
-        })
-        if (!entry.systemDisabled) {
-          cumulativeCompleted.set(entry.projectId, (cumulativeCompleted.get(entry.projectId) ?? 0) + 1)
-          cumulativeStats = applyProjectEffectsToTerraformingStats(
-            cumulativeStats,
-            new Map([[entry.projectId, 1]]),
-            csProjectMap,
-            csIgnoredStats,
-          )
-          cumulativeStats = deriveAirPressure(cluster, cumulativeStats, csIgnoredStats)
+      const r = replayExecutionLog(
+        draftExecutionLog.value.filter(e => !e.systemDisabled).map(e => ({ projectId: e.projectId })),
+        cluster, data, { flags: { stepSnapshots: true } })
+      for (const step of r.steps) {
+        if (step.type === 'task' && step.statsBefore) {
+          cumulativeStateAt.push({ completed: new Map(), stats: { ...step.statsBefore } })
         }
       }
     }
@@ -2883,8 +2292,8 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
       // Get cumulative state at goal's position
       const pos = Math.min(goal.position, cumulativeStateAt.length)
       const stateAt = goal.kind === 'preventive'
-        ? { completed: new Map<string, number>(), stats: replayState.length > 0 && replayState[replayState.length - 1] ? replayState[replayState.length - 1]!.stats : computeTerraformingRuntimeStats(cluster, new Map(), data) }
-        : pos > 0 ? cumulativeStateAt[pos - 1]! : { completed: new Map<string, number>(), stats: computeTerraformingRuntimeStats(cluster, new Map(), data) }
+        ? { completed: new Map<string, number>(), stats: replayState.length > 0 && replayState[replayState.length - 1] ? replayState[replayState.length - 1]!.stats : replayExecutionLog([], cluster, data).finalStats }
+        : pos > 0 ? cumulativeStateAt[pos - 1]! : { completed: new Map<string, number>(), stats: replayExecutionLog([], cluster, data).finalStats }
       const currentValue = stateAt.stats[goal.targetStatId] ?? 0
       const ranges = toScaleRanges(statDef)
       const hasRanges = ranges.length > 0
@@ -3285,26 +2694,12 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     const cluster = store.terraformingSelectedCluster.value
     if (!data || !cluster) return
 
-    const runtimeProjectIds = new Set(getRuntimeTerraformingProjectIds(cluster))
-    const statAffectingEvents = data.projects.filter(p => p.group === 'events' && isStatAffectingEvent(p) && runtimeProjectIds.has(p.id))
-    let triggered = true
-    const maxIterations = 20
-    let iteration = 0
-
-    while (triggered && iteration < maxIterations) {
-      triggered = false
-      iteration++
-
-      const sequentialStats = computeSequentialStatsFromLog(cluster, store.terraformingExecutionLog.value, data)
-      const completedCounts = store.terraformingCompletedProjects.value
-
-      for (const event of statAffectingEvents) {
-        if (event.repeatCooldown === null && (completedCounts.get(event.id) ?? 0) > 0) continue
-        if (checkAllConditions(event.conditions, sequentialStats, data.stats)) {
-          store.appendTerraformingProjectExecution(event.id, 1)
-          triggered = true
-          break
-        }
+    const log = store.terraformingExecutionLog.value.map(e => ({ projectId: e.projectId }))
+    const result = replayExecutionLog(log, cluster, data)
+    const existingEventIds = new Set(log.filter(e => e.projectId.startsWith('evt_')).map(e => e.projectId))
+    for (const step of result.steps) {
+      if (step.type === 'auto-event' && !existingEventIds.has(step.projectId)) {
+        store.appendTerraformingProjectExecution(step.projectId, 1)
       }
     }
   }

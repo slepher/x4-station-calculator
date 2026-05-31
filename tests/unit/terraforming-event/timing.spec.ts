@@ -12,7 +12,7 @@ import type {
   TerraformingStat,
 } from '@/store/logic/terraformingTaskResolver'
 import type { TerraformingExecutionEntry } from '@/store/logic/terraformingRuntime'
-import { computeTerraformingRuntimeStats } from '@/store/logic/terraformingRuntime'
+import { replayExecutionLog } from '@/store/logic/terraformingRuntime'
 import terraformingJson from '@/assets/x4_game_data/9.0-Empire-beta/data/terraforming.json'
 
 const raw = terraformingJson as unknown as TerraformingData & {
@@ -29,12 +29,11 @@ function makeStore(cluster: TerraformingCluster) {
     terraformingSelectedClusterId: computed(() => cluster.id),
     terraformingSelectedCluster: computed(() => cluster),
     terraformingCurrentStats: computed(() => {
-      const m = new Map<string, number>(); for (const e of executionLog.value) m.set(e.projectId, (m.get(e.projectId) ?? 0) + 1)
-      return computeTerraformingRuntimeStats(cluster, m, raw as unknown as TerraformingData)
+      return replayExecutionLog(executionLog.value.map(e => ({ projectId: e.projectId })), cluster, raw as unknown as TerraformingData).finalStats
     }),
     terraformingRuntimeProjectIds: computed(() => cluster.taskProjectIds),
     terraformingCompletedProjects: computed(() => {
-      const m = new Map<string, number>(); for (const e of executionLog.value) m.set(e.projectId, (m.get(e.projectId) ?? 0) + 1); return m
+      return replayExecutionLog(executionLog.value.map(e => ({ projectId: e.projectId })), cluster, raw as unknown as TerraformingData).finalCompleted
     }),
     terraformingExecutionLog: computed(() => executionLog.value),
     terraformingHqStationName: computed(() => ''), terraformingHqArchiveStation: computed(() => null),

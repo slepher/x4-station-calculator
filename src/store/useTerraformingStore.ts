@@ -8,8 +8,8 @@ import type {
 import type { TerraformingData, TerraformingCluster } from './logic/terraformingTaskResolver'
 import {
   buildCompletedProjectsFromExecutionLog,
-  computeTerraformingRuntimeStats,
   getRuntimeTerraformingProjectIds,
+  replayExecutionLog,
   type TerraformingExecutionEntry,
 } from './logic/terraformingRuntime'
 import type { ArchiveStationData } from '@/types/saveArchive'
@@ -243,7 +243,9 @@ export const useTerraformingStore = defineStore('terraforming', () => {
   const currentStats = computed<Record<string, number>>(() => {
     const cluster = selectedCluster.value
     if (!cluster) return {}
-    return computeTerraformingRuntimeStats(cluster, completedProjects.value, terraformingData.value)
+    const data = terraformingData.value
+    if (!data) return {}
+    return replayExecutionLog(executionLog.value, cluster, data).finalStats
   })
 
   const runtimeProjectIds = computed<string[]>(() => {
