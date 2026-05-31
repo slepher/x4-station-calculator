@@ -2538,9 +2538,18 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     const goals = generatedGoals.value
     const pGoals = goals.filter(g => g.kind === 'project' && g.targetProjectId)
     const sGoals = goals.filter(g => g.kind === 'stat')
+    const prevGoals = goals.filter(g => g.kind === 'preventive' && g.targetStatId)
 
     const project = projectMap.value.get(projectId)
     if (!project) return draftExecutionLog.value.length
+
+    // Preventive goals: insert at front if project affects the target stat
+    for (const goal of prevGoals) {
+      if (!goal.targetStatId) continue
+      for (const effect of project.effects) {
+        if (effect.stat === goal.targetStatId) return 0
+      }
+    }
 
     const relevantGoalPositions: number[] = []
 
