@@ -2043,9 +2043,13 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
 
   const hqBuildDocks = computed<{ totalSlots: number } | null>(() => {
     const modules = store.terraformingHqEffectiveModules.value
-    if (!modules.length) return null
     const gameData = useGameDataStore()
     const mm = gameData.modulesMap as Record<string, X4Module>
+    if (!modules.length) {
+      const mod = mm['module_gen_build_dockarea_m_01'] as X4Module | undefined
+      if (mod) return { totalSlots: 1 * mod.buildProcessorCount }
+      return null
+    }
     let totalSlots = 0
     for (const sm of modules) {
       const mod = mm[sm.id] as X4Module | undefined
@@ -2057,10 +2061,17 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
 
   const hqDockModules = computed<Array<{ name: string; count: number; slots: number }>>(() => {
     const modules = store.terraformingHqEffectiveModules.value
-    if (!modules.length) return []
     const gameData = useGameDataStore()
     const localizedMap = gameData.localizedModulesMap as Record<string, { localeName: string; name: string }>
     const mm = gameData.modulesMap as Record<string, X4Module>
+    if (!modules.length) {
+      const mod = mm['module_gen_build_dockarea_m_01'] as X4Module | undefined
+      if (mod) {
+        const name = localizedMap['module_gen_build_dockarea_m_01']!.localeName
+        return [{ name, count: 1, slots: 1 * mod.buildProcessorCount }]
+      }
+      return []
+    }
     const result: Array<{ name: string; count: number; slots: number }> = []
     for (const sm of modules) {
       const mod = mm[sm.id] as X4Module | undefined
