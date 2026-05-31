@@ -338,6 +338,10 @@ export interface X4Module {
 
   // 泊位逻辑 (仅限 pier 模块)
   dockingCount: number;
+
+  // 建造港槽位 (仅限 buildmodule)
+  buildProcessorCount: number;
+  buildShipClasses: string[];
   
   // 颜色标记
   color: string;
@@ -900,6 +904,7 @@ export interface ConnectionValue {
 export interface VersionConfig {
   version: string
   beta: boolean
+  beta_type?: string
   codename: string
   mini_version?: number
   folder_name: string
@@ -910,8 +915,23 @@ export interface VersionConfig {
     setting: string
     save_archives: string
     build_plan_goals: string
+    terraforming: string
   }
   indexeddb_name?: string
+}
+
+export interface TerraformingPlan {
+  id: string
+  mode: 'live' | 'blueprint'
+  planId: string
+  selectedClusterId: string | null
+  executionLogByCluster: Record<string, string[]>
+}
+
+export interface SavedTerraformingState {
+  version: number
+  activeId: string | null
+  list: TerraformingPlan[]
 }
 
 export interface VersionsFile {
@@ -1270,4 +1290,39 @@ export interface ResolvedGroupSaveBinding extends GroupSaveBinding {
 
 export interface ResolvedStationSaveBinding extends StationSaveBinding {
   status: 'ok' | 'missing_at_selected_time'
+}
+
+export interface X4ResearchUnlockParams {
+  sectorMacro?: string
+  sectorNameId?: string
+  shipWareId?: string
+  shipNameId?: string
+  itemWareId?: string
+  itemNameId?: string
+  npcNameId?: string
+  count?: number
+}
+
+export interface X4ResearchUnlock {
+  key: string
+  params?: X4ResearchUnlockParams
+}
+
+export interface X4ResearchItem {
+  id: string
+  nameId: string
+  name: string
+  descriptionId?: string
+  description?: string
+  dlcTag: string
+  tags: string[]
+  category: 'default' | 'abandoned' | 'mission_progress' | 'conditional'
+  researchTime: number
+  cost: Record<string, number>
+  dependencies: string[]
+  unlock?: X4ResearchUnlock
+}
+
+export interface X4ResearchData {
+  items: X4ResearchItem[]
 }

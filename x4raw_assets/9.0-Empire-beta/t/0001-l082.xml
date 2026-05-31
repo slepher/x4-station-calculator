@@ -2944,7 +2944,7 @@
     <t id="11153">명령 대기열 교체</t>
     <t id="11154">전시장 도크</t>
     <t id="11155">이곳에 함선 도킹 요청</t>
-    <t id="11161">Repeat Last Order</t>
+    <t id="11161">마지막 명령 반복 수행</t>
     <t id="11200">(map range 32xx and 83xx continued)역할</t>
     <t id="11201">확실히 해고하시겠습니까?</t>
     <t id="11202">%s($NPC_NAME$) 해고</t>
@@ -3756,10 +3756,10 @@
     <t id="12788">AMD FSR</t>
     <t id="12789">X4를 처음 플레이하시는 분들께는 X4의 오픈 유니버스 여정을 시작하시기 전에 다양한 튜토리얼을 시도해보실 것을 추천드립니다.</t>
     <t id="12790">새 오픈 유니버스 시작</t>
-    <t id="12791">Creator Credit for Uploads</t>
-    <t id="12792">Choose whether to include your forum username when uploading data \(e.g. ships\).</t>
-    <t id="12793">Submit Anonymously</t>
-    <t id="12794">Credit My Forum Username</t>
+    <t id="12791">업로드 콘텐츠 제작자 크레딧</t>
+    <t id="12792">함선 등의 데이터를 업로드할 때 포럼 이용자명을 포함할지 선택하십시오.</t>
+    <t id="12793">익명으로 제출</t>
+    <t id="12794">내 포럼 사용자명 크레딧에 포함</t>
     <t id="12800">(Diplomacy menu)</t>
     <t id="12801">대사관 행동</t>
     <t id="12803">외교관</t>
@@ -9304,7 +9304,7 @@
     <t id="911">스테이션 방문</t>
     <t id="912">다양한 세력 소유의 주요 스테이션을 방문합니다.</t>
     <t id="921">탐사</t>
-    <t id="922">자원 지역을 찾아 자원 탐사정으로 표시하고, 예전에 배치한 탐사정을 회수하거나 재배치 합니다.</t>
+    <t id="922">자원 지역을 찾아 자원 탐사정으로 표시합니다.</t>
     <t id="10000">항로 제거</t>
     <t id="10001">완료 직전</t>
     <t id="10002">순찰 활성화</t>
@@ -57923,10 +57923,10 @@
     <t id="41602">이 함선의 사령관을 위협하는 주력함 폭격</t>
     <t id="41603">다음을 위해 폭격:</t>
     <t id="41604">다음 사령관을 위해 폭격:</t>
-    <t id="41701">Prospector</t>
-    <t id="41702">Prospect for resources needed by this ship's commander.</t>
-    <t id="41703">Prospect for</t>
-    <t id="41704">Prospect for commander</t>
+    <t id="41701">탐광대</t>
+    <t id="41702">이 함선의 지휘관이 필요로 하는 자원을 탐색</t>
+    <t id="41703">탐광 목표:</t>
+    <t id="41704">지휘관을 위한 탐광</t>
     <t id="50000">(***Tiers***)</t>
     <t id="50101">견습생</t>
     <t id="50201">정식 승무원</t>
@@ -62528,7 +62528,7 @@
     <t id="113">{20104,150101}(Wide Area Sensor Array)</t>
     <t id="114">광역 센서 기기</t>
     <t id="200">목적지: $DESTINATION$ \(지정된 장소에\)</t>
-    <t id="201">Destination: $DESTINATION$</t>
+    <t id="201">목적지: $DESTINATION$</t>
     <t id="300">유효한 방어 스테이션이 되려면, 방어 모듈중 하나는 행정 센터여야 합니다.</t>
     <t id="301">비용은 합리적인 범위 내에서 관대하게 충당됩니다.</t>
     <t id="302">예상 최소 건설비용</t>

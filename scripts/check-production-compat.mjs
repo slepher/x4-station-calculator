@@ -6,7 +6,7 @@ const root = process.cwd()
 const targets = [
   'src/store/useBlueprintProductionStore.ts',
   'src/store/useLiveProductionStore.ts',
-  'src/components/empire/presenters/useProductionTabbarPresenter.ts',
+  'src/components/empire/presenters/useProductionSidebarPresenter.ts',
   'src/components/empire/presenters/useProductionToolbarPresenter.ts',
   'src/components/empire/presenters/useProductionPlanningPresenter.ts',
   'src/components/empire/presenters/useProductionWareflowPresenter.ts',

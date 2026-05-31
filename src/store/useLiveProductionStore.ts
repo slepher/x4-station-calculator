@@ -42,6 +42,7 @@ import { loadPlayerStationsFlatByArchiveId, createArchiveId } from '@/db/saveArc
 import { createProductionModuleActions } from './actions/productionModuleActions'
 import { createProductionWareRuleActions } from './actions/productionWareRuleActions'
 import { createProductionSettingActions, doesStationSettingsAffectFlowMap } from './actions/productionSettingActions'
+import { maxSavedModules } from './logic/planningRecommendedModules'
 
 function mergeSavedModules(modules: SavedModule[]): SavedModule[] {
   const counts = new Map<string, number>()
@@ -452,8 +453,78 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     return planningSourceView.getStationById(stationId)
   }
 
-  const workbenchMode = computed<'station' | 'transit' | 'overview'>(() => {
+  const isTerraformingMode = computed({
+    get: () => activeViewStore.activeBindingWorkbench === 'terraforming',
+    set: (val: boolean) => {
+      if (val) {
+        activeViewStore.activeBindingWorkbench = 'terraforming'
+      } else {
+        if (activeViewStore.activeBindingWorkbench === 'terraforming') {
+          activeViewStore.activeBindingWorkbench = 'overview'
+        }
+      }
+    }
+  })
+
+  const isTechTreeMode = computed({
+    get: () => activeViewStore.activeBindingWorkbench === 'tech-tree',
+    set: (val: boolean) => {
+      if (val) {
+        activeViewStore.activeBindingWorkbench = 'tech-tree'
+      } else {
+        if (activeViewStore.activeBindingWorkbench === 'tech-tree') {
+          activeViewStore.activeBindingWorkbench = 'overview'
+        }
+      }
+    }
+  })
+
+  const workbenchMode = computed<'station' | 'transit' | 'overview' | 'terraforming' | 'tech-tree'>(() => {
+    if (isTerraformingMode.value) return 'terraforming'
+    if (isTechTreeMode.value) return 'tech-tree'
     return activeTransitSectorId.value ? 'transit' : (activeStationId.value ? 'station' : 'overview')
+  })
+
+  const terraformingHqStationCode = computed<string | null>(() => {
+    const semantics = tabSemanticsById.value
+    const stations = orderedStationsBySector.value
+    for (const station of stations) {
+      if (semantics[station.id]?.tag === 'playerhq') {
+        return station.id
+      }
+    }
+    return null
+  })
+
+  const terraformingHqStationName = computed<string>(() => {
+    const code = terraformingHqStationCode.value
+    if (!code) return ''
+    const station = orderedStationsBySector.value.find(s => s.id === code)
+    if (station?.name) return station.name
+    return code
+  })
+
+  const terraformingHqArchiveStation = computed<ArchiveStationData | null>(() => {
+    return getArchiveStationDataByCode(terraformingHqStationCode.value)
+  })
+
+  const terraformingHqEffectiveModules = computed<SavedModule[]>(() => {
+    const archiveModules = archiveCurrentTotalModulesFromArchive(terraformingHqArchiveStation.value)
+    const hqStationCode = terraformingHqStationCode.value
+    if (!hqStationCode) return archiveModules
+    const bindingPlan = activeBinding.value?.stationPlans.find(
+      plan => plan.saveStationCode === hqStationCode
+    )
+    if (!bindingPlan?.modules?.length) return archiveModules
+    return maxSavedModules(bindingPlan.modules, archiveModules)
+  })
+
+  const terraformingHqClusterId = computed<string | null>(() => {
+    const archive = terraformingHqArchiveStation.value
+    if (!archive?.sectorMacro) return null
+    const sectorId = archive.sectorMacro
+    const sector = gameData.maps?.sectors?.[sectorId]
+    return sector?.cluster_id || null
   })
 
   const activeBindingStationId = computed(() => activeTransitSectorId.value ? null : activeStationId.value)
@@ -1365,10 +1436,12 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   }
 
   function selectStation(stationId: string | null) {
+    isTerraformingMode.value = false
     activeStationId.value = stationId
   }
 
   function selectTransitSector(sectorId: string | null) {
+    isTerraformingMode.value = false
     if (!sectorId) {
       activeStationId.value = null
       return
@@ -1377,6 +1450,45 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     if (!exists) return
     const transitTabId = toTransitTabId(sectorId)
     activeStationId.value = transitTabId
+  }
+
+  function selectTerraforming() {
+    isTerraformingMode.value = true
+    activeStationId.value = null
+  }
+
+  function selectTechTree() {
+    isTechTreeMode.value = true
+    activeStationId.value = null
+  }
+
+  function jumpToMapBinding(tabId: string, tabType: 'station' | 'transit') {
+    const gameGuid = activeBinding.value?.gameGuid
+    if (!gameGuid) return
+
+    let sectorGroupId: string | null = null
+
+    if (tabType === 'transit') {
+      sectorGroupId = tabId.replace('transit:', '')
+    } else {
+      const station = derivedBindingStations.value.find(s => s.station.id === tabId)
+      sectorGroupId = station?.groupId ?? null
+    }
+
+    if (!sectorGroupId) return
+
+    activeViewStore.isSavePanelOpen = true
+    activeViewStore.mapBindingGameGuid = gameGuid
+    activeViewStore.mapSavePanelLayer = 'binding-station'
+    activeViewStore.mapSavePanelSectorGroupId = sectorGroupId
+    activeViewStore.setActiveView('maps')
+  }
+
+  function canDeleteStation(stationId: string): boolean {
+    const plan = activeBinding.value?.stationPlans.find(p => p.id === stationId)
+    if (!plan) return false
+    if (plan.saveStationCode) return false
+    return true
   }
 
   function updateStationModules(stationId: string, modules: SavedModule[]) {
@@ -1783,15 +1895,16 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       stationPlansById.set(plan.id, plan)
     })
 
-    const entries = orderedStationsBySector.value.map((station) => {
+     const entries = orderedStationsBySector.value.map((station) => {
       const matchingPlan = stationPlansByCode.get(station.id) || stationPlansById.get(station.id)
+      const liveSemantics = liveFlowMap.value?.getCache(station.id)?.semantics
       const semantics = matchingPlan
         ? planningDerivedMap.value?.getCache(station.id)?.semantics
-        : liveFlowMap.value?.getCache(station.id)?.semantics
+        : liveSemantics
       return [
         station.id,
         {
-          tag: semantics?.tag ?? (matchingPlan ? undefined : 'constructionsite'),
+          tag: liveSemantics?.tag ?? (matchingPlan ? undefined : 'constructionsite'),
           factoryGroup: semantics?.factoryGroup
         }
       ] as const
@@ -1912,6 +2025,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     deleteStation,
     renameStation,
     selectTransitSector,
+    jumpToMapBinding,
+    canDeleteStation,
     setExpandedSector: (sectorId: string | null) => { expandedSectorId.value = sectorId },
     getStationById,
     mode,
@@ -1948,6 +2063,14 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     updateWareflowViewMode: (value: WareFlowViewMode) => { wareflowViewMode.value = value },
     updateBuildPriceMultiplier: (value: number) => { buildPriceMultiplier.value = value },
     duplicateStation: () => null,
-    selectStation
+    selectStation,
+    selectTerraforming,
+    selectTechTree,
+    terraformingHqStationCode,
+    terraformingHqStationName,
+    terraformingHqArchiveStation,
+    terraformingHqEffectiveModules,
+    terraformingHqClusterId,
+    gameDataMaps: computed(() => gameData.maps)
   }
 })

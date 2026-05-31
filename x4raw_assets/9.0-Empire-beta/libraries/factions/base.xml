@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<!--Last exported: 24.07.2025 14:51:53
+<!--Last exported: 21.05.2026 16:17:27
 
 Default Relation Ranges:
   self:          1.0  to  1.0
@@ -692,7 +692,7 @@ Note: Relations defined here apply only to gamestart. Relations may change throu
       <relation faction="xenon" relation="-1"/>
     </relations>
   </faction>
-  <faction id="xenon" name="{20203,1101}" description="{20203,1102}" shortname="{20203,1103}" prefixname="{20203,1104}" spacename="{20203,1105}" homespacename="{20203,1106}" primaryrace="xenon" behaviourset="xenon" tags="claimspace nodiplomacyselection notradeoffer privateloadout privateship">
+  <faction id="xenon" name="{20203,1101}" description="{20203,1102}" shortname="{20203,1103}" prefixname="{20203,1104}" spacename="{20203,1105}" homespacename="{20203,1106}" primaryrace="xenon" behaviourset="xenon" tags="claimspace nobuildunits nodiplomacyselection notradeoffer privateloadout privateship">
     <color ref="faction_xenon"/>
     <icon active="faction_xenon" inactive="faction_xenon" banner="diplomacy_banner_xenon"/>
     <relations locked="1">

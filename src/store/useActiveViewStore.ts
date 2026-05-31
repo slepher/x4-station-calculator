@@ -10,6 +10,9 @@ export interface ActiveViewState {
   activeEmpireStation: string | null
   activeBinding: string | null
   activeBindingStation: string | null
+  activeBindingWorkbench: 'overview' | 'station' | 'transit' | 'terraforming' | 'tech-tree'
+  activeEmpireWorkbench: 'overview' | 'station' | 'terraforming' | 'research'
+  activeTerraformingClusterId: string | null
   activeView: StationActiveView
   isResourcePanelOpen: boolean
   isSavePanelOpen: boolean
@@ -25,6 +28,9 @@ const DEFAULT_STATE: ActiveViewState = {
   activeEmpireStation: null,
   activeBinding: null,
   activeBindingStation: null,
+  activeBindingWorkbench: 'overview',
+  activeEmpireWorkbench: 'overview',
+  activeTerraformingClusterId: null,
   activeView: 'blueprint-production',
   isResourcePanelOpen: false,
   isSavePanelOpen: false,
@@ -47,6 +53,9 @@ function loadFromStorage(): ActiveViewState {
         activeEmpireStation: parsed.activeEmpireStation || null,
         activeBinding: parsed.activeBinding || null,
         activeBindingStation: parsed.activeBindingStation || null,
+        activeBindingWorkbench: parsed.activeBindingWorkbench || 'overview',
+        activeEmpireWorkbench: parsed.activeEmpireWorkbench || 'overview',
+        activeTerraformingClusterId: parsed.activeTerraformingClusterId || null,
         activeView: parsed.activeView || 'blueprint-production'
       }
     }
@@ -55,8 +64,10 @@ function loadFromStorage(): ActiveViewState {
       activeEmpireId: parsed.productionSource === 'empire' ? parsed.activeId : null,
       activeEmpireStation: parsed.productionSource === 'empire' ? parsed.activeStationId : null,
       activeBinding: parsed.productionSource === 'save-binding' ? parsed.activeId : null,
-      activeBindingStation: parsed.productionSource === 'save-binding' ? parsed.activeStationId : null,
-      activeView: parsed.activeView || 'blueprint-production'
+        activeBindingStation: parsed.productionSource === 'save-binding' ? parsed.activeStationId : null,
+        activeBindingWorkbench: parsed.activeStationId ? 'station' : 'overview',
+        activeEmpireWorkbench: parsed.activeStationId ? 'station' : 'overview',
+        activeView: parsed.activeView || 'blueprint-production'
     }
   } catch {
     return { ...DEFAULT_STATE }
@@ -102,6 +113,33 @@ export const useActiveViewStore = defineStore('activeView', () => {
     get: () => state.value.activeBindingStation,
     set: (val: string | null) => {
       state.value.activeBindingStation = val
+      if (val) {
+        state.value.activeBindingWorkbench = 'station'
+      } else if (state.value.activeBindingWorkbench === 'station') {
+        state.value.activeBindingWorkbench = 'overview'
+      }
+      saveToStorage(state.value)
+    }
+  })
+
+  const activeBindingWorkbench = computed<ActiveViewState['activeBindingWorkbench']>({
+    get: () => state.value.activeBindingWorkbench,
+    set: (val) => {
+      if (val !== 'terraforming') {
+        state.value.activeTerraformingClusterId = null
+      }
+      state.value.activeBindingWorkbench = val
+      saveToStorage(state.value)
+    }
+  })
+
+  const activeEmpireWorkbench = computed<ActiveViewState['activeEmpireWorkbench']>({
+    get: () => state.value.activeEmpireWorkbench,
+    set: (val) => {
+      if (val !== 'terraforming') {
+        state.value.activeTerraformingClusterId = null
+      }
+      state.value.activeEmpireWorkbench = val
       saveToStorage(state.value)
     }
   })
@@ -242,6 +280,7 @@ export const useActiveViewStore = defineStore('activeView', () => {
   function switchToBinding(gameGuid: string) {
     state.value.activeBinding = gameGuid
     state.value.activeBindingStation = null
+    state.value.activeBindingWorkbench = 'overview'
     state.value.activeView = 'live-production'
     saveToStorage(state.value)
   }
@@ -267,6 +306,15 @@ export const useActiveViewStore = defineStore('activeView', () => {
     activeEmpireStation,
     activeBinding,
     activeBindingStation,
+    activeBindingWorkbench,
+    activeEmpireWorkbench,
+    activeTerraformingClusterId: computed({
+      get: () => state.value.activeTerraformingClusterId,
+      set: (val: string | null) => {
+        state.value.activeTerraformingClusterId = val
+        saveToStorage(state.value)
+      }
+    }),
     activeView,
     isResourcePanelOpen,
     isSavePanelOpen,

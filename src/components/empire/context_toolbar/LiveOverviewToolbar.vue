@@ -37,7 +37,7 @@ const handleOpenImport = () => {
 
 <template>
   <div class="live-toolbar">
-    <div class="toolbar-content w-full flex items-center">
+    <div class="toolbar-content w-full flex items-center h-full">
       <div class="toolbar-section">
         <div class="input-group">
           <label class="group-label">{{ t('binding.binding_name') }}</label>
@@ -76,7 +76,7 @@ const handleOpenImport = () => {
 
 <style scoped>
 .live-toolbar {
-  @apply w-full h-16 bg-slate-950 border-b border-slate-800 flex items-center px-6 select-none relative z-10;
+  @apply w-full h-16 shrink-0 bg-slate-950 border-b border-slate-800 flex px-6 select-none relative z-10;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
@@ -97,7 +97,7 @@ const handleOpenImport = () => {
 }
 
 .toolbar-import-slot {
-  @apply ml-auto flex items-end h-10;
+  @apply ml-auto flex items-center;
 }
 
 .icon-btn {

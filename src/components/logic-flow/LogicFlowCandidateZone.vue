@@ -550,7 +550,7 @@ defineExpose({
 
 /* --- Main Layout --- */
 .candidate-zone {
-  @apply flex flex-col h-full bg-[#0f172a] border-b border-white/10 shadow-2xl relative z-10;
+  @apply flex flex-col bg-[#0f172a] border-b border-white/10 shadow-2xl relative z-10;
 }
 
 /* --- Plan Title Row --- */
@@ -726,11 +726,11 @@ defineExpose({
 
 /* --- Ware Grid --- */
 .ware-grid {
-  @apply flex-1 overflow-hidden pl-4 pr-8 grid grid-cols-[2fr_3fr_3fr_4fr] gap-12 bg-transparent;
+  @apply overflow-hidden pl-4 pr-8 grid grid-cols-[2fr_3fr_3fr_4fr] gap-12 bg-transparent;
 }
 
 .tier-column {
-  @apply flex flex-col h-full min-w-0;
+  @apply flex flex-col min-w-0;
 }
 
 .tier-header {

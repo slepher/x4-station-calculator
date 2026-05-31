@@ -30,8 +30,10 @@ import type {
   X4Dlc,
   X4SettingStorage,
   X4Ship,
-  X4Equipment
+  X4Equipment,
+  X4ResearchData
 } from '@/types/x4'
+import type { TerraformingData } from './logic/terraformingTaskResolver'
 import { generateFilteredModulesGrouped } from './logic/searchModule'
 import {
   loadGameDataFiles,
@@ -74,6 +76,8 @@ export const useGameDataStore = defineStore('gameData', () => {
   const isReady = ref(false)
   const searchQuery = ref('')
   const gameData = ref<GameDataFiles | null>(null)
+  const terraformingData = ref<TerraformingData | null>(null)
+  const researchData = ref<X4ResearchData | null>(null)
   const waresMap = ref<Record<string, X4Ware>>({})
   const modulesMap = ref<Record<string, X4Module>>({})
   const modulesByMacroId = ref<Record<string, X4Module>>({})
@@ -131,12 +135,14 @@ export const useGameDataStore = defineStore('gameData', () => {
     codename?: string,
     miniVersion?: number
   ): string {
+    const config = versionsConfig.value.find(v => v.version === version && v.beta === beta)
     const resolvedCodename = codename
-      || versionsConfig.value.find(v => v.version === version && v.beta === beta)?.codename
+      || config?.codename
       || currentVersionConfig.value?.codename
       || ''
+    const betaType = config?.beta_type || 'beta'
     const miniSuffix = miniVersion !== undefined ? `-${miniVersion}` : ''
-    return `${version}${resolvedCodename ? `-${resolvedCodename}` : ''}${beta ? '-beta' : ''}${miniSuffix}`
+    return `${version}${resolvedCodename ? `-${resolvedCodename}` : ''}${beta ? `-${betaType}` : ''}${miniSuffix}`
   }
 
   function displayFullVersion(
@@ -148,8 +154,9 @@ export const useGameDataStore = defineStore('gameData', () => {
     const config = isCurrentVersion
       ? currentVersionConfig.value
       : versionsConfig.value.find(v => v.version === version && v.beta === beta)
+    const betaType = config?.beta_type || 'beta'
     const miniSuffix = showMiniVersion && config?.mini_version !== undefined ? `-${config.mini_version}` : ''
-    return `${version}${beta ? '-beta' : ''}${miniSuffix}`
+    return `${version}${beta ? `-${betaType}` : ''}${miniSuffix}`
   }
 
   const versionOptions = computed(() => {
@@ -172,14 +179,15 @@ export const useGameDataStore = defineStore('gameData', () => {
     )
   })
 
-  function getStorageKey(module: 'empire' | 'logic_flow' | 'ship_blueprints' | 'setting' | 'save_archives' | 'build_plan_goals'): string {
+  function getStorageKey(module: 'empire' | 'logic_flow' | 'ship_blueprints' | 'setting' | 'save_archives' | 'build_plan_goals' | 'terraforming'): string {
     const config = currentVersionConfig.value
     if (!config) {
       return module === 'empire' ? 'x4_empire_data' :
              module === 'logic_flow' ? 'x4_logic_flow_plans' :
              module === 'ship_blueprints' ? 'x4_ship_blueprints' :
              module === 'save_archives' ? 'x4_save_archives' :
-             module === 'build_plan_goals' ? 'x4_build_plan_goals' : 'x4-setting'
+             module === 'build_plan_goals' ? 'x4_build_plan_goals' :
+             module === 'terraforming' ? 'x4_terraforming_data' : 'x4-setting'
     }
     return config.storage_keys[module]
   }
@@ -443,6 +451,8 @@ export const useGameDataStore = defineStore('gameData', () => {
     shipSlots.value = data.shipSlots
     languages.value = data.languages
     dlcs.value = data.dlcs
+    terraformingData.value = data.terraforming || null
+    researchData.value = data.research || null
   }
 
   function setVersion(version: string, beta: boolean) {
@@ -545,6 +555,8 @@ export const useGameDataStore = defineStore('gameData', () => {
     isReady,
     searchQuery,
     gameData,
+    terraformingData,
+    researchData,
     waresMap,
     modulesMap,
     modulesByMacroId,

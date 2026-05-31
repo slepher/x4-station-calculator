@@ -5,9 +5,9 @@ import LogicFlowPlanningZone from '@/components/logic-flow/LogicFlowPlanningZone
 </script>
 
 <template>
-  <div class="flow-layout flex flex-col gap-6">
+  <div class="flow-layout flex flex-col gap-2">
     <LogicFlowCandidateZone class="shrink-0" />
     <BuildFlowZone class="shrink-0 relative" />
-    <LogicFlowPlanningZone class="flex-1" />
+    <LogicFlowPlanningZone class="shrink-0" />
   </div>
 </template>

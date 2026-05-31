@@ -3756,10 +3756,10 @@
     <t id="12788">AMD FSR</t>
     <t id="12789">Jeśli po raz pierwszy zetkniesz się z X4, sugerujemy zapoznanie się z kilkoma samouczkami, zanim rozpoczniesz podróż do Otwartego Wszechświata X4.</t>
     <t id="12790">Rozpocznij nowy Otwarty Wszechświat</t>
-    <t id="12791">Creator Credit for Uploads</t>
-    <t id="12792">Choose whether to include your forum username when uploading data \(e.g. ships\).</t>
-    <t id="12793">Submit Anonymously</t>
-    <t id="12794">Credit My Forum Username</t>
+    <t id="12791">Kredyty Twórca za Projekty</t>
+    <t id="12792">Zdecyduj czy dołączyć Twoją nazwę z forum gry gdy wrzucasz materiały \(np. statki\).</t>
+    <t id="12793">Dodaj Anonimowo</t>
+    <t id="12794">Przypisz Do Mojej Nazwy Z Forum</t>
     <t id="12800">(Diplomacy menu)</t>
     <t id="12801">Działania Ambasady</t>
     <t id="12803">Dyplomata</t>
@@ -9304,7 +9304,7 @@
     <t id="911">Odwiedź stacje</t>
     <t id="912">Odwiedza ważne stacje należące do różnych frakcji.</t>
     <t id="921">Poszukuj</t>
-    <t id="922">Znajdź obszary zasobów, oznacz je sondami zasobów, podnieś przestarzałe sondy i rozmieść je ponownie.</t>
+    <t id="922">Znajdź obszary zasobów, oznacz je sondami zasobów.</t>
     <t id="10000">Anuluj trasę</t>
     <t id="10001">Właśnie kończy</t>
     <t id="10002">Aktywuj patrol</t>
@@ -57923,10 +57923,10 @@
     <t id="41602">Bombarduje duże okręty zagrażające dowódcy tego statku.</t>
     <t id="41603">Bombarduje dla</t>
     <t id="41604">Bombarduje dla dowódcy</t>
-    <t id="41701">Prospector</t>
-    <t id="41702">Prospect for resources needed by this ship's commander.</t>
-    <t id="41703">Prospect for</t>
-    <t id="41704">Prospect for commander</t>
+    <t id="41701">Poszukiwacz</t>
+    <t id="41702">Poszukuj zasobów poszukiwanych przez dowódcę tego statku.</t>
+    <t id="41703">Poszukuj</t>
+    <t id="41704">Poszukuj dla dowódcy</t>
     <t id="50000">(***Tiers***)</t>
     <t id="50101">Stażysta</t>
     <t id="50201">Zdolny załogant</t>
@@ -62528,7 +62528,7 @@
     <t id="113">{20104,150101}(Wide Area Sensor Array)</t>
     <t id="114">Szerokopasmowe matryce czujników</t>
     <t id="200">Miejsce docelowe: $DESTINATION$ \(w określonym miejscu\)</t>
-    <t id="201">Destination: $DESTINATION$</t>
+    <t id="201">Cel: $DESTINATION$</t>
     <t id="300">Aby Stacja Obrony działała, jeden z modułów obrony musi być centrum nadzorującym.</t>
     <t id="301">Wydatki zostaną hojnie pokryte, w granicach rozsądku rzecz jasna.</t>
     <t id="302">Szacowany minimalny koszt budowy</t>

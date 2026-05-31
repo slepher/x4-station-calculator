@@ -2,18 +2,23 @@
 import { computed, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useLiveProductionStore } from '@/store/useLiveProductionStore'
+import { useTerraformingStore } from '@/store/useTerraformingStore'
+import { useGameDataStore } from '@/store/useGameDataStore'
 import { useActiveViewStore } from '@/store/useActiveViewStore'
-import { useProductionTabbarPresenter } from '@/components/empire/presenters/useProductionTabbarPresenter'
+import { useProductionSidebarPresenter } from '@/components/empire/presenters/useProductionSidebarPresenter'
 import { useProductionToolbarPresenter } from '@/components/empire/presenters/useProductionToolbarPresenter'
 import { useProductionPlanningPresenter } from '@/components/empire/presenters/useProductionPlanningPresenter'
 import { useProductionWareflowPresenter } from '@/components/empire/presenters/useProductionWareflowPresenter'
 import { useProductionDashboardPresenter } from '@/components/empire/presenters/useProductionDashboardPresenter'
+import { useTerraformingPresenter } from '@/components/empire/presenters/useTerraformingPresenter'
 import StationPlanningPanelWrapper from '@/components/empire/StationPlanningPanelWrapper.vue'
 import StationDashboard from '@/components/empire/StationDashboard.vue'
-import SectorStationTabBar from '@/components/empire/SectorStationTabBar.vue'
+import ProductionSidebar from '@/components/empire/ProductionSidebar.vue'
 import LiveOverviewToolbar from '@/components/empire/context_toolbar/LiveOverviewToolbar.vue'
 import LiveTransitToolbar from '@/components/empire/context_toolbar/LiveTransitToolbar.vue'
 import LiveStationToolbar from '@/components/empire/context_toolbar/LiveStationToolbar.vue'
+import TerraformingToolbar from '@/components/empire/context_toolbar/TerraformingToolbar.vue'
+import TerraformingWorkbench from '@/components/empire/TerraformingWorkbench.vue'
 import StationWareFlowsDashboard from '@/components/empire/StationWareFlowsDashboard.vue'
 import EmpireWareFlowsDashboard from '@/components/empire/EmpireWareFlowsDashboard.vue'
 import TransitHubBuildPanel from '@/components/empire/transit-hub/TransitHubBuildPanel.vue'
@@ -22,51 +27,123 @@ import ArchiveModuleList from '@/components/empire/ArchiveModuleList.vue'
 import ImportPlanModal from '@/components/empire/ImportPlanModal.vue'
 import SaveUploadPanel from '@/components/save/SaveUploadPanel.vue'
 import SaveList from '@/components/save/SaveList.vue'
+import TechTreePlaceholder from '@/components/empire/TechTreePlaceholder.vue'
 
 const liveStore = useLiveProductionStore()
+const terraformingStore = useTerraformingStore()
 const activeViewStore = useActiveViewStore()
+const gameDataStore = useGameDataStore()
 const { t } = useI18n()
 
+const gameDataMaps = computed(() => gameDataStore.maps)
+
 onMounted(() => {
+  terraformingStore.init()
   const gameGuid = activeViewStore.activeBinding
   if (gameGuid) {
     liveStore.activateBinding(gameGuid)
+    terraformingStore.ensurePlanForContext('live', gameGuid)
   }
 })
 
 watch(() => activeViewStore.activeBinding, (newGuid) => {
   if (newGuid) {
     liveStore.activateBinding(newGuid)
+    terraformingStore.ensurePlanForContext('live', newGuid)
   }
 })
 
-const tabbarPresenter = useProductionTabbarPresenter(liveStore)
+const sidebarPresenter = useProductionSidebarPresenter(liveStore)
 const toolbarPresenter = useProductionToolbarPresenter(liveStore)
 const planningPresenter = useProductionPlanningPresenter(liveStore)
 const wareflowPresenter = useProductionWareflowPresenter(liveStore)
 const dashboardPresenter = useProductionDashboardPresenter(liveStore)
+const terraformingPresenter = useTerraformingPresenter({
+  terraformingData: computed(() => terraformingStore.terraformingData),
+  terraformingSelectedClusterId: computed(() => terraformingStore.activePlan?.selectedClusterId ?? null),
+  terraformingSelectedCluster: computed(() => terraformingStore.selectedCluster),
+  terraformingRuntimeProjectIds: computed(() => terraformingStore.runtimeProjectIds),
+  terraformingExecutionLog: computed(() => terraformingStore.executionLog),
+  terraformingHqStationName: computed(() => terraformingStore.hqStationName),
+  terraformingHqArchiveStation: computed(() => terraformingStore.hqArchiveStation),
+  terraformingHqEffectiveModules: computed(() => terraformingStore.hqEffectiveModules),
+  terraformingHqClusterId: computed(() => terraformingStore.hqClusterId),
+  selectTerraformingCluster: (id: string) => terraformingStore.selectCluster(id),
+  setTerraformingCompletedProjects: (projects: Map<string, number>) => {
+    for (const [projectId, count] of projects) {
+      terraformingStore.setProjectCount(projectId, count)
+    }
+  },
+  appendTerraformingProjectExecution: (projectId: string, count?: number) => terraformingStore.appendExecution(projectId, count ?? 1),
+  setTerraformingProjectCount: (projectId: string, count: number) => terraformingStore.setProjectCount(projectId, count),
+  removeTerraformingExecutionEntry: (entryId: string) => terraformingStore.removeExecution(entryId),
+  replaceTerraformingExecutionLog: (entries) => terraformingStore.replaceExecutionLog(entries as any),
+  clearTerraformingExecutionQueue: () => terraformingStore.clearExecutionQueue(),
+  mapsClusters: gameDataMaps.value?.clusters ?? {},
+  mapsSectors: gameDataMaps.value?.sectors ?? {},
+  wareNames: computed(() => {
+    const map = new Map<string, string>()
+    const lwm = gameDataStore.localizedWaresMap
+    for (const [id, ware] of Object.entries(lwm)) {
+      map.set(id, ware.localeName || ware.name || id)
+    }
+    return map
+  }),
+  moduleGroupNames: computed(() => {
+    const map = new Map<string, string>()
+    const mg = gameDataStore.localizedModuleGroupsMap
+    for (const [id, group] of Object.entries(mg)) {
+      map.set(id, group.localeName || group.name || id)
+    }
+    return map
+  }),
+  wareGroupMap: computed(() => {
+    const map = new Map<string, string>()
+    const wm = gameDataStore.waresMap
+    for (const [id, ware] of Object.entries(wm)) {
+      if (ware.group) map.set(id, ware.group)
+    }
+    return map
+  }),
+})
 
 const showArchiveModuleList = computed(() => {
   return planningPresenter.props.visualMode.value === 'live' && planningPresenter.props.hasArchive.value
 })
+
 </script>
 
 <template>
-  <SectorStationTabBar
-    :tabs="tabbarPresenter.props.tabs.value"
-    :active-tab-id="tabbarPresenter.props.activeTabId.value"
-    :expanded-sector-id="tabbarPresenter.props.expandedSectorId.value"
-    :can-create-station="tabbarPresenter.props.canCreateStation"
-    :can-open-context-menu="tabbarPresenter.props.canOpenContextMenu"
-    :context-menu-mode="tabbarPresenter.props.contextMenuMode"
-    @select-overview="tabbarPresenter.emits.selectOverview"
-    @select-transit="tabbarPresenter.emits.selectTransit"
-    @select-station="tabbarPresenter.emits.selectStation"
-    @create-station="tabbarPresenter.emits.createStation"
-    @rename-station="tabbarPresenter.emits.renameStation"
-    @delete-station="tabbarPresenter.emits.deleteStation"
-    @expand-sector="tabbarPresenter.emits.expandSector"
-  />
+  <div class="production-layout">
+    <ProductionSidebar
+      :tabs="sidebarPresenter.props.tabs.value"
+      :active-tab-id="sidebarPresenter.props.activeTabId.value"
+      :expanded-sector-id="sidebarPresenter.props.expandedSectorId.value"
+      :has-sectors="sidebarPresenter.props.hasSectors"
+      :show-terraforming="sidebarPresenter.props.showTerraforming"
+      :show-tech-tree="sidebarPresenter.props.showTechTree"
+      :show-research="sidebarPresenter.props.showResearch"
+      :terraforming-clusters="[]"
+      :active-terraforming-cluster-id="null"
+      :can-create-station="sidebarPresenter.props.canCreateStation"
+      :can-open-context-menu="sidebarPresenter.props.canOpenContextMenu"
+      :context-menu-mode="sidebarPresenter.props.contextMenuMode"
+      :can-delete-station="sidebarPresenter.props.canDeleteStation"
+      @select-overview="sidebarPresenter.emits.selectOverview"
+      @select-terraforming="sidebarPresenter.emits.selectTerraforming"
+      @select-tech-tree="sidebarPresenter.emits.selectTechTree"
+      @select-research="sidebarPresenter.emits.selectResearch"
+      @select-terraforming-cluster="() => {}"
+      @select-transit="sidebarPresenter.emits.selectTransit"
+      @select-station="sidebarPresenter.emits.selectStation"
+      @create-station="sidebarPresenter.emits.createStation"
+      @rename-station="sidebarPresenter.emits.renameStation"
+      @duplicate-station="sidebarPresenter.emits.duplicateStation"
+      @delete-station="sidebarPresenter.emits.deleteStation"
+      @expand-sector="sidebarPresenter.emits.expandSector"
+      @jump-to-binding="(tabId, tabType) => sidebarPresenter.emits.jumpToBinding(tabId, tabType)"
+    />
+    <div class="production-content custom-scrollbar">
   
   <LiveOverviewToolbar
     v-if="toolbarPresenter.props.workbenchMode.value === 'overview' && toolbarPresenter.props.hasActiveBinding.value"
@@ -126,6 +203,19 @@ const showArchiveModuleList = computed(() => {
     @cycle-module-scope="toolbarPresenter.emits.cycleModuleScope"
   />
 
+  <TerraformingToolbar
+    v-if="toolbarPresenter.props.workbenchMode.value === 'terraforming' && toolbarPresenter.props.hasActiveBinding.value"
+    :hq-station-name="terraformingPresenter.props.toolbar.hqStationName.value"
+    :station-code="terraformingPresenter.props.toolbar.stationCode.value"
+    :sector-name="terraformingPresenter.props.toolbar.sectorName.value"
+    :sector-name-id="terraformingPresenter.props.toolbar.sectorNameId.value"
+    :position="terraformingPresenter.props.toolbar.position.value"
+    :sector-resources="terraformingPresenter.props.toolbar.sectorResources.value"
+    :sector-sunlight="terraformingPresenter.props.toolbar.sectorSunlight.value"
+    :single-berth-throughput="terraformingPresenter.props.toolbar.singleBerthThroughput.value"
+    :has-hq-station="terraformingPresenter.props.toolbar.hasHqStation.value"
+  />
+
   <ImportPlanModal
     :isOpen="toolbarPresenter.props.showImportModal.value"
     :initialTab="'logic-flow'"
@@ -140,8 +230,14 @@ const showArchiveModuleList = computed(() => {
     @close="toolbarPresenter.emits.closeImport"
   />
 
-<template v-if="toolbarPresenter.props.workbenchMode.value === 'overview' || toolbarPresenter.props.workbenchMode.value === 'transit'">
-    <div v-if="toolbarPresenter.props.workbenchMode.value === 'transit'" class="main-layout mt-6">
+  <TerraformingWorkbench v-if="toolbarPresenter.props.workbenchMode.value === 'terraforming'" />
+
+  <div v-else-if="toolbarPresenter.props.workbenchMode.value === 'tech-tree'" class="">
+    <TechTreePlaceholder />
+  </div>
+
+  <template v-else-if="toolbarPresenter.props.workbenchMode.value === 'overview' || toolbarPresenter.props.workbenchMode.value === 'transit'">
+    <div v-if="toolbarPresenter.props.workbenchMode.value === 'transit'" class="main-layout">
       <div class="col-span-12 lg:col-span-3">
         <ArchiveModuleList
           v-if="showArchiveModuleList"
@@ -186,7 +282,7 @@ const showArchiveModuleList = computed(() => {
       </div>
     </div>
 
-    <div v-else-if="toolbarPresenter.props.workbenchMode.value === 'overview'" class="main-layout mt-6">
+    <div v-else-if="toolbarPresenter.props.workbenchMode.value === 'overview'" class="main-layout">
       <div class="col-span-12 lg:col-span-3">
         <div class="overview-left-panel panel-card">
           <div class="panel-header">{{ t('save_import.title') }}</div>
@@ -211,7 +307,7 @@ const showArchiveModuleList = computed(() => {
     </div>
   </template>
 
-  <div v-else class="main-layout mt-6">
+  <div v-else class="main-layout">
     <div class="col-span-12 lg:col-span-3">
       <StationPlanningPanelWrapper
         :planned-modules="planningPresenter.props.plannedModules.value"
@@ -281,11 +377,21 @@ const showArchiveModuleList = computed(() => {
       />
     </div>
   </div>
+    </div>
+  </div>
 </template>
 
 <style scoped>
+.production-layout {
+  @apply flex flex-1 min-h-0;
+}
+
+.production-content {
+  @apply flex-1 flex flex-col min-w-0 overflow-y-auto;
+}
+
 .main-layout {
-  @apply grid grid-cols-12 gap-8 items-start;
+  @apply grid grid-cols-12 gap-8 items-start px-4 pt-4;
 }
 
 .overview-left-panel {
@@ -302,5 +408,26 @@ const showArchiveModuleList = computed(() => {
 
 .overview-left-panel .panel-content {
   @apply p-4 flex flex-col gap-4;
+}
+
+.panel-card {
+  @apply bg-slate-900/40 rounded-lg border border-slate-800 shadow-xl overflow-hidden;
+}
+
+.panel-header {
+  @apply h-12 flex items-center px-4 text-slate-200 text-sm font-semibold border-b border-slate-700/50 bg-slate-800/30;
+}
+
+.panel-content {
+  @apply p-2 flex flex-col gap-1 max-h-[calc(100vh-12rem)] overflow-y-auto;
+}
+
+.cluster-item {
+  @apply flex flex-col px-3 py-2 rounded cursor-pointer transition-colors;
+  @apply hover:bg-sky-500/10 text-slate-400 hover:text-slate-200;
+}
+
+.cluster-item.active {
+  @apply bg-sky-500/20 text-sky-400 border border-sky-500/30;
 }
 </style>

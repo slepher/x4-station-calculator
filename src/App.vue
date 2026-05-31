@@ -129,6 +129,22 @@ setTimeout(checkExportStores, 500);
 .tooltip-grid .label { @apply text-slate-400; }
 .tooltip-grid .unit { @apply text-slate-500 text-[10px]; }
 
+.tooltip-wares {
+  @apply px-1 py-0.5;
+}
+
+.tooltip-ware-row {
+  @apply flex justify-between gap-6;
+}
+
+.tooltip-ware-name {
+  @apply text-slate-300;
+}
+
+.tooltip-ware-amount {
+  @apply text-slate-400 text-right ml-4;
+}
+
 .tippy-box[data-theme~='x4'] {
   background-color: #151C2C;
 }

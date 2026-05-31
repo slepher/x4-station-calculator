@@ -21,6 +21,38 @@ except ModuleNotFoundError:
     from scripts.processor.step1_map.service import process_map_for_version  # type: ignore
     from scripts.processor.dlc_tag import build_ware_dlc_tag_map  # type: ignore
 
+# 动态导入 terraforming 模块 (目录名 x4-game 含 hyphen, 不可直接 import)
+import importlib
+_process_terraforming = None
+def _get_process_terraforming():
+    global _process_terraforming
+    if _process_terraforming is not None:
+        return _process_terraforming
+    try:
+        mod = importlib.import_module("scripts.x4-game.terraforming.build")
+    except ModuleNotFoundError:
+        try:
+            mod = importlib.import_module("x4-game.terraforming.build")
+        except ModuleNotFoundError:
+            raise ImportError("Cannot import x4-game.terraforming. Run from project root.")
+    _process_terraforming = mod.process_terraforming
+    return _process_terraforming
+
+_process_research = None
+def _get_process_research():
+    global _process_research
+    if _process_research is not None:
+        return _process_research
+    try:
+        mod = importlib.import_module("scripts.x4-game.research.build")
+    except ModuleNotFoundError:
+        try:
+            mod = importlib.import_module("x4-game.research.build")
+        except ModuleNotFoundError:
+            raise ImportError("Cannot import x4-game.research. Run from project root.")
+    _process_research = mod.process_research
+    return _process_research
+
 # =============================================================================
 # ⚙️ 项目配置
 # =============================================================================
@@ -598,11 +630,22 @@ class X4PrecisionLoader:
                     "workforce": { "capacity": wf_cap, "needed": wf_val, "maxBonus": 0 },
                     "outputs": {}, 
                     "inputs": {},
-                    "dockingCount": 0
+                    "dockingCount": 0,
+                    "buildProcessorCount": 0,
+                    "buildShipClasses": [],
                 }
                 
                 # 初始颜色分配 
                 module_data['color'], module_data['color_rgb'] = self._get_module_colors(m_class)
+
+                # Count build processors for build modules
+                if m_class == 'buildmodule':
+                    bp_connections = macro.findall("./connections/connection[@ref='buildprocessorconnection']")
+                    module_data['buildProcessorCount'] = len(bp_connections)
+                    builder = macro.find('properties/builder')
+                    if builder is not None:
+                        classes_raw = builder.get('classes', '')
+                        module_data['buildShipClasses'] = [c for c in classes_raw.split() if c]
 
                 # Fix: Check identification tag for specific module types
                 ident = macro.find('properties/identification')
@@ -2707,7 +2750,35 @@ class X4PrecisionLoader:
                 item['name'] = en_map[raw_key]
                 count_dlcs += 1
         
-        print(f"   ✅ 更新了 {count_wares} 个商品, {count_mods} 个模块, {count_wg} 个模块分组, {count_ships} 个飞船, {count_equips} 个装备, {count_ship_types} 个船只类型, {count_slot_tags} 个 slot tag, {count_dlcs} 个 DLC 的英文名称。")
+        # terraforming 数据
+        count_tf = 0
+        if hasattr(self, 'terraforming_data') and self.terraforming_data is not None:
+            tf_data = self.terraforming_data
+            for section in ['stats', 'projectGroups', 'projects', 'deliveryShips']:
+                for item in tf_data.get(section, []):
+                    for key in ('nameId', 'descriptionId', 'inactiveTextId'):
+                        raw_key = item.get(key)
+                        if raw_key and raw_key in en_map:
+                            item[key.replace('Id', '')] = en_map[raw_key]
+                            count_tf += 1
+            for item in tf_data.get('stats', []):
+                for r in item.get('ranges', []):
+                    raw_key = r.get('descriptionId')
+                    if raw_key and raw_key in en_map:
+                        r['description'] = en_map[raw_key]
+                        count_tf += 1
+        
+        # research 数据
+        count_rs = 0
+        if hasattr(self, 'research_data') and self.research_data is not None:
+            for item in self.research_data.get('items', []):
+                for key in ('nameId', 'descriptionId'):
+                    raw_key = item.get(key)
+                    if raw_key and raw_key in en_map:
+                        item[key.replace('Id', '')] = en_map[raw_key]
+                        count_rs += 1
+        
+        print(f"   ✅ 更新了 {count_wares} 个商品, {count_mods} 个模块, {count_wg} 个模块分组, {count_ships} 个飞船, {count_equips} 个装备, {count_ship_types} 个船只类型, {count_slot_tags} 个 slot tag, {count_dlcs} 个 DLC, {count_tf} 个 terraforming, {count_rs} 个 research 的英文名称。")
 
     # =======================================================
     # 🆕 4.1. 模块类型分析
@@ -2911,6 +2982,16 @@ class X4PrecisionLoader:
         with open(os.path.join(data_dir, "consumables.json"), 'w', encoding='utf-8') as f:
             json.dump(self.consumables_data, f, indent=2, ensure_ascii=False)
 
+        # terraforming 数据
+        if hasattr(self, 'terraforming_data') and self.terraforming_data is not None:
+            with open(os.path.join(data_dir, "terraforming.json"), 'w', encoding='utf-8') as f:
+                json.dump(self.terraforming_data, f, indent=2, ensure_ascii=False)
+
+        # research 数据
+        if hasattr(self, 'research_data') and self.research_data is not None:
+            with open(os.path.join(data_dir, "research.json"), 'w', encoding='utf-8') as f:
+                json.dump(self.research_data, f, indent=2, ensure_ascii=False)
+
         # 保存语言包
         available_languages = []
         for x4_id, conf in X4_LANG_CONFIG.items():
@@ -2954,6 +3035,8 @@ def run_for_config(effective_config):
     loader._build_bullets()
     loader.process_map_data()
     loader.extract_and_resolve_languages()
+    _get_process_terraforming()(loader)  # terraforming 数据解析
+    _get_process_research()(loader)     # research 数据解析
     loader.analyze_ship_types()
     loader.analyze_equipment_types()
     loader.analyze_slot_tags()

@@ -193,7 +193,7 @@
         <resourcearea amount="2" ref="sphere_small_helium_low_veryslow" />
         <resourcearea amount="2" ref="sphere_large_ore_high_slow" />
         <resourcearea amount="4" ref="sphere_medium_ore_medium_average" />
-        <resourcearea amount="1" ref="sphere_large_rawscrap_verylow_slow" />
+        <resourcearea amount="1" ref="sphere_large_rawscrap_low_slow" />
       </resourceareas>
       <area sunlight="2.66" economy="0.25" security="0.25" tags="noaggressivespawn" jobs="false"/>
     </properties>

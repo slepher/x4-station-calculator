@@ -10364,9 +10364,7 @@
         <quotas>
           <quota galaxy="1"/>
         </quotas>
-        <location class="sector" macro="timelines_map_fleet_battle_1_cluster_001_sector_001_macro" matchextension="false">
-          <region allowhazardous="true"/>
-        </location>
+        <location class="sector" macro="timelines_map_fleet_battle_1_cluster_001_sector_001_macro" matchextension="false"/>
         <!-- will be warped to starting position in md.Scenario_Fleet_Battle_1 -->
         <position x="0" y="0" z="0" pitch="0" roll="0" yaw="180" safepos="false"/>
         <ship macro="ship_ter_xl_carrier_01_a_macro">
@@ -10387,9 +10385,7 @@
         <quotas>
           <quota galaxy="1"/>
         </quotas>
-        <location class="sector" macro="timelines_map_fleet_battle_1_cluster_001_sector_001_macro" matchextension="false">
-          <region allowhazardous="true"/>
-        </location>
+        <location class="sector" macro="timelines_map_fleet_battle_1_cluster_001_sector_001_macro" matchextension="false"/>
         <!-- will be warped to starting position in md.Scenario_Fleet_Battle_1 -->
         <position x="0" y="0" z="0" pitch="0" roll="0" yaw="180" safepos="false"/>
         <ship macro="ship_ter_l_destroyer_01_a_macro">
@@ -10410,9 +10406,7 @@
         <quotas>
           <quota galaxy="1"/>
         </quotas>
-        <location class="sector" macro="timelines_map_fleet_battle_1_cluster_001_sector_001_macro" matchextension="false">
-          <region allowhazardous="true"/>
-        </location>
+        <location class="sector" macro="timelines_map_fleet_battle_1_cluster_001_sector_001_macro" matchextension="false"/>
         <!-- will be warped to starting position in md.Scenario_Fleet_Battle_1 -->
         <position x="0" y="0" z="0" pitch="0" roll="0" yaw="180" safepos="false"/>
         <ship macro="ship_ter_l_destroyer_01_a_macro">

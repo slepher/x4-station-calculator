@@ -14,7 +14,8 @@ import type {
   X4Ship,
   X4Equipment,
   X4Map,
-  SavedSaveBindingsState
+  SavedSaveBindingsState,
+  SavedTerraformingState
 } from '@/types/x4'
 import type { SavedBuildPlanGoalsState } from '@/types/build-plan'
 import type {
@@ -34,11 +35,11 @@ import {
   postProcessRustSaveArchive
 } from '@/workers/saveParser.post'
 import { migrateEmpireStateToCurrent, migrateFlowStateToCurrent, migrateShipBlueprintStateToCurrent } from './stateMigrations'
-import { CURRENT_EMPIRE_VERSION, CURRENT_FLOW_VERSION, CURRENT_SHIP_BLUEPRINT_VERSION } from './storageVersions'
+import { CURRENT_EMPIRE_VERSION, CURRENT_FLOW_VERSION, CURRENT_SHIP_BLUEPRINT_VERSION, CURRENT_TERRAFORMING_VERSION } from './storageVersions'
 import { normalizeSectorLinkKey, parseSectorLinkKey } from './sectorLinks'
 
 export type ImportMode = 'overwrite' | 'incremental'
-export type ImportModuleKey = 'x4_empire_data' | 'x4_logic_flow_plans' | 'x4_ship_blueprints' | 'x4_save_archives' | 'x4_save_bindings' | 'x4_build_plan_goals'
+export type ImportModuleKey = 'x4_empire_data' | 'x4_logic_flow_plans' | 'x4_ship_blueprints' | 'x4_save_archives' | 'x4_save_bindings' | 'x4_build_plan_goals' | 'x4_terraforming_data'
 
 const EMPIRE_KEY: ImportModuleKey = 'x4_empire_data'
 const FLOW_KEY: ImportModuleKey = 'x4_logic_flow_plans'
@@ -46,6 +47,7 @@ const SHIP_KEY: ImportModuleKey = 'x4_ship_blueprints'
 const SAVE_KEY: ImportModuleKey = 'x4_save_archives'
 const BINDING_KEY: ImportModuleKey = 'x4_save_bindings'
 const BUILD_PLAN_KEY: ImportModuleKey = 'x4_build_plan_goals'
+const TERRAFORMING_KEY: ImportModuleKey = 'x4_terraforming_data'
 
 const STORAGE_KEY_MAP: Record<ImportModuleKey, string> = {
   [EMPIRE_KEY]: 'x4_empire_data',
@@ -53,7 +55,8 @@ const STORAGE_KEY_MAP: Record<ImportModuleKey, string> = {
   [SHIP_KEY]: 'x4_ship_blueprints',
   [SAVE_KEY]: 'x4_save_archives',
   [BINDING_KEY]: 'x4_save_bindings',
-  [BUILD_PLAN_KEY]: 'x4_build_plan_goals'
+  [BUILD_PLAN_KEY]: 'x4_build_plan_goals',
+  [TERRAFORMING_KEY]: 'x4_terraforming_data'
 }
 
 export interface SaveArchiveExportData {
@@ -123,6 +126,7 @@ export interface ImportApplyOptions {
   saveStore?: SaveStoreLike
   saveBindingStore?: SaveBindingStoreLike
   buildPlanStore?: BuildPlanStoreLike
+  terraformingStore?: TerraformingStoreLike
 }
 
 export interface ImportApplyResult {
@@ -197,6 +201,12 @@ interface BuildPlanStoreLike {
   savedPlans: SavedBuildPlanGoalsState
   loadPlansFromStorage: () => void
   savePlansToStorage: () => void
+}
+
+interface TerraformingStoreLike {
+  savedPlans: SavedTerraformingState
+  loadFromStorage: () => SavedTerraformingState | null
+  init: () => void
 }
 
 interface ShipSlotRequirement {
@@ -621,7 +631,8 @@ function getImportModulesFromRaw(raw: unknown): Partial<Record<ImportModuleKey, 
       [SHIP_KEY]: raw.data[SHIP_KEY],
       [SAVE_KEY]: raw.data[SAVE_KEY],
       [BINDING_KEY]: raw.data[BINDING_KEY],
-      [BUILD_PLAN_KEY]: raw.data[BUILD_PLAN_KEY]
+      [BUILD_PLAN_KEY]: raw.data[BUILD_PLAN_KEY],
+      [TERRAFORMING_KEY]: raw.data[TERRAFORMING_KEY]
     }
   }
 
@@ -631,7 +642,8 @@ function getImportModulesFromRaw(raw: unknown): Partial<Record<ImportModuleKey, 
     [SHIP_KEY]: raw[SHIP_KEY],
     [SAVE_KEY]: raw[SAVE_KEY],
     [BINDING_KEY]: raw[BINDING_KEY],
-    [BUILD_PLAN_KEY]: raw[BUILD_PLAN_KEY]
+    [BUILD_PLAN_KEY]: raw[BUILD_PLAN_KEY],
+    [TERRAFORMING_KEY]: raw[TERRAFORMING_KEY]
   }
 }
 
@@ -658,6 +670,17 @@ function coerceBuildPlanGoalsState(value: unknown): SavedBuildPlanGoalsState | n
   }
 }
 
+function coerceTerraformingState(value: unknown): SavedTerraformingState | null {
+  if (!isObject(value)) return null
+  const raw = value as Record<string, unknown>
+  if (!Array.isArray(raw.list)) return null
+  return {
+    version: typeof raw.version === 'number' ? raw.version : CURRENT_TERRAFORMING_VERSION,
+    activeId: typeof raw.activeId === 'string' ? raw.activeId : null,
+    list: deepClone(raw.list as any[]) as SavedTerraformingState['list']
+  }
+}
+
 export function normalizeImportPayload(raw: unknown): NormalizedImportPayload {
   return {
     modules: getImportModulesFromRaw(raw),
@@ -674,6 +697,7 @@ export function getModuleImportStats(payload: NormalizedImportPayload): ModuleIm
   const save = coerceSaveExportData(payload.modules[SAVE_KEY])
   const binding = coerceSaveBindingsState(payload.modules[BINDING_KEY])
   const buildPlan = coerceBuildPlanGoalsState(payload.modules[BUILD_PLAN_KEY])
+  const terraforming = coerceTerraformingState(payload.modules[TERRAFORMING_KEY])
 
   if (empire) stats.push({ key: EMPIRE_KEY, count: empire.list.length })
   if (flow) stats.push({ key: FLOW_KEY, count: flow.list.length })
@@ -687,6 +711,7 @@ export function getModuleImportStats(payload: NormalizedImportPayload): ModuleIm
   }
   if (binding) stats.push({ key: BINDING_KEY, count: binding.list.length })
   if (buildPlan) stats.push({ key: BUILD_PLAN_KEY, count: buildPlan.list.length })
+  if (terraforming) stats.push({ key: TERRAFORMING_KEY, count: terraforming.list.length })
 
   return stats
 }
@@ -1054,6 +1079,12 @@ export function prepareImportPayload(
     moduleStats.push({ key: BUILD_PLAN_KEY, count: buildPlan.list.length })
   }
 
+  const terraforming = coerceTerraformingState(payload.modules[TERRAFORMING_KEY])
+  if (terraforming) {
+    preparedModules[TERRAFORMING_KEY] = terraforming
+    moduleStats.push({ key: TERRAFORMING_KEY, count: terraforming.list.length })
+  }
+
   return {
     payload,
     moduleStats,
@@ -1070,7 +1101,8 @@ export function buildExportPayload(
   ship: SavedShipBlueprintsState,
   gameDataStore?: GameDataStoreLike,
   saveBindings?: SavedSaveBindingsState,
-  buildPlanGoals?: SavedBuildPlanGoalsState
+  buildPlanGoals?: SavedBuildPlanGoalsState,
+  terraforming?: SavedTerraformingState
 ) {
   const lookup = gameDataStore || { modulesMap: {}, modulesByMacroId: {} }
   const empireCoerced = coerceEmpireState(empire)
@@ -1085,6 +1117,14 @@ export function buildExportPayload(
   }
   const migratedShip = migrateShipBlueprintStateToCurrent(ship)
 
+  let terraformingData = terraforming ? deepClone(terraforming) : undefined
+  if (terraformingData) {
+    if (!saveBindings) {
+      terraformingData.list = terraformingData.list.filter(p => p.mode !== 'live')
+    }
+    if (terraformingData.list.length === 0) terraformingData = undefined
+  }
+
   return {
     format: 'x4-import-export',
     version: 1,
@@ -1098,7 +1138,8 @@ export function buildExportPayload(
       [FLOW_KEY]: deepClone(migratedFlow),
       [SHIP_KEY]: deepClone(migratedShip.state),
       ...(saveBindings ? { [BINDING_KEY]: deepClone(saveBindings) } : {}),
-      ...(buildPlanGoals ? { [BUILD_PLAN_KEY]: deepClone(buildPlanGoals) } : {})
+      ...(buildPlanGoals ? { [BUILD_PLAN_KEY]: deepClone(buildPlanGoals) } : {}),
+      ...(terraformingData ? { [TERRAFORMING_KEY]: terraformingData } : {})
     }
   }
 }
@@ -1388,6 +1429,57 @@ function applyBuildPlanImport(options: ImportApplyOptions, warnings: string[]): 
   return true
 }
 
+function applyTerraformingImport(options: ImportApplyOptions, _warnings: string[]): boolean {
+  const preparedPayload = options.preparedPayload || prepareImportPayload(options.payload, options.gameDataStore, options.shipBuildStore)
+  const data = preparedPayload.preparedModules[TERRAFORMING_KEY] as SavedTerraformingState | undefined
+  if (!data) return false
+
+  let nextList = data.list
+  const liveSelected = options.selectedModules[SAVE_KEY] || options.selectedModules[BINDING_KEY]
+  const blueprintSelected = options.selectedModules[EMPIRE_KEY] || options.selectedModules[FLOW_KEY]
+    || options.selectedModules[SHIP_KEY] || options.selectedModules[BUILD_PLAN_KEY]
+
+  if (!liveSelected && !blueprintSelected) {
+    nextList = []
+  } else if (!liveSelected) {
+    nextList = nextList.filter(p => p.mode !== 'live')
+  } else if (!blueprintSelected) {
+    nextList = nextList.filter(p => p.mode !== 'blueprint')
+  }
+
+  const next: SavedTerraformingState = data.list.length === nextList.length
+    ? data
+    : { ...data, list: nextList }
+
+  if (next.list.length === 0) return false
+
+  if (options.mode === 'overwrite') {
+    persistModule(TERRAFORMING_KEY, next, options.gameDataStore)
+  } else {
+    if (options.terraformingStore) {
+      const current = deepClone(options.terraformingStore.savedPlans)
+      const remappedList = next.list.map(plan => ({
+        ...deepClone(plan),
+        id: `tp-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+      }))
+      const merged: SavedTerraformingState = {
+        version: next.version,
+        activeId: current.activeId,
+        list: [...current.list, ...remappedList]
+      }
+      persistModule(TERRAFORMING_KEY, merged, options.gameDataStore)
+    } else {
+      persistModule(TERRAFORMING_KEY, next, options.gameDataStore)
+    }
+  }
+
+  if (options.terraformingStore) {
+    options.terraformingStore.init()
+  }
+
+  return true
+}
+
 export async function applyImportPayload(options: ImportApplyOptions): Promise<ImportApplyResult> {
   const preparedPayload = options.preparedPayload || prepareImportPayload(options.payload, options.gameDataStore, options.shipBuildStore)
   const warnings: string[] = [...preparedPayload.warnings]
@@ -1399,7 +1491,8 @@ export async function applyImportPayload(options: ImportApplyOptions): Promise<I
     { key: FLOW_KEY, run: () => applyFlowImport(options, warnings) },
     { key: SHIP_KEY, run: () => applyShipImport(options, warnings) },
     { key: BINDING_KEY, run: () => applySaveBindingImport(options, warnings) },
-    { key: BUILD_PLAN_KEY, run: () => applyBuildPlanImport(options, warnings) }
+    { key: BUILD_PLAN_KEY, run: () => applyBuildPlanImport(options, warnings) },
+    { key: TERRAFORMING_KEY, run: () => applyTerraformingImport(options, warnings) }
   ]
 
   syncEntries.forEach(({ key, run }) => {
