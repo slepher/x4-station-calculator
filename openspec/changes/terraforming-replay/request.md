@@ -53,14 +53,16 @@ interface TerraformingReplayResult {
 |------|-------|-------------|---------------|------|
 | executionTimeline (非Edit) | ❌ | ✅ | ✅ | 从 ReplayResult 读取 steps，加 display 富化 |
 | computePlanDraftEntries (Edit) | ✅ | ✅ | ✅ | 从 ReplayResult 读取 steps + goals，加 draft display |
-| cancel validation (非Edit) | ❌ | ✅ | ❌ | 移除 K 及级联事件后重放，检查后续 entry 的 evaluation |
+| cancel validation (非Edit) | ❌ | ✅ | ❌ | 移除 K 及其后连续紧邻的 event 后重放，检查后续 task 的 evaluation |
 | executeAutoEvents | — | — | — | 引擎内部处理，不再独立存在 |
 
 ### Cancel Validation
 
 11. cancel validation 保持懒计算：展开/点击取消时才跑。
 12. append 后不重算已有项的 cancel validation（维持现状）。
-13. 取消 entry K 时，级联移除 K 及紧随 K 的 auto-event（这些 event 由 K 触发，移除 K 后不再成立），用移除后的 log 跑引擎。
+13. 取消 entry K 时，移除 K 以及 K 后面连续紧邻的所有 event entry，直到遇到下一个非 event entry。合法 log 中 event 只能归属于它前一个 task；若 event 不是由前一个 task 在当前位置触发，属于 replay/log 错误，由 event cursor 规则处理。
+14. cancel validation 对移除后的 log 只跑一次 replay；这次 replay 会重新插入仍可触发的 event。若重新插入的 event 使后续 task 通过校验，则允许 cancel。
+15. cancel validation 的 replay 可以从被取消 task 的上一个保留 entry 的状态开始，只重放后缀；不要求每次从整条 task log 开头重放。该优化不得改变验证结果。
 
 ### 删除清单
 
@@ -82,8 +84,13 @@ interface TerraformingReplayResult {
 
 ### Event 注入收敛规则
 
-26. 引擎注入 event 前检查 `upcomingLogHasEvent(event.id)`：若 log 中存在同名 event，不重复注入。
-27. edit 模式下，goals flag 打开时：若某 entry 的 unmet stat condition 的 stat 属于事件的 condition stat 集合，该 stat 被阻断，后续 per-entry 和 end-of-queue 的 auto-event injection 跳过条件涉及已阻断 stat 的事件。初始 phase 不受影响。
+26. 引擎使用 cursor 从左到右解释 log。event step 的权威来源是 replay 计算，log 中的 event 只是“当前位置可被消费的历史占位”。
+27. 当当前位置计算出应触发 event E 时：若 cursor 指向的下一条 log entry 正好是 E，则消费该 entry 并输出 E step；否则插入新的 E step，cursor 不前进。不得扫描后续全部 log 来判断 E 是否存在。
+28. 当 cursor 遇到 event 但当前位置 replay 未计算出该 event 应触发时：
+   - draft/edit 模式：排除该 event，不输出 step，不应用 effects。
+   - committed/non-edit 模式：保留为 `type: 'auto-event', valid: false` 的 step，不应用 effects，供 timeline 显示历史 stale/misplaced event。
+29. edit 模式下，goals flag 打开时：若某 entry 的 unmet stat condition 的 stat 属于事件的 condition stat 集合，该 stat 被阻断，后续 per-entry 和 end-of-queue 的 auto-event injection 跳过条件涉及已阻断 stat 的事件。初始 phase 不受影响。
+30. 同一个 event 是否可重复触发必须由 event 自身属性决定：`repeatCooldown === null` 的 one-time event 在已有有效 occurrence 后不得再次触发；可重复 event 不得被全局 `projectId` 去重规则误杀。
 
 ### Goal 生成规则
 
@@ -98,9 +105,10 @@ interface TerraformingReplayResult {
 
 ### 接口变更
 
-26. `useTerraformingStore` 不新增 mutation，不改变持久化。引擎是纯计算层。
-27. `TerraformingPresenterStore` 接口增加 `terraformingReplayLog(flags): TerraformingReplayResult`（或等价计算入口），移除 `terraformingCurrentStats`、`terraformingCompletedProjects` 的直接暴露（改为从 replay 结果派生）。
-28. presenter 中 `executeAutoEvents()` 移除，execution log 增删后 presenter 直接调引擎跑一次拿到最终 auto-event 插好的结果，将新增的 event 写回 store。
+30. `useTerraformingStore` 不新增 mutation，不改变持久化。引擎是纯计算层。
+31. `TerraformingPresenterStore` 接口增加 `terraformingReplayLog(flags): TerraformingReplayResult`（或等价计算入口），移除 `terraformingCurrentStats`、`terraformingCompletedProjects` 的直接暴露（改为从 replay 结果派生）。
+32. presenter 中 `executeAutoEvents()` 移除，execution log 增删后 presenter 直接调引擎跑一次拿到最终 auto-event 插好的结果，将新增的 event 写回 store。
+33. store 持久化仍只有 `projectId[]` 序列；`TerraformingExecutionEntry.id` 不是持久业务身份，只能作为 hydrate 后的 UI 临时标识。presenter 从 replay step 回填 timeline id 时必须按 occurrence 顺序消费 log entry，不能用 `projectId` 查找第一条，否则重复 task/event 会映射到错误的 UI 行。
 
 ### 复杂度收益
 
@@ -150,6 +158,7 @@ interface TerraformingReplayResult {
 10. `GoalEntry.statGoal.targetStatConditionIndex` 已填充，UI 可据此显示 stat 变化。
 11. 引擎正确调节 deriveAirPressure（gas contribution 减除），使 airpressure goal 的目标值在 `deriveAirPressure` 重算后准确落在目标 state。
 12. `npm run build` 无编译错误。
+13. 重复出现同一 `projectId` 时，`executionTimeline` 中每一行的 `id` 与对应 log occurrence 一一对应，删除/展开不会串到第一次出现的行。
 
 ## 未决项
 

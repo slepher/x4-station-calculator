@@ -29,6 +29,7 @@ import {
   type TerraformingExecutionEntry,
   type GoalEntry,
   type TerraformingReplayResult,
+  type RebateKey,
 } from '@/store/logic/terraformingRuntime'
 import type { ArchiveStationData } from '@/types/saveArchive'
 import type { SavedModule, X4MapCluster, X4MapSector, X4Module } from '@/types/x4'
@@ -335,9 +336,7 @@ export interface TerraformingPresenterStore {
   terraformingData: ComputedRef<TerraformingData | null>
   terraformingSelectedClusterId: ComputedRef<string | null>
   terraformingSelectedCluster: ComputedRef<TerraformingCluster | null>
-  terraformingCurrentStats: ComputedRef<Record<string, number>>
   terraformingRuntimeProjectIds: ComputedRef<string[]>
-  terraformingCompletedProjects: ComputedRef<Map<string, number>>
   terraformingExecutionLog: ComputedRef<TerraformingExecutionEntry[]>
   terraformingHqStationName: ComputedRef<string>
   terraformingHqArchiveStation: ComputedRef<ArchiveStationData | null>
@@ -908,9 +907,8 @@ type DiscountedWareEntry = { wareId: string; name: string; original: number; dis
 
 function computeProjectDiscount(
   projectResources: { wares: Array<{ ware: string; amount: number; actualAmount?: number }> } | undefined,
-  cumulativeEntries: Array<{ name: string; value: number }>,
+  cumulativeEntries: RebateKey[],
   wareGroupMap: ComputedRef<Map<string, string>>,
-  moduleGroupNames: ComputedRef<Map<string, string>>,
   wareNames: ComputedRef<Map<string, string>>,
   waresMap: Record<string, { maxPrice?: number }>,
 ): { discountedWares: DiscountedWareEntry[]; discountAmount: number } {
@@ -925,8 +923,8 @@ function computeProjectDiscount(
       const amount = w.actualAmount ?? w.amount
       if (amount <= 0) continue
       const groupId = wareGroupMap.value.get(w.ware)
-      const translatedGroup = groupId ? (moduleGroupNames.value.get(groupId) || groupId) : ''
-      if (translatedGroup !== rb.name && w.ware !== rb.name) continue
+      if (rb.type === 'wareGroup' && groupId !== rb.id) continue
+      if (rb.type === 'ware' && w.ware !== rb.id) continue
       if (seen.has(w.ware)) continue
       seen.add(w.ware)
       const wareName = wareNames.value.get(w.ware) || w.ware
@@ -1215,7 +1213,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     if (!cluster || !cluster.objectives) return []
     const data = store.terraformingData.value
     const currentStats = effectiveCurrentStats.value
-    const completedProjects = store.terraformingCompletedProjects.value
+    const completedProjects = effectiveCompletedProjects.value
     const hqClusterId = store.terraformingHqClusterId.value
     const hqArchive = store.terraformingHqArchiveStation.value
     const housingTarget = extractHousingTarget(cluster, cluster.objectives)
@@ -1529,6 +1527,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
 
     const log = draftExecutionLog.value.map(e => ({ projectId: e.projectId }))
     const result = replayExecutionLog(log, cluster, data, {
+      mode: 'draft',
       flags: { evaluations: true, stepSnapshots: true, goals: true },
     })
 
@@ -1563,14 +1562,10 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
         repeatRole = prevTask?.projectId === step.projectId ? 'duplicate' : 'first'
       }
 
-      const cumulativeRebatesDisplay = (step.cumulativeRebatesAfter ?? []).map(rb => ({
-        name: resolveRebateName(rb.id, rb.type, store.moduleGroupNames.value, store.wareNames.value),
-        value: rb.value,
-      }))
-
+      const cumulativeRebatesRaw = step.cumulativeRebatesAfter ?? []
       const { discountedWares: entryDw, discountAmount: entryDiscAmt } = computeProjectDiscount(
-        project?.resources, cumulativeRebatesDisplay,
-        store.wareGroupMap, store.moduleGroupNames, store.wareNames, useGameDataStore().waresMap,
+        project?.resources, cumulativeRebatesRaw,
+        store.wareGroupMap, store.wareNames, useGameDataStore().waresMap,
       )
 
       const runtimePidSet = new Set(getRuntimeTerraformingProjectIds(cluster))
@@ -1639,7 +1634,9 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     const log = isQueueEditing.value
       ? draftExecutionLog.value.filter(e => !e.systemDisabled).map(e => ({ projectId: e.projectId }))
       : store.terraformingExecutionLog.value.map(e => ({ projectId: e.projectId }))
-    return replayExecutionLog(log, cluster, data).finalCompleted
+    return replayExecutionLog(log, cluster, data, {
+      mode: isQueueEditing.value ? 'draft' : 'committed',
+    }).finalCompleted
   })
 
   const effectiveCurrentStats = computed<Record<string, number>>(() => {
@@ -1649,7 +1646,9 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     const log = isQueueEditing.value
       ? draftExecutionLog.value.filter(e => !e.systemDisabled).map(e => ({ projectId: e.projectId }))
       : store.terraformingExecutionLog.value.map(e => ({ projectId: e.projectId }))
-    return replayExecutionLog(log, cluster, data).finalStats
+    return replayExecutionLog(log, cluster, data, {
+      mode: isQueueEditing.value ? 'draft' : 'committed',
+    }).finalStats
   })
 
   const taskTree = computed<TaskTree | null>(() => {
@@ -1855,7 +1854,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
   const conditionScaleModels = computed<Map<string, TerraformingConditionScaleModel[]>>(() => {
     const data = store.terraformingData.value
     const cluster = store.terraformingSelectedCluster.value
-    const currentStats = store.terraformingCurrentStats.value
+    const currentStats = effectiveCurrentStats.value
     const map = new Map<string, TerraformingConditionScaleModel[]>()
     if (!data || !cluster) return map
 
@@ -1889,6 +1888,15 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     const translatedProjectNames = projectDisplayNames.value
     const translatedStatNames = statDisplayNames.value
     const results: TerraformingExecutionTimelineEntry[] = []
+    const logEntriesByProject = new Map<string, TerraformingExecutionEntry[]>()
+    for (const entry of log) {
+      const entries = logEntriesByProject.get(entry.projectId)
+      if (entries) {
+        entries.push(entry)
+      } else {
+        logEntriesByProject.set(entry.projectId, [entry])
+      }
+    }
     let previousGroupId: string | null = null
     let order = 0
 
@@ -1912,7 +1920,8 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
         .map(snapshot => buildTimelineStatLineModel(snapshot, data))
         .filter((model): model is TerraformingStatLineModel => model !== null)
 
-      const cumulativeRebateEntries = (step.cumulativeRebatesAfter ?? []).map(rb => ({
+      const cumulativeRebatesRaw = step.cumulativeRebatesAfter ?? []
+      const cumulativeRebateEntries = cumulativeRebatesRaw.map(rb => ({
         name: resolveRebateName(rb.id, rb.type, store.moduleGroupNames.value, store.wareNames.value),
         value: rb.value,
       }))
@@ -1930,14 +1939,13 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
 
       const { discountedWares: discountedWaresData, discountAmount: discountAmountVal } = computeProjectDiscount(
         project?.resources,
-        cumulativeRebateEntries,
+        cumulativeRebatesRaw,
         store.wareGroupMap,
-        store.moduleGroupNames,
         store.wareNames,
         useGameDataStore().waresMap,
       )
 
-      const logEntry = log.find(e => e.projectId === step.projectId && e.id)
+      const logEntry = logEntriesByProject.get(step.projectId)?.shift()
 
       results.push({
         id: logEntry?.id ?? step.projectId,
@@ -2009,17 +2017,41 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     }
 
     const translatedProjectNames = projectDisplayNames.value
-    const remainingLog = log.filter((_, index) => index !== targetIndex).map(e => ({ projectId: e.projectId }))
+    const projectMapForCancel = projectMap.value
+    let removeEndExclusive = targetIndex + 1
+    while (removeEndExclusive < log.length) {
+      const project = projectMapForCancel.get(log[removeEndExclusive]!.projectId)
+      if (project?.group !== 'events') break
+      removeEndExclusive += 1
+    }
+    const remainingEntries = log.filter((_, index) => index < targetIndex || index >= removeEndExclusive)
+    const affectedOriginalEntryIds = new Set(
+      log.slice(removeEndExclusive)
+        .filter(entry => projectMapForCancel.get(entry.projectId)?.group !== 'events')
+        .map(entry => entry.id),
+    )
+    const remainingLog = remainingEntries.map(e => ({ projectId: e.projectId }))
     const result = replayExecutionLog(remainingLog, cluster, data, {
       flags: { evaluations: true, stepSnapshots: false },
     })
 
     const affectedEntryIds: string[] = []
     const reasons: string[] = []
-    for (let i = targetIndex; i < result.steps.length; i++) {
-      const step = result.steps[i]!
+    const remainingEntriesByProject = new Map<string, TerraformingExecutionEntry[]>()
+    for (const entry of remainingEntries) {
+      const entries = remainingEntriesByProject.get(entry.projectId)
+      if (entries) {
+        entries.push(entry)
+      } else {
+        remainingEntriesByProject.set(entry.projectId, [entry])
+      }
+    }
+    for (const step of result.steps) {
+      if (step.type !== 'task') continue
+      const candidates = remainingEntriesByProject.get(step.projectId)
+      const logEntry = candidates?.shift()
+      if (!logEntry || !affectedOriginalEntryIds.has(logEntry.id)) continue
       if (!step.valid) {
-        const logEntry = log.find(e => e.id && step.projectId === e.projectId)
         affectedEntryIds.push(logEntry?.id ?? step.projectId)
         reasons.push(`${translatedProjectNames.get(step.projectId) || step.projectId}: ${step.evaluation ? translateEvaluationReasons(step.evaluation.reasons, data, vI18nLookup).join('; ') : (vI18nLookup('terraforming.projectBlockedAfterCancel') || 'Blocked after cancel')}`)
       }
@@ -2288,7 +2320,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     } else {
       const r = replayExecutionLog(
         draftExecutionLog.value.filter(e => !e.systemDisabled).map(e => ({ projectId: e.projectId })),
-        cluster, data, { flags: { stepSnapshots: true } })
+        cluster, data, { mode: 'draft', flags: { stepSnapshots: true } })
       for (const step of r.steps) {
         if (step.type === 'task' && step.statsBefore) {
           cumulativeStateAt.push({ completed: new Map(), stats: { ...step.statsBefore } })
@@ -2698,8 +2730,14 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     const data = store.terraformingData.value
     const cluster = store.terraformingSelectedCluster.value
     if (!data || !cluster) return false
-    const completedProjects = store.terraformingCompletedProjects.value
-    const stats = store.terraformingCurrentStats.value
+    const replayResult = replayExecutionLog(
+      store.terraformingExecutionLog.value.map(entry => ({ projectId: entry.projectId })),
+      cluster,
+      data,
+      { mode: 'draft' },
+    )
+    const completedProjects = replayResult.finalCompleted
+    const stats = replayResult.finalStats
     const { clusterProjects } = buildRuntimeClusterForReplay(cluster, data)
     const evaluation = evaluateTerraformingProjectExecution(
       projectMap.value.get(projectId),
@@ -2711,19 +2749,21 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     return evaluation.valid
   }
 
-  function executeAutoEvents() {
+  function syncAutoEventsFromReplay() {
     const data = store.terraformingData.value
     const cluster = store.terraformingSelectedCluster.value
     if (!data || !cluster) return
 
     const log = store.terraformingExecutionLog.value.map(e => ({ projectId: e.projectId }))
-    const result = replayExecutionLog(log, cluster, data)
-    const existingEventIds = new Set(log.filter(e => e.projectId.startsWith('evt_')).map(e => e.projectId))
-    for (const step of result.steps) {
-      if (step.type === 'auto-event' && !existingEventIds.has(step.projectId)) {
-        store.appendTerraformingProjectExecution(step.projectId, 1)
-      }
-    }
+    const result = replayExecutionLog(log, cluster, data, { mode: 'draft' })
+    const canonical = result.steps.map(step => ({ id: '', projectId: step.projectId }))
+    const currentProjectIds = store.terraformingExecutionLog.value.map(entry => entry.projectId)
+    const canonicalProjectIds = canonical.map(entry => entry.projectId)
+    if (
+      currentProjectIds.length === canonicalProjectIds.length
+      && currentProjectIds.every((projectId, index) => projectId === canonicalProjectIds[index])
+    ) return
+    store.replaceTerraformingExecutionLog(canonical)
   }
 
   function removeLastCommittedProject(projectId: string) {
@@ -2797,7 +2837,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     selectCluster: (clusterId: string) => {
       store.selectTerraformingCluster(clusterId)
       if (!isQueueEditing.value && store.terraformingExecutionLog.value.length === 0) {
-        executeAutoEvents()
+        syncAutoEventsFromReplay()
       }
     },
     toggleProject: (projectId: string) => {
@@ -2807,12 +2847,12 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
         else appendDraftProject(projectId)
         return
       }
-      const currentCount = store.terraformingCompletedProjects.value.get(projectId) ?? 0
+      const currentCount = effectiveCompletedProjects.value.get(projectId) ?? 0
       if (currentCount > 0) {
         removeLastCommittedProject(projectId)
       } else if (canAppendCommittedProject(projectId)) {
         store.appendTerraformingProjectExecution(projectId, 1)
-        executeAutoEvents()
+        syncAutoEventsFromReplay()
       }
     },
     setProjectCount: (projectId: string, count: number) => {
@@ -2825,12 +2865,12 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
         }
         return
       }
-      const currentCount = store.terraformingCompletedProjects.value.get(projectId) ?? 0
+      const currentCount = effectiveCompletedProjects.value.get(projectId) ?? 0
       if (count > currentCount) {
         for (let i = 0; i < count - currentCount; i += 1) {
           if (canAppendCommittedProject(projectId)) store.appendTerraformingProjectExecution(projectId, 1)
         }
-        executeAutoEvents()
+        syncAutoEventsFromReplay()
         return
       }
       if (count < currentCount) {

@@ -18,6 +18,70 @@ function run(log: Array<{ projectId: string }>, cluster: TerraformingCluster, fl
   return replayExecutionLog(log, cluster, raw as unknown as TerraformingData, { flags: flags ?? {} })
 }
 
+function syntheticStat(id: string): TerraformingStat {
+  return {
+    id,
+    nameId: id,
+    default: 0,
+    dynamic: true,
+    icon: '',
+    ranges: [
+      { start: 0, end: 999, state: 0, rgb: '', descriptionId: `${id}.state0` },
+    ],
+  }
+}
+
+function syntheticProject(project: Partial<TerraformingProject> & { id: string }): TerraformingProject {
+  return {
+    id: project.id,
+    group: 'test',
+    nameId: project.id,
+    duration: null,
+    repeatCooldown: null,
+    resilient: false,
+    chance: 0,
+    version: null,
+    research: null,
+    conditions: [],
+    effects: [],
+    sideEffects: [],
+    resources: { price: 0, wares: [] },
+    deliveries: [],
+    rebates: [],
+    removedProjects: [],
+    blockedProjects: [],
+    blockedGroups: [],
+    predecessors: [],
+    descriptionId: project.id,
+    ...project,
+  }
+}
+
+function syntheticReplayData(
+  projects: TerraformingProject[],
+  initialStats: Record<string, number>,
+): { data: TerraformingData; cluster: TerraformingCluster } {
+  const cluster: TerraformingCluster = {
+    id: 'SyntheticCluster',
+    macro: 'macro.synthetic',
+    partName: 'Synthetic',
+    initialStats,
+    projectIds: projects.map(project => project.id),
+    taskProjectIds: projects.map(project => project.id),
+  }
+
+  return {
+    cluster,
+    data: {
+      stats: Object.keys(initialStats).map(syntheticStat),
+      projectGroups: [],
+      projects,
+      clusters: [cluster],
+      deliveryShips: [],
+    },
+  }
+}
+
 describe('replayExecutionLog — OceanOfFantasy', () => {
   describe('non-edit mode', () => {
     it('3 clouds → solidify after 2nd + volcano after 3rd', () => {
@@ -51,7 +115,9 @@ describe('replayExecutionLog — OceanOfFantasy', () => {
         log.push({ projectId: pid })
         const r = run(log, cluster, {})
         for (const s of r.steps) {
-          if (s.type === 'auto-event') log.push({ projectId: s.projectId })
+          if (s.type === 'auto-event' && !log.some(e => e.projectId === s.projectId)) {
+            log.push({ projectId: s.projectId })
+          }
         }
       }
       append('tmp_cloudparticles')
@@ -96,7 +162,9 @@ describe('replayExecutionLog — OceanOfFantasy', () => {
         log.push({ projectId: pid })
         const r = run(log, cluster, {})
         for (const s of r.steps) {
-          if (s.type === 'auto-event') log.push({ projectId: s.projectId })
+          if (s.type === 'auto-event' && !log.some(e => e.projectId === s.projectId)) {
+            log.push({ projectId: s.projectId })
+          }
         }
       }
       append('tmp_cloudparticles')
@@ -109,6 +177,246 @@ describe('replayExecutionLog — OceanOfFantasy', () => {
         'tmp_cloudparticles', 'evt_volcano_extinction',
       ])
     })
+  })
+})
+
+describe('replayExecutionLog — goal event blocking', () => {
+  it('blocks auto-events whose condition uses a stat goal stat', () => {
+    const goalTask = syntheticProject({
+      id: 'needs_a',
+      conditions: [{ stat: 'a', minvalue: 5, usesValueBounds: true }],
+      effects: [{ stat: 'b', change: 1 }],
+    })
+    const blockedEvent = syntheticProject({
+      id: 'evt_a_blocked',
+      group: 'events',
+      conditions: [{ stat: 'a', minvalue: 5, usesValueBounds: true }],
+      effects: [{ stat: 'b', change: 1 }],
+    })
+    const { data, cluster } = syntheticReplayData([goalTask, blockedEvent], { a: 0, b: 0 })
+
+    const result = replayExecutionLog([{ projectId: 'needs_a' }], cluster, data, {
+      flags: { evaluations: true, stepSnapshots: true, goals: true },
+    })
+
+    expect(result.goalEntries.map(goal => goal.statGoal?.statId)).toContain('a')
+    expect(result.steps.map(step => step.projectId)).toEqual(['needs_a'])
+  })
+
+  it('still injects auto-events whose condition does not use a blocked stat', () => {
+    const goalTask = syntheticProject({
+      id: 'needs_a_then_changes_b',
+      conditions: [{ stat: 'a', minvalue: 5, usesValueBounds: true }],
+      effects: [{ stat: 'b', change: 1 }],
+    })
+    const nextTask = syntheticProject({
+      id: 'next_task',
+      effects: [{ stat: 'c', change: 1 }],
+    })
+    const unrelatedEvent = syntheticProject({
+      id: 'evt_b_unblocked',
+      group: 'events',
+      conditions: [{ stat: 'b', minvalue: 1, usesValueBounds: true }],
+      effects: [{ stat: 'a', change: 1 }],
+    })
+    const { data, cluster } = syntheticReplayData([goalTask, nextTask, unrelatedEvent], { a: 0, b: 0, c: 0 })
+
+    const result = replayExecutionLog([
+      { projectId: 'needs_a_then_changes_b' },
+      { projectId: 'next_task' },
+    ], cluster, data, { flags: { evaluations: true, stepSnapshots: true, goals: true } })
+
+    expect(result.goalEntries.map(goal => goal.statGoal?.statId)).toContain('a')
+    expect(result.steps.map(step => step.projectId)).toEqual([
+      'needs_a_then_changes_b',
+      'evt_b_unblocked',
+      'next_task',
+    ])
+  })
+})
+
+describe('replayExecutionLog — event cursor semantics', () => {
+  it('consumes an immediate existing event when replay triggers it at the current position', () => {
+    const triggerTask = syntheticProject({
+      id: 'trigger_b',
+      effects: [{ stat: 'b', change: 1 }],
+    })
+    const nextTask = syntheticProject({ id: 'next_task' })
+    const event = syntheticProject({
+      id: 'evt_b',
+      group: 'events',
+      conditions: [{ stat: 'b', minvalue: 1, usesValueBounds: true }],
+      effects: [{ stat: 'c', change: 1 }],
+    })
+    const { data, cluster } = syntheticReplayData([triggerTask, event, nextTask], { b: 0, c: 0 })
+
+    const result = replayExecutionLog([
+      { projectId: 'trigger_b' },
+      { projectId: 'evt_b' },
+      { projectId: 'next_task' },
+    ], cluster, data, { mode: 'draft', flags: { evaluations: true, stepSnapshots: true } })
+
+    expect(result.steps.map(step => [step.projectId, step.type, step.valid])).toEqual([
+      ['trigger_b', 'task', true],
+      ['evt_b', 'auto-event', true],
+      ['next_task', 'task', true],
+    ])
+    expect(result.finalStats.c).toBe(1)
+  })
+
+  it('does not let a future event suppress insertion at the current position in draft mode', () => {
+    const triggerTask = syntheticProject({
+      id: 'trigger_b',
+      effects: [{ stat: 'b', change: 1 }],
+    })
+    const nextTask = syntheticProject({ id: 'next_task' })
+    const event = syntheticProject({
+      id: 'evt_b',
+      group: 'events',
+      conditions: [{ stat: 'b', minvalue: 1, usesValueBounds: true }],
+      effects: [{ stat: 'c', change: 1 }],
+    })
+    const { data, cluster } = syntheticReplayData([triggerTask, nextTask, event], { b: 0, c: 0 })
+
+    const result = replayExecutionLog([
+      { projectId: 'trigger_b' },
+      { projectId: 'next_task' },
+      { projectId: 'evt_b' },
+    ], cluster, data, { mode: 'draft', flags: { evaluations: true, stepSnapshots: true } })
+
+    expect(result.steps.map(step => [step.projectId, step.type, step.valid])).toEqual([
+      ['trigger_b', 'task', true],
+      ['evt_b', 'auto-event', true],
+      ['next_task', 'task', true],
+    ])
+    expect(result.finalStats.c).toBe(1)
+  })
+
+  it('excludes stale events in draft mode', () => {
+    const event = syntheticProject({
+      id: 'evt_b',
+      group: 'events',
+      conditions: [{ stat: 'b', minvalue: 1, usesValueBounds: true }],
+      effects: [{ stat: 'c', change: 1 }],
+    })
+    const { data, cluster } = syntheticReplayData([event], { b: 0, c: 0 })
+
+    const result = replayExecutionLog([{ projectId: 'evt_b' }], cluster, data, {
+      mode: 'draft',
+      flags: { evaluations: true, stepSnapshots: true },
+    })
+
+    expect(result.steps).toEqual([])
+    expect(result.finalStats.c).toBe(0)
+  })
+
+  it('keeps stale events as invalid auto-event steps in committed mode', () => {
+    const event = syntheticProject({
+      id: 'evt_b',
+      group: 'events',
+      conditions: [{ stat: 'b', minvalue: 1, usesValueBounds: true }],
+      effects: [{ stat: 'c', change: 1 }],
+    })
+    const { data, cluster } = syntheticReplayData([event], { b: 0, c: 0 })
+
+    const result = replayExecutionLog([{ projectId: 'evt_b' }], cluster, data, {
+      mode: 'committed',
+      flags: { evaluations: true, stepSnapshots: true },
+    })
+
+    expect(result.steps.map(step => [step.projectId, step.type, step.valid])).toEqual([
+      ['evt_b', 'auto-event', false],
+    ])
+    expect(result.finalStats.c).toBe(0)
+  })
+
+  it('treats blocked stat events in the log as stale in draft mode', () => {
+    const goalTask = syntheticProject({
+      id: 'needs_a',
+      conditions: [{ stat: 'a', minvalue: 5, usesValueBounds: true }],
+      effects: [{ stat: 'b', change: 1 }],
+    })
+    const blockedEvent = syntheticProject({
+      id: 'evt_a_blocked',
+      group: 'events',
+      conditions: [{ stat: 'a', minvalue: 5, usesValueBounds: true }],
+      effects: [{ stat: 'b', change: 1 }],
+    })
+    const { data, cluster } = syntheticReplayData([goalTask, blockedEvent], { a: 0, b: 0 })
+
+    const result = replayExecutionLog([
+      { projectId: 'needs_a' },
+      { projectId: 'evt_a_blocked' },
+    ], cluster, data, { mode: 'draft', flags: { evaluations: true, stepSnapshots: true, goals: true } })
+
+    expect(result.goalEntries.map(goal => goal.statGoal?.statId)).toContain('a')
+    expect(result.steps.map(step => [step.projectId, step.type, step.valid])).toEqual([
+      ['needs_a', 'task', true],
+    ])
+    expect(result.finalStats.b).toBe(1)
+  })
+
+  it('does not trigger a one-time event again after an effective occurrence', () => {
+    const firstTask = syntheticProject({
+      id: 'raise_a_1',
+      effects: [{ stat: 'a', change: 1 }],
+    })
+    const secondTask = syntheticProject({
+      id: 'raise_a_2',
+      effects: [{ stat: 'a', change: 1 }],
+    })
+    const event = syntheticProject({
+      id: 'evt_once',
+      group: 'events',
+      repeatCooldown: null,
+      conditions: [{ stat: 'a', minvalue: 1, usesValueBounds: true }],
+      effects: [{ stat: 'b', change: 1 }],
+    })
+    const { data, cluster } = syntheticReplayData([firstTask, event, secondTask], { a: 0, b: 0 })
+
+    const result = replayExecutionLog([
+      { projectId: 'raise_a_1' },
+      { projectId: 'raise_a_2' },
+    ], cluster, data, { mode: 'draft', flags: { evaluations: true, stepSnapshots: true } })
+
+    expect(result.steps.map(step => step.projectId)).toEqual([
+      'raise_a_1',
+      'evt_once',
+      'raise_a_2',
+    ])
+    expect(result.finalStats.b).toBe(1)
+  })
+
+  it('allows a repeatable event to trigger again at a later replay position', () => {
+    const firstTask = syntheticProject({
+      id: 'raise_a_1',
+      effects: [{ stat: 'a', change: 1 }],
+    })
+    const secondTask = syntheticProject({
+      id: 'raise_a_2',
+      effects: [{ stat: 'a', change: 1 }],
+    })
+    const event = syntheticProject({
+      id: 'evt_repeat',
+      group: 'events',
+      repeatCooldown: 0,
+      conditions: [{ stat: 'a', minvalue: 1, usesValueBounds: true }],
+      effects: [{ stat: 'a', change: -1 }, { stat: 'b', change: 1 }],
+    })
+    const { data, cluster } = syntheticReplayData([firstTask, event, secondTask], { a: 0, b: 0 })
+
+    const result = replayExecutionLog([
+      { projectId: 'raise_a_1' },
+      { projectId: 'raise_a_2' },
+    ], cluster, data, { mode: 'draft', flags: { evaluations: true, stepSnapshots: true } })
+
+    expect(result.steps.map(step => step.projectId)).toEqual([
+      'raise_a_1',
+      'evt_repeat',
+      'raise_a_2',
+      'evt_repeat',
+    ])
+    expect(result.finalStats.b).toBe(2)
   })
 })
 

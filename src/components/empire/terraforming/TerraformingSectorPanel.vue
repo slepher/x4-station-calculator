@@ -47,9 +47,6 @@ function getActionLabel(action: string): string {
   return labels[action] || action
 }
 
-function formatPartName(partName: string): string {
-  return partName.replace(/^'(.*)'$/, '$1')
-}
 </script>
 
 <template>

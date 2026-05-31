@@ -7,7 +7,11 @@ terraformingRuntime.ts (引擎层 — 纯函数)
 ├── replayExecutionLog(log, cluster, data, options) → TerraformingReplayResult
 │   ├── 闭包: runningStats + runningCompleted + runningRebates
 │   ├── 初始 auto-event 检测 (iterativeLoop)
-│   ├── 逐 entry 处理:
+│   ├── cursor 从左到右解释 log:
+│   │   ├── log 中 task → 按顺序处理
+│   │   ├── replay 计算出 event E → 若 cursor 下一条正好是 E 则消费/替换，否则插入 E
+│   │   └── cursor 遇到未触发 event → draft 排除；committed 标 invalid 且不应用 effects
+│   ├── 逐 task 处理:
 │   │   ├── evaluation (evaluations flag)
 │   │   │   ├── valid → 正常 push step + apply effects
 │   │   │   └── invalid + goals flag
@@ -85,7 +89,8 @@ useTerraformingPresenter (消费层)
 5. 引擎增量维护累计折扣：每步只处理当前 project 的 rebates，累计到 runningRebates（按 raw `wareGroup`/`ware` ID 聚合，不译名）。`stepSnapshots` 开时推入 `cumulativeRebatesBefore/After`，并 diff 得出 `rebateChanges`。
 6. `evaluateTerraformingProjectExecution` 和 `resolveAvailableTasks` 只在该 step 需要 evaluation 时才调用。
 7. engine 对 auto-event 注入有最大迭代次数保护（`maxIterations = 20`）。
-8. engine 不关心 log 是 committed 还是 draft —— 它只看到 `{ projectId: string }[]`。
+8. engine 通过 `options.mode` 区分 committed 与 draft。未传 mode 时默认为 `committed`。
+9. event step 的权威来源是 replay 计算。log 中的 event 只作为“当前位置可消费的历史占位”；不得扫描后续所有 log 来判断同名 event 是否已存在。
 
 ### `goals` flag 行为
 
@@ -106,9 +111,12 @@ useTerraformingPresenter (消费层)
 15. **预防型 goal** 同上，不进入引擎循环。presenter 从 `replayResult.finalStats` 检测非 stat 影响的重复事件（如地震）的条件是否满足，满足则生成 `kind: 'preventive'` goal。
 16. **插入到 goal 对应位置**（`resolveInsertIndex`）不受影响。新引擎的 `GoalEntry.position` 语义与现状 `generatedGoals[i].position` 一致（无效 entry 在 steps 中的 index），presenter 交叉比对逻辑不变。
 17. **预防型 goal** 对应的 task 插入到队列最前端（position 0），通过 `resolveInsertIndex` 检查预防型 goal 的 `targetStatId` 并返回 0。
-18. **event 阻断**: 引擎维护 `blockedStatIds`。当 goals flag 开启且某 entry 有未满足的 stat condition 且该 stat 属于 `eventStatIds`（事件的条件 stat），该 stat 被加入 `blockedStatIds`。后续 per-entry 和 end-of-queue 的 auto-event injection 会跳过条件涉及已阻断 stat 的事件。初始 phase 的 injection 不受影响。
-19. **deriveAirPressure 处理**: airpressure 是派生 stat（由氧气+甲烷+CO2 算出）。engine 在 `generateGoalsForEntry` 中（1）按依赖关系排序 conditions（airpressure 排在氧气/甲烷/CO2 之后），（2）在 stat goal for-loop 后：若 airpressure 曾被 goal 修改，减除当前 gas contribution（`floor(气体总和/4)`），使得随后的 `deriveAirPressure` 重算时恰好落在目标值。
-20. **predecessors**: engine 的 `generateGoalsForEntry` 不仅检查 `project.dependencies`，也检查 `project.predecessors`：
+18. **event 阻断**: 引擎维护 `blockedStatIds`。当 goals flag 开启且某 entry 有未满足的 stat condition 且该 stat 属于 `eventStatIds`（事件的条件 stat），该 stat 被加入 `blockedStatIds`。后续 per-entry 和 end-of-queue 的 auto-event injection 会跳过条件涉及已阻断 stat 的事件。初始 phase 的 injection 不受影响。若 log 中存在被阻断 event，也按 stale/misplaced event 处理：draft 排除，committed 标 invalid。
+19. **event 重复规则**: 是否允许同一个 event 再次触发只看 event 自身属性。`repeatCooldown === null` 表示 one-time，已有有效 occurrence 后不得再次触发；`repeatCooldown !== null` 的 event 可在后续位置再次触发。调用方不得用 `Set(projectId)` 作为全局去重规则。
+20. **stale/misplaced event**: cursor 遇到 event 但当前位置 replay 未计算出该 event 应触发时，draft/edit 模式排除该 event，不输出 step，不应用 effects；committed/non-edit 模式输出 `type: 'auto-event', valid: false` step，不应用 effects，供历史 timeline 显示。
+21. **cancel validation**: 删除目标 task 和其后连续紧邻的所有 event 后，仅对 remaining log 跑一次 replay。这个 replay 会正常重新插入仍可触发的 event；若重放后后续 task 均 valid，则 cancel 允许。实现可从被取消 task 的上一个保留 entry 的 replay state 开始，只重放 suffix；结果必须等价于整条 remaining log 重放。该过程不会引入额外渐进复杂度。
+22. **deriveAirPressure 处理**: airpressure 是派生 stat（由氧气+甲烷+CO2 算出）。engine 在 `generateGoalsForEntry` 中（1）按依赖关系排序 conditions（airpressure 排在氧气/甲烷/CO2 之后），（2）在 stat goal for-loop 后：若 airpressure 曾被 goal 修改，减除当前 gas contribution（`floor(气体总和/4)`），使得随后的 `deriveAirPressure` 重算时恰好落在目标值。
+23. **predecessors**: engine 的 `generateGoalsForEntry` 不仅检查 `project.dependencies`，也检查 `project.predecessors`：
      - `type: 'project', any: true` → 需至少一个已完成，若均未完成则生成所有成员的 projectGoal
      - `type: 'project', any: false` → 每个未完成成员独立生成 projectGoal
 
@@ -125,7 +133,7 @@ useTerraformingPresenter (消费层)
 | **startQueueEdit / cancelQueueEdit / completeQueueEdit** | ❌ 不受影响 | 门面方法，仅迁移 draft ↔ committed |
 | **executionTimeline** | ✅ 改为引擎 | 删除内联循环，数据来自 `replayResult.steps` |
 | **computePlanDraftEntries** | ✅ 改为引擎 | 删除内联循环 + pushTaskEntry/pushEventEntry |
-| **getExecutionCancelValidation** | ✅ 改为引擎 | 删除内联循环，数据来自 `replayResult.steps` |
+| **getExecutionCancelValidation** | ✅ 改为引擎 | 删除目标 task 及其后连续紧邻 event 后调用引擎 |
 | **effective stats / taskTree** | ✅ 改为引擎 | 从 `replayResult.finalStats/Completed` 派生 |
 | **executeAutoEvents** | ✅ 移除 | 引擎内化 |
 | **toggleProject (non-edit)** | ✅ 简化 | auto-event 部分移除，引擎替代 |
@@ -147,6 +155,7 @@ interface ReplayFlags {
 }
 
 interface ReplayOptions {
+  mode?: 'committed' | 'draft'
   flags?: ReplayFlags
 }
 
@@ -346,6 +355,22 @@ function replayExecutionLog(log, cluster, data, options) {
     p => p.group === 'events' && isStatAffectingEvent(p) && runtimeProjectIds.has(p.id)
   )
 
+  let cursor = 0
+  function nextLogEntryIsEvent(eventId: string) {
+    return log[cursor]?.projectId === eventId
+  }
+
+  function emitTriggeredEvent(event) {
+    if (nextLogEntryIsEvent(event.id)) cursor++
+    pushStep(event.id, 'auto-event', true)
+    insertedEventIds.add(event.id)
+  }
+
+  function handleStaleEvent(entry) {
+    if (mode === 'draft') return
+    pushStep(entry.projectId, 'auto-event', false)
+  }
+
   // iterative event injection closure
   function injectEventsAtPosition() {
     let triggered = true
@@ -356,8 +381,7 @@ function replayExecutionLog(log, cluster, data, options) {
         if (event.repeatCooldown === null && insertedEventIds.has(event.id)) continue
         if (event.repeatCooldown === null && (runningCompleted.get(event.id) ?? 0) > 0) continue
         if (checkAllConditions(event.conditions, currentStats(), data.stats)) {
-          pushStep(event.id, 'auto-event', true)
-          insertedEventIds.add(event.id)
+          emitTriggeredEvent(event)
           triggered = true
           break
         }
@@ -368,8 +392,15 @@ function replayExecutionLog(log, cluster, data, options) {
   // 1. Initial events
   injectEventsAtPosition()
 
-  // 2. Process each log entry
-  for (const entry of log) {
+  // 2. Process each log entry by cursor
+  while (cursor < log.length) {
+    const entry = log[cursor]!
+    if (isEventProject(entry.projectId)) {
+      cursor++
+      handleStaleEvent(entry)
+      continue
+    }
+    cursor++
     const stepIndex = steps.length
     const project = projectMap.get(entry.projectId)
     
@@ -438,10 +469,13 @@ After:
         rebateChanges → 直接取 (引擎已 diff)
         availableBeforeExecution = step.valid (由 engine evaluation 决定)
         blockedReason = step.evaluation?.reasons (若有)
+        UI id → 按 projectId 分组的 log entry 队列 shift，按 occurrence 顺序回填
         + 纯 game data 富化: wares, deliveries, dockModules, deliveryDetails, price, projectDuration
       → push 到 results
   }
 ```
+
+注意：store 持久化只有 `projectId[]` 序列。`TerraformingExecutionEntry.id` 是 hydrate 后的 UI 临时标识，不能作为 replay 业务输入；但 timeline 的删除、展开、缓存仍需要这个临时 id。因此 presenter 在从 `ReplayResult.steps` 构建 timeline 时，必须按 step 顺序消费 committed log 中同 `projectId` 的 occurrence。不能使用 `log.find(projectId)`，否则同一个 task/event 重复出现时，后续行会错误复用第一行 id。
 
 ### computePlanDraftEntries 重构
 
@@ -527,11 +561,13 @@ Before:
   setProjectCount (non-edit) → append → executeAutoEvents()
 
 After:
-  selectCluster → replayExecutionLog([], ...) → 将新 event 写 store
+  selectCluster → replayExecutionLog([], { mode:'draft' }) → 用 canonical projectId 序列替换 store log
   toggleProject (non-edit) → canAppend → append → 
-    replayExecutionLog(log, ...) → 计算差异 → 将新 event 追加 store
+    replayExecutionLog(log, { mode:'draft' }) → 用 canonical projectId 序列替换 store log
   setProjectCount (non-edit) 同上
 ```
+
+execution log 的持久化形态只有 `projectId[]`。`TerraformingExecutionEntry.id` 是 hydrate 后的内存/UI 临时标识，用于删除、展开和缓存；它不是 replay 业务身份。event 也没有独立业务身份，始终是 replay 派生出的 canonical projectId。
 
 ## 删除文件/函数清单
 

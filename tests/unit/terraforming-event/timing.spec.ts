@@ -12,7 +12,6 @@ import type {
   TerraformingStat,
 } from '@/store/logic/terraformingTaskResolver'
 import type { TerraformingExecutionEntry } from '@/store/logic/terraformingRuntime'
-import { replayExecutionLog } from '@/store/logic/terraformingRuntime'
 import terraformingJson from '@/assets/x4_game_data/9.0-Empire-beta/data/terraforming.json'
 
 const raw = terraformingJson as unknown as TerraformingData & {
@@ -28,13 +27,7 @@ function makeStore(cluster: TerraformingCluster) {
     terraformingData: computed(() => raw as unknown as TerraformingData),
     terraformingSelectedClusterId: computed(() => cluster.id),
     terraformingSelectedCluster: computed(() => cluster),
-    terraformingCurrentStats: computed(() => {
-      return replayExecutionLog(executionLog.value.map(e => ({ projectId: e.projectId })), cluster, raw as unknown as TerraformingData).finalStats
-    }),
     terraformingRuntimeProjectIds: computed(() => cluster.taskProjectIds),
-    terraformingCompletedProjects: computed(() => {
-      return replayExecutionLog(executionLog.value.map(e => ({ projectId: e.projectId })), cluster, raw as unknown as TerraformingData).finalCompleted
-    }),
     terraformingExecutionLog: computed(() => executionLog.value),
     terraformingHqStationName: computed(() => ''), terraformingHqArchiveStation: computed(() => null),
     terraformingHqEffectiveModules: computed(() => []), terraformingHqClusterId: computed(() => null),

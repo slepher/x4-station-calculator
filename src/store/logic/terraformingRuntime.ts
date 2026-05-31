@@ -23,6 +23,7 @@ export interface ReplayFlags {
 }
 
 export interface ReplayOptions {
+  mode?: 'committed' | 'draft'
   flags?: ReplayFlags
 }
 
@@ -298,6 +299,7 @@ export function replayExecutionLog(
   data: TerraformingData,
   options?: ReplayOptions,
 ): TerraformingReplayResult {
+  const mode = options?.mode ?? 'committed'
   const flags = options?.flags ?? {}
   const { evaluations, stepSnapshots, goals } = flags
 
@@ -518,29 +520,47 @@ export function replayExecutionLog(
     for (const cond of event.conditions) eventStatIds.add(cond.stat)
   }
 
-  // Track which log entries have been consumed.
-  let logIndex = 0
-  function upcomingLogHasEvent(eventId: string): boolean {
-    for (let i = logIndex; i < log.length; i++) {
-      if (log[i]!.projectId === eventId) return true
+  let cursor = 0
+
+  function isEventProjectId(projectId: string): boolean {
+    return projectMap.get(projectId)?.group === 'events'
+  }
+
+  function nextLogEntryIsEvent(eventId: string): boolean {
+    return log[cursor]?.projectId === eventId
+  }
+
+  function emitTriggeredEvent(event: TerraformingProject) {
+    if (nextLogEntryIsEvent(event.id)) {
+      cursor += 1
     }
-    return false
+    pushStep(event.id, 'auto-event', true)
+    insertedEventIds.add(event.id)
+  }
+
+  function handleStaleEvent(entry: { projectId: string }) {
+    if (mode === 'draft') return
+    pushStep(entry.projectId, 'auto-event', false, {
+      valid: false,
+      reasons: ['stale auto-event'],
+    })
   }
 
   function injectEventsAtPosition(initialPhase: boolean = false) {
     let triggered = true
     let iter = 0
+    const triggeredAtThisPosition = new Set<string>()
     while (triggered && iter < maxIterations) {
       triggered = false
       iter++
       for (const event of statAffectingEvents) {
+        if (triggeredAtThisPosition.has(event.id)) continue
         if (event.repeatCooldown === null && insertedEventIds.has(event.id)) continue
         if (event.repeatCooldown === null && (runningCompleted.get(event.id) ?? 0) > 0) continue
-        if (upcomingLogHasEvent(event.id)) continue
         if (!initialPhase && event.conditions.some(c => blockedStatIds.has(c.stat))) continue
         if (checkAllConditions(event.conditions, currentStats(), data.stats)) {
-          pushStep(event.id, 'auto-event', true)
-          insertedEventIds.add(event.id)
+          emitTriggeredEvent(event)
+          triggeredAtThisPosition.add(event.id)
           triggered = true
           break
         }
@@ -552,7 +572,15 @@ export function replayExecutionLog(
   injectEventsAtPosition(true)
 
   // 2. Process each log entry
-  for (const entry of log) {
+  while (cursor < log.length) {
+    const entry = log[cursor]!
+    if (isEventProjectId(entry.projectId)) {
+      cursor += 1
+      handleStaleEvent(entry)
+      continue
+    }
+    cursor += 1
+
     const stepIndex = steps.length
     const project = projectMap.get(entry.projectId)
 
@@ -573,7 +601,7 @@ export function replayExecutionLog(
         pushStep(entry.projectId, 'task', true, evalResult)
       } else if (goals) {
         // Block event conditions for unmet stat conditions
-        if (project && logIndex >= 0) {
+        if (project) {
           for (const cond of project.conditions) {
             if (eventStatIds.has(cond.stat) && !checkStatConditionMet(cond, currentStats(), data.stats)) {
               blockedStatIds.add(cond.stat)
@@ -582,15 +610,12 @@ export function replayExecutionLog(
           }
         }
         generateGoalsForEntry(entry.projectId, stepIndex)
-        continue
       } else {
         pushStep(entry.projectId, 'task', false, evalResult)
       }
     } else {
       pushStep(entry.projectId, 'task', true)
     }
-
-    logIndex++
     injectEventsAtPosition()
   }
 

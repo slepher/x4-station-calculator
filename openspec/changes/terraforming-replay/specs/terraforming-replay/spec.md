@@ -67,27 +67,33 @@
 
 **并且** MUST 在末尾插入触发的 event steps
 
-#### Scenario: repeatable 事件仅一次不重复
+#### Scenario: 可重复 event MUST 由 event 属性允许再次触发
 
-**前提** evt_globalwarming_co2 为 repeatable 事件且已在之前被插入
+**前提** event X 的 `repeatCooldown !== null`
 
-**当** 后续 stats 仍满足其 conditions
+**并且** event X 已在之前被有效触发
 
-**那么** MUST NOT 再次插入该事件
+**当** 后续 replay 位置再次满足 event X 的 conditions
+
+**那么** 引擎 MUST 允许 event X 再次触发
+
+**并且** MUST NOT 使用全局 `projectId` 去重阻止该 occurrence
 
 #### Scenario: ONE_TIME 事件已完成时跳过
 
-**前提** evt_icemelt 为 ONE_TIME 事件且已完成
+**前提** event Y 的 `repeatCooldown === null`
+
+**并且** event Y 已被有效触发
 
 **当** stats 满足其 conditions
 
-**那么** MUST NOT 插入该事件
+**那么** MUST NOT 再次插入该事件
 
 ### Requirement: ReplayOptions.flags MUST 控制附加产出与行为
 
 引擎 MUST 通过 `ReplayOptions.flags` 控制是否产出附加数据。
 
-**前提** `ReplayOptions` 包含 `flags.goals`, `flags.evaluations`, `flags.stepSnapshots`
+**前提** `ReplayOptions` 包含 `mode?: 'committed' | 'draft'` 与 `flags.goals`, `flags.evaluations`, `flags.stepSnapshots`
 
 **当** `flags.goals === true`
 
@@ -118,6 +124,10 @@
 **当** `flags.stepSnapshots === false`
 
 **那么** `ReplayStep` MUST NOT 包含 `statsBefore/After`、`completedBefore/After`、`cumulativeRebatesBefore/After`、`rebateChanges`
+
+**当** `options.mode` 未指定
+
+**那么** 引擎 MUST 按 `mode: 'committed'` 处理。
 
 #### Scenario: goal 对 any(completed A, completed B) MUST 生成两条
 
@@ -159,6 +169,82 @@
 
 **并且** 应用后满足的 entry MUST 通过重新评估变为 valid
 
+### Requirement: replay MUST 按当前位置消费或排除 log 中的 event
+
+引擎 MUST 使用 cursor 从左到右解释 log，event step 的权威来源是 replay 计算，不是 log 原文。
+
+**前提** replay 在当前位置计算出应触发 event E
+
+**当** cursor 指向的下一条 log entry 正好是 E
+
+**那么** 引擎 MUST 消费该 log entry，输出一个 `type: 'auto-event', valid: true` 的 E step，并应用 E effects
+
+**当** cursor 指向的下一条 log entry 不是 E
+
+**那么** 引擎 MUST 插入一个新的 E step，应用 E effects，并且 MUST NOT 消费 cursor 指向的 log entry
+
+**并且** 引擎 MUST NOT 扫描 cursor 之后的全部 log 来判断 E 是否已经存在
+
+#### Scenario: future 同名 event MUST NOT 阻止当前位置插入
+
+**前提** log 为 `task A, task B, event X`
+
+**并且** replay 在 task A 后计算出 event X 应触发
+
+**当** task A 处理完毕
+
+**那么** 引擎 MUST 在 task A 和 task B 之间插入 event X
+
+**并且** 后续 cursor 遇到原 log 中的 event X 时，若当前位置不再计算出 X，应按 mode 处理 stale/misplaced event
+
+#### Scenario: immediate next event MUST 被当前位置触发替换
+
+**前提** log 为 `task A, event X, task B`
+
+**并且** replay 在 task A 后计算出 event X 应触发
+
+**当** task A 处理完毕
+
+**那么** 引擎 MUST 消费 log 中紧随 task A 的 event X
+
+**并且** MUST 只输出一条 event X step，不得重复插入。
+
+#### Scenario: draft mode stale event MUST 被排除
+
+**前提** `options.mode === 'draft'`
+
+**并且** cursor 当前 entry 是 event X
+
+**当** 当前 replay 位置没有计算出 event X 应触发
+
+**那么** 引擎 MUST 排除 event X，不输出 step，不应用 effects。
+
+#### Scenario: committed mode stale event MUST 标为 invalid
+
+**前提** `options.mode === 'committed'`
+
+**并且** cursor 当前 entry 是 event X
+
+**当** 当前 replay 位置没有计算出 event X 应触发
+
+**那么** 引擎 MUST 输出 `type: 'auto-event', valid: false` 的 event X step
+
+**并且** MUST NOT 应用 event X effects。
+
+#### Scenario: blocked stat event 即使在 log 中也 MUST 按 stale 处理
+
+**前提** `flags.goals === true`
+
+**并且** stat goal 已阻断 stat S
+
+**并且** event X 的 conditions 包含 stat S
+
+**当** cursor 遇到 event X
+
+**那么** 引擎 MUST NOT 因 log 中存在 event X 而强制执行它
+
+**并且** draft mode MUST 排除 X，committed mode MUST 标记 X invalid。
+
 ### Requirement: executionTimeline MUST 通过引擎获得数据
 
 `executionTimeline` computed MUST 调用 `replayExecutionLog()` 获取 `ReplayResult`，MUST NOT 内联维护顺序循环。
@@ -174,6 +260,8 @@
 **并且** MUST 对每个 step 进行 display 富化（rebates、wares、delivery 等）
 
 **并且** display 富化逻辑 MUST NOT 混入 stats 计算
+
+**并且** 当同一 `projectId` 在 committed log 中重复出现时，timeline entry 的 `id` MUST 按 replay step 顺序消费对应 log entry occurrence，MUST NOT 通过 `projectId` 查找第一条匹配 entry
 
 ### Requirement: computePlanDraftEntries MUST 通过引擎获得数据（含 goals）
 
@@ -269,13 +357,37 @@
 
 **前提** 取消 entry K
 
-**并且** 移除 K 及其后续由 K 触发的 auto-event 后的剩余 log 为 `remainingLog`
+**并且** 移除 K 以及 K 后面连续紧邻的所有 event entry 后的剩余 log 为 `remainingLog`
 
 **当** 调用引擎
 
 **那么** MUST 调用 `replayExecutionLog(remainingLog, cluster, data, { flags: { evaluations: true, stepSnapshots: false } })`
 
 **并且** MUST NOT 内联循环或调用 `resolveAvailableTasks`
+
+**并且** 这次 replay MUST 允许重新插入仍由 remaining log 触发的 event；若重新插入 event 后后续 task 全部 valid，则 MUST 允许 cancel。
+
+**并且** 实现 MAY 从被取消 task 的上一个保留 entry 的 replay state 开始重放 suffix；该优化 MUST 与整条 `remainingLog` 重放得到相同 validation 结果。
+
+#### Scenario: cancel validation MUST remove all contiguous events after target task
+
+**前提** execution log 为 `task A, event X, event Y, task B`
+
+**当** 对 `task A` 执行 cancel validation
+
+**那么** `remainingLog` MUST 为 `task B`
+
+**并且** `event X` 和 `event Y` MUST NOT 作为 stale event 参与 validation
+
+#### Scenario: cancel validation MUST stop removing at next task
+
+**前提** execution log 为 `task A, event X, task B, event Y`
+
+**当** 对 `task A` 执行 cancel validation
+
+**那么** `remainingLog` MUST 为 `task B, event Y`
+
+**并且** `task B` MUST 保留用于判断后续 task 是否仍 valid
 
 ### Requirement: effectiveCurrentStats 和 effectiveCompletedProjects MUST 从引擎派生
 
@@ -331,21 +443,41 @@ Presenter 的 `executionTimeline` 和其他 display 逻辑 MUST 从引擎 step �
 
 非编辑模式 cluster 切换（空队列）和 append 操作后，引擎 MUST 处理 auto-event 注入。
 
+持久化 execution log MUST 被视为 `projectId[]` 序列；`TerraformingExecutionEntry.id` 只是 hydrate 后供 UI 删除、展开和缓存使用的内存临时标识，MUST NOT 参与 replay 业务判断。
+
+当 presenter 需要为 timeline、取消按钮或展开状态保留 `TerraformingExecutionEntry.id` 时，该 id MUST 只作为 UI 临时标识使用；重复 `projectId` 的多次 occurrence MUST 保持各自 log entry id，不得合并或引用第一次 occurrence。
+
+event MUST 被视为 replay 从 task 序列派生出的 canonical projectId，不存在独立业务身份。log 中已有的 event 只是上一次 replay 派生后写入的 projectId；若后续 replay 不再生成该 event，canonical sync MUST 移除它。
+
 **前提** `selectCluster` 后 executionLog 为空
 
 **当** 需要执行初始 auto-event
 
-**那么** MUST 调用 `replayExecutionLog([], cluster, data, { flags: {} })` 获取 `ReplayResult`
+**那么** MUST 调用 `replayExecutionLog([], cluster, data, { mode: 'draft', flags: {} })` 获取 canonical `ReplayResult`
 
-**并且** 若 `ReplayResult.steps` 包含 auto-event steps，MUST 将其 projectId 写入 store
+**并且** MUST 将 store execution log 替换为 `ReplayResult.steps.map(step => step.projectId)` 对应的 projectId 序列
 
 **前提** `appendTerraformingProjectExecution` 完成后
 
 **当** 需要检查 auto-event
 
-**那么** MUST 调用 `replayExecutionLog(log, cluster, data, { flags: {} })` 获取 `ReplayResult`
+**那么** MUST 调用 `replayExecutionLog(log, cluster, data, { mode: 'draft', flags: {} })` 获取 canonical `ReplayResult`
 
-**并且** 若 `ReplayResult.steps` 的末尾新增了 auto-event steps（未在原始 log 中），MUST 将其追加到 store
+**并且** MUST 将 store execution log 替换为 `ReplayResult.steps.map(step => step.projectId)` 对应的 projectId 序列
+
+**并且** MUST NOT 通过“原 log 是否包含同名 event projectId”判断是否追加 event。
+
+#### Scenario: misplaced existing event MUST NOT suppress canonical auto-event
+
+**前提** execution log 中已存在 `event X`
+
+**并且** replay 在后续追加的 `task A` 后才生成 `event X`
+
+**当** 非 edit 模式执行 auto-event sync
+
+**那么** store 中 canonical projectId 序列 MUST 为 `task A, event X`
+
+**并且** 原先错位的 `event X` MUST NOT 保留在原位置。
 
 ### Requirement: event 阻断 MUST 基于 stat goal 阻止后续 auto-inject
 
