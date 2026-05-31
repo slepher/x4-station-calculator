@@ -95,7 +95,8 @@
       "unlock": {
         "key": "xen_equipment",
         "params": {
-          "itemWareId": "inv_quantum_data_shard"
+          "itemWareId": "inv_quantum_data_shard",
+          "itemNameId": "{20201,56001}"
         }
       },
       "description": "This research will unlock the ability to modify the mysterious new variants of Xenon ships at personal ship production installations."
@@ -109,7 +110,7 @@
       "tags": [
         "research"
       ],
-      "category": "default",
+      "category": "abandoned",
       "researchTime": 0,
       "cost": {},
       "dependencies": [],
@@ -154,7 +155,7 @@
         "hidden",
         "research"
       ],
-      "category": "default",
+      "category": "abandoned",
       "researchTime": 600,
       "cost": {},
       "dependencies": [
@@ -280,7 +281,7 @@
         "hidden",
         "research"
       ],
-      "category": "default",
+      "category": "abandoned",
       "researchTime": 600,
       "cost": {},
       "dependencies": [],
@@ -882,7 +883,7 @@
       "nameId": "{20216,1481}",
       "name": "Terraformer Tech",
       "descriptionId": "{20216,1482}",
-      "dlcTag": "dlc_terran",
+      "dlcTag": "base",
       "tags": [
         "missiononly",
         "research"
@@ -898,7 +899,7 @@
       "nameId": "{20216,1801}",
       "name": "Condensate Sample",
       "descriptionId": "{20216,1802}",
-      "dlcTag": "dlc_pirate",
+      "dlcTag": "base",
       "tags": [
         "nocustomgamestart",
         "research"
@@ -917,7 +918,8 @@
         "key": "condensate_sample",
         "params": {
           "npcNameId": "{30201,2}",
-          "itemWareId": "inv_condensate_sample"
+          "itemWareId": "inv_condensate_sample",
+          "itemNameId": "{20201,55501}"
         }
       },
       "description": "Analysing the Northriver Company sample could prove to be the first step towards improving conditions in Avarice."
@@ -927,7 +929,7 @@
       "nameId": "{20216,1901}",
       "name": "Condensate Sample Prerequisite",
       "descriptionId": "{20216,1902}",
-      "dlcTag": "dlc_pirate",
+      "dlcTag": "base",
       "tags": [
         "missiononly",
         "research"
@@ -947,7 +949,7 @@
       "nameId": "{20216,2001}",
       "name": "Erlking Power Core",
       "descriptionId": "{20216,2002}",
-      "dlcTag": "dlc_pirate",
+      "dlcTag": "base",
       "tags": [
         "research"
       ],
@@ -960,7 +962,10 @@
       "unlock": {
         "key": "erlking",
         "params": {
-          "shipWareId": "ship_pir_xl_battleship_01_a"
+          "shipWareId": "ship_pir_xl_battleship_01_a",
+          "shipNameId": "{20101,121101}",
+          "sectorMacro": "cluster_502_sector001_macro",
+          "sectorNameId": "{20004,5020011}"
         }
       },
       "description": "Carefully recover the unique power core of the Erlking battleship from its wreckage, in the hopes of incorporating it into a new incarnation of the ship."
@@ -970,7 +975,7 @@
       "nameId": "{20216,2201}",
       "name": "Welfare Module - Casino",
       "descriptionId": "{20216,2202}",
-      "dlcTag": "dlc_pirate",
+      "dlcTag": "base",
       "tags": [
         "research"
       ],
@@ -988,7 +993,7 @@
       "nameId": "{20216,2401}",
       "name": "Investigate leisure habits.",
       "descriptionId": "{20216,2402}",
-      "dlcTag": "dlc_pirate",
+      "dlcTag": "base",
       "tags": [
         "hidden",
         "missiononly",
@@ -1007,7 +1012,7 @@
       "nameId": "{20216,2801}",
       "name": "Elite Sport",
       "descriptionId": "{20216,2802}",
-      "dlcTag": "dlc_timelines",
+      "dlcTag": "base",
       "tags": [
         "nocustomgamestart",
         "research"
@@ -1024,7 +1029,9 @@
         "key": "abandoned_ship",
         "params": {
           "sectorMacro": "cluster_713_sector001_macro",
-          "shipWareId": "ship_arg_s_racer_01_a"
+          "sectorNameId": "{20004,7130011}",
+          "shipWareId": "ship_arg_s_racer_01_a",
+          "shipNameId": "{20101,11904}"
         }
       },
       "description": "Allows limited reproduction of the Sport variant of the Elite."
@@ -1034,7 +1041,7 @@
       "nameId": "{20216,3001}",
       "name": "Theseus Sport",
       "descriptionId": "{20216,3002}",
-      "dlcTag": "dlc_timelines",
+      "dlcTag": "base",
       "tags": [
         "nocustomgamestart",
         "research"
@@ -1051,7 +1058,9 @@
         "key": "abandoned_ship",
         "params": {
           "sectorMacro": "cluster_710_sector001_macro",
-          "shipWareId": "ship_par_s_racer_01_a"
+          "sectorNameId": "{20004,7100011}",
+          "shipWareId": "ship_par_s_racer_01_a",
+          "shipNameId": "{20101,31504}"
         }
       },
       "description": "Allows limited reproduction of the Sport variant of the Theseus."
@@ -1061,7 +1070,7 @@
       "nameId": "{20216,2901}",
       "name": "Kestrel Sport",
       "descriptionId": "{20216,2902}",
-      "dlcTag": "dlc_timelines",
+      "dlcTag": "base",
       "tags": [
         "nocustomgamestart",
         "research"
@@ -1078,7 +1087,9 @@
         "key": "abandoned_ship",
         "params": {
           "sectorMacro": "cluster_714_sector001_macro",
-          "shipWareId": "ship_tel_s_racer_01_a"
+          "sectorNameId": "{20004,7140011}",
+          "shipWareId": "ship_tel_s_racer_01_a",
+          "shipNameId": "{20101,20104}"
         }
       },
       "description": "Allows limited reproduction of the Sport variant of the Kestrel."
@@ -1088,7 +1099,7 @@
       "nameId": "{20216,2701}",
       "name": "Sapporo",
       "descriptionId": "{20216,2702}",
-      "dlcTag": "dlc_timelines",
+      "dlcTag": "base",
       "tags": [
         "nocustomgamestart",
         "research"
@@ -1106,7 +1117,9 @@
         "key": "abandoned_ship",
         "params": {
           "sectorMacro": "cluster_715_sector001_macro",
-          "shipWareId": "ship_ter_l_flagship_01_a"
+          "sectorNameId": "{20004,7150011}",
+          "shipWareId": "ship_ter_l_flagship_01_a",
+          "shipNameId": "{20101,62701}"
         }
       },
       "description": "Allows the building of the Sapporo and its equipment."
@@ -1116,7 +1129,7 @@
       "nameId": "{20216,2601}",
       "name": "Odachi",
       "descriptionId": "{20216,2602}",
-      "dlcTag": "dlc_timelines",
+      "dlcTag": "base",
       "tags": [
         "nocustomgamestart",
         "research"
@@ -1134,7 +1147,9 @@
         "key": "abandoned_ship",
         "params": {
           "sectorMacro": "cluster_48_sector001_macro",
-          "shipWareId": "ship_ter_m_corvette_02_a"
+          "sectorNameId": "{20004,480011}",
+          "shipWareId": "ship_ter_m_corvette_02_a",
+          "shipNameId": "{20101,64801}"
         }
       },
       "description": "Allows the building of the Odachi and its equipment."
@@ -1144,7 +1159,7 @@
       "nameId": "{20216,2501}",
       "name": "Cutlass",
       "descriptionId": "{20216,2502}",
-      "dlcTag": "dlc_timelines",
+      "dlcTag": "base",
       "tags": [
         "nocustomgamestart",
         "research"
@@ -1162,7 +1177,9 @@
         "key": "abandoned_ship",
         "params": {
           "sectorMacro": "cluster_31_sector001_macro",
-          "shipWareId": "ship_ter_s_fighter_04_a"
+          "sectorNameId": "{20004,310011}",
+          "shipWareId": "ship_ter_s_fighter_04_a",
+          "shipNameId": "{20101,60401}"
         }
       },
       "description": "Allows the building of the Cutlass and its equipment."
@@ -1172,7 +1189,7 @@
       "nameId": "{20216,4001}",
       "name": "Cypher",
       "descriptionId": "{20216,4002}",
-      "dlcTag": "dlc_mini_02",
+      "dlcTag": "base",
       "tags": [
         "nocustomgamestart",
         "research"
@@ -1189,7 +1206,8 @@
       "unlock": {
         "key": "abandoned_ship",
         "params": {
-          "shipWareId": "ship_gen_m_corvette_02"
+          "shipWareId": "ship_gen_m_corvette_02",
+          "shipNameId": "{20101,123701}"
         }
       },
       "description": "This research grants technical insights that allow the reproduction of the legendary ship, the Cypher."
