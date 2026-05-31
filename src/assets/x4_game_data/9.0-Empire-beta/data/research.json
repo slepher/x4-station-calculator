@@ -855,7 +855,7 @@
       "unlock": {
         "key": "xenon_crisis_01"
       },
-      "description": "033#text_error#Warning: May lead to an overwhelming crisis. 033X n nTaking advantage of the extensive presence of your ships throughout the Jump Gate network, this research will pool and analyse vast amounts of data in the hope of unravelling the mysteries of the universe."
+      "description": "Warning: May lead to an overwhelming crisis. Taking advantage of the extensive presence of your ships throughout the Jump Gate network, this research will pool and analyse vast amounts of data in the hope of unravelling the mysteries of the universe."
     },
     {
       "id": "research_xenon_crisis_02",
@@ -876,14 +876,14 @@
       "unlock": {
         "key": "xenon_crisis_02"
       },
-      "description": "The data from the previous Xenon-Kha'ak crisis has been exhausted of all reasonable usefulness. To gain more insight into such Xenon behaviour an attack signal could be encoded with the CPU ship's signature to trigger another phase of aggression. Whether the actual CPU ship halts or commits to these new assaults is unknown. n n 033#text_error#Warning: Research may lead to; criminal charges, extinction, incarceration, heightened blood-pressure , injury and loss of property. 033X"
+      "description": "The data from the previous Xenon-Kha'ak crisis has been exhausted of all reasonable usefulness. To gain more insight into such Xenon behaviour an attack signal could be encoded with the CPU ship's signature to trigger another phase of aggression. Whether the actual CPU ship halts or commits to these new assaults is unknown. Warning: Research may lead to; criminal charges, extinction, incarceration, heightened blood-pressure , injury and loss of property."
     },
     {
       "id": "research_tf_tech",
       "nameId": "{20216,1481}",
       "name": "Terraformer Tech",
       "descriptionId": "{20216,1482}",
-      "dlcTag": "base",
+      "dlcTag": "dlc_terran",
       "tags": [
         "missiononly",
         "research"
@@ -899,7 +899,7 @@
       "nameId": "{20216,1801}",
       "name": "Condensate Sample",
       "descriptionId": "{20216,1802}",
-      "dlcTag": "base",
+      "dlcTag": "dlc_pirate",
       "tags": [
         "nocustomgamestart",
         "research"
@@ -929,7 +929,7 @@
       "nameId": "{20216,1901}",
       "name": "Condensate Sample Prerequisite",
       "descriptionId": "{20216,1902}",
-      "dlcTag": "base",
+      "dlcTag": "dlc_pirate",
       "tags": [
         "missiononly",
         "research"
@@ -949,7 +949,7 @@
       "nameId": "{20216,2001}",
       "name": "Erlking Power Core",
       "descriptionId": "{20216,2002}",
-      "dlcTag": "base",
+      "dlcTag": "dlc_pirate",
       "tags": [
         "research"
       ],
@@ -975,7 +975,7 @@
       "nameId": "{20216,2201}",
       "name": "Welfare Module - Casino",
       "descriptionId": "{20216,2202}",
-      "dlcTag": "base",
+      "dlcTag": "dlc_pirate",
       "tags": [
         "research"
       ],
@@ -993,7 +993,7 @@
       "nameId": "{20216,2401}",
       "name": "Investigate leisure habits.",
       "descriptionId": "{20216,2402}",
-      "dlcTag": "base",
+      "dlcTag": "dlc_pirate",
       "tags": [
         "hidden",
         "missiononly",
@@ -1012,7 +1012,7 @@
       "nameId": "{20216,2801}",
       "name": "Elite Sport",
       "descriptionId": "{20216,2802}",
-      "dlcTag": "base",
+      "dlcTag": "dlc_timelines",
       "tags": [
         "nocustomgamestart",
         "research"
@@ -1041,7 +1041,7 @@
       "nameId": "{20216,3001}",
       "name": "Theseus Sport",
       "descriptionId": "{20216,3002}",
-      "dlcTag": "base",
+      "dlcTag": "dlc_timelines",
       "tags": [
         "nocustomgamestart",
         "research"
@@ -1070,7 +1070,7 @@
       "nameId": "{20216,2901}",
       "name": "Kestrel Sport",
       "descriptionId": "{20216,2902}",
-      "dlcTag": "base",
+      "dlcTag": "dlc_timelines",
       "tags": [
         "nocustomgamestart",
         "research"
@@ -1099,7 +1099,7 @@
       "nameId": "{20216,2701}",
       "name": "Sapporo",
       "descriptionId": "{20216,2702}",
-      "dlcTag": "base",
+      "dlcTag": "dlc_timelines",
       "tags": [
         "nocustomgamestart",
         "research"
@@ -1129,7 +1129,7 @@
       "nameId": "{20216,2601}",
       "name": "Odachi",
       "descriptionId": "{20216,2602}",
-      "dlcTag": "base",
+      "dlcTag": "dlc_timelines",
       "tags": [
         "nocustomgamestart",
         "research"
@@ -1159,7 +1159,7 @@
       "nameId": "{20216,2501}",
       "name": "Cutlass",
       "descriptionId": "{20216,2502}",
-      "dlcTag": "base",
+      "dlcTag": "dlc_timelines",
       "tags": [
         "nocustomgamestart",
         "research"
@@ -1189,7 +1189,7 @@
       "nameId": "{20216,4001}",
       "name": "Cypher",
       "descriptionId": "{20216,4002}",
-      "dlcTag": "base",
+      "dlcTag": "dlc_mini_02",
       "tags": [
         "nocustomgamestart",
         "research"
