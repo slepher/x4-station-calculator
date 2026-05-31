@@ -2041,12 +2041,14 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     return map
   })
 
+  const BLUEPRINT_DOCK_MODULE_ID = 'module_gen_build_dockarea_m_01'
+
   const hqBuildDocks = computed<{ totalSlots: number } | null>(() => {
     const modules = store.terraformingHqEffectiveModules.value
     const gameData = useGameDataStore()
     const mm = gameData.modulesMap as Record<string, X4Module>
     if (!modules.length) {
-      const mod = mm['module_gen_build_dockarea_m_01'] as X4Module | undefined
+      const mod = mm[BLUEPRINT_DOCK_MODULE_ID] as X4Module | undefined
       if (mod) return { totalSlots: 1 * mod.buildProcessorCount }
       return null
     }
@@ -2065,10 +2067,9 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     const localizedMap = gameData.localizedModulesMap as Record<string, { localeName: string; name: string }>
     const mm = gameData.modulesMap as Record<string, X4Module>
     if (!modules.length) {
-      const mod = mm['module_gen_build_dockarea_m_01'] as X4Module | undefined
+      const mod = mm[BLUEPRINT_DOCK_MODULE_ID] as X4Module | undefined
       if (mod) {
-        const name = localizedMap['module_gen_build_dockarea_m_01']!.localeName
-        return [{ name, count: 1, slots: 1 * mod.buildProcessorCount }]
+        return [{ name: localizedMap[BLUEPRINT_DOCK_MODULE_ID]!.localeName, count: 1, slots: 1 * mod.buildProcessorCount }]
       }
       return []
     }
