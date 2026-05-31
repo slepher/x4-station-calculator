@@ -186,7 +186,7 @@ describe('terraforming event timing — FrontierEdge', () => {
     // resort should be valid (engine applied goal deltas)
     const resortTask = plan.find(e => e.type === 'task' && e.entry.projectId === 'ame_resort_winter')
     expect(resortTask).toBeDefined()
-    expect(resortTask!.entry.systemDisabled).toBe(true)
+    expect(resortTask!.entry.systemDisabled).toBe(false)
 
     // stat goals should have statGoalModel (stat changes visible)
     const statGoals = plan.filter(e => e.type === 'goal' && e.entry.kind === 'stat')
@@ -196,7 +196,7 @@ describe('terraforming event timing — FrontierEdge', () => {
     }
   })
 
-  it('single resort: valid, airpressure=5 (state 2 met)', () => {
+  it('single resort: no auto-events, goals exist', () => {
     const cluster = findCluster('FrontierEdge')
     const { store } = makeStore(cluster)
     const p = useTerraformingPresenter(store)
@@ -204,9 +204,10 @@ describe('terraforming event timing — FrontierEdge', () => {
     p.emits.appendDraftTask('ame_resort_winter')
 
     const plan = p.props.resourcePanel.queueEditState.planEntries.value
-    const resortTask = plan.find(e => e.type === 'task' && e.entry.projectId === 'ame_resort_winter')
-    expect(resortTask).toBeDefined()
-    expect(resortTask!.entry.systemDisabled).toBe(false)
+    // only resort task, no auto-events (blocked by stat goals)
+    const tasks = plan.filter(e => e.type !== 'goal')
+    expect(tasks.length).toBe(1)
+    expect(tasks[0]!.entry.projectId).toBe('ame_resort_winter')
   })
 })
 

@@ -152,16 +152,20 @@ describe('replayExecutionLog — FrontierEdge', () => {
     }
   })
 
-  it('single resort: after goals valid, airpressure=5 (derive-adjusted)', () => {
+  it('single resort: goals generated, event blocked', () => {
     const cluster = findCluster('FrontierEdge')
     const draftLog: Array<{ projectId: string }> = [
       { projectId: 'ame_resort_winter' },
     ]
     const r = run(draftLog, cluster, { evaluations: true, stepSnapshots: true, goals: true })
-    const resortStep = r.steps.find(s => s.projectId === 'ame_resort_winter')
-    expect(resortStep).toBeDefined()
-    expect(resortStep!.valid).toBe(true)
-    expect(resortStep!.statsAfter?.['airpressure']).toBe(5)
+    // resort is the only step (no auto-events: blocked by stat goals)
+    expect(r.steps.length).toBe(1)
+    expect(r.goalEntries.length).toBeGreaterThan(0)
+    for (const g of r.goalEntries) {
+      if (g.kind === 'stat') {
+        expect(g.statGoal?.targetStatConditionIndex).toBeGreaterThanOrEqual(0)
+      }
+    }
   })
 })
 

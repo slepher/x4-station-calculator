@@ -441,10 +441,37 @@ export function replayExecutionLog(
       runningStats[condition.stat] = targetValue
     }
 
-    // After applying goals, adjust airpressure to account for derive offset
-    // so that deriveAirPressure produces the correct final value.
-    // airpressure is derived from gas stats (oxygen + methane + CO2) / 4.
-    if (runningStats['airpressure'] !== undefined) {
+    const apBeforeLoop = runningStats['airpressure']
+    for (const { condition, originalIndex } of sortedConditions) {
+      const ci = originalIndex
+      if (!isStatInRuntime(runningStats, condition.stat)) continue
+      if (checkStatConditionMet(condition, currentStats(), data.stats)) continue
+
+      const targetValue = computeTargetValue(condition, currentStats(), data.stats)
+      const currentValue = currentStats()[condition.stat] ?? 0
+
+      const existing = goalEntries.find(
+        g => g.kind === 'stat' && g.statGoal?.statId === condition.stat && g.statGoal?.targetValue === targetValue,
+      )
+      if (existing) {
+        if (!existing.dependentTaskIds.includes(projectId)) {
+          existing.dependentTaskIds.push(projectId)
+        }
+      } else {
+        goalEntries.push({
+          id: `goal-${++goalSeq}`, kind: 'stat', position: stepIndex,
+          dependentTaskIds: [projectId],
+          statGoal: { statId: condition.stat, currentValue, targetValue, targetStatConditionIndex: ci },
+        })
+      }
+
+      runningStats[condition.stat] = targetValue
+    }
+
+    // After applying goals, adjust airpressure to account for derive offset.
+    // Only adjust if airpressure was actually modified by a goal in this loop.
+    if (apBeforeLoop !== undefined && runningStats['airpressure'] !== undefined
+        && runningStats['airpressure'] !== apBeforeLoop) {
       const gases = ['oxygen', 'methane', 'carbondioxide'] as const
       const initialAtmos = gases.reduce((sum, g) => sum + (cluster.initialStats[g] ?? 0), 0)
       const currentAtmos = gases.reduce((sum, g) => sum + (runningStats[g] ?? 0), 0)
@@ -480,10 +507,16 @@ export function replayExecutionLog(
 
   const maxIterations = 20
   const insertedEventIds = new Set<string>()
+  const blockedStatIds = new Set<string>()
   const runtimeProjectIds = new Set(getRuntimeTerraformingProjectIds(cluster))
   const statAffectingEvents = data.projects.filter(
     p => p.group === 'events' && isStatAffectingEvent(p) && runtimeProjectIds.has(p.id),
   )
+  // eventStatIds: stats referenced by event conditions (for blocking)
+  const eventStatIds = new Set<string>()
+  for (const event of statAffectingEvents) {
+    for (const cond of event.conditions) eventStatIds.add(cond.stat)
+  }
 
   // Track which log entries have been consumed.
   let logIndex = 0
@@ -494,7 +527,7 @@ export function replayExecutionLog(
     return false
   }
 
-  function injectEventsAtPosition() {
+  function injectEventsAtPosition(initialPhase: boolean = false) {
     let triggered = true
     let iter = 0
     while (triggered && iter < maxIterations) {
@@ -504,6 +537,7 @@ export function replayExecutionLog(
         if (event.repeatCooldown === null && insertedEventIds.has(event.id)) continue
         if (event.repeatCooldown === null && (runningCompleted.get(event.id) ?? 0) > 0) continue
         if (upcomingLogHasEvent(event.id)) continue
+        if (!initialPhase && event.conditions.some(c => blockedStatIds.has(c.stat))) continue
         if (checkAllConditions(event.conditions, currentStats(), data.stats)) {
           pushStep(event.id, 'auto-event', true)
           insertedEventIds.add(event.id)
@@ -514,8 +548,8 @@ export function replayExecutionLog(
     }
   }
 
-  // 1. Initial events
-  injectEventsAtPosition()
+  // 1. Initial events (not affected by goal blocking)
+  injectEventsAtPosition(true)
 
   // 2. Process each log entry
   for (const entry of log) {
@@ -538,6 +572,15 @@ export function replayExecutionLog(
       if (evalResult.valid) {
         pushStep(entry.projectId, 'task', true, evalResult)
       } else if (goals) {
+        // Block event conditions for unmet stat conditions
+        if (project && logIndex >= 0) {
+          for (const cond of project.conditions) {
+            if (eventStatIds.has(cond.stat) && !checkStatConditionMet(cond, currentStats(), data.stats)) {
+              blockedStatIds.add(cond.stat)
+              break
+            }
+          }
+        }
         generateGoalsForEntry(entry.projectId, stepIndex)
         continue
       } else {
