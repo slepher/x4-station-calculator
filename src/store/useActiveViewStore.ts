@@ -136,6 +136,9 @@ export const useActiveViewStore = defineStore('activeView', () => {
   const activeEmpireWorkbench = computed<ActiveViewState['activeEmpireWorkbench']>({
     get: () => state.value.activeEmpireWorkbench,
     set: (val) => {
+      if (val !== 'terraforming') {
+        state.value.activeTerraformingClusterId = null
+      }
       state.value.activeEmpireWorkbench = val
       saveToStorage(state.value)
     }
