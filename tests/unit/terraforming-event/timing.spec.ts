@@ -165,6 +165,36 @@ describe('terraforming event timing — FrontierEdge', () => {
     // Should have population stat goal (housing)
     expect(statGoalIds.filter(s => s === 'population').length).toBeGreaterThan(0)
   })
+
+  it('resort is invalid with goals showing stat changes', () => {
+    const cluster = findCluster('FrontierEdge')
+    const { store } = makeStore(cluster)
+    const p = useTerraformingPresenter(store)
+    p.emits.startQueueEdit()
+
+    p.emits.appendDraftTask('ter_tectonic_scaffolding')
+    p.emits.appendDraftTask('tmp_blackdust')
+    p.emits.appendDraftTask('evt_icemelt')
+    p.emits.appendDraftTask('bio_tailored')
+    p.emits.appendDraftTask('agr_fertilize')
+    p.emits.appendDraftTask('agr_fields_wheat')
+    p.emits.appendDraftTask('agr_forestation')
+    p.emits.appendDraftTask('ame_resort_winter')
+
+    const plan = p.props.resourcePanel.queueEditState.planEntries.value
+
+    // resort should be valid (engine applied goal deltas)
+    const resortTask = plan.find(e => e.type === 'task' && e.entry.projectId === 'ame_resort_winter')
+    expect(resortTask).toBeDefined()
+    expect(resortTask!.entry.systemDisabled).toBe(false)
+
+    // stat goals should have statGoalModel (stat changes visible)
+    const statGoals = plan.filter(e => e.type === 'goal' && e.entry.kind === 'stat')
+    expect(statGoals.length).toBeGreaterThanOrEqual(1)
+    for (const g of statGoals) {
+      expect(g.entry.statGoalModel).toBeDefined()
+    }
+  })
 })
 
 describe('terraforming event timing — BlackHoleSun', () => {

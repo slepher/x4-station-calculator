@@ -1438,6 +1438,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
           id: nextGoalId(), kind: 'stat',
           label: eg.statGoal ? (statNames.get(eg.statGoal.statId) || eg.statGoal.statId) : '',
           targetProjectId: null, targetStatId: eg.statGoal?.statId ?? null,
+          targetStatConditionIndex: eg.statGoal?.targetStatConditionIndex,
           position, satisfied: false, hasRisk: false,
           dependentTaskIds: eg.dependentTaskIds.map(id => draftEntries.find(e => e.projectId === id)?.id ?? id),
           hasExistingTask: false,

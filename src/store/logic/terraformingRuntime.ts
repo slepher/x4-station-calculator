@@ -51,7 +51,7 @@ export interface GoalEntry {
   kind: 'stat' | 'project'
   position: number
   dependentTaskIds: string[]
-  statGoal?: { statId: string; currentValue: number; targetValue: number }
+  statGoal?: { statId: string; currentValue: number; targetValue: number; targetStatConditionIndex: number }
   projectGoal?: { targetProjectId: string }
 }
 
@@ -426,7 +426,7 @@ export function replayExecutionLog(
         goalEntries.push({
           id: `goal-${++goalSeq}`, kind: 'stat', position: stepIndex,
           dependentTaskIds: [projectId],
-          statGoal: { statId: condition.stat, currentValue, targetValue },
+          statGoal: { statId: condition.stat, currentValue, targetValue, targetStatConditionIndex: ci },
         })
       }
 

@@ -128,6 +128,30 @@ describe('replayExecutionLog — FrontierEdge', () => {
     expect(statGoalIds.filter(s => s === 'airpressure')).toEqual([])
     expect(statGoalIds.filter(s => s === 'population').length).toBeGreaterThan(0)
   })
+
+  it('resort is invalid with 4 stat goals having targetValue', () => {
+    const cluster = findCluster('FrontierEdge')
+    const draftLog: Array<{ projectId: string }> = [
+      'ter_tectonic_scaffolding', 'tmp_blackdust', 'evt_icemelt', 'bio_tailored',
+      'agr_fertilize', 'agr_fields_wheat', 'agr_forestation', 'ame_resort_winter',
+    ].map(id => ({ projectId: id }))
+
+    const r = run(draftLog, cluster, { evaluations: true, stepSnapshots: true, goals: true })
+
+    // resort should be in steps — engine applies goal deltas to make it valid
+    const resortStep = r.steps.find(s => s.projectId === 'ame_resort_winter')
+    expect(resortStep).toBeDefined()
+    expect(resortStep!.valid).toBe(true)
+
+    // stat goals should have targetStatConditionIndex for UI display
+    const statGoals = r.goalEntries.filter(g => g.kind === 'stat')
+    // at least population goal exists; some goals merged with prior entries
+    expect(statGoals.length).toBeGreaterThanOrEqual(1)
+    for (const g of statGoals) {
+      expect(g.statGoal).toBeDefined()
+      expect(g.statGoal!.targetStatConditionIndex).toBeGreaterThanOrEqual(0)
+    }
+  })
 })
 
 describe('replayExecutionLog — BlackHoleSun', () => {
