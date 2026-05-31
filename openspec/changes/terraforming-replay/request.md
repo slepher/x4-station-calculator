@@ -80,6 +80,22 @@ interface TerraformingReplayResult {
 24. `effectiveCurrentStats` / `effectiveCompletedProjects` / `taskTree` 从引擎结果派生。
 25. `getExecutionCancelValidation` 用引擎（不需要 stepSnapshots，只需要 evaluations）。
 
+### Event 注入收敛规则
+
+26. 引擎注入 event 前检查 `upcomingLogHasEvent(event.id)`：若 log 中存在同名 event，不重复注入。
+27. edit 模式下，goals flag 打开时：若某 entry 的 unmet stat condition 的 stat 属于事件的 condition stat 集合，该 stat 被阻断，后续 per-entry 和 end-of-queue 的 auto-event injection 跳过条件涉及已阻断 stat 的事件。初始 phase 不受影响。
+
+### Goal 生成规则
+
+28. engine 的 goal 生成检查 `project.predecessors`（非仅 `dependencies`）：
+    - `type: 'project', any` → 均未完成则生成所有成员 projectGoal
+    - `type: 'project', !any` → 每个未完成成员独立生成 projectGoal
+29. `GoalEntry.statGoal` 必须包含 `targetStatConditionIndex: number`，记录该 stat goal 对应的 project conditions 数组索引，供 UI 定位条件定义。
+30. airpressure 是派生 stat（由氧气+甲烷+CO2 导出），engine 在 goal 循环中：
+    - 按依赖排序（airpressure 在气体 stat 之后处理）
+    - airpressure goal 设定后，减除当前气体贡献，使 `deriveAirPressure` 重算后恰好落在目标值
+31. presenter 的 `resolveInsertIndex` 检查预防型 goal：若待插入 project 的 effects 命中预防型 goal 的 `targetStatId`，插入到队列最前端（position 0）。
+
 ### 接口变更
 
 26. `useTerraformingStore` 不新增 mutation，不改变持久化。引擎是纯计算层。
@@ -106,6 +122,10 @@ interface TerraformingReplayResult {
 - `generateGoalEntries` 签名变更（接收 `ReplayResult`）
 - 删除 `computeSequentialStatsFromLog`、`computeTerraformingRuntimeStats`、`executeAutoEvents`
 - 删除 presenter 三处内联循环、`pushTaskEntry`/`pushEventEntry` 闭包
+- event blocking（stat goal 阻断后续 auto-event injection）
+- predecessors goal 生成（`project.predecessors` 检查）
+- 预防型 goal satisfier 前端插入（`resolveInsertIndex` 返回 0）
+- deriveAirPressure goal 调节（airpressure 按依赖排序 + 气体贡献减除）
 - `npm run build` 无编译错误
 
 ### Out of Scope
@@ -124,7 +144,12 @@ interface TerraformingReplayResult {
 4. `computeTerraformingRuntimeStats` 和 `computeSequentialStatsFromLog` 已删除。
 5. `executeAutoEvents` `pushTaskEntry` `pushEventEntry` 已移除。
 6. 引擎的 ReplayResult 中的 stats 与当前多种重放路径的 stats 一致（无上下限处理误差）。
-7. `npm run build` 无编译错误。
+7. 引擎正确执行 event 阻断（stat goal 产生后，auto-event 条件涉及该 stat 的事件不触发）。
+8. 引擎正确生成 predecessors 对应的 project goal。
+9. 预防型 goal satisfier 插入到队列最前端。
+10. `GoalEntry.statGoal.targetStatConditionIndex` 已填充，UI 可据此显示 stat 变化。
+11. 引擎正确调节 deriveAirPressure（gas contribution 减除），使 airpressure goal 的目标值在 `deriveAirPressure` 重算后准确落在目标 state。
+12. `npm run build` 无编译错误。
 
 ## 未决项
 
