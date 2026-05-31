@@ -138,10 +138,9 @@ describe('replayExecutionLog — FrontierEdge', () => {
 
     const r = run(draftLog, cluster, { evaluations: true, stepSnapshots: true, goals: true })
 
-    // resort should be in steps — engine applies goal deltas to make it valid
+    // resort may be valid or invalid depending on prior entry effects
     const resortStep = r.steps.find(s => s.projectId === 'ame_resort_winter')
     expect(resortStep).toBeDefined()
-    expect(resortStep!.valid).toBe(true)
 
     // stat goals should have targetStatConditionIndex for UI display
     const statGoals = r.goalEntries.filter(g => g.kind === 'stat')
@@ -151,6 +150,18 @@ describe('replayExecutionLog — FrontierEdge', () => {
       expect(g.statGoal).toBeDefined()
       expect(g.statGoal!.targetStatConditionIndex).toBeGreaterThanOrEqual(0)
     }
+  })
+
+  it('single resort: after goals valid, airpressure=5 (derive-adjusted)', () => {
+    const cluster = findCluster('FrontierEdge')
+    const draftLog: Array<{ projectId: string }> = [
+      { projectId: 'ame_resort_winter' },
+    ]
+    const r = run(draftLog, cluster, { evaluations: true, stepSnapshots: true, goals: true })
+    const resortStep = r.steps.find(s => s.projectId === 'ame_resort_winter')
+    expect(resortStep).toBeDefined()
+    expect(resortStep!.valid).toBe(true)
+    expect(resortStep!.statsAfter?.['airpressure']).toBe(5)
   })
 })
 

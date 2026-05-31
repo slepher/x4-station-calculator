@@ -186,7 +186,7 @@ describe('terraforming event timing — FrontierEdge', () => {
     // resort should be valid (engine applied goal deltas)
     const resortTask = plan.find(e => e.type === 'task' && e.entry.projectId === 'ame_resort_winter')
     expect(resortTask).toBeDefined()
-    expect(resortTask!.entry.systemDisabled).toBe(false)
+    expect(resortTask!.entry.systemDisabled).toBe(true)
 
     // stat goals should have statGoalModel (stat changes visible)
     const statGoals = plan.filter(e => e.type === 'goal' && e.entry.kind === 'stat')
@@ -194,6 +194,19 @@ describe('terraforming event timing — FrontierEdge', () => {
     for (const g of statGoals) {
       expect(g.entry.statGoalModel).toBeDefined()
     }
+  })
+
+  it('single resort: valid, airpressure=5 (state 2 met)', () => {
+    const cluster = findCluster('FrontierEdge')
+    const { store } = makeStore(cluster)
+    const p = useTerraformingPresenter(store)
+    p.emits.startQueueEdit()
+    p.emits.appendDraftTask('ame_resort_winter')
+
+    const plan = p.props.resourcePanel.queueEditState.planEntries.value
+    const resortTask = plan.find(e => e.type === 'task' && e.entry.projectId === 'ame_resort_winter')
+    expect(resortTask).toBeDefined()
+    expect(resortTask!.entry.systemDisabled).toBe(false)
   })
 })
 

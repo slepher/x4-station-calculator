@@ -407,8 +407,16 @@ export function replayExecutionLog(
     }
 
     // 2. Stat condition goals: apply delta to runningStats
-    for (let ci = 0; ci < project.conditions.length; ci++) {
-      const condition = project.conditions[ci]!
+    // Process airpressure last (derived stat: fixing gases first adjusts airpressure)
+    const sortedConditions = project.conditions
+      .map((c, i) => ({ condition: c, originalIndex: i }))
+      .sort((a, b) => {
+        if (a.condition.stat === 'airpressure') return 1
+        if (b.condition.stat === 'airpressure') return -1
+        return 0
+      })
+    for (const { condition, originalIndex } of sortedConditions) {
+      const ci = originalIndex
       if (!isStatInRuntime(runningStats, condition.stat)) continue
       if (checkStatConditionMet(condition, currentStats(), data.stats)) continue
 
@@ -431,6 +439,20 @@ export function replayExecutionLog(
       }
 
       runningStats[condition.stat] = targetValue
+    }
+
+    // After applying goals, adjust airpressure to account for derive offset
+    // so that deriveAirPressure produces the correct final value.
+    // airpressure is derived from gas stats (oxygen + methane + CO2) / 4.
+    if (runningStats['airpressure'] !== undefined) {
+      const gases = ['oxygen', 'methane', 'carbondioxide'] as const
+      const initialAtmos = gases.reduce((sum, g) => sum + (cluster.initialStats[g] ?? 0), 0)
+      const currentAtmos = gases.reduce((sum, g) => sum + (runningStats[g] ?? 0), 0)
+      const initialContrib = Math.floor(initialAtmos / 4)
+      const currentContrib = Math.floor(currentAtmos / 4)
+      if (currentContrib !== initialContrib) {
+        runningStats['airpressure'] = Math.max(0, runningStats['airpressure'] - (currentContrib - initialContrib))
+      }
     }
 
     // 3. Re-evaluate after goals applied
