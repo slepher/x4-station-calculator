@@ -137,14 +137,6 @@ pub(crate) struct Meta {
 }
 
 #[derive(Clone, Serialize, Deserialize)]
-pub(crate) struct SaveTerraformingShipBatch {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "macro")]
-    pub(crate) macro_field: Option<String>,
-    pub(crate) amount: i64,
-}
-
-#[derive(Clone, Serialize, Deserialize)]
 pub(crate) struct PlayerStationConstruction {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) id: Option<String>,
