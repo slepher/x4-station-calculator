@@ -386,4 +386,24 @@ mod tests {
         assert_eq!(overrides.sell[1].ware, "quantumtubes");
         assert_eq!(overrides.sell[1].amount, 3000);
     }
+
+    #[test]
+    fn research_runtime_serializes_with_null_active_id() {
+        let r = crate::model::SaveResearchRuntime::default();
+        let json = serde_json::to_string(&r).unwrap();
+        assert!(json.contains("\"activeId\":null"), "expected activeId:null, got: {}", json);
+    }
+
+    #[test]
+    fn research_runtime_serializes_with_active_id() {
+        let r = crate::model::SaveResearchRuntime {
+            visible_ids: vec!["research_a".into()],
+            completed_ids: vec!["research_b".into()],
+            active_id: Some("research_c".into()),
+        };
+        let json = serde_json::to_string(&r).unwrap();
+        assert!(json.contains("\"visibleIds\":[\"research_a\"]"), "got: {}", json);
+        assert!(json.contains("\"completedIds\":[\"research_b\"]"), "got: {}", json);
+        assert!(json.contains("\"activeId\":\"research_c\""), "got: {}", json);
+    }
 }

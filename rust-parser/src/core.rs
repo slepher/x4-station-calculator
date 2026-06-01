@@ -2,8 +2,8 @@ use crate::model::{
     norm_ver, AbandonedShipEntry, AggregatedEquipment, AggregatedStationModule, ArchiveMeta,
     BuildProgress, BuildStorageEntry, DatavaultEntry, DatavaultWareEntry, FactionStationEntry,
     Meta, NpcStationEntry, ParserError, PlayerStationConstruction, PlayerStationEntry, SaveArchive,
-    SectorData, StationBaseEntry, StationEquipment, StationTradeOverrides, Vector3, WareAmount,
-    WorkforceEntry,
+    SaveResearchRuntime, SectorData, StationBaseEntry, StationEquipment, StationTradeOverrides,
+    Vector3, WareAmount, WorkforceEntry,
 };
 use std::collections::{HashMap, VecDeque};
 
@@ -108,6 +108,9 @@ pub(crate) struct SaveParserCore {
     entry_ref: Option<String>,
     entry_predecessor: Option<i64>,
     entry_eq: Vec<StationEquipment>,
+    research: SaveResearchRuntime,
+    in_player_researchables: bool,
+    in_player_completed_research: bool,
 }
 
 impl SaveParserCore {
@@ -132,6 +135,9 @@ impl SaveParserCore {
             entry_ref: None,
             entry_predecessor: None,
             entry_eq: Vec::new(),
+            research: SaveResearchRuntime::default(),
+            in_player_researchables: false,
+            in_player_completed_research: false,
         }
     }
 
@@ -566,6 +572,57 @@ impl SaveParserCore {
             });
         }
 
+        if name == "entries"
+            && self.is_inside_player_component()
+            && a.get("type").map_or(false, |t| t == "researchables")
+        {
+            self.in_player_researchables = true;
+        }
+
+        if name == "entry" && self.in_player_researchables {
+            if let Some(id) = a.get("id").cloned() {
+                if id.starts_with("research_") {
+                    self.research.visible_ids.push(id);
+                }
+            }
+        }
+
+        if name == "research" && self.is_inside_player_component() {
+            if a.contains_key("ware") {
+                if self.in_player_completed_research {
+                    if a.get("method").map_or(false, |m| m == "research") {
+                        if let Some(ware) = a.get("ware").cloned() {
+                            if ware.starts_with("research_") {
+                                self.research.completed_ids.push(ware);
+                            }
+                        }
+                    }
+                }
+            } else {
+                self.in_player_completed_research = true;
+            }
+        }
+
+        if name == "queue" && self.is_inside_research_production() {
+            let parent_is_production = self.path.len() >= 2
+                && self
+                    .path
+                    .get(self.path.len() - 2)
+                    .map(|s| s.as_str())
+                    == Some("production");
+            if parent_is_production {
+                if let Some(method) = a.get("method") {
+                    if method == "research" {
+                        if let Some(ware) = a.get("ware").cloned() {
+                            if ware.starts_with("research_") {
+                                self.research.active_id = Some(ware);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         Ok(())
     }
 
@@ -810,6 +867,22 @@ impl SaveParserCore {
             self.comp_stack.pop_back();
         }
 
+        if name == "entries" && self.in_player_researchables {
+            self.in_player_researchables = false;
+        }
+
+        if name == "research" && self.in_player_completed_research {
+            let parent_is_research = self.path.len() >= 2
+                && self
+                    .path
+                    .get(self.path.len() - 2)
+                    .map(|s| s.as_str())
+                    == Some("research");
+            if !parent_is_research {
+                self.in_player_completed_research = false;
+            }
+        }
+
         self.path.pop_back();
         Ok(())
     }
@@ -849,6 +922,7 @@ impl SaveParserCore {
             sectors: self.sectors.clone(),
             is_compatible,
             is_valid: true,
+            research: self.research.clone(),
         })
     }
 
@@ -896,6 +970,18 @@ impl SaveParserCore {
             .iter_mut()
             .rev()
             .find(|ctx| ctx.class == "buildstorage")
+    }
+
+    fn is_inside_player_component(&self) -> bool {
+        self.comp_stack.iter().any(|ctx| ctx.class == "player")
+    }
+
+    fn is_inside_research_production(&self) -> bool {
+        self.comp_stack.iter().any(|ctx| {
+            ctx.class == "production"
+                && ctx.macro_field.as_deref()
+                    == Some("landmarks_player_hq_01_research_macro")
+        })
     }
 }
 

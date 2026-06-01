@@ -256,6 +256,12 @@ export interface PlayerStationRecord {
   data: PlayerStationEntry | BuildStorageEntry
 }
 
+export interface SaveResearchRuntime {
+  visibleIds: string[]
+  completedIds: string[]
+  activeId: string | null
+}
+
 export interface PlayerStationsRecord {
   id: string
   archiveId: string
@@ -263,6 +269,7 @@ export interface PlayerStationsRecord {
   data: {
     player_stations: Record<string, Record<string, PlayerStationEntry>>
     player_buildstorages: Record<string, Record<string, BuildStorageEntry>>
+    research: SaveResearchRuntime
   }
 }
 
@@ -296,6 +303,7 @@ export interface SaveArchive {
   sectors: Record<string, SectorData>
   isCompatible: boolean
   isValid: boolean
+  research?: SaveResearchRuntime
 }
 
 export interface ArchiveMeta {

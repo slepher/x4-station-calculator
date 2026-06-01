@@ -1,4 +1,4 @@
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Serialize, Serializer};
 use std::collections::HashMap;
 
 #[derive(Clone, Copy, Debug, Serialize, PartialEq, Eq)]
@@ -323,6 +323,22 @@ pub(crate) struct SectorData {
     pub(crate) abandoned_ships: HashMap<String, AbandonedShipEntry>,
 }
 
+#[derive(Clone, Serialize, Default)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct SaveResearchRuntime {
+    pub(crate) visible_ids: Vec<String>,
+    pub(crate) completed_ids: Vec<String>,
+    #[serde(serialize_with = "serialize_option_str_or_null")]
+    pub(crate) active_id: Option<String>,
+}
+
+fn serialize_option_str_or_null<S: Serializer>(v: &Option<String>, s: S) -> Result<S::Ok, S::Error> {
+    match v {
+        Some(val) => s.serialize_str(val),
+        None => s.serialize_none(),
+    }
+}
+
 #[derive(Clone, Serialize)]
 pub(crate) struct SaveArchive {
     pub(crate) meta: ArchiveMeta,
@@ -331,6 +347,7 @@ pub(crate) struct SaveArchive {
     pub(crate) is_compatible: bool,
     #[serde(rename = "isValid")]
     pub(crate) is_valid: bool,
+    pub(crate) research: SaveResearchRuntime,
 }
 
 #[derive(Clone, Serialize)]
