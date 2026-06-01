@@ -5,6 +5,7 @@ use crate::model::{
     SectorData, StationBaseEntry, StationEquipment, StationTradeOverrides, Vector3, WareAmount,
     WorkforceEntry,
 };
+use crate::blueprints::BlueprintsParser;
 use crate::research::ResearchParser;
 use crate::terraforming::TerraformingParser;
 use std::collections::{HashMap, VecDeque};
@@ -112,6 +113,7 @@ pub(crate) struct SaveParserCore {
     entry_eq: Vec<StationEquipment>,
     research: ResearchParser,
     terraforming: TerraformingParser,
+    pub(crate) blueprints: BlueprintsParser,
     universe_closed: bool,
 }
 
@@ -139,6 +141,7 @@ impl SaveParserCore {
             entry_eq: Vec::new(),
             research: ResearchParser::default(),
             terraforming: TerraformingParser::default(),
+            blueprints: BlueprintsParser::default(),
             universe_closed: false,
         }
     }
@@ -594,6 +597,8 @@ impl SaveParserCore {
         self.terraforming
             .open(name, a, &self.path, terraforming_cluster_id);
 
+        self.blueprints.open(name, a, &self.path);
+
         Ok(())
     }
 
@@ -840,6 +845,7 @@ impl SaveParserCore {
 
         self.research.close(name, &self.path);
         self.terraforming.close(name);
+        self.blueprints.close(name);
 
         if name == "universe" {
             self.universe_closed = true;
@@ -890,6 +896,7 @@ impl SaveParserCore {
             is_valid: true,
             research: self.research.runtime().clone(),
             terraforming_clusters: self.terraforming.clusters().clone(),
+            player_blueprints: self.blueprints.blueprints().clone(),
         })
     }
 

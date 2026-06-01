@@ -1,3 +1,4 @@
+mod blueprints;
 mod core;
 mod model;
 mod research;

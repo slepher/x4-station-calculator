@@ -313,6 +313,7 @@ export interface PlayerStationsRecord {
     player_buildstorages: Record<string, Record<string, BuildStorageEntry>>
     research: SaveResearchRuntime
     terraforming_clusters: Record<string, SaveTerraformingCluster>
+    player_blueprints: string[]
   }
 }
 
@@ -348,6 +349,7 @@ export interface SaveArchive {
   isValid: boolean
   research?: SaveResearchRuntime
   terraforming_clusters?: Record<string, SaveTerraformingCluster>
+  playerBlueprints?: string[]
 }
 
 export interface ArchiveMeta {
