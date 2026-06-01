@@ -23,6 +23,7 @@ export interface ProgressInfo {
   parsedBytesTotal: number
   bufferedBytes: number
   expectedTotalBytes: number
+  expectedTotalSectors?: number
   percent: number
   tagCount: number
   sectorCount: number

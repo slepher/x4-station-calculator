@@ -163,7 +163,8 @@ async function processXmlFile(file: File) {
     await streamFileToSaveParserWorker({
       worker,
       file,
-      currentVersion: gameDataStore.currentVersion
+      currentVersion: gameDataStore.currentVersion,
+      expectedTotalSectors: gameDataStore.maps ? Object.keys(gameDataStore.maps.sectors || {}).length : 0
     })
   } catch (e) {
     const message = e instanceof Error ? e.message : t('save_import.parse_failed')

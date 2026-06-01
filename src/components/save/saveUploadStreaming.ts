@@ -2,6 +2,7 @@ type StreamFileToSaveParserWorkerOptions = {
   worker: Worker
   file: File
   currentVersion: string
+  expectedTotalSectors?: number
 }
 
 async function getExpectedTotalBytes(file: File): Promise<number> {
@@ -27,7 +28,7 @@ function toTransferableBuffer(chunk: Uint8Array): ArrayBuffer {
 }
 
 export async function streamFileToSaveParserWorker(options: StreamFileToSaveParserWorkerOptions) {
-  const { worker, file, currentVersion } = options
+  const { worker, file, currentVersion, expectedTotalSectors } = options
   const expectedTotalBytes = await getExpectedTotalBytes(file)
   let workerFinished = false
   const onWorkerMessage = (event: MessageEvent<{ type?: string }>) => {
@@ -42,7 +43,8 @@ export async function streamFileToSaveParserWorker(options: StreamFileToSavePars
       type: 'parse_start',
       filename: file.name,
       currentVersion,
-      expectedTotalBytes
+      expectedTotalBytes,
+      expectedTotalSectors
     })
 
     const reader = file.stream().getReader()

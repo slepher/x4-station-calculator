@@ -118,6 +118,7 @@ pub(crate) struct StreamingSaveParser {
     total_parsed: usize,
     input_bytes_received: usize,
     expected_total_bytes: usize,
+    expected_total_sectors: usize,
     phase: ParsePhase,
     input_complete: bool,
     done: bool,
@@ -139,6 +140,7 @@ impl StreamingSaveParser {
             total_parsed: 0,
             input_bytes_received: 0,
             expected_total_bytes: 0,
+            expected_total_sectors: 0,
             phase: ParsePhase::Receiving,
             input_complete: false,
             done: false,
@@ -155,6 +157,10 @@ impl StreamingSaveParser {
 
     pub(crate) fn set_expected_total_bytes(&mut self, total: usize) {
         self.expected_total_bytes = total;
+    }
+
+    pub(crate) fn set_expected_total_sectors(&mut self, total: usize) {
+        self.expected_total_sectors = total;
     }
 
     pub(crate) fn set_expected_version(&mut self, version: Option<String>) {
@@ -202,15 +208,20 @@ impl StreamingSaveParser {
 
     fn current_progress_info(&self) -> ProgressInfo {
         let buffered = self.buffer.len().saturating_sub(self.committed);
-        let progress_total = if self.expected_total_bytes > 0 {
-            self.expected_total_bytes
+        let sector_count = self.core.sector_count();
+        let raw_pct = if self.expected_total_sectors > 0 {
+            sector_count as f64 / self.expected_total_sectors as f64 * 100.0
         } else {
-            self.input_bytes_received
-        };
-        let raw_pct = if progress_total == 0 {
-            0.0
-        } else {
-            self.total_parsed as f64 / progress_total as f64 * 100.0
+            let progress_total = if self.expected_total_bytes > 0 {
+                self.expected_total_bytes
+            } else {
+                self.input_bytes_received
+            };
+            if progress_total == 0 {
+                0.0
+            } else {
+                self.total_parsed as f64 / progress_total as f64 * 100.0
+            }
         };
         let pct = match self.phase {
             ParsePhase::Receiving => 0.0,
@@ -228,7 +239,7 @@ impl StreamingSaveParser {
             expected_total_bytes: self.expected_total_bytes,
             percent: pct,
             tag_count: self.core.tag_count(),
-            sector_count: self.core.sector_count(),
+            sector_count,
             done: self.done,
             input_complete: self.input_complete,
             error: self.error.as_ref().map(|e| e.to_string()),

@@ -23,6 +23,7 @@ type RustSaveParserLike = {
   finish_input: () => void
   set_expected_version?: (version: string) => void
   set_expected_total_bytes?: (total: number) => void
+  set_expected_total_sectors?: (total: number) => void
 }
 
 function pumpRustParser(options: {
@@ -50,7 +51,7 @@ function pumpRustParser(options: {
 }
 
 type WorkerInputMessage =
-  | { type: 'parse_start'; filename?: string; currentVersion?: string; expectedTotalBytes?: number }
+  | { type: 'parse_start'; filename?: string; currentVersion?: string; expectedTotalBytes?: number; expectedTotalSectors?: number }
   | { type: 'parse_chunk'; chunk?: ArrayBuffer; sentAtMs?: number; chunkIndex?: number }
   | { type: 'parse_end' }
 
@@ -65,6 +66,7 @@ function createRustParseSession(options: {
   filename: string
   currentVersion?: string
   expectedTotalBytes?: number
+  expectedTotalSectors?: number
   postProgress: (info: ProgressInfo) => void
   postComplete: (archive: unknown) => void
   postError: (message: string, detail?: unknown) => void
@@ -90,6 +92,7 @@ function createRustParseSession(options: {
     onError: handleParserError
   })
   options.parser.set_expected_total_bytes?.(options.expectedTotalBytes ?? 0)
+  options.parser.set_expected_total_sectors?.(options.expectedTotalSectors ?? 0)
 
   const completeIfDone = () => {
     if (finalized || failed) return false
@@ -170,6 +173,7 @@ if (typeof self !== 'undefined' && typeof (self as unknown as { importScripts: u
             filename: e.data.filename || '',
             currentVersion: e.data.currentVersion || '8.0',
             expectedTotalBytes: e.data.expectedTotalBytes,
+            expectedTotalSectors: e.data.expectedTotalSectors,
             postProgress,
             postComplete,
             postError
