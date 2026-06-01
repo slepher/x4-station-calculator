@@ -881,7 +881,7 @@ impl SaveParserCore {
                 player_name: self.meta.player_name.clone(),
                 version: self.meta.version.clone(),
                 filename: f,
-                parser_version: "v7".into(),
+                parser_version: "v8".into(),
                 post_processor_version: None,
                 source: "original".into(),
             },
