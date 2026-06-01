@@ -45,6 +45,26 @@ interface SaveArchive {
 
 ## XML 解析策略
 
+## Rust 模块拆分
+
+- `rust-parser/src/core.rs` 只维护通用 XML 事件流、component stack 和 archive 组装。
+- `rust-parser/src/research.rs` 拥有 research runtime 的状态机、visible/completed/active 提取和 `SaveResearchRuntime` 累积结果。
+- core 在 `open()` 时把当前 element、属性、path、是否位于 player component、是否位于 HQ research production component 分派给 `ResearchParser::open()`。
+- core 在 `close()` 时把关闭 element 与当前 path 分派给 `ResearchParser::close()`。
+- `ResearchParser` 不打开 XML 文件，不创建新 reader，不从头扫描；它只消费 core 当前流式读取中的事件上下文。
+
+### universe 边界提前结束
+
+当前 visible/completed/active research 来源均位于 `<savegame>/<universe>` 内：
+
+- player component 内的 `<entries type="researchables">`
+- player component 内的 completed `<research><research ware="..."/></research>`
+- HQ research production component 内的 `<queue method="research" ware="...">`
+
+因此 save binding parser MAY 在关闭 `</universe>` 后提前完成，不继续扫描后续 `economylog/log/script/md/aidirector/ui/signature` 顶层块。该优化不从 script/MD 文本推断 research，也不改变 `activeId` 来源。
+
+对 gzip 输入，提前完成以解压出的 XML 事件到达 `</universe>` 为准，不要求继续读取 gzip trailer 或校验后续压缩流 CRC。
+
 ### 定位规则
 
 实现者不需要重新阅读样本 XML；parser SHALL 按以下结构规则识别 research runtime：
@@ -314,7 +334,7 @@ fn serialize_option_str_or_null<S: Serializer>(v: &Option<String>, s: S) -> Resu
 
 ### 标志位状态管理
 
-parser 在 `SaveParserCore` 中维护三个运行时状态：
+parser 在 `ResearchParser` 中维护三个运行时状态：
 
 - `research: SaveResearchRuntime` — 累积的解析结果，`finish_archive()` 输出到 archive
 - `in_player_researchables: bool` — 当前在 `<entries type="researchables">` 内

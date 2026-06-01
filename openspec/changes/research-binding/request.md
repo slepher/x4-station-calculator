@@ -62,6 +62,8 @@ research 提取 SHALL 插入现有 rust parser 的流式读取流程，复用当
 
 parser MUST NOT 为 research 另起一次从文件开头开始的扫描，也 MUST NOT 在现有读取流程之外重新读取 save XML。
 
+当前 research 来源位于 `<savegame>/<universe>` 内；save binding parser MAY 在关闭 `</universe>` 后提前完成，不继续扫描后续日志和脚本运行时顶层块。
+
 ### 3. 输出结构
 
 archive 顶层 SHALL 新增：

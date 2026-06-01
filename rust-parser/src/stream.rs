@@ -48,7 +48,9 @@ fn parse_gzip_header_length(bytes: &[u8]) -> Result<Option<usize>, ParserError> 
         return Err(ParserError::parse_error("invalid gzip header magic"));
     }
     if bytes[2] != 8 {
-        return Err(ParserError::parse_error("unsupported gzip compression method"));
+        return Err(ParserError::parse_error(
+            "unsupported gzip compression method",
+        ));
     }
 
     let flags = bytes[3];
@@ -246,7 +248,10 @@ impl StreamingSaveParser {
             || self.last_reported_phase != Some(progress.phase)
             || self.last_reported_done != progress.done
             || self.last_reported_has_error != has_error
-            || matches!(progress.phase, ParsePhase::Finalizing | ParsePhase::Done | ParsePhase::Error);
+            || matches!(
+                progress.phase,
+                ParsePhase::Finalizing | ParsePhase::Done | ParsePhase::Error
+            );
 
         let now = now_ms();
         let interval_elapsed = self
@@ -389,6 +394,13 @@ impl StreamingSaveParser {
                 self.error = Some(err);
                 return false;
             }
+
+            if self.core.should_stop_after_universe() {
+                self.phase = ParsePhase::Finalizing;
+                self.done = true;
+                self.phase = ParsePhase::Done;
+                return false;
+            }
         }
 
         if hit_eof && self.input_complete {
@@ -456,15 +468,13 @@ impl StreamingSaveParser {
 
         let is_gzip = sniffed.len() >= 2 && sniffed[0] == 0x1f && sniffed[1] == 0x8b;
         if is_gzip {
-            self.input_mode = InputMode::Gzip(
-                GzipInputState {
-                    decompressor: Decompress::new(false),
-                    header_parsed: false,
-                    pending_input: Vec::new(),
-                    trailer: Vec::new(),
-                    finished: false,
-                }
-            );
+            self.input_mode = InputMode::Gzip(GzipInputState {
+                decompressor: Decompress::new(false),
+                header_parsed: false,
+                pending_input: Vec::new(),
+                trailer: Vec::new(),
+                finished: false,
+            });
             if let Err(err) = self.feed_gzip_input(&sniffed, false) {
                 self.phase = ParsePhase::Error;
                 self.error = Some(err);
@@ -486,7 +496,9 @@ impl StreamingSaveParser {
     fn feed_gzip_input(&mut self, chunk: &[u8], finish: bool) -> Result<(), ParserError> {
         {
             let InputMode::Gzip(state) = &mut self.input_mode else {
-                return Err(ParserError::parse_error("gzip input received without gzip mode"));
+                return Err(ParserError::parse_error(
+                    "gzip input received without gzip mode",
+                ));
             };
             if !chunk.is_empty() {
                 state.pending_input.extend_from_slice(chunk);
@@ -514,7 +526,9 @@ impl StreamingSaveParser {
 
             {
                 let InputMode::Gzip(state) = &mut self.input_mode else {
-                    return Err(ParserError::parse_error("gzip input received without gzip mode"));
+                    return Err(ParserError::parse_error(
+                        "gzip input received without gzip mode",
+                    ));
                 };
 
                 if state.finished {
@@ -537,7 +551,9 @@ impl StreamingSaveParser {
                                 FlushDecompress::None
                             },
                         )
-                        .map_err(|err| ParserError::parse_error(format!("gzip decode error: {err}")))?;
+                        .map_err(|err| {
+                            ParserError::parse_error(format!("gzip decode error: {err}"))
+                        })?;
                     let consumed = (state.decompressor.total_in() - before_in) as usize;
                     let produced = (state.decompressor.total_out() - before_out) as usize;
 
@@ -585,7 +601,9 @@ impl StreamingSaveParser {
 
             if finished_stream {
                 let InputMode::Gzip(state) = &self.input_mode else {
-                    return Err(ParserError::parse_error("gzip state lost after decompression"));
+                    return Err(ParserError::parse_error(
+                        "gzip state lost after decompression",
+                    ));
                 };
                 if state.trailer.len() == 8 {
                     return Ok(());

@@ -14,6 +14,13 @@ rust parser SHALL extract research runtime state from raw save XML and expose it
 - **并且** research 解析 SHALL 复用当前 XML reader、component stack 和 archive builder
 - **并且** research 解析 SHALL NOT 从文件开头重新读取 save XML
 
+#### Scenario: stop after universe without losing research runtime
+
+- **前提** visible/completed/active research 来源均位于 `<savegame>/<universe>` 内
+- **当** parser 读到 `</universe>`
+- **那么** parser MAY 将当前 archive 视为解析完成
+- **并且** parser SHALL NOT 继续扫描后续日志和脚本运行时顶层块来推断 research
+
 #### Scenario: output default research runtime when absent
 
 - **前提** save XML 中没有可解析的 research runtime 数据

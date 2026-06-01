@@ -262,6 +262,47 @@ export interface SaveResearchRuntime {
   activeId: string | null
 }
 
+export interface SaveTerraformingRebateAmount {
+  ware?: string
+  wareGroup?: string
+  amount: number
+}
+
+export interface SaveTerraformingEventProgress {
+  eventId: string
+  completedCount: number
+  startTime?: number
+}
+
+export interface SaveTerraformingProjectProgress {
+  projectId: string
+  aborted?: boolean
+  scaledResources: WareAmount[]
+  submittedResources: WareAmount[]
+  inTransitResources?: WareAmount[]
+  inTransitShipBatches?: number
+}
+
+export interface SaveTerraformingCompletedProject {
+  projectId: string
+  completedCount: number
+  startTime?: number
+}
+
+export interface SaveTerraformingCluster {
+  clusterId: string
+  part: string
+  seed: string
+  missionCue?: string
+  missionComplete: boolean
+  stats: Record<string, number>
+  rebates: SaveTerraformingRebateAmount[]
+  activeProject?: SaveTerraformingProjectProgress
+  completedProjects: SaveTerraformingCompletedProject[]
+  retainedProjects: SaveTerraformingProjectProgress[]
+  events: SaveTerraformingEventProgress[]
+}
+
 export interface PlayerStationsRecord {
   id: string
   archiveId: string
@@ -270,6 +311,7 @@ export interface PlayerStationsRecord {
     player_stations: Record<string, Record<string, PlayerStationEntry>>
     player_buildstorages: Record<string, Record<string, BuildStorageEntry>>
     research: SaveResearchRuntime
+    terraforming_clusters: Record<string, SaveTerraformingCluster>
   }
 }
 
@@ -304,6 +346,7 @@ export interface SaveArchive {
   isCompatible: boolean
   isValid: boolean
   research?: SaveResearchRuntime
+  terraforming_clusters?: Record<string, SaveTerraformingCluster>
 }
 
 export interface ArchiveMeta {

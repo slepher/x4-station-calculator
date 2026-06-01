@@ -1,6 +1,8 @@
 mod core;
 mod model;
+mod research;
 mod stream;
+mod terraforming;
 
 #[cfg(test)]
 mod tests;

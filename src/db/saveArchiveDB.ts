@@ -67,7 +67,7 @@ function stripPlayerStationsFromArchive(archive: SaveArchive): SaveArchive {
       player_buildstorages: undefined
     }
   }
-  const { research: _, ...rest } = archive
+  const { research: _, terraforming_clusters: __, ...rest } = archive
   return {
     ...rest,
     sectors: strippedSectors
@@ -90,7 +90,8 @@ function extractPlayerStationsData(archive: SaveArchive): PlayerStationsRecord['
   return {
     player_stations: playerStationsData,
     player_buildstorages: playerBuildstoragesData,
-    research: archive.research ?? defaultResearchRuntime
+    research: archive.research ?? defaultResearchRuntime,
+    terraforming_clusters: archive.terraforming_clusters ?? {}
   }
 }
 
@@ -109,7 +110,12 @@ function mergePlayerStationsIntoArchive(
     }
   }
 
-  return { ...archive, sectors: mergedSectors, research: stationsData.research ?? defaultResearchRuntime }
+  return {
+    ...archive,
+    sectors: mergedSectors,
+    research: stationsData.research ?? defaultResearchRuntime,
+    terraforming_clusters: stationsData.terraforming_clusters ?? {}
+  }
 }
 
 export async function saveArchiveToDB(gameDataStore: GameDataStoreLike, archive: SaveArchive): Promise<void> {

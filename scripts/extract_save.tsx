@@ -417,6 +417,11 @@ function pumpWasmParser(options: {
   }
 }
 
+function isWasmParserDone(parser: { progress_json: () => string }): boolean {
+  const progress = JSON.parse(parser.progress_json()) as ProgressInfo
+  return progress.done === true
+}
+
 export function createFilteredSaveXmlRuntime(options: FilteredXmlRuntimeOptions): FilteredXmlRuntime {
   return createSaveXmlFilterRuntime({
     currentVersion: options.expectedVersion,
@@ -791,6 +796,31 @@ function feedRawBlockWriter(writer: RawBlockWriter, chunk: string): void {
   }
 }
 
+function feedRawBlockWritersUntilUniverseEnd(writers: RawBlockWriter[], state: { tail: string; done: boolean }, text: string): void {
+  if (state.done || !text) return
+
+  const endTag = '</universe>'
+  const combined = state.tail + text
+  const end = combined.indexOf(endTag)
+  const keep = endTag.length - 1
+  const feedText = end >= 0
+    ? combined.slice(0, end + endTag.length)
+    : combined.slice(0, Math.max(0, combined.length - keep))
+
+  if (feedText) {
+    for (const writer of writers) {
+      feedRawBlockWriter(writer, feedText)
+    }
+  }
+
+  if (end >= 0) {
+    state.tail = ''
+    state.done = true
+  } else {
+    state.tail = combined.slice(Math.max(0, combined.length - keep))
+  }
+}
+
 async function extractSaveRawBlocks(inputPath: string, targets: RawBlockTarget[]): Promise<void> {
   const absoluteInput = path.resolve(process.cwd(), inputPath)
   const gzip = isGzipFile(absoluteInput)
@@ -831,18 +861,28 @@ async function extractSaveRawBlocks(inputPath: string, targets: RawBlockTarget[]
   })
 
   const decoder = new TextDecoder()
+  const universeState = { tail: '', done: false }
   try {
     for await (const chunk of dataStream as AsyncIterable<Buffer>) {
       const text = decoder.decode(chunk, { stream: true })
-      for (const writer of writers) {
-        feedRawBlockWriter(writer, text)
+      feedRawBlockWritersUntilUniverseEnd(writers, universeState, text)
+      if (universeState.done) {
+        console.log('[extract_save] reached </universe>, stopping raw block scan early')
+        if ('destroy' in dataStream && typeof dataStream.destroy === 'function') {
+          dataStream.destroy()
+        }
+        sourceStream.destroy()
+        break
       }
     }
 
-    const tail = decoder.decode()
-    if (tail) {
-      for (const writer of writers) {
-        feedRawBlockWriter(writer, tail)
+    if (!universeState.done) {
+      const tail = decoder.decode()
+      feedRawBlockWritersUntilUniverseEnd(writers, universeState, tail)
+      if (!universeState.done && universeState.tail) {
+        for (const writer of writers) {
+          feedRawBlockWriter(writer, universeState.tail)
+        }
       }
     }
 
@@ -1039,6 +1079,7 @@ async function extractSaveWasm(inputPath: string, outputPath: string, expectedVe
         maxEventsPerPump: MAX_EVENTS_PER_PUMP,
         onProgress: reportProgress
       })
+      if (isWasmParserDone(parser)) break
     }
   } else {
     parser.set_expected_total_bytes(stat.size)
@@ -1050,15 +1091,18 @@ async function extractSaveWasm(inputPath: string, outputPath: string, expectedVe
         maxEventsPerPump: MAX_EVENTS_PER_PUMP,
         onProgress: reportProgress
       })
+      if (isWasmParserDone(parser)) break
     }
   }
 
-  parser.finish_input()
-  pumpWasmParser({
-    parser,
-    maxEventsPerPump: MAX_EVENTS_PER_PUMP,
-    onProgress: reportProgress
-  })
+  if (!isWasmParserDone(parser)) {
+    parser.finish_input()
+    pumpWasmParser({
+      parser,
+      maxEventsPerPump: MAX_EVENTS_PER_PUMP,
+      onProgress: reportProgress
+    })
+  }
 
   const elapsed = performance.now() - start
   console.log(`[extract_save] parse time: ${elapsed.toFixed(0)}ms`)

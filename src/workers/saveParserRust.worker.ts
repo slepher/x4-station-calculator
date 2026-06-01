@@ -57,6 +57,7 @@ type WorkerInputMessage =
 type RustParseSession = {
   pushChunk: (chunk: Uint8Array) => Promise<boolean>
   finish: () => Promise<boolean>
+  isFinalized: () => boolean
 }
 
 function createRustParseSession(options: {
@@ -90,11 +91,26 @@ function createRustParseSession(options: {
   })
   options.parser.set_expected_total_bytes?.(options.expectedTotalBytes ?? 0)
 
+  const completeIfDone = () => {
+    if (finalized || failed) return false
+    const progress = JSON.parse(options.parser.progress_json()) as ProgressInfo
+    if (!progress.done) return false
+    finalized = true
+    const result = options.parser.finish(options.filename || '')
+    const archive = JSON.parse(result) as SaveArchive
+    options.postProgress(progress)
+    options.postComplete(archive)
+    return true
+  }
+
   return {
     async pushChunk(chunk: Uint8Array) {
       if (finalized || failed || chunk.length === 0) return false
       options.parser.push_chunk(chunk)
-      return pumpNow()
+      const ok = pumpNow()
+      if (!ok) return false
+      completeIfDone()
+      return !finalized
     },
     async finish() {
       if (finalized || failed) return false
@@ -107,6 +123,9 @@ function createRustParseSession(options: {
       const archive = JSON.parse(result) as SaveArchive
       options.postComplete(archive)
       return true
+    },
+    isFinalized() {
+      return finalized || failed
     }
   }
 }
@@ -168,6 +187,10 @@ if (typeof self !== 'undefined' && typeof (self as unknown as { importScripts: u
         }
 
         if (e.data.type === 'parse_end') {
+          if (session.isFinalized()) {
+            session = null
+            return
+          }
           if (lastProgressSnapshot) {
             postProgress({
               ...lastProgressSnapshot,

@@ -2,9 +2,11 @@ use crate::model::{
     norm_ver, AbandonedShipEntry, AggregatedEquipment, AggregatedStationModule, ArchiveMeta,
     BuildProgress, BuildStorageEntry, DatavaultEntry, DatavaultWareEntry, FactionStationEntry,
     Meta, NpcStationEntry, ParserError, PlayerStationConstruction, PlayerStationEntry, SaveArchive,
-    SaveResearchRuntime, SectorData, StationBaseEntry, StationEquipment, StationTradeOverrides,
-    Vector3, WareAmount, WorkforceEntry,
+    SectorData, StationBaseEntry, StationEquipment, StationTradeOverrides, Vector3, WareAmount,
+    WorkforceEntry,
 };
+use crate::research::ResearchParser;
+use crate::terraforming::TerraformingParser;
 use std::collections::{HashMap, VecDeque};
 
 #[derive(Clone, Default)]
@@ -108,9 +110,9 @@ pub(crate) struct SaveParserCore {
     entry_ref: Option<String>,
     entry_predecessor: Option<i64>,
     entry_eq: Vec<StationEquipment>,
-    research: SaveResearchRuntime,
-    in_player_researchables: bool,
-    in_player_completed_research: bool,
+    research: ResearchParser,
+    terraforming: TerraformingParser,
+    universe_closed: bool,
 }
 
 impl SaveParserCore {
@@ -135,9 +137,9 @@ impl SaveParserCore {
             entry_ref: None,
             entry_predecessor: None,
             entry_eq: Vec::new(),
-            research: SaveResearchRuntime::default(),
-            in_player_researchables: false,
-            in_player_completed_research: false,
+            research: ResearchParser::default(),
+            terraforming: TerraformingParser::default(),
+            universe_closed: false,
         }
     }
 
@@ -572,56 +574,25 @@ impl SaveParserCore {
             });
         }
 
-        if name == "entries"
-            && self.is_inside_player_component()
-            && a.get("type").map_or(false, |t| t == "researchables")
-        {
-            self.in_player_researchables = true;
-        }
+        self.research.open(
+            name,
+            a,
+            &self.path,
+            self.is_inside_player_component(),
+            self.is_inside_research_production(),
+        );
 
-        if name == "entry" && self.in_player_researchables {
-            if let Some(id) = a.get("id").cloned() {
-                if id.starts_with("research_") {
-                    self.research.visible_ids.push(id);
-                }
-            }
-        }
-
-        if name == "research" && self.is_inside_player_component() {
-            if a.contains_key("ware") {
-                if self.in_player_completed_research {
-                    if a.get("method").map_or(false, |m| m == "research") {
-                        if let Some(ware) = a.get("ware").cloned() {
-                            if ware.starts_with("research_") {
-                                self.research.completed_ids.push(ware);
-                            }
-                        }
-                    }
-                }
-            } else {
-                self.in_player_completed_research = true;
-            }
-        }
-
-        if name == "queue" && self.is_inside_research_production() {
-            let parent_is_production = self.path.len() >= 2
-                && self
-                    .path
-                    .get(self.path.len() - 2)
-                    .map(|s| s.as_str())
-                    == Some("production");
-            if parent_is_production {
-                if let Some(method) = a.get("method") {
-                    if method == "research" {
-                        if let Some(ware) = a.get("ware").cloned() {
-                            if ware.starts_with("research_") {
-                                self.research.active_id = Some(ware);
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        let terraforming_cluster_id = if name == "terraforming" {
+            self.comp_stack
+                .iter()
+                .rev()
+                .find(|ctx| ctx.class == "cluster")
+                .and_then(|ctx| ctx.macro_field.clone())
+        } else {
+            None
+        };
+        self.terraforming
+            .open(name, a, &self.path, terraforming_cluster_id);
 
         Ok(())
     }
@@ -867,24 +838,19 @@ impl SaveParserCore {
             self.comp_stack.pop_back();
         }
 
-        if name == "entries" && self.in_player_researchables {
-            self.in_player_researchables = false;
-        }
+        self.research.close(name, &self.path);
+        self.terraforming.close(name);
 
-        if name == "research" && self.in_player_completed_research {
-            let parent_is_research = self.path.len() >= 2
-                && self
-                    .path
-                    .get(self.path.len() - 2)
-                    .map(|s| s.as_str())
-                    == Some("research");
-            if !parent_is_research {
-                self.in_player_completed_research = false;
-            }
+        if name == "universe" {
+            self.universe_closed = true;
         }
 
         self.path.pop_back();
         Ok(())
+    }
+
+    pub(crate) fn should_stop_after_universe(&self) -> bool {
+        self.universe_closed
     }
 
     pub(crate) fn has_open_path(&self) -> bool {
@@ -922,7 +888,8 @@ impl SaveParserCore {
             sectors: self.sectors.clone(),
             is_compatible,
             is_valid: true,
-            research: self.research.clone(),
+            research: self.research.runtime().clone(),
+            terraforming_clusters: self.terraforming.clusters().clone(),
         })
     }
 
@@ -979,8 +946,7 @@ impl SaveParserCore {
     fn is_inside_research_production(&self) -> bool {
         self.comp_stack.iter().any(|ctx| {
             ctx.class == "production"
-                && ctx.macro_field.as_deref()
-                    == Some("landmarks_player_hq_01_research_macro")
+                && ctx.macro_field.as_deref() == Some("landmarks_player_hq_01_research_macro")
         })
     }
 }
