@@ -1031,6 +1031,8 @@
     "loading_json": "加载 JSON...",
     "import_failed": "导入失败",
     "reading_file": "读取文件...",
+    "finalizing": "处理完成...",
+    "parsing_progress": "{percent}% - {count} 个星区",
     "parse_failed": "解析失败",
     "parse_error": "解析错误: {message}",
     "tab_player_stations": "玩家空间站",

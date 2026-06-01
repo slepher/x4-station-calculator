@@ -1030,6 +1030,8 @@
     "loading_json": "Loading JSON...",
     "import_failed": "Import failed",
     "reading_file": "Reading file...",
+    "finalizing": "Finalizing...",
+    "parsing_progress": "{percent}% - {count} sectors",
     "parse_failed": "Parse failed",
     "parse_error": "Parse error: {message}",
     "tab_player_stations": "Player Stations",

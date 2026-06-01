@@ -119,7 +119,7 @@ async function processXmlFile(file: File) {
           ? error
           : phase === 'done'
             ? t('save_import.finalizing')
-            : `${percent.toFixed(0)}% - ${sectorCount} sectors`
+            : t('save_import.parsing_progress', { percent: percent.toFixed(0), count: sectorCount })
         saveStore.setParsingState(true, statusText, null)
       } else if (msg.type === 'complete') {
         parsePercent.value = 100
@@ -264,7 +264,7 @@ async function processXmlFile(file: File) {
 }
 
 .progress-bar-container {
-  @apply w-32 h-2 bg-slate-700 rounded overflow-hidden;
+  @apply w-24 h-2 bg-slate-700 rounded overflow-hidden;
 }
 
 .progress-bar {
