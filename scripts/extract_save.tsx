@@ -67,6 +67,22 @@ interface ComponentFilterOptions {
   codes: string[]
 }
 
+type RawBlockKind = 'terraforming' | 'research'
+
+interface RawBlockTarget {
+  kind: RawBlockKind
+  outputPath: string
+}
+
+interface RawBlockWriter {
+  kind: RawBlockKind
+  outputPath: string
+  fd: number
+  matchCount: number
+  buffer: string
+  capturing: boolean
+}
+
 function printHelp(): void {
   console.log('Usage: vite-node scripts/extract_save.tsx <input.xml|input.xml.gz|input.gz> [output] [options]')
   console.log('')
@@ -85,6 +101,8 @@ function printHelp(): void {
   console.log('  --query-xml <q>    Output matching tags with full subtree and ancestor chain as XML')
   console.log('  --version <v>      Expected game version (e.g., "8.0"). Skipped if not set')
   console.log('  --skip-post        Skip post-processing (output raw parsed data without tag inference)')
+  console.log('  --terraforming     Output raw <terraforming> blocks as XML (JS streaming mode only)')
+  console.log('  --research         Output raw <research> block as XML (JS streaming mode only)')
   console.log('')
   console.log('Examples:')
   console.log('  vite-node scripts/extract_save.tsx save_009.xml')
@@ -93,6 +111,8 @@ function printHelp(): void {
   console.log('  vite-node scripts/extract_save.tsx save_009.xml --xml')
   console.log('  vite-node scripts/extract_save.tsx save_009.xml --query-xml \'<component class="station"/>\'')
   console.log('  vite-node scripts/extract_save.tsx save_009.xml --class station --code XAJ-926,FIX-154')
+  console.log('  vite-node scripts/extract_save.tsx save_009.xml --terraforming')
+  console.log('  vite-node scripts/extract_save.tsx save_009.xml --research')
 }
 
 interface ParsedArgs {
@@ -102,6 +122,8 @@ interface ParsedArgs {
   outputXml: boolean
   queryXml: string | null
   componentFilter: ComponentFilterOptions | null
+  extractTerraforming: boolean
+  extractResearch: boolean
   expectedVersion: string | null
   skipPost: boolean
 }
@@ -113,7 +135,7 @@ function parseArgs(): ParsedArgs & { help: boolean } {
     alias: {
       h: 'help',
     },
-    boolean: ['help', 'wasm', 'xml', 'skip-post'],
+    boolean: ['help', 'wasm', 'xml', 'skip-post', 'terraforming', 'research'],
     string: ['class', 'code', 'query-xml', 'version'],
   })
 
@@ -121,6 +143,8 @@ function parseArgs(): ParsedArgs & { help: boolean } {
   const useWasm = opts.wasm as boolean
   const outputXml = opts.xml as boolean
   const skipPost = opts['skip-post'] as boolean
+  const extractTerraforming = opts.terraforming as boolean
+  const extractResearch = opts.research as boolean
   const queryXml = (opts['query-xml'] as string) || null
   const expectedVersion = (opts.version as string) || null
 
@@ -135,7 +159,19 @@ function parseArgs(): ParsedArgs & { help: boolean } {
   const input = opts._[0] || ''
   const output = opts._[1] || ''
 
-  return { input, output, useWasm, outputXml, queryXml, componentFilter, expectedVersion, skipPost, help }
+  return {
+    input,
+    output,
+    useWasm,
+    outputXml,
+    queryXml,
+    componentFilter,
+    extractTerraforming,
+    extractResearch,
+    expectedVersion,
+    skipPost,
+    help
+  }
 }
 
 function isGzipFile(filePath: string): boolean {
@@ -175,6 +211,25 @@ function defaultComponentOutputPath(inputPath: string, className: string, codes:
   const classPart = className ? `_${className}` : ''
   const codesPart = codes.length === 1 ? codes[0] : `${codes.length}codes`
   return `${baseName}${classPart}_${codesPart}.xml`
+}
+
+function inputBaseName(inputPath: string): string {
+  return inputPath
+    .replace(/\.xml\.gz$/i, '')
+    .replace(/\.gz$/i, '')
+    .replace(/\.xml$/i, '')
+}
+
+function defaultRawBlockOutputPath(inputPath: string, kind: RawBlockKind): string {
+  return `${inputBaseName(inputPath)}.${kind}.xml`
+}
+
+function outputWithRawBlockKind(outputPath: string, kind: RawBlockKind): string {
+  const normalized = outputPath
+    .replace(/\.xml\.gz$/i, '')
+    .replace(/\.gz$/i, '')
+    .replace(/\.xml$/i, '')
+  return `${normalized}.${kind}.xml`
 }
 
 function formatMB(bytes: number): string {
@@ -674,6 +729,138 @@ async function extractSaveComponentXml(inputPath: string, outputPath: string, fi
   console.log(`[extract_save] xml written: ${absoluteOutput}`)
 }
 
+function findRawBlockStart(buffer: string, kind: RawBlockKind): number {
+  if (kind === 'research') {
+    return buffer.indexOf('<research>')
+  }
+
+  let searchFrom = 0
+  while (searchFrom < buffer.length) {
+    const index = buffer.indexOf('<terraforming', searchFrom)
+    if (index === -1) return -1
+    const next = buffer[index + '<terraforming'.length]
+    if (next === '>' || next === ' ' || next === '\t' || next === '\r' || next === '\n') {
+      return index
+    }
+    searchFrom = index + 1
+  }
+  return -1
+}
+
+function rawBlockEndTag(kind: RawBlockKind): string {
+  return kind === 'terraforming' ? '</terraforming>' : '</research>'
+}
+
+function rawBlockStartTailLength(kind: RawBlockKind): number {
+  return kind === 'terraforming' ? '<terraforming'.length - 1 : '<research>'.length - 1
+}
+
+function feedRawBlockWriter(writer: RawBlockWriter, chunk: string): void {
+  writer.buffer += chunk
+  const endTag = rawBlockEndTag(writer.kind)
+
+  while (writer.buffer.length > 0) {
+    if (!writer.capturing) {
+      const start = findRawBlockStart(writer.buffer, writer.kind)
+      if (start === -1) {
+        const keep = rawBlockStartTailLength(writer.kind)
+        writer.buffer = writer.buffer.length > keep ? writer.buffer.slice(-keep) : writer.buffer
+        return
+      }
+
+      writer.buffer = writer.buffer.slice(start)
+      writer.capturing = true
+    }
+
+    const end = writer.buffer.indexOf(endTag)
+    if (end === -1) {
+      const safeLength = Math.max(0, writer.buffer.length - endTag.length + 1)
+      if (safeLength > 0) {
+        fs.writeSync(writer.fd, writer.buffer.slice(0, safeLength))
+        writer.buffer = writer.buffer.slice(safeLength)
+      }
+      return
+    }
+
+    const endExclusive = end + endTag.length
+    fs.writeSync(writer.fd, writer.buffer.slice(0, endExclusive))
+    fs.writeSync(writer.fd, '\n')
+    writer.matchCount += 1
+    writer.buffer = writer.buffer.slice(endExclusive)
+    writer.capturing = false
+  }
+}
+
+async function extractSaveRawBlocks(inputPath: string, targets: RawBlockTarget[]): Promise<void> {
+  const absoluteInput = path.resolve(process.cwd(), inputPath)
+  const gzip = isGzipFile(absoluteInput)
+  const stat = fs.statSync(absoluteInput)
+  const writers: RawBlockWriter[] = targets.map(target => {
+    const absoluteOutput = path.resolve(process.cwd(), target.outputPath)
+    const fd = fs.openSync(absoluteOutput, 'w')
+    fs.writeSync(fd, '<?xml version="1.0" encoding="utf-8"?>\n')
+    fs.writeSync(fd, `<save-blocks type="${target.kind}">\n`)
+    return {
+      kind: target.kind,
+      outputPath: absoluteOutput,
+      fd,
+      matchCount: 0,
+      buffer: '',
+      capturing: false
+    }
+  })
+
+  console.log('[extract_save] parser: sax-js (raw XML block output)')
+  console.log(`[extract_save] input: ${absoluteInput}`)
+  console.log(`[extract_save] outputs: ${writers.map(writer => `${writer.kind}=${writer.outputPath}`).join(', ')}`)
+  console.log(`[extract_save] source size: ${formatMB(stat.size)} MB`)
+  console.log(`[extract_save] source type: ${gzip ? 'gzip' : 'xml'}`)
+
+  const sourceStream = fs.createReadStream(absoluteInput)
+  const dataStream = gzip ? sourceStream.pipe(zlib.createGunzip()) : sourceStream
+
+  let bytesRead = 0
+  let nextLogMB = 10
+  sourceStream.on('data', (chunk: string | Buffer) => {
+    bytesRead += typeof chunk === 'string' ? chunk.length : chunk.length
+    const sourceMB = bytesRead / (1024 * 1024)
+    if (sourceMB >= nextLogMB) {
+      console.log(`[extract_save] read source ${formatMB(bytesRead)} MB / ${formatMB(stat.size)} MB`)
+      nextLogMB += 10
+    }
+  })
+
+  const decoder = new TextDecoder()
+  try {
+    for await (const chunk of dataStream as AsyncIterable<Buffer>) {
+      const text = decoder.decode(chunk, { stream: true })
+      for (const writer of writers) {
+        feedRawBlockWriter(writer, text)
+      }
+    }
+
+    const tail = decoder.decode()
+    if (tail) {
+      for (const writer of writers) {
+        feedRawBlockWriter(writer, tail)
+      }
+    }
+
+    for (const writer of writers) {
+      fs.writeSync(writer.fd, `</save-blocks>\n`)
+      if (writer.capturing) {
+        console.warn(`[extract_save] warning: unterminated ${writer.kind} block in input`)
+      }
+      console.log(`[extract_save] done: ${writer.kind} ${writer.matchCount} blocks`)
+      console.log(`[extract_save] xml written: ${writer.outputPath}`)
+    }
+  } finally {
+    for (const writer of writers) {
+      fs.closeSync(writer.fd)
+    }
+  }
+}
+
 async function extractSaveSaxJs(inputPath: string, outputPath: string, expectedVersion: string | null): Promise<SaveArchive> {
   const absoluteInput = path.resolve(process.cwd(), inputPath)
   const absoluteOutput = path.resolve(process.cwd(), outputPath)
@@ -898,7 +1085,19 @@ async function extractSaveWasm(inputPath: string, outputPath: string, expectedVe
 }
 
 async function main(): Promise<void> {
-  const { input, output, useWasm, outputXml, queryXml, componentFilter, expectedVersion, skipPost, help } = parseArgs()
+  const {
+    input,
+    output,
+    useWasm,
+    outputXml,
+    queryXml,
+    componentFilter,
+    extractTerraforming,
+    extractResearch,
+    expectedVersion,
+    skipPost,
+    help
+  } = parseArgs()
 
   if (help) {
     printHelp()
@@ -912,7 +1111,30 @@ async function main(): Promise<void> {
   }
 
   try {
-    if (componentFilter) {
+    if (extractTerraforming || extractResearch) {
+      if (useWasm) {
+        console.error('[extract_save] --terraforming/--research mode does not support --wasm, using JS streaming extractor')
+      }
+      const both = extractTerraforming && extractResearch
+      const targets: RawBlockTarget[] = []
+      if (extractTerraforming) {
+        targets.push({
+          kind: 'terraforming',
+          outputPath: output
+            ? (both ? outputWithRawBlockKind(output, 'terraforming') : output)
+            : defaultRawBlockOutputPath(input, 'terraforming')
+        })
+      }
+      if (extractResearch) {
+        targets.push({
+          kind: 'research',
+          outputPath: output
+            ? (both ? outputWithRawBlockKind(output, 'research') : output)
+            : defaultRawBlockOutputPath(input, 'research')
+        })
+      }
+      await extractSaveRawBlocks(input, targets)
+    } else if (componentFilter) {
       const outputPath = output || defaultComponentOutputPath(input, componentFilter.className, componentFilter.codes)
       await extractSaveComponentXml(input, outputPath, componentFilter)
     } else if (queryXml) {
