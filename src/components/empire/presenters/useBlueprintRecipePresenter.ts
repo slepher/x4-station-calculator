@@ -176,7 +176,7 @@ export function useBlueprintRecipePresenter(store: {
         const l = bp.licence
         const factionMatch = !hasFactionFilter
           || (fs.length === 0)
-          || !fs.some(fid => factionFilter.value.has(fid))
+          || !fs.every(fid => factionFilter.value.has(fid))
         const licenceMatch = !hasLicenceFilter
           || !l
           || !licenceFilter.value.has(l)
