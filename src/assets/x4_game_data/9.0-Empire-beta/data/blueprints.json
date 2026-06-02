@@ -13000,17 +13000,17 @@
   "types": [
     {
       "id": "module",
-      "name": "",
+      "name": "Module",
       "nameId": "{1001,56}"
     },
     {
       "id": "ship",
-      "name": "",
+      "name": "Ships",
       "nameId": "{1001,6}"
     },
     {
       "id": "equipment",
-      "name": "",
+      "name": "Equipment",
       "nameId": "{1001,7935}"
     }
   ],
