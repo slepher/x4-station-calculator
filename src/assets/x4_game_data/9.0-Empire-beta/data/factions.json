@@ -12,7 +12,7 @@
       "watchdoguser"
     ],
     "color_name": "faction_alliance",
-    "color": "#4b5563",
+    "color": "#660066",
     "claimspace": false,
     "licences": [
       {
@@ -143,7 +143,7 @@
       "watchdoguser"
     ],
     "color_name": "faction_antigone",
-    "color": "#4b5563",
+    "color": "#0095FF",
     "claimspace": true,
     "licences": [
       {
@@ -280,7 +280,7 @@
       "watchdoguser"
     ],
     "color_name": "faction_argon",
-    "color": "#4b5563",
+    "color": "#0069B3",
     "claimspace": true,
     "licences": [
       {
@@ -405,7 +405,7 @@
       "watchdoguser"
     ],
     "color_name": "faction_boron",
-    "color": "#4b5563",
+    "color": "#4DB5FF",
     "claimspace": true,
     "licences": [
       {
@@ -515,7 +515,7 @@
       "watchdoguser"
     ],
     "color_name": "faction_buccaneers",
-    "color": "#4b5563",
+    "color": "#006466",
     "claimspace": true,
     "licences": [
       {
@@ -668,7 +668,7 @@
       "hidden"
     ],
     "color_name": "faction_civilian",
-    "color": "#4b5563",
+    "color": "#C0C0C0",
     "claimspace": false,
     "licences": []
   },
@@ -686,7 +686,7 @@
       "privateship"
     ],
     "color_name": "faction_court",
-    "color": "#4b5563",
+    "color": "#FFBF00",
     "claimspace": true,
     "licences": [
       {
@@ -839,7 +839,7 @@
       "hidden"
     ],
     "color_name": "faction_criminal",
-    "color": "#4b5563",
+    "color": "#B30000",
     "claimspace": false,
     "licences": []
   },
@@ -855,7 +855,7 @@
       "privateship"
     ],
     "color_name": "faction_fallensplit",
-    "color": "#4b5563",
+    "color": "#FF9999",
     "claimspace": false,
     "licences": [
       {
@@ -906,7 +906,7 @@
       "standard"
     ],
     "color_name": "faction_freesplit",
-    "color": "#4b5563",
+    "color": "#FF8B00",
     "claimspace": true,
     "licences": [
       {
@@ -1011,7 +1011,7 @@
       "watchdoguser"
     ],
     "color_name": "faction_hatikvah",
-    "color": "#4b5563",
+    "color": "#00F9FF",
     "claimspace": true,
     "licences": [
       {
@@ -1127,7 +1127,7 @@
       "watchdoguser"
     ],
     "color_name": "faction_holyorder",
-    "color": "#4b5563",
+    "color": "#FF99FF",
     "claimspace": true,
     "licences": [
       {
@@ -1256,7 +1256,7 @@
       "hidden"
     ],
     "color_name": "faction_holyorderfanatic",
-    "color": "#4b5563",
+    "color": "#660000",
     "claimspace": false,
     "licences": [
       {
@@ -1311,7 +1311,7 @@
       "standard"
     ],
     "color_name": "faction_kaori",
-    "color": "#4b5563",
+    "color": "#FFB966",
     "claimspace": true,
     "licences": [
       {
@@ -1389,7 +1389,7 @@
       "privateship"
     ],
     "color_name": "faction_khaak",
-    "color": "#4b5563",
+    "color": "#FF00FF",
     "claimspace": false,
     "licences": []
   },
@@ -1408,7 +1408,7 @@
       "standard"
     ],
     "color_name": "faction_loanshark",
-    "color": "#4b5563",
+    "color": "#B38600",
     "claimspace": true,
     "licences": [
       {
@@ -1513,7 +1513,7 @@
       "watchdoguser"
     ],
     "color_name": "faction_ministry",
-    "color": "#4b5563",
+    "color": "#006600",
     "claimspace": false,
     "licences": [
       {
@@ -1651,7 +1651,7 @@
       "hidden"
     ],
     "color_name": "faction_criminal",
-    "color": "#4b5563",
+    "color": "#B30000",
     "claimspace": false,
     "licences": []
   },
@@ -1663,7 +1663,7 @@
       "hidden"
     ],
     "color_name": "faction_ownerless",
-    "color": "#4b5563",
+    "color": "#C0C0C0",
     "claimspace": false,
     "licences": []
   },
@@ -1684,7 +1684,7 @@
       "watchdoguser"
     ],
     "color_name": "faction_paranid",
-    "color": "#4b5563",
+    "color": "#B300B3",
     "claimspace": true,
     "licences": [
       {
@@ -1802,7 +1802,7 @@
       "standard"
     ],
     "color_name": "faction_pioneers",
-    "color": "#4b5563",
+    "color": "#00AFB3",
     "claimspace": true,
     "licences": [
       {
@@ -1936,7 +1936,7 @@
       "police"
     ],
     "color_name": "faction_player",
-    "color": "#4b5563",
+    "color": "#4DFF4D",
     "claimspace": true,
     "licences": [
       {
@@ -2045,7 +2045,7 @@
       "watchdoguser"
     ],
     "color_name": "faction_scaleplate",
-    "color": "#4b5563",
+    "color": "#666600",
     "claimspace": false,
     "licences": [
       {
@@ -2193,7 +2193,7 @@
       "standard"
     ],
     "color_name": "faction_scavenger",
-    "color": "#4b5563",
+    "color": "#003C66",
     "claimspace": true,
     "licences": [
       {
@@ -2291,7 +2291,7 @@
       "hidden"
     ],
     "color_name": "faction_smuggler",
-    "color": "#4b5563",
+    "color": "#B30000",
     "claimspace": false,
     "licences": []
   },
@@ -2312,7 +2312,7 @@
       "watchdoguser"
     ],
     "color_name": "faction_split",
-    "color": "#4b5563",
+    "color": "#B36100",
     "claimspace": true,
     "licences": [
       {
@@ -2423,7 +2423,7 @@
       "watchdoguser"
     ],
     "color_name": "faction_teladi",
-    "color": "#4b5563",
+    "color": "#B3B300",
     "claimspace": true,
     "licences": [
       {
@@ -2553,7 +2553,7 @@
       "watchdoguser"
     ],
     "color_name": "faction_terran",
-    "color": "#4b5563",
+    "color": "#99D5FF",
     "claimspace": true,
     "licences": [
       {
@@ -2705,7 +2705,7 @@
       "watchdoguser"
     ],
     "color_name": "faction_trinity",
-    "color": "#4b5563",
+    "color": "#FFCCFF",
     "claimspace": true,
     "licences": [
       {
@@ -2809,7 +2809,7 @@
       "hidden"
     ],
     "color_name": "faction_visitor",
-    "color": "#4b5563",
+    "color": "#FFFF00",
     "claimspace": false,
     "licences": [
       {
@@ -2832,7 +2832,7 @@
       "privateship"
     ],
     "color_name": "faction_xenon",
-    "color": "#4b5563",
+    "color": "#B30000",
     "claimspace": true,
     "licences": []
   },
@@ -2847,7 +2847,7 @@
       "privateship"
     ],
     "color_name": "faction_yaki",
-    "color": "#4b5563",
+    "color": "#FF4D4D",
     "claimspace": false,
     "licences": [
       {

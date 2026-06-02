@@ -68,6 +68,21 @@ def _get_process_blueprints():
     _process_blueprints = mod.process_blueprints
     return _process_blueprints
 
+_process_factions = None
+def _get_process_factions():
+    global _process_factions
+    if _process_factions is not None:
+        return _process_factions
+    try:
+        mod = importlib.import_module("scripts.x4-game.factions.build")
+    except ModuleNotFoundError:
+        try:
+            mod = importlib.import_module("x4-game.factions.build")
+        except ModuleNotFoundError:
+            raise ImportError("Cannot import x4-game.factions. Run from project root.")
+    _process_factions = mod.process_factions
+    return _process_factions
+
 # =============================================================================
 # ⚙️ 项目配置
 # =============================================================================
@@ -2397,6 +2412,7 @@ class X4PrecisionLoader:
             folder_name="",  # base_path 已经包含 folder_name
             version=version_str,
             i18n_registry=self.i18n_registry,  # 使用已配置好的 registry
+            factions_list=getattr(self, 'factions_data', None),
         )
 
         # 收集 nameId 到 needed_raw_names
@@ -2802,8 +2818,22 @@ class X4PrecisionLoader:
                     if raw_key and raw_key in en_map:
                         item['name'] = en_map[raw_key]
                         count_bp += 1
+
+        # factions 数据
+        count_fac = 0
+        if hasattr(self, 'factions_data') and self.factions_data is not None:
+            for faction in self.factions_data:
+                raw_key = faction.get('nameId')
+                if raw_key and raw_key in en_map:
+                    faction['name'] = en_map[raw_key]
+                    count_fac += 1
+                for l in faction.get('licences', []):
+                    raw_key = l.get('nameId')
+                    if raw_key and raw_key in en_map:
+                        l['name'] = en_map[raw_key]
+                        count_fac += 1
         
-        print(f"   ✅ 更新了 {count_wares} 个商品, {count_mods} 个模块, {count_wg} 个模块分组, {count_ships} 个飞船, {count_equips} 个装备, {count_ship_types} 个船只类型, {count_slot_tags} 个 slot tag, {count_dlcs} 个 DLC, {count_tf} 个 terraforming, {count_rs} 个 research, {count_bp} 个 blueprints 的英文名称。")
+        print(f"   ✅ 更新了 {count_wares} 个商品, {count_mods} 个模块, {count_wg} 个模块分组, {count_ships} 个飞船, {count_equips} 个装备, {count_ship_types} 个船只类型, {count_slot_tags} 个 slot tag, {count_dlcs} 个 DLC, {count_tf} 个 terraforming, {count_rs} 个 research, {count_bp} 个 blueprints, {count_fac} 个 factions/licences 的英文名称。")
 
     # =======================================================
     # 🆕 4.1. 模块类型分析
@@ -3022,6 +3052,11 @@ class X4PrecisionLoader:
             with open(os.path.join(data_dir, "blueprints.json"), 'w', encoding='utf-8') as f:
                 json.dump(self.blueprints_data, f, indent=2, ensure_ascii=False)
 
+        # factions 数据
+        if hasattr(self, 'factions_data') and self.factions_data is not None:
+            with open(os.path.join(data_dir, "factions.json"), 'w', encoding='utf-8') as f:
+                json.dump(self.factions_data, f, indent=2, ensure_ascii=False)
+
         # 保存语言包
         available_languages = []
         for x4_id, conf in X4_LANG_CONFIG.items():
@@ -3063,6 +3098,7 @@ def run_for_config(effective_config):
     loader._build_missiles()
     loader._build_drones_and_consumables()
     loader._build_bullets()
+    _get_process_factions()(loader)   # factions 派系数据（含 licences）- 地图之前
     loader.process_map_data()
     loader.extract_and_resolve_languages()
     _get_process_terraforming()(loader)  # terraforming 数据解析

@@ -53,6 +53,8 @@ def migrate_factions(
             continue
         name_id = (node.get("name") or "").strip()
         name = ""
+        if i18n_collector is not None and name_id:
+            i18n_collector.add(name_id)
         tags = split_tags(node.get("tags"))
         color_node = node.find("./color")
         color_name = (color_node.get("ref") if color_node is not None else "") or ""

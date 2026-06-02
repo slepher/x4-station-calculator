@@ -39,6 +39,7 @@ def process_map_for_version(
     folder_name: str,
     version: str,
     i18n_registry: Optional[I18nRegistry] = None,
+    factions_list: Optional[list] = None,
 ) -> Dict[str, Any]:
     """
     根据版本号处理 Map 数据。
@@ -91,12 +92,16 @@ def process_map_for_version(
         registry.configure(raw_assets_dir, {"044": {"iso": "en", "name": "English"}})
 
     # 处理 factions
-    factions_rows, factions_by_id = migrate_factions(
-        factions_xml_path=factions_xml_path,
-        colors_xml_path=colors_xml_path,
-        i18n_registry=registry,
-    )
-    write_factions(factions_rows, factions_output_path)
+    if factions_list is not None:
+        factions_rows = factions_list
+        factions_by_id = {f["id"]: f for f in factions_list}
+    else:
+        factions_rows, factions_by_id = migrate_factions(
+            factions_xml_path=factions_xml_path,
+            colors_xml_path=colors_xml_path,
+            i18n_registry=registry,
+        )
+        write_factions(factions_rows, factions_output_path)
 
     # 根据资源模型选择处理逻辑
     if resource_model == "resourceareas":
