@@ -54,17 +54,17 @@ function resolveLicenceForFaction(factionId: string, ltype: string | undefined):
   return ''
 }
 
-function toggleAllFactions(_items: { id: string }[]) {
+function toggleAllFactions(items: { id: string }[]) {
   if (factionFilter.value.size === 0) {
-    factionFilter.value = new Set(['__none__'])
+    factionFilter.value = new Set(items.map(i => i.id))
   } else {
     factionFilter.value = new Set()
   }
 }
 
-function toggleAllLicences(_items: { id: string }[]) {
+function toggleAllLicences(items: { id: string }[]) {
   if (licenceFilter.value.size === 0) {
-    licenceFilter.value = new Set(['__none__'])
+    licenceFilter.value = new Set(items.map(i => i.id))
   } else {
     licenceFilter.value = new Set()
   }
@@ -126,7 +126,7 @@ function toggleAllLicences(_items: { id: string }[]) {
         >
           <input
             type="checkbox"
-            :checked="factionFilter.size === 0 || factionFilter.has(fac.id)"
+            :checked="!factionFilter.has(fac.id)"
             @change="toggleFactionFilter(fac.id)"
           />
           <span>{{ fac.name }}</span>
@@ -144,7 +144,7 @@ function toggleAllLicences(_items: { id: string }[]) {
         >
           <input
             type="checkbox"
-            :checked="licenceFilter.size === 0 || licenceFilter.has(lic.id)"
+            :checked="!licenceFilter.has(lic.id)"
             @change="toggleLicenceFilter(lic.id)"
           />
           <span>{{ t('licence.' + lic.id) }}</span>

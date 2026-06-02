@@ -176,10 +176,10 @@ export function useBlueprintRecipePresenter(store: {
         const l = bp.licence
         const factionMatch = !hasFactionFilter
           || (fs.length === 0)
-          || fs.some(fid => factionFilter.value.has(fid))
+          || !fs.some(fid => factionFilter.value.has(fid))
         const licenceMatch = !hasLicenceFilter
-          || (!l && licenceFilter.value.size === 0)
-          || (!!l && licenceFilter.value.has(l))
+          || !l
+          || !licenceFilter.value.has(l)
         return factionMatch && licenceMatch
       })
     }
@@ -208,12 +208,7 @@ export function useBlueprintRecipePresenter(store: {
 
   function toggleFactionFilter(id: string) {
     const next = new Set(factionFilter.value)
-    if (next.size === 0) {
-      for (const f of availableFactions.value) {
-        next.add(f.id)
-      }
-      next.delete(id)
-    } else if (next.has(id)) {
+    if (next.has(id)) {
       next.delete(id)
     } else {
       next.add(id)
@@ -223,12 +218,7 @@ export function useBlueprintRecipePresenter(store: {
 
   function toggleLicenceFilter(id: string) {
     const next = new Set(licenceFilter.value)
-    if (next.size === 0) {
-      for (const l of availableLicences.value) {
-        next.add(l.id)
-      }
-      next.delete(id)
-    } else if (next.has(id)) {
+    if (next.has(id)) {
       next.delete(id)
     } else {
       next.add(id)
