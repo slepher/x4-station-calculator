@@ -82,6 +82,12 @@ export class SaveParser {
         wasm.saveparser_set_expected_total_bytes(this.__wbg_ptr, total);
     }
     /**
+     * @param {number} total
+     */
+    set_expected_total_sectors(total) {
+        wasm.saveparser_set_expected_total_sectors(this.__wbg_ptr, total);
+    }
+    /**
      * @param {string} version
      */
     set_expected_version(version) {

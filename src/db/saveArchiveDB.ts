@@ -1,6 +1,7 @@
 import Dexie, { type Table } from 'dexie'
 import type {
   SaveArchive,
+  SaveResearchRuntime,
   PlayerStationEntry,
   BuildStorageEntry,
   SectorData,
@@ -51,6 +52,12 @@ export function createArchiveId(guid: string, time: number): string {
   return `${guid}_${time}`
 }
 
+const defaultResearchRuntime: SaveResearchRuntime = {
+  visibleIds: [],
+  completedIds: [],
+  activeId: null
+}
+
 function stripPlayerStationsFromArchive(archive: SaveArchive): SaveArchive {
   const strippedSectors: Record<string, SectorData> = {}
   for (const [sectorMacro, sector] of Object.entries(archive.sectors)) {
@@ -60,8 +67,9 @@ function stripPlayerStationsFromArchive(archive: SaveArchive): SaveArchive {
       player_buildstorages: undefined
     }
   }
+  const { research: _, terraforming_clusters: __, playerBlueprints: ___, ...rest } = archive
   return {
-    ...archive,
+    ...rest,
     sectors: strippedSectors
   }
 }
@@ -81,7 +89,10 @@ function extractPlayerStationsData(archive: SaveArchive): PlayerStationsRecord['
 
   return {
     player_stations: playerStationsData,
-    player_buildstorages: playerBuildstoragesData
+    player_buildstorages: playerBuildstoragesData,
+    research: archive.research ?? defaultResearchRuntime,
+    terraforming_clusters: archive.terraforming_clusters ?? {},
+    player_blueprints: archive.playerBlueprints ?? []
   }
 }
 
@@ -100,7 +111,13 @@ function mergePlayerStationsIntoArchive(
     }
   }
 
-  return { ...archive, sectors: mergedSectors }
+  return {
+    ...archive,
+    sectors: mergedSectors,
+    research: stationsData.research ?? defaultResearchRuntime,
+    terraforming_clusters: stationsData.terraforming_clusters ?? {},
+    playerBlueprints: stationsData.player_blueprints ?? []
+  }
 }
 
 export async function saveArchiveToDB(gameDataStore: GameDataStoreLike, archive: SaveArchive): Promise<void> {

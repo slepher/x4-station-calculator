@@ -5,6 +5,9 @@ use crate::model::{
     SectorData, StationBaseEntry, StationEquipment, StationTradeOverrides, Vector3, WareAmount,
     WorkforceEntry,
 };
+use crate::blueprints::BlueprintsParser;
+use crate::research::ResearchParser;
+use crate::terraforming::TerraformingParser;
 use std::collections::{HashMap, VecDeque};
 
 #[derive(Clone, Default)]
@@ -108,6 +111,10 @@ pub(crate) struct SaveParserCore {
     entry_ref: Option<String>,
     entry_predecessor: Option<i64>,
     entry_eq: Vec<StationEquipment>,
+    research: ResearchParser,
+    terraforming: TerraformingParser,
+    pub(crate) blueprints: BlueprintsParser,
+    universe_closed: bool,
 }
 
 impl SaveParserCore {
@@ -132,6 +139,10 @@ impl SaveParserCore {
             entry_ref: None,
             entry_predecessor: None,
             entry_eq: Vec::new(),
+            research: ResearchParser::default(),
+            terraforming: TerraformingParser::default(),
+            blueprints: BlueprintsParser::default(),
+            universe_closed: false,
         }
     }
 
@@ -566,6 +577,28 @@ impl SaveParserCore {
             });
         }
 
+        self.research.open(
+            name,
+            a,
+            &self.path,
+            self.is_inside_player_component(),
+            self.is_inside_research_production(),
+        );
+
+        let terraforming_cluster_id = if name == "terraforming" {
+            self.comp_stack
+                .iter()
+                .rev()
+                .find(|ctx| ctx.class == "cluster")
+                .and_then(|ctx| ctx.macro_field.clone())
+        } else {
+            None
+        };
+        self.terraforming
+            .open(name, a, &self.path, terraforming_cluster_id);
+
+        self.blueprints.open(name, a, &self.path);
+
         Ok(())
     }
 
@@ -810,8 +843,20 @@ impl SaveParserCore {
             self.comp_stack.pop_back();
         }
 
+        self.research.close(name, &self.path);
+        self.terraforming.close(name);
+        self.blueprints.close(name);
+
+        if name == "universe" {
+            self.universe_closed = true;
+        }
+
         self.path.pop_back();
         Ok(())
+    }
+
+    pub(crate) fn should_stop_after_universe(&self) -> bool {
+        self.universe_closed
     }
 
     pub(crate) fn has_open_path(&self) -> bool {
@@ -842,13 +887,16 @@ impl SaveParserCore {
                 player_name: self.meta.player_name.clone(),
                 version: self.meta.version.clone(),
                 filename: f,
-                parser_version: "v7".into(),
+                parser_version: "v8".into(),
                 post_processor_version: None,
                 source: "original".into(),
             },
             sectors: self.sectors.clone(),
             is_compatible,
             is_valid: true,
+            research: self.research.runtime().clone(),
+            terraforming_clusters: self.terraforming.clusters().clone(),
+            player_blueprints: self.blueprints.blueprints().clone(),
         })
     }
 
@@ -896,6 +944,17 @@ impl SaveParserCore {
             .iter_mut()
             .rev()
             .find(|ctx| ctx.class == "buildstorage")
+    }
+
+    fn is_inside_player_component(&self) -> bool {
+        self.comp_stack.iter().any(|ctx| ctx.class == "player")
+    }
+
+    fn is_inside_research_production(&self) -> bool {
+        self.comp_stack.iter().any(|ctx| {
+            ctx.class == "production"
+                && ctx.macro_field.as_deref() == Some("landmarks_player_hq_01_research_macro")
+        })
     }
 }
 

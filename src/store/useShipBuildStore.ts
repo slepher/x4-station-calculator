@@ -1155,6 +1155,17 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     takeSnapshot()
   }
 
+  const toggleFavoriteBlueprint = (id: string) => {
+    if (isBuiltInBlueprintId(id)) return
+    const bp = findBlueprintById(id)
+    if (!bp) return
+    bp.favorite = !bp.favorite
+    if (blueprint.value?.id === id) {
+      blueprint.value.favorite = bp.favorite
+    }
+    saveBlueprintsToStorage()
+  }
+
   // Sync selectedByConnection with computed
   watch(selectedByConnectionComputed, (newVal) => {
     selectedByConnection.value = Object.fromEntries(
@@ -1759,6 +1770,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     requiresSaveAsOnSave,
     loadBlueprint,
     deleteBlueprint,
+    toggleFavoriteBlueprint,
     getBlueprintsForShip,
     getLoadableBlueprintsForShip,
     isBuiltInBlueprintId,

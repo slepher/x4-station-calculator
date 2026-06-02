@@ -553,7 +553,7 @@ onUnmounted(() => {
 <style scoped>
 .production-sidebar {
   @apply flex-shrink-0 bg-slate-900 border-r border-slate-700 select-none relative flex flex-col;
-  width: 240px;
+  width: 200px;
   transition: width 0.2s ease;
   overflow: hidden;
 }

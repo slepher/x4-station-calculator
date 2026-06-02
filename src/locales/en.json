@@ -750,7 +750,9 @@
     "blueprint_group_preset": "Preset Loadouts",
     "blueprint_group_user": "Blueprint Loadouts",
     "connections_count": "connections",
-    "shield_secondary": "Shield (Secondary)"
+    "shield_secondary": "Shield (Secondary)",
+    "fav_add": "Add to Favorites",
+    "fav_remove": "Remove from Favorites"
   },
   "wareflow": {
     "resource_overview": "Resource Production",
@@ -1028,6 +1030,8 @@
     "loading_json": "Loading JSON...",
     "import_failed": "Import failed",
     "reading_file": "Reading file...",
+    "finalizing": "Finalizing...",
+    "parsing_progress": "{percent}% - {count} sectors",
     "parse_failed": "Parse failed",
     "parse_error": "Parse error: {message}",
     "tab_player_stations": "Player Stations",

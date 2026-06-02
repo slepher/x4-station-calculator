@@ -63,7 +63,7 @@ const emit = defineEmits<{
 const shipBuildStore = useShipBuildStore()
 const gameData = useGameDataStore()
 const { selectedShip, blueprint, mockTagPatch, isDirty, activeBlueprintStatusLabel, isBuiltInPresetUnchanged } = storeToRefs(shipBuildStore)
-const { applyConnectionAssignment, setConnectionAssignmentCount, enterShipSelector } = shipBuildStore
+const { applyConnectionAssignment, setConnectionAssignmentCount, enterShipSelector, toggleFavoriteBlueprint, isBuiltInBlueprintId } = shipBuildStore
 
 // 本地 connectionKeyMap：从 connectionRows 构建
 const localConnectionKeyMap = computed(() => {
@@ -281,11 +281,29 @@ const shouldShowBlueprintDirtyDot = computed(() => {
   return isDirty.value && !isBuiltInPresetUnchanged.value
 })
 
+const currentBlueprintId = computed(() => blueprint.value?.id || '')
+
+const isCurrentBlueprintFavoritable = computed(() => {
+  const id = currentBlueprintId.value
+  if (!id) return false
+  return !isBuiltInBlueprintId(id)
+})
+
+const currentBlueprintFavorited = computed(() => {
+  return blueprint.value?.favorite ?? false
+})
+
+const toggleFavoriteCurrent = () => {
+  const id = currentBlueprintId.value
+  if (id) toggleFavoriteBlueprint(id)
+}
+
 const loadableBlueprintItems = computed(() => {
   if (!selectedShip.value) return []
   return shipBuildStore.getLoadableBlueprintsForShip(selectedShip.value.id).map((bp) => ({
     id: bp.id,
     label: bp.name,
+    favorite: bp.favorite ?? false,
     isBuiltIn: shipBuildStore.isBuiltInBlueprintId(bp.id),
     isCurrentSaved: shipBuildStore.savedBlueprints.activeBlueprintId === bp.id
   }))
@@ -294,6 +312,10 @@ const loadableBlueprintItems = computed(() => {
 const groupedLoadableBlueprintItems = computed(() => {
   const builtInItems = loadableBlueprintItems.value.filter((item) => item.isBuiltIn)
   const userItems = loadableBlueprintItems.value.filter((item) => !item.isBuiltIn)
+  userItems.sort((a, b) => {
+    if (a.favorite !== b.favorite) return a.favorite ? -1 : 1
+    return 0
+  })
   return [
     { key: 'preset', title: t('shipBuild.blueprint_group_preset'), items: builtInItems },
     { key: 'user', title: t('shipBuild.blueprint_group_user'), items: userItems }
@@ -964,6 +986,21 @@ watch(slotTargets, () => {
         </button>
         <div class="ship-blueprint-picker" ref="blueprintMenuRef">
           <button
+            v-if="isCurrentBlueprintFavoritable"
+            class="ship-blueprint-fav-btn"
+            :class="{ 'is-favorited': currentBlueprintFavorited }"
+            :title="currentBlueprintFavorited ? t('shipBuild.fav_remove') : t('shipBuild.fav_add')"
+            data-testid="ship-build-blueprint-fav-btn"
+            @click="toggleFavoriteCurrent"
+          >
+            <svg v-if="currentBlueprintFavorited" class="h-4 w-4 text-yellow-400" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+            </svg>
+            <svg v-else class="h-4 w-4 text-slate-400 hover:text-yellow-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+            </svg>
+          </button>
+          <button
             class="ship-blueprint-trigger"
             data-testid="ship-build-blueprint-menu-trigger"
             :title="t('shipBuild.load_blueprint')"
@@ -1006,6 +1043,15 @@ watch(slotTargets, () => {
                 >
                   <span>{{ item.label }}</span>
                 </button>
+                <span
+                  v-if="!item.isBuiltIn && item.favorite"
+                  class="ship-blueprint-menu-fav-star absolute right-8 top-1/2 -translate-y-1/2"
+                  :title="t('shipBuild.fav_remove')"
+                >
+                  <svg class="h-3.5 w-3.5 text-yellow-400" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                  </svg>
+                </span>
                 <button
                   v-if="!item.isBuiltIn"
                   class="ship-blueprint-delete-btn"
@@ -1183,7 +1229,15 @@ watch(slotTargets, () => {
 }
 
 .ship-blueprint-picker {
-  @apply relative;
+  @apply relative inline-flex items-center gap-1.5;
+}
+
+.ship-blueprint-fav-btn {
+  @apply inline-flex items-center justify-center h-9 w-9 rounded-md text-slate-400 hover:text-yellow-400 transition-colors;
+}
+
+.ship-blueprint-fav-btn.is-favorited {
+  @apply text-yellow-400;
 }
 
 .ship-blueprint-trigger {

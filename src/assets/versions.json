@@ -23,7 +23,7 @@
       "beta": true,
       "beta_type": "rc",
       "codename": "Empire",
-      "mini_version": 2,
+      "mini_version": 3,
       "folder_name": "9.0-Empire-beta",
       "storage_keys": {
         "empire": "x4_empire_data_v9_beta",

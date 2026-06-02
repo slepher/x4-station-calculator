@@ -462,6 +462,16 @@ export function migrateShipBlueprintStateToCurrent(
     )
   }
 
+  if (working.version < CURRENT_SHIP_BLUEPRINT_VERSION) {
+    working.ships.forEach(bucket => {
+      bucket.blueprints.forEach(bp => {
+        if (bp.favorite === undefined) {
+          bp.favorite = false
+        }
+      })
+    })
+  }
+
   working.version = CURRENT_SHIP_BLUEPRINT_VERSION
   return { state: working, warnings }
 }

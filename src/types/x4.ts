@@ -844,6 +844,7 @@ export interface ShipBlueprint {
   storage?: ShipBlueprintStorage
   materialMethod: string
   lastUpdated: number
+  favorite?: boolean
 }
 
 export type ShipBlueprintBuildEntryKind = 'ship' | 'equipment' | 'storage'

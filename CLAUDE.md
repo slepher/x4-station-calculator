@@ -284,6 +284,7 @@ When merging a worktree branch into develop:
 
 ### Git Operations Safety
 - **当用户说"提交"时，必须先检查本地变动**（`git status`、`git diff`），不得从对话记录里假设没有变动
+- **用户说"提交"就是提交，不要做任何额外操作**：不修 warning、不改代码、不删未使用的 struct、不调查警告原因
 - **我不是仓库的唯一编辑人**，用户可能在其他终端、编辑器或工具中修改了文件
 - 任何 git 操作前，必须先确认当前状态，不得假设状态与对话记录一致
 - Do NOT push to remote unless explicitly requested

@@ -46,6 +46,7 @@ export interface SaveParserRuntime {
   close: (filename: string) => SaveArchive
   getProgress: () => SaveParserProgressInfo
   getData: () => SaveData
+  isDone: () => boolean
 }
 
 export interface SaveXmlFilterRuntime {
@@ -72,6 +73,7 @@ class X4SaveParser {
   private sectorsCount = 0
   private expectedVersion: string | null
   private versionChecked = false
+  private universeClosed = false
 
   private currentStationOwner: string | null = null
   private currentStationModules: PlayerStationConstruction[] = []
@@ -191,6 +193,10 @@ class X4SaveParser {
 
   getSectorsCount(): number {
     return this.sectorsCount
+  }
+
+  isDone(): boolean {
+    return this.universeClosed
   }
 
   private getCurrentSectorData(): SectorData | null {
@@ -421,6 +427,10 @@ class X4SaveParser {
       }
 
       this.componentStack.pop()
+    }
+
+    if (name === 'universe') {
+      this.universeClosed = true
     }
 
     if (this.path.length > 0 && this.path[this.path.length - 1]?.name === name) {
@@ -880,16 +890,19 @@ export function createSaveParserRuntime(
 
   return {
     feed(text: string) {
-      if (!text) return
+      if (!text || parser.isDone()) return
       bytesProcessed += text.length
       for (let i = 0; i < text.length; i += SAX_WRITE_CHUNK_SIZE) {
+        if (parser.isDone()) break
         const chunk = text.slice(i, i + SAX_WRITE_CHUNK_SIZE)
         saxParser.write(chunk)
       }
       emitProgress()
     },
     close(filename: string) {
-      saxParser.close()
+      if (!parser.isDone()) {
+        saxParser.close()
+      }
       emitProgress(true)
       saxWithBufferConfig.MAX_BUFFER_LENGTH = previousMaxBufferLength
       const isCompatible = currentVersion !== null 
@@ -912,6 +925,9 @@ export function createSaveParserRuntime(
     },
     getData() {
       return parser.data
+    },
+    isDone() {
+      return parser.isDone()
     }
   }
 }
@@ -922,6 +938,7 @@ export async function parseSaveXmlChunks(
 ): Promise<SaveArchive> {
   for await (const chunk of chunks) {
     runtime.feed(chunk)
+    if (runtime.isDone()) break
   }
   return runtime.close('')
 }
@@ -1024,10 +1041,14 @@ if (hasWorkerRuntime()) {
         const { done, value } = await reader.read()
         if (done) break
         runtime.feed(decoder.decode(value, { stream: true }))
+        if (runtime.isDone()) {
+          await reader.cancel()
+          break
+        }
       }
 
       const tail = decoder.decode()
-      if (tail) {
+      if (tail && !runtime.isDone()) {
         runtime.feed(tail)
       }
 

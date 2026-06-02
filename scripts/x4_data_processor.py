@@ -53,6 +53,21 @@ def _get_process_research():
     _process_research = mod.process_research
     return _process_research
 
+_process_blueprints = None
+def _get_process_blueprints():
+    global _process_blueprints
+    if _process_blueprints is not None:
+        return _process_blueprints
+    try:
+        mod = importlib.import_module("scripts.x4-game.blueprints.build")
+    except ModuleNotFoundError:
+        try:
+            mod = importlib.import_module("x4-game.blueprints.build")
+        except ModuleNotFoundError:
+            raise ImportError("Cannot import x4-game.blueprints. Run from project root.")
+    _process_blueprints = mod.process_blueprints
+    return _process_blueprints
+
 # =============================================================================
 # ⚙️ 项目配置
 # =============================================================================
@@ -2778,7 +2793,17 @@ class X4PrecisionLoader:
                         item[key.replace('Id', '')] = en_map[raw_key]
                         count_rs += 1
         
-        print(f"   ✅ 更新了 {count_wares} 个商品, {count_mods} 个模块, {count_wg} 个模块分组, {count_ships} 个飞船, {count_equips} 个装备, {count_ship_types} 个船只类型, {count_slot_tags} 个 slot tag, {count_dlcs} 个 DLC, {count_tf} 个 terraforming, {count_rs} 个 research 的英文名称。")
+        # blueprints 数据
+        count_bp = 0
+        if hasattr(self, 'blueprints_data') and self.blueprints_data is not None:
+            for group in ('blueprints', 'classes', 'types'):
+                for item in self.blueprints_data.get(group, []):
+                    raw_key = item.get('nameId')
+                    if raw_key and raw_key in en_map:
+                        item['name'] = en_map[raw_key]
+                        count_bp += 1
+        
+        print(f"   ✅ 更新了 {count_wares} 个商品, {count_mods} 个模块, {count_wg} 个模块分组, {count_ships} 个飞船, {count_equips} 个装备, {count_ship_types} 个船只类型, {count_slot_tags} 个 slot tag, {count_dlcs} 个 DLC, {count_tf} 个 terraforming, {count_rs} 个 research, {count_bp} 个 blueprints 的英文名称。")
 
     # =======================================================
     # 🆕 4.1. 模块类型分析
@@ -2992,6 +3017,11 @@ class X4PrecisionLoader:
             with open(os.path.join(data_dir, "research.json"), 'w', encoding='utf-8') as f:
                 json.dump(self.research_data, f, indent=2, ensure_ascii=False)
 
+        # blueprints 数据
+        if hasattr(self, 'blueprints_data') and self.blueprints_data is not None:
+            with open(os.path.join(data_dir, "blueprints.json"), 'w', encoding='utf-8') as f:
+                json.dump(self.blueprints_data, f, indent=2, ensure_ascii=False)
+
         # 保存语言包
         available_languages = []
         for x4_id, conf in X4_LANG_CONFIG.items():
@@ -3037,6 +3067,7 @@ def run_for_config(effective_config):
     loader.extract_and_resolve_languages()
     _get_process_terraforming()(loader)  # terraforming 数据解析
     _get_process_research()(loader)     # research 数据解析
+    _get_process_blueprints()(loader)   # blueprints 蓝图数据
     loader.analyze_ship_types()
     loader.analyze_equipment_types()
     loader.analyze_slot_tags()
