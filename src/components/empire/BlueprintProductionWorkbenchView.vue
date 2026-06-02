@@ -1,17 +1,21 @@
 <script setup lang="ts">
-import { onMounted, watch } from 'vue'
+import { onMounted, watch, computed } from 'vue'
+import i18n from '@/i18n'
 import { useBlueprintProductionStore } from '@/store/useBlueprintProductionStore'
+import { useTerraformingStore } from '@/store/useTerraformingStore'
 import { useBuildPlanStore } from '@/store/useBuildPlanStore'
 import { useActiveViewStore } from '@/store/useActiveViewStore'
-import { useProductionTabbarPresenter } from '@/components/empire/presenters/useProductionTabbarPresenter'
+import { useProductionSidebarPresenter } from '@/components/empire/presenters/useProductionSidebarPresenter'
 import { useProductionToolbarPresenter } from '@/components/empire/presenters/useProductionToolbarPresenter'
 import { useProductionPlanningPresenter } from '@/components/empire/presenters/useProductionPlanningPresenter'
 import { useProductionWareflowPresenter } from '@/components/empire/presenters/useProductionWareflowPresenter'
 import { useProductionDashboardPresenter } from '@/components/empire/presenters/useProductionDashboardPresenter'
 import StationPlanningPanel from '@/components/empire/StationPlanningPanel.vue'
 import StationDashboard from '@/components/empire/StationDashboard.vue'
-import StationTabBar from '@/components/empire/StationTabBar.vue'
+import ProductionSidebar from '@/components/empire/ProductionSidebar.vue'
 import BlueprintContextToolbar from '@/components/empire/context_toolbar/BlueprintContextToolbar.vue'
+import TerraformingWorkbench from '@/components/empire/TerraformingWorkbench.vue'
+import ResearchWorkbench from '@/components/empire/ResearchWorkbench.vue'
 import StationWareFlowsDashboard from '@/components/empire/StationWareFlowsDashboard.vue'
 import ImportPlanModal from '@/components/empire/ImportPlanModal.vue'
 import { useBuildPlanPresenter } from '@/components/empire/presenters/useBuildPlanPresenter'
@@ -19,24 +23,67 @@ import BuildPlanConstraintsPanel from '@/components/empire/BuildPlanConstraintsP
 import BuildPlanPanel from '@/components/empire/BuildPlanPanel.vue'
 import EmpireWareFlowsDashboard from '@/components/empire/EmpireWareFlowsDashboard.vue'
 
+import { useGameDataStore } from '@/store/useGameDataStore'
+
 const blueprintStore = useBlueprintProductionStore()
+const terraformingStore = useTerraformingStore()
 const buildPlanStore = useBuildPlanStore()
 const activeViewStore = useActiveViewStore()
+const gameDataStore = useGameDataStore()
+
+const terraformingClusters = computed(() => {
+  const clusters = gameDataStore.terraformingData?.clusters ?? []
+  const stats = gameDataStore.terraformingData?.stats ?? []
+  const mapsData = gameDataStore.maps
+  const t = i18n.global.t.bind(i18n.global)
+  return clusters.map(c => {
+    const macro = c.macro?.replace('macro.', '')
+    let nameId = ''
+    if (mapsData && macro) {
+      const clusterInfo = mapsData.clusters[macro]
+      if (clusterInfo) {
+        const sectorList = clusterInfo.sectors ?? []
+        if (sectorList.length === 1 && sectorList[0]) {
+          nameId = mapsData.sectors[sectorList[0]]?.nameId ?? ''
+        } else {
+          nameId = clusterInfo.nameId ?? ''
+        }
+      }
+    }
+    const resolvedName = nameId ? t(nameId) : c.id
+    const temperatureStat = stats.find(s => s.id === 'temperature')
+    let temperatureState = 2
+    if (temperatureStat && c.initialStats?.temperature != null) {
+      const tempValue = c.initialStats.temperature
+      const range = temperatureStat.ranges.find(r => {
+        const start = r.start ?? 0
+        return tempValue >= start && tempValue <= r.end
+      })
+      if (range) temperatureState = range.state
+    }
+    return { id: c.id, name: resolvedName, nameId, temperatureState }
+  })
+})
 
 onMounted(() => {
+  terraformingStore.init()
   const empireId = activeViewStore.activeEmpireId
   if (empireId && !blueprintStore.activeEmpire) {
     blueprintStore.loadEmpire(empireId)
+  }
+  if (empireId) {
+    terraformingStore.ensurePlanForContext('blueprint', '__default__')
   }
 })
 
 watch(() => activeViewStore.activeEmpireId, (newId) => {
   if (newId && newId !== blueprintStore.activeEmpire?.id) {
     blueprintStore.loadEmpire(newId)
+    terraformingStore.ensurePlanForContext('blueprint', '__default__')
   }
 })
 
-const tabbarPresenter = useProductionTabbarPresenter(blueprintStore)
+const sidebarPresenter = useProductionSidebarPresenter(blueprintStore)
 const toolbarPresenter = useProductionToolbarPresenter(blueprintStore)
 const planningPresenter = useProductionPlanningPresenter(blueprintStore)
 const wareflowPresenter = useProductionWareflowPresenter(blueprintStore)
@@ -48,20 +95,42 @@ const buildPlanPresenter = useBuildPlanPresenter({
 </script>
 
 <template>
-  <StationTabBar
-    :tabs="tabbarPresenter.props.tabs.value"
-    :active-tab-id="tabbarPresenter.props.activeTabId.value"
-    :expanded-sector-id="tabbarPresenter.props.expandedSectorId.value"
-    :can-create-station="tabbarPresenter.props.canCreateStation"
-    :can-open-context-menu="tabbarPresenter.props.canOpenContextMenu"
-    @select-overview="tabbarPresenter.emits.selectOverview"
-    @select-station="tabbarPresenter.emits.selectStation"
-    @create-station="tabbarPresenter.emits.createStation"
-    @rename-station="tabbarPresenter.emits.renameStation"
-    @duplicate-station="tabbarPresenter.emits.duplicateStation"
-    @delete-station="tabbarPresenter.emits.deleteStation"
-  />
-  <BlueprintContextToolbar
+  <div class="production-layout">
+    <ProductionSidebar
+      :tabs="sidebarPresenter.props.tabs.value"
+      :active-tab-id="sidebarPresenter.props.activeTabId.value"
+      :expanded-sector-id="sidebarPresenter.props.expandedSectorId.value"
+      :has-sectors="sidebarPresenter.props.hasSectors"
+      :show-terraforming="sidebarPresenter.props.showTerraforming"
+      :show-tech-tree="sidebarPresenter.props.showTechTree"
+      :show-research="sidebarPresenter.props.showResearch"
+      :terraforming-clusters="terraformingClusters"
+      :active-terraforming-cluster-id="activeViewStore.activeTerraformingClusterId"
+      :can-create-station="sidebarPresenter.props.canCreateStation"
+      :can-open-context-menu="sidebarPresenter.props.canOpenContextMenu"
+      :context-menu-mode="sidebarPresenter.props.contextMenuMode"
+      :can-delete-station="sidebarPresenter.props.canDeleteStation"
+      @select-overview="sidebarPresenter.emits.selectOverview"
+      @select-station="sidebarPresenter.emits.selectStation"
+      @create-station="sidebarPresenter.emits.createStation"
+      @rename-station="sidebarPresenter.emits.renameStation"
+      @duplicate-station="sidebarPresenter.emits.duplicateStation"
+      @delete-station="sidebarPresenter.emits.deleteStation"
+      @select-terraforming="sidebarPresenter.emits.selectTerraforming"
+      @select-tech-tree="() => {}"
+      @select-research="sidebarPresenter.emits.selectResearch"
+      @select-terraforming-cluster="(clusterId: string) => {
+        activeViewStore.activeEmpireWorkbench = 'terraforming'
+        activeViewStore.activeTerraformingClusterId = clusterId
+        terraformingStore.selectCluster(clusterId)
+      }"
+      @select-transit="() => {}"
+      @expand-sector="() => {}"
+      @jump-to-binding="() => {}"
+    />
+    <div class="production-content custom-scrollbar">
+      <BlueprintContextToolbar
+        v-if="toolbarPresenter.props.workbenchMode.value !== 'terraforming' && toolbarPresenter.props.workbenchMode.value !== 'research'"
     :station="toolbarPresenter.props.station.value"
     :workbench-mode="toolbarPresenter.props.workbenchMode.value"
     :title-model="toolbarPresenter.props.titleModel.value"
@@ -97,7 +166,10 @@ const buildPlanPresenter = useBuildPlanPresenter({
     @close="toolbarPresenter.emits.closeImport"
   />
 
-  <div v-if="toolbarPresenter.props.workbenchMode.value === 'station'" class="main-layout mt-6">
+  <TerraformingWorkbench v-if="toolbarPresenter.props.workbenchMode.value === 'terraforming'" />
+  <ResearchWorkbench v-if="toolbarPresenter.props.workbenchMode.value === 'research'" />
+
+  <div v-if="toolbarPresenter.props.workbenchMode.value === 'station'" class="main-layout">
     <div class="col-span-12 lg:col-span-3">
       <StationPlanningPanel
         :planned-modules="planningPresenter.props.plannedModules.value"
@@ -155,7 +227,7 @@ const buildPlanPresenter = useBuildPlanPresenter({
     </div>
   </div>
 
-  <div v-if="toolbarPresenter.props.workbenchMode.value === 'overview'" class="main-layout mt-6">
+  <div v-if="toolbarPresenter.props.workbenchMode.value === 'overview'" class="main-layout">
     <div class="col-span-12 lg:col-span-3">
       <BuildPlanConstraintsPanel
         :goals="buildPlanPresenter.props.goals.value"
@@ -211,12 +283,22 @@ const buildPlanPresenter = useBuildPlanPresenter({
         @update:sell-multiplier="blueprintStore.overviewSellMultiplier = $event"
       />
     </div>
+    </div>
   </div>
+</div>
 
 </template>
 
 <style scoped>
+.production-layout {
+  @apply flex flex-1 min-h-0;
+}
+
+.production-content {
+  @apply flex-1 flex flex-col min-w-0 overflow-y-auto;
+}
+
 .main-layout {
-  @apply grid grid-cols-12 gap-8 items-start;
+  @apply grid grid-cols-12 gap-8 items-start px-4 pt-4;
 }
 </style>

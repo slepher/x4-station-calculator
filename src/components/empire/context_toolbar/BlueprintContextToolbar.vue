@@ -12,7 +12,7 @@ const props = defineProps<{
     count: number
     minerals: string[]
   } | null
-  workbenchMode: 'overview' | 'station' | 'transit'
+  workbenchMode: 'overview' | 'station' | 'transit' | 'terraforming' | 'tech-tree' | 'research'
   titleModel: {
     value: string
     placeholder: string
@@ -106,7 +106,7 @@ const handleOpenImport = () => {
 
 <template>
   <div class="context-toolbar">
-    <div v-if="isOverview" class="toolbar-content w-full flex items-center">
+    <div v-if="isOverview" class="toolbar-content w-full flex items-center h-full">
       <div class="toolbar-section">
         <div class="input-group">
           <label class="group-label">{{ t('sector.blueprint_name') }}</label>
@@ -130,7 +130,7 @@ const handleOpenImport = () => {
       </div>
     </div>
 
-    <div v-else class="toolbar-content w-full flex items-center">
+    <div v-else class="toolbar-content w-full flex items-center h-full">
       <div class="toolbar-section">
         <div class="input-group">
           <label class="group-label">{{ t('toolbar.station_name') }}</label>
@@ -267,7 +267,7 @@ const handleOpenImport = () => {
 
 <style scoped>
 .context-toolbar {
-  @apply w-full h-16 bg-slate-950 border-b border-slate-800 flex items-center px-6 select-none relative z-10;
+  @apply w-full h-16 shrink-0 bg-slate-950 border-b border-slate-800 flex px-6 select-none relative z-10;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
@@ -288,7 +288,7 @@ const handleOpenImport = () => {
 }
 
 .toolbar-import-slot {
-  @apply ml-auto flex items-end h-10;
+  @apply ml-auto flex items-center;
 }
 
 .icon-btn {

@@ -8,6 +8,7 @@ import { useShipBuildStore } from '@/store/useShipBuildStore'
 import { useSaveStore } from '@/store/useSaveStore'
 import { useSaveBindingStore } from '@/store/useSaveBindingStore'
 import { useBuildPlanStore } from '@/store/useBuildPlanStore'
+import { useTerraformingStore } from '@/store/useTerraformingStore'
 import {
   buildExportPayload,
   buildSaveExportData,
@@ -33,6 +34,7 @@ const shipBuildStore = useShipBuildStore()
 const saveStore = useSaveStore()
 const saveBindingStore = useSaveBindingStore()
 const buildPlanStore = useBuildPlanStore()
+const terraformingStore = useTerraformingStore()
 
 const currentVersionLabel = computed(() =>
   gameDataStore.displayFullVersion(undefined, undefined, false)
@@ -139,6 +141,8 @@ const moduleTitle = (key: ImportModuleKey) => {
       return t('moduleNames.save_binding')
     case 'x4_build_plan_goals':
       return t('moduleNames.build_plan')
+    case 'x4_terraforming_data':
+      return t('moduleNames.terraforming', 'Terraforming')
     default:
       return key
   }
@@ -162,7 +166,8 @@ const handleDownload = async () => {
       shipBuildStore.savedBlueprints,
       gameDataStore,
       saveBindingStore.savedBindings,
-      buildPlanStore.savedPlans
+      buildPlanStore.savedPlans,
+      terraformingStore.savedPlans
     )
 
     if (saveStore.savedArchivesState.list.length > 0) {
@@ -184,8 +189,9 @@ const handleDownload = async () => {
       logicFlowStore.savedPlans,
       shipBuildStore.savedBlueprints,
       gameDataStore,
-      undefined,
-      buildPlanStore.savedPlans
+      saveBindingStore.savedBindings,
+      buildPlanStore.savedPlans,
+      terraformingStore.savedPlans
     )
     triggerJsonDownload(withExt, basePayload)
   }

@@ -85,3 +85,9 @@ analysis/tmp_scripts/
 
 server-*.log
 save_009.json
+
+# Root markdown files (except allow-listed)
+/*.md
+!/CLAUDE.md
+!/README.md
+!/gemini.md

@@ -4,34 +4,46 @@ import type { ProductionTabItem } from '@/types/production-ui'
 import type { StationType } from '@/types/x4'
 import i18n from '@/i18n'
 
-export interface TabbarPresenterProps {
+export interface SidebarPresenterProps {
   tabs: ComputedRef<ProductionTabItem[]>
   activeTabId: ComputedRef<string | null>
   expandedSectorId: ComputedRef<string | null>
+  hasSectors: boolean
+  showTerraforming: boolean
+  showTechTree: boolean
+  showResearch: boolean
   canCreateStation: boolean
+  terraformingClusters: ComputedRef<{ id: string; nameId: string }[]>
+  activeTerraformingClusterId: ComputedRef<string | null>
   canOpenContextMenu: boolean
   contextMenuMode: 'full' | 'delete-only'
+  canDeleteStation: (stationId: string) => boolean
 }
 
-export interface TabbarPresenterEmits {
+export interface SidebarPresenterEmits {
   selectOverview: () => void
+  selectTerraforming: () => void
+  selectTechTree: () => void
+  selectResearch: () => void
   selectTransit: (sectorId: string) => void
+  selectTerraformingCluster: (clusterId: string) => void
   selectStation: (stationId: string) => void
   createStation: () => unknown
   renameStation: (stationId: string) => void
   duplicateStation: (stationId: string) => unknown
   deleteStation: (stationId: string) => void
   expandSector: (sectorId: string | null) => void
+  jumpToBinding: (tabId: string, tabType: 'station' | 'transit') => void
 }
 
-export interface UseProductionTabbarPresenterReturn {
-  props: TabbarPresenterProps
-  emits: TabbarPresenterEmits
+export interface UseProductionSidebarPresenterReturn {
+  props: SidebarPresenterProps
+  emits: SidebarPresenterEmits
 }
 
-export interface TabbarPresenterStore {
+export interface SidebarPresenterStore {
   session: {
-    workbenchMode: 'overview' | 'station' | 'transit'
+    workbenchMode: 'overview' | 'station' | 'transit' | 'terraforming' | 'tech-tree' | 'research'
     activeStationId: string | null
     activeTransitSectorId: string | null
   }
@@ -60,12 +72,17 @@ export interface TabbarPresenterStore {
   tabSemanticsById?: Record<string, { tag?: string; factoryGroup?: string }>
   expandedSectorId?: string | null
   selectStation(stationId: string | null): void
+  selectTerraforming?(): void
+  selectTechTree?(): void
+  selectResearch?(): void
   selectTransitSector?(sectorId: string | null): void
   createStation(name?: string): unknown
   renameStation(stationId: string, name: string): void
   duplicateStation(stationId: string): unknown
   deleteStation(stationId: string): void
   setExpandedSector?(sectorId: string | null): void
+  jumpToMapBinding?(tabId: string, tabType: 'station' | 'transit'): void
+  canDeleteStation?(stationId: string): boolean
 }
 
 function getFallbackTagForStationType(type?: StationType): string | undefined {
@@ -75,7 +92,7 @@ function getFallbackTagForStationType(type?: StationType): string | undefined {
 }
 
 function resolveTabSemantics(
-  store: TabbarPresenterStore,
+  store: SidebarPresenterStore,
   station: {
     type?: StationType
     tag?: string
@@ -89,20 +106,21 @@ function resolveTabSemantics(
   return { tag, factoryGroup }
 }
 
-export function useProductionTabbarPresenter(store: TabbarPresenterStore): UseProductionTabbarPresenterReturn {
+export function useProductionSidebarPresenter(store: SidebarPresenterStore): UseProductionSidebarPresenterReturn {
   const tabs = computed<ProductionTabItem[]>(() => {
     if (!store.capabilities.hasSectors) {
-      return [
-        { id: 'overview', type: 'overview' as const, name: i18n.global.t('sector.overview') },
-        ...(store.orderedStations || []).map((station) => ({
-          id: station.id,
-          type: 'station' as const,
-          name: station.name,
-          sectorId: station.sectorId ?? undefined,
-          stationType: station.type,
-          ...resolveTabSemantics(store, station, station.id)
-        }))
+      const items: ProductionTabItem[] = [
+        { id: 'overview', type: 'overview' as const, name: i18n.global.t('sector.overview') }
       ]
+      items.push(...(store.orderedStations || []).map((station) => ({
+        id: station.id,
+        type: 'station' as const,
+        name: station.name,
+        sectorId: station.sectorId ?? undefined,
+        stationType: station.type,
+        ...resolveTabSemantics(store, station, station.id)
+      })))
+      return items
     }
 
     const result: ProductionTabItem[] = [
@@ -137,17 +155,25 @@ export function useProductionTabbarPresenter(store: TabbarPresenterStore): UsePr
         name: sector.name,
         sectorId: sector.id
       })
-      if (store.expandedSectorId === sector.id) {
-        result.push(...(grouped.get(sector.id) || []))
-      }
+      result.push(...(grouped.get(sector.id) || []))
     })
 
     return result
   })
 
-  const props: TabbarPresenterProps = {
+  const hasSectors = store.capabilities.hasSectors
+  // 蓝图显示地球化；实况暂隐藏（恢复：!!store.selectTerraforming）
+  const showTerraforming = !hasSectors
+  // 暂隐藏（恢复：!!store.selectTechTree）
+  const showTechTree = false
+  const showResearch = !hasSectors
+
+  const props: SidebarPresenterProps = {
     tabs,
     activeTabId: computed(() => {
+      if (store.session.workbenchMode === 'terraforming') return 'terraforming'
+      if (store.session.workbenchMode === 'tech-tree') return 'tech-tree'
+      if (store.session.workbenchMode === 'research') return 'research'
       if (store.session.workbenchMode === 'transit' && store.session.activeTransitSectorId) {
         return `transit:${store.session.activeTransitSectorId}`
       }
@@ -155,20 +181,34 @@ export function useProductionTabbarPresenter(store: TabbarPresenterStore): UsePr
       return store.session.activeStationId
     }),
     expandedSectorId: computed(() => store.expandedSectorId ?? null),
+    hasSectors,
+    showTerraforming,
+    showTechTree,
+    showResearch,
     canCreateStation: !store.capabilities.uniqueStation,
     canOpenContextMenu: !store.capabilities.uniqueStation || (store.capabilities.uniqueStation && !store.archiveStation),
-    contextMenuMode: store.capabilities.uniqueStation ? 'delete-only' : 'full'
+    contextMenuMode: store.capabilities.uniqueStation ? 'delete-only' : 'full',
+    canDeleteStation: (stationId: string) => store.canDeleteStation?.(stationId) ?? !store.capabilities.uniqueStation,
+    terraformingClusters: computed(() => []),
+    activeTerraformingClusterId: computed(() => null),
   }
 
-  const emits: TabbarPresenterEmits = {
+  const emits: SidebarPresenterEmits = {
     selectOverview: () => store.selectStation(null),
+    selectTerraforming: () => (store.selectTerraforming || (() => {}))(),
+    selectTechTree: () => (store.selectTechTree || (() => {}))(),
+    selectResearch: () => (store.selectResearch || (() => {}))(),
+    selectTerraformingCluster: () => {},
     selectTransit: (sectorId: string) => (store.selectTransitSector || (() => {}))(sectorId),
     selectStation: (stationId: string) => store.selectStation(stationId),
     createStation: () => store.createStation(),
     renameStation: (stationId: string) => store.renameStation(stationId, ''),
     duplicateStation: (stationId: string) => store.duplicateStation(stationId),
     deleteStation: (stationId: string) => store.deleteStation(stationId),
-    expandSector: (sectorId: string | null) => (store.setExpandedSector || (() => {}))(sectorId)
+    expandSector: (sectorId: string | null) => (store.setExpandedSector || (() => {}))(sectorId),
+    jumpToBinding: (tabId: string, tabType: 'station' | 'transit') => {
+      ;(store.jumpToMapBinding || (() => {}))(tabId, tabType)
+    }
   }
 
   return { props, emits }

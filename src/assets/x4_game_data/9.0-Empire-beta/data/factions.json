@@ -496,6 +496,7 @@
     "nameId": "{20203,1101}",
     "tags": [
       "claimspace",
+      "nobuildunits",
       "nodiplomacyselection",
       "notradeoffer",
       "privateloadout",

@@ -1,0 +1,1216 @@
+{
+  "items": [
+    {
+      "id": "research_agentslot_01",
+      "nameId": "{20216,3501}",
+      "name": "Embassy Management - Upgrade I",
+      "descriptionId": "{20216,3502}",
+      "dlcTag": "base",
+      "tags": [
+        "nocustomgamestart",
+        "research"
+      ],
+      "category": "conditional",
+      "researchTime": 900,
+      "cost": {
+        "medicalsupplies": 485,
+        "microchips": 48,
+        "smartchips": 720
+      },
+      "dependencies": [],
+      "unlock": {
+        "key": "embassy"
+      },
+      "description": "Primary Embassy upgrade enabling management and deployment of additional Agents."
+    },
+    {
+      "id": "research_agentslot_02",
+      "nameId": "{20216,3601}",
+      "name": "Embassy Management - Upgrade II",
+      "descriptionId": "{20216,3602}",
+      "dlcTag": "base",
+      "tags": [
+        "nocustomgamestart",
+        "research"
+      ],
+      "category": "conditional",
+      "researchTime": 1500,
+      "cost": {
+        "advancedelectronics": 1200,
+        "foodrations": 25000,
+        "medicalsupplies": 12500,
+        "microchips": 935,
+        "smartchips": 4355
+      },
+      "dependencies": [
+        "research_agentslot_01"
+      ],
+      "unlock": {
+        "key": "embassy"
+      },
+      "description": "Secondary Embassy upgrade enabling management and deployment of the maximum number of Agents."
+    },
+    {
+      "id": "research_diplomacy_network",
+      "nameId": "{20216,3401}",
+      "name": "Diplomacy Network",
+      "descriptionId": "{20216,3402}",
+      "dlcTag": "base",
+      "tags": [
+        "nocustomgamestart",
+        "research"
+      ],
+      "category": "default",
+      "researchTime": 720,
+      "cost": {
+        "advancedcomposites": 88,
+        "advancedelectronics": 35,
+        "energycells": 450
+      },
+      "dependencies": [],
+      "description": "Grants access to the Embassy at Headquarters, enabling diplomatic opportunities."
+    },
+    {
+      "id": "research_equipment_xenon",
+      "nameId": "{20216,3101}",
+      "name": "Xenon Special Equipment",
+      "descriptionId": "{20216,3102}",
+      "dlcTag": "base",
+      "tags": [
+        "nocustomgamestart",
+        "research"
+      ],
+      "category": "conditional",
+      "researchTime": 750,
+      "cost": {
+        "advancedcomposites": 1851,
+        "advancedelectronics": 1972,
+        "energycells": 62500,
+        "microchips": 2110,
+        "nividium": 4902,
+        "quantumtubes": 2333,
+        "smartchips": 14035
+      },
+      "dependencies": [],
+      "unlock": {
+        "key": "xen_equipment",
+        "params": {
+          "itemWareId": "inv_quantum_data_shard",
+          "itemNameId": "{20201,56001}"
+        }
+      },
+      "description": "This research will unlock the ability to modify the mysterious new variants of Xenon ships at personal ship production installations."
+    },
+    {
+      "id": "research_high_mass_teleportation",
+      "nameId": "{20216,1431}",
+      "name": "High-mass Teleportation",
+      "descriptionId": "{20216,1432}",
+      "dlcTag": "base",
+      "tags": [
+        "research"
+      ],
+      "category": "abandoned",
+      "researchTime": 0,
+      "cost": {},
+      "dependencies": [],
+      "description": "Seemingly based on technology used to tunnel to parallel universes, this function of the station is capable of moving massive structures to another pre-determined location."
+    },
+    {
+      "id": "research_interference_network",
+      "nameId": "{20216,3701}",
+      "name": "Undercover Interference Network",
+      "descriptionId": "{20216,3702}",
+      "dlcTag": "base",
+      "tags": [
+        "nocustomgamestart",
+        "research"
+      ],
+      "category": "conditional",
+      "researchTime": 900,
+      "cost": {
+        "energycells": 3850,
+        "foodrations": 1620,
+        "medicalsupplies": 530,
+        "spacefuel": 242
+      },
+      "dependencies": [
+        "research_diplomacy_network"
+      ],
+      "unlock": {
+        "key": "interference_network",
+        "params": {
+          "count": 2
+        }
+      },
+      "description": "Enables the deployment of autonomous intelligence cells operating under Protocol Null. These deep-cover units conduct unsupervised operations designed to provoke diplomatic friction between factions, independent of direct oversight."
+    },
+    {
+      "id": "research_module_build",
+      "nameId": "{20216,1291}",
+      "name": "Build Module Hack",
+      "descriptionId": "{20216,1292}",
+      "dlcTag": "base",
+      "tags": [
+        "hidden",
+        "research"
+      ],
+      "category": "abandoned",
+      "researchTime": 600,
+      "cost": {},
+      "dependencies": [
+        "research_module_defence",
+        "research_module_habitation"
+      ],
+      "description": "Allows the possibility to steal build module blueprints when scanning their data leaks."
+    },
+    {
+      "id": "research_module_defence",
+      "nameId": "{20216,1271}",
+      "name": "Defence Module Hack",
+      "descriptionId": "{20216,1272}",
+      "dlcTag": "base",
+      "tags": [
+        "research"
+      ],
+      "category": "default",
+      "researchTime": 600,
+      "cost": {
+        "advancedelectronics": 100,
+        "claytronics": 50,
+        "energycells": 2500,
+        "weaponcomponents": 75
+      },
+      "dependencies": [
+        "research_module_dock",
+        "research_module_production",
+        "research_module_storage"
+      ],
+      "description": "Allows the possibility to steal defence module blueprints when scanning their data leaks."
+    },
+    {
+      "id": "research_module_dock",
+      "nameId": "{20216,1261}",
+      "name": "Dock Module Hack",
+      "descriptionId": "{20216,1262}",
+      "dlcTag": "base",
+      "tags": [
+        "research"
+      ],
+      "category": "default",
+      "researchTime": 600,
+      "cost": {
+        "claytronics": 125,
+        "energycells": 2500,
+        "smartchips": 150
+      },
+      "dependencies": [],
+      "description": "Allows the possibility to steal Dock Module blueprints when scanning their data leaks."
+    },
+    {
+      "id": "research_module_habitation",
+      "nameId": "{20216,1281}",
+      "name": "Habitation Module Hack",
+      "descriptionId": "{20216,1282}",
+      "dlcTag": "base",
+      "tags": [
+        "research"
+      ],
+      "category": "default",
+      "researchTime": 600,
+      "cost": {
+        "energycells": 2500,
+        "smartchips": 400,
+        "superfluidcoolant": 500,
+        "teladianium": 500
+      },
+      "dependencies": [
+        "research_module_dock",
+        "research_module_production",
+        "research_module_storage"
+      ],
+      "description": "Allows the possibility to steal habitation module blueprints when scanning their data leaks."
+    },
+    {
+      "id": "research_module_production",
+      "nameId": "{20216,1241}",
+      "name": "Production Module Hack",
+      "descriptionId": "{20216,1242}",
+      "dlcTag": "base",
+      "tags": [
+        "research"
+      ],
+      "category": "default",
+      "researchTime": 600,
+      "cost": {
+        "advancedelectronics": 225,
+        "energycells": 2500,
+        "graphene": 300,
+        "smartchips": 200
+      },
+      "dependencies": [],
+      "description": "Allows the possibility to steal production module blueprints when scanning their data leaks."
+    },
+    {
+      "id": "research_module_storage",
+      "nameId": "{20216,1251}",
+      "name": "Storage Module Hack",
+      "descriptionId": "{20216,1252}",
+      "dlcTag": "base",
+      "tags": [
+        "research"
+      ],
+      "category": "default",
+      "researchTime": 600,
+      "cost": {
+        "claytronics": 50,
+        "energycells": 2500,
+        "refinedmetals": 500,
+        "teladianium": 400
+      },
+      "dependencies": [],
+      "description": "Allows the possibility to steal storage module blueprints when scanning their data leaks."
+    },
+    {
+      "id": "research_module_venture",
+      "nameId": "{20216,1421}",
+      "name": "Venture Docks",
+      "descriptionId": "{20216,1422}",
+      "dlcTag": "base",
+      "tags": [
+        "hidden",
+        "research"
+      ],
+      "category": "abandoned",
+      "researchTime": 600,
+      "cost": {},
+      "dependencies": [],
+      "description": "Allows the construction of experimental modules to send ships to parallel universes."
+    },
+    {
+      "id": "research_module_welfare_1",
+      "nameId": "{20216,2101}",
+      "name": "Welfare Module - Gambling Den",
+      "descriptionId": "{20216,2102}",
+      "dlcTag": "base",
+      "tags": [
+        "research"
+      ],
+      "category": "default",
+      "researchTime": 10,
+      "cost": {},
+      "dependencies": [
+        "research_module_welfare_1_pre"
+      ],
+      "description": "A certain nearby station is enticing workers from far and wide. What makes it so alluring, and can we achieve the same effect?"
+    },
+    {
+      "id": "research_module_welfare_1_pre",
+      "nameId": "{20216,2301}",
+      "name": "Investigate nearby station.",
+      "descriptionId": "{20216,2302}",
+      "dlcTag": "base",
+      "tags": [
+        "missiononly",
+        "research"
+      ],
+      "category": "mission_progress",
+      "researchTime": 10,
+      "cost": {},
+      "dependencies": [],
+      "description": "No information available"
+    },
+    {
+      "id": "research_mod_engine_mk1",
+      "nameId": "{20216,1331}",
+      "name": "Basic Engine Mods",
+      "descriptionId": "{20216,1332}",
+      "dlcTag": "base",
+      "tags": [
+        "research"
+      ],
+      "category": "default",
+      "researchTime": 600,
+      "cost": {},
+      "dependencies": [
+        "research_mod_engine_pre"
+      ],
+      "description": "Allows the crafting of basic engine mods for ships."
+    },
+    {
+      "id": "research_mod_engine_mk2",
+      "nameId": "{20216,1341}",
+      "name": "Advanced Engine Mods",
+      "descriptionId": "{20216,1342}",
+      "dlcTag": "base",
+      "tags": [
+        "research"
+      ],
+      "category": "default",
+      "researchTime": 600,
+      "cost": {
+        "advancedelectronics": 50,
+        "antimattercells": 150,
+        "engineparts": 150,
+        "superfluidcoolant": 200
+      },
+      "dependencies": [
+        "research_mod_engine_mk1"
+      ],
+      "description": "Allows the crafting of more advanced engine mods for ships."
+    },
+    {
+      "id": "research_mod_engine_mk3",
+      "nameId": "{20216,1351}",
+      "name": "Exceptional Engine Mods",
+      "descriptionId": "{20216,1352}",
+      "dlcTag": "base",
+      "tags": [
+        "research"
+      ],
+      "category": "default",
+      "researchTime": 600,
+      "cost": {
+        "antimattercells": 400,
+        "engineparts": 500,
+        "fieldcoils": 250,
+        "superfluidcoolant": 500
+      },
+      "dependencies": [
+        "research_mod_engine_mk2"
+      ],
+      "description": "Allows the crafting of superior engine mods for ships."
+    },
+    {
+      "id": "research_mod_engine_pre",
+      "nameId": "{20216,1441}",
+      "name": "Acquire Engine Sensors",
+      "descriptionId": "{20216,1442}",
+      "dlcTag": "base",
+      "tags": [
+        "missiononly",
+        "research"
+      ],
+      "category": "mission_progress",
+      "researchTime": 10,
+      "cost": {},
+      "dependencies": [],
+      "description": "High-grade sensors are required for development of engine technology."
+    },
+    {
+      "id": "research_mod_shield_mk1",
+      "nameId": "{20216,1361}",
+      "name": "Basic Shield Mods",
+      "descriptionId": "{20216,1362}",
+      "dlcTag": "base",
+      "tags": [
+        "research"
+      ],
+      "category": "default",
+      "researchTime": 600,
+      "cost": {},
+      "dependencies": [
+        "research_mod_shield_pre"
+      ],
+      "description": "Allows the crafting of basic shield mods for ships."
+    },
+    {
+      "id": "research_mod_shield_mk2",
+      "nameId": "{20216,1371}",
+      "name": "Advanced Shield Mods",
+      "descriptionId": "{20216,1372}",
+      "dlcTag": "base",
+      "tags": [
+        "research"
+      ],
+      "category": "default",
+      "researchTime": 600,
+      "cost": {
+        "advancedcomposites": 25,
+        "energycells": 2000,
+        "fieldcoils": 150,
+        "plasmaconductors": 250
+      },
+      "dependencies": [
+        "research_mod_shield_mk1"
+      ],
+      "description": "Allows the crafting of more advanced shield mods for ships."
+    },
+    {
+      "id": "research_mod_shield_mk3",
+      "nameId": "{20216,1381}",
+      "name": "Exceptional Shield Mods",
+      "descriptionId": "{20216,1382}",
+      "dlcTag": "base",
+      "tags": [
+        "research"
+      ],
+      "category": "default",
+      "researchTime": 600,
+      "cost": {
+        "advancedcomposites": 50,
+        "fieldcoils": 250,
+        "plasmaconductors": 300
+      },
+      "dependencies": [
+        "research_mod_shield_mk2"
+      ],
+      "description": "Allows the crafting of superior shield mods for ships."
+    },
+    {
+      "id": "research_mod_shield_pre",
+      "nameId": "{20216,1451}",
+      "name": "Acquire Weapon Damage Data",
+      "descriptionId": "{20216,1452}",
+      "dlcTag": "base",
+      "tags": [
+        "missiononly",
+        "research"
+      ],
+      "category": "mission_progress",
+      "researchTime": 10,
+      "cost": {},
+      "dependencies": [],
+      "description": "Live combat data will help in developing more advanced shield technology."
+    },
+    {
+      "id": "research_mod_ship_mk1",
+      "nameId": "{20216,1301}",
+      "name": "Basic Chassis Mods",
+      "descriptionId": "{20216,1302}",
+      "dlcTag": "base",
+      "tags": [
+        "research"
+      ],
+      "category": "default",
+      "researchTime": 600,
+      "cost": {},
+      "dependencies": [
+        "research_mod_ship_pre"
+      ],
+      "description": "Allows the crafting of basic chassis mods for ships."
+    },
+    {
+      "id": "research_mod_ship_mk2",
+      "nameId": "{20216,1311}",
+      "name": "Advanced Chassis Mods",
+      "descriptionId": "{20216,1312}",
+      "dlcTag": "base",
+      "tags": [
+        "research"
+      ],
+      "category": "default",
+      "researchTime": 600,
+      "cost": {
+        "claytronics": 50,
+        "graphene": 75,
+        "refinedmetals": 100,
+        "teladianium": 25
+      },
+      "dependencies": [
+        "research_mod_ship_mk1"
+      ],
+      "description": "Allows the crafting of more advanced chassis mods for ships."
+    },
+    {
+      "id": "research_mod_ship_mk3",
+      "nameId": "{20216,1321}",
+      "name": "Exceptional Chassis Mods",
+      "descriptionId": "{20216,1322}",
+      "dlcTag": "base",
+      "tags": [
+        "research"
+      ],
+      "category": "default",
+      "researchTime": 600,
+      "cost": {
+        "claytronics": 200,
+        "nividium": 50,
+        "refinedmetals": 250,
+        "teladianium": 75
+      },
+      "dependencies": [
+        "research_mod_ship_mk2"
+      ],
+      "description": "Allows the crafting of superior chassis mods for ships."
+    },
+    {
+      "id": "research_mod_ship_pre",
+      "nameId": "{20216,1461}",
+      "name": "Acquire Nanites",
+      "descriptionId": "{20216,1462}",
+      "dlcTag": "base",
+      "tags": [
+        "missiononly",
+        "research"
+      ],
+      "category": "mission_progress",
+      "researchTime": 10,
+      "cost": {},
+      "dependencies": [],
+      "description": "Nanites will allow us to easily modify a ship chassis and bring out its potential."
+    },
+    {
+      "id": "research_mod_weapon_mk1",
+      "nameId": "{20216,1391}",
+      "name": "Basic Weapon Mods",
+      "descriptionId": "{20216,1392}",
+      "dlcTag": "base",
+      "tags": [
+        "research"
+      ],
+      "category": "default",
+      "researchTime": 600,
+      "cost": {},
+      "dependencies": [
+        "research_mod_weapon_pre"
+      ],
+      "description": "Allows the crafting of basic weapon mods for ships."
+    },
+    {
+      "id": "research_mod_weapon_mk2",
+      "nameId": "{20216,1401}",
+      "name": "Advanced Weapon Mods",
+      "descriptionId": "{20216,1402}",
+      "dlcTag": "base",
+      "tags": [
+        "research"
+      ],
+      "category": "default",
+      "researchTime": 600,
+      "cost": {
+        "advancedcomposites": 50,
+        "fieldcoils": 150,
+        "smartchips": 100,
+        "weaponcomponents": 75
+      },
+      "dependencies": [
+        "research_mod_weapon_mk1"
+      ],
+      "description": "Allows the crafting of more advanced weapon mods for ships."
+    },
+    {
+      "id": "research_mod_weapon_mk3",
+      "nameId": "{20216,1411}",
+      "name": "Exceptional Weapon Mods",
+      "descriptionId": "{20216,1412}",
+      "dlcTag": "base",
+      "tags": [
+        "research"
+      ],
+      "category": "default",
+      "researchTime": 600,
+      "cost": {
+        "advancedcomposites": 50,
+        "fieldcoils": 250,
+        "plasmaconductors": 300,
+        "weaponcomponents": 200
+      },
+      "dependencies": [
+        "research_mod_weapon_mk2"
+      ],
+      "description": "Allows the crafting of superior weapon mods for ships."
+    },
+    {
+      "id": "research_mod_weapon_pre",
+      "nameId": "{20216,1471}",
+      "name": "Acquire Regulators",
+      "descriptionId": "{20216,1472}",
+      "dlcTag": "base",
+      "tags": [
+        "missiononly",
+        "research"
+      ],
+      "category": "mission_progress",
+      "researchTime": 10,
+      "cost": {},
+      "dependencies": [],
+      "description": "To improve the chances of creating safe and effective weapon modifications, high-spec particle regulators are required."
+    },
+    {
+      "id": "research_radioreceiver",
+      "nameId": "{20216,1231}",
+      "name": "Radio Receiver",
+      "descriptionId": "{20216,1232}",
+      "dlcTag": "base",
+      "tags": [
+        "hidden",
+        "research"
+      ],
+      "category": "abandoned",
+      "researchTime": 10,
+      "cost": {},
+      "dependencies": [],
+      "description": "Allows you to receive radio transmissions from throughout space."
+    },
+    {
+      "id": "research_sensorbooster",
+      "nameId": "{20216,1211}",
+      "name": "Sensor Booster",
+      "descriptionId": "{20216,1212}",
+      "dlcTag": "base",
+      "tags": [
+        "hidden",
+        "research"
+      ],
+      "category": "abandoned",
+      "researchTime": 10,
+      "cost": {},
+      "dependencies": [],
+      "description": "Allows you to scan station modules for more information."
+    },
+    {
+      "id": "research_seta",
+      "nameId": "{20216,3801}",
+      "name": "Time Compression",
+      "descriptionId": "{20216,3802}",
+      "dlcTag": "base",
+      "tags": [
+        "research"
+      ],
+      "category": "default",
+      "researchTime": 600,
+      "cost": {},
+      "dependencies": [
+        "research_seta_pre"
+      ],
+      "description": "Unlocks construction of the Singularity Engine Time Accelerator , a device that locally compresses perceived time. Primarily intended to reduce transit duration during extended travel phases."
+    },
+    {
+      "id": "research_seta_pre",
+      "nameId": "{20216,3901}",
+      "name": "Time Compression Prerequisite",
+      "descriptionId": "{20216,3902}",
+      "dlcTag": "base",
+      "tags": [
+        "missiononly",
+        "research"
+      ],
+      "category": "mission_progress",
+      "researchTime": 10,
+      "cost": {},
+      "dependencies": [],
+      "description": "This initiative serves as a prerequisite for enabling Boso Ta to commence research into time-compression technology."
+    },
+    {
+      "id": "research_teleportation",
+      "nameId": "{20216,1001}",
+      "name": "Teleportation",
+      "descriptionId": "{20216,1002}",
+      "dlcTag": "base",
+      "tags": [
+        "research"
+      ],
+      "category": "default",
+      "researchTime": 600,
+      "cost": {
+        "advancedelectronics": 100,
+        "energycells": 2000
+      },
+      "dependencies": [],
+      "description": "A by-product of Terran warp research, this will allow teleportation of an individual over a limited range."
+    },
+    {
+      "id": "research_teleportation_range_01",
+      "nameId": "{20216,1011}",
+      "name": "Teleportation - Range I",
+      "descriptionId": "{20216,1012}",
+      "dlcTag": "base",
+      "tags": [
+        "research"
+      ],
+      "category": "default",
+      "researchTime": 900,
+      "cost": {
+        "advancedelectronics": 200,
+        "antimatterconverters": 300,
+        "energycells": 5000
+      },
+      "dependencies": [
+        "research_teleportation"
+      ],
+      "description": "Increases the range of the personal teleporter from within 1 system to within 3."
+    },
+    {
+      "id": "research_teleportation_range_02",
+      "nameId": "{20216,1021}",
+      "name": "Teleportation - Range II",
+      "descriptionId": "{20216,1022}",
+      "dlcTag": "base",
+      "tags": [
+        "research"
+      ],
+      "category": "default",
+      "researchTime": 900,
+      "cost": {
+        "advancedelectronics": 300,
+        "energycells": 7000,
+        "nividium": 50,
+        "plasmaconductors": 750
+      },
+      "dependencies": [
+        "research_teleportation_range_01"
+      ],
+      "description": "Increases the range of the personal teleporter from within 3 systems to within 5."
+    },
+    {
+      "id": "research_teleportation_range_03",
+      "nameId": "{20216,1031}",
+      "name": "Teleportation - Range III",
+      "descriptionId": "{20216,1032}",
+      "dlcTag": "base",
+      "tags": [
+        "research"
+      ],
+      "category": "default",
+      "researchTime": 1200,
+      "cost": {
+        "advancedelectronics": 1500,
+        "energycells": 25000,
+        "fieldcoils": 2500,
+        "nividium": 2000,
+        "superfluidcoolant": 7500
+      },
+      "dependencies": [
+        "research_teleportation_range_02"
+      ],
+      "description": "Increases the range of the personal teleporter so that you can jump to ships you own across the entire Jump Gate network."
+    },
+    {
+      "id": "research_tradeinterface",
+      "nameId": "{20216,1221}",
+      "name": "Trade Interface",
+      "descriptionId": "{20216,1222}",
+      "dlcTag": "base",
+      "tags": [
+        "hidden",
+        "research"
+      ],
+      "category": "abandoned",
+      "researchTime": 10,
+      "cost": {},
+      "dependencies": [],
+      "description": "Allows you to access trade information from around stations."
+    },
+    {
+      "id": "research_warp_hq_01",
+      "nameId": "{20216,1491}",
+      "name": "High-mass Teleportation I",
+      "descriptionId": "{20216,1492}",
+      "dlcTag": "base",
+      "tags": [
+        "research"
+      ],
+      "category": "default",
+      "researchTime": 10,
+      "cost": {
+        "advancedelectronics": 10000,
+        "energycells": 12500,
+        "fieldcoils": 5000,
+        "nividium": 1000,
+        "superfluidcoolant": 8000
+      },
+      "dependencies": [
+        "research_teleportation_range_03"
+      ],
+      "description": "Replicating the conditions often observed near spatial anomalies, enact an experiment to relocate this facility within its current sector."
+    },
+    {
+      "id": "research_warp_hq_02",
+      "nameId": "{20216,1501}",
+      "name": "High-mass Teleportation II",
+      "descriptionId": "{20216,1502}",
+      "dlcTag": "base",
+      "tags": [
+        "research"
+      ],
+      "category": "default",
+      "researchTime": 10,
+      "cost": {
+        "advancedelectronics": 27500,
+        "energycells": 25000,
+        "fieldcoils": 30000,
+        "nividium": 5000,
+        "superfluidcoolant": 20000
+      },
+      "dependencies": [
+        "research_warp_hq_01"
+      ],
+      "description": "Allows the facility to be relocated to a marked location within any known sector."
+    },
+    {
+      "id": "research_xenon_crisis_01",
+      "nameId": "{20216,3201}",
+      "name": "Fleet-Wide Sensor Analytics",
+      "descriptionId": "{20216,3202}",
+      "dlcTag": "base",
+      "tags": [
+        "nocustomgamestart",
+        "research"
+      ],
+      "category": "conditional",
+      "researchTime": 600,
+      "cost": {},
+      "dependencies": [],
+      "unlock": {
+        "key": "xenon_crisis_01"
+      },
+      "description": "Warning: May lead to an overwhelming crisis. Taking advantage of the extensive presence of your ships throughout the Jump Gate network, this research will pool and analyse vast amounts of data in the hope of unravelling the mysteries of the universe."
+    },
+    {
+      "id": "research_xenon_crisis_02",
+      "nameId": "{20216,3301}",
+      "name": "Xenon Intelligence Study",
+      "descriptionId": "{20216,3302}",
+      "dlcTag": "base",
+      "tags": [
+        "nocustomgamestart",
+        "research"
+      ],
+      "category": "conditional",
+      "researchTime": 1800,
+      "cost": {},
+      "dependencies": [
+        "research_xenon_crisis_01"
+      ],
+      "unlock": {
+        "key": "xenon_crisis_02"
+      },
+      "description": "The data from the previous Xenon-Kha'ak crisis has been exhausted of all reasonable usefulness. To gain more insight into such Xenon behaviour an attack signal could be encoded with the CPU ship's signature to trigger another phase of aggression. Whether the actual CPU ship halts or commits to these new assaults is unknown. Warning: Research may lead to; criminal charges, extinction, incarceration, heightened blood-pressure , injury and loss of property."
+    },
+    {
+      "id": "research_tf_tech",
+      "nameId": "{20216,1481}",
+      "name": "Terraformer Tech",
+      "descriptionId": "{20216,1482}",
+      "dlcTag": "dlc_terran",
+      "tags": [
+        "missiononly",
+        "research"
+      ],
+      "category": "mission_progress",
+      "researchTime": 10,
+      "cost": {},
+      "dependencies": [],
+      "description": "The technology that powered the original Terraformer fleet can still be used for highly advanced terraforming projects."
+    },
+    {
+      "id": "research_condensate_sample",
+      "nameId": "{20216,1801}",
+      "name": "Condensate Sample",
+      "descriptionId": "{20216,1802}",
+      "dlcTag": "dlc_pirate",
+      "tags": [
+        "nocustomgamestart",
+        "research"
+      ],
+      "category": "conditional",
+      "researchTime": 300,
+      "cost": {
+        "antimattercells": 100,
+        "energycells": 3000,
+        "plasmaconductors": 500
+      },
+      "dependencies": [
+        "research_condensate_sample_pre"
+      ],
+      "unlock": {
+        "key": "condensate_sample",
+        "params": {
+          "npcNameId": "{30201,2}",
+          "itemWareId": "inv_condensate_sample",
+          "itemNameId": "{20201,55501}"
+        }
+      },
+      "description": "Analysing the Northriver Company sample could prove to be the first step towards improving conditions in Avarice."
+    },
+    {
+      "id": "research_condensate_sample_pre",
+      "nameId": "{20216,1901}",
+      "name": "Condensate Sample Prerequisite",
+      "descriptionId": "{20216,1902}",
+      "dlcTag": "dlc_pirate",
+      "tags": [
+        "missiononly",
+        "research"
+      ],
+      "category": "mission_progress",
+      "researchTime": 10,
+      "cost": {
+        "antimattercells": 150,
+        "energycells": 3000,
+        "plasmaconductors": 1000
+      },
+      "dependencies": [],
+      "description": "This is the prerequisite research required for Boso Ta to initiate the condensate sample research."
+    },
+    {
+      "id": "research_erlking_core",
+      "nameId": "{20216,2001}",
+      "name": "Erlking Power Core",
+      "descriptionId": "{20216,2002}",
+      "dlcTag": "dlc_pirate",
+      "tags": [
+        "research"
+      ],
+      "category": "conditional",
+      "researchTime": 600,
+      "cost": {
+        "energycells": 10000
+      },
+      "dependencies": [],
+      "unlock": {
+        "key": "erlking",
+        "params": {
+          "shipWareId": "ship_pir_xl_battleship_01_a",
+          "shipNameId": "{20101,121101}",
+          "sectorMacro": "cluster_502_sector001_macro",
+          "sectorNameId": "{20004,5020011}"
+        }
+      },
+      "description": "Carefully recover the unique power core of the Erlking battleship from its wreckage, in the hopes of incorporating it into a new incarnation of the ship."
+    },
+    {
+      "id": "research_module_welfare_2",
+      "nameId": "{20216,2201}",
+      "name": "Welfare Module - Casino",
+      "descriptionId": "{20216,2202}",
+      "dlcTag": "dlc_pirate",
+      "tags": [
+        "research"
+      ],
+      "category": "default",
+      "researchTime": 600,
+      "cost": {},
+      "dependencies": [
+        "research_module_welfare_1",
+        "research_module_welfare_2_pre"
+      ],
+      "description": "In the hopes of establishing an exceptional recreational hub, we must investigate the leisure habits of the various races."
+    },
+    {
+      "id": "research_module_welfare_2_pre",
+      "nameId": "{20216,2401}",
+      "name": "Investigate leisure habits.",
+      "descriptionId": "{20216,2402}",
+      "dlcTag": "dlc_pirate",
+      "tags": [
+        "hidden",
+        "missiononly",
+        "research"
+      ],
+      "category": "mission_progress",
+      "researchTime": 10,
+      "cost": {},
+      "dependencies": [
+        "research_module_welfare_1"
+      ],
+      "description": "No information available"
+    },
+    {
+      "id": "research_ship_arg_s_racing_01",
+      "nameId": "{20216,2801}",
+      "name": "Elite Sport",
+      "descriptionId": "{20216,2802}",
+      "dlcTag": "dlc_timelines",
+      "tags": [
+        "nocustomgamestart",
+        "research"
+      ],
+      "category": "conditional",
+      "researchTime": 600,
+      "cost": {
+        "antimattercells": 32,
+        "microchips": 6,
+        "superfluidcoolant": 38
+      },
+      "dependencies": [],
+      "unlock": {
+        "key": "abandoned_ship",
+        "params": {
+          "sectorMacro": "cluster_713_sector001_macro",
+          "sectorNameId": "{20004,7130011}",
+          "shipWareId": "ship_arg_s_racer_01_a",
+          "shipNameId": "{20101,11904}"
+        }
+      },
+      "description": "Allows limited reproduction of the Sport variant of the Elite."
+    },
+    {
+      "id": "research_ship_par_s_racing_01",
+      "nameId": "{20216,3001}",
+      "name": "Theseus Sport",
+      "descriptionId": "{20216,3002}",
+      "dlcTag": "dlc_timelines",
+      "tags": [
+        "nocustomgamestart",
+        "research"
+      ],
+      "category": "conditional",
+      "researchTime": 600,
+      "cost": {
+        "antimatterconverters": 14,
+        "graphene": 39,
+        "quantumtubes": 21
+      },
+      "dependencies": [],
+      "unlock": {
+        "key": "abandoned_ship",
+        "params": {
+          "sectorMacro": "cluster_710_sector001_macro",
+          "sectorNameId": "{20004,7100011}",
+          "shipWareId": "ship_par_s_racer_01_a",
+          "shipNameId": "{20101,31504}"
+        }
+      },
+      "description": "Allows limited reproduction of the Sport variant of the Theseus."
+    },
+    {
+      "id": "research_ship_tel_s_racing_01",
+      "nameId": "{20216,2901}",
+      "name": "Kestrel Sport",
+      "descriptionId": "{20216,2902}",
+      "dlcTag": "dlc_timelines",
+      "tags": [
+        "nocustomgamestart",
+        "research"
+      ],
+      "category": "conditional",
+      "researchTime": 360,
+      "cost": {
+        "engineparts": 36,
+        "fieldcoils": 14,
+        "teladianium": 28
+      },
+      "dependencies": [],
+      "unlock": {
+        "key": "abandoned_ship",
+        "params": {
+          "sectorMacro": "cluster_714_sector001_macro",
+          "sectorNameId": "{20004,7140011}",
+          "shipWareId": "ship_tel_s_racer_01_a",
+          "shipNameId": "{20101,20104}"
+        }
+      },
+      "description": "Allows limited reproduction of the Sport variant of the Kestrel."
+    },
+    {
+      "id": "research_ship_ter_l_flagship_01",
+      "nameId": "{20216,2701}",
+      "name": "Sapporo",
+      "descriptionId": "{20216,2702}",
+      "dlcTag": "dlc_timelines",
+      "tags": [
+        "nocustomgamestart",
+        "research"
+      ],
+      "category": "conditional",
+      "researchTime": 640,
+      "cost": {
+        "advancedelectronics": 20,
+        "energycells": 760,
+        "refinedmetals": 78,
+        "scanningarrays": 52
+      },
+      "dependencies": [],
+      "unlock": {
+        "key": "abandoned_ship",
+        "params": {
+          "sectorMacro": "cluster_715_sector001_macro",
+          "sectorNameId": "{20004,7150011}",
+          "shipWareId": "ship_ter_l_flagship_01_a",
+          "shipNameId": "{20101,62701}"
+        }
+      },
+      "description": "Allows the building of the Sapporo and its equipment."
+    },
+    {
+      "id": "research_ship_ter_m_corvette_01",
+      "nameId": "{20216,2601}",
+      "name": "Odachi",
+      "descriptionId": "{20216,2602}",
+      "dlcTag": "dlc_timelines",
+      "tags": [
+        "nocustomgamestart",
+        "research"
+      ],
+      "category": "conditional",
+      "researchTime": 580,
+      "cost": {
+        "antimattercells": 54,
+        "energycells": 415,
+        "engineparts": 172,
+        "smartchips": 148
+      },
+      "dependencies": [],
+      "unlock": {
+        "key": "abandoned_ship",
+        "params": {
+          "sectorMacro": "cluster_48_sector001_macro",
+          "sectorNameId": "{20004,480011}",
+          "shipWareId": "ship_ter_m_corvette_02_a",
+          "shipNameId": "{20101,64801}"
+        }
+      },
+      "description": "Allows the building of the Odachi and its equipment."
+    },
+    {
+      "id": "research_ship_ter_s_fighter_01",
+      "nameId": "{20216,2501}",
+      "name": "Cutlass",
+      "descriptionId": "{20216,2502}",
+      "dlcTag": "dlc_timelines",
+      "tags": [
+        "nocustomgamestart",
+        "research"
+      ],
+      "category": "conditional",
+      "researchTime": 450,
+      "cost": {
+        "energycells": 360,
+        "fieldcoils": 15,
+        "plasmaconductors": 23,
+        "superfluidcoolant": 48
+      },
+      "dependencies": [],
+      "unlock": {
+        "key": "abandoned_ship",
+        "params": {
+          "sectorMacro": "cluster_31_sector001_macro",
+          "sectorNameId": "{20004,310011}",
+          "shipWareId": "ship_ter_s_fighter_04_a",
+          "shipNameId": "{20101,60401}"
+        }
+      },
+      "description": "Allows the building of the Cutlass and its equipment."
+    },
+    {
+      "id": "research_ship_gen_m_corvette_02",
+      "nameId": "{20216,4001}",
+      "name": "Cypher",
+      "descriptionId": "{20216,4002}",
+      "dlcTag": "dlc_mini_02",
+      "tags": [
+        "nocustomgamestart",
+        "research"
+      ],
+      "category": "conditional",
+      "researchTime": 780,
+      "cost": {
+        "energycells": 2450,
+        "smartchips": 850,
+        "superfluidcoolant": 244,
+        "teladianium": 348
+      },
+      "dependencies": [],
+      "unlock": {
+        "key": "abandoned_ship",
+        "params": {
+          "shipWareId": "ship_gen_m_corvette_02",
+          "shipNameId": "{20101,123701}"
+        }
+      },
+      "description": "This research grants technical insights that allow the reproduction of the legendary ship, the Cypher."
+    }
+  ]
+}

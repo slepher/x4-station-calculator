@@ -133,6 +133,9 @@ class I18nRegistry:
             return self._resolve_text(raw, lang, depth + 1, visiting)
 
         current = re.sub(r"\{\s*(\d+)\s*,\s*(\d+)\s*\}", replace_callback, current)
+        current = re.sub(r"\\033#[^#]*#", "", current)
+        current = re.sub(r"\\033.", "", current)
+        current = current.replace("\\n", " ")
         if strip_parenthetical:
             current = _strip_parenthetical_text(current)
         current = current.replace("\\", " ")

@@ -21,7 +21,7 @@ const DEFAULT_WAREFLOW_SETTINGS = {
 }
 
 export interface WareflowPresenterProps {
-  workbenchMode: ComputedRef<'overview' | 'station' | 'transit'>
+  workbenchMode: ComputedRef<'overview' | 'station' | 'transit' | 'terraforming' | 'tech-tree' | 'research'>
   visualMode: ComputedRef<'planning' | 'live'>
   viewMode: ComputedRef<WareFlowViewMode>
   useAllocationVolumeView: ComputedRef<boolean>
@@ -102,15 +102,14 @@ export function useProductionWareflowPresenter(store: WareflowPresenterStore): U
     return value as T
   }
 
-  const isPlanningArchiveStation = computed(() => {
+  const isBindingArchiveStation = computed(() => {
     return store.session.workbenchMode === 'station'
-      && store.session.visualMode === 'planning'
       && store.stationState?.entityType === 'station'
       && (store.stationState?.archiveProducedWareIds?.length || 0) > 0
   })
 
   const isArchiveProducedWare = (wareId: string): boolean => {
-    if (!isPlanningArchiveStation.value) return false
+    if (!isBindingArchiveStation.value) return false
     return store.stationState?.archiveProducedWareIds?.includes(wareId) ?? false
   }
 
