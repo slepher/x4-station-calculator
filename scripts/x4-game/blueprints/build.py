@@ -135,6 +135,16 @@ def build_blueprints_data(
             if faction:
                 entry["factions"] = [faction]
 
+        owners = elem.findall("owner")
+        if owners:
+            factions = []
+            for ow in owners:
+                fac = ow.get("faction")
+                if fac:
+                    factions.append(fac)
+            if factions:
+                entry["factions"] = factions
+
         comp = elem.find("component")
         comp_ref = comp.get("ref") if comp is not None else None
         cls = _resolve_class(comp_ref, macro_class_map)

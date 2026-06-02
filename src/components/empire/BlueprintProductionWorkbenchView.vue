@@ -16,6 +16,7 @@ import ProductionSidebar from '@/components/empire/ProductionSidebar.vue'
 import BlueprintContextToolbar from '@/components/empire/context_toolbar/BlueprintContextToolbar.vue'
 import TerraformingWorkbench from '@/components/empire/TerraformingWorkbench.vue'
 import ResearchWorkbench from '@/components/empire/ResearchWorkbench.vue'
+import BlueprintRecipeWorkbench from '@/components/empire/BlueprintRecipeWorkbench.vue'
 import StationWareFlowsDashboard from '@/components/empire/StationWareFlowsDashboard.vue'
 import ImportPlanModal from '@/components/empire/ImportPlanModal.vue'
 import { useBuildPlanPresenter } from '@/components/empire/presenters/useBuildPlanPresenter'
@@ -104,6 +105,7 @@ const buildPlanPresenter = useBuildPlanPresenter({
       :show-terraforming="sidebarPresenter.props.showTerraforming"
       :show-tech-tree="sidebarPresenter.props.showTechTree"
       :show-research="sidebarPresenter.props.showResearch"
+      :show-blueprint-recipe="sidebarPresenter.props.showBlueprintRecipe"
       :terraforming-clusters="terraformingClusters"
       :active-terraforming-cluster-id="activeViewStore.activeTerraformingClusterId"
       :can-create-station="sidebarPresenter.props.canCreateStation"
@@ -119,6 +121,7 @@ const buildPlanPresenter = useBuildPlanPresenter({
       @select-terraforming="sidebarPresenter.emits.selectTerraforming"
       @select-tech-tree="() => {}"
       @select-research="sidebarPresenter.emits.selectResearch"
+      @select-blueprint-recipe="sidebarPresenter.emits.selectBlueprintRecipe"
       @select-terraforming-cluster="(clusterId: string) => {
         activeViewStore.activeEmpireWorkbench = 'terraforming'
         activeViewStore.activeTerraformingClusterId = clusterId
@@ -130,7 +133,7 @@ const buildPlanPresenter = useBuildPlanPresenter({
     />
     <div class="production-content custom-scrollbar">
       <BlueprintContextToolbar
-        v-if="toolbarPresenter.props.workbenchMode.value !== 'terraforming' && toolbarPresenter.props.workbenchMode.value !== 'research'"
+        v-if="toolbarPresenter.props.workbenchMode.value !== 'terraforming' && toolbarPresenter.props.workbenchMode.value !== 'research' && toolbarPresenter.props.workbenchMode.value !== 'blueprint-recipe'"
     :station="toolbarPresenter.props.station.value"
     :workbench-mode="toolbarPresenter.props.workbenchMode.value"
     :title-model="toolbarPresenter.props.titleModel.value"
@@ -168,6 +171,7 @@ const buildPlanPresenter = useBuildPlanPresenter({
 
   <TerraformingWorkbench v-if="toolbarPresenter.props.workbenchMode.value === 'terraforming'" />
   <ResearchWorkbench v-if="toolbarPresenter.props.workbenchMode.value === 'research'" />
+  <BlueprintRecipeWorkbench v-if="toolbarPresenter.props.workbenchMode.value === 'blueprint-recipe'" />
 
   <div v-if="toolbarPresenter.props.workbenchMode.value === 'station'" class="main-layout">
     <div class="col-span-12 lg:col-span-3">

@@ -1132,6 +1132,12 @@ export interface X4Res {
 
 // --- Faction Types ---
 
+export interface X4FactionLicence {
+  type: string
+  name: string
+  nameId: string
+}
+
 export interface X4Faction {
   id: string
   name: string
@@ -1140,6 +1146,7 @@ export interface X4Faction {
   color_name?: string
   color?: string
   claimspace?: boolean
+  licences?: X4FactionLicence[]
 }
 
 // --- Language Types ---
@@ -1325,4 +1332,46 @@ export interface X4ResearchItem {
 
 export interface X4ResearchData {
   items: X4ResearchItem[]
+}
+
+export interface X4Blueprint {
+  id: string
+  name: string
+  nameId: string
+  type: 'module' | 'ship' | 'equipment'
+  class: string
+  price?: number
+  licence?: string
+  factions?: string[]
+  missiononly?: boolean
+  noplayerblueprint?: boolean
+}
+
+export interface BlueprintTypeCategory {
+  id: string
+  name: string
+  nameId: string
+}
+
+export interface BlueprintClassCategory {
+  id: string
+  name: string
+  nameId: string
+  type: string
+}
+
+export interface BlueprintsData {
+  blueprints: X4Blueprint[]
+  types: BlueprintTypeCategory[]
+  classes: BlueprintClassCategory[]
+}
+
+export interface X4Licence {
+  id: string
+  name: string
+  nameId: string
+}
+
+export interface LicencesData {
+  licences: X4Licence[]
 }

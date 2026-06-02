@@ -12,8 +12,120 @@
       "watchdoguser"
     ],
     "color_name": "faction_alliance",
-    "color": "#660066",
-    "claimspace": false
+    "color": "#4b5563",
+    "claimspace": false,
+    "licences": [
+      {
+        "type": "capitalequipment",
+        "nameId": "{20207,2141}",
+        "name": "Alliance Capital Equipment Licence"
+      },
+      {
+        "type": "capitalship",
+        "nameId": "{20207,3111}",
+        "name": "Alliance Capital Ship Licence"
+      },
+      {
+        "type": "ceremonyally",
+        "nameId": "{20207,5111}",
+        "name": "Trusted Alliance Ally"
+      },
+      {
+        "type": "ceremonyfriend",
+        "nameId": "{20207,5101}",
+        "name": "Trusted Alliance Friend"
+      },
+      {
+        "type": "generaluseequipment",
+        "nameId": "{20207,2331}",
+        "name": "Alliance General Use Ship Licence"
+      },
+      {
+        "type": "generaluseship",
+        "nameId": "{20207,2321}",
+        "name": "Alliance General Use Equipment Licence"
+      },
+      {
+        "type": "militaryequipment",
+        "nameId": "{20207,2131}",
+        "name": "Alliance Military Equipment Licence"
+      },
+      {
+        "type": "militaryship",
+        "nameId": "{20207,3101}",
+        "name": "Alliance Military Ship Licence"
+      },
+      {
+        "type": "shipsalecontract",
+        "nameId": "{20207,9061}",
+        "name": "Alliance Ship Sale Contract"
+      },
+      {
+        "type": "station_equip_lxl",
+        "nameId": "{20207,10041}",
+        "name": "Alliance Capital Ship Building Module Licence"
+      },
+      {
+        "type": "station_equip_sm",
+        "nameId": "{20207,10031}",
+        "name": "Alliance Ancillary Ship Building Module Licence"
+      },
+      {
+        "type": "station_gen_advanced",
+        "nameId": "{20207,10021}",
+        "name": "Alliance Advanced Module Licence"
+      },
+      {
+        "type": "station_gen_basic",
+        "nameId": "{20207,10001}",
+        "name": "Alliance Basic Module Licence"
+      },
+      {
+        "type": "station_gen_intermediate",
+        "nameId": "{20207,10011}",
+        "name": "Alliance Intermediate Module Licence"
+      },
+      {
+        "type": "subgroupfriend",
+        "nameId": "{20207,6051}",
+        "name": "Stargazers' Guild Membership"
+      },
+      {
+        "type": "tradesubscription",
+        "nameId": "{20207,4051}",
+        "name": "Alliance Trade Offer Subscription"
+      },
+      {
+        "type": "capitalequipment",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "generaluseequipment",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "generaluseship",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "police",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "subgroupfriend",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "ceremonyally",
+        "nameId": "",
+        "name": ""
+      }
+    ]
   },
   {
     "id": "antigone",
@@ -31,8 +143,125 @@
       "watchdoguser"
     ],
     "color_name": "faction_antigone",
-    "color": "#0095FF",
-    "claimspace": true
+    "color": "#4b5563",
+    "claimspace": true,
+    "licences": [
+      {
+        "type": "capitalequipment",
+        "nameId": "{20207,2061}",
+        "name": "Republic Capital Equipment Licence"
+      },
+      {
+        "type": "capitalship",
+        "nameId": "{20207,3031}",
+        "name": "Republic Capital Ship Licence"
+      },
+      {
+        "type": "ceremonyally",
+        "nameId": "{20207,5031}",
+        "name": "Citizen of the Republic"
+      },
+      {
+        "type": "ceremonyfriend",
+        "nameId": "{20207,5021}",
+        "name": "Friend of the Republic"
+      },
+      {
+        "type": "generaluseequipment",
+        "nameId": "{20207,2241}",
+        "name": "Republic General Use Equipment Licence"
+      },
+      {
+        "type": "generaluseship",
+        "nameId": "{20207,2251}",
+        "name": "Republic General Use Ship Licence"
+      },
+      {
+        "type": "militaryequipment",
+        "nameId": "{20207,2051}",
+        "name": "Republic Military Equipment Licence"
+      },
+      {
+        "type": "militaryship",
+        "nameId": "{20207,3021}",
+        "name": "Republic Military Ship Licence"
+      },
+      {
+        "type": "shipsalecontract",
+        "nameId": "{20207,9031}",
+        "name": "Republic Ship Sale Contract"
+      },
+      {
+        "type": "station_equip_lxl",
+        "nameId": "{20207,7191}",
+        "name": "Republic Capital Ship Building Module Licence"
+      },
+      {
+        "type": "station_equip_sm",
+        "nameId": "{20207,7181}",
+        "name": "Republic Ancillary Ship Building Module Licence"
+      },
+      {
+        "type": "station_gen_advanced",
+        "nameId": "{20207,7331}",
+        "name": "Republic Advanced Module Licence"
+      },
+      {
+        "type": "station_gen_basic",
+        "nameId": "{20207,7311}",
+        "name": "Republic Basic Module Licence"
+      },
+      {
+        "type": "station_gen_intermediate",
+        "nameId": "{20207,7321}",
+        "name": "Republic Intermediate Module Licence"
+      },
+      {
+        "type": "tradesubscription",
+        "nameId": "{20207,4011}",
+        "name": "Republic Trade Offer Subscription"
+      },
+      {
+        "type": "capitalequipment",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "capitalship",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "envoy_access",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "generaluseequipment",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "generaluseship",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "militaryequipment",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "militaryship",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "police",
+        "nameId": "",
+        "name": ""
+      }
+    ]
   },
   {
     "id": "argon",
@@ -51,8 +280,115 @@
       "watchdoguser"
     ],
     "color_name": "faction_argon",
-    "color": "#0069B3",
-    "claimspace": true
+    "color": "#4b5563",
+    "claimspace": true,
+    "licences": [
+      {
+        "type": "capitalequipment",
+        "nameId": "{20207,2041}",
+        "name": "Federation Capital Equipment Licence"
+      },
+      {
+        "type": "capitalship",
+        "nameId": "{20207,3011}",
+        "name": "Federation Capital Ship Licence"
+      },
+      {
+        "type": "ceremonyally",
+        "nameId": "{20207,5011}",
+        "name": "Hero of the Federation"
+      },
+      {
+        "type": "ceremonyfriend",
+        "nameId": "{20207,5001}",
+        "name": "Friend of the Federation"
+      },
+      {
+        "type": "envoy_access",
+        "nameId": "{20207,9401}",
+        "name": "Envoy Sales Contract"
+      },
+      {
+        "type": "generaluseequipment",
+        "nameId": "{20207,2001}",
+        "name": "Argon General Use Equipment Licence"
+      },
+      {
+        "type": "generaluseship",
+        "nameId": "{20207,2211}",
+        "name": "Federation General Use Ship Licence"
+      },
+      {
+        "type": "militaryequipment",
+        "nameId": "{20207,2031}",
+        "name": "Federation Military Equipment Licence"
+      },
+      {
+        "type": "militaryship",
+        "nameId": "{20207,3001}",
+        "name": "Federation Military Ship Licence"
+      },
+      {
+        "type": "police",
+        "nameId": "{20207,1001}",
+        "name": "Federation Police Licence"
+      },
+      {
+        "type": "shipsalecontract",
+        "nameId": "{20207,9001}",
+        "name": "Federation Ship Sale Contract"
+      },
+      {
+        "type": "station_equip_lxl",
+        "nameId": "{20207,7171}",
+        "name": "Federation Capital Ship Building Module Licence"
+      },
+      {
+        "type": "station_equip_sm",
+        "nameId": "{20207,7161}",
+        "name": "Federation Ancillary Ship Building Module Licence"
+      },
+      {
+        "type": "station_gen_advanced",
+        "nameId": "{20207,7301}",
+        "name": "Federation Advanced Module Licence"
+      },
+      {
+        "type": "station_gen_basic",
+        "nameId": "{20207,7281}",
+        "name": "Federation Basic Module Licence"
+      },
+      {
+        "type": "station_gen_intermediate",
+        "nameId": "{20207,7291}",
+        "name": "Federation Intermediate Module Licence"
+      },
+      {
+        "type": "subgroupfriend",
+        "nameId": "{20207,6001}",
+        "name": "Argon Secret Service Membership"
+      },
+      {
+        "type": "tradesubscription",
+        "nameId": "{20207,4001}",
+        "name": "Federation Trade Offer Subscription"
+      },
+      {
+        "type": "capitalship",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "generaluseship",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "militaryship",
+        "nameId": "",
+        "name": ""
+      }
+    ]
   },
   {
     "id": "boron",
@@ -69,8 +405,130 @@
       "watchdoguser"
     ],
     "color_name": "faction_boron",
-    "color": "#4DB5FF",
-    "claimspace": true
+    "color": "#4b5563",
+    "claimspace": true,
+    "licences": [
+      {
+        "type": "capitalequipment",
+        "nameId": "{20207,2781}",
+        "name": "Boron Capital Equipment Licence"
+      },
+      {
+        "type": "capitalship",
+        "nameId": "{20207,3391}",
+        "name": "Boron Capital Ship Licence"
+      },
+      {
+        "type": "ceremonyally",
+        "nameId": "{20207,5391}",
+        "name": "Queen's Knight"
+      },
+      {
+        "type": "ceremonyfriend",
+        "nameId": "{20207,5381}",
+        "name": "Accepted Friend"
+      },
+      {
+        "type": "generaluseequipment",
+        "nameId": "{20207,2761}",
+        "name": "Boron General Use Equipment Licence"
+      },
+      {
+        "type": "generaluseship",
+        "nameId": "{20207,2791}",
+        "name": "Boron General Use Ship Licence"
+      },
+      {
+        "type": "militaryequipment",
+        "nameId": "{20207,2771}",
+        "name": "Boron Military Equipment Licence"
+      },
+      {
+        "type": "militaryship",
+        "nameId": "{20207,3381}",
+        "name": "Boron Military Ship Licence"
+      },
+      {
+        "type": "police",
+        "nameId": "{20207,1401}",
+        "name": "Boron Police Licence"
+      },
+      {
+        "type": "shipsalecontract",
+        "nameId": "{20207,9191}",
+        "name": "Boron Ship Sale Contract"
+      },
+      {
+        "type": "station_equip_lxl",
+        "nameId": "{20207,10091}",
+        "name": "Boron Capital Ship Building Module Licence"
+      },
+      {
+        "type": "station_equip_sm",
+        "nameId": "{20207,10081}",
+        "name": "Boron Ancillary Ship Building Module Licence"
+      },
+      {
+        "type": "station_gen_advanced",
+        "nameId": "{20207,10071}",
+        "name": "Boron Advanced Module Licence"
+      },
+      {
+        "type": "station_gen_basic",
+        "nameId": "{20207,10051}",
+        "name": "Boron Basic Module Licence"
+      },
+      {
+        "type": "station_gen_intermediate",
+        "nameId": "{20207,10061}",
+        "name": "Boron Intermediate Module Licence"
+      },
+      {
+        "type": "tradesubscription",
+        "nameId": "{20207,4191}",
+        "name": "Boron Trade Offer Subscription"
+      },
+      {
+        "type": "capitalequipment",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "capitalship",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "envoy_access",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "generaluseequipment",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "generaluseship",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "militaryequipment",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "militaryship",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "police",
+        "nameId": "",
+        "name": ""
+      }
+    ]
   },
   {
     "id": "buccaneers",
@@ -87,8 +545,150 @@
       "watchdoguser"
     ],
     "color_name": "faction_buccaneers",
-    "color": "#006466",
-    "claimspace": true
+    "color": "#4b5563",
+    "claimspace": true,
+    "licences": [
+      {
+        "type": "capitalequipment",
+        "nameId": "{20207,2511}",
+        "name": "Duke's Capital Equipment Licence"
+      },
+      {
+        "type": "capitalship",
+        "nameId": "{20207,3251}",
+        "name": "Duke's Capital Ship Licence"
+      },
+      {
+        "type": "ceremonyally",
+        "nameId": "{20207,5251}",
+        "name": "Duke's Honour Guard"
+      },
+      {
+        "type": "ceremonyfriend",
+        "nameId": "{20207,5241}",
+        "name": "Duke's Buccaneer"
+      },
+      {
+        "type": "generaluseequipment",
+        "nameId": "{20207,2481}",
+        "name": "Duke's General Use Equipment Licence"
+      },
+      {
+        "type": "generaluseship",
+        "nameId": "{20207,2491}",
+        "name": "Duke's General Use Ship Licence"
+      },
+      {
+        "type": "militaryequipment",
+        "nameId": "{20207,2501}",
+        "name": "Duke's Military Equipment Licence"
+      },
+      {
+        "type": "militaryship",
+        "nameId": "{20207,3241}",
+        "name": "Duke's Military Ship Licence"
+      },
+      {
+        "type": "police",
+        "nameId": "{20207,1061}",
+        "name": "Duke's Police Licence"
+      },
+      {
+        "type": "shipsalecontract",
+        "nameId": "{20207,9121}",
+        "name": "Duke's Ship Sale Contract"
+      },
+      {
+        "type": "station_equip_lxl",
+        "nameId": "{20207,7651}",
+        "name": "Duke's Capital Ship Building Module Licence"
+      },
+      {
+        "type": "station_equip_sm",
+        "nameId": "{20207,7661}",
+        "name": "Duke's Ancillary Ship Building Module Licence"
+      },
+      {
+        "type": "station_gen_advanced",
+        "nameId": "{20207,7671}",
+        "name": "Duke's Advanced Module Licence"
+      },
+      {
+        "type": "station_gen_basic",
+        "nameId": "{20207,7681}",
+        "name": "Duke's Basic Module Licence"
+      },
+      {
+        "type": "station_gen_intermediate",
+        "nameId": "{20207,7691}",
+        "name": "Duke's Intermediate Module Licence"
+      },
+      {
+        "type": "tradesubscription",
+        "nameId": "{20207,4111}",
+        "name": "Duke's Trade Offer Subscription"
+      },
+      {
+        "type": "capitalequipment",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "capitalship",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "envoy_access",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "generaluseequipment",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "generaluseship",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "militaryequipment",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "militaryship",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "station_equip_lxl",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "station_equip_sm",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "station_gen_advanced",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "station_gen_basic",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "station_gen_intermediate",
+        "nameId": "",
+        "name": ""
+      }
+    ]
   },
   {
     "id": "civilian",
@@ -98,8 +698,9 @@
       "hidden"
     ],
     "color_name": "faction_civilian",
-    "color": "#C0C0C0",
-    "claimspace": false
+    "color": "#4b5563",
+    "claimspace": false,
+    "licences": []
   },
   {
     "id": "court",
@@ -115,8 +716,150 @@
       "privateship"
     ],
     "color_name": "faction_court",
-    "color": "#FFBF00",
-    "claimspace": true
+    "color": "#4b5563",
+    "claimspace": true,
+    "licences": [
+      {
+        "type": "capitalequipment",
+        "nameId": "{20207,2471}",
+        "name": "Court of Curbs Capital Equipment Licence"
+      },
+      {
+        "type": "capitalship",
+        "nameId": "{20207,3231}",
+        "name": "Court of Curbs Capital Ship Licence"
+      },
+      {
+        "type": "ceremonyally",
+        "nameId": "{20207,5211}",
+        "name": "Courtier of the Curbs"
+      },
+      {
+        "type": "ceremonyfriend",
+        "nameId": "{20207,5201}",
+        "name": "Court Debutant"
+      },
+      {
+        "type": "generaluseequipment",
+        "nameId": "{20207,2441}",
+        "name": "Court of Curbs General Use Equipment Licence"
+      },
+      {
+        "type": "generaluseship",
+        "nameId": "{20207,2451}",
+        "name": "Court of Curbs General Use Ship Licence"
+      },
+      {
+        "type": "militaryequipment",
+        "nameId": "{20207,2461}",
+        "name": "Court of Curbs Military Equipment Licence"
+      },
+      {
+        "type": "militaryship",
+        "nameId": "{20207,3221}",
+        "name": "Court of Curbs Military Ship Licence"
+      },
+      {
+        "type": "police",
+        "nameId": "{20207,1081}",
+        "name": "Court of Curbs Police Licence"
+      },
+      {
+        "type": "shipsalecontract",
+        "nameId": "{20207,9111}",
+        "name": "Court of Curbs Ship Sale Contract"
+      },
+      {
+        "type": "station_equip_lxl",
+        "nameId": "{20207,7601}",
+        "name": "Court of Curbs Capital Ship Building Module Licence"
+      },
+      {
+        "type": "station_equip_sm",
+        "nameId": "{20207,7611}",
+        "name": "Court of Curbs Ancillary Ship Building Module Licence"
+      },
+      {
+        "type": "station_gen_advanced",
+        "nameId": "{20207,7621}",
+        "name": "Court of Curbs Advanced Module Licence"
+      },
+      {
+        "type": "station_gen_basic",
+        "nameId": "{20207,7631}",
+        "name": "Court of Curbs Basic Module Licence"
+      },
+      {
+        "type": "station_gen_intermediate",
+        "nameId": "{20207,7641}",
+        "name": "Court of Curbs Intermediate Module Licence"
+      },
+      {
+        "type": "tradesubscription",
+        "nameId": "{20207,4131}",
+        "name": "Court of Curbs Trade Offer Subscription"
+      },
+      {
+        "type": "capitalequipment",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "capitalship",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "envoy_access",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "generaluseequipment",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "generaluseship",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "militaryequipment",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "militaryship",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "station_equip_lxl",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "station_equip_sm",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "station_gen_advanced",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "station_gen_basic",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "station_gen_intermediate",
+        "nameId": "",
+        "name": ""
+      }
+    ]
   },
   {
     "id": "criminal",
@@ -126,8 +869,9 @@
       "hidden"
     ],
     "color_name": "faction_criminal",
-    "color": "#B30000",
-    "claimspace": false
+    "color": "#4b5563",
+    "claimspace": false,
+    "licences": []
   },
   {
     "id": "fallensplit",
@@ -141,8 +885,40 @@
       "privateship"
     ],
     "color_name": "faction_fallensplit",
-    "color": "#FF9999",
-    "claimspace": false
+    "color": "#4b5563",
+    "claimspace": false,
+    "licences": [
+      {
+        "type": "capitalequipment",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "capitalship",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "generaluseequipment",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "generaluseship",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "militaryequipment",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "militaryship",
+        "nameId": "",
+        "name": ""
+      }
+    ]
   },
   {
     "id": "freesplit",
@@ -160,8 +936,95 @@
       "standard"
     ],
     "color_name": "faction_freesplit",
-    "color": "#FF8B00",
-    "claimspace": true
+    "color": "#4b5563",
+    "claimspace": true,
+    "licences": [
+      {
+        "type": "capitalequipment",
+        "nameId": "{20207,2391}",
+        "name": "Free Split Capital Equipment Licence"
+      },
+      {
+        "type": "capitalship",
+        "nameId": "{20207,3191}",
+        "name": "Free Split Capital Ship Licence"
+      },
+      {
+        "type": "ceremonyally",
+        "nameId": "{20207,5191}",
+        "name": "Strong Arm of the Families"
+      },
+      {
+        "type": "ceremonyfriend",
+        "nameId": "{20207,5181}",
+        "name": "Friend of the Families"
+      },
+      {
+        "type": "generaluseequipment",
+        "nameId": "{20207,2361}",
+        "name": "Free Split General Use Equipment Licence"
+      },
+      {
+        "type": "generaluseship",
+        "nameId": "{20207,2371}",
+        "name": "Free Split General Use Ship Licence"
+      },
+      {
+        "type": "militaryequipment",
+        "nameId": "{20207,2381}",
+        "name": "Free Split Military Equipment Licence"
+      },
+      {
+        "type": "militaryship",
+        "nameId": "{20207,3181}",
+        "name": "Free Split Military Ship Licence"
+      },
+      {
+        "type": "police",
+        "nameId": "{20207,1041}",
+        "name": "Free Split Police Licence"
+      },
+      {
+        "type": "shipsalecontract",
+        "nameId": "{20207,9091}",
+        "name": "Free Split Ship Sale Contract"
+      },
+      {
+        "type": "station_equip_lxl",
+        "nameId": "{20207,7501}",
+        "name": "Free Split Capital Ship Building Module Licence"
+      },
+      {
+        "type": "station_equip_sm",
+        "nameId": "{20207,7511}",
+        "name": "Free Split Ancillary Ship Building Module Licence"
+      },
+      {
+        "type": "station_gen_advanced",
+        "nameId": "{20207,7521}",
+        "name": "Free Split Advanced Module Licence"
+      },
+      {
+        "type": "station_gen_basic",
+        "nameId": "{20207,7531}",
+        "name": "Free Split Basic Module Licence"
+      },
+      {
+        "type": "station_gen_intermediate",
+        "nameId": "{20207,7541}",
+        "name": "Free Split Intermediate Module Licence"
+      },
+      {
+        "type": "tradesubscription",
+        "nameId": "{20207,4091}",
+        "name": "Free Split Trade Offer Subscription"
+      },
+      {
+        "type": "envoy_access",
+        "nameId": "",
+        "name": ""
+      }
+    ]
   },
   {
     "id": "hatikvah",
@@ -178,8 +1041,105 @@
       "watchdoguser"
     ],
     "color_name": "faction_hatikvah",
-    "color": "#00F9FF",
-    "claimspace": true
+    "color": "#4b5563",
+    "claimspace": true,
+    "licences": [
+      {
+        "type": "capitalequipment",
+        "nameId": "{20207,2081}",
+        "name": "Free League Capital Equipment Licence"
+      },
+      {
+        "type": "capitalship",
+        "nameId": "{20207,3051}",
+        "name": "Free League Capital Ship Licence"
+      },
+      {
+        "type": "ceremonyally",
+        "nameId": "{20207,5051}",
+        "name": "League Member"
+      },
+      {
+        "type": "ceremonyfriend",
+        "nameId": "{20207,5041}",
+        "name": "League Associate"
+      },
+      {
+        "type": "generaluseequipment",
+        "nameId": "{20207,2301}",
+        "name": "Free League General Use Equipment Licence"
+      },
+      {
+        "type": "generaluseship",
+        "nameId": "{20207,2341}",
+        "name": "Free League General Use Ship Licence"
+      },
+      {
+        "type": "militaryequipment",
+        "nameId": "{20207,2071}",
+        "name": "Free League Military Equipment Licence"
+      },
+      {
+        "type": "militaryship",
+        "nameId": "{20207,3041}",
+        "name": "Free League Military Ship Licence"
+      },
+      {
+        "type": "shipsalecontract",
+        "nameId": "{20207,9071}",
+        "name": "Free League Ship Sale Contract"
+      },
+      {
+        "type": "station_gen_advanced",
+        "nameId": "{20207,10191}",
+        "name": "Free League Advanced Module Licence"
+      },
+      {
+        "type": "station_gen_basic",
+        "nameId": "{20207,10171}",
+        "name": "Free League Basic Module Licence"
+      },
+      {
+        "type": "station_gen_intermediate",
+        "nameId": "{20207,10181}",
+        "name": "Free League Intermediate Module Licence"
+      },
+      {
+        "type": "station_illegal",
+        "nameId": "{20207,7461}",
+        "name": "League Illegal Module Licence"
+      },
+      {
+        "type": "subgroupfriend",
+        "nameId": "{20207,6021}",
+        "name": "Mercenary Guild Membership"
+      },
+      {
+        "type": "tradesubscription",
+        "nameId": "{20207,4021}",
+        "name": "Free League Trade Offer Subscription"
+      },
+      {
+        "type": "generaluseequipment",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "generaluseship",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "station_gen_basic",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "station_illegal",
+        "nameId": "",
+        "name": ""
+      }
+    ]
   },
   {
     "id": "holyorder",
@@ -197,8 +1157,125 @@
       "watchdoguser"
     ],
     "color_name": "faction_holyorder",
-    "color": "#FF99FF",
-    "claimspace": true
+    "color": "#4b5563",
+    "claimspace": true,
+    "licences": [
+      {
+        "type": "capitalequipment",
+        "nameId": "{20207,2121}",
+        "name": "Holy Order Capital Equipment Licence"
+      },
+      {
+        "type": "capitalship",
+        "nameId": "{20207,3091}",
+        "name": "Holy Order Capital Ship Licence"
+      },
+      {
+        "type": "ceremonyally",
+        "nameId": "{20207,5091}",
+        "name": "Servant of the Order"
+      },
+      {
+        "type": "ceremonyfriend",
+        "nameId": "{20207,5081}",
+        "name": "Order Initiate"
+      },
+      {
+        "type": "generaluseequipment",
+        "nameId": "{20207,2261}",
+        "name": "Holy Order General Use Equipment Licence"
+      },
+      {
+        "type": "generaluseship",
+        "nameId": "{20207,2271}",
+        "name": "Holy Order General Use Ship Licence"
+      },
+      {
+        "type": "hyperion_access",
+        "nameId": "{20207,9301}",
+        "name": "Hyperion Sale Contract"
+      },
+      {
+        "type": "militaryequipment",
+        "nameId": "{20207,2111}",
+        "name": "Holy Order Military Equipment Licence"
+      },
+      {
+        "type": "militaryship",
+        "nameId": "{20207,3081}",
+        "name": "Holy Order Military Ship Licence"
+      },
+      {
+        "type": "police",
+        "nameId": "{20207,1021}",
+        "name": "Holy Order Police Licence"
+      },
+      {
+        "type": "shipsalecontract",
+        "nameId": "{20207,9041}",
+        "name": "Holy Order Ship Sale Contract"
+      },
+      {
+        "type": "station_equip_lxl",
+        "nameId": "{20207,7231}",
+        "name": "Holy Order Capital Ship Building Module Licence"
+      },
+      {
+        "type": "station_equip_sm",
+        "nameId": "{20207,7221}",
+        "name": "Holy Order Ancillary Ship Building Module Licence"
+      },
+      {
+        "type": "station_gen_advanced",
+        "nameId": "{20207,7391}",
+        "name": "Holy Order Advanced Module Licence"
+      },
+      {
+        "type": "station_gen_basic",
+        "nameId": "{20207,7371}",
+        "name": "Holy Order Basic Module Licence"
+      },
+      {
+        "type": "station_gen_intermediate",
+        "nameId": "{20207,7381}",
+        "name": "Holy Order Intermediate Module Licence"
+      },
+      {
+        "type": "story_paranid_palace_module",
+        "nameId": "{20207,10201}",
+        "name": "Paranid Palace Module Licence"
+      },
+      {
+        "type": "tradesubscription",
+        "nameId": "{20207,4041}",
+        "name": "Holy Order Trade Offer Subscription"
+      },
+      {
+        "type": "capitalequipment",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "envoy_access",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "generaluseequipment",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "generaluseship",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "militaryequipment",
+        "nameId": "",
+        "name": ""
+      }
+    ]
   },
   {
     "id": "holyorderfanatic",
@@ -209,8 +1286,40 @@
       "hidden"
     ],
     "color_name": "faction_holyorderfanatic",
-    "color": "#660000",
-    "claimspace": false
+    "color": "#4b5563",
+    "claimspace": false,
+    "licences": [
+      {
+        "type": "capitalequipment",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "capitalship",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "generaluseequipment",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "generaluseship",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "militaryequipment",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "militaryship",
+        "nameId": "",
+        "name": ""
+      }
+    ]
   },
   {
     "id": "kaori",
@@ -232,8 +1341,70 @@
       "standard"
     ],
     "color_name": "faction_kaori",
-    "color": "#FFB966",
-    "claimspace": true
+    "color": "#4b5563",
+    "claimspace": true,
+    "licences": [
+      {
+        "type": "ceremonyally",
+        "nameId": "{20207,5411}",
+        "name": "Mitsuno's Trusted Adviser"
+      },
+      {
+        "type": "ceremonyfriend",
+        "nameId": "{20207,5401}",
+        "name": "Mitsuno's Friend"
+      },
+      {
+        "type": "generaluseequipment",
+        "nameId": "{20207,2801}",
+        "name": "Quettanauts General Use Equipment Licence"
+      },
+      {
+        "type": "police",
+        "nameId": "{20207,1501}",
+        "name": "Quettanauts Police Licence"
+      },
+      {
+        "type": "station_gen_advanced",
+        "nameId": "{20207,10131}",
+        "name": "Quettanauts Advanced Module Licence"
+      },
+      {
+        "type": "station_gen_basic",
+        "nameId": "{20207,10111}",
+        "name": "Quettanauts Basic Module Licence"
+      },
+      {
+        "type": "station_gen_intermediate",
+        "nameId": "{20207,10121}",
+        "name": "Quettanauts Intermediate Module Licence"
+      },
+      {
+        "type": "station_equip_lxl",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "station_equip_sm",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "station_gen_advanced",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "station_gen_basic",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "station_gen_intermediate",
+        "nameId": "",
+        "name": ""
+      }
+    ]
   },
   {
     "id": "khaak",
@@ -248,8 +1419,9 @@
       "privateship"
     ],
     "color_name": "faction_khaak",
-    "color": "#FF00FF",
-    "claimspace": false
+    "color": "#4b5563",
+    "claimspace": false,
+    "licences": []
   },
   {
     "id": "loanshark",
@@ -266,8 +1438,95 @@
       "standard"
     ],
     "color_name": "faction_loanshark",
-    "color": "#B38600",
-    "claimspace": true
+    "color": "#4b5563",
+    "claimspace": true,
+    "licences": [
+      {
+        "type": "capitalequipment",
+        "nameId": "{20207,2711}",
+        "name": "Syndicate Capital Equipment Licence"
+      },
+      {
+        "type": "capitalship",
+        "nameId": "{20207,3351}",
+        "name": "Syndicate Capital Ship Licence"
+      },
+      {
+        "type": "ceremonyally",
+        "nameId": "{20207,5351}",
+        "name": "Capo"
+      },
+      {
+        "type": "ceremonyfriend",
+        "nameId": "{20207,5341}",
+        "name": "Syndicate Enforcer"
+      },
+      {
+        "type": "generaluseequipment",
+        "nameId": "{20207,2681}",
+        "name": "Syndicate General Use Equipment Licence"
+      },
+      {
+        "type": "generaluseship",
+        "nameId": "{20207,2691}",
+        "name": "Syndicate General Use Ship Licence"
+      },
+      {
+        "type": "militaryequipment",
+        "nameId": "{20207,2701}",
+        "name": "Syndicate Military Equipment Licence"
+      },
+      {
+        "type": "militaryship",
+        "nameId": "{20207,3341}",
+        "name": "Syndicate Military Ship Licence"
+      },
+      {
+        "type": "police",
+        "nameId": "{20207,1301}",
+        "name": "Syndicate Police Licence"
+      },
+      {
+        "type": "shipsalecontract",
+        "nameId": "{20207,9171}",
+        "name": "Syndicate Ship Sale Contract"
+      },
+      {
+        "type": "station_equip_lxl",
+        "nameId": "{20207,7941}",
+        "name": "Syndicate Capital Ship Building Module Licence"
+      },
+      {
+        "type": "station_equip_sm",
+        "nameId": "{20207,7931}",
+        "name": "Syndicate Ancillary Ship Building Module Licence"
+      },
+      {
+        "type": "station_gen_advanced",
+        "nameId": "{20207,7921}",
+        "name": "Syndicate Advanced Module Licence"
+      },
+      {
+        "type": "station_gen_basic",
+        "nameId": "{20207,7901}",
+        "name": "Syndicate Basic Module Licence"
+      },
+      {
+        "type": "station_gen_intermediate",
+        "nameId": "{20207,7911}",
+        "name": "Syndicate Intermediate Module Licence"
+      },
+      {
+        "type": "tradesubscription",
+        "nameId": "{20207,4171}",
+        "name": "Syndicate Trade Offer Subscription"
+      },
+      {
+        "type": "envoy_access",
+        "nameId": "",
+        "name": ""
+      }
+    ]
   },
   {
     "id": "ministry",
@@ -284,8 +1543,135 @@
       "watchdoguser"
     ],
     "color_name": "faction_ministry",
-    "color": "#006600",
-    "claimspace": false
+    "color": "#4b5563",
+    "claimspace": false,
+    "licences": [
+      {
+        "type": "capitalequipment",
+        "nameId": "{20207,2181}",
+        "name": "Ministry Capital Equipment Licence"
+      },
+      {
+        "type": "capitalship",
+        "nameId": "{20207,3151}",
+        "name": "Ministry Capital Ship Licence"
+      },
+      {
+        "type": "ceremonyally",
+        "nameId": "{20207,5151}",
+        "name": "Ministry Profiteer"
+      },
+      {
+        "type": "ceremonyfriend",
+        "nameId": "{20207,5141}",
+        "name": "Ministry Helper"
+      },
+      {
+        "type": "envoy_access",
+        "nameId": "{20207,9401}",
+        "name": "Envoy Sales Contract"
+      },
+      {
+        "type": "generaluseequipment",
+        "nameId": "{20207,2281}",
+        "name": "Ministry General Use Equipment Licence"
+      },
+      {
+        "type": "generaluseship",
+        "nameId": "{20207,2291}",
+        "name": "Ministry General Use Ship Licence"
+      },
+      {
+        "type": "militaryequipment",
+        "nameId": "{20207,2171}",
+        "name": "Ministry Military Equipment Licence"
+      },
+      {
+        "type": "militaryship",
+        "nameId": "{20207,3141}",
+        "name": "Ministry Military Ship Licence"
+      },
+      {
+        "type": "police",
+        "nameId": "{20207,1031}",
+        "name": "Company Police Licence"
+      },
+      {
+        "type": "shipsalecontract",
+        "nameId": "{20207,9051}",
+        "name": "Ministry Ship Sale Contract"
+      },
+      {
+        "type": "station_equip_lxl",
+        "nameId": "{20207,7271}",
+        "name": "Ministry Capital Ship Building Module Licence"
+      },
+      {
+        "type": "station_equip_sm",
+        "nameId": "{20207,7261}",
+        "name": "Ministry Ancillary Ship Building Module Licence"
+      },
+      {
+        "type": "station_gen_advanced",
+        "nameId": "{20207,7451}",
+        "name": "Ministry Advanced Module Licence"
+      },
+      {
+        "type": "station_gen_basic",
+        "nameId": "{20207,7431}",
+        "name": "Ministry Basic Module Licence"
+      },
+      {
+        "type": "station_gen_intermediate",
+        "nameId": "{20207,7441}",
+        "name": "Ministry Intermediate Module Licence"
+      },
+      {
+        "type": "station_illegal",
+        "nameId": "{20207,7471}",
+        "name": "Ministry Illegal Module Licence"
+      },
+      {
+        "type": "tradesubscription",
+        "nameId": "{20207,4071}",
+        "name": "Ministry Trade Offer Subscription"
+      },
+      {
+        "type": "capitalequipment",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "capitalship",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "generaluseequipment",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "generaluseship",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "militaryequipment",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "militaryship",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "station_illegal",
+        "nameId": "",
+        "name": ""
+      }
+    ]
   },
   {
     "id": "outlaw",
@@ -295,8 +1681,9 @@
       "hidden"
     ],
     "color_name": "faction_criminal",
-    "color": "#B30000",
-    "claimspace": false
+    "color": "#4b5563",
+    "claimspace": false,
+    "licences": []
   },
   {
     "id": "ownerless",
@@ -306,8 +1693,9 @@
       "hidden"
     ],
     "color_name": "faction_ownerless",
-    "color": "#C0C0C0",
-    "claimspace": false
+    "color": "#4b5563",
+    "claimspace": false,
+    "licences": []
   },
   {
     "id": "paranid",
@@ -326,8 +1714,110 @@
       "watchdoguser"
     ],
     "color_name": "faction_paranid",
-    "color": "#B300B3",
-    "claimspace": true
+    "color": "#4b5563",
+    "claimspace": true,
+    "licences": [
+      {
+        "type": "capitalequipment",
+        "nameId": "{20207,2101}",
+        "name": "Godrealm Capital Equipment Licence"
+      },
+      {
+        "type": "capitalship",
+        "nameId": "{20207,3071}",
+        "name": "Godrealm Capital Ship Licence"
+      },
+      {
+        "type": "ceremonyally",
+        "nameId": "{20207,5071}",
+        "name": "Honour Guard of Xaar"
+      },
+      {
+        "type": "ceremonyfriend",
+        "nameId": "{20207,5061}",
+        "name": "Friend of the Godrealm"
+      },
+      {
+        "type": "generaluseequipment",
+        "nameId": "{20207,2011}",
+        "name": "Paranid General Use Equipment Licence"
+      },
+      {
+        "type": "generaluseship",
+        "nameId": "{20207,2221}",
+        "name": "Godrealm General Use Ship Licence"
+      },
+      {
+        "type": "hyperion_access",
+        "nameId": "{20207,9301}",
+        "name": "Hyperion Sale Contract"
+      },
+      {
+        "type": "militaryequipment",
+        "nameId": "{20207,2091}",
+        "name": "Godrealm Military Equipment Licence"
+      },
+      {
+        "type": "militaryship",
+        "nameId": "{20207,3061}",
+        "name": "Godrealm Military Ship Licence"
+      },
+      {
+        "type": "police",
+        "nameId": "{20207,1011}",
+        "name": "Godrealm Police Licence"
+      },
+      {
+        "type": "shipsalecontract",
+        "nameId": "{20207,9011}",
+        "name": "Godrealm Ship Sale Contract"
+      },
+      {
+        "type": "station_equip_lxl",
+        "nameId": "{20207,7211}",
+        "name": "Godrealm Capital Ship Building Module Licence"
+      },
+      {
+        "type": "station_equip_sm",
+        "nameId": "{20207,7201}",
+        "name": "Godrealm Ancillary Ship Building Module Licence"
+      },
+      {
+        "type": "station_gen_advanced",
+        "nameId": "{20207,7361}",
+        "name": "Godrealm Advanced Module Licence"
+      },
+      {
+        "type": "station_gen_basic",
+        "nameId": "{20207,7341}",
+        "name": "Godrealm Basic Module Licence"
+      },
+      {
+        "type": "station_gen_intermediate",
+        "nameId": "{20207,7351}",
+        "name": "Godrealm Intermediate Module Licence"
+      },
+      {
+        "type": "story_paranid_palace_module",
+        "nameId": "{20207,10201}",
+        "name": "Paranid Palace Module Licence"
+      },
+      {
+        "type": "tradesubscription",
+        "nameId": "{20207,4031}",
+        "name": "Godrealm Trade Offer Subscription"
+      },
+      {
+        "type": "envoy_access",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "generaluseship",
+        "nameId": "",
+        "name": ""
+      }
+    ]
   },
   {
     "id": "pioneers",
@@ -342,8 +1832,130 @@
       "standard"
     ],
     "color_name": "faction_pioneers",
-    "color": "#00AFB3",
-    "claimspace": true
+    "color": "#4b5563",
+    "claimspace": true,
+    "licences": [
+      {
+        "type": "capitalequipment",
+        "nameId": "{20207,2631}",
+        "name": "Pioneers Capital Equipment Licence"
+      },
+      {
+        "type": "capitalship",
+        "nameId": "{20207,3311}",
+        "name": "Pioneers Capital Ship Licence"
+      },
+      {
+        "type": "ceremonyally",
+        "nameId": "{20207,5311}",
+        "name": "Patron of Terranova"
+      },
+      {
+        "type": "ceremonyfriend",
+        "nameId": "{20207,5301}",
+        "name": "Honorary Assistant"
+      },
+      {
+        "type": "generaluseequipment",
+        "nameId": "{20207,2601}",
+        "name": "Pioneers General Use Equipment Licence"
+      },
+      {
+        "type": "generaluseship",
+        "nameId": "{20207,2611}",
+        "name": "Pioneers General Use Ship Licence"
+      },
+      {
+        "type": "militaryequipment",
+        "nameId": "{20207,2621}",
+        "name": "Pioneers Military Equipment Licence"
+      },
+      {
+        "type": "militaryship",
+        "nameId": "{20207,3301}",
+        "name": "Pioneers Military Ship Licence"
+      },
+      {
+        "type": "police",
+        "nameId": "{20207,1101}",
+        "name": "Pioneers Police Licence"
+      },
+      {
+        "type": "shipsalecontract",
+        "nameId": "{20207,9151}",
+        "name": "Pioneers Ship Sale Contract"
+      },
+      {
+        "type": "station_equip_lxl",
+        "nameId": "{20207,7801}",
+        "name": "Pioneers Capital Ship Building Module Licence"
+      },
+      {
+        "type": "station_equip_sm",
+        "nameId": "{20207,7811}",
+        "name": "Pioneers Ancillary Ship Building Module Licence"
+      },
+      {
+        "type": "station_gen_advanced",
+        "nameId": "{20207,7821}",
+        "name": "Pioneers Advanced Module Licence"
+      },
+      {
+        "type": "station_gen_basic",
+        "nameId": "{20207,7831}",
+        "name": "Pioneers Basic Module Licence"
+      },
+      {
+        "type": "station_gen_intermediate",
+        "nameId": "{20207,7841}",
+        "name": "Pioneers Intermediate Module Licence"
+      },
+      {
+        "type": "tradesubscription",
+        "nameId": "{20207,4151}",
+        "name": "Pioneers Trade Offer Subscription"
+      },
+      {
+        "type": "capitalequipment",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "capitalship",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "envoy_access",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "generaluseequipment",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "generaluseship",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "militaryequipment",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "militaryship",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "police",
+        "nameId": "",
+        "name": ""
+      }
+    ]
   },
   {
     "id": "player",
@@ -354,8 +1966,100 @@
       "police"
     ],
     "color_name": "faction_player",
-    "color": "#4DFF4D",
-    "claimspace": true
+    "color": "#4b5563",
+    "claimspace": true,
+    "licences": [
+      {
+        "type": "generaluseship",
+        "nameId": "{1001,61}",
+        "name": "Licence"
+      },
+      {
+        "type": "generaluseequipment",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "generaluseship",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "station_gen_basic",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "station_illegal",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "generaluseequipment",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "generaluseship",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "station_gen_basic",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "generaluseequipment",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "generaluseship",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "station_gen_basic",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "generaluseequipment",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "generaluseship",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "station_gen_basic",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "generaluseequipment",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "generaluseship",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "station_gen_basic",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "generaluseequipment",
+        "nameId": "",
+        "name": ""
+      }
+    ]
   },
   {
     "id": "scaleplate",
@@ -371,8 +2075,140 @@
       "watchdoguser"
     ],
     "color_name": "faction_scaleplate",
-    "color": "#666600",
-    "claimspace": false
+    "color": "#4b5563",
+    "claimspace": false,
+    "licences": [
+      {
+        "type": "capitalequipment",
+        "nameId": "{20207,2201}",
+        "name": "Pact Capital Equipment Licence"
+      },
+      {
+        "type": "capitalship",
+        "nameId": "{20207,3171}",
+        "name": "Pact Capital Ship Licence"
+      },
+      {
+        "type": "ceremonyally",
+        "nameId": "{20207,5171}",
+        "name": "Pact Holder"
+      },
+      {
+        "type": "ceremonyfriend",
+        "nameId": "{20207,5161}",
+        "name": "Pact Trustee"
+      },
+      {
+        "type": "generaluseequipment",
+        "nameId": "{20207,2311}",
+        "name": "Pact General Use Equipment Licence"
+      },
+      {
+        "type": "generaluseship",
+        "nameId": "{20207,2351}",
+        "name": "Pact General Use Ship Licence"
+      },
+      {
+        "type": "militaryequipment",
+        "nameId": "{20207,2191}",
+        "name": "Pact Military Equipment Licence"
+      },
+      {
+        "type": "militaryship",
+        "nameId": "{20207,3161}",
+        "name": "Pact Military Ship Licence"
+      },
+      {
+        "type": "shipsalecontract",
+        "nameId": "{20207,9081}",
+        "name": "Pact Ship Sale Contract"
+      },
+      {
+        "type": "station_gen_advanced",
+        "nameId": "{20207,7021}",
+        "name": "Advanced Module Licence"
+      },
+      {
+        "type": "station_gen_basic",
+        "nameId": "{20207,7001}",
+        "name": "Basic Module Licence"
+      },
+      {
+        "type": "station_gen_intermediate",
+        "nameId": "{20207,7011}",
+        "name": "Intermediate Module Licence"
+      },
+      {
+        "type": "station_illegal",
+        "nameId": "{20207,7491}",
+        "name": "Pact Illegal Module Licence"
+      },
+      {
+        "type": "subgroupfriend",
+        "nameId": "{20207,6081}",
+        "name": "Scaleless/Profiteers Membership"
+      },
+      {
+        "type": "tradesubscription",
+        "nameId": "{20207,4081}",
+        "name": "Pact Trade Offer Subscription"
+      },
+      {
+        "type": "capitalequipment",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "capitalship",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "generaluseequipment",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "generaluseship",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "militaryequipment",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "militaryship",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "station_illegal",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "generaluseequipment",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "generaluseship",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "militaryequipment",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "militaryship",
+        "nameId": "",
+        "name": ""
+      }
+    ]
   },
   {
     "id": "scavenger",
@@ -387,8 +2223,95 @@
       "standard"
     ],
     "color_name": "faction_scavenger",
-    "color": "#003C66",
-    "claimspace": true
+    "color": "#4b5563",
+    "claimspace": true,
+    "licences": [
+      {
+        "type": "capitalequipment",
+        "nameId": "{20207,2751}",
+        "name": "Rakers Capital Equipment Licence"
+      },
+      {
+        "type": "capitalship",
+        "nameId": "{20207,3371}",
+        "name": "Rakers Capital Ship Licence"
+      },
+      {
+        "type": "ceremonyally",
+        "nameId": "{20207,5371}",
+        "name": "Tide Breaker"
+      },
+      {
+        "type": "ceremonyfriend",
+        "nameId": "{20207,5361}",
+        "name": "Tide Runner"
+      },
+      {
+        "type": "generaluseequipment",
+        "nameId": "{20207,2721}",
+        "name": "Rakers General Use Equipment Licence"
+      },
+      {
+        "type": "generaluseship",
+        "nameId": "{20207,2731}",
+        "name": "Rakers General Use Ship Licence"
+      },
+      {
+        "type": "militaryequipment",
+        "nameId": "{20207,2741}",
+        "name": "Rakers Military Equipment Licence"
+      },
+      {
+        "type": "militaryship",
+        "nameId": "{20207,3361}",
+        "name": "Rakers Military Ship Licence"
+      },
+      {
+        "type": "shipsalecontract",
+        "nameId": "{20207,9181}",
+        "name": "Rakers Ship Sale Contract"
+      },
+      {
+        "type": "station_equip_lxl",
+        "nameId": "{20207,7991}",
+        "name": "Rakers Capital Ship Building Module Licence"
+      },
+      {
+        "type": "station_equip_sm",
+        "nameId": "{20207,7981}",
+        "name": "Rakers Ancillary Ship Building Module Licence"
+      },
+      {
+        "type": "station_gen_advanced",
+        "nameId": "{20207,7971}",
+        "name": "Rakers Advanced Module Licence"
+      },
+      {
+        "type": "station_gen_basic",
+        "nameId": "{20207,7951}",
+        "name": "Rakers Basic Module Licence"
+      },
+      {
+        "type": "station_gen_intermediate",
+        "nameId": "{20207,7961}",
+        "name": "Rakers Intermediate Module Licence"
+      },
+      {
+        "type": "tradesubscription",
+        "nameId": "{20207,4181}",
+        "name": "Rakers Trade Offer Subscription"
+      },
+      {
+        "type": "envoy_access",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "generaluseship",
+        "nameId": "",
+        "name": ""
+      }
+    ]
   },
   {
     "id": "smuggler",
@@ -398,8 +2321,9 @@
       "hidden"
     ],
     "color_name": "faction_smuggler",
-    "color": "#B30000",
-    "claimspace": false
+    "color": "#4b5563",
+    "claimspace": false,
+    "licences": []
   },
   {
     "id": "split",
@@ -418,8 +2342,100 @@
       "watchdoguser"
     ],
     "color_name": "faction_split",
-    "color": "#B36100",
-    "claimspace": true
+    "color": "#4b5563",
+    "claimspace": true,
+    "licences": [
+      {
+        "type": "capitalequipment",
+        "nameId": "{20207,2431}",
+        "name": "Patriarchy Capital Equipment Licence"
+      },
+      {
+        "type": "capitalship",
+        "nameId": "{20207,3211}",
+        "name": "Patriarchy Capital Ship Licence"
+      },
+      {
+        "type": "ceremonyally",
+        "nameId": "{20207,5231}",
+        "name": "Patriarch's Confidant"
+      },
+      {
+        "type": "ceremonyfriend",
+        "nameId": "{20207,5221}",
+        "name": "Spear of the Patriarch"
+      },
+      {
+        "type": "generaluseequipment",
+        "nameId": "{20207,2401}",
+        "name": "Patriarchy General Use Equipment Licence"
+      },
+      {
+        "type": "generaluseship",
+        "nameId": "{20207,2411}",
+        "name": "Patriarchy General Use Ship Licence"
+      },
+      {
+        "type": "militaryequipment",
+        "nameId": "{20207,2421}",
+        "name": "Patriarchy Military Equipment Licence"
+      },
+      {
+        "type": "militaryship",
+        "nameId": "{20207,3201}",
+        "name": "Patriarchy Military Ship Licence"
+      },
+      {
+        "type": "police",
+        "nameId": "{20207,1051}",
+        "name": "Patriarchy Police Licence"
+      },
+      {
+        "type": "shipsalecontract",
+        "nameId": "{20207,9101}",
+        "name": "Patriarchy Ship Sale Contract"
+      },
+      {
+        "type": "station_equip_lxl",
+        "nameId": "{20207,7551}",
+        "name": "Patriarchy Capital Ship Building Module Licence"
+      },
+      {
+        "type": "station_equip_sm",
+        "nameId": "{20207,7561}",
+        "name": "Patriarchy Ancillary Ship Building Module Licence"
+      },
+      {
+        "type": "station_gen_advanced",
+        "nameId": "{20207,7571}",
+        "name": "Patriarchy Advanced Module Licence"
+      },
+      {
+        "type": "station_gen_basic",
+        "nameId": "{20207,7581}",
+        "name": "Patriarchy Basic Module Licence"
+      },
+      {
+        "type": "station_gen_intermediate",
+        "nameId": "{20207,7591}",
+        "name": "Patriarchy Intermediate Module Licence"
+      },
+      {
+        "type": "tradesubscription",
+        "nameId": "{20207,4101}",
+        "name": "Patriarchy Trade Offer Subscription"
+      },
+      {
+        "type": "envoy_access",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "generaluseship",
+        "nameId": "",
+        "name": ""
+      }
+    ]
   },
   {
     "id": "teladi",
@@ -437,8 +2453,120 @@
       "watchdoguser"
     ],
     "color_name": "faction_teladi",
-    "color": "#B3B300",
-    "claimspace": true
+    "color": "#4b5563",
+    "claimspace": true,
+    "licences": [
+      {
+        "type": "capitalequipment",
+        "nameId": "{20207,2161}",
+        "name": "Company Capital Equipment Licence"
+      },
+      {
+        "type": "capitalship",
+        "nameId": "{20207,3131}",
+        "name": "Company Capital Ship Licence"
+      },
+      {
+        "type": "ceremonyally",
+        "nameId": "{20207,5131}",
+        "name": "Honorary Company Director"
+      },
+      {
+        "type": "ceremonyfriend",
+        "nameId": "{20207,5121}",
+        "name": "Honorary Company Shareholder"
+      },
+      {
+        "type": "generaluseequipment",
+        "nameId": "{20207,2021}",
+        "name": "Teladi General Use Equipment Licence"
+      },
+      {
+        "type": "generaluseship",
+        "nameId": "{20207,2231}",
+        "name": "Company General Use Ship Licence"
+      },
+      {
+        "type": "militaryequipment",
+        "nameId": "{20207,2151}",
+        "name": "Company Military Equipment Licence"
+      },
+      {
+        "type": "militaryship",
+        "nameId": "{20207,3121}",
+        "name": "Company Military Ship Licence"
+      },
+      {
+        "type": "shipsalecontract",
+        "nameId": "{20207,9021}",
+        "name": "Company Ship Sale Contract"
+      },
+      {
+        "type": "station_equip_lxl",
+        "nameId": "{20207,7251}",
+        "name": "Company Capital Ship Building Module Licence"
+      },
+      {
+        "type": "station_equip_sm",
+        "nameId": "{20207,7241}",
+        "name": "Company Ancillary Ship Building Module Licence"
+      },
+      {
+        "type": "station_gen_advanced",
+        "nameId": "{20207,7421}",
+        "name": "Company Advanced Module Licence"
+      },
+      {
+        "type": "station_gen_basic",
+        "nameId": "{20207,7401}",
+        "name": "Company Basic Module Licence"
+      },
+      {
+        "type": "station_gen_intermediate",
+        "nameId": "{20207,7411}",
+        "name": "Company Intermediate Module Licence"
+      },
+      {
+        "type": "station_illegal",
+        "nameId": "{20207,7481}",
+        "name": "Company Illegal Module Licence"
+      },
+      {
+        "type": "subgroupfriend",
+        "nameId": "{20207,6061}",
+        "name": "Free Traders' Association Membership"
+      },
+      {
+        "type": "tradesubscription",
+        "nameId": "{20207,4061}",
+        "name": "Company Trade Offer Subscription"
+      },
+      {
+        "type": "capitalship",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "envoy_access",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "generaluseship",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "militaryship",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "police",
+        "nameId": "",
+        "name": ""
+      }
+    ]
   },
   {
     "id": "terran",
@@ -455,8 +2583,140 @@
       "watchdoguser"
     ],
     "color_name": "faction_terran",
-    "color": "#99D5FF",
-    "claimspace": true
+    "color": "#4b5563",
+    "claimspace": true,
+    "licences": [
+      {
+        "type": "capitalequipment",
+        "nameId": "{20207,2591}",
+        "name": "Protectorate Capital Equipment Licence"
+      },
+      {
+        "type": "capitalship",
+        "nameId": "{20207,3291}",
+        "name": "Protectorate Capital Ship Licence"
+      },
+      {
+        "type": "ceremonyally",
+        "nameId": "{20207,5291}",
+        "name": "Hero of Humanity"
+      },
+      {
+        "type": "ceremonyfriend",
+        "nameId": "{20207,5281}",
+        "name": "Servant of Sol"
+      },
+      {
+        "type": "generaluseequipment",
+        "nameId": "{20207,2561}",
+        "name": "Protectorate General Use Equipment Licence"
+      },
+      {
+        "type": "generaluseship",
+        "nameId": "{20207,2571}",
+        "name": "Protectorate General Use Ship Licence"
+      },
+      {
+        "type": "innercore_access",
+        "nameId": "{20207,8001}",
+        "name": "Protectorate Inner Core Access Licence"
+      },
+      {
+        "type": "militaryequipment",
+        "nameId": "{20207,2581}",
+        "name": "Protectorate Military Equipment Licence"
+      },
+      {
+        "type": "militaryship",
+        "nameId": "{20207,3281}",
+        "name": "Protectorate Military Ship Licence"
+      },
+      {
+        "type": "outercore_access",
+        "nameId": "{20207,8011}",
+        "name": "Protectorate Outer Core Access Licence"
+      },
+      {
+        "type": "police",
+        "nameId": "{20207,1091}",
+        "name": "Protectorate Police Licence"
+      },
+      {
+        "type": "shipsalecontract",
+        "nameId": "{20207,9141}",
+        "name": "Protectorate Ship Sale Contract"
+      },
+      {
+        "type": "station_equip_lxl",
+        "nameId": "{20207,7751}",
+        "name": "Protectorate Capital Ship Building Module Licence"
+      },
+      {
+        "type": "station_equip_sm",
+        "nameId": "{20207,7761}",
+        "name": "Protectorate Ancillary Ship Building Module Licence"
+      },
+      {
+        "type": "station_gen_advanced",
+        "nameId": "{20207,7771}",
+        "name": "Protectorate Advanced Module Licence"
+      },
+      {
+        "type": "station_gen_basic",
+        "nameId": "{20207,7781}",
+        "name": "Protectorate Basic Module Licence"
+      },
+      {
+        "type": "station_gen_intermediate",
+        "nameId": "{20207,7791}",
+        "name": "Protectorate Intermediate Module Licence"
+      },
+      {
+        "type": "tradesubscription",
+        "nameId": "{20207,4141}",
+        "name": "Protectorate Trade Offer Subscription"
+      },
+      {
+        "type": "capitalequipment",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "capitalship",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "envoy_access",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "generaluseequipment",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "generaluseship",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "militaryequipment",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "militaryship",
+        "nameId": "",
+        "name": ""
+      },
+      {
+        "type": "police",
+        "nameId": "",
+        "name": ""
+      }
+    ]
   },
   {
     "id": "trinity",
@@ -475,8 +2735,100 @@
       "watchdoguser"
     ],
     "color_name": "faction_trinity",
-    "color": "#FFCCFF",
-    "claimspace": true
+    "color": "#4b5563",
+    "claimspace": true,
+    "licences": [
+      {
+        "type": "capitalequipment",
+        "nameId": "{20207,2551}",
+        "name": "Paranid Capital Equipment Licence"
+      },
+      {
+        "type": "capitalship",
+        "nameId": "{20207,3271}",
+        "name": "Paranid Capital Ship Licence"
+      },
+      {
+        "type": "ceremonyally",
+        "nameId": "{20207,5271}",
+        "name": "Seeker of the Holy Light"
+      },
+      {
+        "type": "ceremonyfriend",
+        "nameId": "{20207,5261}",
+        "name": "Creature of Merit"
+      },
+      {
+        "type": "generaluseequipment",
+        "nameId": "{20207,2521}",
+        "name": "Paranid General Use Equipment Licence"
+      },
+      {
+        "type": "generaluseship",
+        "nameId": "{20207,2531}",
+        "name": "Paranid General Use Ship Licence"
+      },
+      {
+        "type": "hyperion_access",
+        "nameId": "{20207,9301}",
+        "name": "Hyperion Sale Contract"
+      },
+      {
+        "type": "militaryequipment",
+        "nameId": "{20207,2541}",
+        "name": "Paranid Military Equipment Licence"
+      },
+      {
+        "type": "militaryship",
+        "nameId": "{20207,3261}",
+        "name": "Paranid Military Ship Licence"
+      },
+      {
+        "type": "police",
+        "nameId": "{20207,1071}",
+        "name": "Paranid Police Licence"
+      },
+      {
+        "type": "shipsalecontract",
+        "nameId": "{20207,9131}",
+        "name": "Paranid Ship Sale Contract"
+      },
+      {
+        "type": "station_equip_lxl",
+        "nameId": "{20207,7701}",
+        "name": "Paranid Capital Ship Building Module Licence"
+      },
+      {
+        "type": "station_equip_sm",
+        "nameId": "{20207,7711}",
+        "name": "Paranid Ancillary Ship Building Module Licence"
+      },
+      {
+        "type": "station_gen_advanced",
+        "nameId": "{20207,7101}",
+        "name": "Paranid Advanced Module Licence"
+      },
+      {
+        "type": "station_gen_basic",
+        "nameId": "{20207,7081}",
+        "name": "Paranid Basic Module Licence"
+      },
+      {
+        "type": "station_gen_intermediate",
+        "nameId": "{20207,7091}",
+        "name": "Paranid Intermediate Module Licence"
+      },
+      {
+        "type": "tradesubscription",
+        "nameId": "{20207,4121}",
+        "name": "Paranid Trade Offer Subscription"
+      },
+      {
+        "type": "envoy_access",
+        "nameId": "",
+        "name": ""
+      }
+    ]
   },
   {
     "id": "visitor",
@@ -487,8 +2839,15 @@
       "hidden"
     ],
     "color_name": "faction_visitor",
-    "color": "#FFFF00",
-    "claimspace": false
+    "color": "#4b5563",
+    "claimspace": false,
+    "licences": [
+      {
+        "type": "station_venture",
+        "nameId": "{20207,7151}",
+        "name": "Venture Module Licence"
+      }
+    ]
   },
   {
     "id": "xenon",
@@ -502,8 +2861,9 @@
       "privateship"
     ],
     "color_name": "faction_xenon",
-    "color": "#B30000",
-    "claimspace": true
+    "color": "#4b5563",
+    "claimspace": true,
+    "licences": []
   },
   {
     "id": "yaki",
@@ -516,7 +2876,34 @@
       "privateship"
     ],
     "color_name": "faction_yaki",
-    "color": "#FF4D4D",
-    "claimspace": false
+    "color": "#4b5563",
+    "claimspace": false,
+    "licences": [
+      {
+        "type": "ceremonyally",
+        "nameId": "{20207,5331}",
+        "name": "Honourable Dragon"
+      },
+      {
+        "type": "ceremonyfriend",
+        "nameId": "{20207,5321}",
+        "name": "Among Friends"
+      },
+      {
+        "type": "generaluseequipment",
+        "nameId": "{20207,2641}",
+        "name": "Yaki General Use Equipment Licence"
+      },
+      {
+        "type": "militaryequipment",
+        "nameId": "{20207,2661}",
+        "name": "Yaki Military Equipment Licence"
+      },
+      {
+        "type": "militaryship",
+        "nameId": "{20207,3321}",
+        "name": "Yaki Military Ship Licence"
+      }
+    ]
   }
 ]

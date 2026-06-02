@@ -11,7 +11,7 @@ export interface ActiveViewState {
   activeBinding: string | null
   activeBindingStation: string | null
   activeBindingWorkbench: 'overview' | 'station' | 'transit' | 'terraforming' | 'tech-tree'
-  activeEmpireWorkbench: 'overview' | 'station' | 'terraforming' | 'research'
+  activeEmpireWorkbench: 'overview' | 'station' | 'terraforming' | 'research' | 'blueprint-recipe'
   activeTerraformingClusterId: string | null
   activeView: StationActiveView
   isResourcePanelOpen: boolean

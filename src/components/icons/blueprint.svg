@@ -1,0 +1,19 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN"
+ "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+ width="128.000000pt" height="128.000000pt" viewBox="0 0 128.000000 128.000000"
+ preserveAspectRatio="xMidYMid meet">
+<g transform="translate(0.000000,128.000000) scale(0.100000,-0.100000)"
+ fill="#ffffff" stroke="none">
+<circle cx="640" cy="640" r="440" fill="none" stroke="#ffffff" stroke-width="100"/>
+<path d="M450 880 L450 400 L770 400 L770 460 L830 460 L830 520 L830 880 Z M770 400 L770 460 L830 460 Z"/>
+<rect x="490" y="540" width="200" height="24" rx="4"/>
+<rect x="490" y="590" width="280" height="16" rx="3"/>
+<rect x="490" y="630" width="280" height="16" rx="3"/>
+<rect x="490" y="670" width="240" height="16" rx="3"/>
+<rect x="490" y="710" width="280" height="16" rx="3"/>
+<rect x="490" y="750" width="180" height="16" rx="3"/>
+<path d="M830 520 L830 580 L770 580 Z" fill="none" stroke="#ffffff" stroke-width="8"/>
+</g>
+</svg>

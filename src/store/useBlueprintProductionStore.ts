@@ -881,10 +881,11 @@ function updateStationModules(stationId: string, modules: SavedModule[]) {
     }
   })
 
-  function resolveWorkbenchType(): 'overview' | 'station' | 'terraforming' | 'research' {
+  function resolveWorkbenchType(): 'overview' | 'station' | 'terraforming' | 'research' | 'blueprint-recipe' {
     switch (activeViewStore.activeEmpireWorkbench) {
       case 'terraforming': return 'terraforming'
       case 'research': return 'research'
+      case 'blueprint-recipe': return 'blueprint-recipe'
       default: return activeStation.value ? 'station' : 'overview'
     }
   }
@@ -893,6 +894,7 @@ function updateStationModules(stationId: string, modules: SavedModule[]) {
     const wb = resolveWorkbenchType()
     const isSpecialView = activeViewStore.activeEmpireWorkbench === 'terraforming'
       || activeViewStore.activeEmpireWorkbench === 'research'
+      || activeViewStore.activeEmpireWorkbench === 'blueprint-recipe'
     return {
       workbenchMode: wb,
       entityType: wb,
@@ -1093,6 +1095,10 @@ function updateStationModules(stationId: string, modules: SavedModule[]) {
     },
     selectResearch() {
       activeViewStore.activeEmpireWorkbench = 'research'
+      activeStationId.value = null
+    },
+    selectBlueprintRecipe() {
+      activeViewStore.activeEmpireWorkbench = 'blueprint-recipe'
       activeStationId.value = null
     },
     updateWareflowViewMode: (value: WareFlowViewMode) => { wareflowViewMode.value = value },

@@ -8,10 +8,11 @@ export interface SidebarPresenterProps {
   tabs: ComputedRef<ProductionTabItem[]>
   activeTabId: ComputedRef<string | null>
   expandedSectorId: ComputedRef<string | null>
-  hasSectors: boolean
+    hasSectors: boolean
   showTerraforming: boolean
   showTechTree: boolean
   showResearch: boolean
+  showBlueprintRecipe: boolean
   canCreateStation: boolean
   terraformingClusters: ComputedRef<{ id: string; nameId: string }[]>
   activeTerraformingClusterId: ComputedRef<string | null>
@@ -25,6 +26,7 @@ export interface SidebarPresenterEmits {
   selectTerraforming: () => void
   selectTechTree: () => void
   selectResearch: () => void
+  selectBlueprintRecipe: () => void
   selectTransit: (sectorId: string) => void
   selectTerraformingCluster: (clusterId: string) => void
   selectStation: (stationId: string) => void
@@ -43,7 +45,7 @@ export interface UseProductionSidebarPresenterReturn {
 
 export interface SidebarPresenterStore {
   session: {
-    workbenchMode: 'overview' | 'station' | 'transit' | 'terraforming' | 'tech-tree' | 'research'
+    workbenchMode: 'overview' | 'station' | 'transit' | 'terraforming' | 'tech-tree' | 'research' | 'blueprint-recipe'
     activeStationId: string | null
     activeTransitSectorId: string | null
   }
@@ -75,6 +77,7 @@ export interface SidebarPresenterStore {
   selectTerraforming?(): void
   selectTechTree?(): void
   selectResearch?(): void
+  selectBlueprintRecipe?(): void
   selectTransitSector?(sectorId: string | null): void
   createStation(name?: string): unknown
   renameStation(stationId: string, name: string): void
@@ -167,6 +170,7 @@ export function useProductionSidebarPresenter(store: SidebarPresenterStore): Use
   // 暂隐藏（恢复：!!store.selectTechTree）
   const showTechTree = false
   const showResearch = !hasSectors
+  const showBlueprintRecipe = !hasSectors
 
   const props: SidebarPresenterProps = {
     tabs,
@@ -174,6 +178,7 @@ export function useProductionSidebarPresenter(store: SidebarPresenterStore): Use
       if (store.session.workbenchMode === 'terraforming') return 'terraforming'
       if (store.session.workbenchMode === 'tech-tree') return 'tech-tree'
       if (store.session.workbenchMode === 'research') return 'research'
+      if (store.session.workbenchMode === 'blueprint-recipe') return 'blueprint-recipe'
       if (store.session.workbenchMode === 'transit' && store.session.activeTransitSectorId) {
         return `transit:${store.session.activeTransitSectorId}`
       }
@@ -185,6 +190,7 @@ export function useProductionSidebarPresenter(store: SidebarPresenterStore): Use
     showTerraforming,
     showTechTree,
     showResearch,
+    showBlueprintRecipe,
     canCreateStation: !store.capabilities.uniqueStation,
     canOpenContextMenu: !store.capabilities.uniqueStation || (store.capabilities.uniqueStation && !store.archiveStation),
     contextMenuMode: store.capabilities.uniqueStation ? 'delete-only' : 'full',
@@ -198,6 +204,7 @@ export function useProductionSidebarPresenter(store: SidebarPresenterStore): Use
     selectTerraforming: () => (store.selectTerraforming || (() => {}))(),
     selectTechTree: () => (store.selectTechTree || (() => {}))(),
     selectResearch: () => (store.selectResearch || (() => {}))(),
+    selectBlueprintRecipe: () => (store.selectBlueprintRecipe || (() => {}))(),
     selectTerraformingCluster: () => {},
     selectTransit: (sectorId: string) => (store.selectTransitSector || (() => {}))(sectorId),
     selectStation: (stationId: string) => store.selectStation(stationId),

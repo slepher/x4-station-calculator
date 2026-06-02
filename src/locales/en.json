@@ -1244,5 +1244,12 @@
   "research.group.abandoned_ships": "Abandoned Ship Blueprints",
   "research.group.pirate_dlc": "Pirate DLC",
   "research.group.terran_dlc": "Terran DLC",
-  "research.group.xen_equipment": "Xenon Equipment"
+  "research.group.xen_equipment": "Xenon Equipment",
+  "blueprint_recipe.label": "Blueprint Recipe",
+  "blueprint_recipe.search": "Search name, ID or faction...",
+  "blueprint_recipe.select_class": "Select a category from the left",
+  "blueprint_recipe.results": "results",
+  "blueprint_recipe.no_results": "No matching results",
+  "blueprint_recipe.mission_only": "Mission Only",
+  "blueprint_recipe.no_player_blueprint": "Not Obtainable"
 }

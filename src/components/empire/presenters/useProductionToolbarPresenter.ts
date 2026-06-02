@@ -6,7 +6,7 @@ import type { BindingStationPlan, TradeStationBinding } from '@/types/x4'
 import i18n from '@/i18n'
 
 export interface ToolbarPresenterProps {
-  workbenchMode: ComputedRef<'overview' | 'station' | 'transit' | 'terraforming' | 'tech-tree' | 'research'>
+  workbenchMode: ComputedRef<'overview' | 'station' | 'transit' | 'terraforming' | 'tech-tree' | 'research' | 'blueprint-recipe'>
   mode: ComputedRef<'planning' | 'live'>
   titleModel: ComputedRef<{ value: string; placeholder: string }>
   settings: ComputedRef<StationSettings | null>

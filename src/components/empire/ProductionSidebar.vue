@@ -9,6 +9,7 @@ import tradestationIconUrl from '@/components/icons/tradestation.svg'
 import factoryIconUrl from '@/components/icons/factory.svg'
 import researchIconUrl from '@/components/icons/tlt_research.svg'
 import terraformingIconUrl from '@/components/icons/tlt_terraforming.svg'
+import blueprintIconUrl from '@/components/icons/blueprint.svg'
 
 const props = defineProps<{
   tabs: ProductionTabItem[]
@@ -18,6 +19,7 @@ const props = defineProps<{
   showTerraforming: boolean
   showResearch: boolean
   showTechTree: boolean
+  showBlueprintRecipe: boolean
   terraformingClusters: { id: string; name: string; nameId: string; temperatureState: number }[]
   activeTerraformingClusterId: string | null
   canCreateStation: boolean
@@ -31,6 +33,7 @@ const emit = defineEmits<{
   selectTerraforming: []
   selectTechTree: []
   selectResearch: []
+  selectBlueprintRecipe: []
   selectTerraformingCluster: [clusterId: string]
   selectTransit: [sectorId: string]
   selectStation: [stationId: string]
@@ -142,6 +145,9 @@ watch([() => props.activeTabId, () => props.tabs.length], ([tabId]) => {
 
 const fixedItems = computed<ProductionTabItem[]>(() => {
   const result = props.tabs.filter(t => t.type === 'overview')
+  if (props.showBlueprintRecipe) {
+    result.push({ id: 'blueprint-recipe', type: 'blueprint-recipe' as const, name: t('blueprint_recipe.label') })
+  }
   if (props.showResearch) {
     result.push({ id: 'research', type: 'research' as const, name: '研究' })
   }
@@ -204,6 +210,7 @@ const getTabIcon = (tab: ProductionTabItem): string => {
   if (tab.type === 'terraforming') return terraformingIconUrl
   if (tab.id === 'tech-tree') return terraformingIconUrl
   if (tab.id === 'research') return researchIconUrl
+  if (tab.id === 'blueprint-recipe') return blueprintIconUrl
   if (tab.type === 'transit') return tradestationIconUrl
   const iconTag = getPoiIconTag(tab)
   if (iconTag) return SAVE_POI_ICON_MAP[iconTag] || factoryIconUrl
@@ -221,6 +228,8 @@ const handleTabClick = (tab: ProductionTabItem) => {
     emit('selectTechTree')
   } else if (tab.id === 'research') {
     emit('selectResearch')
+  } else if (tab.id === 'blueprint-recipe') {
+    emit('selectBlueprintRecipe')
   } else if (tab.type === 'transit') {
     emit('selectTransit', tab.sectorId!)
   } else {
@@ -353,7 +362,7 @@ onUnmounted(() => {
             :key="item.id"
             class="sidebar-item"
             :class="{ active: isTabActive(item.id) }"
-            :data-testid="item.id === 'overview' ? 'sidebar-overview' : item.id === 'terraforming' ? 'sidebar-terraforming' : 'sidebar-tech-tree'"
+            :data-testid="item.id === 'overview' ? 'sidebar-overview' : item.id === 'terraforming' ? 'sidebar-terraforming' : item.id === 'blueprint-recipe' ? 'sidebar-blueprint-recipe' : 'sidebar-tech-tree'"
           >
             <div class="sidebar-item-active-bar"></div>
             <button

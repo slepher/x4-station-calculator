@@ -1245,5 +1245,12 @@
   "research.group.abandoned_ships": "废弃船蓝图",
   "research.group.pirate_dlc": "海盗 DLC",
   "research.group.terran_dlc": "Terran DLC",
-  "research.group.xen_equipment": "Xenon 装备"
+  "research.group.xen_equipment": "Xenon 装备",
+  "blueprint_recipe.label": "蓝图配方",
+  "blueprint_recipe.search": "搜索名称、ID 或阵营...",
+  "blueprint_recipe.select_class": "请从左侧选择一个分类",
+  "blueprint_recipe.results": "条结果",
+  "blueprint_recipe.no_results": "无匹配结果",
+  "blueprint_recipe.mission_only": "任务专属",
+  "blueprint_recipe.no_player_blueprint": "不可获取"
 }

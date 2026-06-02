@@ -21,7 +21,7 @@ const DEFAULT_WAREFLOW_SETTINGS = {
 }
 
 export interface WareflowPresenterProps {
-  workbenchMode: ComputedRef<'overview' | 'station' | 'transit' | 'terraforming' | 'tech-tree' | 'research'>
+  workbenchMode: ComputedRef<'overview' | 'station' | 'transit' | 'terraforming' | 'tech-tree' | 'research' | 'blueprint-recipe'>
   visualMode: ComputedRef<'planning' | 'live'>
   viewMode: ComputedRef<WareFlowViewMode>
   useAllocationVolumeView: ComputedRef<boolean>
