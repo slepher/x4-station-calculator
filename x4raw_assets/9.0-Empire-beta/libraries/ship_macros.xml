@@ -7466,7 +7466,7 @@
       </jerk>
       <explosiondamage value="1000" shield="5000" shielddisruption="10"/>
       <storage countermeasure="0" missile="0" unit="0" deployable="0"/>
-      <hull max="136000" scrapware="rawkhaakscrap"/>
+      <hull max="136000" noscrap="1"/>
       <secrecy level="1"/>
       <steeringcurve>
         <point position="1.01" value="1"/>
@@ -7768,7 +7768,7 @@
       </jerk>
       <explosiondamage shield="7500" shielddisruption="10"/>
       <storage countermeasure="0" missile="0" unit="0" deployable="0"/>
-      <hull max="275000" scrapware="rawkhaakscrap"/>
+      <hull max="275000" noscrap="1"/>
       <threatscore value="35"/>
       <secrecy level="3"/>
       <steeringcurve>
