@@ -80,12 +80,17 @@
 ### In Scope
 
 - 蓝图产能界面侧边栏新增「蓝图配方」菜单
-- 蓝图配方页面：左侧 type/class 导航 + 右侧蓝图列表
-- 蓝图列表：本地化名称、id、class、price、licence、factions、特殊标记
-- 搜索过滤功能
+- 蓝图配方页面：左侧 type/class 导航 + 中间 filter 面板 + 右侧蓝图列表
+- Filter 面板：Faction 多选 + Licence 多选（全选/取消），切换 class 时不重置值
+- Faction 与 Licence 过滤为 AND 关系，Faction 组内为 OR
+- 蓝图列表：名称+价格同行，factions+licences 独立区域
+- licence 名称优先取 faction 专属 nameId，无匹配时不显示
+- `noplayerblueprint` 蓝图默认隐藏
+- `ownerless` 蓝图不被 faction 过滤拦截
 - `blueprints.json` 在 `useGameData` 中加载
-- 新图标 SVG
-- i18n 键值
+- 蓝图数据多 faction 修复：`findall("owner")` 替代 `find("owner")`
+- factions.json 含 per-faction `licences` 数组（由 faction-runner 提供）
+- 新图标 SVG + i18n 键值（含 `licence.` Vue i18n 命名空间）
 
 ### Out of Scope
 
@@ -99,11 +104,11 @@
 1. `npm run build` 成功
 2. 蓝图产能界面侧边栏显示「蓝图配方」菜单，位于「研究」之上
 3. 点击进入蓝图配方页面，无 ContextToolbar
-4. 左侧按 module/ship/equipment → class 两级导航
-5. 右侧展示选中 class 的蓝图列表
-6. 每条蓝图显示本地化名称、原始 id、class、price/licence/factions（有则显示）
-7. `missiononly` 和 `noplayerblueprint` 分别显示 badge
-8. 搜索框可按名称/id/阵营过滤
+4. 左侧按 module/ship/equipment → class 两级导航，初始全部展开
+5. 中间 Filter 面板：Faction + Licence 多选过滤，全选/取消
+6. 右侧展示选中 class 的蓝图列表，无 class 时列表为空
+7. 每条蓝图显示本地化名称+价格同行，faction+licence 成对显示
+8. licence 仅在有 faction 匹配时显示，无匹配时不显示
 9. 只在蓝图模式显示，实况模式不显示
 
 ## 未决项

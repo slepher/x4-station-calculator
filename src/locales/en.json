@@ -1251,5 +1251,21 @@
   "blueprint_recipe.results": "results",
   "blueprint_recipe.no_results": "No matching results",
   "blueprint_recipe.mission_only": "Mission Only",
-  "blueprint_recipe.no_player_blueprint": "Not Obtainable"
+  "blueprint_recipe.no_player_blueprint": "Not Obtainable",
+  "licence.generaluseequipment": "General Use Equipment Licence",
+  "licence.station_gen_basic": "Basic Module Licence",
+  "licence.generaluseship": "General Use Ship Licence",
+  "licence.militaryequipment": "Military Equipment Licence",
+  "licence.militaryship": "Military Ship Licence",
+  "licence.capitalequipment": "Capital Equipment Licence",
+  "licence.capitalship": "Capital Ship Licence",
+  "licence.station_gen_intermediate": "Intermediate Module Licence",
+  "licence.station_gen_advanced": "Advanced Module Licence",
+  "licence.station_equip_lxl": "Capital Ship Building Module Licence",
+  "licence.station_equip_sm": "Ancillary Ship Building Module Licence",
+  "licence.station_illegal": "Illegal Module Licence",
+  "licence.station_venture": "Venture Module Licence",
+  "licence.hyperion_access": "Hyperion Sale Contract",
+  "licence.envoy_access": "Envoy Sales Contract",
+  "licence.story_paranid_palace_module": "Palace Module Licence"
 }

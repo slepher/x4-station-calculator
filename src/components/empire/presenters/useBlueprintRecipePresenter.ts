@@ -8,6 +8,11 @@ export interface BlueprintRecipePresenterProps {
   selectedClassId: Ref<string | null>
   filteredBlueprints: ComputedRef<X4Blueprint[]>
   searchQuery: Ref<string>
+  factionFilter: Ref<Set<string>>
+  licenceFilter: Ref<Set<string>>
+  availableFactions: ComputedRef<{ id: string; name: string }[]>
+  availableLicences: ComputedRef<{ id: string; name: string }[]>
+  allLicences: ComputedRef<{ id: string; name: string }[]>
   factionDisplayNames: ComputedRef<Record<string, string>>
   licenceDisplayNames: ComputedRef<Record<string, string>>
 }
@@ -16,6 +21,8 @@ export interface BlueprintRecipePresenterEmits {
   selectType: (typeId: string) => void
   selectClass: (classId: string) => void
   updateSearchQuery: (query: string) => void
+  toggleFactionFilter: (id: string) => void
+  toggleLicenceFilter: (id: string) => void
 }
 
 export function useBlueprintRecipePresenter(store: {
@@ -30,6 +37,8 @@ export function useBlueprintRecipePresenter(store: {
   const selectedTypeId = ref<string | null>(null)
   const selectedClassId = ref<string | null>(null)
   const searchQuery = ref('')
+  const factionFilter = ref<Set<string>>(new Set())
+  const licenceFilter = ref<Set<string>>(new Set())
 
   const factionDisplayNames = computed(() => {
     const map: Record<string, string> = {}
@@ -37,6 +46,21 @@ export function useBlueprintRecipePresenter(store: {
       map[f.id] = f.nameId ? t(f.nameId) : (f.name || f.id)
     }
     return map
+  })
+
+  const allLicences = computed(() => {
+    const map = new Map<string, string>()
+    for (const f of store.factions.value) {
+      if (f.licences) {
+        for (const l of f.licences) {
+          if (l.nameId && !map.has(l.type)) {
+            const label = t(l.nameId)
+            map.set(l.type, label && label !== l.nameId ? label : l.name)
+          }
+        }
+      }
+    }
+    return Array.from(map.entries()).map(([id, name]) => ({ id, name }))
   })
 
   const licenceDisplayNames = computed(() => {
@@ -89,11 +113,48 @@ export function useBlueprintRecipePresenter(store: {
     }))
   })
 
-  const filteredBlueprints = computed(() => {
+  const classBlueprints = computed(() => {
     const data = store.blueprintsData.value
     if (!data || !selectedClassId.value) return []
+    return data.blueprints.filter(bp => bp.class === selectedClassId.value && !bp.noplayerblueprint)
+  })
 
-    let result = data.blueprints.filter(bp => bp.class === selectedClassId.value && !bp.noplayerblueprint)
+  const allBlueprints = computed(() => {
+    const data = store.blueprintsData.value
+    if (!data) return []
+    return data.blueprints.filter(bp => !bp.noplayerblueprint)
+  })
+
+  const availableFactions = computed(() => {
+    const source = classBlueprints.value.length > 0 ? classBlueprints.value : allBlueprints.value
+    const seen = new Map<string, string>()
+    const fdn = factionDisplayNames.value
+    for (const bp of source) {
+      for (const fid of bp.factions || []) {
+        if (!seen.has(fid)) {
+          seen.set(fid, fdn[fid] || fid)
+        }
+      }
+    }
+    return Array.from(seen.entries()).map(([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name))
+  })
+
+  const availableLicences = computed(() => {
+    const source = classBlueprints.value.length > 0 ? classBlueprints.value : allBlueprints.value
+    const seen = new Map<string, string>()
+    const ldn = licenceDisplayNames.value
+    for (const bp of source) {
+      if (bp.licence) {
+        if (!seen.has(bp.licence)) {
+          seen.set(bp.licence, ldn[bp.licence] || bp.licence)
+        }
+      }
+    }
+    return Array.from(seen.entries()).map(([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name))
+  })
+
+  const filteredBlueprints = computed(() => {
+    let result = classBlueprints.value
 
     const q = searchQuery.value.toLowerCase().trim()
     if (q) {
@@ -103,6 +164,23 @@ export function useBlueprintRecipePresenter(store: {
         const facDisplayNames = factionDisplayNames.value
         const factionText = (bp.factions || []).map(fid => facDisplayNames[fid] || fid).join(' ').toLowerCase()
         return name.includes(q) || id.includes(q) || factionText.includes(q)
+      })
+    }
+
+    const hasFactionFilter = factionFilter.value.size > 0
+    const hasLicenceFilter = licenceFilter.value.size > 0
+
+    if (hasFactionFilter || hasLicenceFilter) {
+      result = result.filter(bp => {
+        const fs = bp.factions || []
+        const l = bp.licence
+        const factionMatch = !hasFactionFilter
+          || (fs.length === 0)
+          || fs.some(fid => factionFilter.value.has(fid))
+        const licenceMatch = !hasLicenceFilter
+          || (!l && licenceFilter.value.size === 0)
+          || (!!l && licenceFilter.value.has(l))
+        return factionMatch && licenceMatch
       })
     }
 
@@ -128,12 +206,47 @@ export function useBlueprintRecipePresenter(store: {
     searchQuery.value = query
   }
 
+  function toggleFactionFilter(id: string) {
+    const next = new Set(factionFilter.value)
+    if (next.size === 0) {
+      for (const f of availableFactions.value) {
+        next.add(f.id)
+      }
+      next.delete(id)
+    } else if (next.has(id)) {
+      next.delete(id)
+    } else {
+      next.add(id)
+    }
+    factionFilter.value = next
+  }
+
+  function toggleLicenceFilter(id: string) {
+    const next = new Set(licenceFilter.value)
+    if (next.size === 0) {
+      for (const l of availableLicences.value) {
+        next.add(l.id)
+      }
+      next.delete(id)
+    } else if (next.has(id)) {
+      next.delete(id)
+    } else {
+      next.add(id)
+    }
+    licenceFilter.value = next
+  }
+
   const props: BlueprintRecipePresenterProps = {
     typesNav,
     selectedTypeId,
     selectedClassId,
     filteredBlueprints,
     searchQuery,
+    factionFilter,
+    licenceFilter,
+    availableFactions,
+    availableLicences,
+    allLicences,
     factionDisplayNames,
     licenceDisplayNames,
   }
@@ -142,6 +255,8 @@ export function useBlueprintRecipePresenter(store: {
     selectType,
     selectClass,
     updateSearchQuery,
+    toggleFactionFilter,
+    toggleLicenceFilter,
   }
 
   return { props, emits }

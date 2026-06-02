@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
 import { useGameDataStore } from '@/store/useGameDataStore'
@@ -10,18 +10,10 @@ const { blueprintsData, factions } = storeToRefs(gameData)
 const p = useBlueprintRecipePresenter({ blueprintsData, factions })
 const { t } = useI18n()
 
-const { typesNav, selectedTypeId, selectedClassId, filteredBlueprints, searchQuery } = p.props
-const { selectType, selectClass, updateSearchQuery } = p.emits
+const { typesNav, selectedTypeId, selectedClassId, filteredBlueprints, searchQuery, factionFilter, licenceFilter, availableFactions, availableLicences } = p.props
+const { selectType, selectClass, updateSearchQuery, toggleFactionFilter, toggleLicenceFilter } = p.emits
 
-const expandedTypes = ref<Set<string>>(new Set())
-
-watch(selectedTypeId, (typeId) => {
-  if (typeId && !expandedTypes.value.has(typeId)) {
-    const next = new Set(expandedTypes.value)
-    next.add(typeId)
-    expandedTypes.value = next
-  }
-}, { immediate: true })
+const expandedTypes = ref<Set<string>>(new Set(p.props.typesNav.value.map(t => t.id)))
 
 function toggleType(typeId: string) {
   const next = new Set(expandedTypes.value)
@@ -60,6 +52,22 @@ function resolveLicenceForFaction(factionId: string, ltype: string | undefined):
     }
   }
   return ''
+}
+
+function toggleAllFactions(_items: { id: string }[]) {
+  if (factionFilter.value.size === 0) {
+    factionFilter.value = new Set(['__none__'])
+  } else {
+    factionFilter.value = new Set()
+  }
+}
+
+function toggleAllLicences(_items: { id: string }[]) {
+  if (licenceFilter.value.size === 0) {
+    licenceFilter.value = new Set(['__none__'])
+  } else {
+    licenceFilter.value = new Set()
+  }
 }
 </script>
 
@@ -105,6 +113,45 @@ function resolveLicenceForFaction(factionId: string, ltype: string | undefined):
       </div>
     </div>
 
+    <div class="bp-filter-panel custom-scrollbar">
+      <div v-if="availableFactions.length > 0" class="bp-filter-section">
+        <div class="bp-filter-title">
+          <span>Factions</span>
+          <button class="bp-filter-toggle" @click="toggleAllFactions(availableFactions)">{{ factionFilter.size === 0 ? '取消' : '全选' }}</button>
+        </div>
+        <label
+          v-for="fac in availableFactions"
+          :key="fac.id"
+          class="bp-filter-item"
+        >
+          <input
+            type="checkbox"
+            :checked="factionFilter.size === 0 || factionFilter.has(fac.id)"
+            @change="toggleFactionFilter(fac.id)"
+          />
+          <span>{{ fac.name }}</span>
+        </label>
+      </div>
+      <div v-if="availableLicences.length > 0" class="bp-filter-section">
+        <div class="bp-filter-title">
+          <span>Licences</span>
+          <button class="bp-filter-toggle" @click="toggleAllLicences(availableLicences)">{{ licenceFilter.size === 0 ? '取消' : '全选' }}</button>
+        </div>
+        <label
+          v-for="lic in availableLicences"
+          :key="lic.id"
+          class="bp-filter-item"
+        >
+          <input
+            type="checkbox"
+            :checked="licenceFilter.size === 0 || licenceFilter.has(lic.id)"
+            @change="toggleLicenceFilter(lic.id)"
+          />
+          <span>{{ t('licence.' + lic.id) }}</span>
+        </label>
+      </div>
+    </div>
+
     <div class="bp-content custom-scrollbar">
       <div class="bp-search-bar">
         <input
@@ -116,11 +163,7 @@ function resolveLicenceForFaction(factionId: string, ltype: string | undefined):
         />
       </div>
 
-      <div v-if="!selectedClassId" class="bp-empty">
-        {{ t('blueprint_recipe.select_class') }}
-      </div>
-
-      <div v-else class="bp-list">
+      <div class="bp-list">
         <div class="bp-list-header">
           <span class="bp-list-count">
             {{ filteredBlueprints.length }} {{ t('blueprint_recipe.results') }}
@@ -208,6 +251,30 @@ function resolveLicenceForFaction(factionId: string, ltype: string | undefined):
 
 .bp-nav-class.active {
   @apply text-sky-400 bg-slate-800/30;
+}
+
+.bp-filter-panel {
+  @apply w-44 flex-shrink-0 overflow-y-auto border-r border-slate-700 bg-slate-900/30 px-2 py-2;
+}
+
+.bp-filter-section {
+  @apply mb-3;
+}
+
+.bp-filter-title {
+  @apply flex items-center justify-between text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 px-1;
+}
+
+.bp-filter-toggle {
+  @apply text-[10px] text-sky-400 hover:text-sky-300 font-normal normal-case tracking-normal;
+}
+
+.bp-filter-item {
+  @apply flex items-center gap-1.5 px-1 py-0.5 text-xs text-slate-400 hover:text-slate-200 cursor-pointer rounded;
+}
+
+.bp-filter-item input {
+  @apply w-3 h-3;
 }
 
 .bp-content {

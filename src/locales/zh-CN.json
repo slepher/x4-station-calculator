@@ -1252,6 +1252,21 @@
   "blueprint_recipe.results": "条结果",
   "blueprint_recipe.no_results": "无匹配结果",
   "blueprint_recipe.mission_only": "任务专属",
-  "blueprint_recipe.show_noplayer": "显示不可获取",
-  "blueprint_recipe.no_player_blueprint": "不可获取"
+  "blueprint_recipe.no_player_blueprint": "不可获取",
+  "licence.generaluseequipment": "通用装备执照",
+  "licence.station_gen_basic": "基础模块执照",
+  "licence.generaluseship": "通用飞船执照",
+  "licence.militaryequipment": "军用装备执照",
+  "licence.militaryship": "军用飞船执照",
+  "licence.capitalequipment": "主力装备执照",
+  "licence.capitalship": "主力飞船执照",
+  "licence.station_gen_intermediate": "中级模块执照",
+  "licence.station_gen_advanced": "高级模块执照",
+  "licence.station_equip_lxl": "主力飞船建造模块执照",
+  "licence.station_equip_sm": "辅助飞船建造模块执照",
+  "licence.station_illegal": "非法模块执照",
+  "licence.station_venture": "远征模块执照",
+  "licence.hyperion_access": "亥伯龙销售合约",
+  "licence.envoy_access": "特使销售合同",
+  "licence.story_paranid_palace_module": "宫殿模块许可证"
 }
