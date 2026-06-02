@@ -10,7 +10,7 @@ const { blueprintsData, factions } = storeToRefs(gameData)
 const p = useBlueprintRecipePresenter({ blueprintsData, factions })
 const { t } = useI18n()
 
-const { typesNav, selectedTypeId, selectedClassId, filteredBlueprints, searchQuery, licenceDisplayNames } = p.props
+const { typesNav, selectedTypeId, selectedClassId, filteredBlueprints, searchQuery } = p.props
 const { selectType, selectClass, updateSearchQuery } = p.emits
 
 const expandedTypes = ref<Set<string>>(new Set())
@@ -59,7 +59,7 @@ function resolveLicenceForFaction(factionId: string, ltype: string | undefined):
       if (match.name) return match.name
     }
   }
-  return licenceDisplayNames.value[ltype] || ltype
+  return ''
 }
 </script>
 
@@ -146,8 +146,11 @@ function resolveLicenceForFaction(factionId: string, ltype: string | undefined):
               :key="faction"
               class="bp-faction-group"
             >
-              <span class="bp-tag bp-tag-faction">{{ p.props.factionDisplayNames.value[faction] || faction }}</span>
-              <span v-if="bp.licence" class="bp-tag bp-tag-licence">{{ resolveLicenceForFaction(faction, bp.licence) }}</span>
+              <span
+                class="bp-tag bp-tag-faction"
+                :class="{ 'bp-fr-none': !!resolveLicenceForFaction(faction, bp.licence) }"
+              >{{ p.props.factionDisplayNames.value[faction] || faction }}</span>
+              <span v-if="resolveLicenceForFaction(faction, bp.licence)" class="bp-tag bp-tag-licence">{{ resolveLicenceForFaction(faction, bp.licence) }}</span>
             </div>
           </div>
           <div class="bp-item-meta" v-if="bp.missiononly || bp.noplayerblueprint">
@@ -262,7 +265,8 @@ function resolveLicenceForFaction(factionId: string, ltype: string | undefined):
 }
 
 .bp-tag {
-  @apply inline-block text-[10px] px-1.5 py-0.5 rounded font-medium;
+  @apply inline-block text-[10px] px-1.5 py-0.5 font-medium;
+  border-radius: 4px;
 }
 
 .bp-tag-faction {
@@ -271,17 +275,17 @@ function resolveLicenceForFaction(factionId: string, ltype: string | undefined):
 
 .bp-tag-licence {
   @apply bg-blue-900/50 text-blue-300 border border-blue-800/50;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-left: none;
 }
 
-.bp-faction-group .bp-tag-faction {
-  @apply rounded-r-none;
-}
-
-.bp-faction-group .bp-tag-licence {
-  @apply rounded-l-none border-l-0;
+.bp-fr-none {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
 }
 
 .bp-tag-warn {
-  @apply bg-amber-900/50 text-amber-400 border border-amber-800/50;
+  @apply bg-amber-900/50 text-amber-400 border border-amber-800/50 rounded;
 }
 </style>
