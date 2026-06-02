@@ -73,6 +73,7 @@
 - 名称 + 价格同排（价格靠右）
 - factions + licences 独立区域，每个派系显示其专属 licence 名称
 - 隐藏原始 ID，仅显示本地化名称
+- `noplayerblueprint: true` 的蓝图默认不显示
 
 ## 边界
 

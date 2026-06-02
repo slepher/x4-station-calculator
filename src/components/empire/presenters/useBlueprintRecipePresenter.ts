@@ -93,7 +93,7 @@ export function useBlueprintRecipePresenter(store: {
     const data = store.blueprintsData.value
     if (!data || !selectedClassId.value) return []
 
-    let result = data.blueprints.filter(bp => bp.class === selectedClassId.value)
+    let result = data.blueprints.filter(bp => bp.class === selectedClassId.value && !bp.noplayerblueprint)
 
     const q = searchQuery.value.toLowerCase().trim()
     if (q) {

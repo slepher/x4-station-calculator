@@ -1252,5 +1252,6 @@
   "blueprint_recipe.results": "条结果",
   "blueprint_recipe.no_results": "无匹配结果",
   "blueprint_recipe.mission_only": "任务专属",
+  "blueprint_recipe.show_noplayer": "显示不可获取",
   "blueprint_recipe.no_player_blueprint": "不可获取"
 }
