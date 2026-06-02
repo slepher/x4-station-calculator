@@ -13,6 +13,65 @@ from processor.utils.math_utils import as_float, as_number, rgb_to_hex
 from processor.map.calculator import compute_spline_length
 
 
+def load_color_map_from_xml(colors_xml_path: Path) -> Dict[str, str]:
+    """从 XML 加载颜色映射。"""
+    if not colors_xml_path.exists():
+        return {}
+    root = parse_xml(colors_xml_path)
+    color_map: Dict[str, str] = {}
+    for color_node in root.findall(".//colors/color[@id]"):
+        color_id = (color_node.get("id") or "").strip()
+        if not color_id:
+            continue
+        r = int(as_float(color_node.get("r"), 0.0))
+        g = int(as_float(color_node.get("g"), 0.0))
+        b = int(as_float(color_node.get("b"), 0.0))
+        color_map[color_id] = rgb_to_hex(r, g, b)
+    for mapping_node in root.findall(".//mappings/mapping[@id]"):
+        mapping_id = (mapping_node.get("id") or "").strip()
+        ref_id = (mapping_node.get("ref") or "").strip()
+        if mapping_id and ref_id and ref_id in color_map:
+            color_map[mapping_id] = color_map[ref_id]
+    return color_map
+
+
+def migrate_factions(
+    factions_xml_path: Path,
+    colors_xml_path: Path,
+    i18n_registry=None,
+) -> Tuple[List[dict], Dict[str, dict]]:
+    """迁移派系数据。"""
+    if not factions_xml_path.exists():
+        return [], {}
+    colors_by_name = load_color_map_from_xml(colors_xml_path)
+    factions_root = parse_xml(factions_xml_path)
+    rows: List[dict] = []
+    by_id: Dict[str, dict] = {}
+    for node in factions_root.findall("./faction[@id]"):
+        faction_id = (node.get("id") or "").strip()
+        if not faction_id:
+            continue
+        name_id = (node.get("name") or "").strip()
+        name = i18n_registry.get_name(name_id, "en") if name_id else ""
+        tags = split_tags(node.get("tags"))
+        color_node = node.find("./color")
+        color_name = (color_node.get("ref") if color_node is not None else "") or ""
+        color = colors_by_name.get(color_name, "#4b5563")
+        item = {
+            "id": faction_id,
+            "name": name,
+            "nameId": name_id,
+            "tags": tags,
+            "color_name": color_name,
+            "color": color,
+            "claimspace": "claimspace" in tags,
+        }
+        rows.append(item)
+        by_id[faction_id] = item
+    rows.sort(key=lambda item: item["id"])
+    return rows, by_id
+
+
 def build_boundary(node: Optional[ET.Element]) -> Optional[dict]:
     """
     构建边界对象。

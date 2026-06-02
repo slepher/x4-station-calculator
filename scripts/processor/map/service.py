@@ -17,9 +17,7 @@ from processor.resource.modern_processor import (
 )
 from processor.resource.legacy_processor import migrate_regionyields
 from processor.map.generator import generate_map_data
-import importlib as _imp
-_mig = _imp.import_module("scripts.x4-game.factions.converter")
-migrate_factions = _mig.migrate_factions
+from processor.map.converter import migrate_factions
 from processor.output_manager import (
     write_regionyields,
     write_factions,
@@ -96,6 +94,7 @@ def process_map_for_version(
     factions_rows, factions_by_id = migrate_factions(
         factions_xml_path=factions_xml_path,
         colors_xml_path=colors_xml_path,
+        i18n_registry=registry,
     )
     write_factions(factions_rows, factions_output_path)
 
