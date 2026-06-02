@@ -1191,7 +1191,7 @@
     <properties>
       <identification name="{20107,3204}" basename="{20107,3201}" shortname="{20107,3205}" makerrace="khaak" description="{20107,3202}" mk="1"/>
       <thrust forward="5058" reverse="5564"/>
-      <hull max="7500" threshold="0.3" integrated="1" scrapware="rawkhaakscrap"/>
+      <hull max="7500" threshold="0.3" integrated="1" noscrap="1"/>
       <effects>
         <traveling ref="gen_traveldrive_fx_l"/>
       </effects>
@@ -1309,7 +1309,7 @@
     <properties>
       <identification name="{20107,4204}" basename="{20107,4201}" shortname="{20107,4205}" makerrace="khaak" description="{20107,4202}" mk="1"/>
       <thrust forward="36000" reverse="39000"/>
-      <hull max="150000" threshold="0.3" scrapware="rawkhaakscrap"/>
+      <hull max="150000" threshold="0.3" noscrap="1"/>
       <effects>
         <traveling ref="gen_traveldrive_fx_xl"/>
       </effects>
@@ -6110,11 +6110,11 @@
     <properties>
       <identification name="{20106,3214}" basename="{20106,3211}" shortname="{20106,3215}" makerrace="khaak" description="{20106,3212}" mk="1"/>
       <recharge max="135000" rate="240" delay="8" disruptionstability="10"/>
-      <hull max="2400" scrapware="rawkhaakscrap"/>
+      <hull max="2400" noscrap="1"/>
       <effects>
+        <sefx_damage_high ref="surfacemodule_damage_l_high"/>
         <sefx_damage_low ref="surfacemodule_damage_l_low"/>
         <sefx_damage_medium ref="surfacemodule_damage_l_medium"/>
-        <sefx_damage_high ref="surfacemodule_damage_l_high"/>
       </effects>
     </properties>
   </macro>
@@ -6155,7 +6155,7 @@
     <properties>
       <identification name="{20106,4154}" basename="{20106,4151}" shortname="{20106,4155}" makerrace="khaak" description="{20106,4152}" mk="1"/>
       <recharge max="150000" rate="400" delay="8" disruptionstability="10"/>
-      <hull max="7000" scrapware="rawkhaakscrap"/>
+      <hull max="7000" noscrap="1"/>
     </properties>
   </macro>
   <macro name="shield_par_l_standard_01_mk1_macro" class="shieldgenerator">
@@ -8112,7 +8112,7 @@
       <bullet class="bullet_kha_turret_l_beam_01_mk1_macro"/>
       <rotationspeed max="25"/>
       <rotationacceleration max="40"/>
-      <hull max="3000" threshold="0.2" integrated="1" scrapware="rawkhaakscrap"/>
+      <hull max="3000" threshold="0.2" integrated="1" noscrap="1"/>
       <effects>
         <sefx_damage_high ref="surfacemodule_damage_l_high"/>
         <sefx_damage_low ref="surfacemodule_damage_l_low"/>
@@ -10308,7 +10308,7 @@
       <identification name="{20105,3084}" basename="{20105,3081}" description="{20105,3082}"/>
       <bullet class="bullet_kha_l_beam_02_mk1_macro"/>
       <heat overheat="10000" cooldelay="2" overheatcooldelay="2" coolrate="1000" reenable="1"/>
-      <hull scrapware="rawkhaakscrap"/>
+      <hull noscrap="1"/>
       <effects>
         <firing stop="stopshooting_kha_l_destroyer_01_mk1"/>
       </effects>
@@ -10346,6 +10346,7 @@
       <identification name="{20105,3074}" basename="{20105,3071}" description="{20105,3072}"/>
       <bullet class="bullet_kha_xl_beam_01_mk1_macro"/>
       <heat overheat="10000" cooldelay="0" coolrate="1000" reenable="1"/>
+      <hull noscrap="1"/>
       <effects>
         <firing stop="stopshooting_kha_xl_beam_01_mk1"/>
       </effects>
