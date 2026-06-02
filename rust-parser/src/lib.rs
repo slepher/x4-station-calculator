@@ -1,6 +1,9 @@
+mod blueprints;
 mod core;
 mod model;
+mod research;
 mod stream;
+mod terraforming;
 
 #[cfg(test)]
 mod tests;
@@ -25,6 +28,10 @@ impl SaveParser {
 
     pub fn set_expected_total_bytes(&mut self, total: usize) {
         self.inner.set_expected_total_bytes(total);
+    }
+
+    pub fn set_expected_total_sectors(&mut self, total: usize) {
+        self.inner.set_expected_total_sectors(total);
     }
 
     pub fn set_expected_version(&mut self, version: &str) {

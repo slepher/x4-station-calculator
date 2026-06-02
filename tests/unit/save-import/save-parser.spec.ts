@@ -48,6 +48,21 @@ describe('save parser core (simplified)', () => {
       relative_position: { x: 5, y: 6, z: 7 }
     })
   })
+
+  it('stops parsing after closing universe and ignores later save sections', async () => {
+    const runtime = createSaveParserRuntime()
+
+    runtime.feed('<savegame><info><game guid="GUID-U" seed="1" time="2" version="800"/><player name="p"/></info>')
+    runtime.feed('<universe><component class="sector" macro="sec_alpha" known="1"></component></universe>')
+    expect(runtime.isDone()).toBe(true)
+    runtime.feed('<economylog><entries><entry id="ignored">')
+
+    const archive = runtime.close('universe.xml')
+
+    expect(archive.meta.guid).toBe('GUID-U')
+    expect(archive.sectors.sec_alpha?.name).toBe('sec_alpha')
+    expect(runtime.getProgress().sectorsCount).toBe(1)
+  })
 })
 
 describe('save parser (Rust WASM streaming)', () => {

@@ -407,7 +407,7 @@ const showArchiveModuleList = computed(() => {
 }
 
 .overview-left-panel .panel-content {
-  @apply p-4 flex flex-col gap-4;
+  @apply p-4 flex flex-col gap-4 max-h-none overflow-visible;
 }
 
 .panel-card {

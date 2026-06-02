@@ -23,6 +23,7 @@ type RustSaveParserLike = {
   finish_input: () => void
   set_expected_version?: (version: string) => void
   set_expected_total_bytes?: (total: number) => void
+  set_expected_total_sectors?: (total: number) => void
 }
 
 function pumpRustParser(options: {
@@ -50,13 +51,14 @@ function pumpRustParser(options: {
 }
 
 type WorkerInputMessage =
-  | { type: 'parse_start'; filename?: string; currentVersion?: string; expectedTotalBytes?: number }
+  | { type: 'parse_start'; filename?: string; currentVersion?: string; expectedTotalBytes?: number; expectedTotalSectors?: number }
   | { type: 'parse_chunk'; chunk?: ArrayBuffer; sentAtMs?: number; chunkIndex?: number }
   | { type: 'parse_end' }
 
 type RustParseSession = {
   pushChunk: (chunk: Uint8Array) => Promise<boolean>
   finish: () => Promise<boolean>
+  isFinalized: () => boolean
 }
 
 function createRustParseSession(options: {
@@ -64,6 +66,7 @@ function createRustParseSession(options: {
   filename: string
   currentVersion?: string
   expectedTotalBytes?: number
+  expectedTotalSectors?: number
   postProgress: (info: ProgressInfo) => void
   postComplete: (archive: unknown) => void
   postError: (message: string, detail?: unknown) => void
@@ -89,12 +92,28 @@ function createRustParseSession(options: {
     onError: handleParserError
   })
   options.parser.set_expected_total_bytes?.(options.expectedTotalBytes ?? 0)
+  options.parser.set_expected_total_sectors?.(options.expectedTotalSectors ?? 0)
+
+  const completeIfDone = () => {
+    if (finalized || failed) return false
+    const progress = JSON.parse(options.parser.progress_json()) as ProgressInfo
+    if (!progress.done) return false
+    finalized = true
+    const result = options.parser.finish(options.filename || '')
+    const archive = JSON.parse(result) as SaveArchive
+    options.postProgress(progress)
+    options.postComplete(archive)
+    return true
+  }
 
   return {
     async pushChunk(chunk: Uint8Array) {
       if (finalized || failed || chunk.length === 0) return false
       options.parser.push_chunk(chunk)
-      return pumpNow()
+      const ok = pumpNow()
+      if (!ok) return false
+      completeIfDone()
+      return !finalized
     },
     async finish() {
       if (finalized || failed) return false
@@ -107,6 +126,9 @@ function createRustParseSession(options: {
       const archive = JSON.parse(result) as SaveArchive
       options.postComplete(archive)
       return true
+    },
+    isFinalized() {
+      return finalized || failed
     }
   }
 }
@@ -151,6 +173,7 @@ if (typeof self !== 'undefined' && typeof (self as unknown as { importScripts: u
             filename: e.data.filename || '',
             currentVersion: e.data.currentVersion || '8.0',
             expectedTotalBytes: e.data.expectedTotalBytes,
+            expectedTotalSectors: e.data.expectedTotalSectors,
             postProgress,
             postComplete,
             postError
@@ -168,6 +191,10 @@ if (typeof self !== 'undefined' && typeof (self as unknown as { importScripts: u
         }
 
         if (e.data.type === 'parse_end') {
+          if (session.isFinalized()) {
+            session = null
+            return
+          }
           if (lastProgressSnapshot) {
             postProgress({
               ...lastProgressSnapshot,

@@ -1,4 +1,4 @@
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Serialize, Serializer};
 use std::collections::HashMap;
 
 #[derive(Clone, Copy, Debug, Serialize, PartialEq, Eq)]
@@ -323,14 +323,96 @@ pub(crate) struct SectorData {
     pub(crate) abandoned_ships: HashMap<String, AbandonedShipEntry>,
 }
 
-#[derive(Clone, Serialize)]
-pub(crate) struct SaveArchive {
-    pub(crate) meta: ArchiveMeta,
-    pub(crate) sectors: HashMap<String, SectorData>,
-    #[serde(rename = "isCompatible")]
-    pub(crate) is_compatible: bool,
-    #[serde(rename = "isValid")]
-    pub(crate) is_valid: bool,
+#[derive(Clone, Serialize, Default)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct SaveResearchRuntime {
+    pub(crate) visible_ids: Vec<String>,
+    pub(crate) completed_ids: Vec<String>,
+    #[serde(serialize_with = "serialize_option_str_or_null")]
+    pub(crate) active_id: Option<String>,
+}
+
+fn serialize_option_str_or_null<S: Serializer>(
+    v: &Option<String>,
+    s: S,
+) -> Result<S::Ok, S::Error> {
+    match v {
+        Some(val) => s.serialize_str(val),
+        None => s.serialize_none(),
+    }
+}
+
+#[derive(Clone, Serialize, Deserialize)]
+pub(crate) struct SaveTerraformingRebateAmount {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) ware: Option<String>,
+    #[serde(rename = "wareGroup")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) ware_group: Option<String>,
+    pub(crate) amount: i64,
+}
+
+#[derive(Clone, Serialize, Deserialize)]
+pub(crate) struct SaveTerraformingEventProgress {
+    #[serde(rename = "eventId")]
+    pub(crate) event_id: String,
+    #[serde(rename = "completedCount")]
+    pub(crate) completed_count: i64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "startTime")]
+    pub(crate) start_time: Option<f64>,
+}
+
+#[derive(Clone, Serialize, Deserialize)]
+pub(crate) struct SaveTerraformingProjectProgress {
+    #[serde(rename = "projectId")]
+    pub(crate) project_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) aborted: Option<bool>,
+    #[serde(rename = "scaledResources")]
+    pub(crate) scaled_resources: Vec<WareAmount>,
+    #[serde(rename = "submittedResources")]
+    pub(crate) submitted_resources: Vec<WareAmount>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "inTransitResources")]
+    pub(crate) in_transit_resources: Option<Vec<WareAmount>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "inTransitShipBatches")]
+    pub(crate) in_transit_ship_batches: Option<i64>,
+}
+
+#[derive(Clone, Serialize, Deserialize)]
+pub(crate) struct SaveTerraformingCompletedProject {
+    #[serde(rename = "projectId")]
+    pub(crate) project_id: String,
+    #[serde(rename = "completedCount")]
+    pub(crate) completed_count: i64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "startTime")]
+    pub(crate) start_time: Option<f64>,
+}
+
+#[derive(Clone, Serialize, Deserialize)]
+pub(crate) struct SaveTerraformingCluster {
+    #[serde(rename = "clusterId")]
+    pub(crate) cluster_id: String,
+    pub(crate) part: String,
+    pub(crate) seed: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "missionCue")]
+    pub(crate) mission_cue: Option<String>,
+    #[serde(rename = "missionComplete")]
+    pub(crate) mission_complete: bool,
+    pub(crate) stats: HashMap<String, f64>,
+    pub(crate) rebates: Vec<SaveTerraformingRebateAmount>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "activeProject")]
+    pub(crate) active_project: Option<SaveTerraformingProjectProgress>,
+    #[serde(rename = "completedProjects")]
+    pub(crate) completed_projects: Vec<SaveTerraformingCompletedProject>,
+    #[serde(rename = "retainedProjects")]
+    pub(crate) retained_projects: Vec<SaveTerraformingProjectProgress>,
+    pub(crate) events: Vec<SaveTerraformingEventProgress>,
 }
 
 #[derive(Clone, Serialize)]
@@ -350,6 +432,21 @@ pub(crate) struct ArchiveMeta {
     )]
     pub(crate) post_processor_version: Option<String>,
     pub(crate) source: String,
+}
+
+#[derive(Clone, Serialize)]
+pub(crate) struct SaveArchive {
+    pub(crate) meta: ArchiveMeta,
+    pub(crate) sectors: HashMap<String, SectorData>,
+    #[serde(rename = "isCompatible")]
+    pub(crate) is_compatible: bool,
+    #[serde(rename = "isValid")]
+    pub(crate) is_valid: bool,
+    pub(crate) research: SaveResearchRuntime,
+    #[serde(rename = "terraforming_clusters")]
+    pub(crate) terraforming_clusters: HashMap<String, SaveTerraformingCluster>,
+    #[serde(rename = "playerBlueprints")]
+    pub(crate) player_blueprints: Vec<String>,
 }
 
 pub(crate) fn norm_ver(v: &str) -> String {

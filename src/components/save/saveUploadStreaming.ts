@@ -2,6 +2,7 @@ type StreamFileToSaveParserWorkerOptions = {
   worker: Worker
   file: File
   currentVersion: string
+  expectedTotalSectors?: number
 }
 
 async function getExpectedTotalBytes(file: File): Promise<number> {
@@ -27,31 +28,49 @@ function toTransferableBuffer(chunk: Uint8Array): ArrayBuffer {
 }
 
 export async function streamFileToSaveParserWorker(options: StreamFileToSaveParserWorkerOptions) {
-  const { worker, file, currentVersion } = options
+  const { worker, file, currentVersion, expectedTotalSectors } = options
   const expectedTotalBytes = await getExpectedTotalBytes(file)
-
-  worker.postMessage({
-    type: 'parse_start',
-    filename: file.name,
-    currentVersion,
-    expectedTotalBytes
-  })
-
-  const reader = file.stream().getReader()
-  let sourceChunkCount = 0
-  while (true) {
-    const { done, value } = await reader.read()
-    if (done) break
-    if (!value || value.length === 0) continue
-    sourceChunkCount += 1
-    const transferable = toTransferableBuffer(value)
-    worker.postMessage({
-      type: 'parse_chunk',
-      chunk: transferable,
-      sentAtMs: Date.now(),
-      chunkIndex: sourceChunkCount
-    }, [transferable])
+  let workerFinished = false
+  const onWorkerMessage = (event: MessageEvent<{ type?: string }>) => {
+    if (event.data?.type === 'complete' || event.data?.type === 'error') {
+      workerFinished = true
+    }
   }
+  worker.addEventListener('message', onWorkerMessage)
 
-  worker.postMessage({ type: 'parse_end' })
+  try {
+    worker.postMessage({
+      type: 'parse_start',
+      filename: file.name,
+      currentVersion,
+      expectedTotalBytes,
+      expectedTotalSectors
+    })
+
+    const reader = file.stream().getReader()
+    let sourceChunkCount = 0
+    while (true) {
+      if (workerFinished) {
+        await reader.cancel()
+        break
+      }
+      const { done, value } = await reader.read()
+      if (done) break
+      if (!value || value.length === 0) continue
+      sourceChunkCount += 1
+      const transferable = toTransferableBuffer(value)
+      worker.postMessage({
+        type: 'parse_chunk',
+        chunk: transferable,
+        sentAtMs: Date.now(),
+        chunkIndex: sourceChunkCount
+      }, [transferable])
+    }
+
+    if (!workerFinished) {
+      worker.postMessage({ type: 'parse_end' })
+    }
+  } finally {
+    worker.removeEventListener('message', onWorkerMessage)
+  }
 }

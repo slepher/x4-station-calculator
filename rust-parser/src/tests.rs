@@ -386,4 +386,171 @@ mod tests {
         assert_eq!(overrides.sell[1].ware, "quantumtubes");
         assert_eq!(overrides.sell[1].amount, 3000);
     }
+
+    #[test]
+    fn research_runtime_serializes_with_null_active_id() {
+        let r = crate::model::SaveResearchRuntime::default();
+        let json = serde_json::to_string(&r).unwrap();
+        assert!(
+            json.contains("\"activeId\":null"),
+            "expected activeId:null, got: {}",
+            json
+        );
+    }
+
+    #[test]
+    fn research_runtime_serializes_with_active_id() {
+        let r = crate::model::SaveResearchRuntime {
+            visible_ids: vec!["research_a".into()],
+            completed_ids: vec!["research_b".into()],
+            active_id: Some("research_c".into()),
+        };
+        let json = serde_json::to_string(&r).unwrap();
+        assert!(
+            json.contains("\"visibleIds\":[\"research_a\"]"),
+            "got: {}",
+            json
+        );
+        assert!(
+            json.contains("\"completedIds\":[\"research_b\"]"),
+            "got: {}",
+            json
+        );
+        assert!(
+            json.contains("\"activeId\":\"research_c\""),
+            "got: {}",
+            json
+        );
+    }
+
+    #[test]
+    fn parses_research_runtime_from_player_and_hq_production_components() {
+        let xml = r#"<savegame><info><game guid="g" seed="1" time="2" version="8.0"/><player name="p"/></info><component class="player" macro="player_macro"><entries type="researchables"><entry id="research_a"/><entry id="not_research"/></entries><research><research ware="research_done" method="research"/><research ware="research_trade" method="trade"/></research></component><component class="production" macro="landmarks_player_hq_01_research_macro"><production state="waitingforresources"><queue ware="research_warp_hq_02" method="research"><insufficient><ware ware="fieldcoils" amount="1"/></insufficient></queue></production></component></savegame>"#;
+
+        let mut parser = StreamingSaveParser::new(Some("8.0".to_string()));
+        parser.push_chunk(xml.as_bytes());
+        parser.finish_input();
+        while parser.pump(4096) {}
+
+        let archive = parser.finish_archive("research.xml").expect("archive");
+
+        assert_eq!(archive.research.visible_ids, vec!["research_a"]);
+        assert_eq!(archive.research.completed_ids, vec!["research_done"]);
+        assert_eq!(
+            archive.research.active_id.as_deref(),
+            Some("research_warp_hq_02")
+        );
+    }
+
+    #[test]
+    fn parses_terraforming_ship_count_and_in_transit_resources() {
+        let xml = r#"<savegame><info><game guid="g" seed="1" time="2" version="8.0"/><player name="p"/></info><component class="cluster" macro="cluster_26_macro"><terraforming part="planet001b" seed="seed" active="agr_hydroponics" missioncomplete="0"><stats><stat id="temperature" value="9"/></stats><projects><project id="agr_hydroponics" starttime="123"><scaledresources><ware ware="energycells" amount="100"/></scaledresources><deliveredresources><ware ware="energycells" amount="40"/></deliveredresources><ships><ship id="[0x1]"><cargo><ware ware="energycells" amount="10"/><ware ware="hullparts" amount="3"/></cargo></ship><ship id="[0x2]"><cargo><ware ware="energycells" amount="2"/></cargo></ship></ships><predecessors><projects><project id="nested_reference"/></projects></predecessors></project></projects><events><event id="evt_done" completed="2" starttime="456"/><event id="evt_pending"/></events><rebates><rebate ware="energycells" amount="5"/></rebates></terraforming></component></savegame>"#;
+
+        let mut parser = StreamingSaveParser::new(Some("8.0".to_string()));
+        parser.push_chunk(xml.as_bytes());
+        parser.finish_input();
+        while parser.pump(4096) {}
+
+        let archive = parser.finish_archive("terraforming.xml").expect("archive");
+        let cluster = archive
+            .terraforming_clusters
+            .get("cluster_26_macro")
+            .expect("terraforming cluster");
+        let active = cluster.active_project.as_ref().expect("active project");
+
+        assert_eq!(cluster.cluster_id, "cluster_26_macro");
+        assert_eq!(cluster.stats["temperature"], 9.0);
+        assert_eq!(active.project_id, "agr_hydroponics");
+        assert_eq!(active.in_transit_ship_batches, Some(2));
+        let in_transit_resources = active
+            .in_transit_resources
+            .as_ref()
+            .expect("in-transit resources");
+        assert_eq!(in_transit_resources.len(), 2);
+        assert_eq!(in_transit_resources[0].ware, "energycells");
+        assert_eq!(in_transit_resources[0].amount, 12);
+        assert_eq!(in_transit_resources[1].ware, "hullparts");
+        assert_eq!(in_transit_resources[1].amount, 3);
+        assert!(cluster.completed_projects.is_empty());
+        assert_eq!(cluster.events.len(), 1);
+        assert_eq!(cluster.events[0].completed_count, 2);
+        assert_eq!(cluster.rebates[0].amount, 5);
+    }
+
+    #[test]
+    fn omits_in_transit_fields_when_project_has_no_ships() {
+        let xml = r#"<savegame><info><game guid="g" seed="1" time="2" version="8.0"/><player name="p"/></info><component class="cluster" macro="cluster_no_ships"><terraforming part="planet" seed="seed" active="atm_methane_oxidize"><projects><project id="atm_methane_oxidize"><scaledresources><ware ware="energycells" amount="100"/></scaledresources><deliveredresources><ware ware="energycells" amount="40"/></deliveredresources></project></projects></terraforming></component></savegame>"#;
+
+        let mut parser = StreamingSaveParser::new(Some("8.0".to_string()));
+        parser.push_chunk(xml.as_bytes());
+        parser.finish_input();
+        while parser.pump(4096) {}
+
+        let archive = parser
+            .finish_archive("terraforming-no-ships.xml")
+            .expect("archive");
+        let cluster = archive
+            .terraforming_clusters
+            .get("cluster_no_ships")
+            .expect("terraforming cluster");
+        let active = cluster.active_project.as_ref().expect("active project");
+        let json = serde_json::to_value(active).expect("active project json");
+
+        assert!(active.in_transit_resources.is_none());
+        assert_eq!(active.in_transit_ship_batches, None);
+        assert!(json.get("inTransitResources").is_none(), "got: {}", json);
+        assert!(json.get("inTransitShipBatches").is_none(), "got: {}", json);
+    }
+
+    #[test]
+    fn stops_after_universe_and_ignores_later_save_sections() {
+        let xml = r#"<savegame><info><game guid="g" seed="1" time="2" version="8.0"/><player name="p"/></info><universe><component class="sector" macro="sec_alpha" knownto="player"></component></universe><economylog><entries><log id="ignored"/></entries></economylog></savegame>"#;
+
+        let mut parser = StreamingSaveParser::new(Some("8.0".to_string()));
+        parser.push_chunk(xml.as_bytes());
+
+        while parser.pump(4096) {}
+
+        let progress = serde_json::from_str::<serde_json::Value>(&parser.progress_json())
+            .expect("progress json");
+        let archive = parser.finish_archive("universe.xml").expect("archive");
+
+        assert_eq!(archive.sectors.len(), 1);
+        assert_eq!(progress["done"], true);
+        assert_eq!(progress["phase"], "done");
+    }
+
+    #[test]
+    fn gzip_stream_can_finish_before_compressed_input_is_exhausted_after_universe() {
+        let mut xml = String::from(
+            r#"<savegame><info><game guid="g" seed="1" time="2" version="8.0"/><player name="p"/></info><universe><component class="sector" macro="sec_alpha" knownto="player"></component></universe><economylog><entries>"#,
+        );
+        for i in 0..20_000 {
+            xml.push_str(&format!(r#"<log id="{i}" value="{}"/>"#, i * 17));
+        }
+        xml.push_str("</entries></economylog></savegame>");
+
+        let mut encoder = GzEncoder::new(Vec::new(), Compression::none());
+        encoder.write_all(xml.as_bytes()).expect("write gzip");
+        let gzipped = encoder.finish().expect("finish gzip");
+
+        let mut parser = StreamingSaveParser::new(Some("8.0".to_string()));
+        parser.set_expected_total_bytes(xml.len());
+        let mut consumed = 0usize;
+        for chunk in gzipped.chunks(512) {
+            consumed += chunk.len();
+            parser.push_chunk(chunk);
+            while parser.pump(128) {}
+            let progress = serde_json::from_str::<serde_json::Value>(&parser.progress_json())
+                .expect("progress json");
+            if progress["done"] == true {
+                break;
+            }
+        }
+
+        assert!(consumed < gzipped.len(), "gzip stream was fully consumed");
+        let archive = parser.finish_archive("early.xml.gz").expect("archive");
+        assert_eq!(archive.sectors.len(), 1);
+        assert!(archive.sectors.contains_key("sec_alpha"));
+    }
 }

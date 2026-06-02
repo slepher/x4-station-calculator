@@ -9,6 +9,7 @@ export const saveparser_progress_json: (a: number) => [number, number];
 export const saveparser_pump: (a: number, b: number) => number;
 export const saveparser_push_chunk: (a: number, b: number, c: number) => void;
 export const saveparser_set_expected_total_bytes: (a: number, b: number) => void;
+export const saveparser_set_expected_total_sectors: (a: number, b: number) => void;
 export const saveparser_set_expected_version: (a: number, b: number, c: number) => void;
 export const saveparser_take_cli_progress_json: (a: number) => [number, number];
 export const __wbindgen_externrefs: WebAssembly.Table;
