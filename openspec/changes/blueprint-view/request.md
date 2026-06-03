@@ -84,8 +84,9 @@
 - Filter 面板：Faction 嵌套 Licence 折叠结构，三态 checkbox（全选/部分/全不选），排除语义（不勾选=隐藏，勾选=显示），切换 class 时不重置值
 - 每个 licence 前显示需求声望（`ceil(10 * log10(minrelation * 1000))`），按声望升序排列，无 minrelation 排最后
 - `noblueprintsale` / `nodiplomacyselection` faction 不显示 licence 子项，仅显示简单 faction checkbox
+- 无 faction 的 blueprint 归入「通用」分组，仅显示 checkbox 无 licence，全局联动
 - 未选中 class 时不显示 checkbox
-- 全局全选/取消影响所有 class 的 faction/licence，不限于当前显示
+- 全局全选/取消影响所有 class 的 faction/licence，含通用分组
 - 蓝图列表：名称+价格同行，factions+licences 独立区域
 - licence 名称优先取 faction 专属 nameId，全局 fallback，无匹配时显示 type id
 - `noplayerblueprint` 蓝图默认隐藏

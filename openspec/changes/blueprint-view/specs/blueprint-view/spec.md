@@ -121,7 +121,15 @@ Filter 面板 SHALL 以 faction → licence 嵌套结构替代独立的 licence 
 
 - **前提** 全局 Factions checkbox 被点击
 - **当** 全选或取消
-- **那么** SHALL 影响所有 class 的 faction/licence 组合，不限于当前显示
+- **那么** SHALL 影响所有 class 的 faction/licence 组合，含通用分组，不限于当前显示
+
+#### Scenario: no-faction blueprints in generic group
+
+- **前提** 当前 scope 存在无 faction 的 blueprint
+- **当** 渲染 filter 面板
+- **那么** SHALL 在底部显示「通用」分组
+- **并且** SHALL 仅显示一个 checkbox，无 licence 子项
+- **并且** 通用分组的勾选状态 SHALL 与全局 checkbox 联动
 
 ### Requirement: Search and Filter
 

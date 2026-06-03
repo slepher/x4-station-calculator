@@ -27,6 +27,7 @@ const noblueprintsaleFactions = computed(() => {
   for (const f of factions.value) {
     if (f.noblueprintsale || f.nodiplomacyselection) set.add(f.id)
   }
+  set.add('__generic__')
   return set
 })
 

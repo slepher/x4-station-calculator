@@ -1254,6 +1254,7 @@
   "blueprint_recipe.mission_only": "任务专属",
   "blueprint_recipe.no_player_blueprint": "不可获取",
   "blueprint_recipe.factions": "势力",
+  "blueprint_recipe.generic": "通用",
   "licence.generaluseequipment": "通用装备执照",
   "licence.station_gen_basic": "基础模块执照",
   "licence.generaluseship": "通用飞船执照",

@@ -2,6 +2,8 @@ import { computed, ref, type Ref, type ComputedRef } from 'vue'
 import i18n from '@/i18n'
 import type { BlueprintsData, X4Blueprint, BlueprintTypeCategory, BlueprintClassCategory, X4Faction } from '@/types/x4'
 
+const GENERIC_FACTION_ID = '__generic__'
+
 export interface FactionLicenceEntry {
   factionId: string
   factionName: string
@@ -144,8 +146,10 @@ export function useBlueprintRecipePresenter(store: {
 
     const merged: Record<string, Record<string, number>> = {}
 
-    if (selectedClassId.value && fb[selectedClassId.value]) {
-      Object.assign(merged, fb[selectedClassId.value])
+    if (selectedClassId.value) {
+      if (fb[selectedClassId.value]) {
+        Object.assign(merged, fb[selectedClassId.value])
+      }
     } else {
       for (const cls of Object.values(fb)) {
         for (const fid of Object.keys(cls)) {
@@ -161,7 +165,7 @@ export function useBlueprintRecipePresenter(store: {
 
     const floop = factionLicenceMap.value
 
-    return Object.entries(merged)
+    const result: FactionLicenceEntry[] = Object.entries(merged)
       .map(([fid, lm]) => ({
         factionId: fid,
         factionName: fdn[fid] || fid,
@@ -178,6 +182,16 @@ export function useBlueprintRecipePresenter(store: {
           }),
       }))
       .sort((a, b) => a.factionName.localeCompare(b.factionName))
+
+    if (classBlueprints.value.some(bp => !bp.factions || bp.factions.length === 0)) {
+      result.push({
+        factionId: GENERIC_FACTION_ID,
+        factionName: t('blueprint_recipe.generic'),
+        licences: [],
+      })
+    }
+
+    return result
   })
 
   const factionCheckState = computed(() => {
@@ -185,6 +199,10 @@ export function useBlueprintRecipePresenter(store: {
     for (const entry of factionLicenceTree.value) {
       const excluded = factionLicenceFilter.value.get(entry.factionId)
       const total = entry.licences.length
+      if (entry.factionId === GENERIC_FACTION_ID) {
+        state[entry.factionId] = excluded ? 'all' : 'none'
+        continue
+      }
       if (!excluded || excluded.size === 0) {
         state[entry.factionId] = 'none'
       } else {
@@ -209,6 +227,11 @@ export function useBlueprintRecipePresenter(store: {
     let hasAll = true
     for (const entry of factionLicenceTree.value) {
       const excluded = factionLicenceFilter.value.get(entry.factionId)
+      if (entry.factionId === GENERIC_FACTION_ID) {
+        if (excluded) hasAny = true
+        else hasAll = false
+        continue
+      }
       const total = entry.licences.length
       if (total === 0) continue
       let relevantExcluded = 0
@@ -263,7 +286,9 @@ export function useBlueprintRecipePresenter(store: {
       result = result.filter(bp => {
         const fs = bp.factions || []
         const l = bp.licence
-        if (fs.length === 0) return true
+        if (fs.length === 0) {
+          return !factionLicenceFilter.value.has(GENERIC_FACTION_ID)
+        }
         if (!l) return true
         return !fs.every(fid => {
           const excluded = factionLicenceFilter.value.get(fid)
@@ -295,6 +320,17 @@ export function useBlueprintRecipePresenter(store: {
   }
 
   function toggleFactionAllLicences(factionId: string) {
+    if (factionId === GENERIC_FACTION_ID) {
+      const next = new Map(factionLicenceFilter.value)
+      if (next.has(GENERIC_FACTION_ID)) {
+        next.delete(GENERIC_FACTION_ID)
+      } else {
+        next.set(GENERIC_FACTION_ID, new Set())
+      }
+      factionLicenceFilter.value = next
+      return
+    }
+
     const entry = allFactionLicenceTree.value.find(e => e.factionId === factionId)
     if (!entry) return
 
@@ -317,6 +353,9 @@ export function useBlueprintRecipePresenter(store: {
       const next = new Map<string, Set<string>>()
       for (const entry of allFactionLicenceTree.value) {
         next.set(entry.factionId, new Set(entry.licences))
+      }
+      if (factionLicenceTree.value.some(e => e.factionId === GENERIC_FACTION_ID)) {
+        next.set(GENERIC_FACTION_ID, new Set())
       }
       factionLicenceFilter.value = next
     }

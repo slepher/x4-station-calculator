@@ -67,6 +67,7 @@ case 'blueprint-recipe': return 'blueprint-recipe'
 - 每个 licence 前显示需求声望，公式 `ceil(10 * log10(minrelation * 1000))`，按声望升序排列
 - licence 名称优先取 faction 专属 nameId，全局 fallback
 - `noblueprintsale` / `nodiplomacyselection` faction 不显示 licence 子项和展开按钮，用占位保持对齐
+- 无 faction 的 blueprint 归入「通用」分组（`__generic__`），仅 checkbox 无 licence，全局 toggle 联动
 - 未选中 class 时隐藏所有 checkbox（filter 树仍可见）
 
 ### 3. 数据来源：blueprints.json 一次性加载
