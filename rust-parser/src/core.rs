@@ -6,6 +6,7 @@ use crate::model::{
     WorkforceEntry,
 };
 use crate::blueprints::BlueprintsParser;
+use crate::faction::FactionParser;
 use crate::research::ResearchParser;
 use crate::terraforming::TerraformingParser;
 use std::collections::{HashMap, VecDeque};
@@ -114,6 +115,7 @@ pub(crate) struct SaveParserCore {
     research: ResearchParser,
     terraforming: TerraformingParser,
     pub(crate) blueprints: BlueprintsParser,
+    faction: FactionParser,
     universe_closed: bool,
 }
 
@@ -142,6 +144,7 @@ impl SaveParserCore {
             research: ResearchParser::default(),
             terraforming: TerraformingParser::default(),
             blueprints: BlueprintsParser::default(),
+            faction: FactionParser::default(),
             universe_closed: false,
         }
     }
@@ -599,6 +602,8 @@ impl SaveParserCore {
 
         self.blueprints.open(name, a, &self.path);
 
+        self.faction.open(name, a, &self.path);
+
         Ok(())
     }
 
@@ -846,6 +851,7 @@ impl SaveParserCore {
         self.research.close(name, &self.path);
         self.terraforming.close(name);
         self.blueprints.close(name);
+        self.faction.close(name);
 
         if name == "universe" {
             self.universe_closed = true;
@@ -887,7 +893,7 @@ impl SaveParserCore {
                 player_name: self.meta.player_name.clone(),
                 version: self.meta.version.clone(),
                 filename: f,
-                parser_version: "v8".into(),
+                parser_version: "v9".into(),
                 post_processor_version: None,
                 source: "original".into(),
             },
@@ -897,6 +903,8 @@ impl SaveParserCore {
             research: self.research.runtime().clone(),
             terraforming_clusters: self.terraforming.clusters().clone(),
             player_blueprints: self.blueprints.blueprints().clone(),
+            player_relations: self.faction.relations().clone(),
+            player_licences: self.faction.licences().clone(),
         })
     }
 

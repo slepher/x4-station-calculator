@@ -314,6 +314,8 @@ export interface PlayerStationsRecord {
     research: SaveResearchRuntime
     terraforming_clusters: Record<string, SaveTerraformingCluster>
     player_blueprints: string[]
+    player_relations: Record<string, number>
+    player_licences: Record<string, string[]>
   }
 }
 
@@ -350,6 +352,8 @@ export interface SaveArchive {
   research?: SaveResearchRuntime
   terraforming_clusters?: Record<string, SaveTerraformingCluster>
   playerBlueprints?: string[]
+  playerRelations?: Record<string, number>
+  playerLicences?: Record<string, string[]>
 }
 
 export interface ArchiveMeta {

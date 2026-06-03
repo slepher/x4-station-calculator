@@ -447,6 +447,10 @@ pub(crate) struct SaveArchive {
     pub(crate) terraforming_clusters: HashMap<String, SaveTerraformingCluster>,
     #[serde(rename = "playerBlueprints")]
     pub(crate) player_blueprints: Vec<String>,
+    #[serde(rename = "playerRelations")]
+    pub(crate) player_relations: HashMap<String, f64>,
+    #[serde(rename = "playerLicences")]
+    pub(crate) player_licences: HashMap<String, Vec<String>>,
 }
 
 pub(crate) fn norm_ver(v: &str) -> String {

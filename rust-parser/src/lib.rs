@@ -1,5 +1,6 @@
 mod blueprints;
 mod core;
+mod faction;
 mod model;
 mod research;
 mod stream;
