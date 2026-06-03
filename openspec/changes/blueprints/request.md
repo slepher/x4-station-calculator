@@ -77,7 +77,29 @@ equipment / missile / consumable / drone 统一 `type: "equipment"`。
 - `PlayerStationsRecord.data.player_blueprints` 同 player_stations/buildstorages/research/terraforming_clusters 平级
 - strip/extract/merge 与 terraforming_clusters 相同模式
 
-### 3. 模块结构
+### 3. faction_blueprints / general_blueprints 汇总数据
+
+在生成 `blueprints.json` 时，额外输出两个汇总结构，供前端 filter panel 使用：
+
+#### 3.1 faction_blueprints
+
+```
+faction_blueprints: { <class>: { <faction>: { <licence>: <count> } } }
+```
+
+- 按 class → faction → licence 三级分组，值为该组合下的蓝图数量
+- 数据来源：遍历 `blueprints` 数组，对每条蓝图的 `class` / `factions` / `licence` 字段做统计
+- `factions` 为空数组或无 `licence` 的蓝图不纳入
+
+#### 3.2 general_blueprints
+
+```
+general_blueprints: { <class>: <count> }
+```
+
+- 按 class 统计所有蓝图总数
+
+### 4. 模块结构
 
 `scripts/x4-game/blueprints/`（仿 `scripts/x4-game/research/`）：
 - `build.py`: 主编排函数 `process_blueprints(loader)`，输出挂载到 `loader.blueprints_data`

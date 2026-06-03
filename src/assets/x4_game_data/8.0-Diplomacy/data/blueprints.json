@@ -15532,5 +15532,1290 @@
       "nameId": "{1001,9620}",
       "type": "module"
     }
-  ]
+  ],
+  "faction_blueprints": {
+    "engine": {
+      "alliance": {
+        "generaluseequipment": 66
+      },
+      "antigone": {
+        "generaluseequipment": 22
+      },
+      "argon": {
+        "generaluseequipment": 22,
+        "envoy_access": 2
+      },
+      "buccaneers": {
+        "generaluseequipment": 44
+      },
+      "hatikvah": {
+        "generaluseequipment": 7
+      },
+      "loanshark": {
+        "generaluseequipment": 22
+      },
+      "scavenger": {
+        "generaluseequipment": 22
+      },
+      "yaki": {
+        "generaluseequipment": 6
+      },
+      "holyorder": {
+        "generaluseequipment": 22
+      },
+      "paranid": {
+        "generaluseequipment": 22
+      },
+      "trinity": {
+        "generaluseequipment": 22
+      },
+      "kaori": {
+        "generaluseequipment": 22
+      },
+      "ministry": {
+        "generaluseequipment": 22,
+        "envoy_access": 2
+      },
+      "scaleplate": {
+        "generaluseequipment": 9,
+        "envoy_access": 1
+      },
+      "teladi": {
+        "generaluseequipment": 22
+      },
+      "xenon": {
+        "generaluseequipment": 3
+      },
+      "court": {
+        "generaluseequipment": 14,
+        "militaryequipment": 10
+      },
+      "freesplit": {
+        "generaluseequipment": 14,
+        "militaryequipment": 8
+      },
+      "split": {
+        "generaluseequipment": 14,
+        "militaryequipment": 10
+      },
+      "pioneers": {
+        "generaluseequipment": 22
+      },
+      "terran": {
+        "generaluseequipment": 24,
+        "capitalequipment": 1
+      },
+      "ownerless": {
+        "capitalequipment": 1,
+        "generaluseequipment": 5
+      },
+      "boron": {
+        "generaluseequipment": 8
+      }
+    },
+    "connectionmodule": {
+      "antigone": {
+        "station_gen_basic": 14
+      },
+      "argon": {
+        "station_gen_basic": 14
+      },
+      "alliance": {
+        "station_gen_basic": 3
+      },
+      "hatikvah": {
+        "station_gen_basic": 3
+      },
+      "ministry": {
+        "station_gen_basic": 3
+      },
+      "teladi": {
+        "station_gen_basic": 9
+      },
+      "pioneers": {
+        "station_gen_basic": 9
+      },
+      "loanshark": {
+        "station_gen_basic": 3
+      },
+      "scavenger": {
+        "station_gen_basic": 3
+      },
+      "kaori": {
+        "station_gen_basic": 3,
+        "station_gen_intermediate": 3
+      },
+      "visitor": {
+        "station_venture": 6
+      },
+      "holyorder": {
+        "station_gen_basic": 8
+      },
+      "paranid": {
+        "station_gen_basic": 8
+      },
+      "trinity": {
+        "station_gen_basic": 8
+      },
+      "freesplit": {
+        "station_gen_basic": 6
+      },
+      "split": {
+        "station_gen_basic": 6
+      },
+      "terran": {
+        "station_gen_basic": 6
+      },
+      "boron": {
+        "station_gen_basic": 9
+      }
+    },
+    "defencemodule": {
+      "antigone": {
+        "station_gen_advanced": 1,
+        "station_gen_intermediate": 2
+      },
+      "argon": {
+        "station_gen_advanced": 1,
+        "station_gen_intermediate": 2
+      },
+      "holyorder": {
+        "station_gen_advanced": 1,
+        "story_paranid_palace_module": 1,
+        "station_gen_intermediate": 2
+      },
+      "paranid": {
+        "station_gen_advanced": 1,
+        "story_paranid_palace_module": 1,
+        "station_gen_intermediate": 2
+      },
+      "trinity": {
+        "station_gen_advanced": 1,
+        "story_paranid_palace_module": 1,
+        "station_gen_intermediate": 2
+      },
+      "ministry": {
+        "station_gen_advanced": 1,
+        "station_gen_intermediate": 2
+      },
+      "teladi": {
+        "station_gen_advanced": 1,
+        "station_gen_intermediate": 2
+      },
+      "freesplit": {
+        "station_gen_advanced": 1,
+        "station_gen_intermediate": 2
+      },
+      "split": {
+        "station_gen_advanced": 1,
+        "station_gen_intermediate": 2
+      },
+      "pioneers": {
+        "station_gen_advanced": 1,
+        "station_gen_intermediate": 2
+      },
+      "terran": {
+        "station_gen_advanced": 1,
+        "station_gen_intermediate": 2
+      },
+      "boron": {
+        "station_gen_advanced": 1,
+        "station_gen_intermediate": 2
+      }
+    },
+    "dockarea": {
+      "antigone": {
+        "station_gen_basic": 4,
+        "station_gen_intermediate": 2,
+        "station_gen_advanced": 1
+      },
+      "argon": {
+        "station_gen_basic": 4,
+        "station_gen_intermediate": 2,
+        "station_gen_advanced": 1
+      },
+      "holyorder": {
+        "station_gen_basic": 4,
+        "station_gen_intermediate": 2
+      },
+      "paranid": {
+        "station_gen_basic": 4,
+        "station_gen_intermediate": 2
+      },
+      "teladi": {
+        "station_gen_basic": 4,
+        "station_gen_intermediate": 2
+      },
+      "trinity": {
+        "station_gen_basic": 4,
+        "station_gen_intermediate": 2
+      },
+      "freesplit": {
+        "station_gen_basic": 4,
+        "station_gen_intermediate": 2
+      },
+      "split": {
+        "station_gen_basic": 4,
+        "station_gen_intermediate": 2
+      },
+      "visitor": {
+        "station_venture": 1
+      },
+      "pioneers": {
+        "station_gen_basic": 1
+      },
+      "terran": {
+        "station_gen_basic": 1
+      },
+      "boron": {
+        "station_gen_basic": 1
+      }
+    },
+    "habitation": {
+      "antigone": {
+        "station_gen_advanced": 1,
+        "station_gen_intermediate": 1,
+        "station_gen_basic": 1
+      },
+      "argon": {
+        "station_gen_advanced": 1,
+        "station_gen_intermediate": 1,
+        "station_gen_basic": 1
+      },
+      "holyorder": {
+        "station_gen_advanced": 1,
+        "station_gen_intermediate": 1,
+        "station_gen_basic": 1
+      },
+      "paranid": {
+        "station_gen_advanced": 1,
+        "station_gen_intermediate": 1,
+        "station_gen_basic": 1
+      },
+      "trinity": {
+        "station_gen_advanced": 1,
+        "station_gen_intermediate": 1,
+        "station_gen_basic": 1
+      },
+      "teladi": {
+        "station_gen_advanced": 1,
+        "station_gen_intermediate": 1,
+        "station_gen_basic": 1
+      },
+      "freesplit": {
+        "station_gen_advanced": 1,
+        "station_gen_intermediate": 1,
+        "station_gen_basic": 1
+      },
+      "split": {
+        "station_gen_advanced": 1,
+        "station_gen_intermediate": 1,
+        "station_gen_basic": 1
+      },
+      "pioneers": {
+        "station_gen_advanced": 1,
+        "station_gen_intermediate": 1,
+        "station_gen_basic": 1
+      },
+      "terran": {
+        "station_gen_advanced": 1,
+        "station_gen_intermediate": 1,
+        "station_gen_basic": 1
+      },
+      "loanshark": {
+        "station_gen_advanced": 1,
+        "station_gen_intermediate": 1,
+        "station_gen_basic": 1
+      },
+      "scavenger": {
+        "station_gen_advanced": 1,
+        "station_gen_intermediate": 1,
+        "station_gen_basic": 1
+      },
+      "boron": {
+        "station_gen_advanced": 1,
+        "station_gen_intermediate": 1,
+        "station_gen_basic": 1
+      },
+      "kaori": {
+        "station_gen_advanced": 2
+      }
+    },
+    "pier": {
+      "argon": {
+        "station_gen_basic": 3
+      },
+      "antigone": {
+        "station_gen_basic": 3
+      },
+      "paranid": {
+        "station_gen_basic": 2
+      },
+      "trinity": {
+        "station_gen_basic": 3
+      },
+      "holyorder": {
+        "station_gen_basic": 2
+      },
+      "ministry": {
+        "station_gen_basic": 3
+      },
+      "teladi": {
+        "station_gen_basic": 3
+      },
+      "freesplit": {
+        "station_gen_basic": 3
+      },
+      "split": {
+        "station_gen_basic": 3
+      },
+      "pioneers": {
+        "station_gen_basic": 5
+      },
+      "terran": {
+        "station_gen_basic": 5
+      },
+      "boron": {
+        "station_gen_basic": 5
+      }
+    },
+    "production": {
+      "antigone": {
+        "station_gen_basic": 18,
+        "station_gen_advanced": 2,
+        "station_gen_intermediate": 4
+      },
+      "argon": {
+        "station_gen_basic": 19,
+        "station_gen_advanced": 4,
+        "station_gen_intermediate": 4
+      },
+      "scaleplate": {
+        "station_illegal": 3,
+        "station_gen_basic": 1
+      },
+      "holyorder": {
+        "station_gen_basic": 18,
+        "station_gen_advanced": 3,
+        "station_gen_intermediate": 4
+      },
+      "paranid": {
+        "station_gen_basic": 19,
+        "station_gen_advanced": 4,
+        "station_gen_intermediate": 3
+      },
+      "teladi": {
+        "station_gen_basic": 24,
+        "station_gen_advanced": 2,
+        "station_gen_intermediate": 4,
+        "station_illegal": 1
+      },
+      "trinity": {
+        "station_gen_basic": 19,
+        "station_gen_advanced": 5,
+        "station_gen_intermediate": 5
+      },
+      "freesplit": {
+        "station_gen_basic": 17,
+        "station_gen_advanced": 5,
+        "station_gen_intermediate": 5
+      },
+      "split": {
+        "station_gen_basic": 18,
+        "station_gen_advanced": 5,
+        "station_gen_intermediate": 5
+      },
+      "boron": {
+        "station_gen_basic": 18,
+        "station_gen_advanced": 5,
+        "station_gen_intermediate": 5
+      },
+      "ministry": {
+        "station_gen_intermediate": 1,
+        "station_gen_advanced": 3,
+        "station_gen_basic": 1
+      },
+      "alliance": {
+        "station_gen_basic": 1
+      },
+      "scavenger": {
+        "station_gen_basic": 1
+      },
+      "hatikvah": {
+        "station_illegal": 2
+      },
+      "pioneers": {
+        "station_gen_basic": 9
+      },
+      "terran": {
+        "station_gen_basic": 8
+      }
+    },
+    "radar": {
+      "alliance": {
+        "station_gen_intermediate": 1
+      },
+      "antigone": {
+        "station_gen_intermediate": 1
+      },
+      "argon": {
+        "station_gen_intermediate": 1
+      },
+      "buccaneers": {
+        "station_gen_intermediate": 1
+      },
+      "hatikvah": {
+        "station_gen_intermediate": 1
+      },
+      "holyorder": {
+        "station_gen_intermediate": 1
+      },
+      "ministry": {
+        "station_gen_intermediate": 1
+      },
+      "paranid": {
+        "station_gen_intermediate": 1
+      },
+      "teladi": {
+        "station_gen_intermediate": 1
+      },
+      "trinity": {
+        "station_gen_intermediate": 1
+      },
+      "court": {
+        "station_gen_intermediate": 1
+      },
+      "freesplit": {
+        "station_gen_intermediate": 1
+      },
+      "split": {
+        "station_gen_intermediate": 1
+      },
+      "pioneers": {
+        "station_gen_intermediate": 1
+      },
+      "terran": {
+        "station_gen_intermediate": 1
+      },
+      "loanshark": {
+        "station_gen_intermediate": 1
+      },
+      "scavenger": {
+        "station_gen_intermediate": 1
+      },
+      "boron": {
+        "station_gen_intermediate": 1
+      },
+      "kaori": {
+        "station_gen_intermediate": 1
+      }
+    },
+    "storage": {
+      "antigone": {
+        "station_gen_basic": 9
+      },
+      "argon": {
+        "station_gen_basic": 9
+      },
+      "holyorder": {
+        "station_gen_basic": 9
+      },
+      "paranid": {
+        "station_gen_basic": 9
+      },
+      "trinity": {
+        "station_gen_basic": 9
+      },
+      "teladi": {
+        "station_gen_basic": 9
+      },
+      "freesplit": {
+        "station_gen_basic": 9
+      },
+      "split": {
+        "station_gen_basic": 9
+      },
+      "pioneers": {
+        "station_gen_basic": 9
+      },
+      "terran": {
+        "station_gen_basic": 9
+      },
+      "scavenger": {
+        "station_gen_advanced": 1,
+        "station_gen_basic": 1
+      },
+      "boron": {
+        "station_gen_basic": 9
+      }
+    },
+    "buildmodule": {
+      "antigone": {
+        "station_equip_sm": 2,
+        "station_equip_lxl": 4
+      },
+      "argon": {
+        "station_equip_sm": 2,
+        "station_equip_lxl": 4
+      },
+      "holyorder": {
+        "station_equip_sm": 2,
+        "station_equip_lxl": 4
+      },
+      "paranid": {
+        "station_equip_sm": 2,
+        "station_equip_lxl": 4
+      },
+      "teladi": {
+        "station_equip_sm": 2,
+        "station_equip_lxl": 4
+      },
+      "trinity": {
+        "station_equip_sm": 2,
+        "station_equip_lxl": 4
+      },
+      "xenon": {
+        "station_equip_sm": 1
+      },
+      "freesplit": {
+        "station_equip_sm": 2,
+        "station_equip_lxl": 4
+      },
+      "split": {
+        "station_equip_sm": 2,
+        "station_equip_lxl": 4
+      },
+      "pioneers": {
+        "station_equip_sm": 2,
+        "station_equip_lxl": 4
+      },
+      "terran": {
+        "station_equip_sm": 2,
+        "station_equip_lxl": 4
+      },
+      "boron": {
+        "station_equip_sm": 2,
+        "station_equip_lxl": 4
+      }
+    },
+    "processingmodule": {
+      "alliance": {
+        "station_gen_basic": 1
+      },
+      "scaleplate": {
+        "station_gen_basic": 1
+      },
+      "teladi": {
+        "station_gen_basic": 1
+      },
+      "pioneers": {
+        "station_gen_basic": 1
+      },
+      "scavenger": {
+        "station_gen_basic": 1
+      }
+    },
+    "ventureplatform": {
+      "visitor": {
+        "station_venture": 1
+      }
+    },
+    "shieldgenerator": {
+      "alliance": {
+        "generaluseequipment": 30
+      },
+      "antigone": {
+        "generaluseequipment": 10
+      },
+      "argon": {
+        "generaluseequipment": 10,
+        "envoy_access": 1
+      },
+      "buccaneers": {
+        "generaluseequipment": 20
+      },
+      "hatikvah": {
+        "generaluseequipment": 4
+      },
+      "yaki": {
+        "generaluseequipment": 8
+      },
+      "loanshark": {
+        "generaluseequipment": 10
+      },
+      "scavenger": {
+        "generaluseequipment": 10
+      },
+      "boron": {
+        "generaluseequipment": 15,
+        "militaryequipment": 3
+      },
+      "holyorder": {
+        "generaluseequipment": 10
+      },
+      "paranid": {
+        "generaluseequipment": 10
+      },
+      "trinity": {
+        "generaluseequipment": 10
+      },
+      "ministry": {
+        "generaluseequipment": 10,
+        "envoy_access": 1
+      },
+      "scaleplate": {
+        "generaluseequipment": 4,
+        "envoy_access": 1
+      },
+      "teladi": {
+        "generaluseequipment": 10
+      },
+      "kaori": {
+        "generaluseequipment": 10
+      },
+      "xenon": {
+        "generaluseequipment": 5
+      },
+      "court": {
+        "generaluseequipment": 6,
+        "militaryequipment": 4
+      },
+      "freesplit": {
+        "generaluseequipment": 5,
+        "militaryequipment": 1
+      },
+      "split": {
+        "generaluseequipment": 6,
+        "militaryequipment": 4
+      },
+      "pioneers": {
+        "generaluseequipment": 14
+      },
+      "terran": {
+        "generaluseequipment": 22,
+        "capitalequipment": 3
+      },
+      "ownerless": {
+        "capitalequipment": 1,
+        "generaluseequipment": 4
+      }
+    },
+    "ship_l": {
+      "argon": {
+        "capitalship": 2,
+        "generaluseship": 7
+      },
+      "buccaneers": {
+        "capitalship": 6,
+        "generaluseship": 25
+      },
+      "hatikvah": {
+        "capitalship": 2,
+        "generaluseship": 14
+      },
+      "scaleplate": {
+        "capitalship": 2
+      },
+      "antigone": {
+        "capitalship": 2,
+        "generaluseship": 7
+      },
+      "paranid": {
+        "capitalship": 2,
+        "generaluseship": 7,
+        "hyperion_access": 1
+      },
+      "trinity": {
+        "capitalship": 3,
+        "generaluseship": 11,
+        "hyperion_access": 1
+      },
+      "holyorder": {
+        "capitalship": 2,
+        "generaluseship": 7,
+        "hyperion_access": 1
+      },
+      "alliance": {
+        "capitalship": 1
+      },
+      "teladi": {
+        "capitalship": 2,
+        "generaluseship": 7
+      },
+      "ministry": {
+        "capitalship": 2,
+        "generaluseship": 7
+      },
+      "kaori": {
+        "generaluseship": 1
+      },
+      "xenon": {
+        "capitalship": 1
+      },
+      "court": {
+        "capitalship": 1,
+        "generaluseship": 3
+      },
+      "freesplit": {
+        "capitalship": 1,
+        "generaluseship": 3
+      },
+      "split": {
+        "capitalship": 1,
+        "generaluseship": 3
+      },
+      "terran": {
+        "capitalship": 2,
+        "generaluseship": 3
+      },
+      "pioneers": {
+        "capitalship": 1,
+        "generaluseship": 3
+      },
+      "loanshark": {
+        "capitalship": 2
+      },
+      "scavenger": {
+        "generaluseship": 1
+      },
+      "boron": {
+        "capitalship": 2,
+        "generaluseship": 3
+      },
+      "ownerless": {
+        "capitalship": 1
+      }
+    },
+    "ship_m": {
+      "argon": {
+        "militaryship": 2,
+        "generaluseship": 4,
+        "envoy_access": 1
+      },
+      "buccaneers": {
+        "militaryship": 10,
+        "generaluseship": 16
+      },
+      "antigone": {
+        "militaryship": 2,
+        "generaluseship": 4
+      },
+      "hatikvah": {
+        "militaryship": 1,
+        "generaluseship": 12
+      },
+      "scaleplate": {
+        "militaryship": 1,
+        "generaluseship": 1,
+        "envoy_access": 1
+      },
+      "kaori": {
+        "generaluseship": 3,
+        "militaryship": 2
+      },
+      "alliance": {
+        "generaluseship": 7
+      },
+      "player": {
+        "generaluseship": 2
+      },
+      "teladi": {
+        "generaluseship": 5,
+        "militaryship": 2
+      },
+      "pioneers": {
+        "generaluseship": 4,
+        "militaryship": 1
+      },
+      "scavenger": {
+        "generaluseship": 1
+      },
+      "paranid": {
+        "militaryship": 2,
+        "generaluseship": 4
+      },
+      "trinity": {
+        "militaryship": 4,
+        "generaluseship": 8
+      },
+      "holyorder": {
+        "militaryship": 2,
+        "generaluseship": 4
+      },
+      "ministry": {
+        "militaryship": 3,
+        "generaluseship": 4,
+        "envoy_access": 1
+      },
+      "xenon": {
+        "militaryship": 2,
+        "generaluseship": 1
+      },
+      "court": {
+        "militaryship": 3,
+        "generaluseship": 3
+      },
+      "split": {
+        "militaryship": 2,
+        "generaluseship": 3
+      },
+      "freesplit": {
+        "militaryship": 1,
+        "generaluseship": 3
+      },
+      "terran": {
+        "militaryship": 3,
+        "generaluseship": 3
+      },
+      "yaki": {
+        "militaryship": 1
+      },
+      "boron": {
+        "militaryship": 2,
+        "generaluseship": 3
+      },
+      "ownerless": {
+        "militaryship": 1
+      }
+    },
+    "ship_s": {
+      "argon": {
+        "generaluseship": 6,
+        "militaryship": 2
+      },
+      "buccaneers": {
+        "generaluseship": 18,
+        "militaryship": 6
+      },
+      "antigone": {
+        "generaluseship": 6,
+        "militaryship": 1
+      },
+      "kaori": {
+        "generaluseship": 4,
+        "militaryship": 1
+      },
+      "alliance": {
+        "generaluseship": 11
+      },
+      "hatikvah": {
+        "generaluseship": 9
+      },
+      "scaleplate": {
+        "generaluseship": 14
+      },
+      "player": {
+        "generaluseship": 2
+      },
+      "paranid": {
+        "generaluseship": 4,
+        "militaryship": 1
+      },
+      "trinity": {
+        "generaluseship": 7,
+        "militaryship": 3
+      },
+      "holyorder": {
+        "generaluseship": 4,
+        "militaryship": 2
+      },
+      "teladi": {
+        "generaluseship": 5,
+        "militaryship": 1
+      },
+      "ministry": {
+        "generaluseship": 5,
+        "militaryship": 1
+      },
+      "xenon": {
+        "militaryship": 1
+      },
+      "court": {
+        "militaryship": 4,
+        "generaluseship": 4
+      },
+      "split": {
+        "militaryship": 2,
+        "generaluseship": 4
+      },
+      "freesplit": {
+        "militaryship": 2,
+        "generaluseship": 3
+      },
+      "pioneers": {
+        "militaryship": 3,
+        "generaluseship": 3
+      },
+      "terran": {
+        "militaryship": 2,
+        "generaluseship": 4
+      },
+      "yaki": {
+        "militaryship": 1
+      },
+      "loanshark": {
+        "militaryship": 4,
+        "generaluseship": 1
+      },
+      "scavenger": {
+        "militaryship": 1,
+        "generaluseship": 1
+      },
+      "boron": {
+        "generaluseship": 4,
+        "militaryship": 2
+      },
+      "ownerless": {
+        "generaluseship": 4,
+        "militaryship": 2
+      }
+    },
+    "ship_xl": {
+      "argon": {
+        "generaluseship": 1,
+        "capitalship": 2,
+        "militaryship": 1
+      },
+      "buccaneers": {
+        "generaluseship": 4,
+        "capitalship": 6,
+        "militaryship": 5
+      },
+      "antigone": {
+        "generaluseship": 1,
+        "capitalship": 2,
+        "militaryship": 1
+      },
+      "alliance": {
+        "generaluseship": 1
+      },
+      "paranid": {
+        "generaluseship": 1,
+        "capitalship": 2,
+        "militaryship": 2
+      },
+      "trinity": {
+        "generaluseship": 2,
+        "capitalship": 3,
+        "militaryship": 3
+      },
+      "holyorder": {
+        "generaluseship": 1,
+        "capitalship": 2,
+        "militaryship": 2
+      },
+      "teladi": {
+        "generaluseship": 1,
+        "capitalship": 1,
+        "militaryship": 1
+      },
+      "ministry": {
+        "generaluseship": 1,
+        "capitalship": 1,
+        "militaryship": 1
+      },
+      "kaori": {
+        "generaluseship": 1
+      },
+      "court": {
+        "generaluseship": 1,
+        "capitalship": 2
+      },
+      "freesplit": {
+        "generaluseship": 1,
+        "capitalship": 2
+      },
+      "split": {
+        "generaluseship": 1,
+        "capitalship": 2
+      },
+      "terran": {
+        "capitalship": 3,
+        "generaluseship": 1
+      },
+      "pioneers": {
+        "generaluseship": 1,
+        "capitalship": 1
+      },
+      "ownerless": {
+        "capitalship": 1
+      },
+      "loanshark": {
+        "generaluseship": 1
+      },
+      "scavenger": {
+        "generaluseship": 1
+      },
+      "boron": {
+        "generaluseship": 1,
+        "capitalship": 2
+      }
+    },
+    "turret": {
+      "alliance": {
+        "capitalequipment": 12,
+        "generaluseequipment": 19,
+        "militaryequipment": 32
+      },
+      "antigone": {
+        "capitalequipment": 4,
+        "generaluseequipment": 6,
+        "militaryequipment": 10
+      },
+      "argon": {
+        "capitalequipment": 4,
+        "generaluseequipment": 6,
+        "militaryequipment": 12,
+        "envoy_access": 1
+      },
+      "buccaneers": {
+        "capitalequipment": 4,
+        "generaluseequipment": 12,
+        "militaryequipment": 18
+      },
+      "loanshark": {
+        "capitalequipment": 4,
+        "generaluseequipment": 6,
+        "militaryequipment": 10
+      },
+      "scavenger": {
+        "capitalequipment": 4,
+        "generaluseequipment": 7,
+        "militaryequipment": 10
+      },
+      "kaori": {
+        "capitalequipment": 4,
+        "generaluseequipment": 6,
+        "militaryequipment": 10
+      },
+      "hatikvah": {
+        "generaluseequipment": 6
+      },
+      "yaki": {
+        "generaluseequipment": 3,
+        "militaryequipment": 4
+      },
+      "boron": {
+        "militaryequipment": 10,
+        "generaluseequipment": 10
+      },
+      "scaleplate": {
+        "generaluseequipment": 5
+      },
+      "teladi": {
+        "generaluseequipment": 7,
+        "capitalequipment": 4,
+        "militaryequipment": 10
+      },
+      "pioneers": {
+        "generaluseequipment": 6,
+        "capitalequipment": 5,
+        "militaryequipment": 2
+      },
+      "holyorder": {
+        "capitalequipment": 4,
+        "generaluseequipment": 6,
+        "militaryequipment": 10
+      },
+      "paranid": {
+        "capitalequipment": 4,
+        "generaluseequipment": 6,
+        "militaryequipment": 10
+      },
+      "trinity": {
+        "capitalequipment": 4,
+        "generaluseequipment": 6,
+        "militaryequipment": 10
+      },
+      "ministry": {
+        "capitalequipment": 4,
+        "generaluseequipment": 6,
+        "militaryequipment": 10,
+        "envoy_access": 1
+      },
+      "xenon": {
+        "generaluseequipment": 3
+      },
+      "court": {
+        "capitalequipment": 5,
+        "generaluseequipment": 5,
+        "militaryequipment": 12
+      },
+      "freesplit": {
+        "capitalequipment": 5,
+        "generaluseequipment": 5,
+        "militaryequipment": 12
+      },
+      "split": {
+        "capitalequipment": 5,
+        "generaluseequipment": 5,
+        "militaryequipment": 10
+      },
+      "terran": {
+        "capitalequipment": 5,
+        "generaluseequipment": 7,
+        "militaryequipment": 6
+      },
+      "ownerless": {
+        "capitalequipment": 2
+      }
+    },
+    "weapon": {
+      "alliance": {
+        "capitalequipment": 2,
+        "militaryequipment": 42,
+        "generaluseequipment": 9
+      },
+      "antigone": {
+        "capitalequipment": 1,
+        "militaryequipment": 28,
+        "generaluseequipment": 8
+      },
+      "argon": {
+        "capitalequipment": 1,
+        "militaryequipment": 32,
+        "generaluseequipment": 8,
+        "envoy_access": 1
+      },
+      "buccaneers": {
+        "capitalequipment": 2,
+        "militaryequipment": 32,
+        "generaluseequipment": 8
+      },
+      "hatikvah": {
+        "capitalequipment": 1,
+        "militaryequipment": 2,
+        "generaluseequipment": 3
+      },
+      "scaleplate": {
+        "capitalequipment": 1,
+        "militaryequipment": 2,
+        "generaluseequipment": 3,
+        "envoy_access": 1
+      },
+      "yaki": {
+        "militaryequipment": 13,
+        "generaluseequipment": 4
+      },
+      "holyorder": {
+        "militaryequipment": 30,
+        "generaluseequipment": 8,
+        "capitalequipment": 1,
+        "hyperion_access": 1
+      },
+      "ministry": {
+        "militaryequipment": 30,
+        "generaluseequipment": 9,
+        "envoy_access": 1
+      },
+      "paranid": {
+        "militaryequipment": 34,
+        "generaluseequipment": 8,
+        "capitalequipment": 1,
+        "hyperion_access": 1
+      },
+      "teladi": {
+        "militaryequipment": 32,
+        "generaluseequipment": 9
+      },
+      "trinity": {
+        "militaryequipment": 36,
+        "generaluseequipment": 8,
+        "capitalequipment": 1,
+        "hyperion_access": 1
+      },
+      "loanshark": {
+        "militaryequipment": 28,
+        "generaluseequipment": 8
+      },
+      "scavenger": {
+        "militaryequipment": 28,
+        "generaluseequipment": 8
+      },
+      "kaori": {
+        "militaryequipment": 30,
+        "generaluseequipment": 8
+      },
+      "court": {
+        "militaryequipment": 32,
+        "generaluseequipment": 8,
+        "capitalequipment": 1
+      },
+      "freesplit": {
+        "militaryequipment": 28,
+        "generaluseequipment": 8,
+        "capitalequipment": 1
+      },
+      "split": {
+        "militaryequipment": 32,
+        "generaluseequipment": 8,
+        "capitalequipment": 1
+      },
+      "pioneers": {
+        "militaryequipment": 10,
+        "generaluseequipment": 8,
+        "capitalequipment": 1
+      },
+      "terran": {
+        "militaryequipment": 16,
+        "generaluseequipment": 11,
+        "capitalequipment": 2
+      },
+      "xenon": {
+        "generaluseequipment": 4
+      },
+      "ownerless": {
+        "capitalequipment": 2
+      },
+      "boron": {
+        "capitalequipment": 1,
+        "militaryequipment": 10,
+        "generaluseequipment": 4
+      }
+    },
+    "missile": {
+      "court": {
+        "militaryequipment": 4
+      },
+      "freesplit": {
+        "militaryequipment": 4
+      },
+      "split": {
+        "militaryequipment": 4
+      },
+      "ownerless": {
+        "capitalequipment": 2
+      }
+    },
+    "consumable": {
+      "yaki": {
+        "militaryequipment": 1
+      }
+    }
+  },
+  "general_blueprints": {
+    "consumable": 9,
+    "engine": 154,
+    "missile": 23,
+    "connectionmodule": 58,
+    "defencemodule": 19,
+    "dockarea": 10,
+    "habitation": 23,
+    "pier": 23,
+    "production": 62,
+    "radar": 1,
+    "storage": 56,
+    "buildmodule": 18,
+    "processingmodule": 1,
+    "ventureplatform": 1,
+    "welfaremodule": 3,
+    "shieldgenerator": 90,
+    "ship_l": 65,
+    "ship_m": 66,
+    "ship_s": 74,
+    "ship_xl": 33,
+    "drone": 8,
+    "turret": 125,
+    "weapon": 113
+  }
 }

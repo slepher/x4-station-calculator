@@ -84,6 +84,24 @@
 - **当** 渲染该条目
 - **那么** SHALL 显示「不可获取」badge
 
+### Requirement: Faction Filter with Nested Licence
+
+Filter 面板 SHALL 以 faction → licence 嵌套结构替代独立的 licence 筛选区，Faction 使用三态 checkbox。
+
+#### Scenario: faction with nested licences
+
+- **前提** `blueprints.json` 包含 `faction_blueprints` 数据
+- **当** 渲染 filter 面板
+- **那么** SHALL 在每个 Faction 行下折叠显示其对应的 Licence 子项（checkbox）
+- **并且** SHALL NOT 显示独立的 Licence flat checkbox 区域
+
+#### Scenario: faction indeterminate state
+
+- **前提** Faction 下的 licence 部分被选中、部分未选中
+- **当** 渲染 Faction checkbox
+- **那么** SHALL 显示 `[-]` 表示中间状态
+- **并且** 点击 Faction checkbox SHALL 切换该 faction 下所有 licence 的全选/取消
+
 ### Requirement: Search and Filter
 
 蓝图配方页面 SHALL 支持按名称、id、阵营名称搜索过滤蓝图列表。

@@ -1364,6 +1364,8 @@ export interface BlueprintsData {
   blueprints: X4Blueprint[]
   types: BlueprintTypeCategory[]
   classes: BlueprintClassCategory[]
+  faction_blueprints: Record<string, Record<string, Record<string, number>>>
+  general_blueprints: Record<string, number>
 }
 
 export interface X4Licence {

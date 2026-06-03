@@ -47,6 +47,7 @@
   - `filteredBlueprints` computed（按 selectedClass + searchQuery 过滤）
   - `navTree` computed（types/classes 分组结构）
   - 输出 props / emits
+- [ ] Presenter 新增 `factionLicenceTree`（基于 `faction_blueprints`）、三态 filter 逻辑
 
 ### 6. 蓝图配方页面组件
 
@@ -56,6 +57,7 @@
   - 每条蓝图显示：本地化名称（i18n `nameId` + 回退 `name`）、id、class、price/licence/factions（有则显示）、missiononly/noplayerblueprint badge
   - 搜索为空时显示空状态
   - 无 ContextToolbar
+- [ ] Filter 面板重构：Faction 嵌套 Licence 折叠结构，三态 checkbox，移除独立 Licence 区域
 
 ### 7. 主视图集成
 

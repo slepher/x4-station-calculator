@@ -57,6 +57,11 @@ case 'blueprint-recipe': return 'blueprint-recipe'
 
 ### 2. 选中 class 状态管理
 
+- Filter 面板使用 `faction_blueprints` 数据构建 faction → licence 嵌套结构
+- 每个 Faction 行可折叠展开其下的 Licence 子项（checkbox）
+- Faction 行使用三态 checkbox：全选 `[✓]` / 部分选 `[-]` / 全不选 `[☐]`
+- 不再使用独立的 Licence flat checkbox 区域
+
 - 选中 `type` 和 `class` 的 UI 状态由 `useBlueprintRecipePresenter` 内部 `ref` 管理
 - 不在 store 中持久化（页面切换后重置为默认状态）
 - 默认选中第一个 type 的第一个 class

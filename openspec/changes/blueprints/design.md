@@ -43,7 +43,37 @@ data_processor XML 解析产物 (loader 内存数据)
 - `ship_xs` / `ship_s`（equipment 条目） → `drone`
 - `mine` / `satellite` / `scanner` / `countermeasure` / `navbeacon` / `resourceprobe`（equipment 条目） → `consumable`
 
-### 4. 字段省略规则
+### 4. faction_blueprints / general_blueprints 生成
+
+在 `build_blueprints_data()` 返回前，遍历已生成的 `blueprints` 列表：
+
+```python
+faction_bps: Dict[str, Dict[str, Dict[str, int]]] = {}
+general_bps: Dict[str, int] = {}
+
+for bp in items:
+    cls = bp.get("class")
+    factions = bp.get("factions", [])
+    licence = bp.get("licence")
+    if not cls:
+        continue
+    general_bps[cls] = general_bps.get(cls, 0) + 1
+    if factions and licence:
+        fb = faction_bps.setdefault(cls, {})
+        for fid in factions:
+            fl = fb.setdefault(fid, {})
+            fl[licence] = fl.get(licence, 0) + 1
+
+return {
+    "blueprints": items,
+    "types": TYPES,
+    "classes": class_entries,
+    "faction_blueprints": faction_bps,
+    "general_blueprints": general_bps,
+}
+```
+
+### 5. 字段省略规则
 
 | 字段 | 省略条件 |
 |------|---------|
@@ -107,7 +137,27 @@ Usage:
   ],
   "classes": [
     { "id": "production", "name": "Production Modules", "nameId": "{1001,2421}", "type": "module" }
-  ]
+  ],
+  "faction_blueprints": {
+    "production": {
+      "antigone": {
+        "station_gen_basic": 12
+      },
+      "argon": {
+        "station_gen_basic": 10,
+        "station_gen_expert": 3
+      }
+    },
+    "ship_s": {
+      "paranid": {
+        "military_ship_small": 5
+      }
+    }
+  },
+  "general_blueprints": {
+    "production": 45,
+    "ship_s": 20
+  }
 }
 ```
 

@@ -47,6 +47,24 @@ data_processor SHALL generate `blueprints.json` containing all non-noblueprint g
 - **那么** `type` SHALL 统一为 `"equipment"`
 - **并且** `subtype` SHALL 保留原名（如 `shields`, `turrets`, `missile`, `consumable`, `drone`）
 
+### Requirement: faction_blueprints and general_blueprints Summary
+
+data_processor SHALL generate `faction_blueprints` and `general_blueprints` summary structures in `blueprints.json`.
+
+#### Scenario: faction_blueprints structure
+
+- **前提** `blueprints` 数组包含 class/factions/licence 信息
+- **当** data_processor 生成 `blueprints.json`
+- **那么** SHALL 输出 `faction_blueprints` 字段，结构为 `{ <class>: { <faction>: { <licence>: <count> } } }`
+- **并且** 无 factions 或无 licence 的蓝图 SHALL NOT 纳入
+
+#### Scenario: general_blueprints structure
+
+- **前提** `blueprints` 数组包含 class 信息
+- **当** data_processor 生成 `blueprints.json`
+- **那么** SHALL 输出 `general_blueprints` 字段，结构为 `{ <class>: <count> }`
+- **并且** count SHALL 为该 class 下所有蓝图总数
+
 ### Requirement: Save XML Blueprint List Extraction
 
 rust parser 通过独立模块 `blueprints.rs` SHALL 提取玩家已掌握的蓝图 ID 列表。

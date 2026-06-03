@@ -192,10 +192,28 @@ def build_blueprints_data(
         if i18n_collector is not None and t["nameId"]:
             i18n_collector.add(t["nameId"])
 
+    faction_bps: Dict[str, Dict[str, Dict[str, int]]] = {}
+    general_bps: Dict[str, int] = {}
+    for item in items:
+        cls = item.get("class")
+        if not cls:
+            continue
+        if not item.get("noplayerblueprint"):
+            general_bps[cls] = general_bps.get(cls, 0) + 1
+            factions = item.get("factions", [])
+            licence = item.get("licence")
+            if factions and licence:
+                fb = faction_bps.setdefault(cls, {})
+                for fid in factions:
+                    fl = fb.setdefault(fid, {})
+                    fl[licence] = fl.get(licence, 0) + 1
+
     return {
         "blueprints": items,
         "types": TYPES,
         "classes": class_entries,
+        "faction_blueprints": faction_bps,
+        "general_blueprints": general_bps,
     }
 
 

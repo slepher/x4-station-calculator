@@ -18,6 +18,8 @@
 - [x] `price` / `licence` / `factions` 缺失时省略
 - [x] nameId 加入 `i18n_collector`
 - [x] 返回 dict 挂载到 `loader.blueprints_data`
+- [ ] 生成 `faction_blueprints` 汇总（class → faction → licence → count）
+- [ ] 生成 `general_blueprints` 汇总（class → count）
 
 ### 3. 实现 process_blueprints(loader)
 

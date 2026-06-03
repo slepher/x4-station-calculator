@@ -2,27 +2,35 @@ import { computed, ref, type Ref, type ComputedRef } from 'vue'
 import i18n from '@/i18n'
 import type { BlueprintsData, X4Blueprint, BlueprintTypeCategory, BlueprintClassCategory, X4Faction } from '@/types/x4'
 
+export interface FactionLicenceEntry {
+  factionId: string
+  factionName: string
+  licences: { id: string; name: string }[]
+}
+
 export interface BlueprintRecipePresenterProps {
   typesNav: ComputedRef<{ id: string; name: string; classes: { id: string; name: string }[] }[]>
   selectedTypeId: Ref<string | null>
   selectedClassId: Ref<string | null>
   filteredBlueprints: ComputedRef<X4Blueprint[]>
   searchQuery: Ref<string>
-  factionFilter: Ref<Set<string>>
-  licenceFilter: Ref<Set<string>>
-  availableFactions: ComputedRef<{ id: string; name: string }[]>
-  availableLicences: ComputedRef<{ id: string; name: string }[]>
-  allLicences: ComputedRef<{ id: string; name: string }[]>
+  factionLicenceTree: ComputedRef<FactionLicenceEntry[]>
+  factionLicenceFilter: Ref<Map<string, Set<string>>>
+  factionCheckState: ComputedRef<Record<string, 'all' | 'none' | 'partial'>>
+  expandedFactions: Ref<Set<string>>
   factionDisplayNames: ComputedRef<Record<string, string>>
   licenceDisplayNames: ComputedRef<Record<string, string>>
+  factionLicenceAllState: ComputedRef<'all' | 'none' | 'partial'>
 }
 
 export interface BlueprintRecipePresenterEmits {
   selectType: (typeId: string) => void
   selectClass: (classId: string) => void
   updateSearchQuery: (query: string) => void
-  toggleFactionFilter: (id: string) => void
-  toggleLicenceFilter: (id: string) => void
+  toggleFactionAllLicences: (factionId: string) => void
+  toggleAllFactionLicences: () => void
+  toggleFactionLicence: (factionId: string, licenceId: string) => void
+  toggleExpandedFaction: (factionId: string) => void
 }
 
 export function useBlueprintRecipePresenter(store: {
@@ -37,8 +45,8 @@ export function useBlueprintRecipePresenter(store: {
   const selectedTypeId = ref<string | null>(null)
   const selectedClassId = ref<string | null>(null)
   const searchQuery = ref('')
-  const factionFilter = ref<Set<string>>(new Set())
-  const licenceFilter = ref<Set<string>>(new Set())
+  const factionLicenceFilter = ref<Map<string, Set<string>>>(new Map())
+  const expandedFactions = ref<Set<string>>(new Set())
 
   const factionDisplayNames = computed(() => {
     const map: Record<string, string> = {}
@@ -46,21 +54,6 @@ export function useBlueprintRecipePresenter(store: {
       map[f.id] = f.nameId ? t(f.nameId) : (f.name || f.id)
     }
     return map
-  })
-
-  const allLicences = computed(() => {
-    const map = new Map<string, string>()
-    for (const f of store.factions.value) {
-      if (f.licences) {
-        for (const l of f.licences) {
-          if (l.nameId && !map.has(l.type)) {
-            const label = t(l.nameId)
-            map.set(l.type, label && label !== l.nameId ? label : l.name)
-          }
-        }
-      }
-    }
-    return Array.from(map.entries()).map(([id, name]) => ({ id, name }))
   })
 
   const licenceDisplayNames = computed(() => {
@@ -119,38 +112,72 @@ export function useBlueprintRecipePresenter(store: {
     return data.blueprints.filter(bp => bp.class === selectedClassId.value && !bp.noplayerblueprint)
   })
 
-  const allBlueprints = computed(() => {
+  const factionLicenceTree = computed(() => {
     const data = store.blueprintsData.value
     if (!data) return []
-    return data.blueprints.filter(bp => !bp.noplayerblueprint)
-  })
 
-  const availableFactions = computed(() => {
-    const source = classBlueprints.value.length > 0 ? classBlueprints.value : allBlueprints.value
-    const seen = new Map<string, string>()
+    const fb = data.faction_blueprints
+    if (!fb) return []
+
     const fdn = factionDisplayNames.value
-    for (const bp of source) {
-      for (const fid of bp.factions || []) {
-        if (!seen.has(fid)) {
-          seen.set(fid, fdn[fid] || fid)
+    const ldn = licenceDisplayNames.value
+
+    const merged: Record<string, Record<string, number>> = {}
+
+    if (selectedClassId.value && fb[selectedClassId.value]) {
+      Object.assign(merged, fb[selectedClassId.value])
+    } else {
+      for (const cls of Object.values(fb)) {
+        for (const fid of Object.keys(cls)) {
+          if (!merged[fid]) merged[fid] = {}
+          const licences = cls[fid]
+          if (!licences) continue
+          for (const lid of Object.keys(licences)) {
+            merged[fid][lid] = (merged[fid][lid] || 0) + (licences[lid] || 0)
+          }
         }
       }
     }
-    return Array.from(seen.entries()).map(([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name))
+
+    return Object.entries(merged)
+      .map(([fid, lm]) => ({
+        factionId: fid,
+        factionName: fdn[fid] || fid,
+        licences: Object.entries(lm)
+          .map(([lid]) => ({ id: lid, name: ldn[lid] || lid }))
+          .sort((a, b) => a.name.localeCompare(b.name)),
+      }))
+      .sort((a, b) => a.factionName.localeCompare(b.factionName))
   })
 
-  const availableLicences = computed(() => {
-    const source = classBlueprints.value.length > 0 ? classBlueprints.value : allBlueprints.value
-    const seen = new Map<string, string>()
-    const ldn = licenceDisplayNames.value
-    for (const bp of source) {
-      if (bp.licence) {
-        if (!seen.has(bp.licence)) {
-          seen.set(bp.licence, ldn[bp.licence] || bp.licence)
-        }
+  const factionCheckState = computed(() => {
+    const state: Record<string, 'all' | 'none' | 'partial'> = {}
+    for (const entry of factionLicenceTree.value) {
+      const excluded = factionLicenceFilter.value.get(entry.factionId)
+      const total = entry.licences.length
+      if (!excluded || excluded.size === 0) {
+        state[entry.factionId] = 'none'
+      } else if (excluded.size === total) {
+        state[entry.factionId] = 'all'
+      } else {
+        state[entry.factionId] = 'partial'
       }
     }
-    return Array.from(seen.entries()).map(([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name))
+    return state
+  })
+
+  const factionLicenceAllState = computed(() => {
+    let hasAny = false
+    let hasAll = true
+    for (const entry of factionLicenceTree.value) {
+      const excluded = factionLicenceFilter.value.get(entry.factionId)
+      const total = entry.licences.length
+      if (excluded && excluded.size > 0) hasAny = true
+      if (!excluded || excluded.size < total) hasAll = false
+    }
+    if (!hasAny) return 'none'
+    if (hasAll) return 'all'
+    return 'partial'
   })
 
   const filteredBlueprints = computed(() => {
@@ -167,20 +194,16 @@ export function useBlueprintRecipePresenter(store: {
       })
     }
 
-    const hasFactionFilter = factionFilter.value.size > 0
-    const hasLicenceFilter = licenceFilter.value.size > 0
-
-    if (hasFactionFilter || hasLicenceFilter) {
+    if (factionLicenceFilter.value.size > 0) {
       result = result.filter(bp => {
         const fs = bp.factions || []
         const l = bp.licence
-        const factionMatch = !hasFactionFilter
-          || (fs.length === 0)
-          || !fs.every(fid => factionFilter.value.has(fid))
-        const licenceMatch = !hasLicenceFilter
-          || !l
-          || !licenceFilter.value.has(l)
-        return factionMatch && licenceMatch
+        if (fs.length === 0) return true
+        if (!l) return true
+        return !fs.every(fid => {
+          const excluded = factionLicenceFilter.value.get(fid)
+          return excluded ? excluded.has(l) : false
+        })
       })
     }
 
@@ -206,24 +229,62 @@ export function useBlueprintRecipePresenter(store: {
     searchQuery.value = query
   }
 
-  function toggleFactionFilter(id: string) {
-    const next = new Set(factionFilter.value)
-    if (next.has(id)) {
-      next.delete(id)
+  function toggleFactionAllLicences(factionId: string) {
+    const entry = factionLicenceTree.value.find(e => e.factionId === factionId)
+    if (!entry) return
+
+    const next = new Map(factionLicenceFilter.value)
+    const current = next.get(factionId)
+
+    if (current && current.size > 0) {
+      next.delete(factionId)
     } else {
-      next.add(id)
+      next.set(factionId, new Set(entry.licences.map(l => l.id)))
     }
-    factionFilter.value = next
+
+    factionLicenceFilter.value = next
   }
 
-  function toggleLicenceFilter(id: string) {
-    const next = new Set(licenceFilter.value)
-    if (next.has(id)) {
-      next.delete(id)
+  function toggleAllFactionLicences() {
+    if (factionLicenceAllState.value === 'all') {
+      factionLicenceFilter.value = new Map()
     } else {
-      next.add(id)
+      const next = new Map<string, Set<string>>()
+      for (const entry of factionLicenceTree.value) {
+        next.set(entry.factionId, new Set(entry.licences.map(l => l.id)))
+      }
+      factionLicenceFilter.value = next
     }
-    licenceFilter.value = next
+  }
+
+  function toggleFactionLicence(factionId: string, licenceId: string) {
+    const next = new Map(factionLicenceFilter.value)
+    const current = next.get(factionId) || new Set<string>()
+    const updated = new Set(current)
+
+    if (updated.has(licenceId)) {
+      updated.delete(licenceId)
+    } else {
+      updated.add(licenceId)
+    }
+
+    if (updated.size > 0) {
+      next.set(factionId, updated)
+    } else {
+      next.delete(factionId)
+    }
+
+    factionLicenceFilter.value = next
+  }
+
+  function toggleExpandedFaction(factionId: string) {
+    const next = new Set(expandedFactions.value)
+    if (next.has(factionId)) {
+      next.delete(factionId)
+    } else {
+      next.add(factionId)
+    }
+    expandedFactions.value = next
   }
 
   const props: BlueprintRecipePresenterProps = {
@@ -232,21 +293,23 @@ export function useBlueprintRecipePresenter(store: {
     selectedClassId,
     filteredBlueprints,
     searchQuery,
-    factionFilter,
-    licenceFilter,
-    availableFactions,
-    availableLicences,
-    allLicences,
+    factionLicenceTree,
+    factionLicenceFilter,
+    factionCheckState,
+    expandedFactions,
     factionDisplayNames,
     licenceDisplayNames,
+    factionLicenceAllState,
   }
 
   const emits: BlueprintRecipePresenterEmits = {
     selectType,
     selectClass,
     updateSearchQuery,
-    toggleFactionFilter,
-    toggleLicenceFilter,
+    toggleFactionAllLicences,
+    toggleAllFactionLicences,
+    toggleFactionLicence,
+    toggleExpandedFaction,
   }
 
   return { props, emits }

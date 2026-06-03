@@ -81,7 +81,7 @@
 
 - 蓝图产能界面侧边栏新增「蓝图配方」菜单
 - 蓝图配方页面：左侧 type/class 导航 + 中间 filter 面板 + 右侧蓝图列表
-- Filter 面板：Faction 多选 + Licence 多选（全选/取消），排除语义（勾选=隐藏），切换 class 时不重置值
+- Filter 面板：Faction 多选 + Licence 多选（全选/取消），排除语义（不勾选=隐藏，勾选=显示），切换 class 时不重置值
 - 无 class 选中时 filter 面板显示全部选项，蓝图列表为空
 - Faction 与 Licence 过滤为 AND 关系，Faction 组内等效 OR（仅当蓝图全部 faction 被排除才隐藏）
 - 蓝图列表：名称+价格同行，factions+licences 独立区域
