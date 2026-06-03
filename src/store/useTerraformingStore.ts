@@ -15,13 +15,12 @@ import {
 import type { ArchiveStationData } from '@/types/saveArchive'
 import { useGameDataStore } from './useGameDataStore'
 import { useLiveProductionStore } from './useLiveProductionStore'
-import { useActiveViewStore } from './useActiveViewStore'
 import { CURRENT_TERRAFORMING_VERSION } from './logic/storageVersions'
+import i18n from '@/i18n'
 
 export const useTerraformingStore = defineStore('terraforming', () => {
   const gameData = useGameDataStore()
   const liveStore = useLiveProductionStore()
-  const activeViewStore = useActiveViewStore()
 
   function getStorageKey(): string {
     return gameData.getStorageKey('terraforming')
@@ -143,7 +142,6 @@ export const useTerraformingStore = defineStore('terraforming', () => {
   function selectCluster(clusterId: string): void {
     if (!activePlan.value) return
     activePlan.value.selectedClusterId = clusterId
-    activeViewStore.activeTerraformingClusterId = clusterId
     saveToStorage()
   }
 
@@ -274,20 +272,46 @@ export const useTerraformingStore = defineStore('terraforming', () => {
     return liveStore.terraformingHqClusterId ?? null
   })
 
+  const sidebarClusters = computed(() => {
+    const clusters = terraformingData.value?.clusters ?? []
+    const stats = terraformingData.value?.stats ?? []
+    const mapsData = gameData.maps
+    const t = i18n.global.t.bind(i18n.global)
+    return clusters.map(c => {
+      const macro = c.macro?.replace('macro.', '')
+      let nameId = ''
+      if (mapsData && macro) {
+        const clusterInfo = mapsData.clusters[macro]
+        if (clusterInfo) {
+          const sectorList = clusterInfo.sectors ?? []
+          if (sectorList.length === 1 && sectorList[0]) {
+            nameId = mapsData.sectors[sectorList[0]]?.nameId ?? ''
+          } else {
+            nameId = clusterInfo.nameId ?? ''
+          }
+        }
+      }
+      const resolvedName = nameId ? t(nameId) : c.id
+      const temperatureStat = stats.find(s => s.id === 'temperature')
+      let temperatureState = 2
+      if (temperatureStat && c.initialStats?.temperature != null) {
+        const tempValue = c.initialStats.temperature
+        const range = temperatureStat.ranges.find(r => {
+          const start = r.start ?? 0
+          return tempValue >= start && tempValue <= r.end
+        })
+        if (range) temperatureState = range.state
+      }
+      return { id: c.id, name: resolvedName, nameId, temperatureState }
+    })
+  })
+
   function init(): void {
     const stored = loadFromStorage()
     if (stored) {
       savedPlans.value = stored
     }
     hydrateExecutionLogs()
-
-    const savedClusterId = activeViewStore.activeTerraformingClusterId
-    const clusterIds = terraformingData.value?.clusters.map(c => c.id) ?? []
-    if (savedClusterId && clusterIds.includes(savedClusterId)) {
-      if (activePlan.value) {
-        activePlan.value.selectedClusterId = savedClusterId
-      }
-    }
     saveToStorage()
   }
 
@@ -306,6 +330,7 @@ export const useTerraformingStore = defineStore('terraforming', () => {
     hqArchiveStation,
     hqEffectiveModules,
     hqClusterId,
+    sidebarClusters,
     ensurePlanForContext,
     createPlan,
     deletePlan,

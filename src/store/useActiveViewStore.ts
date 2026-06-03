@@ -10,7 +10,7 @@ export interface ActiveViewState {
   activeEmpireStation: string | null
   activeBinding: string | null
   activeBindingStation: string | null
-  activeBindingWorkbench: 'overview' | 'station' | 'transit' | 'terraforming' | 'tech-tree'
+  activeBindingWorkbench: 'overview' | 'station' | 'transit' | 'terraforming' | 'tech-tree' | 'research' | 'blueprint-recipe'
   activeEmpireWorkbench: 'overview' | 'station' | 'terraforming' | 'research' | 'blueprint-recipe'
   activeTerraformingClusterId: string | null
   activeView: StationActiveView
@@ -113,7 +113,8 @@ export const useActiveViewStore = defineStore('activeView', () => {
     get: () => state.value.activeBindingStation,
     set: (val: string | null) => {
       state.value.activeBindingStation = val
-      if (val) {
+      const FIXED_MODES = ['terraforming', 'tech-tree', 'research', 'blueprint-recipe']
+      if (val && !FIXED_MODES.includes(state.value.activeBindingWorkbench)) {
         state.value.activeBindingWorkbench = 'station'
       } else if (state.value.activeBindingWorkbench === 'station') {
         state.value.activeBindingWorkbench = 'overview'
@@ -125,9 +126,6 @@ export const useActiveViewStore = defineStore('activeView', () => {
   const activeBindingWorkbench = computed<ActiveViewState['activeBindingWorkbench']>({
     get: () => state.value.activeBindingWorkbench,
     set: (val) => {
-      if (val !== 'terraforming') {
-        state.value.activeTerraformingClusterId = null
-      }
       state.value.activeBindingWorkbench = val
       saveToStorage(state.value)
     }
@@ -136,9 +134,6 @@ export const useActiveViewStore = defineStore('activeView', () => {
   const activeEmpireWorkbench = computed<ActiveViewState['activeEmpireWorkbench']>({
     get: () => state.value.activeEmpireWorkbench,
     set: (val) => {
-      if (val !== 'terraforming') {
-        state.value.activeTerraformingClusterId = null
-      }
       state.value.activeEmpireWorkbench = val
       saveToStorage(state.value)
     }

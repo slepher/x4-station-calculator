@@ -28,6 +28,8 @@ import ImportPlanModal from '@/components/empire/ImportPlanModal.vue'
 import SaveUploadPanel from '@/components/save/SaveUploadPanel.vue'
 import SaveList from '@/components/save/SaveList.vue'
 import TechTreePlaceholder from '@/components/empire/TechTreePlaceholder.vue'
+import ResearchWorkbench from '@/components/empire/ResearchWorkbench.vue'
+import BlueprintRecipeWorkbench from '@/components/empire/BlueprintRecipeWorkbench.vue'
 
 const liveStore = useLiveProductionStore()
 const terraformingStore = useTerraformingStore()
@@ -124,8 +126,8 @@ const showArchiveModuleList = computed(() => {
       :show-tech-tree="sidebarPresenter.props.showTechTree"
       :show-research="sidebarPresenter.props.showResearch"
       :show-blueprint-recipe="sidebarPresenter.props.showBlueprintRecipe"
-      :terraforming-clusters="[]"
-      :active-terraforming-cluster-id="null"
+      :terraforming-clusters="terraformingStore.sidebarClusters"
+      :active-terraforming-cluster-id="terraformingStore.activePlan?.selectedClusterId ?? null"
       :can-create-station="sidebarPresenter.props.canCreateStation"
       :can-open-context-menu="sidebarPresenter.props.canOpenContextMenu"
       :context-menu-mode="sidebarPresenter.props.contextMenuMode"
@@ -134,8 +136,11 @@ const showArchiveModuleList = computed(() => {
       @select-terraforming="sidebarPresenter.emits.selectTerraforming"
       @select-tech-tree="sidebarPresenter.emits.selectTechTree"
       @select-research="sidebarPresenter.emits.selectResearch"
-      @select-blueprint-recipe="() => {}"
-      @select-terraforming-cluster="() => {}"
+      @select-blueprint-recipe="sidebarPresenter.emits.selectBlueprintRecipe"
+      @select-terraforming-cluster="(clusterId: string) => {
+        activeViewStore.activeBindingWorkbench = 'terraforming'
+        terraformingStore.selectCluster(clusterId)
+      }"
       @select-transit="sidebarPresenter.emits.selectTransit"
       @select-station="sidebarPresenter.emits.selectStation"
       @create-station="sidebarPresenter.emits.createStation"
@@ -237,6 +242,10 @@ const showArchiveModuleList = computed(() => {
   <div v-else-if="toolbarPresenter.props.workbenchMode.value === 'tech-tree'" class="">
     <TechTreePlaceholder />
   </div>
+
+  <ResearchWorkbench v-else-if="toolbarPresenter.props.workbenchMode.value === 'research'" />
+
+  <BlueprintRecipeWorkbench v-else-if="toolbarPresenter.props.workbenchMode.value === 'blueprint-recipe'" />
 
   <template v-else-if="toolbarPresenter.props.workbenchMode.value === 'overview' || toolbarPresenter.props.workbenchMode.value === 'transit'">
     <div v-if="toolbarPresenter.props.workbenchMode.value === 'transit'" class="main-layout">

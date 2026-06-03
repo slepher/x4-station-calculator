@@ -107,7 +107,7 @@ const buildPlanPresenter = useBuildPlanPresenter({
       :show-research="sidebarPresenter.props.showResearch"
       :show-blueprint-recipe="sidebarPresenter.props.showBlueprintRecipe"
       :terraforming-clusters="terraformingClusters"
-      :active-terraforming-cluster-id="activeViewStore.activeTerraformingClusterId"
+      :active-terraforming-cluster-id="terraformingStore.activePlan?.selectedClusterId ?? null"
       :can-create-station="sidebarPresenter.props.canCreateStation"
       :can-open-context-menu="sidebarPresenter.props.canOpenContextMenu"
       :context-menu-mode="sidebarPresenter.props.contextMenuMode"
@@ -124,7 +124,6 @@ const buildPlanPresenter = useBuildPlanPresenter({
       @select-blueprint-recipe="sidebarPresenter.emits.selectBlueprintRecipe"
       @select-terraforming-cluster="(clusterId: string) => {
         activeViewStore.activeEmpireWorkbench = 'terraforming'
-        activeViewStore.activeTerraformingClusterId = clusterId
         terraformingStore.selectCluster(clusterId)
       }"
       @select-transit="() => {}"

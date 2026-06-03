@@ -479,9 +479,37 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     }
   })
 
-  const workbenchMode = computed<'station' | 'transit' | 'overview' | 'terraforming' | 'tech-tree'>(() => {
+  const isResearchMode = computed({
+    get: () => activeViewStore.activeBindingWorkbench === 'research',
+    set: (val: boolean) => {
+      if (val) {
+        activeViewStore.activeBindingWorkbench = 'research'
+      } else {
+        if (activeViewStore.activeBindingWorkbench === 'research') {
+          activeViewStore.activeBindingWorkbench = 'overview'
+        }
+      }
+    }
+  })
+
+  const isBlueprintRecipeMode = computed({
+    get: () => activeViewStore.activeBindingWorkbench === 'blueprint-recipe',
+    set: (val: boolean) => {
+      if (val) {
+        activeViewStore.activeBindingWorkbench = 'blueprint-recipe'
+      } else {
+        if (activeViewStore.activeBindingWorkbench === 'blueprint-recipe') {
+          activeViewStore.activeBindingWorkbench = 'overview'
+        }
+      }
+    }
+  })
+
+  const workbenchMode = computed<'station' | 'transit' | 'overview' | 'terraforming' | 'tech-tree' | 'research' | 'blueprint-recipe'>(() => {
     if (isTerraformingMode.value) return 'terraforming'
     if (isTechTreeMode.value) return 'tech-tree'
+    if (isResearchMode.value) return 'research'
+    if (isBlueprintRecipeMode.value) return 'blueprint-recipe'
     return activeTransitSectorId.value ? 'transit' : (activeStationId.value ? 'station' : 'overview')
   })
 
@@ -1437,11 +1465,17 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
 
   function selectStation(stationId: string | null) {
     isTerraformingMode.value = false
+    isTechTreeMode.value = false
+    isResearchMode.value = false
+    isBlueprintRecipeMode.value = false
     activeStationId.value = stationId
   }
 
   function selectTransitSector(sectorId: string | null) {
     isTerraformingMode.value = false
+    isTechTreeMode.value = false
+    isResearchMode.value = false
+    isBlueprintRecipeMode.value = false
     if (!sectorId) {
       activeStationId.value = null
       return
@@ -1459,6 +1493,16 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
 
   function selectTechTree() {
     isTechTreeMode.value = true
+    activeStationId.value = null
+  }
+
+  function selectResearch() {
+    isResearchMode.value = true
+    activeStationId.value = null
+  }
+
+  function selectBlueprintRecipe() {
+    isBlueprintRecipeMode.value = true
     activeStationId.value = null
   }
 
@@ -2066,6 +2110,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     selectStation,
     selectTerraforming,
     selectTechTree,
+    selectResearch,
+    selectBlueprintRecipe,
     terraformingHqStationCode,
     terraformingHqStationName,
     terraformingHqArchiveStation,
