@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
 import { useGameDataStore } from '@/store/useGameDataStore'
@@ -21,6 +21,14 @@ const {
 } = p.emits
 
 const expandedTypes = ref<Set<string>>(new Set(p.props.typesNav.value.map(t => t.id)))
+
+const noblueprintsaleFactions = computed(() => {
+  const set = new Set<string>()
+  for (const f of factions.value) {
+    if (f.noblueprintsale || f.nodiplomacyselection) set.add(f.id)
+  }
+  return set
+})
 
 function toggleType(typeId: string) {
   const next = new Set(expandedTypes.value)
@@ -125,28 +133,31 @@ function resolveLicenceForFaction(factionId: string, ltype: string | undefined):
         >
           <div class="bp-filter-faction">
             <button
+              v-if="!noblueprintsaleFactions.has(entry.factionId)"
               class="bp-filter-expand"
               @click="toggleExpandedFaction(entry.factionId)"
             >
               {{ expandedFactions.has(entry.factionId) ? '▼' : '▶' }}
             </button>
+            <span v-else class="bp-filter-expand-placeholder" />
             <label class="bp-filter-item">
               <input
                 v-if="selectedClassId"
                 type="checkbox"
-                :indeterminate.prop="factionCheckState[entry.factionId] === 'partial'"
+                :indeterminate.prop="!noblueprintsaleFactions.has(entry.factionId) && factionCheckState[entry.factionId] === 'partial'"
                 :checked="factionCheckState[entry.factionId] === 'none'"
                 @change="toggleFactionAllLicences(entry.factionId)"
               />
               <span>{{ entry.factionName }}</span>
             </label>
           </div>
-          <div v-if="expandedFactions.has(entry.factionId)" class="bp-filter-licences">
+          <div v-if="!noblueprintsaleFactions.has(entry.factionId) && expandedFactions.has(entry.factionId)" class="bp-filter-licences">
             <label
               v-for="l in entry.licences"
               :key="l.id"
               class="bp-filter-item bp-filter-licence-item"
             >
+              <span class="bp-licence-rep">{{ l.rep != null ? (l.rep > 0 ? '+' : '') + l.rep : '' }}</span>
               <input
                 v-if="selectedClassId"
                 type="checkbox"
@@ -286,6 +297,10 @@ function resolveLicenceForFaction(factionId: string, ltype: string | undefined):
   @apply flex-shrink-0 leading-none;
 }
 
+.bp-filter-expand-placeholder {
+  @apply w-4 h-4 flex-shrink-0;
+}
+
 .bp-filter-item {
   @apply flex items-center gap-1.5 px-1 py-0.5 text-xs text-slate-400 hover:text-slate-200 cursor-pointer rounded;
 }
@@ -295,11 +310,15 @@ function resolveLicenceForFaction(factionId: string, ltype: string | undefined):
 }
 
 .bp-filter-licences {
-  @apply pl-8;
+  @apply pl-3;
 }
 
 .bp-filter-licence-item {
   @apply pl-1;
+}
+
+.bp-licence-rep {
+  @apply text-[10px] text-amber-400/70 font-mono inline-block w-6 text-right flex-shrink-0;
 }
 
 .bp-content {

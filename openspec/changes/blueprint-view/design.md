@@ -55,16 +55,19 @@ case 'blueprint-recipe': return 'blueprint-recipe'
 - 未来在实况界面开放此菜单时，通过 `player_blueprints: string[]` 数据实现高亮
 - 当前设计不在 presenter/store 中预留 owned 标记字段，避免过度设计
 
-### 2. 选中 class 状态管理
+### 2. Filter 面板设计
 
 - Filter 面板使用 `faction_blueprints` 数据构建 faction → licence 嵌套结构
 - 每个 Faction 行可折叠展开其下的 Licence 子项（checkbox）
 - Faction 行使用三态 checkbox：全选 `[✓]` / 部分选 `[-]` / 全不选 `[☐]`
+- 全局 Factions 标题行使用三态 checkbox 控制全选/取消
 - 不再使用独立的 Licence flat checkbox 区域
-
-- 选中 `type` 和 `class` 的 UI 状态由 `useBlueprintRecipePresenter` 内部 `ref` 管理
-- 不在 store 中持久化（页面切换后重置为默认状态）
-- 默认选中第一个 type 的第一个 class
+- 切换 class 时 selection 状态保留，stale licence 不参与三态计算
+- 全局全选/取消使用 `allFactionLicenceTree`（全 class 数据），影响所有 faction/licence
+- 每个 licence 前显示需求声望，公式 `ceil(10 * log10(minrelation * 1000))`，按声望升序排列
+- licence 名称优先取 faction 专属 nameId，全局 fallback
+- `noblueprintsale` / `nodiplomacyselection` faction 不显示 licence 子项和展开按钮，用占位保持对齐
+- 未选中 class 时隐藏所有 checkbox（filter 树仍可见）
 
 ### 3. 数据来源：blueprints.json 一次性加载
 

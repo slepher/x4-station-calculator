@@ -64,9 +64,20 @@ def migrate_factions(
         licences_elem = node.find("licences")
         if licences_elem is not None:
             for l in licences_elem.findall("licence"):
+                lfactions = (l.get("factions") or "").strip()
+                if lfactions:
+                    continue
                 ltype = (l.get("type") or "").strip()
                 lname_id = (l.get("name") or "").strip()
+                if not lname_id:
+                    continue
+                lminrelation = l.get("minrelation")
                 entry = {"type": ltype, "nameId": lname_id, "name": ""}
+                if lminrelation is not None:
+                    try:
+                        entry["minrelation"] = float(lminrelation)
+                    except (ValueError, TypeError):
+                        pass
                 licences.append(entry)
                 if i18n_collector is not None and lname_id:
                     i18n_collector.add(lname_id)
@@ -80,7 +91,10 @@ def migrate_factions(
             "color": color,
             "claimspace": "claimspace" in tags,
             "licences": licences,
+            "noblueprintsale": "noblueprintsale" in tags or "nodiplomacyselection" in tags,
         }
+        if "nodiplomacyselection" in tags:
+            item["nodiplomacyselection"] = True
         rows.append(item)
         by_id[faction_id] = item
 

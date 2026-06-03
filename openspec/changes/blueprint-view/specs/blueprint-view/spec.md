@@ -102,6 +102,27 @@ Filter 面板 SHALL 以 faction → licence 嵌套结构替代独立的 licence 
 - **那么** SHALL 显示 `[-]` 表示中间状态
 - **并且** 点击 Faction checkbox SHALL 切换该 faction 下所有 licence 的全选/取消
 
+#### Scenario: noblueprintsale faction display
+
+- **前提** Faction 的 tags 含 `noblueprintsale` 或 `nodiplomacyselection`
+- **当** 渲染该 faction
+- **那么** SHALL NOT 显示展开按钮和 licence 子项
+- **并且** SHALL 使用占位保持 checkbox 对齐
+- **并且** 仅根据 faction checkbox 勾选状态显示/隐藏对应蓝图
+
+#### Scenario: licence reputation display
+
+- **前提** Licence 条目含 `minrelation` 字段
+- **当** 渲染 licence 子项
+- **那么** SHALL 在 checkbox 前显示需求声望，格式 `+N` 或 `-N`
+- **并且** SHALL 按声望升序排列，无 `minrelation` 的排最后
+
+#### Scenario: global toggle affects all classes
+
+- **前提** 全局 Factions checkbox 被点击
+- **当** 全选或取消
+- **那么** SHALL 影响所有 class 的 faction/licence 组合，不限于当前显示
+
 ### Requirement: Search and Filter
 
 蓝图配方页面 SHALL 支持按名称、id、阵营名称搜索过滤蓝图列表。

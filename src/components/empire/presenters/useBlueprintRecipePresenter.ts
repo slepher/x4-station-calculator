@@ -5,7 +5,13 @@ import type { BlueprintsData, X4Blueprint, BlueprintTypeCategory, BlueprintClass
 export interface FactionLicenceEntry {
   factionId: string
   factionName: string
-  licences: { id: string; name: string }[]
+  licences: { id: string; name: string; rep: number | null }[]
+}
+
+function repFromMinrelation(mr: number | undefined): number | null {
+  if (mr == null || mr === 0) return null
+  const sign = mr > 0 ? 1 : -1
+  return sign * Math.ceil(10 * Math.log10(Math.abs(mr) * 1000))
 }
 
 export interface BlueprintRecipePresenterProps {
@@ -19,7 +25,6 @@ export interface BlueprintRecipePresenterProps {
   factionCheckState: ComputedRef<Record<string, 'all' | 'none' | 'partial'>>
   expandedFactions: Ref<Set<string>>
   factionDisplayNames: ComputedRef<Record<string, string>>
-  licenceDisplayNames: ComputedRef<Record<string, string>>
   factionLicenceAllState: ComputedRef<'all' | 'none' | 'partial'>
 }
 
@@ -52,20 +57,6 @@ export function useBlueprintRecipePresenter(store: {
     const map: Record<string, string> = {}
     for (const f of store.factions.value) {
       map[f.id] = f.nameId ? t(f.nameId) : (f.name || f.id)
-    }
-    return map
-  })
-
-  const licenceDisplayNames = computed(() => {
-    const map: Record<string, string> = {}
-    for (const f of store.factions.value) {
-      if (f.licences) {
-        for (const l of f.licences) {
-          if (l.nameId && !(l.type in map)) {
-            map[l.type] = t(l.nameId) || l.name
-          }
-        }
-      }
     }
     return map
   })
@@ -112,6 +103,35 @@ export function useBlueprintRecipePresenter(store: {
     return data.blueprints.filter(bp => bp.class === selectedClassId.value && !bp.noplayerblueprint)
   })
 
+  const factionLicenceMap = computed(() => {
+    const map: Record<string, Record<string, { mr: number | undefined; name: string }>> = {}
+    for (const f of store.factions.value) {
+      if (f.licences) {
+        const fm: Record<string, { mr: number | undefined; name: string }> = {}
+        for (const l of f.licences) {
+          if (!l.nameId) continue
+          fm[l.type] = { mr: l.minrelation, name: t(l.nameId) || l.name }
+        }
+        map[f.id] = fm
+      }
+    }
+    return map
+  })
+
+  const globalLicenceNames = computed(() => {
+    const map: Record<string, string> = {}
+    for (const f of store.factions.value) {
+      if (f.licences) {
+        for (const l of f.licences) {
+          if (l.nameId && !(l.type in map)) {
+            map[l.type] = t(l.nameId) || l.name
+          }
+        }
+      }
+    }
+    return map
+  })
+
   const factionLicenceTree = computed(() => {
     const data = store.blueprintsData.value
     if (!data) return []
@@ -120,7 +140,7 @@ export function useBlueprintRecipePresenter(store: {
     if (!fb) return []
 
     const fdn = factionDisplayNames.value
-    const ldn = licenceDisplayNames.value
+    const gln = globalLicenceNames.value
 
     const merged: Record<string, Record<string, number>> = {}
 
@@ -139,13 +159,23 @@ export function useBlueprintRecipePresenter(store: {
       }
     }
 
+    const floop = factionLicenceMap.value
+
     return Object.entries(merged)
       .map(([fid, lm]) => ({
         factionId: fid,
         factionName: fdn[fid] || fid,
         licences: Object.entries(lm)
-          .map(([lid]) => ({ id: lid, name: ldn[lid] || lid }))
-          .sort((a, b) => a.name.localeCompare(b.name)),
+          .map(([lid]) => {
+            const fl = floop[fid]?.[lid]
+            return { id: lid, name: fl?.name || gln[lid] || lid, rep: repFromMinrelation(fl?.mr) }
+          })
+          .sort((a, b) => {
+            if (a.rep == null && b.rep == null) return a.name.localeCompare(b.name)
+            if (a.rep == null) return 1
+            if (b.rep == null) return -1
+            return a.rep - b.rep
+          }),
       }))
       .sort((a, b) => a.factionName.localeCompare(b.factionName))
   })
@@ -157,10 +187,18 @@ export function useBlueprintRecipePresenter(store: {
       const total = entry.licences.length
       if (!excluded || excluded.size === 0) {
         state[entry.factionId] = 'none'
-      } else if (excluded.size === total) {
-        state[entry.factionId] = 'all'
       } else {
-        state[entry.factionId] = 'partial'
+        let relevantExcluded = 0
+        for (const l of entry.licences) {
+          if (excluded.has(l.id)) relevantExcluded++
+        }
+        if (relevantExcluded === 0) {
+          state[entry.factionId] = 'none'
+        } else if (relevantExcluded === total) {
+          state[entry.factionId] = 'all'
+        } else {
+          state[entry.factionId] = 'partial'
+        }
       }
     }
     return state
@@ -172,17 +210,44 @@ export function useBlueprintRecipePresenter(store: {
     for (const entry of factionLicenceTree.value) {
       const excluded = factionLicenceFilter.value.get(entry.factionId)
       const total = entry.licences.length
-      if (excluded && excluded.size > 0) hasAny = true
-      if (!excluded || excluded.size < total) hasAll = false
+      if (total === 0) continue
+      let relevantExcluded = 0
+      if (excluded) {
+        for (const l of entry.licences) {
+          if (excluded.has(l.id)) relevantExcluded++
+        }
+      }
+      if (relevantExcluded > 0) hasAny = true
+      if (relevantExcluded < total) hasAll = false
     }
     if (!hasAny) return 'none'
     if (hasAll) return 'all'
     return 'partial'
   })
 
+  const allFactionLicenceTree = computed(() => {
+    const data = store.blueprintsData.value
+    if (!data || !data.faction_blueprints) return []
+    const fb = data.faction_blueprints
+    const merged: Record<string, Set<string>> = {}
+    for (const cls of Object.values(fb)) {
+      for (const fid of Object.keys(cls)) {
+        if (!merged[fid]) merged[fid] = new Set()
+        const licences = cls[fid]
+        if (!licences) continue
+        for (const lid of Object.keys(licences)) {
+          merged[fid].add(lid)
+        }
+      }
+    }
+    return Object.entries(merged).map(([fid, lids]) => ({
+      factionId: fid,
+      licences: Array.from(lids),
+    }))
+  })
+
   const filteredBlueprints = computed(() => {
     let result = classBlueprints.value
-
     const q = searchQuery.value.toLowerCase().trim()
     if (q) {
       result = result.filter(bp => {
@@ -230,7 +295,7 @@ export function useBlueprintRecipePresenter(store: {
   }
 
   function toggleFactionAllLicences(factionId: string) {
-    const entry = factionLicenceTree.value.find(e => e.factionId === factionId)
+    const entry = allFactionLicenceTree.value.find(e => e.factionId === factionId)
     if (!entry) return
 
     const next = new Map(factionLicenceFilter.value)
@@ -239,19 +304,19 @@ export function useBlueprintRecipePresenter(store: {
     if (current && current.size > 0) {
       next.delete(factionId)
     } else {
-      next.set(factionId, new Set(entry.licences.map(l => l.id)))
+      next.set(factionId, new Set(entry.licences))
     }
 
     factionLicenceFilter.value = next
   }
 
   function toggleAllFactionLicences() {
-    if (factionLicenceAllState.value === 'all') {
+    if (factionLicenceFilter.value.size > 0) {
       factionLicenceFilter.value = new Map()
     } else {
       const next = new Map<string, Set<string>>()
-      for (const entry of factionLicenceTree.value) {
-        next.set(entry.factionId, new Set(entry.licences.map(l => l.id)))
+      for (const entry of allFactionLicenceTree.value) {
+        next.set(entry.factionId, new Set(entry.licences))
       }
       factionLicenceFilter.value = next
     }
@@ -298,7 +363,6 @@ export function useBlueprintRecipePresenter(store: {
     factionCheckState,
     expandedFactions,
     factionDisplayNames,
-    licenceDisplayNames,
     factionLicenceAllState,
   }
 

@@ -1136,6 +1136,7 @@ export interface X4FactionLicence {
   type: string
   name: string
   nameId: string
+  minrelation?: number
 }
 
 export interface X4Faction {
@@ -1147,6 +1148,8 @@ export interface X4Faction {
   color?: string
   claimspace?: boolean
   licences?: X4FactionLicence[]
+  nodiplomacyselection?: boolean
+  noblueprintsale?: boolean
 }
 
 // --- Language Types ---
