@@ -32,6 +32,7 @@
 
 - [x] 实现 `getBlueprintPurchaseStatus(bp, playerData, factions)`。
 - [x] 确保已持证蓝图返回 `purchasable`，不返回"已持证"状态。
+- [x] 不在 presenter 中硬编码 `player` / `ownerless` faction 判定；这类不可展开/不售蓝图语义来自 faction 数据的 `noblueprintsale`。
 - [x] 实现 `blueprintStatusMap`。
 - [x] 实现 `blueprintLockedReasonMap`。
 - [x] 保持 `noplayerblueprint` 现有默认隐藏逻辑。
@@ -40,9 +41,10 @@
 
 - [x] 新增 `blueprintStatusFilter`，默认包含 `owned`、`purchasable`、`licence_needed`、`rep_needed`、`locked`、`no_licence`。
 - [x] 实现 `toggleBlueprintStatusFilter(status)`。
+- [x] 实现 `blueprintStatusAllState` 和 `toggleAllBlueprintStatusFilter`。
 - [x] 将过滤顺序调整为 class -> search -> faction/licence -> blueprint status。
 - [x] 实现 `blueprintStatusCounts`，统计不受 `blueprintStatusFilter` 自身影响。
-- [x] 所有蓝图状态均取消时列表为空。
+- [x] 所有蓝图状态均取消时列表为空。未选择 class 时隐藏蓝图状态过滤区域。
 
 ### 6. Vue Filter 面板
 
@@ -50,6 +52,7 @@
 - [x] 蓝图模式隐藏该新增过滤区域。
 - [x] faction checkbox 前显示当前 faction 声望。
 - [x] licence 行保留证书需求声望，并根据状态给证书名称应用绿色/橙色/红色/蓝色样式。
+- [x] 将 `noblueprintsale` / `nodiplomacyselection` faction 排在 faction filter 最下面。
 - [x] 不新增旧方案中的 licence 进度条或 `+current/+required` 缺口行。
 
 ### 7. Vue 蓝图条目
@@ -76,3 +79,8 @@
 
 - [x] 执行 `npm run build`。
 - [x] ~~如有 TypeScript 编译错误，修复并重复构建直到通过或记录明确 blocker。~~ 构建通过。
+
+### 11. Python faction 数据生成
+
+- [x] `scripts/x4-game/factions/converter.py` 中为 `player` / `ownerless` faction 写入 `noblueprintsale: true`。
+- [x] 更新当前版本 `factions.json` 生成产物，使 `player` / `ownerless` 与 `xenon` 一样不展开 licence 子项。

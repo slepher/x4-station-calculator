@@ -148,7 +148,9 @@ export interface BlueprintRecipePresenterProps {
   factionLicenceAllState: ComputedRef<'all' | 'none' | 'partial'>
   isLiveMode: ComputedRef<boolean>
   blueprintStatusFilter: Ref<Set<BlueprintPurchaseStatus>>
+  blueprintStatusAllState: ComputedRef<'all' | 'none' | 'partial'>
   toggleBlueprintStatusFilter: (status: BlueprintPurchaseStatus) => void
+  toggleAllBlueprintStatusFilter: () => void
   blueprintStatusMap: ComputedRef<Record<string, BlueprintPurchaseStatus>>
   blueprintLockedReasonMap: ComputedRef<Record<string, BlueprintLockedReason>>
   blueprintStatusCounts: ComputedRef<Record<string, number>>
@@ -297,6 +299,11 @@ export function useBlueprintRecipePresenter(store: {
     }
 
     const floop = factionLicenceMap.value
+    const factionNoBlueprintSale = new Set(
+      store.factions.value
+        .filter(f => f.noblueprintsale || f.nodiplomacyselection)
+        .map(f => f.id),
+    )
 
     const result: FactionLicenceEntry[] = Object.entries(merged)
       .map(([fid, lm]) => {
@@ -320,7 +327,12 @@ export function useBlueprintRecipePresenter(store: {
             }),
         }
       })
-      .sort((a, b) => a.factionName.localeCompare(b.factionName))
+      .sort((a, b) => {
+        const aNoSale = factionNoBlueprintSale.has(a.factionId)
+        const bNoSale = factionNoBlueprintSale.has(b.factionId)
+        if (aNoSale !== bNoSale) return aNoSale ? 1 : -1
+        return a.factionName.localeCompare(b.factionName)
+      })
 
     if (classBlueprints.value.some(bp => !bp.factions || bp.factions.length === 0)) {
       result.push({
@@ -520,6 +532,24 @@ export function useBlueprintRecipePresenter(store: {
     blueprintStatusFilter.value = next
   }
 
+  const ALL_BLUEPRINT_STATUSES: BlueprintPurchaseStatus[] = ['owned', 'purchasable', 'licence_needed', 'rep_needed', 'locked', 'no_licence']
+
+  const blueprintStatusAllState = computed(() => {
+    const size = blueprintStatusFilter.value.size
+    if (size === 0) return 'none'
+    if (size === ALL_BLUEPRINT_STATUSES.length) return 'all'
+    return 'partial'
+  })
+
+  function toggleAllBlueprintStatusFilter() {
+    const currentSize = blueprintStatusFilter.value.size
+    if (currentSize > 0) {
+      blueprintStatusFilter.value = new Set()
+    } else {
+      blueprintStatusFilter.value = new Set(ALL_BLUEPRINT_STATUSES)
+    }
+  }
+
   function selectType(typeId: string) {
     selectedTypeId.value = typeId
     const tc = typesNav.value.find(t => t.id === typeId)
@@ -625,7 +655,9 @@ export function useBlueprintRecipePresenter(store: {
     factionLicenceAllState,
     isLiveMode,
     blueprintStatusFilter,
+    blueprintStatusAllState,
     toggleBlueprintStatusFilter,
+    toggleAllBlueprintStatusFilter,
     blueprintStatusMap,
     blueprintLockedReasonMap,
     blueprintStatusCounts,

@@ -22,7 +22,8 @@ const {
   typesNav, selectedTypeId, selectedClassId, filteredBlueprints, searchQuery,
   factionLicenceTree, factionLicenceFilter, factionCheckState, expandedFactions,
   factionLicenceAllState, isLiveMode,
-  blueprintStatusFilter, toggleBlueprintStatusFilter,
+  blueprintStatusFilter, toggleBlueprintStatusFilter, toggleAllBlueprintStatusFilter,
+  blueprintStatusAllState,
   blueprintStatusMap, blueprintLockedReasonMap, blueprintStatusCounts,
   getFactionLicenceState,
 } = p.props
@@ -166,9 +167,17 @@ function statusCount(status: string): number {
     </div>
 
     <div class="bp-filter-panel custom-scrollbar">
-      <div v-if="isLiveMode" class="bp-filter-section">
+      <div v-if="isLiveMode && selectedClassId" class="bp-filter-section">
         <div class="bp-filter-title">
-          <span>{{ t('blueprint_recipe.blueprint_status') }}</span>
+          <label class="bp-filter-item bp-filter-title-item">
+            <input
+              type="checkbox"
+              :indeterminate.prop="blueprintStatusAllState === 'partial'"
+              :checked="blueprintStatusAllState === 'all'"
+              @change="toggleAllBlueprintStatusFilter()"
+            />
+            <span>{{ t('blueprint_recipe.blueprint_status') }}</span>
+          </label>
         </div>
         <label
           v-for="status in ['owned', 'purchasable', 'licence_needed', 'rep_needed', 'locked', 'no_licence']"

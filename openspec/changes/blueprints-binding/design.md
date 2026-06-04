@@ -43,6 +43,8 @@ export interface PlayerBindingData {
 
 蓝图模式传入 `null`。实况模式从当前 archive 构造该对象。缺失字段在构造时归一为空数组/空对象。
 
+`relations` 来自 `faction-binding` 输出的 `playerRelations`，表示当前有效声望。XML 中 `<relation>` / `<booster>` 的读取和优先级由 `faction-binding` 负责，本变更不得重新读取或解释 save XML 的声望节点。
+
 `licences` 的 value 是 save 中该 `<licence>` 节点 `factions` 属性拆分后的 faction ID 列表。它不是 licence type 的全局 boolean。任何“已持证”判断都必须使用 `(licenceType, factionId)` 二元组。
 
 ```typescript
@@ -59,7 +61,7 @@ function hasPlayerLicenceForFaction(
 
 ### 2. 声望显示
 
-提供 `formatRelation(raw: number | undefined): string`：
+提供 `formatRelation(raw: number | undefined): string`，其中 `raw` 是 `playerData.relations[factionId]` 的当前有效声望值：
 
 - `raw == null`：显示空或 unknown 样式，不参与达标。
 - `raw === 0`：显示 `0`。
@@ -122,6 +124,13 @@ type BlueprintPurchaseStatus =
 
 `noblueprintsale` / `nodiplomacyselection` faction 不作为可售 faction。
 
+`player` / `ownerless` 不在 presenter 中按 faction ID 特判；它们必须由 `scripts/x4-game/factions/converter.py` 在生成 `factions.json` 时写入 `noblueprintsale: true`。这样 faction 行与 `xenon` 等不售蓝图 faction 使用同一展开/销售语义。
+
+Faction filter 排序分两组：
+
+1. 可售蓝图 faction：按显示名排序。
+2. `noblueprintsale` / `nodiplomacyselection` faction：统一排在最下面，组内按显示名排序。
+
 ### 5. Locked Reason
 
 Presenter 为 locked 蓝图输出 reason code：
@@ -146,7 +155,9 @@ const blueprintStatusFilter = ref<Set<BlueprintPurchaseStatus>>(
 )
 ```
 
-蓝图模式隐藏该过滤区域，且不应用该 filter。
+蓝图模式隐藏该过滤区域，且不应用该 filter。未选择 class 时同样隐藏。
+
+`blueprintStatusAllState` 计算当前全选/部分/全不选状态，`toggleAllBlueprintStatusFilter` 用于全选或全不选切换。
 
 过滤顺序：
 
@@ -180,7 +191,9 @@ interface FactionLicenceEntry {
 - `blueprintLockedReasonMap`
 - `blueprintStatusCounts`
 - `blueprintStatusFilter`
+- `blueprintStatusAllState`
 - `toggleBlueprintStatusFilter`
+- `toggleAllBlueprintStatusFilter`
 - `getFactionLicenceState(factionId, licenceType)`
 
 ### 8. UI 布局
@@ -204,5 +217,6 @@ licence 行保留现有证书需求声望显示，并通过 class 改变证书�
 | `src/components/empire/BlueprintRecipeWorkbench.vue` | 修改 | 渲染 faction 声望、证书颜色、蓝图状态 filter/badge |
 | `src/components/empire/BlueprintProductionWorkbenchView.vue` | 修改 | 蓝图模式传入 `playerData = null` 或等价 presenter 输入 |
 | `src/components/empire/LiveProductionWorkbenchView.vue` | 修改 | 从 archive 构造 `PlayerBindingData` |
+| `scripts/x4-game/factions/converter.py` | 修改 | 为 `player` / `ownerless` faction 写入 `noblueprintsale: true` |
 | `src/locales/zh-CN.json` | 修改 | 新增蓝图状态、证书状态、locked reason 文案 |
 | `src/locales/en.json` | 修改 | 新增对应英文文案 |

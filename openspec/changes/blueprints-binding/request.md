@@ -19,7 +19,7 @@
 
 - `playerBlueprints: string[]`：玩家已拥有蓝图 ID。
 - `playerLicences: Record<string, string[]>`：licence type -> 已购买该证书的 faction ID 列表。该列表来自 save 中 `<licence type="..." factions="...">` 的 `factions` 属性。
-- `playerRelations: Record<string, number>`：faction ID -> 当前原始声望值，范围沿用 X4 save 原始值。
+- `playerRelations: Record<string, number>`：faction ID -> 当前有效声望值；该字段由 `faction-binding` 的 save parser 负责从 XML `<relation>` / `<booster>` 解析并处理优先级，本变更只消费结果。
 
 缺失字段按空数据处理，但不应影响页面渲染。
 
@@ -30,7 +30,7 @@ Game data 中 `faction.licences` 的职责是判断该 faction 是否提供此 l
 ### 3. Faction 行显示
 
 - faction checkbox 前显示该 faction 当前声望。
-- 当前声望使用与现有 blueprint-view 一致的显示公式：`ceil(10 * log10(abs(rawRep) * 1000))`，带符号显示（如 `+18`、`-15`）。
+- 当前声望使用与现有 blueprint-view 一致的显示公式：`ceil(10 * log10(abs(rawRep) * 1000))`，带符号显示（如 `+18`、`-15`）。其中 `rawRep` 来自 `playerRelations[factionId]`，不在蓝图绑定层重新读取或解释 save XML。
 - `rawRep = 0` 时显示 `0`，不得显示 `Infinity`、`-Infinity` 或空进度。
 - faction 行显示玩家当前声望，不替代 licence 行现有的证书需求声望显示。
 
@@ -46,6 +46,8 @@ licence 行保留现有证书需求声望显示（来自该 faction licence 的 
 | `default` | 无玩家数据或无法判定 | 蓝色 |
 
 `noblueprintsale` / `nodiplomacyselection` faction 不展示 licence 子项，沿用现有 faction 行占位表现。
+
+Faction filter 的页面显示顺序 SHALL 将可售蓝图 faction 排在前面，将 `noblueprintsale` / `nodiplomacyselection` faction 统一排到最下面；同一组内按 faction 显示名排序。
 
 ### 5. 蓝图购买状态分类
 
@@ -63,9 +65,11 @@ licence 行保留现有证书需求声望显示（来自该 faction licence 的 
 
 “已持证”不是蓝图状态。对蓝图来说，已持有所需证书即为 `purchasable`。
 
+`player` / `ownerless` faction SHALL 在 Python faction 数据生成阶段写入 `noblueprintsale: true`，与 `xenon` 等不售蓝图 faction 使用同一属性。页面 presenter 不得为 `player` / `ownerless` 增加额外硬编码判定；它只消费 faction 数据中的 `noblueprintsale`。
+
 ### 6. 蓝图购买状态过滤
 
-在 filter 面板顶部新增「蓝图状态」过滤区域，位于 faction filter 之上。过滤项：
+在 filter 面板顶部新增「蓝图状态」过滤区域，位于 faction filter 之上。区域标题带全局 checkbox 用于全选/取消全部状态。未选择 class 时隐藏。过滤项：
 
 - 已拥有
 - 可购买
@@ -107,7 +111,6 @@ licence 行保留现有证书需求声望显示（来自该 faction licence 的 
 ### Out of Scope
 
 - 修改 save parser、`useSaveStore` 或 `saveArchiveDB` 的数据结构。
-- 修改 `blueprints.json` 数据生成。
 - 在 licence 行显示进度条。
 - 变更或删除 licence 行现有证书需求声望。
 - 把“已持证”作为蓝图购买状态。
@@ -126,6 +129,8 @@ licence 行保留现有证书需求声望显示（来自该 faction licence 的 
 9. 状态计数 N 不受蓝图状态 filter 自身影响。
 10. `locked` 蓝图显示明确不可购买原因。
 11. `noplayerblueprint` 蓝图继续保持现有默认隐藏行为。
+12. `player` / `ownerless` faction 由 Python faction 生成器写入 `noblueprintsale: true`，其 faction 行与 `xenon` 一样不展开 licence 子项，而不是由页面运行时特判。
+13. Faction filter 中 `noblueprintsale` / `nodiplomacyselection` faction 显示在可售 faction 之后。
 
 ## 未决项
 

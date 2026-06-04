@@ -48,7 +48,7 @@
 #### Scenario: faction row shows current reputation
 
 - **前提** 当前为实况模式
-- **前提** `playerRelations` 包含当前 faction 的原始声望值
+- **前提** `playerRelations` 包含当前 faction 的当前有效声望值
 - **当** 渲染 faction filter 行
 - **那么** faction checkbox 前 SHALL 显示当前声望
 - **并且** 正声望 SHALL 带 `+` 前缀
@@ -56,7 +56,7 @@
 
 #### Scenario: zero reputation displays zero
 
-- **前提** 当前 faction 的原始声望为 `0`
+- **前提** 当前 faction 的当前有效声望为 `0`
 - **当** 渲染 faction filter 行
 - **那么** 声望 SHALL 显示为 `0`
 - **并且** SHALL NOT 显示 `Infinity` 或 `-Infinity`
@@ -117,6 +117,14 @@
 - **当** 渲染 faction filter
 - **那么** SHALL NOT 显示该 faction 的 licence 子项
 - **并且** SHALL 保持现有 faction 行占位和 checkbox 行为
+
+#### Scenario: non-selling factions are displayed last
+
+- **前提** faction filter 同时包含可售蓝图 faction 和 `noblueprintsale` / `nodiplomacyselection` faction
+- **当** 渲染 faction filter
+- **那么** 可售蓝图 faction SHALL 显示在前
+- **并且** `noblueprintsale` / `nodiplomacyselection` faction SHALL 显示在最后
+- **并且** 同一组内 SHALL 按 faction 显示名排序
 
 ### Requirement: Blueprint Purchase Status Classification
 
@@ -184,6 +192,29 @@
 - **那么** 状态 SHALL 为 `no_player_data`
 - **并且** SHALL NOT 显示任何蓝图状态 badge
 
+### Requirement: Unsalable Faction Source Generation
+
+`player` / `ownerless` faction SHALL 在 Python faction 数据生成阶段写入 `noblueprintsale: true`，而不是由页面运行时按 faction ID 特判。
+
+#### Scenario: player faction is marked no blueprint sale
+
+- **前提** factions XML 中存在 `<faction id="player">`
+- **当** Python factions 生成器写出 `factions.json`
+- **那么** `player` faction SHALL 包含 `noblueprintsale: true`
+
+#### Scenario: ownerless faction is marked no blueprint sale
+
+- **前提** factions XML 中存在 `<faction id="ownerless">`
+- **当** Python factions 生成器写出 `factions.json`
+- **那么** `ownerless` faction SHALL 包含 `noblueprintsale: true`
+
+#### Scenario: presenter uses faction no sale attribute
+
+- **前提** faction 数据包含 `noblueprintsale: true`
+- **当** 页面 presenter 构造 faction/licence filter
+- **那么** 该 faction 行 SHALL 不展开 licence 子项
+- **并且** presenter SHALL NOT 额外硬编码 `player` 或 `ownerless` faction 判定
+
 ### Requirement: Blueprint Status Filter
 
 实况模式下 filter 面板 SHALL 提供蓝图最终购买状态过滤。
@@ -222,6 +253,23 @@
 - **当** 计算状态数量 N
 - **那么** N SHALL 基于当前 class、搜索和 faction/licence filter 后的结果
 - **并且** N SHALL NOT 受蓝图状态 filter 自身影响
+
+#### Scenario: blueprint status filter has global toggle
+
+- **前提** 当前为实况模式
+- **前提** 已选择 class
+- **当** 渲染 filter 面板
+- **那么** 「蓝图状态」标题 SHALL 包含全局 checkbox
+- **并且** 所有状态均勾选时 SHALL 显示为 checked
+- **并且** 部分勾选时 SHALL 显示 indeterminate
+- **并且** 点击全局 checkbox SHALL 切换全选/全不选
+
+#### Scenario: blueprint status filter hidden when no class selected
+
+- **前提** 当前为实况模式
+- **前提** 未选择 class
+- **当** 渲染 filter 面板
+- **那么** SHALL NOT 显示「蓝图状态」过滤区域
 
 #### Scenario: blueprint status filter hidden in blueprint mode
 
