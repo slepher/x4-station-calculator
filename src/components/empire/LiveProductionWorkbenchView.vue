@@ -2,9 +2,12 @@
 import { computed, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useLiveProductionStore } from '@/store/useLiveProductionStore'
+import { useSaveStore } from '@/store/useSaveStore'
 import { useTerraformingStore } from '@/store/useTerraformingStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useActiveViewStore } from '@/store/useActiveViewStore'
+import { storeToRefs } from 'pinia'
+import type { PlayerBindingData } from '@/components/empire/presenters/useBlueprintRecipePresenter'
 import { useProductionSidebarPresenter } from '@/components/empire/presenters/useProductionSidebarPresenter'
 import { useProductionToolbarPresenter } from '@/components/empire/presenters/useProductionToolbarPresenter'
 import { useProductionPlanningPresenter } from '@/components/empire/presenters/useProductionPlanningPresenter'
@@ -35,7 +38,20 @@ const liveStore = useLiveProductionStore()
 const terraformingStore = useTerraformingStore()
 const activeViewStore = useActiveViewStore()
 const gameDataStore = useGameDataStore()
+const saveStore = useSaveStore()
 const { t } = useI18n()
+
+const { selectedArchive } = storeToRefs(saveStore)
+
+const playerBindingData = computed<PlayerBindingData | null>(() => {
+  const archive = selectedArchive.value
+  if (!archive) return null
+  return {
+    blueprints: archive.playerBlueprints ?? [],
+    relations: archive.playerRelations ?? {},
+    licences: archive.playerLicences ?? {},
+  }
+})
 
 const gameDataMaps = computed(() => gameDataStore.maps)
 
@@ -245,7 +261,7 @@ const showArchiveModuleList = computed(() => {
 
   <ResearchWorkbench v-else-if="toolbarPresenter.props.workbenchMode.value === 'research'" />
 
-  <BlueprintRecipeWorkbench v-else-if="toolbarPresenter.props.workbenchMode.value === 'blueprint-recipe'" />
+  <BlueprintRecipeWorkbench v-else-if="toolbarPresenter.props.workbenchMode.value === 'blueprint-recipe'" :playerData="playerBindingData" />
 
   <template v-else-if="toolbarPresenter.props.workbenchMode.value === 'overview' || toolbarPresenter.props.workbenchMode.value === 'transit'">
     <div v-if="toolbarPresenter.props.workbenchMode.value === 'transit'" class="main-layout">

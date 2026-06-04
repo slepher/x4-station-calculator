@@ -36,6 +36,16 @@ impl FactionParser {
             }
         }
 
+        if self.in_player_faction && name == "booster" {
+            if let Some(faction) = attrs.get("faction").cloned() {
+                if let Some(rel_str) = attrs.get("relation") {
+                    if let Ok(value) = rel_str.parse::<f64>() {
+                        self.player_relations.insert(faction, value);
+                    }
+                }
+            }
+        }
+
         if self.in_player_faction && name == "licence" {
             if let Some(licence_type) = attrs.get("type").cloned() {
                 if let Some(factions_str) = attrs.get("factions") {

@@ -77,6 +77,21 @@ mod tests {
     }
 
     #[test]
+    fn player_relation_booster_overrides_base_relation_when_present() {
+        let xml = r#"<savegame><info><game guid="g" seed="1" time="2" version="8.0"/><player name="p"/></info><faction id="player"><relations><relation faction="antigone" relation="-0.032"/><relation faction="ministry" relation="-0.032"/><booster faction="antigone" relation="0.800418"/></relations></faction></savegame>"#;
+
+        let mut parser = StreamingSaveParser::new(Some("8.0".to_string()));
+        parser.push_chunk(xml.as_bytes());
+        parser.finish_input();
+        while parser.pump(4096) {}
+
+        let archive = parser.finish_archive("relations.xml").expect("archive");
+
+        assert_eq!(archive.player_relations.get("antigone"), Some(&0.800418));
+        assert_eq!(archive.player_relations.get("ministry"), Some(&-0.032));
+    }
+
+    #[test]
     fn progress_percent_uses_expected_total_bytes_when_available() {
         let xml = r#"<savegame><info><game guid="g" seed="1" time="2" version="8.0"/><player name="p"/></info><component class="sector" macro="sec_alpha" known="1"></component></savegame>"#;
         let mut parser = StreamingSaveParser::new(Some("8.0".to_string()));

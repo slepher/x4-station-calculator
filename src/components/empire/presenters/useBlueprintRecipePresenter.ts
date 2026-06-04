@@ -4,16 +4,134 @@ import type { BlueprintsData, X4Blueprint, BlueprintTypeCategory, BlueprintClass
 
 const GENERIC_FACTION_ID = '__generic__'
 
+export type LicencePurchaseState = 'licensed' | 'eligible' | 'rep_needed' | 'default'
+
+export type BlueprintPurchaseStatus = 'owned' | 'purchasable' | 'licence_needed' | 'rep_needed' | 'locked' | 'no_licence' | 'no_player_data'
+
+export type BlueprintLockedReason = 'no_seller' | 'faction_no_blueprint_sale' | 'no_diplomacy' | 'unknown_licence'
+
+export interface PlayerBindingData {
+  blueprints: string[]
+  relations: Record<string, number>
+  licences: Record<string, string[]>
+}
+
 export interface FactionLicenceEntry {
   factionId: string
   factionName: string
-  licences: { id: string; name: string; rep: number | null }[]
+  relationLabel?: string
+  licences: { id: string; name: string; rep: number | null; state?: LicencePurchaseState }[]
 }
 
 function repFromMinrelation(mr: number | undefined): number | null {
   if (mr == null || mr === 0) return null
   const sign = mr > 0 ? 1 : -1
   return sign * Math.ceil(10 * Math.log10(Math.abs(mr) * 1000))
+}
+
+function formatRelation(raw: number | undefined): string {
+  if (raw == null) return ''
+  if (raw === 0) return '0'
+  const sign = raw > 0 ? '+' : '-'
+  return sign + String(Math.ceil(10 * Math.log10(Math.abs(raw) * 1000)))
+}
+
+function hasPlayerLicenceForFaction(
+  playerData: PlayerBindingData,
+  licenceType: string,
+  factionId: string,
+): boolean {
+  return playerData.licences[licenceType]?.includes(factionId) === true
+}
+
+function getLicencePurchaseState(
+  factionId: string,
+  licenceType: string,
+  playerData: PlayerBindingData | null,
+  minrelation: number | undefined,
+): LicencePurchaseState {
+  if (!playerData) return 'default'
+  if (hasPlayerLicenceForFaction(playerData, licenceType, factionId)) return 'licensed'
+  if (minrelation == null || playerData.relations[factionId] == null) return 'default'
+  if (playerData.relations[factionId] >= minrelation) return 'eligible'
+  return 'rep_needed'
+}
+
+function getBlueprintPurchaseStatus(
+  bp: X4Blueprint,
+  playerData: PlayerBindingData | null,
+  factions: X4Faction[],
+  classLicenceFactions: Record<string, Record<string, Record<string, number>>> | undefined,
+  selectedClassId: string | null,
+): { status: BlueprintPurchaseStatus; lockedReason?: BlueprintLockedReason } {
+  if (!playerData) return { status: 'no_player_data' }
+  if (playerData.blueprints.includes(bp.id)) return { status: 'owned' }
+  if (!bp.licence) return { status: 'no_licence' }
+
+  const licenceType = bp.licence
+  const sellingFactions = resolveSellingFactions(bp, factions, classLicenceFactions, selectedClassId)
+
+  if (sellingFactions.length === 0) {
+    const allFactions = bp.factions || []
+    if (allFactions.length === 0) return { status: 'locked', lockedReason: 'no_seller' }
+    const hasNoDiplomacy = allFactions.every(fid => factions.find(f => f.id === fid)?.nodiplomacyselection)
+    if (hasNoDiplomacy) return { status: 'locked', lockedReason: 'no_diplomacy' }
+    const hasNoSale = allFactions.every(fid => factions.find(f => f.id === fid)?.noblueprintsale)
+    if (hasNoSale) return { status: 'locked', lockedReason: 'faction_no_blueprint_sale' }
+    return { status: 'locked', lockedReason: 'unknown_licence' }
+  }
+
+  const hasLicensed = sellingFactions.some(fid => getLicenceStateForFaction(fid, licenceType, playerData, factions) === 'licensed')
+  if (hasLicensed) return { status: 'purchasable' }
+
+  const hasEligible = sellingFactions.some(fid => getLicenceStateForFaction(fid, licenceType, playerData, factions) === 'eligible')
+  if (hasEligible) return { status: 'licence_needed' }
+
+  return { status: 'rep_needed' }
+}
+
+function resolveSellingFactions(
+  bp: X4Blueprint,
+  factions: X4Faction[],
+  classLicenceFactions: Record<string, Record<string, Record<string, number>>> | undefined,
+  selectedClassId: string | null,
+): string[] {
+  const licenceType = bp.licence
+  if (!licenceType) return []
+
+  const bpFactions = bp.factions || []
+  if (bpFactions.length === 0) return []
+
+  let licenceFactions: Set<string> | undefined
+  if (selectedClassId && classLicenceFactions?.[selectedClassId]) {
+    const clsData = classLicenceFactions[selectedClassId]
+    const candidates = new Set<string>()
+    for (const fid of Object.keys(clsData)) {
+      if (clsData[fid]?.[licenceType] != null) candidates.add(fid)
+    }
+    if (candidates.size > 0) licenceFactions = candidates
+  }
+
+  return bpFactions.filter(fid => {
+    const faction = factions.find(f => f.id === fid)
+    if (!faction) return false
+    if (faction.noblueprintsale || faction.nodiplomacyselection) return false
+    if (licenceFactions && !licenceFactions.has(fid)) return false
+    return faction.licences?.some(l => l.type === licenceType)
+  })
+}
+
+function getLicenceStateForFaction(
+  factionId: string,
+  licenceType: string,
+  playerData: PlayerBindingData | null,
+  factions: X4Faction[],
+): LicencePurchaseState {
+  if (!playerData) return 'default'
+  const faction = factions.find(f => f.id === factionId)
+  if (!faction || !faction.licences) return 'default'
+  const licence = faction.licences.find(l => l.type === licenceType)
+  return getLicencePurchaseState(factionId, licenceType, playerData, licence?.minrelation)
 }
 
 export interface BlueprintRecipePresenterProps {
@@ -28,6 +146,13 @@ export interface BlueprintRecipePresenterProps {
   expandedFactions: Ref<Set<string>>
   factionDisplayNames: ComputedRef<Record<string, string>>
   factionLicenceAllState: ComputedRef<'all' | 'none' | 'partial'>
+  isLiveMode: ComputedRef<boolean>
+  blueprintStatusFilter: Ref<Set<BlueprintPurchaseStatus>>
+  toggleBlueprintStatusFilter: (status: BlueprintPurchaseStatus) => void
+  blueprintStatusMap: ComputedRef<Record<string, BlueprintPurchaseStatus>>
+  blueprintLockedReasonMap: ComputedRef<Record<string, BlueprintLockedReason>>
+  blueprintStatusCounts: ComputedRef<Record<string, number>>
+  getFactionLicenceState: (factionId: string, licenceType: string) => LicencePurchaseState
 }
 
 export interface BlueprintRecipePresenterEmits {
@@ -43,6 +168,7 @@ export interface BlueprintRecipePresenterEmits {
 export function useBlueprintRecipePresenter(store: {
   blueprintsData: Ref<BlueprintsData | null>
   factions: Ref<X4Faction[]>
+  playerData?: Ref<PlayerBindingData | null>
 }): {
   props: BlueprintRecipePresenterProps
   emits: BlueprintRecipePresenterEmits
@@ -54,6 +180,13 @@ export function useBlueprintRecipePresenter(store: {
   const searchQuery = ref('')
   const factionLicenceFilter = ref<Map<string, Set<string>>>(new Map())
   const expandedFactions = ref<Set<string>>(new Set())
+  const blueprintStatusFilter = ref<Set<BlueprintPurchaseStatus>>(
+    new Set(['owned', 'purchasable', 'licence_needed', 'rep_needed', 'locked', 'no_licence']),
+  )
+
+  const playerDataRef = computed(() => store.playerData?.value ?? null)
+
+  const isLiveMode = computed(() => playerDataRef.value !== null)
 
   const factionDisplayNames = computed(() => {
     const map: Record<string, string> = {}
@@ -166,21 +299,27 @@ export function useBlueprintRecipePresenter(store: {
     const floop = factionLicenceMap.value
 
     const result: FactionLicenceEntry[] = Object.entries(merged)
-      .map(([fid, lm]) => ({
-        factionId: fid,
-        factionName: fdn[fid] || fid,
-        licences: Object.entries(lm)
-          .map(([lid]) => {
-            const fl = floop[fid]?.[lid]
-            return { id: lid, name: fl?.name || gln[lid] || lid, rep: repFromMinrelation(fl?.mr) }
-          })
-          .sort((a, b) => {
-            if (a.rep == null && b.rep == null) return a.name.localeCompare(b.name)
-            if (a.rep == null) return 1
-            if (b.rep == null) return -1
-            return a.rep - b.rep
-          }),
-      }))
+      .map(([fid, lm]) => {
+        const pd = playerDataRef.value
+        const relRaw = pd?.relations?.[fid]
+        return {
+          factionId: fid,
+          factionName: fdn[fid] || fid,
+          relationLabel: pd ? formatRelation(relRaw) : undefined,
+          licences: Object.entries(lm)
+            .map(([lid]) => {
+              const fl = floop[fid]?.[lid]
+              const state = getLicencePurchaseState(fid, lid, pd, fl?.mr)
+              return { id: lid, name: fl?.name || gln[lid] || lid, rep: repFromMinrelation(fl?.mr), state }
+            })
+            .sort((a, b) => {
+              if (a.rep == null && b.rep == null) return a.name.localeCompare(b.name)
+              if (a.rep == null) return 1
+              if (b.rep == null) return -1
+              return a.rep - b.rep
+            }),
+        }
+      })
       .sort((a, b) => a.factionName.localeCompare(b.factionName))
 
     if (classBlueprints.value.some(bp => !bp.factions || bp.factions.length === 0)) {
@@ -269,6 +408,32 @@ export function useBlueprintRecipePresenter(store: {
     }))
   })
 
+  const blueprintStatusMap = computed(() => {
+    const map: Record<string, BlueprintPurchaseStatus> = {}
+    const pd = playerDataRef.value
+    const clsLicFactions = store.blueprintsData.value?.faction_blueprints
+    for (const bp of classBlueprints.value) {
+      const { status } = getBlueprintPurchaseStatus(
+        bp, pd, store.factions.value, clsLicFactions, selectedClassId.value,
+      )
+      map[bp.id] = status
+    }
+    return map
+  })
+
+  const blueprintLockedReasonMap = computed(() => {
+    const map: Record<string, BlueprintLockedReason> = {}
+    const pd = playerDataRef.value
+    const clsLicFactions = store.blueprintsData.value?.faction_blueprints
+    for (const bp of classBlueprints.value) {
+      const { lockedReason } = getBlueprintPurchaseStatus(
+        bp, pd, store.factions.value, clsLicFactions, selectedClassId.value,
+      )
+      if (lockedReason) map[bp.id] = lockedReason
+    }
+    return map
+  })
+
   const filteredBlueprints = computed(() => {
     let result = classBlueprints.value
     const q = searchQuery.value.toLowerCase().trim()
@@ -297,8 +462,63 @@ export function useBlueprintRecipePresenter(store: {
       })
     }
 
+    if (blueprintStatusFilter.value.size < 6) {
+      result = result.filter(bp => blueprintStatusFilter.value.has(blueprintStatusMap.value[bp.id] ?? 'no_player_data'))
+    }
+
     return result
   })
+
+  const blueprintStatusCounts = computed(() => {
+    const counts: Record<string, number> = {}
+    const q = searchQuery.value.toLowerCase().trim()
+    let result = classBlueprints.value
+
+    if (q) {
+      result = result.filter(bp => {
+        const name = resolveBlueprintName(bp).toLowerCase()
+        const id = bp.id.toLowerCase()
+        const facDisplayNames = factionDisplayNames.value
+        const factionText = (bp.factions || []).map(fid => facDisplayNames[fid] || fid).join(' ').toLowerCase()
+        return name.includes(q) || id.includes(q) || factionText.includes(q)
+      })
+    }
+
+    if (factionLicenceFilter.value.size > 0) {
+      result = result.filter(bp => {
+        const fs = bp.factions || []
+        const l = bp.licence
+        if (fs.length === 0) {
+          return !factionLicenceFilter.value.has(GENERIC_FACTION_ID)
+        }
+        if (!l) return true
+        return !fs.every(fid => {
+          const excluded = factionLicenceFilter.value.get(fid)
+          return excluded ? excluded.has(l) : false
+        })
+      })
+    }
+
+    for (const bp of result) {
+      const s = blueprintStatusMap.value[bp.id] || 'no_player_data'
+      counts[s] = (counts[s] || 0) + 1
+    }
+    return counts
+  })
+
+  function getFactionLicenceState(factionId: string, licenceType: string): LicencePurchaseState {
+    return getLicenceStateForFaction(factionId, licenceType, playerDataRef.value, store.factions.value)
+  }
+
+  function toggleBlueprintStatusFilter(status: BlueprintPurchaseStatus) {
+    const next = new Set(blueprintStatusFilter.value)
+    if (next.has(status)) {
+      next.delete(status)
+    } else {
+      next.add(status)
+    }
+    blueprintStatusFilter.value = next
+  }
 
   function selectType(typeId: string) {
     selectedTypeId.value = typeId
@@ -403,6 +623,13 @@ export function useBlueprintRecipePresenter(store: {
     expandedFactions,
     factionDisplayNames,
     factionLicenceAllState,
+    isLiveMode,
+    blueprintStatusFilter,
+    toggleBlueprintStatusFilter,
+    blueprintStatusMap,
+    blueprintLockedReasonMap,
+    blueprintStatusCounts,
+    getFactionLicenceState,
   }
 
   const emits: BlueprintRecipePresenterEmits = {
