@@ -8,6 +8,7 @@ import type {
 } from '@/types/x4'
 import type { TerraformingData, TerraformingCluster } from './logic/terraformingTaskResolver'
 import {
+  buildArchiveRuntimeStats,
   buildCompletedProjectsFromExecutionLog,
   deductExecutionLogByArchiveDelta,
   getRuntimeTerraformingProjectIds,
@@ -318,7 +319,7 @@ export const useTerraformingStore = defineStore('terraforming', () => {
       .filter((item): item is RebateKey => item !== null)
     return {
       clusterId: runtime.clusterId,
-      stats: { ...runtime.stats },
+      stats: buildArchiveRuntimeStats(selectedCluster.value, runtime.stats),
       completedProjects,
       completedEvents,
       rebates,
@@ -417,6 +418,18 @@ export const useTerraformingStore = defineStore('terraforming', () => {
     const next = { ...plan.syncedExecutedBaselineByCluster }
     delete next[clusterId]
     plan.syncedExecutedBaselineByCluster = next
+    saveToStorage()
+  }
+
+  function importBlueprintSettingsToActivePlan(): void {
+    const plan = activePlan.value
+    if (!plan || plan.mode !== 'live') return
+    const blueprintPlan = savedPlans.value.list.find(item => item.mode === 'blueprint' && item.planId === '__default__')
+    if (!blueprintPlan) return
+    plan.selectedClusterId = blueprintPlan.selectedClusterId
+    plan.executionLogByCluster = { ...blueprintPlan.executionLogByCluster }
+    plan.syncedExecutedBaselineByCluster = {}
+    hydrateExecutionLogs()
     saveToStorage()
   }
 
@@ -540,6 +553,7 @@ export const useTerraformingStore = defineStore('terraforming', () => {
     replaceExecutionLogAndSyncBaseline,
     syncExecutedBaselineForSelectedCluster,
     clearExecutedBaselineForSelectedCluster,
+    importBlueprintSettingsToActivePlan,
     clearExecutionQueue,
     loadFromStorage,
     saveToStorage,

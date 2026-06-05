@@ -25,7 +25,7 @@
 
 起始点包含：
 
-- `baseStats`: 来自 `SaveTerraformingCluster.stats`
+- `baseStats`: 来自 `SaveTerraformingCluster.stats` 的归一化结果；静态 `cluster.initialStats` 中存在但 save runtime 缺失的 stat 记为 `0`
 - `baseCompletedProjects`: 来自 `SaveTerraformingCluster.completedProjects`
 - `baseCompletedOneTimeEvents`: 来自 `SaveTerraformingCluster.events` 中属于一次性事件的完成次数
 - `baseRebates`: 来自 `SaveTerraformingCluster.rebates`
@@ -33,7 +33,7 @@
 - `retainedProjects`: 来自 `SaveTerraformingCluster.retainedProjects`
 - `missionComplete`: 来自 `SaveTerraformingCluster.missionComplete`
 
-`baseStats` 是存档权威值。实现不得先从静态初始 stats 加 completed project effects 重新推导，再覆盖成存档 stats。
+`baseStats` 是存档权威值。实现不得先从静态初始 stats 加 completed project effects 重新推导，再覆盖成存档 stats。若某 stat 在静态初始状态存在、但当前 save runtime 没有该字段，系统 SHALL 将其解释为该 stat 已被存档清零。
 
 ### 3. 已执行列表同步与 baseline
 
@@ -48,7 +48,8 @@
   - 完成次数减少表示 archive 回退或切换到不一致存档，应提示风险。
   - stats/rebates/activeProject 与 baseline 不一致时，应提示存档状态已变化并重新校验队列。
 - 用户确认同步后，`syncedExecutedBaseline` 更新为当前 archive executed 状态。
-- 页面 SHALL 提供调试按钮，用于清空当前 cluster 已保存的 `syncedExecutedBaseline`，以便重新观察 archive 与空 baseline 的差额。
+- live 模式页面 SHALL 提供“导入”按钮，用于将蓝图中的 terraforming 设置导入当前 live plan，并清空当前 live plan 已保存的 `syncedExecutedBaseline`，使 archive 已完成/正在执行状态重新进入用户确认流程。
+- 非 live 模式 SHALL NOT 显示该“导入”按钮。
 
 ### 4. 队列扣除规则
 
@@ -123,7 +124,9 @@ task log 内部新增一个切换栏，用于在同一面板内切换：
 ### 9. activeProject 与 retainedProjects 展示
 
 - 若 archive runtime 存在 `activeProject` 且 `activeProject.aborted !== true`，页面 SHALL 将该 project 作为当前正在执行内容，固定显示为“当前队列”视图第一项。
+- 当前正在执行内容 SHALL 作为 replay timeline 的第一步参与当前队列与编辑态推演。
 - 当前正在执行内容不可移动、不可取消、不可编辑，不进入 `draftExecutionLog`，也不得写入 `terraformingExecutionLog`。
+- 当前正在执行内容在非编辑态和编辑态都 SHALL 固定显示为第一项，并使用当前队列 task log 的普通项目展开形式展示。
 - 如果同一个 project 已经存在于 `terraformingExecutionLog` 的后续位置，当前队列显示 SHALL 将其提升为第一项，并避免在原位置重复显示。
 - 若 `activeProject.aborted === true`，该 project SHALL NOT 被视为当前正在执行内容，也 SHALL NOT 固定为当前队列第一项。
 - 若 `activeProject.aborted === true` 或 project 存在于 `retainedProjects`，并且同 project 出现在当前 log 队列中，页面 SHALL 在该 log entry 上标记“有进度”。
@@ -164,18 +167,19 @@ task log 内部新增一个切换栏，用于在同一面板内切换：
 5. 可重复 event 不按 archive 扣除，而是由扣除后的 replay 重新生成。
 6. archive 中额外存在但队列中没有的完成项出现在“已执行”视图，但不加入当前队列。
 7. archive runtime 中的 project/event 在“已执行”视图中分别标记为“已执行”/“已发生”；已执行视图不得只依赖本次扣除差额。
-8. 非编辑态初始进入 task log 时，被扣除的原队列 entry 依旧在当前队列显示列表中保留原位置，并分别标记为“已执行”/“已发生”。
-9. 被扣除 entry 不参与 replay、不参与确认合法性判断，也不可被当作待执行 entry 取消。
-10. task log 内部提供“当前队列 / 已执行”切换栏，且不改成三栏布局。
-11. 进入编辑态时，`draftExecutionLog` 使用扣除后的 remaining queue 初始化。
-12. 完成编辑后，保存到 `terraformingExecutionLog` 的内容不包含已执行项。
-13. 完成编辑或直接确认后，`syncedExecutedBaseline` 更新为当前 archive 已执行状态；archive 未变化时再次进入页面不再重复扣除。
-14. `syncedExecutedBaseline` 可用于比较后续 archive runtime 变化，并能识别新增执行项与回退风险。
-15. 非 aborted activeProject 固定显示为当前队列第一项，且不可移动、不可取消、不可编辑。
-16. aborted activeProject 不视为当前正在执行内容；aborted/retained 对应项目若出现在 log 队列中，仅在该 entry 上标记“有进度”。
-17. 扣除后的 remaining queue 合法时，用户可直接确认；不合法时提示进入编辑模式。
-18. 多次执行 project 的用户可操作次数不得低于 archive runtime 已完成次数。
-19. `npm run build` 成功。
+8. 已执行/已发生 entry 可以展开，但详情只显示资源消耗与交付清单，不显示折扣、建造和状态卡。
+9. 非编辑态初始进入 task log 时，被扣除的原队列 entry 依旧在当前队列显示列表中保留原位置，并分别标记为“已执行”/“已发生”。
+10. 被扣除 entry 不参与 replay、不参与确认合法性判断，也不可被当作待执行 entry 取消。
+11. task log 内部提供“当前队列 / 已执行”切换栏，且不改成三栏布局。
+12. 进入编辑态时，`draftExecutionLog` 使用扣除后的 remaining queue 初始化。
+13. 完成编辑后，保存到 `terraformingExecutionLog` 的内容不包含已执行项。
+14. 完成编辑或直接确认后，`syncedExecutedBaseline` 更新为当前 archive 已执行状态；archive 未变化时再次进入页面不再重复扣除。
+15. `syncedExecutedBaseline` 可用于比较后续 archive runtime 变化，并能识别新增执行项与回退风险。
+16. 非 aborted activeProject 作为 replay timeline 第一项固定显示在非编辑态和编辑态，且不可移动、不可取消、不可编辑，并保留普通 task log 展开形式。
+17. aborted activeProject 不视为当前正在执行内容；aborted/retained 对应项目若出现在 log 队列中，仅在该 entry 上标记“有进度”。
+18. 扣除后的 remaining queue 合法时，用户可直接确认；不合法时提示进入编辑模式。
+19. 多次执行 project 的用户可操作次数不得低于 archive runtime 已完成次数。
+20. `npm run build` 成功。
 
 ## 未决项
 

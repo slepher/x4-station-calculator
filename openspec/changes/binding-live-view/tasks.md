@@ -20,7 +20,7 @@
 - [x] 完成编辑或直接确认后，将 baseline 更新为当前 archive executed snapshot。
 - [x] archive runtime 与 baseline 相同时，确保不会再次扣除同一批项目/一次性事件。
 - [x] 提供明确的同步 baseline action 或确认保存路径，但不得静默吞掉未确认差额。
-- [x] 增加调试 action，用于清空当前 cluster 已同步 baseline。
+- [x] 增加“导入” action，用于导入蓝图 terraforming 设置并清空当前 live plan 已同步 baseline。
 
 ### 3. 实现队列扣除逻辑
 
@@ -60,13 +60,15 @@
 - [x] 已执行视图显示 archive runtime 同步出的已执行项目/一次性事件。
 - [x] 已执行视图中的项目标记为“已执行”，一次性事件标记为“已发生”。
 - [x] 队列外完成项通过 archive runtime 全量已执行列表展示，不加入当前队列。
+- [x] 已执行/已发生 entries 支持展开，但只显示资源消耗与交付清单，不显示折扣、建造和状态卡。
 - [x] 已执行视图不提供取消、拖拽、排序操作。
 - [x] 保持右列面板结构，不改成三栏布局。
-- [x] 增加调试按钮，用于清空当前 cluster 同步的已执行 baseline。
+- [x] 增加 live 模式“导入”按钮，按钮 tooltip 说明导入蓝图设置后需要重新确认 archive 已完成/正在执行项目。
 
 ### 7. 编辑态接入扣除结果
 
 - [x] 进入编辑态时使用 `remainingLog` 初始化 `draftExecutionLog`。
+- [x] 非 aborted activeProject 作为 replay timeline 固定首项显示在编辑态，但不进入 `draftExecutionLog`。
 - [x] 被 archive 扣除的 entries 不进入 draft。
 - [x] 完成编辑时只保存编辑后的未来 entries 到 `terraformingExecutionLog`。
 - [x] 完成编辑后同步 `syncedExecutedBaseline` 到当前 archive executed snapshot。

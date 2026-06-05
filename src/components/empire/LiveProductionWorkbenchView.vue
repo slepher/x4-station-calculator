@@ -78,6 +78,7 @@ const wareflowPresenter = useProductionWareflowPresenter(liveStore)
 const dashboardPresenter = useProductionDashboardPresenter(liveStore)
 const terraformingPresenter = useTerraformingPresenter({
   terraformingData: computed(() => terraformingStore.terraformingData),
+  terraformingIsLiveMode: computed(() => terraformingStore.isLiveMode),
   terraformingSelectedClusterId: computed(() => terraformingStore.activePlan?.selectedClusterId ?? null),
   terraformingSelectedCluster: computed(() => terraformingStore.selectedCluster),
   terraformingRuntimeProjectIds: computed(() => terraformingStore.runtimeProjectIds),
@@ -102,6 +103,7 @@ const terraformingPresenter = useTerraformingPresenter({
   replaceTerraformingExecutionLogAndSyncBaseline: (entries) => terraformingStore.replaceExecutionLogAndSyncBaseline(entries as any),
   syncTerraformingExecutedBaseline: () => terraformingStore.syncExecutedBaselineForSelectedCluster(),
   clearTerraformingExecutedBaseline: () => terraformingStore.clearExecutedBaselineForSelectedCluster(),
+  importTerraformingBlueprintSettings: () => terraformingStore.importBlueprintSettingsToActivePlan(),
   clearTerraformingExecutionQueue: () => terraformingStore.clearExecutionQueue(),
   mapsClusters: gameDataMaps.value?.clusters ?? {},
   mapsSectors: gameDataMaps.value?.sectors ?? {},
@@ -149,7 +151,7 @@ const showArchiveModuleList = computed(() => {
       :show-research="sidebarPresenter.props.showResearch"
       :show-blueprint-recipe="sidebarPresenter.props.showBlueprintRecipe"
       :terraforming-clusters="terraformingStore.sidebarClusters"
-      :active-terraforming-cluster-id="terraformingStore.activePlan?.selectedClusterId ?? null"
+      :active-terraforming-cluster-id="toolbarPresenter.props.workbenchMode.value === 'terraforming' ? (terraformingStore.activePlan?.selectedClusterId ?? null) : null"
       :can-create-station="sidebarPresenter.props.canCreateStation"
       :can-open-context-menu="sidebarPresenter.props.canOpenContextMenu"
       :context-menu-mode="sidebarPresenter.props.contextMenuMode"

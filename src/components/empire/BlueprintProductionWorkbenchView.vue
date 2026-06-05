@@ -107,7 +107,7 @@ const buildPlanPresenter = useBuildPlanPresenter({
       :show-research="sidebarPresenter.props.showResearch"
       :show-blueprint-recipe="sidebarPresenter.props.showBlueprintRecipe"
       :terraforming-clusters="terraformingClusters"
-      :active-terraforming-cluster-id="terraformingStore.activePlan?.selectedClusterId ?? null"
+      :active-terraforming-cluster-id="toolbarPresenter.props.workbenchMode.value === 'terraforming' ? (terraformingStore.activePlan?.selectedClusterId ?? null) : null"
       :can-create-station="sidebarPresenter.props.canCreateStation"
       :can-open-context-menu="sidebarPresenter.props.canOpenContextMenu"
       :context-menu-mode="sidebarPresenter.props.contextMenuMode"

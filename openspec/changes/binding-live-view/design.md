@@ -56,7 +56,7 @@ interface TerraformingArchiveRuntimeBaseState {
 
 其中：
 
-- `stats` 直接来自 save runtime，是 replay 起点的权威值。
+- `stats` 以 save runtime 为权威值；若静态 `cluster.initialStats` 中存在某 stat，而 save runtime `stats` 中缺失该 stat，则该 stat SHALL 归一化为 `0`，表示存档已将其清零而不是该 stat 不存在。
 - `completedProjects` 来自 `SaveTerraformingCluster.completedProjects`。
 - `completedOneTimeEvents` 只收录静态 project 定义中 `group === 'events'` 且 `repeatCooldown === null` 的 event。
 - `rebates` 从 `SaveTerraformingCluster.rebates` 转成 replay 使用的 raw rebate key。
@@ -89,7 +89,7 @@ interface TerraformingExecutedSnapshot {
 baseline 不代表用户输入，不进入 task log 排序，也不得在首次读取 archive runtime 时自动写入。
 当当前 cluster 没有 baseline 时，比较逻辑以空 baseline 作为对照，archive runtime 中已有的 completed project / 一次性 event 全部视为尚未确认的 archive 差额。只有用户直接确认扣除后的队列，或完成编辑保存后，才将当前 archive executed snapshot 写入 baseline。
 
-调试入口可以提供“清空同步基准”动作，但该动作只删除当前 cluster 的 baseline；删除后下一次比较同样按空 baseline 处理，不修改 `terraformingExecutionLog`。
+live task log 提供“导入”动作，用于将蓝图 plan 中的 terraforming 设置复制到当前 live plan，并清空当前 live plan 的 baseline。非 live 模式不显示该动作。导入后下一次比较同样按空 baseline 处理，archive 已完成/正在执行状态必须重新由用户确认，不得在导入动作中自动同步 baseline。
 
 ## 扣除模型
 
@@ -179,7 +179,7 @@ interface ReplayOptions {
 规则：
 
 - 无 `baseState` 时保持现有行为。
-- 有 `baseState.stats` 时，`runningStats` 从该值开始。
+- 有 `baseState.stats` 时，`runningStats` 从归一化后的 archive runtime stats 开始；静态初始存在但 save runtime 缺失的 stat 按 `0` 参与 replay 与展示。
 - 有 `baseState.completedProjects` 时，`runningCompleted` 从该 map 开始。
 - 有 `baseState.completedEvents` 时，仅用于一次性 event 的“已发生”状态，防止 replay 重复生成一次性 event。
 - 有 `baseState.rebates` 时，`runningRebates` 从该累计值开始。
@@ -250,10 +250,13 @@ resource panel props 可增加：
 
 非编辑态初始进入时，当前队列模式显示 `currentQueueDisplayEntries`。通常它保留原 `terraformingExecutionLog` 的可视顺序；若 archive runtime 存在非 aborted `activeProject`，该 active project SHALL 固定为第一项：
 
-- 非 aborted `activeProject` 标记“存档执行中”，不可移动、不可取消、不可编辑。
+- 非 aborted `activeProject` 标记“存档执行中”，作为 replay timeline 的第一步参与当前队列与编辑态推演。
+- 非 aborted `activeProject` 在非编辑态与编辑态都固定显示为第一项，不进入 `draftExecutionLog`，不可移动、不可取消、不可编辑。
+- 非 aborted `activeProject` 保留当前队列 task log 的普通项目展开形式。
 - 如果同 project 原本位于队列后续位置，显示层将其提升到第一项，并避免在原位置重复显示。
 - 已被 archive 扣除的 project 仍显示在原位置，标记“已执行”。
 - 已被 archive 扣除的一次性 event 仍显示在原位置，标记“已发生”。
+- 已执行/已发生 entry 可展开，但详情只显示资源消耗与交付清单，不显示折扣、建造和状态卡。
 - 未扣除 entry 显示为待执行，并展示对应 `remainingLog` replay 结果。
 - aborted active project、retained project 不生成独立队列项；若同 project 出现在当前 log 队列中，标记“有进度”。
 
@@ -282,6 +285,7 @@ resource panel props 可增加：
 - 一次性 event 标记“已发生”。
 - 即使 archive runtime 与 baseline 已经相同，已执行模式仍然显示 archive runtime 中的已完成内容；相同只表示本次没有新的扣除差额。
 - archive 中队列外已完成项不会获得独立的第三种列表来源或排序语义，只作为 archive runtime 全量已执行内容的一部分展示。
+- 已执行/已发生 entry 可展开，但存档没有每次完成时的折扣与建造快照，因此展开详情只显示资源消耗与交付清单，不显示折扣、建造和状态卡。
 
 已执行模式不承载 active/retained resource progress 的独立卡片；active/retained 只通过当前队列行的“存档执行中”或“有进度”标签表达。
 
@@ -331,7 +335,7 @@ draftExecutionLog = terraformingExecutionLog
 - archive runtime 中已有的 completed project / 一次性 event SHALL 被视为 archive advance。
 - 系统 SHALL NOT 因为首次读到 archive runtime 就自动写入 baseline。
 
-调试清空 baseline 后，后续比较回到“无 baseline”规则；该动作不得清空 archive runtime、不得写入当前队列。
+导入蓝图设置后，后续比较回到“无 baseline”规则；该动作不得清空 archive runtime，也不得将 archive 已完成/正在执行状态自动标记为已同步。
 
 ## active 与 retained 展示
 

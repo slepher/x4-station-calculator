@@ -32,6 +32,7 @@ onUnmounted(() => {
 
 const terraformingPresenter = useTerraformingPresenter({
   terraformingData: computed(() => terraformingStore.terraformingData),
+  terraformingIsLiveMode: computed(() => terraformingStore.isLiveMode),
   terraformingSelectedClusterId: computed(() => terraformingStore.activePlan?.selectedClusterId ?? null),
   terraformingSelectedCluster: computed(() => terraformingStore.selectedCluster),
   terraformingRuntimeProjectIds: computed(() => terraformingStore.runtimeProjectIds),
@@ -56,6 +57,7 @@ const terraformingPresenter = useTerraformingPresenter({
   replaceTerraformingExecutionLogAndSyncBaseline: (entries) => terraformingStore.replaceExecutionLogAndSyncBaseline(entries as any),
   syncTerraformingExecutedBaseline: () => terraformingStore.syncExecutedBaselineForSelectedCluster(),
   clearTerraformingExecutedBaseline: () => terraformingStore.clearExecutedBaselineForSelectedCluster(),
+  importTerraformingBlueprintSettings: () => terraformingStore.importBlueprintSettingsToActivePlan(),
   clearTerraformingExecutionQueue: () => terraformingStore.clearExecutionQueue(),
   mapsClusters: gameDataMaps.value?.clusters ?? {},
   mapsSectors: gameDataMaps.value?.sectors ?? {},
@@ -146,6 +148,7 @@ function toggleStatFilter(statId: string) {
     <div class="col-span-12 lg:col-span-4" :class="{ 'sticky top-2 z-10': terraformingFloating.resourcePanel }">
       <TerraformingResourcePanel
         :selected-cluster-id="terraformingPresenter.props.resourcePanel.selectedClusterId.value"
+        :can-import-blueprint-settings="terraformingPresenter.props.resourcePanel.canImportBlueprintSettings.value"
         :execution-timeline="terraformingPresenter.props.resourcePanel.executionTimeline.value"
         :task-log-mode="terraformingPresenter.props.resourcePanel.taskLogMode.value"
         :current-queue-display-entries="terraformingPresenter.props.resourcePanel.currentQueueDisplayEntries.value"
@@ -179,7 +182,7 @@ function toggleStatFilter(statId: string) {
         @drop-task="(pid: string, idx?: number) => terraformingPresenter.emits.appendDraftTask(pid, idx)"
         @set-task-log-mode="terraformingPresenter.emits.setTaskLogMode"
         @confirm-archive-sync="terraformingPresenter.emits.confirmArchiveSync"
-        @debug-clear-executed-baseline="terraformingPresenter.emits.debugClearExecutedBaseline"
+        @import-blueprint-settings="terraformingPresenter.emits.importBlueprintSettings"
       />
     </div>
   </div>

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { replayExecutionLog } from '@/store/logic/terraformingRuntime'
+import { buildArchiveRuntimeStats, replayExecutionLog } from '@/store/logic/terraformingRuntime'
 import type {
   TerraformingData,
   TerraformingProject,
@@ -176,6 +176,24 @@ describe('replayExecutionLog — OceanOfFantasy', () => {
         'tmp_cloudparticles', 'tmp_cloudparticles', 'evt_solidify_crust',
         'tmp_cloudparticles', 'evt_volcano_extinction',
       ])
+    })
+  })
+})
+
+describe('buildArchiveRuntimeStats', () => {
+  it('treats missing archive stat as zero when the cluster has that initial stat', () => {
+    const cluster = findCluster('GetsuFune')
+
+    const stats = buildArchiveRuntimeStats(cluster, {
+      population: 405000000,
+      oxygen: 8,
+    })
+
+    expect(cluster.initialStats.toxicity).toBe(3)
+    expect(stats).toMatchObject({
+      population: 405000000,
+      oxygen: 8,
+      toxicity: 0,
     })
   })
 })

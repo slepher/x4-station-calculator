@@ -301,6 +301,26 @@ export function buildTerraformingBaseStats(
   return stats
 }
 
+export function buildArchiveRuntimeStats(
+  cluster: TerraformingCluster | null,
+  runtimeStats: Record<string, number>,
+): Record<string, number> {
+  const stats: Record<string, number> = {}
+  const baseStats = buildTerraformingBaseStats(cluster)
+  for (const statId of Object.keys(baseStats)) {
+    if (Object.prototype.hasOwnProperty.call(runtimeStats, statId)) {
+      stats[statId] = runtimeStats[statId]!
+    } else {
+      stats[statId] = 0
+    }
+  }
+  for (const [statId, value] of Object.entries(runtimeStats)) {
+    if (Object.prototype.hasOwnProperty.call(stats, statId)) continue
+    stats[statId] = value
+  }
+  return stats
+}
+
 export function applyProjectEffectsToTerraformingStats(
   stats: Record<string, number>,
   completed: Map<string, number>,

@@ -25,6 +25,14 @@
 - **那么** `stats` SHALL 直接作为权威起始值
 - **并且** 系统 SHALL NOT 先用 completed project effects 从静态初始状态重新推导 stats 再覆盖
 
+#### Scenario: missing archive stat that exists initially is zero
+
+- **前提** 静态 `cluster.initialStats` 包含 `toxicity = 3`
+- **并且** archive runtime 的 `stats` 不包含 `toxicity`
+- **当** 构造 replay 起始状态
+- **那么** `baseState.stats.toxicity` SHALL 为 `0`
+- **并且** 系统 SHALL NOT 将该 stat 视为不存在
+
 #### Scenario: missing archive runtime keeps existing behavior
 
 - **前提** 当前 archive 不包含匹配的 `terraforming_clusters`
@@ -182,6 +190,17 @@ task log SHALL 在同一面板内部提供当前队列与已执行视图切换�
 - **并且** 已执行 entries SHALL NOT 支持拖拽排序
 - **并且** 已执行 entries SHALL NOT 写入 `terraformingExecutionLog`
 
+#### Scenario: executed entry expands with consumed resources and delivery list
+
+- **前提** 用户打开已执行视图
+- **并且** 已执行 project `project_a` 有资源消耗
+- **当** 用户展开 `project_a`
+- **那么** 页面 SHALL 显示资源消耗列表
+- **并且** 页面 SHALL 显示交付清单
+- **并且** 页面 SHALL NOT 显示折扣卡
+- **并且** 页面 SHALL NOT 显示建造卡
+- **并且** 页面 SHALL NOT 显示状态卡
+
 ### Requirement: Edit Mode Starts From Deducted Queue
 
 编辑模式 SHALL 从 archive 扣除后的 remaining queue 开始。
@@ -243,13 +262,23 @@ task log SHALL 在同一面板内部提供当前队列与已执行视图切换�
 - **并且** `project_a` SHALL 被视为 archive 新增完成项
 - **并且** 系统 SHALL NOT 在用户确认或完成编辑保存前自动写入 `syncedExecutedBaseline`
 
-#### Scenario: clear synced baseline debug action
+#### Scenario: import blueprint settings resets archive confirmation
 
 - **前提** 当前 cluster 已保存 `syncedExecutedBaseline`
-- **当** 用户点击清空同步基准的调试按钮
-- **那么** 系统 SHALL 删除当前 cluster 的 `syncedExecutedBaseline`
-- **并且** 系统 SHALL NOT 删除 archive runtime 中的已完成项目或已发生事件
+- **并且** 页面处于 live 模式
+- **并且** 蓝图 plan 中存在 terraforming 设置
+- **当** 用户点击“导入”按钮
+- **那么** 系统 SHALL 将蓝图 terraforming 设置导入当前 live plan
+- **并且** 系统 SHALL 清空当前 live plan 的 `syncedExecutedBaseline`
+- **并且** 系统 SHALL NOT 删除 archive runtime 中的已完成项目、已发生事件或正在执行项目
+- **并且** 系统 SHALL NOT 在导入时自动确认 archive 已执行状态
 - **并且** 系统 SHALL NOT 修改 `terraformingExecutionLog`
+
+#### Scenario: hide blueprint import outside live mode
+
+- **前提** 页面不处于 live 模式
+- **当** task log 渲染
+- **那么** 页面 SHALL NOT 显示“导入”按钮
 
 ### Requirement: Active And Retained Runtime Display
 
@@ -262,10 +291,22 @@ task log SHALL 在同一面板内部提供当前队列与已执行视图切换�
 - **当** 页面显示 terraforming task log 或项目状态
 - **那么** 该 project SHALL 固定显示为“当前队列”视图第一项
 - **并且** 该 project SHALL 标识为游戏中正在执行
+- **并且** 该 project SHALL 作为 replay timeline 第一项参与后续队列推演
+- **并且** 该 project SHALL 使用当前队列 task log 的普通项目展开形式
 - **并且** 该 project SHALL NOT 提供取消按钮
 - **并且** 该 project SHALL NOT 支持拖拽排序
 - **并且** 该 project SHALL NOT 进入 `draftExecutionLog`
 - **并且** 该 project SHALL NOT 写入 `terraformingExecutionLog`
+
+#### Scenario: display active project as fixed edit head
+
+- **前提** archive runtime 包含非 aborted `activeProject.projectId = project_a`
+- **当** 用户进入编辑模式
+- **那么** `project_a` SHALL 显示为编辑态 task log 第一项
+- **并且** `project_a` SHALL NOT 支持拖拽排序
+- **并且** `project_a` SHALL NOT 提供删除或复制操作
+- **并且** 保存编辑结果时 `project_a` SHALL NOT 写入 `terraformingExecutionLog`
+- **并且** 添加任务到首位 SHALL 将新任务插入到 `project_a` 之后
 
 #### Scenario: promote queued active project to current queue head
 

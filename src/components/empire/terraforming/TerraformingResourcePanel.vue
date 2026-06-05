@@ -20,6 +20,7 @@ import TerraformingStatScale from '@/components/empire/terraforming/Terraforming
 
 interface Props {
 	  selectedClusterId: string | null
+	  canImportBlueprintSettings: boolean
 	  executionTimeline: TerraformingExecutionTimelineEntry[]
 	  taskLogMode: 'queue' | 'executed'
 	  currentQueueDisplayEntries: TerraformingCurrentQueueDisplayEntry[]
@@ -58,7 +59,7 @@ const emit = defineEmits<{
 	  (e: 'dropTask', projectId: string, targetIdx: number): void
 	  (e: 'setTaskLogMode', mode: 'queue' | 'executed'): void
 	  (e: 'confirmArchiveSync'): void
-	  (e: 'debugClearExecutedBaseline'): void
+	  (e: 'importBlueprintSettings'): void
 	}>()
 
 const { t } = useI18n()
@@ -86,6 +87,7 @@ const draggableContainerRef = ref<any>(null)
 	  statusLabel?: string
 	  progressLabel?: string
 	  fixedRuntime?: boolean
+	  archiveDetailMode?: 'consumed-only'
 	}
 
 	const timelineById = computed(() => new Map(props.executionTimeline.map(entry => [entry.id, entry])))
@@ -97,10 +99,14 @@ const draggableContainerRef = ref<any>(null)
 	      if (timelineEntry) {
 	        return {
 	          ...timelineEntry,
-	          progressLabel: entry.runtimeStatus === 'has-progress' ? (t('terraforming.hasProgress') || 'Has progress') : undefined,
+	          progressLabel: entry.runtimeStatus === 'active'
+	            ? (t('terraforming.activeInArchive') || 'Active')
+	            : entry.runtimeStatus === 'has-progress' ? (t('terraforming.hasProgress') || 'Has progress') : undefined,
+	          fixedRuntime: entry.fixedFirst,
 	        }
 	      }
 	    }
+	    const isActive = entry.runtimeStatus === 'active'
 	    return {
 	      id: entry.id,
 	      order: 0,
@@ -109,7 +115,7 @@ const draggableContainerRef = ref<any>(null)
 	      projectGroupId: entry.status === 'occurred' ? 'events' : 'archive',
 	      projectGroupName: '',
 	      showGroupMarker: false,
-	      wares: [],
+	      wares: entry.archiveConsumedWares?.map(item => ({ ware: item.ware, amount: item.amount })) ?? [],
 	      deliveries: [],
 	      deliveryDetails: [],
 	      dockModules: [],
@@ -126,11 +132,16 @@ const draggableContainerRef = ref<any>(null)
 	      availableBeforeExecution: true,
 	      blockedReason: null,
 	      projectDuration: 0,
-	      statusLabel: entry.runtimeStatus === 'active'
+	      statusLabel: isActive
+	        ? undefined
+	        : entry.runtimeStatus === 'active'
 	        ? (t('terraforming.activeInArchive') || 'Active')
 	        : queueStatusLabel(entry),
-	      progressLabel: entry.runtimeStatus === 'has-progress' ? (t('terraforming.hasProgress') || 'Has progress') : undefined,
+	      progressLabel: isActive
+	        ? (t('terraforming.activeInArchive') || 'Active')
+	        : entry.runtimeStatus === 'has-progress' ? (t('terraforming.hasProgress') || 'Has progress') : undefined,
 	      fixedRuntime: entry.fixedFirst,
+	      archiveDetailMode: isActive ? undefined : 'consumed-only',
 	    }
 	  })
 	})
@@ -214,7 +225,7 @@ function clearHoverIndex() {
 function onModelValueUpdate(entries: TerraformingGoalPlanDisplayEntry[]) {
   if (props.taskDrag.isDragging.value) return
   const tasks = entries
-    .filter((pe): pe is { type: 'task'; entry: TerraformingDraftTimelineEntry } => pe.type === 'task')
+    .filter((pe): pe is { type: 'task'; entry: TerraformingDraftTimelineEntry } => pe.type === 'task' && !pe.entry.fixedRuntime)
     .map(pe => pe.entry)
   emit('updateDraftEntries', tasks)
 }
@@ -385,11 +396,12 @@ function buildDraftWaresTooltip(entry: { wares: Array<{ name: string; amount: nu
         {{ queueEditState.unsatisfiedGoalCount }} {{ t('terraforming.unmetDependencies') || 'unmet dependencies' }}
       </span>
 	      <button
-	        v-if="!queueEditState.editing"
-	        class="debug-btn"
-	        @click="emit('debugClearExecutedBaseline')"
+	        v-if="canImportBlueprintSettings && !queueEditState.editing"
+	        class="import-btn"
+	        v-tippy="{ content: t('terraforming.importBlueprintSettingsTooltip'), allowHTML: false, placement: 'bottom', theme: 'material', maxWidth: 320 }"
+	        @click="emit('importBlueprintSettings')"
 	      >
-	        {{ t('terraforming.debugClearExecutedBaseline') || 'Clear baseline' }}
+	        {{ t('terraforming.importBlueprintSettings') || 'Import' }}
 	      </button>
 	      <button
 	        v-if="!queueEditState.editing"
@@ -562,9 +574,11 @@ function buildDraftWaresTooltip(entry: { wares: Array<{ name: string; amount: nu
               <template v-else>
                 <div class="timeline-head">
                   <button class="timeline-main" @click.stop="toggleEntry(planEntry.entry.id)">
-                    <span class="drag-handle">↕</span>
+                    <span v-if="!planEntry.entry.fixedRuntime" class="drag-handle">↕</span>
+                    <span v-else class="drag-placeholder">◇</span>
                     <span class="entry-order">#{{ planEntry.entry.order }}</span>
                     <span class="entry-name">{{ planEntry.entry.projectName }}</span>
+                    <span v-if="planEntry.entry.fixedRuntime" class="progress-tag">{{ t('terraforming.activeInArchive') || 'Active' }}</span>
                     <span v-if="planEntry.entry.systemDisabled" class="draft-state disabled">
                       {{ t('terraforming.queueState.disabled') || 'Disabled' }}
                     </span>
@@ -577,13 +591,14 @@ function buildDraftWaresTooltip(entry: { wares: Array<{ name: string; amount: nu
                       v-tippy="{ content: buildDraftWaresTooltip(planEntry.entry), allowHTML: true, placement: 'top', theme: 'material' }"
                     >ⓘ</span>
                     <button
+                      v-if="!planEntry.entry.fixedRuntime"
                       class="draft-btn danger"
                       @click.stop="emit('removeDraft', planEntry.entry.id)"
                     >
                       {{ t('terraforming.remove') || 'Remove' }}
                     </button>
                     <button
-                      v-if="planEntry.entry.repeatRole !== 'single'"
+                      v-if="!planEntry.entry.fixedRuntime && planEntry.entry.repeatRole !== 'single'"
                       class="draft-btn"
                       @click.stop="emit('copyDraft', planEntry.entry.id)"
                     >
@@ -640,10 +655,35 @@ function buildDraftWaresTooltip(entry: { wares: Array<{ name: string; amount: nu
 	        </div>
 	        <div v-for="entry in executedEntries" :key="entry.id" class="timeline-item executed-item">
 	          <div class="timeline-head">
-	            <div class="timeline-main">
+	            <button class="timeline-main" @click="toggleEntry(entry.id)">
+	              <span class="expand-icon">{{ expandedEntryId === entry.id ? '▼' : '▶' }}</span>
 	              <span class="entry-order">×{{ entry.count }}</span>
 	              <span class="entry-name">{{ entry.projectName }}</span>
 	              <span class="executed-tag" :class="{ archive: entry.status === 'archive-only' }">{{ executedStatusLabel(entry) }}</span>
+	            </button>
+	          </div>
+	          <div v-if="expandedEntryId === entry.id && (entry.archiveConsumedWares.length > 0 || entry.deliveryDetails.length > 0)" class="timeline-body">
+	            <div v-if="entry.archiveConsumedWares.length > 0" class="detail-section">
+	              <div class="section-title">{{ t('terraforming.materialPrice') }}</div>
+	              <div class="archive-consumed-row detail-header">
+	                <span>{{ t('terraforming.wareName') || 'Name' }}</span>
+	                <span>{{ t('terraforming.consumed') || 'Consumed' }}</span>
+	              </div>
+	              <div v-for="ware in entry.archiveConsumedWares" :key="`${entry.id}-ware-${ware.ware}`" class="archive-consumed-row">
+	                <span>{{ getWareName(ware.ware) }}</span>
+	                <span>{{ ware.amount.toLocaleString() }}</span>
+	              </div>
+	            </div>
+	            <div v-if="entry.deliveryDetails.length > 0" class="detail-section">
+	              <div class="section-title">{{ t('terraforming.deliveryList') }}</div>
+	              <div
+	                v-for="dd in entry.deliveryDetails"
+	                :key="`${entry.id}-delivery-${dd.macro}`"
+	                class="detail-row"
+	              >
+	                <span>{{ dd.shipName }}</span>
+	                <span>×{{ dd.amount }}  {{ dd.buildDuration }}s</span>
+	              </div>
 	            </div>
 	          </div>
 	        </div>
@@ -657,10 +697,23 @@ function buildDraftWaresTooltip(entry: { wares: Array<{ name: string; amount: nu
 	        <div v-for="entry in currentQueueTimelineEntries" :key="entry.id">
 	          <div v-if="entry.statusLabel" class="timeline-item executed-item">
 	            <div class="timeline-head">
-	              <div class="timeline-main">
-	                <span class="expand-icon"></span>
+	              <button class="timeline-main" @click="toggleEntry(entry.id)">
+	                <span class="expand-icon">{{ expandedEntryId === entry.id ? '▼' : '▶' }}</span>
 	                <span class="entry-name">{{ entry.projectName }}</span>
 	                <span class="executed-tag" :class="{ archive: entry.fixedRuntime }">{{ entry.statusLabel }}</span>
+	              </button>
+	            </div>
+	            <div v-if="expandedEntryId === entry.id && entry.archiveDetailMode === 'consumed-only' && entry.wares.length > 0" class="timeline-body">
+	              <div class="detail-section">
+	                <div class="section-title">{{ t('terraforming.materialPrice') }}</div>
+	                <div class="archive-consumed-row detail-header">
+	                  <span>{{ t('terraforming.wareName') || 'Name' }}</span>
+	                  <span>{{ t('terraforming.consumed') || 'Consumed' }}</span>
+	                </div>
+	                <div v-for="ware in entry.wares" :key="`${entry.id}-archive-ware-${ware.ware}`" class="archive-consumed-row">
+	                  <span>{{ getWareName(ware.ware) }}</span>
+	                  <span>{{ (ware.actualAmount ?? ware.amount).toLocaleString() }}</span>
+	                </div>
 	              </div>
 	            </div>
 	          </div>
@@ -673,13 +726,13 @@ function buildDraftWaresTooltip(entry: { wares: Array<{ name: string; amount: nu
             <div class="timeline-head">
               <button class="timeline-main" @click="toggleEntry(entry.id)">
                 <span class="expand-icon">{{ expandedEntryId === entry.id ? '▼' : '▶' }}</span>
-	                <span class="entry-order">#{{ entry.order }}</span>
+	                <span v-if="!entry.fixedRuntime" class="entry-order">#{{ entry.order }}</span>
 	                <span class="entry-name">{{ entry.projectName }}</span>
 	                <span v-if="entry.projectGroupId === 'events'" class="event-tag">{{ t('terraforming.event.tag') || 'EVENT' }}</span>
 	                <span v-if="entry.progressLabel" class="progress-tag">{{ entry.progressLabel }}</span>
 	              </button>
               <button
-                v-if="entry.projectGroupId !== 'events'"
+                v-if="entry.projectGroupId !== 'events' && !entry.fixedRuntime"
                 class="cancel-btn"
                 :class="{ disabled: !getValidation(entry.id).canCancel }"
                 :disabled="!getValidation(entry.id).canCancel"
@@ -845,12 +898,12 @@ function buildDraftWaresTooltip(entry: { wares: Array<{ name: string; amount: nu
 	  @apply hover:bg-red-800/40 hover:border-red-700;
 	}
 
-	.debug-btn {
+	.import-btn {
 	  @apply ml-auto text-[11px] px-2 py-1 rounded border border-amber-800 text-amber-300 bg-amber-950/20 transition-colors;
 	  @apply hover:bg-amber-900/40 hover:border-amber-700;
 	}
 
-	.debug-btn + .clear-all-btn {
+	.import-btn + .clear-all-btn {
 	  @apply ml-2;
 	}
 
@@ -915,9 +968,13 @@ function buildDraftWaresTooltip(entry: { wares: Array<{ name: string; amount: nu
 	  @apply shrink-0 rounded bg-emerald-900/40 px-1.5 py-0.5 text-[10px] text-emerald-300;
 	}
 
-	.executed-tag.archive {
-	  @apply bg-slate-800 text-slate-300;
-	}
+.executed-tag.archive {
+  @apply bg-slate-800 text-slate-300;
+}
+
+.archive-consumed-row {
+  @apply grid grid-cols-[1fr_auto] gap-3 text-xs text-slate-300 py-1;
+}
 
 .group-marker {
   @apply text-[11px] font-semibold text-sky-300 px-1 pt-1;
