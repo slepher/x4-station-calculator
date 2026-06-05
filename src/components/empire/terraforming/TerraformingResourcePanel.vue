@@ -3,21 +3,31 @@ import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
 import draggable from 'vuedraggable'
 import { useI18n } from 'vue-i18n'
 import type {
-  TerraformingCancelValidation,
-  TerraformingDraftTimelineEntry,
-  TerraformingExecutionTimelineEntry,
-  TerraformingGoalPlanDisplayEntry,
-  TerraformingTaskDragState,
-} from '@/components/empire/presenters/useTerraformingPresenter'
+	  TerraformingCancelValidation,
+	  TerraformingArchiveProjectDisplay,
+	  TerraformingArchiveSyncNotice,
+	  TerraformingCurrentQueueDisplayEntry,
+	  TerraformingDraftTimelineEntry,
+	  TerraformingExecutionTimelineEntry,
+	  TerraformingExecutedDisplayEntry,
+	  TerraformingGoalPlanDisplayEntry,
+	  TerraformingTaskDragState,
+	} from '@/components/empire/presenters/useTerraformingPresenter'
 import type { DeliveryShip } from '@/store/logic/terraformingTaskResolver'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import TerraformingStatScale from '@/components/empire/terraforming/TerraformingStatScale.vue'
 
 interface Props {
-  selectedClusterId: string | null
-  executionTimeline: TerraformingExecutionTimelineEntry[]
-  queueEditState: {
+	  selectedClusterId: string | null
+	  executionTimeline: TerraformingExecutionTimelineEntry[]
+	  taskLogMode: 'queue' | 'executed'
+	  currentQueueDisplayEntries: TerraformingCurrentQueueDisplayEntry[]
+	  executedEntries: TerraformingExecutedDisplayEntry[]
+	  archiveSyncNotice: TerraformingArchiveSyncNotice | null
+	  archiveActiveProjectDisplay: TerraformingArchiveProjectDisplay | null
+	  archiveRetainedProjectDisplays: TerraformingArchiveProjectDisplay[]
+	  queueEditState: {
     editing: boolean
     canComplete: boolean
     unsatisfiedGoalCount: number
@@ -43,10 +53,13 @@ const emit = defineEmits<{
   (e: 'copyDraft', entryId: string): void
   (e: 'updateDraftEntries', entries: TerraformingDraftTimelineEntry[]): void
   (e: 'clickStat', statId: string): void
-  (e: 'clickGoal', goalId: string): void
-  (e: 'moveTaskBeforeDependency', entryId: string, goalId: string): void
-  (e: 'dropTask', projectId: string, targetIdx: number): void
-}>()
+	  (e: 'clickGoal', goalId: string): void
+	  (e: 'moveTaskBeforeDependency', entryId: string, goalId: string): void
+	  (e: 'dropTask', projectId: string, targetIdx: number): void
+	  (e: 'setTaskLogMode', mode: 'queue' | 'executed'): void
+	  (e: 'confirmArchiveSync'): void
+	  (e: 'debugClearExecutedBaseline'): void
+	}>()
 
 const { t } = useI18n()
 const { translateWare } = useX4I18n()
@@ -58,7 +71,7 @@ const cancelValidationCache = ref<Record<string, TerraformingCancelValidation>>(
 const dragHoverIndex = ref(-1)
 const draggableContainerRef = ref<any>(null)
 
-const displayPlanEntries = computed(() => {
+	const displayPlanEntries = computed(() => {
   const entries = [...props.queueEditState.planEntries] as TerraformingGoalPlanDisplayEntry[]
   if (props.taskDrag.isDragging.value && dragHoverIndex.value >= 0 && dragHoverIndex.value <= entries.length) {
     entries.splice(dragHoverIndex.value, 0, {
@@ -67,7 +80,72 @@ const displayPlanEntries = computed(() => {
     } as any)
   }
   return entries
-})
+	})
+
+	interface CurrentQueueTimelineEntry extends TerraformingExecutionTimelineEntry {
+	  statusLabel?: string
+	  progressLabel?: string
+	  fixedRuntime?: boolean
+	}
+
+	const timelineById = computed(() => new Map(props.executionTimeline.map(entry => [entry.id, entry])))
+
+	const currentQueueTimelineEntries = computed<CurrentQueueTimelineEntry[]>(() => {
+	  return props.currentQueueDisplayEntries.map(entry => {
+	    if (entry.status === 'pending') {
+	      const timelineEntry = timelineById.value.get(entry.replayEntryId ?? entry.id)
+	      if (timelineEntry) {
+	        return {
+	          ...timelineEntry,
+	          progressLabel: entry.runtimeStatus === 'has-progress' ? (t('terraforming.hasProgress') || 'Has progress') : undefined,
+	        }
+	      }
+	    }
+	    return {
+	      id: entry.id,
+	      order: 0,
+	      projectId: entry.projectId,
+	      projectName: entry.projectName,
+	      projectGroupId: entry.status === 'occurred' ? 'events' : 'archive',
+	      projectGroupName: '',
+	      showGroupMarker: false,
+	      wares: [],
+	      deliveries: [],
+	      deliveryDetails: [],
+	      dockModules: [],
+	      totalSlots: 0,
+	      price: 0,
+	      discountAmount: 0,
+	      projectRebates: [],
+	      cumulativeRebates: [],
+	      rebateChanges: [],
+	      discountedWares: [],
+	      statLines: [],
+	      beforeStats: [],
+	      afterStats: [],
+	      availableBeforeExecution: true,
+	      blockedReason: null,
+	      projectDuration: 0,
+	      statusLabel: entry.runtimeStatus === 'active'
+	        ? (t('terraforming.activeInArchive') || 'Active')
+	        : queueStatusLabel(entry),
+	      progressLabel: entry.runtimeStatus === 'has-progress' ? (t('terraforming.hasProgress') || 'Has progress') : undefined,
+	      fixedRuntime: entry.fixedFirst,
+	    }
+	  })
+	})
+
+	function queueStatusLabel(entry: TerraformingCurrentQueueDisplayEntry): string {
+	  if (entry.status === 'executed') return t('terraforming.executedStatus') || 'Executed'
+	  if (entry.status === 'occurred') return t('terraforming.occurredStatus') || 'Occurred'
+	  return t('terraforming.pendingStatus') || 'Pending'
+	}
+
+	function executedStatusLabel(entry: TerraformingExecutedDisplayEntry): string {
+	  if (entry.status === 'archive-only') return t('terraforming.archiveOnly') || 'Archive'
+	  if (entry.status === 'occurred') return t('terraforming.occurredStatus') || 'Occurred'
+	  return t('terraforming.executedStatus') || 'Executed'
+	}
 
 watch(() => props.taskDrag.isDragging.value, (dragging) => {
   document.body.classList.toggle('terraforming-task-dragging', dragging)
@@ -306,11 +384,18 @@ function buildDraftWaresTooltip(entry: { wares: Array<{ name: string; amount: nu
       <span v-if="queueEditState.editing && queueEditState.unsatisfiedGoalCount > 0" class="text-red-400 text-[11px] ml-2">
         {{ queueEditState.unsatisfiedGoalCount }} {{ t('terraforming.unmetDependencies') || 'unmet dependencies' }}
       </span>
-      <button
-        v-if="!queueEditState.editing"
-        class="clear-all-btn"
-        @click="emit('startEdit')"
-      >
+	      <button
+	        v-if="!queueEditState.editing"
+	        class="debug-btn"
+	        @click="emit('debugClearExecutedBaseline')"
+	      >
+	        {{ t('terraforming.debugClearExecutedBaseline') || 'Clear baseline' }}
+	      </button>
+	      <button
+	        v-if="!queueEditState.editing"
+	        class="clear-all-btn"
+	        @click="emit('startEdit')"
+	      >
         {{ t('terraforming.editQueue') || 'Edit' }}
       </button>
       <template v-else>
@@ -329,11 +414,34 @@ function buildDraftWaresTooltip(entry: { wares: Array<{ name: string; amount: nu
       </template>
     </div>
     <div ref="panelContentRef" class="panel-content">
-      <div v-if="!selectedClusterId" class="empty-state">
-        {{ t('terraforming.selectClusterForResources') }}
-      </div>
+	      <div v-if="!selectedClusterId" class="empty-state">
+	        {{ t('terraforming.selectClusterForResources') }}
+	      </div>
+	
+	      <div
+	        v-if="selectedClusterId && archiveSyncNotice && !queueEditState.editing"
+	        class="archive-sync-notice"
+	        :class="{ warning: archiveSyncNotice.hasArchiveRollbackRisk }"
+	      >
+	        <div class="notice-main">
+	          <span>{{ archiveSyncNotice.message }}</span>
+	          <span v-if="archiveSyncNotice.deductedCount > 0">
+	            {{ archiveSyncNotice.deductedCount }} {{ t('terraforming.deductedEntries') || 'deducted' }}
+	          </span>
+	          <span v-if="archiveSyncNotice.archiveOnlyCount > 0">
+	            {{ archiveSyncNotice.archiveOnlyCount }} {{ t('terraforming.archiveOnly') || 'archive only' }}
+	          </span>
+	        </div>
+	        <button
+	          class="notice-confirm-btn"
+	          :disabled="archiveSyncNotice.hasArchiveRollbackRisk"
+	          @click="emit('confirmArchiveSync')"
+	        >
+	          {{ t('terraforming.confirmArchiveSync') || 'Confirm' }}
+	        </button>
+	      </div>
 
-      <div v-else-if="queueEditState.editing" class="timeline-list">
+	      <div v-if="selectedClusterId && queueEditState.editing" class="timeline-list">
         <div v-if="showNoDockWarning" class="text-amber-400 text-[11px]">⚠ {{ t('terraforming.noBuildDock') }}</div>
         <div class="bulk-edit-card">
           <button class="draft-btn danger" @click="emit('removeAllDraft')">{{ t('terraforming.removeAll') || 'Remove all' }}</button>
@@ -500,33 +608,76 @@ function buildDraftWaresTooltip(entry: { wares: Array<{ name: string; amount: nu
                   <div v-if="planEntry.entry.reasons.length > 0" class="detail-section">
                     <div class="section-title">{{ t('terraforming.invalidReason') || 'Invalid reason' }}</div>
                     <div v-for="reason in planEntry.entry.reasons" :key="`${planEntry.entry.id}-${reason}`" class="detail-text text-red-300">{{ reason }}</div>
-                  </div>
-                </div>
-              </template>
-            </div>
+	            </div>
+	          </div>
+		        </template>
+		      </div>
             </div>
           </template>
         </draggable>
       </div>
 
-      <div v-else-if="executionTimeline.length === 0" class="empty-state">
-        {{ t('terraforming.noExecutionTimeline') }}
-      </div>
+	      <div v-if="selectedClusterId && !queueEditState.editing" class="task-log-tabs">
+	        <button
+	          class="task-log-tab"
+	          :class="{ active: taskLogMode === 'queue' }"
+	          @click="emit('setTaskLogMode', 'queue')"
+	        >
+	          {{ t('terraforming.currentQueue') || 'Current Queue' }}
+	        </button>
+	        <button
+	          class="task-log-tab"
+	          :class="{ active: taskLogMode === 'executed' }"
+	          @click="emit('setTaskLogMode', 'executed')"
+	        >
+	          {{ t('terraforming.executed') || 'Executed' }}
+	        </button>
+	      </div>
 
-      <div v-else class="timeline-list">
-        <template v-for="entry in executionTimeline" :key="entry.id">
-          <div v-if="entry.showGroupMarker" class="group-marker">
-            {{ entry.projectGroupName }}
-          </div>
+	      <div v-if="selectedClusterId && !queueEditState.editing && taskLogMode === 'executed'" class="timeline-list">
+	        <div v-if="executedEntries.length === 0" class="empty-state">
+	          {{ t('terraforming.noExecutedEntries') || t('terraforming.noExecutionTimeline') }}
+	        </div>
+	        <div v-for="entry in executedEntries" :key="entry.id" class="timeline-item executed-item">
+	          <div class="timeline-head">
+	            <div class="timeline-main">
+	              <span class="entry-order">×{{ entry.count }}</span>
+	              <span class="entry-name">{{ entry.projectName }}</span>
+	              <span class="executed-tag" :class="{ archive: entry.status === 'archive-only' }">{{ executedStatusLabel(entry) }}</span>
+	            </div>
+	          </div>
+	        </div>
+	      </div>
+
+	      <div v-if="selectedClusterId && !queueEditState.editing && taskLogMode === 'queue' && currentQueueTimelineEntries.length === 0" class="empty-state">
+	        {{ t('terraforming.noExecutionTimeline') }}
+	      </div>
+	
+	      <div v-if="selectedClusterId && !queueEditState.editing && taskLogMode === 'queue' && currentQueueTimelineEntries.length > 0" class="timeline-list">
+	        <div v-for="entry in currentQueueTimelineEntries" :key="entry.id">
+	          <div v-if="entry.statusLabel" class="timeline-item executed-item">
+	            <div class="timeline-head">
+	              <div class="timeline-main">
+	                <span class="expand-icon"></span>
+	                <span class="entry-name">{{ entry.projectName }}</span>
+	                <span class="executed-tag" :class="{ archive: entry.fixedRuntime }">{{ entry.statusLabel }}</span>
+	              </div>
+	            </div>
+	          </div>
+	          <template v-else>
+	          <div v-if="entry.showGroupMarker" class="group-marker">
+	            {{ entry.projectGroupName }}
+	          </div>
 
           <div class="timeline-item">
             <div class="timeline-head">
               <button class="timeline-main" @click="toggleEntry(entry.id)">
                 <span class="expand-icon">{{ expandedEntryId === entry.id ? '▼' : '▶' }}</span>
-                <span class="entry-order">#{{ entry.order }}</span>
-                <span class="entry-name">{{ entry.projectName }}</span>
-                <span v-if="entry.projectGroupId === 'events'" class="event-tag">{{ t('terraforming.event.tag') || 'EVENT' }}</span>
-              </button>
+	                <span class="entry-order">#{{ entry.order }}</span>
+	                <span class="entry-name">{{ entry.projectName }}</span>
+	                <span v-if="entry.projectGroupId === 'events'" class="event-tag">{{ t('terraforming.event.tag') || 'EVENT' }}</span>
+	                <span v-if="entry.progressLabel" class="progress-tag">{{ entry.progressLabel }}</span>
+	              </button>
               <button
                 v-if="entry.projectGroupId !== 'events'"
                 class="cancel-btn"
@@ -568,15 +719,15 @@ function buildDraftWaresTooltip(entry: { wares: Array<{ name: string; amount: nu
                   <span>{{ t('terraforming.credits') }}</span>
                   <span>{{ (entry.discountAmount > 0 ? entry.price - entry.discountAmount : entry.price).toLocaleString() }} Cr</span>
                 </div>
-                <template v-if="getTotalVolume(entry) > 0">
-                  <div v-for="[type, vol] in Object.entries(getVolumeByTransport(entry)).filter(([,v]) => v > 0)" :key="type" class="detail-row volume-row">
-                    <span>{{ t(`terraforming.transport.${type}`) }}</span>
-                    <span>{{ vol.toLocaleString() }} m³</span>
-                  </div>
-                </template>
-              </div>
+	                <template v-if="getTotalVolume(entry) > 0">
+	                  <div v-for="[type, vol] in Object.entries(getVolumeByTransport(entry)).filter(([,v]) => v > 0)" :key="type" class="detail-row volume-row">
+	                    <span>{{ t(`terraforming.transport.${type}`) }}</span>
+	                    <span>{{ vol.toLocaleString() }} m³</span>
+	                  </div>
+	                </template>
+	              </div>
 
-              <div v-if="entry.cumulativeRebates.length > 0 && entry.projectGroupId !== 'events'" class="detail-section">
+	              <div v-if="entry.cumulativeRebates.length > 0 && entry.projectGroupId !== 'events'" class="detail-section">
                 <div class="section-title">{{ t('terraforming.cumulativeRebates') }}</div>
                 <div
                   v-for="(rb, i) in entry.cumulativeRebates"
@@ -653,6 +804,7 @@ function buildDraftWaresTooltip(entry: { wares: Array<{ name: string; amount: nu
           </div>
         </template>
       </div>
+      </div>
     </div>
   </div>
 </template>
@@ -688,10 +840,19 @@ function buildDraftWaresTooltip(entry: { wares: Array<{ name: string; amount: nu
 .panel-floating .panel-content::-webkit-scrollbar-thumb { background: rgba(71, 85, 105, 0.8); border-radius: 3px; }
 .panel-floating .panel-content::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 1); }
 
-.clear-all-btn {
-  @apply ml-auto text-[11px] px-2 py-1 rounded border border-red-800 text-red-300 bg-red-900/20 transition-colors;
-  @apply hover:bg-red-800/40 hover:border-red-700;
-}
+	.clear-all-btn {
+	  @apply ml-auto text-[11px] px-2 py-1 rounded border border-red-800 text-red-300 bg-red-900/20 transition-colors;
+	  @apply hover:bg-red-800/40 hover:border-red-700;
+	}
+
+	.debug-btn {
+	  @apply ml-auto text-[11px] px-2 py-1 rounded border border-amber-800 text-amber-300 bg-amber-950/20 transition-colors;
+	  @apply hover:bg-amber-900/40 hover:border-amber-700;
+	}
+
+	.debug-btn + .clear-all-btn {
+	  @apply ml-2;
+	}
 
 .edit-actions-group {
   @apply ml-auto flex gap-2;
@@ -713,9 +874,50 @@ function buildDraftWaresTooltip(entry: { wares: Array<{ name: string; amount: nu
   @apply text-slate-500 text-sm text-center py-6;
 }
 
-.timeline-list {
-  @apply flex flex-col gap-2;
-}
+	.timeline-list {
+	  @apply flex flex-col gap-2;
+	}
+
+	.task-log-tabs {
+	  @apply flex gap-1 rounded border border-slate-700/60 bg-slate-950/40 p-1;
+	}
+
+	.task-log-tab {
+	  @apply flex-1 rounded px-2 py-1 text-xs text-slate-400 transition-colors;
+	  @apply hover:bg-slate-800/60 hover:text-slate-200;
+	}
+
+	.task-log-tab.active {
+	  @apply bg-sky-900/40 text-sky-200 border border-sky-700/50;
+	}
+
+	.archive-sync-notice {
+	  @apply flex items-center gap-2 rounded border border-sky-800/60 bg-sky-950/30 px-3 py-2 text-xs text-sky-200;
+	}
+
+	.archive-sync-notice.warning {
+	  @apply border-amber-700/70 bg-amber-950/30 text-amber-200;
+	}
+
+	.notice-main {
+	  @apply flex flex-col gap-0.5 flex-1 min-w-0;
+	}
+
+	.notice-confirm-btn {
+	  @apply shrink-0 rounded border border-sky-700 bg-sky-900/50 px-2 py-1 text-[11px] text-sky-100 disabled:opacity-40 disabled:cursor-not-allowed;
+	}
+
+	.executed-item {
+	  @apply border-emerald-800/40 bg-emerald-950/10;
+	}
+
+	.executed-tag {
+	  @apply shrink-0 rounded bg-emerald-900/40 px-1.5 py-0.5 text-[10px] text-emerald-300;
+	}
+
+	.executed-tag.archive {
+	  @apply bg-slate-800 text-slate-300;
+	}
 
 .group-marker {
   @apply text-[11px] font-semibold text-sky-300 px-1 pt-1;
@@ -973,9 +1175,13 @@ function buildDraftWaresTooltip(entry: { wares: Array<{ name: string; amount: nu
   @apply flex items-center gap-2;
 }
 
-.event-tag {
-  @apply text-xs px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 font-medium;
-}
+	.event-tag {
+	  @apply text-xs px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 font-medium;
+	}
+
+	.progress-tag {
+	  @apply text-xs px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-medium;
+	}
 
 .auto-event-entry .event-drag-placeholder {
   @apply inline-block w-3.5 text-center opacity-30 cursor-default;

@@ -25,6 +25,14 @@ export interface ReplayFlags {
 export interface ReplayOptions {
   mode?: 'committed' | 'draft'
   flags?: ReplayFlags
+  baseState?: ReplayBaseState
+}
+
+export interface ReplayBaseState {
+  stats?: Record<string, number>
+  completedProjects?: Map<string, number>
+  completedEvents?: Map<string, number>
+  rebates?: RebateKey[]
 }
 
 export interface RebateKey {
@@ -63,6 +71,63 @@ export interface TerraformingReplayResult {
   finalCompleted: Map<string, number>
 }
 
+export interface TerraformingArchiveRuntimeBaseState extends ReplayBaseState {
+  clusterId: string
+  stats: Record<string, number>
+  completedProjects: Map<string, number>
+  completedEvents: Map<string, number>
+  rebates: RebateKey[]
+  activeProject?: {
+    projectId: string
+    aborted?: boolean
+    scaledResources: Array<{ ware: string; amount: number }>
+    submittedResources: Array<{ ware: string; amount: number }>
+    inTransitResources?: Array<{ ware: string; amount: number }>
+    inTransitShipBatches?: number
+  }
+  retainedProjects: Array<{
+    projectId: string
+    scaledResources: Array<{ ware: string; amount: number }>
+    submittedResources: Array<{ ware: string; amount: number }>
+    inTransitResources?: Array<{ ware: string; amount: number }>
+    inTransitShipBatches?: number
+  }>
+  missionComplete: boolean
+}
+
+export interface TerraformingExecutedDelta {
+  completedProjects: Map<string, number>
+  completedOneTimeEvents: Map<string, number>
+  hasArchiveAdvance: boolean
+  hasArchiveRollbackRisk: boolean
+  hasRuntimeStateChange: boolean
+}
+
+export interface TerraformingCurrentQueueDisplayEntry {
+  id: string
+  projectId: string
+  status: 'pending' | 'executed' | 'occurred'
+  source: 'remaining-queue' | 'deducted-from-archive'
+}
+
+export interface TerraformingExecutedDisplaySource {
+  id: string
+  projectId: string
+  kind: 'project' | 'one-time-event'
+  status: 'executed' | 'occurred' | 'archive-only'
+  count: number
+  source: 'deducted-from-queue' | 'archive-runtime'
+}
+
+export interface DeductExecutionResult {
+  remainingLog: TerraformingExecutionEntry[]
+  currentQueueDisplayEntries: TerraformingCurrentQueueDisplayEntry[]
+  deductedEntries: TerraformingExecutedDisplaySource[]
+  archiveOnlyEntries: TerraformingExecutedDisplaySource[]
+  consumedProjects: Map<string, number>
+  consumedOneTimeEvents: Map<string, number>
+}
+
 export const TERRAFORMING_IGNORE_FLAG_TO_STAT: Record<string, string> = {
   '$IgnoreTemperature': 'temperature',
   '$IgnoreOxygen': 'oxygen',
@@ -86,6 +151,119 @@ export function buildCompletedProjectsFromExecutionLog(
     counts.set(entry.projectId, (counts.get(entry.projectId) ?? 0) + 1)
   }
   return counts
+}
+
+function cloneCountMap(input: Map<string, number>): Map<string, number> {
+  const output = new Map<string, number>()
+  for (const [id, count] of input) {
+    if (count > 0) output.set(id, count)
+  }
+  return output
+}
+
+export function subtractCountMaps(current: Map<string, number>, baseline: Map<string, number>): Map<string, number> {
+  const delta = new Map<string, number>()
+  for (const [id, currentCount] of current) {
+    const diff = currentCount - (baseline.get(id) ?? 0)
+    if (diff > 0) delta.set(id, diff)
+  }
+  return delta
+}
+
+export function hasRollback(current: Map<string, number>, baseline: Map<string, number>): boolean {
+  for (const [id, baselineCount] of baseline) {
+    if ((current.get(id) ?? 0) < baselineCount) return true
+  }
+  return false
+}
+
+function isOneTimeEventProject(project: TerraformingProject | undefined): boolean {
+  return project?.group === 'events' && project.repeatCooldown === null
+}
+
+export function deductExecutionLogByArchiveDelta(
+  executionLog: TerraformingExecutionEntry[],
+  executedDelta: { completedProjects: Map<string, number>; completedOneTimeEvents: Map<string, number> },
+  projectMap: Map<string, TerraformingProject>,
+): DeductExecutionResult {
+  const projectBudget = cloneCountMap(executedDelta.completedProjects)
+  const eventBudget = cloneCountMap(executedDelta.completedOneTimeEvents)
+  const remainingLog: TerraformingExecutionEntry[] = []
+  const currentQueueDisplayEntries: TerraformingCurrentQueueDisplayEntry[] = []
+  const deductedEntries: TerraformingExecutedDisplaySource[] = []
+  const consumedProjects = new Map<string, number>()
+  const consumedOneTimeEvents = new Map<string, number>()
+
+  for (const entry of executionLog) {
+    const project = projectMap.get(entry.projectId)
+    const isOneTimeEvent = isOneTimeEventProject(project)
+    const budget = isOneTimeEvent ? eventBudget : projectBudget
+    const available = budget.get(entry.projectId) ?? 0
+
+    if (available > 0) {
+      budget.set(entry.projectId, available - 1)
+      if (available - 1 <= 0) budget.delete(entry.projectId)
+      const consumed = isOneTimeEvent ? consumedOneTimeEvents : consumedProjects
+      consumed.set(entry.projectId, (consumed.get(entry.projectId) ?? 0) + 1)
+      const status = isOneTimeEvent ? 'occurred' : 'executed'
+      currentQueueDisplayEntries.push({
+        id: entry.id,
+        projectId: entry.projectId,
+        status,
+        source: 'deducted-from-archive',
+      })
+      deductedEntries.push({
+        id: entry.id,
+        projectId: entry.projectId,
+        kind: isOneTimeEvent ? 'one-time-event' : 'project',
+        status,
+        count: 1,
+        source: 'deducted-from-queue',
+      })
+      continue
+    }
+
+    remainingLog.push(entry)
+    currentQueueDisplayEntries.push({
+      id: entry.id,
+      projectId: entry.projectId,
+      status: 'pending',
+      source: 'remaining-queue',
+    })
+  }
+
+  const archiveOnlyEntries: TerraformingExecutedDisplaySource[] = []
+  for (const [projectId, count] of projectBudget) {
+    if (count <= 0) continue
+    archiveOnlyEntries.push({
+      id: `archive-project-${projectId}`,
+      projectId,
+      kind: 'project',
+      status: 'archive-only',
+      count,
+      source: 'archive-runtime',
+    })
+  }
+  for (const [projectId, count] of eventBudget) {
+    if (count <= 0) continue
+    archiveOnlyEntries.push({
+      id: `archive-event-${projectId}`,
+      projectId,
+      kind: 'one-time-event',
+      status: 'archive-only',
+      count,
+      source: 'archive-runtime',
+    })
+  }
+
+  return {
+    remainingLog,
+    currentQueueDisplayEntries,
+    deductedEntries,
+    archiveOnlyEntries,
+    consumedProjects,
+    consumedOneTimeEvents,
+  }
 }
 
 export function getTerraformingIgnoredStats(cluster: TerraformingCluster | null): Set<string> {
@@ -302,14 +480,23 @@ export function replayExecutionLog(
   const mode = options?.mode ?? 'committed'
   const flags = options?.flags ?? {}
   const { evaluations, stepSnapshots, goals } = flags
+  const baseState = options?.baseState
 
   const steps: ReplayStep[] = []
   const goalEntries: GoalEntry[] = []
   let goalSeq = 0
 
-  let runningStats = buildTerraformingBaseStats(cluster)
-  const runningCompleted = new Map<string, number>()
+  let runningStats = baseState?.stats ? { ...baseState.stats } : buildTerraformingBaseStats(cluster)
+  const runningCompleted = new Map<string, number>([
+    ...(baseState?.completedProjects ? [...baseState.completedProjects.entries()] : []),
+    ...(baseState?.completedEvents ? [...baseState.completedEvents.entries()] : []),
+  ])
   const runningRebates = new Map<string, number>()
+  if (baseState?.rebates) {
+    for (const rb of baseState.rebates) {
+      runningRebates.set(`${rb.type === 'wareGroup' ? 'g' : 'w'}:${rb.id}`, rb.value)
+    }
+  }
   const projectMap = buildProjectMap(data)
   const ignoredStats = getTerraformingIgnoredStats(cluster)
 

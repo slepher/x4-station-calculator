@@ -18,6 +18,7 @@ interface Props {
   groupNames: Map<string, string>
   taskNodeDisplays: Map<string, TerraformingTaskNodeDisplay>
   completedProjectCounts: Map<string, number>
+  archiveCompletedProjectCounts: Map<string, number>
   projectMap: Map<string, TerraformingProject>
   projectDisplayNames: Map<string, string>
   floating: boolean
@@ -351,6 +352,7 @@ function getStatLines(projectId: string): TerraformingStatLineModel[] {
                       :node="node"
                       :is-editing="isEditing"
                       :completed-project-counts="completedProjectCounts"
+                      :archive-completed-project-counts="archiveCompletedProjectCounts"
                       :project-map="projectMap"
                       :project-display-names="projectDisplayNames"
                       :task-node-displays="taskNodeDisplays"

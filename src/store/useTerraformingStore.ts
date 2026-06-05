@@ -4,23 +4,69 @@ import type {
   TerraformingPlan,
   SavedTerraformingState,
   SavedModule,
+  TerraformingExecutedSnapshot,
 } from '@/types/x4'
 import type { TerraformingData, TerraformingCluster } from './logic/terraformingTaskResolver'
 import {
   buildCompletedProjectsFromExecutionLog,
+  deductExecutionLogByArchiveDelta,
   getRuntimeTerraformingProjectIds,
+  hasRollback,
   replayExecutionLog,
+  subtractCountMaps,
+  type DeductExecutionResult,
+  type RebateKey,
+  type TerraformingArchiveRuntimeBaseState,
+  type TerraformingExecutedDelta,
   type TerraformingExecutionEntry,
 } from './logic/terraformingRuntime'
-import type { ArchiveStationData } from '@/types/saveArchive'
+import type { ArchiveStationData, SaveTerraformingCluster } from '@/types/saveArchive'
 import { useGameDataStore } from './useGameDataStore'
 import { useLiveProductionStore } from './useLiveProductionStore'
+import { useSaveStore } from './useSaveStore'
 import { CURRENT_TERRAFORMING_VERSION } from './logic/storageVersions'
 import i18n from '@/i18n'
+
+function stripMacroPrefix(macro: string): string {
+  return macro.replace(/^macro\./, '')
+}
+
+function mapToRecord(map: Map<string, number>): Record<string, number> {
+  return Object.fromEntries([...map.entries()].filter(([, count]) => count > 0))
+}
+
+function recordToMap(record: Record<string, number> | undefined): Map<string, number> {
+  return new Map(Object.entries(record ?? {}).filter(([, count]) => count > 0))
+}
+
+function rebateRuntimeKey(rb: { ware?: string; wareGroup?: string; amount: number }): RebateKey | null {
+  if (rb.wareGroup) return { id: rb.wareGroup, type: 'wareGroup', value: rb.amount }
+  if (rb.ware) return { id: rb.ware, type: 'ware', value: rb.amount }
+  return null
+}
+
+function rebatesEqual(a: RebateKey[], b: RebateKey[]): boolean {
+  if (a.length !== b.length) return false
+  const normalize = (items: RebateKey[]) => [...items]
+    .map(item => `${item.type}:${item.id}:${item.value}`)
+    .sort()
+  const na = normalize(a)
+  const nb = normalize(b)
+  return na.every((value, index) => value === nb[index])
+}
+
+function recordsEqual(a: Record<string, number>, b: Record<string, number>): boolean {
+  const keys = new Set([...Object.keys(a), ...Object.keys(b)])
+  for (const key of keys) {
+    if ((a[key] ?? 0) !== (b[key] ?? 0)) return false
+  }
+  return true
+}
 
 export const useTerraformingStore = defineStore('terraforming', () => {
   const gameData = useGameDataStore()
   const liveStore = useLiveProductionStore()
+  const saveStore = useSaveStore()
 
   function getStorageKey(): string {
     return gameData.getStorageKey('terraforming')
@@ -101,6 +147,7 @@ export const useTerraformingStore = defineStore('terraforming', () => {
       planId,
       selectedClusterId: null,
       executionLogByCluster: {},
+      syncedExecutedBaselineByCluster: {},
     }
     savedPlans.value.list.push(plan)
     savedPlans.value.activeId = id
@@ -204,6 +251,11 @@ export const useTerraformingStore = defineStore('terraforming', () => {
     setExecutionLogForCluster(clusterId, normalized)
   }
 
+  function replaceExecutionLogAndSyncBaseline(entries: TerraformingExecutionEntry[]): void {
+    replaceExecutionLog(entries)
+    syncExecutedBaselineForSelectedCluster()
+  }
+
   function clearExecutionQueue(): void {
     const clusterId = activePlan.value?.selectedClusterId
     if (!clusterId) return
@@ -234,8 +286,147 @@ export const useTerraformingStore = defineStore('terraforming', () => {
     return getExecutionLogForCluster(clusterId)
   })
 
+  const projectMap = computed(() => {
+    return new Map((terraformingData.value?.projects ?? []).map(project => [project.id, project]))
+  })
+
+  const selectedArchiveTerraformingCluster = computed<SaveTerraformingCluster | null>(() => {
+    if (!isLiveMode.value) return null
+    const cluster = selectedCluster.value
+    const archive = saveStore.selectedArchive
+    if (!cluster || !archive?.terraforming_clusters) return null
+    const clusterId = stripMacroPrefix(cluster.macro)
+    return archive.terraforming_clusters[clusterId] ?? null
+  })
+
+  const archiveRuntimeBaseState = computed<TerraformingArchiveRuntimeBaseState | null>(() => {
+    const runtime = selectedArchiveTerraformingCluster.value
+    if (!runtime) return null
+    const completedProjects = new Map<string, number>()
+    for (const item of runtime.completedProjects) {
+      if (item.completedCount > 0) completedProjects.set(item.projectId, item.completedCount)
+    }
+    const completedEvents = new Map<string, number>()
+    for (const item of runtime.events) {
+      const project = projectMap.value.get(item.eventId)
+      if (project?.group === 'events' && project.repeatCooldown === null && item.completedCount > 0) {
+        completedEvents.set(item.eventId, item.completedCount)
+      }
+    }
+    const rebates = runtime.rebates
+      .map(rebateRuntimeKey)
+      .filter((item): item is RebateKey => item !== null)
+    return {
+      clusterId: runtime.clusterId,
+      stats: { ...runtime.stats },
+      completedProjects,
+      completedEvents,
+      rebates,
+      activeProject: runtime.activeProject,
+      retainedProjects: [...runtime.retainedProjects],
+      missionComplete: runtime.missionComplete,
+    }
+  })
+
+  function createExecutedSnapshot(base: TerraformingArchiveRuntimeBaseState | null): TerraformingExecutedSnapshot | null {
+    const archive = saveStore.selectedArchive
+    if (!archive || !base) return null
+    return {
+      archiveGuid: archive.meta.guid,
+      archiveTime: archive.meta.time,
+      completedProjects: mapToRecord(base.completedProjects),
+      completedOneTimeEvents: mapToRecord(base.completedEvents),
+      stats: { ...base.stats },
+      rebates: base.rebates.map(rb => ({ ...rb })),
+      activeProjectId: base.activeProject?.projectId,
+    }
+  }
+
+  const syncedExecutedBaseline = computed<TerraformingExecutedSnapshot | null>(() => {
+    const plan = activePlan.value
+    const clusterId = selectedCluster.value?.id
+    if (!plan || !clusterId) return null
+    return plan.syncedExecutedBaselineByCluster?.[clusterId] ?? null
+  })
+
+  const archiveExecutedDelta = computed<TerraformingExecutedDelta>(() => {
+    const base = archiveRuntimeBaseState.value
+    const baseline = syncedExecutedBaseline.value
+    if (!base) {
+      return {
+        completedProjects: new Map(),
+        completedOneTimeEvents: new Map(),
+        hasArchiveAdvance: false,
+        hasArchiveRollbackRisk: false,
+        hasRuntimeStateChange: false,
+      }
+    }
+
+    const baselineProjects = recordToMap(baseline?.completedProjects)
+    const baselineEvents = recordToMap(baseline?.completedOneTimeEvents)
+    const completedProjects = subtractCountMaps(base.completedProjects, baselineProjects)
+    const completedOneTimeEvents = subtractCountMaps(base.completedEvents, baselineEvents)
+    const hasArchiveRollbackRisk = hasRollback(base.completedProjects, baselineProjects)
+      || hasRollback(base.completedEvents, baselineEvents)
+    const hasArchiveAdvance = completedProjects.size > 0 || completedOneTimeEvents.size > 0
+    const hasRuntimeStateChange = baseline === null
+      || !recordsEqual(base.stats, baseline.stats)
+      || !rebatesEqual(base.rebates, baseline.rebates)
+      || (base.activeProject?.projectId ?? '') !== (baseline.activeProjectId ?? '')
+
+    return {
+      completedProjects,
+      completedOneTimeEvents,
+      hasArchiveAdvance,
+      hasArchiveRollbackRisk,
+      hasRuntimeStateChange,
+    }
+  })
+
+  const deductedExecution = computed<DeductExecutionResult>(() => {
+    const emptyDelta = { completedProjects: new Map<string, number>(), completedOneTimeEvents: new Map<string, number>() }
+    const delta = archiveExecutedDelta.value
+    return deductExecutionLogByArchiveDelta(
+      executionLog.value,
+      {
+        completedProjects: delta.completedProjects ?? emptyDelta.completedProjects,
+        completedOneTimeEvents: delta.completedOneTimeEvents ?? emptyDelta.completedOneTimeEvents,
+      },
+      projectMap.value,
+    )
+  })
+
+  function syncExecutedBaselineForSelectedCluster(): void {
+    const plan = activePlan.value
+    const clusterId = selectedCluster.value?.id
+    if (!plan || !clusterId) return
+    const snapshot = createExecutedSnapshot(archiveRuntimeBaseState.value)
+    if (!snapshot) return
+    plan.syncedExecutedBaselineByCluster = {
+      ...(plan.syncedExecutedBaselineByCluster ?? {}),
+      [clusterId]: snapshot,
+    }
+    saveToStorage()
+  }
+
+  function clearExecutedBaselineForSelectedCluster(): void {
+    const plan = activePlan.value
+    const clusterId = selectedCluster.value?.id
+    if (!plan || !clusterId) return
+    if (!plan.syncedExecutedBaselineByCluster?.[clusterId]) return
+    const next = { ...plan.syncedExecutedBaselineByCluster }
+    delete next[clusterId]
+    plan.syncedExecutedBaselineByCluster = next
+    saveToStorage()
+  }
+
   const completedProjects = computed<Map<string, number>>(() => {
-    return buildCompletedProjectsFromExecutionLog(executionLog.value)
+    const cluster = selectedCluster.value
+    const data = terraformingData.value
+    if (!cluster || !data) return buildCompletedProjectsFromExecutionLog(deductedExecution.value.remainingLog)
+    return replayExecutionLog(deductedExecution.value.remainingLog, cluster, data, {
+      baseState: archiveRuntimeBaseState.value ?? undefined,
+    }).finalCompleted
   })
 
   const currentStats = computed<Record<string, number>>(() => {
@@ -243,7 +434,9 @@ export const useTerraformingStore = defineStore('terraforming', () => {
     if (!cluster) return {}
     const data = terraformingData.value
     if (!data) return {}
-    return replayExecutionLog(executionLog.value, cluster, data).finalStats
+    return replayExecutionLog(deductedExecution.value.remainingLog, cluster, data, {
+      baseState: archiveRuntimeBaseState.value ?? undefined,
+    }).finalStats
   })
 
   const runtimeProjectIds = computed<string[]>(() => {
@@ -323,6 +516,10 @@ export const useTerraformingStore = defineStore('terraforming', () => {
     terraformingData,
     selectedCluster,
     executionLog,
+    archiveRuntimeBaseState,
+    archiveExecutedDelta,
+    deductedExecution,
+    syncedExecutedBaseline,
     completedProjects,
     currentStats,
     runtimeProjectIds,
@@ -340,6 +537,9 @@ export const useTerraformingStore = defineStore('terraforming', () => {
     removeExecution,
     setProjectCount,
     replaceExecutionLog,
+    replaceExecutionLogAndSyncBaseline,
+    syncExecutedBaselineForSelectedCluster,
+    clearExecutedBaselineForSelectedCluster,
     clearExecutionQueue,
     loadFromStorage,
     saveToStorage,

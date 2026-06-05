@@ -20,6 +20,7 @@ interface Props {
   isChild?: boolean
   isEditing?: boolean
   completedProjectCounts: Map<string, number>
+  archiveCompletedProjectCounts: Map<string, number>
   projectMap: Map<string, TerraformingProject>
   projectDisplayNames: Map<string, string>
   taskNodeDisplays: Map<string, TerraformingTaskNodeDisplay>
@@ -131,8 +132,10 @@ function getStatusIcon(projectId: string, available: boolean): string {
 
 function handleSetCount(node: { id: string; available: boolean }, newCount: number) {
   const current = props.completedProjectCounts.get(node.id) ?? 0
+  const minCount = props.archiveCompletedProjectCounts.get(node.id) ?? 0
+  const targetCount = Math.max(newCount, minCount)
   if (newCount > current && !node.available && !props.isEditing) return
-  emit('setProjectCount', node.id, newCount)
+  emit('setProjectCount', node.id, targetCount)
 }
 
 function onChildDragStart(event: any) {
@@ -182,7 +185,7 @@ function onChildDragStart(event: any) {
           <template v-if="isRepeatableProject(node.id)">
             <X4NumberInput
               :model-value="completedProjectCounts.get(node.id) ?? 0"
-              :min="0"
+              :min="archiveCompletedProjectCounts.get(node.id) ?? 0"
               :max="99"
               :disabled="!node.available && (completedProjectCounts.get(node.id) ?? 0) === 0 && !isEditing"
               width-class="w-14"
@@ -277,6 +280,7 @@ function onChildDragStart(event: any) {
               :is-child="true"
               :is-editing="isEditing"
               :completed-project-counts="completedProjectCounts"
+              :archive-completed-project-counts="archiveCompletedProjectCounts"
               :project-map="projectMap"
               :project-display-names="projectDisplayNames"
               :task-node-displays="taskNodeDisplays"
@@ -297,6 +301,7 @@ function onChildDragStart(event: any) {
           :is-child="true"
           :is-editing="isEditing"
           :completed-project-counts="completedProjectCounts"
+          :archive-completed-project-counts="archiveCompletedProjectCounts"
           :project-map="projectMap"
           :project-display-names="projectDisplayNames"
           :task-node-displays="taskNodeDisplays"

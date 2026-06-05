@@ -36,6 +36,9 @@ const terraformingPresenter = useTerraformingPresenter({
   terraformingSelectedCluster: computed(() => terraformingStore.selectedCluster),
   terraformingRuntimeProjectIds: computed(() => terraformingStore.runtimeProjectIds),
   terraformingExecutionLog: computed(() => terraformingStore.executionLog),
+  terraformingArchiveRuntimeBaseState: computed(() => terraformingStore.archiveRuntimeBaseState),
+  terraformingExecutedDelta: computed(() => terraformingStore.archiveExecutedDelta),
+  terraformingDeductedExecution: computed(() => terraformingStore.deductedExecution),
   terraformingHqStationName: computed(() => terraformingStore.hqStationName),
   terraformingHqArchiveStation: computed(() => terraformingStore.hqArchiveStation),
   terraformingHqEffectiveModules: computed(() => terraformingStore.hqEffectiveModules),
@@ -50,6 +53,9 @@ const terraformingPresenter = useTerraformingPresenter({
   setTerraformingProjectCount: (projectId: string, count: number) => terraformingStore.setProjectCount(projectId, count),
   removeTerraformingExecutionEntry: (entryId: string) => terraformingStore.removeExecution(entryId),
   replaceTerraformingExecutionLog: (entries) => terraformingStore.replaceExecutionLog(entries as any),
+  replaceTerraformingExecutionLogAndSyncBaseline: (entries) => terraformingStore.replaceExecutionLogAndSyncBaseline(entries as any),
+  syncTerraformingExecutedBaseline: () => terraformingStore.syncExecutedBaselineForSelectedCluster(),
+  clearTerraformingExecutedBaseline: () => terraformingStore.clearExecutedBaselineForSelectedCluster(),
   clearTerraformingExecutionQueue: () => terraformingStore.clearExecutionQueue(),
   mapsClusters: gameDataMaps.value?.clusters ?? {},
   mapsSectors: gameDataMaps.value?.sectors ?? {},
@@ -121,6 +127,7 @@ function toggleStatFilter(statId: string) {
         :group-names="terraformingPresenter.props.taskList.groupNames.value"
         :task-node-displays="terraformingPresenter.props.taskList.taskNodeDisplays.value"
         :completed-project-counts="terraformingPresenter.props.taskList.completedProjectCounts.value"
+        :archive-completed-project-counts="terraformingPresenter.props.taskList.archiveCompletedProjectCounts.value"
         :project-map="terraformingPresenter.props.taskList.projectMap.value"
         :project-display-names="terraformingPresenter.props.taskList.projectDisplayNames.value"
         :floating="terraformingFloating.taskList"
@@ -140,6 +147,12 @@ function toggleStatFilter(statId: string) {
       <TerraformingResourcePanel
         :selected-cluster-id="terraformingPresenter.props.resourcePanel.selectedClusterId.value"
         :execution-timeline="terraformingPresenter.props.resourcePanel.executionTimeline.value"
+        :task-log-mode="terraformingPresenter.props.resourcePanel.taskLogMode.value"
+        :current-queue-display-entries="terraformingPresenter.props.resourcePanel.currentQueueDisplayEntries.value"
+        :executed-entries="terraformingPresenter.props.resourcePanel.executedEntries.value"
+        :archive-sync-notice="terraformingPresenter.props.resourcePanel.archiveSyncNotice.value"
+        :archive-active-project-display="terraformingPresenter.props.resourcePanel.archiveActiveProjectDisplay.value"
+        :archive-retained-project-displays="terraformingPresenter.props.resourcePanel.archiveRetainedProjectDisplays.value"
         :queue-edit-state="{
           editing: terraformingPresenter.props.resourcePanel.queueEditState.editing.value,
           canComplete: terraformingPresenter.props.resourcePanel.queueEditState.canComplete.value,
@@ -164,6 +177,9 @@ function toggleStatFilter(statId: string) {
         @click-goal="terraformingPresenter.emits.clickGoal"
         @move-task-before-dependency="terraformingPresenter.emits.moveTaskBeforeDependency"
         @drop-task="(pid: string, idx?: number) => terraformingPresenter.emits.appendDraftTask(pid, idx)"
+        @set-task-log-mode="terraformingPresenter.emits.setTaskLogMode"
+        @confirm-archive-sync="terraformingPresenter.emits.confirmArchiveSync"
+        @debug-clear-executed-baseline="terraformingPresenter.emits.debugClearExecutedBaseline"
       />
     </div>
   </div>

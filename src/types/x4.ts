@@ -926,6 +926,17 @@ export interface TerraformingPlan {
   planId: string
   selectedClusterId: string | null
   executionLogByCluster: Record<string, string[]>
+  syncedExecutedBaselineByCluster?: Record<string, TerraformingExecutedSnapshot>
+}
+
+export interface TerraformingExecutedSnapshot {
+  archiveGuid: string
+  archiveTime: number
+  completedProjects: Record<string, number>
+  completedOneTimeEvents: Record<string, number>
+  stats: Record<string, number>
+  rebates: Array<{ id: string; type: 'ware' | 'wareGroup'; value: number }>
+  activeProjectId?: string
 }
 
 export interface SavedTerraformingState {

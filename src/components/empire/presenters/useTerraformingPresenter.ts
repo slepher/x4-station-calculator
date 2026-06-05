@@ -26,7 +26,12 @@ import {
 import {
   getRuntimeTerraformingProjectIds,
   replayExecutionLog,
+  type DeductExecutionResult,
   type TerraformingExecutionEntry,
+  type TerraformingArchiveRuntimeBaseState,
+  type TerraformingExecutedDelta,
+  type TerraformingCurrentQueueDisplayEntry as RuntimeCurrentQueueDisplayEntry,
+  type TerraformingExecutedDisplaySource,
   type GoalEntry,
   type TerraformingReplayResult,
   type RebateKey,
@@ -134,6 +139,7 @@ export interface TerraformingTaskListProps {
   groupNames: ComputedRef<Map<string, string>>
   taskNodeDisplays: ComputedRef<Map<string, TerraformingTaskNodeDisplay>>
   completedProjectCounts: ComputedRef<Map<string, number>>
+  archiveCompletedProjectCounts: ComputedRef<Map<string, number>>
   projectMap: ComputedRef<Map<string, TerraformingProject>>
   projectDisplayNames: ComputedRef<Map<string, string>>
   wareNames: ComputedRef<Map<string, string>>
@@ -286,10 +292,62 @@ export interface TerraformingQueueEditState {
 export interface TerraformingResourcePanelProps {
   selectedClusterId: ComputedRef<string | null>
   executionTimeline: ComputedRef<TerraformingExecutionTimelineEntry[]>
+  taskLogMode: ComputedRef<'queue' | 'executed'>
+  currentQueueDisplayEntries: ComputedRef<TerraformingCurrentQueueDisplayEntry[]>
+  executedEntries: ComputedRef<TerraformingExecutedDisplayEntry[]>
+  archiveSyncNotice: ComputedRef<TerraformingArchiveSyncNotice | null>
+  archiveActiveProjectDisplay: ComputedRef<TerraformingArchiveProjectDisplay | null>
+  archiveRetainedProjectDisplays: ComputedRef<TerraformingArchiveProjectDisplay[]>
   queueEditState: TerraformingQueueEditState
   getCancelValidation: (entryId: string) => TerraformingCancelValidation
   deliveryShipMap: ComputedRef<Map<string, DeliveryShip>>
   hqBuildDocks: ComputedRef<{ totalSlots: number } | null>
+}
+
+export interface TerraformingCurrentQueueDisplayEntry {
+  id: string
+  projectId: string
+  projectName: string
+  status: RuntimeCurrentQueueDisplayEntry['status']
+  source: RuntimeCurrentQueueDisplayEntry['source']
+  replayEntryId?: string
+  runtimeStatus?: 'active' | 'has-progress'
+  fixedFirst?: boolean
+}
+
+export interface TerraformingExecutedDisplayEntry {
+  id: string
+  projectId: string
+  projectName: string
+  kind: TerraformingExecutedDisplaySource['kind']
+  status: TerraformingExecutedDisplaySource['status']
+  count: number
+  source: TerraformingExecutedDisplaySource['source']
+}
+
+export interface TerraformingArchiveSyncNotice {
+  deductedCount: number
+  archiveOnlyCount: number
+  hasArchiveAdvance: boolean
+  hasArchiveRollbackRisk: boolean
+  hasRuntimeStateChange: boolean
+  message: string
+}
+
+export interface TerraformingArchiveResourceProgress {
+  ware: string
+  wareName: string
+  scaled: number
+  submitted: number
+  inTransit: number
+}
+
+export interface TerraformingArchiveProjectDisplay {
+  projectId: string
+  projectName: string
+  status: 'active' | 'aborting' | 'retained'
+  shipBatches?: number
+  resources: TerraformingArchiveResourceProgress[]
 }
 
 export interface TerraformingTaskDragState {
@@ -325,6 +383,9 @@ export interface TerraformingPresenterEmits {
   copyDraftEntry: (entryId: string) => void
   moveDraftEntry: (entryId: string, targetIndex: number) => void
   reorderDraftEntries: (entries: TerraformingDraftTimelineEntry[]) => void
+  setTaskLogMode: (mode: 'queue' | 'executed') => void
+  confirmArchiveSync: () => void
+  debugClearExecutedBaseline: () => void
 }
 
 export interface UseTerraformingPresenterReturn {
@@ -338,6 +399,9 @@ export interface TerraformingPresenterStore {
   terraformingSelectedCluster: ComputedRef<TerraformingCluster | null>
   terraformingRuntimeProjectIds: ComputedRef<string[]>
   terraformingExecutionLog: ComputedRef<TerraformingExecutionEntry[]>
+  terraformingArchiveRuntimeBaseState: ComputedRef<TerraformingArchiveRuntimeBaseState | null>
+  terraformingExecutedDelta: ComputedRef<TerraformingExecutedDelta>
+  terraformingDeductedExecution: ComputedRef<DeductExecutionResult>
   terraformingHqStationName: ComputedRef<string>
   terraformingHqArchiveStation: ComputedRef<ArchiveStationData | null>
   terraformingHqEffectiveModules: ComputedRef<SavedModule[]>
@@ -348,6 +412,9 @@ export interface TerraformingPresenterStore {
   setTerraformingProjectCount: (projectId: string, count: number) => void
   removeTerraformingExecutionEntry: (entryId: string) => void
   replaceTerraformingExecutionLog: (entries: TerraformingExecutionEntry[]) => void
+  replaceTerraformingExecutionLogAndSyncBaseline: (entries: TerraformingExecutionEntry[]) => void
+  syncTerraformingExecutedBaseline: () => void
+  clearTerraformingExecutedBaseline: () => void
   clearTerraformingExecutionQueue: () => void
   mapsClusters: Record<string, X4MapCluster>
   mapsSectors: Record<string, X4MapSector>
@@ -1150,8 +1217,17 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
   const committedEventCounts = ref<Map<string, number>>(new Map())
   const draftSequence = ref(0)
   const activeGoalFilterIds = ref<Set<string>>(new Set())
+  const taskLogMode = ref<'queue' | 'executed'>('queue')
 
-  const hqArchiveStation = computed(() => store.terraformingHqArchiveStation.value)
+	  const hqArchiveStation = computed(() => store.terraformingHqArchiveStation.value)
+	  const replayBaseState = computed(() => store.terraformingArchiveRuntimeBaseState.value ?? undefined)
+	  const activeRuntimeProjectId = computed(() => {
+	    const active = store.terraformingArchiveRuntimeBaseState.value?.activeProject
+	    if (!active || active.aborted === true) return null
+	    return active.projectId
+	  })
+	  const committedReplayLog = computed(() => store.terraformingDeductedExecution.value.remainingLog
+	    .filter(entry => entry.projectId !== activeRuntimeProjectId.value))
 
   const hasHqStation = computed(() => hqArchiveStation.value !== null)
 
@@ -1529,6 +1605,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     const result = replayExecutionLog(log, cluster, data, {
       mode: 'draft',
       flags: { evaluations: true, stepSnapshots: true, goals: true },
+      baseState: replayBaseState.value,
     })
 
     const pmap = projectMap.value
@@ -1633,9 +1710,10 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     if (!data || !cluster) return new Map()
     const log = isQueueEditing.value
       ? draftExecutionLog.value.filter(e => !e.systemDisabled).map(e => ({ projectId: e.projectId }))
-      : store.terraformingExecutionLog.value.map(e => ({ projectId: e.projectId }))
+      : committedReplayLog.value.map(e => ({ projectId: e.projectId }))
     return replayExecutionLog(log, cluster, data, {
       mode: isQueueEditing.value ? 'draft' : 'committed',
+      baseState: replayBaseState.value,
     }).finalCompleted
   })
 
@@ -1645,9 +1723,10 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     if (!data || !cluster) return {}
     const log = isQueueEditing.value
       ? draftExecutionLog.value.filter(e => !e.systemDisabled).map(e => ({ projectId: e.projectId }))
-      : store.terraformingExecutionLog.value.map(e => ({ projectId: e.projectId }))
+      : committedReplayLog.value.map(e => ({ projectId: e.projectId }))
     return replayExecutionLog(log, cluster, data, {
       mode: isQueueEditing.value ? 'draft' : 'committed',
+      baseState: replayBaseState.value,
     }).finalStats
   })
 
@@ -1686,6 +1765,14 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     return new Map(effectiveCompletedProjects.value)
   })
 
+  const archiveCompletedProjectCounts = computed<Map<string, number>>(() => {
+    return new Map(store.terraformingArchiveRuntimeBaseState.value?.completedProjects ?? [])
+  })
+
+  function getArchiveCompletedProjectCount(projectId: string): number {
+    return archiveCompletedProjectCounts.value.get(projectId) ?? 0
+  }
+
   const projectMap = computed<Map<string, TerraformingProject>>(() => {
     const data = store.terraformingData.value
     if (!data) return new Map()
@@ -1705,6 +1792,135 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
       }
     }
     return map
+  })
+
+  const currentQueueDisplayEntries = computed<TerraformingCurrentQueueDisplayEntry[]>(() => {
+    const names = projectDisplayNames.value
+    const active = store.terraformingArchiveRuntimeBaseState.value?.activeProject
+    const activeProjectId = activeRuntimeProjectId.value
+    const hasProgressIds = new Set<string>()
+    if (active?.aborted === true) hasProgressIds.add(active.projectId)
+    for (const retained of store.terraformingArchiveRuntimeBaseState.value?.retainedProjects ?? []) {
+      hasProgressIds.add(retained.projectId)
+    }
+
+    const entries: TerraformingCurrentQueueDisplayEntry[] = []
+    if (activeProjectId) {
+      entries.push({
+        id: `archive-active-${activeProjectId}`,
+        projectId: activeProjectId,
+        projectName: names.get(activeProjectId) || activeProjectId,
+        status: 'pending',
+        source: 'remaining-queue',
+        runtimeStatus: 'active',
+        fixedFirst: true,
+      })
+    }
+
+    for (const entry of store.terraformingDeductedExecution.value.currentQueueDisplayEntries) {
+      if (activeProjectId && entry.projectId === activeProjectId) continue
+      entries.push({
+        ...entry,
+        projectName: names.get(entry.projectId) || entry.projectId,
+        replayEntryId: entry.source === 'remaining-queue' ? entry.id : undefined,
+        runtimeStatus: hasProgressIds.has(entry.projectId) ? 'has-progress' : undefined,
+      })
+    }
+
+    return entries
+  })
+
+  const executedEntries = computed<TerraformingExecutedDisplayEntry[]>(() => {
+    const names = projectDisplayNames.value
+    const base = store.terraformingArchiveRuntimeBaseState.value
+    if (!base) return []
+    const entries: TerraformingExecutedDisplayEntry[] = []
+    for (const [projectId, count] of base.completedProjects) {
+      if (count <= 0) continue
+      entries.push({
+        id: `archive-project-${projectId}`,
+        projectId,
+        projectName: names.get(projectId) || projectId,
+        kind: 'project',
+        status: 'executed',
+        count,
+        source: 'archive-runtime',
+      })
+    }
+    for (const [projectId, count] of base.completedEvents) {
+      if (count <= 0) continue
+      entries.push({
+        id: `archive-event-${projectId}`,
+        projectId,
+        projectName: names.get(projectId) || projectId,
+        kind: 'one-time-event',
+        status: 'occurred',
+        count,
+        source: 'archive-runtime',
+      })
+    }
+    return entries
+  })
+
+  const archiveSyncNotice = computed<TerraformingArchiveSyncNotice | null>(() => {
+    const delta = store.terraformingExecutedDelta.value
+    const deduced = store.terraformingDeductedExecution.value
+    const deductedCount = deduced.deductedEntries.length
+    const archiveOnlyCount = deduced.archiveOnlyEntries.reduce((sum, entry) => sum + entry.count, 0)
+    if (!delta.hasArchiveAdvance && !delta.hasArchiveRollbackRisk && !delta.hasRuntimeStateChange && deductedCount === 0 && archiveOnlyCount === 0) {
+      return null
+    }
+    const message = delta.hasArchiveRollbackRisk
+      ? (vI18nLookup('terraforming.archiveRollbackRisk') || 'Archive state may have rolled back')
+      : delta.hasArchiveAdvance
+        ? (vI18nLookup('terraforming.archiveAdvanceNotice') || 'Archive has executed terraforming entries')
+        : (vI18nLookup('terraforming.archiveRuntimeChanged') || 'Archive runtime changed')
+    return {
+      deductedCount,
+      archiveOnlyCount,
+      hasArchiveAdvance: delta.hasArchiveAdvance,
+      hasArchiveRollbackRisk: delta.hasArchiveRollbackRisk,
+      hasRuntimeStateChange: delta.hasRuntimeStateChange,
+      message,
+    }
+  })
+
+  function buildArchiveProjectDisplay(
+    projectId: string,
+    status: TerraformingArchiveProjectDisplay['status'],
+    progress: {
+      scaledResources: Array<{ ware: string; amount: number }>
+      submittedResources: Array<{ ware: string; amount: number }>
+      inTransitResources?: Array<{ ware: string; amount: number }>
+      inTransitShipBatches?: number
+    },
+  ): TerraformingArchiveProjectDisplay {
+    const submitted = new Map(progress.submittedResources.map(item => [item.ware, item.amount]))
+    const inTransit = new Map((progress.inTransitResources ?? []).map(item => [item.ware, item.amount]))
+    return {
+      projectId,
+      projectName: projectDisplayNames.value.get(projectId) || projectId,
+      status,
+      shipBatches: progress.inTransitShipBatches,
+      resources: progress.scaledResources.map(item => ({
+        ware: item.ware,
+        wareName: store.wareNames.value.get(item.ware) || item.ware,
+        scaled: item.amount,
+        submitted: submitted.get(item.ware) ?? 0,
+        inTransit: inTransit.get(item.ware) ?? 0,
+      })),
+    }
+  }
+
+  const archiveActiveProjectDisplay = computed<TerraformingArchiveProjectDisplay | null>(() => {
+    const active = store.terraformingArchiveRuntimeBaseState.value?.activeProject
+    if (!active) return null
+    return buildArchiveProjectDisplay(active.projectId, active.aborted ? 'aborting' : 'active', active)
+  })
+
+  const archiveRetainedProjectDisplays = computed<TerraformingArchiveProjectDisplay[]>(() => {
+    return (store.terraformingArchiveRuntimeBaseState.value?.retainedProjects ?? [])
+      .map(project => buildArchiveProjectDisplay(project.projectId, 'retained', project))
   })
 
   const taskNodeDisplays = computed<Map<string, TerraformingTaskNodeDisplay>>(() => {
@@ -1877,11 +2093,12 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     const cluster = store.terraformingSelectedCluster.value
     if (!data || !cluster) return []
 
-    const log = store.terraformingExecutionLog.value
+    const log = committedReplayLog.value
     if (log.length === 0) return []
 
     const result = replayExecutionLog(log.map(e => ({ projectId: e.projectId })), cluster, data, {
       flags: { evaluations: true, stepSnapshots: true },
+      baseState: replayBaseState.value,
     })
 
     const translatedGroupNames = groupNames.value
@@ -2006,7 +2223,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
       }
     }
 
-    const log = store.terraformingExecutionLog.value
+    const log = committedReplayLog.value
     const targetIndex = log.findIndex(entry => entry.id === entryId)
     if (targetIndex < 0) {
       return {
@@ -2033,6 +2250,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     const remainingLog = remainingEntries.map(e => ({ projectId: e.projectId }))
     const result = replayExecutionLog(remainingLog, cluster, data, {
       flags: { evaluations: true, stepSnapshots: false },
+      baseState: replayBaseState.value,
     })
 
     const affectedEntryIds: string[] = []
@@ -2320,7 +2538,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     } else {
       const r = replayExecutionLog(
         draftExecutionLog.value.filter(e => !e.systemDisabled).map(e => ({ projectId: e.projectId })),
-        cluster, data, { mode: 'draft', flags: { stepSnapshots: true } })
+        cluster, data, { mode: 'draft', flags: { stepSnapshots: true }, baseState: replayBaseState.value })
       for (const step of r.steps) {
         if (step.type === 'task' && step.statsBefore) {
           cumulativeStateAt.push({ completed: new Map(), stats: { ...step.statsBefore } })
@@ -2337,8 +2555,8 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
       // Get cumulative state at goal's position
       const pos = Math.min(goal.position, cumulativeStateAt.length)
       const stateAt = goal.kind === 'preventive'
-        ? { completed: new Map<string, number>(), stats: replayState.length > 0 && replayState[replayState.length - 1] ? replayState[replayState.length - 1]!.stats : replayExecutionLog([], cluster, data).finalStats }
-        : pos > 0 ? cumulativeStateAt[pos - 1]! : { completed: new Map<string, number>(), stats: replayExecutionLog([], cluster, data).finalStats }
+        ? { completed: new Map<string, number>(), stats: replayState.length > 0 && replayState[replayState.length - 1] ? replayState[replayState.length - 1]!.stats : replayExecutionLog([], cluster, data, { baseState: replayBaseState.value }).finalStats }
+        : pos > 0 ? cumulativeStateAt[pos - 1]! : { completed: new Map<string, number>(), stats: replayExecutionLog([], cluster, data, { baseState: replayBaseState.value }).finalStats }
       const currentValue = stateAt.stats[goal.targetStatId] ?? 0
       const ranges = toScaleRanges(statDef)
       const hasRanges = ranges.length > 0
@@ -2466,11 +2684,13 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
 
   const canCompleteQueueEdit = computed(() => isQueueEditing.value && unsatisfiedDerivedGoalCount.value === 0)
 
-  function startQueueEdit() {
-    const userTasks: TerraformingDraftExecutionEntry[] = []
-    const committedEvents = new Map<string, number>()
-    for (const entry of store.terraformingExecutionLog.value) {
-      if (entry.projectId.startsWith('evt_')) {
+	  function startQueueEdit() {
+	    const userTasks: TerraformingDraftExecutionEntry[] = []
+	    const committedEvents = new Map<string, number>()
+	    for (const entry of store.terraformingExecutionLog.value) {
+	      if (!store.terraformingDeductedExecution.value.remainingLog.some(item => item.id === entry.id)) continue
+	      if (entry.projectId === activeRuntimeProjectId.value) continue
+	      if (entry.projectId.startsWith('evt_')) {
         committedEvents.set(entry.projectId, (committedEvents.get(entry.projectId) ?? 0) + 1)
       } else {
         userTasks.push({
@@ -2497,7 +2717,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     const committed = draftReplayEntries.value
       .filter(entry => !entry.systemDisabled)
       .map(entry => ({ id: entry.source === 'committed' ? entry.id : '', projectId: entry.projectId }))
-    store.replaceTerraformingExecutionLog(committed)
+    store.replaceTerraformingExecutionLogAndSyncBaseline(committed)
     draftExecutionLog.value = []
     committedEventCounts.value = new Map()
     activeGoalFilterIds.value = new Set()
@@ -2692,8 +2912,9 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     return draftIndex
   }
 
-  function appendDraftProject(projectId: string, targetPlanIndex?: number) {
-    const project = projectMap.value.get(projectId)
+	  function appendDraftProject(projectId: string, targetPlanIndex?: number) {
+	    if (projectId === activeRuntimeProjectId.value) return
+	    const project = projectMap.value.get(projectId)
     if (project?.repeatCooldown === null && draftExecutionLog.value.some(entry => entry.projectId === projectId && !entry.systemDisabled)) {
       return
     }
@@ -2726,15 +2947,16 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     draftExecutionLog.value = next
   }
 
-  function canAppendCommittedProject(projectId: string): boolean {
-    const data = store.terraformingData.value
+	  function canAppendCommittedProject(projectId: string): boolean {
+	    if (projectId === activeRuntimeProjectId.value) return false
+	    const data = store.terraformingData.value
     const cluster = store.terraformingSelectedCluster.value
     if (!data || !cluster) return false
     const replayResult = replayExecutionLog(
-      store.terraformingExecutionLog.value.map(entry => ({ projectId: entry.projectId })),
+      committedReplayLog.value.map(entry => ({ projectId: entry.projectId })),
       cluster,
       data,
-      { mode: 'draft' },
+      { mode: 'draft', baseState: replayBaseState.value },
     )
     const completedProjects = replayResult.finalCompleted
     const stats = replayResult.finalStats
@@ -2754,10 +2976,10 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     const cluster = store.terraformingSelectedCluster.value
     if (!data || !cluster) return
 
-    const log = store.terraformingExecutionLog.value.map(e => ({ projectId: e.projectId }))
-    const result = replayExecutionLog(log, cluster, data, { mode: 'draft' })
+    const log = committedReplayLog.value.map(e => ({ projectId: e.projectId }))
+    const result = replayExecutionLog(log, cluster, data, { mode: 'draft', baseState: replayBaseState.value })
     const canonical = result.steps.map(step => ({ id: '', projectId: step.projectId }))
-    const currentProjectIds = store.terraformingExecutionLog.value.map(entry => entry.projectId)
+    const currentProjectIds = committedReplayLog.value.map(entry => entry.projectId)
     const canonicalProjectIds = canonical.map(entry => entry.projectId)
     if (
       currentProjectIds.length === canonicalProjectIds.length
@@ -2767,6 +2989,8 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
   }
 
   function removeLastCommittedProject(projectId: string) {
+    const currentCount = effectiveCompletedProjects.value.get(projectId) ?? 0
+    if (currentCount <= getArchiveCompletedProjectCount(projectId)) return
     const log = store.terraformingExecutionLog.value
     for (let index = log.length - 1; index >= 0; index -= 1) {
       const entry = log[index]
@@ -2807,18 +3031,25 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
       groupNames,
       taskNodeDisplays,
       completedProjectCounts,
+      archiveCompletedProjectCounts,
       projectMap,
       projectDisplayNames,
       wareNames: store.wareNames,
       moduleGroupNames: store.moduleGroupNames,
       goalFilteredTaskIds,
     },
-    resourcePanel: {
-      selectedClusterId,
-      executionTimeline,
-      queueEditState: {
-        editing: computed(() => isQueueEditing.value),
-        canComplete: canCompleteQueueEdit,
+	    resourcePanel: {
+	      selectedClusterId,
+	      executionTimeline,
+	      taskLogMode: computed(() => taskLogMode.value),
+	      currentQueueDisplayEntries,
+	      executedEntries,
+	      archiveSyncNotice,
+	      archiveActiveProjectDisplay,
+	      archiveRetainedProjectDisplays,
+	      queueEditState: {
+	        editing: computed(() => isQueueEditing.value),
+	        canComplete: canCompleteQueueEdit,
         unsatisfiedGoalCount: unsatisfiedDerivedGoalCount,
         planEntries: planDisplayEntries,
       },
@@ -2848,7 +3079,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
         return
       }
       const currentCount = effectiveCompletedProjects.value.get(projectId) ?? 0
-      if (currentCount > 0) {
+      if (currentCount > getArchiveCompletedProjectCount(projectId)) {
         removeLastCommittedProject(projectId)
       } else if (canAppendCommittedProject(projectId)) {
         store.appendTerraformingProjectExecution(projectId, 1)
@@ -2866,15 +3097,16 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
         return
       }
       const currentCount = effectiveCompletedProjects.value.get(projectId) ?? 0
-      if (count > currentCount) {
-        for (let i = 0; i < count - currentCount; i += 1) {
+      const targetCount = Math.max(count, getArchiveCompletedProjectCount(projectId))
+      if (targetCount > currentCount) {
+        for (let i = 0; i < targetCount - currentCount; i += 1) {
           if (canAppendCommittedProject(projectId)) store.appendTerraformingProjectExecution(projectId, 1)
         }
         syncAutoEventsFromReplay()
         return
       }
-      if (count < currentCount) {
-        for (let i = 0; i < currentCount - count; i += 1) removeLastCommittedProject(projectId)
+      if (targetCount < currentCount) {
+        for (let i = 0; i < currentCount - targetCount; i += 1) removeLastCommittedProject(projectId)
       }
     },
     cancelExecution: (entryId: string) => {
@@ -2900,11 +3132,20 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
       dragTaskId.value = projectId
       dragTaskName.value = projectName
     },
-    endDraggingTask: () => {
-      dragTaskId.value = ''
-      dragTaskName.value = ''
-    },
-  }
+	    endDraggingTask: () => {
+	      dragTaskId.value = ''
+	      dragTaskName.value = ''
+	    },
+	    setTaskLogMode: (mode: 'queue' | 'executed') => {
+	      taskLogMode.value = mode
+	    },
+	    confirmArchiveSync: () => {
+	      store.replaceTerraformingExecutionLogAndSyncBaseline(committedReplayLog.value)
+	    },
+	    debugClearExecutedBaseline: () => {
+	      store.clearTerraformingExecutedBaseline()
+	    },
+	  }
 
   return { props, emits }
 }
