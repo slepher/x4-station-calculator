@@ -64,6 +64,7 @@
 - [x] 已执行视图不提供取消、拖拽、排序操作。
 - [x] 保持右列面板结构，不改成三栏布局。
 - [x] 增加 live 模式“导入”按钮，按钮 tooltip 说明导入蓝图设置后需要重新确认 archive 已完成/正在执行项目。
+- [x] 非编辑态重复 project entries 保留实例级 display id，展开与状态显示按点击 entry 生效。
 
 ### 7. 编辑态接入扣除结果
 
@@ -71,6 +72,7 @@
 - [x] 非 aborted activeProject 作为 replay timeline 固定首项显示在编辑态，但不进入 `draftExecutionLog`。
 - [x] 被 archive 扣除的 entries 不进入 draft。
 - [x] 完成编辑时只保存编辑后的未来 entries 到 `terraformingExecutionLog`。
+- [x] 编辑态重复 project entries 按 draft 实例 id 生成显示项；移除只删除点击到的实例，保存后保留实例 id。
 - [x] 完成编辑后同步 `syncedExecutedBaseline` 到当前 archive executed snapshot。
 - [x] 完成编辑后重新计算 replay；若 archive 未变化，不再重复扣除已同步项。
 

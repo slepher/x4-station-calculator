@@ -259,6 +259,7 @@ resource panel props 可增加：
 - 已执行/已发生 entry 可展开，但详情只显示资源消耗与交付清单，不显示折扣、建造和状态卡。
 - 未扣除 entry 显示为待执行，并展示对应 `remainingLog` replay 结果。
 - aborted active project、retained project 不生成独立队列项；若同 project 出现在当前 log 队列中，标记“有进度”。
+- 同一个 project 多次出现在当前队列时，display entry id 必须来自对应执行实例；展开状态、状态详情、取消校验等 UI 状态不得只按 `projectId` 归并。
 
 该显示模式用于解释为什么当前队列被 archive 扣除。真正参与 replay 和确认的是 `remainingLog`。
 
@@ -314,8 +315,11 @@ draftExecutionLog = terraformingExecutionLog
 完成编辑时：
 
 - 保存编辑后的 draft entries 到 `terraformingExecutionLog`。
+- 保存时保留 draft entry 的实例 id；新建重复 project 不应被写成空 id 或 `projectId`，避免非编辑态 timeline 的展开与状态显示串到同 project 的其他实例。
 - 不把 deducted/archive-only entries 写回正式队列。
 - 更新后继续以 archive base state 重新扣除和 replay。
+
+编辑态 plan entries 由 draft replay 生成时，重复 project 必须按 draft entry 出现顺序绑定实例 id。删除、拖拽、复制等 action 使用 entry id 定位单个实例；点击删除某一个重复 project entry 只移除该 entry，不影响同 project 的其他 draft entries。
 
 ## archive 变化比较
 

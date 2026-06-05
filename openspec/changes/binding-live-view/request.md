@@ -133,6 +133,13 @@ task log 内部新增一个切换栏，用于在同一面板内切换：
 - `retainedProjects` 不应被视为已完成队列 entry，不独立加入当前队列，不进入 `draftExecutionLog`。
 - active/retained 资源进度不得直接写入 `terraformingExecutionLog`。
 
+### 10. 重复 project 的实例级交互
+
+- 同一个 project 在 task log 中多次出现时，每一次执行 SHALL 保留独立 entry identity。
+- 非编辑态 replay timeline 与编辑态 plan entries 都 SHALL 按执行实例绑定显示 id，而不是用 `projectId` 合并多次执行。
+- 展开、状态显示、移除、拖拽、复制等 UI 状态和操作 SHALL 作用于点击到的 entry 实例。
+- 编辑态点击移除重复 project 的某一项时，系统 SHALL 只移除该 entry，不得移除同 project 的其他执行实例。
+
 ## 边界
 
 ### In Scope
@@ -179,7 +186,8 @@ task log 内部新增一个切换栏，用于在同一面板内切换：
 17. aborted activeProject 不视为当前正在执行内容；aborted/retained 对应项目若出现在 log 队列中，仅在该 entry 上标记“有进度”。
 18. 扣除后的 remaining queue 合法时，用户可直接确认；不合法时提示进入编辑模式。
 19. 多次执行 project 的用户可操作次数不得低于 archive runtime 已完成次数。
-20. `npm run build` 成功。
+20. 重复 project 在非编辑态和编辑态都保留实例级 display id；展开、状态、移除等行为不得按 `projectId` 串联或批量作用到全部重复项。
+21. `npm run build` 成功。
 
 ## 未决项
 

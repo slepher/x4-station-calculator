@@ -201,6 +201,15 @@ task log SHALL 在同一面板内部提供当前队列与已执行视图切换�
 - **并且** 页面 SHALL NOT 显示建造卡
 - **并且** 页面 SHALL NOT 显示状态卡
 
+#### Scenario: repeated current queue entries keep instance identity
+
+- **前提** 当前队列中存在同一 project 的多个执行实例
+- **当** 页面显示非编辑态 task log timeline
+- **那么** 每个显示 entry SHALL 使用对应执行实例的独立 id
+- **并且** 展开状态 SHALL 只作用于被点击的 entry
+- **并且** 状态显示 SHALL 对应该 entry 的 replay 步骤
+- **并且** 系统 SHALL NOT 仅用 `projectId` 合并这些重复 entries
+
 ### Requirement: Edit Mode Starts From Deducted Queue
 
 编辑模式 SHALL 从 archive 扣除后的 remaining queue 开始。
@@ -212,6 +221,15 @@ task log SHALL 在同一面板内部提供当前队列与已执行视图切换�
 - **那么** `draftExecutionLog` SHALL 使用扣除后的 remaining queue 初始化
 - **并且** 被扣除 entries SHALL NOT 进入 `draftExecutionLog`
 
+#### Scenario: remove one repeated draft entry
+
+- **前提** 用户处于编辑模式
+- **并且** `draftExecutionLog` 中存在同一 project 的多个执行实例
+- **当** 用户点击其中一个重复 project entry 的移除操作
+- **那么** 系统 SHALL 只移除被点击的 entry 实例
+- **并且** 系统 SHALL 保留同 project 的其他 draft entries
+- **并且** 系统 SHALL NOT 按 `projectId` 移除所有重复项
+
 #### Scenario: save edited future queue only
 
 - **前提** 用户在编辑模式中修改 draft queue
@@ -219,6 +237,15 @@ task log SHALL 在同一面板内部提供当前队列与已执行视图切换�
 - **那么** 系统 SHALL 只将编辑后的未来 entries 保存到 `terraformingExecutionLog`
 - **并且** 系统 SHALL NOT 将 archive 已执行 entries 写入 `terraformingExecutionLog`
 - **并且** 系统 SHALL 将 `syncedExecutedBaseline` 更新为当前 archive executed snapshot
+
+#### Scenario: save repeated draft entries with instance ids
+
+- **前提** 用户处于编辑模式
+- **并且** draft 中存在新建的重复 project entries
+- **当** 用户完成编辑并保存
+- **那么** 保存到 `terraformingExecutionLog` 的 entries SHALL 保留各自的实例 id
+- **并且** 后续非编辑态 timeline SHALL 能按实例 id 展开和显示状态
+- **并且** 系统 SHALL NOT 将新建 entries 保存为空 id 或仅保存为 `projectId`
 
 #### Scenario: no repeated deduction after edit save
 

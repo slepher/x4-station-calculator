@@ -12,6 +12,7 @@ import type {
   TerraformingStat,
 } from '@/store/logic/terraformingTaskResolver'
 import type { TerraformingExecutionEntry } from '@/store/logic/terraformingRuntime'
+import type { DeductExecutionResult } from '@/store/logic/terraformingRuntime'
 import terraformingJson from '@/assets/x4_game_data/9.0-Empire-beta/data/terraforming.json'
 
 const raw = terraformingJson as unknown as TerraformingData & {
@@ -23,18 +24,42 @@ function findCluster(id: string) { const c = raw.clusters.find(c => c.id === id)
 function makeStore(cluster: TerraformingCluster) {
   const executionLog = ref<TerraformingExecutionEntry[]>([])
   let seq = 0
+  const deductedExecution = computed<DeductExecutionResult>(() => ({
+    remainingLog: executionLog.value,
+    deductedProjectEntries: [],
+    deductedEventEntries: [],
+    currentQueueDisplayEntries: executionLog.value.map((entry, index) => ({
+      ...entry,
+      displayId: entry.id,
+      order: index + 1,
+      source: 'current',
+      hasArchiveProgress: false,
+    })),
+  }))
   const store: TerraformingPresenterStore = {
     terraformingData: computed(() => raw as unknown as TerraformingData),
+    terraformingIsLiveMode: computed(() => false),
     terraformingSelectedClusterId: computed(() => cluster.id),
     terraformingSelectedCluster: computed(() => cluster),
     terraformingRuntimeProjectIds: computed(() => cluster.taskProjectIds),
     terraformingExecutionLog: computed(() => executionLog.value),
+    terraformingArchiveRuntimeBaseState: computed(() => null),
+    terraformingExecutedDelta: computed(() => ({
+      hasDelta: false,
+      completedProjectDeltas: [],
+      eventDeltas: [],
+    })),
+    terraformingDeductedExecution: deductedExecution,
     terraformingHqStationName: computed(() => ''), terraformingHqArchiveStation: computed(() => null),
     terraformingHqEffectiveModules: computed(() => []), terraformingHqClusterId: computed(() => null),
     selectTerraformingCluster: () => {}, setTerraformingCompletedProjects: () => {},
     appendTerraformingProjectExecution: (pid: string, c = 1) => { for (let i = 0; i < c; i++) executionLog.value = [...executionLog.value, { id: `${cluster.id}-exec-${++seq}`, projectId: pid }] },
     setTerraformingProjectCount: () => {}, removeTerraformingExecutionEntry: (eid: string) => { executionLog.value = executionLog.value.filter(e => e.id !== eid) },
     replaceTerraformingExecutionLog: (e: TerraformingExecutionEntry[]) => { executionLog.value = e },
+    replaceTerraformingExecutionLogAndSyncBaseline: (e: TerraformingExecutionEntry[]) => { executionLog.value = e },
+    syncTerraformingExecutedBaseline: () => {},
+    clearTerraformingExecutedBaseline: () => {},
+    importTerraformingBlueprintSettings: () => {},
     clearTerraformingExecutionQueue: () => { executionLog.value = [] },
     mapsClusters: {}, mapsSectors: {}, wareNames: computed(() => new Map()), moduleGroupNames: computed(() => new Map()), wareGroupMap: computed(() => new Map()),
   }
@@ -125,6 +150,43 @@ describe('terraforming event timing — OceanOfFantasy', () => {
     expect(si).toBeGreaterThan(-1)
     expect(vi).toBeGreaterThan(-1)
     expect(si).toBeLessThan(vi)
+  })
+
+  it('edit mode: removing one repeated task keeps the other instances', () => {
+    const { store } = makeStore(findCluster('OceanOfFantasy'))
+    const p = useTerraformingPresenter(store)
+    p.emits.startQueueEdit()
+
+    p.emits.appendDraftTask('tmp_cloudparticles')
+    p.emits.appendDraftTask('tmp_cloudparticles')
+
+    const repeatedBefore = p.props.resourcePanel.queueEditState.planEntries.value
+      .filter(e => e.type === 'task' && e.entry.projectId === 'tmp_cloudparticles')
+    expect(repeatedBefore).toHaveLength(2)
+    expect(new Set(repeatedBefore.map(e => e.entry.id)).size).toBe(2)
+
+    p.emits.removeDraftEntry(repeatedBefore[0]!.entry.id)
+
+    const repeatedAfter = p.props.resourcePanel.queueEditState.planEntries.value
+      .filter(e => e.type === 'task' && e.entry.projectId === 'tmp_cloudparticles')
+    expect(repeatedAfter).toHaveLength(1)
+    expect(repeatedAfter[0]!.entry.id).toBe(repeatedBefore[1]!.entry.id)
+  })
+
+  it('non-edit: repeated tasks committed from edit mode keep instance ids', () => {
+    const { store } = makeStore(findCluster('OceanOfFantasy'))
+    const p = useTerraformingPresenter(store)
+    p.emits.startQueueEdit()
+
+    p.emits.appendDraftTask('tmp_cloudparticles')
+    p.emits.appendDraftTask('tmp_cloudparticles')
+    p.emits.appendDraftTask('tmp_cloudparticles')
+    p.emits.completeQueueEdit()
+
+    const repeatedTimeline = p.props.resourcePanel.executionTimeline.value
+      .filter(e => e.projectId === 'tmp_cloudparticles')
+    expect(repeatedTimeline).toHaveLength(3)
+    expect(new Set(repeatedTimeline.map(e => e.id)).size).toBe(3)
   })
 })
 

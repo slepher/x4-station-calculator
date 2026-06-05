@@ -1637,14 +1637,30 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     const translatedGroupNames = groupNames.value
 
     const entries: TerraformingDraftTimelineEntry[] = []
+    const draftEntriesByProject = new Map<string, TerraformingDraftExecutionEntry[]>()
+    for (const entry of draftExecutionLog.value) {
+      if (entry.systemDisabled) continue
+      const list = draftEntriesByProject.get(entry.projectId)
+      if (list) {
+        list.push(entry)
+      } else {
+        draftEntriesByProject.set(entry.projectId, [entry])
+      }
+    }
     let orderSeq = 0
 
     for (let i = 0; i < result.steps.length; i++) {
       const step = result.steps[i]!
       const project = pmap.get(step.projectId)
       const isActiveRuntimeStep = i === 0 && step.projectId === activeRuntimeProjectId.value && activeRuntimeReplayEntry.value !== null
-      const draftEntry = isActiveRuntimeStep ? undefined : draftExecutionLog.value.find(e => e.projectId === step.projectId)
-      const entryId = isActiveRuntimeStep ? activeRuntimeReplayEntry.value!.id : (draftEntry?.id ?? step.projectId)
+      let draftEntry: TerraformingDraftExecutionEntry | undefined
+      let entryId: string
+      if (isActiveRuntimeStep) {
+        entryId = activeRuntimeReplayEntry.value!.id
+      } else {
+        draftEntry = draftEntriesByProject.get(step.projectId)?.shift()
+        entryId = draftEntry ? draftEntry.id : step.projectId
+      }
 
       const beforeStats = step.statsBefore ?? {}
       const afterStatsObj = step.statsAfter ?? {}
@@ -2756,7 +2772,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     if (!canCompleteQueueEdit.value) return
     const committed = draftReplayEntries.value
       .filter(entry => !entry.systemDisabled && !entry.fixedRuntime)
-      .map(entry => ({ id: entry.source === 'committed' ? entry.id : '', projectId: entry.projectId }))
+      .map(entry => ({ id: entry.id, projectId: entry.projectId }))
     store.replaceTerraformingExecutionLogAndSyncBaseline(committed)
     draftExecutionLog.value = []
     committedEventCounts.value = new Map()
