@@ -222,6 +222,13 @@ function clearHoverIndex() {
   dragHoverIndex.value = -1
 }
 
+function handleImportBlueprintSettings() {
+  emit('importBlueprintSettings')
+  nextTick(() => {
+    if (panelContentRef.value) panelContentRef.value.scrollTop = 0
+  })
+}
+
 function onModelValueUpdate(entries: TerraformingGoalPlanDisplayEntry[]) {
   if (props.taskDrag.isDragging.value) return
   const tasks = entries
@@ -399,7 +406,7 @@ function buildDraftWaresTooltip(entry: { wares: Array<{ name: string; amount: nu
 	        v-if="isLiveMode && !queueEditState.editing"
 	        class="import-btn"
 	        v-tippy="{ content: t('terraforming.importBlueprintSettingsTooltip'), allowHTML: false, placement: 'bottom', theme: 'material', maxWidth: 320 }"
-	        @click="emit('importBlueprintSettings')"
+	        @click="handleImportBlueprintSettings"
 	      >
 	        {{ t('terraforming.importBlueprintSettings') || 'Import' }}
 	      </button>
