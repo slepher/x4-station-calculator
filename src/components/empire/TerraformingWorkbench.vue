@@ -149,7 +149,7 @@ function toggleStatFilter(statId: string) {
     <div class="col-span-12 lg:col-span-4" :class="{ 'sticky top-2 z-10': terraformingFloating.resourcePanel }">
       <TerraformingResourcePanel
         :selected-cluster-id="terraformingPresenter.props.resourcePanel.selectedClusterId.value"
-        :can-import-blueprint-settings="terraformingPresenter.props.resourcePanel.canImportBlueprintSettings.value"
+        :is-live-mode="terraformingPresenter.props.resourcePanel.isLiveMode.value"
         :execution-timeline="terraformingPresenter.props.resourcePanel.executionTimeline.value"
         :task-log-mode="terraformingPresenter.props.resourcePanel.taskLogMode.value"
         :current-queue-display-entries="terraformingPresenter.props.resourcePanel.currentQueueDisplayEntries.value"

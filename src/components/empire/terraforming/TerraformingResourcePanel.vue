@@ -20,7 +20,7 @@ import TerraformingStatScale from '@/components/empire/terraforming/Terraforming
 
 interface Props {
 	  selectedClusterId: string | null
-	  canImportBlueprintSettings: boolean
+	  isLiveMode: boolean
 	  executionTimeline: TerraformingExecutionTimelineEntry[]
 	  taskLogMode: 'queue' | 'executed'
 	  currentQueueDisplayEntries: TerraformingCurrentQueueDisplayEntry[]
@@ -396,7 +396,7 @@ function buildDraftWaresTooltip(entry: { wares: Array<{ name: string; amount: nu
         {{ queueEditState.unsatisfiedGoalCount }} {{ t('terraforming.unmetDependencies') || 'unmet dependencies' }}
       </span>
 	      <button
-	        v-if="canImportBlueprintSettings && !queueEditState.editing"
+	        v-if="isLiveMode && !queueEditState.editing"
 	        class="import-btn"
 	        v-tippy="{ content: t('terraforming.importBlueprintSettingsTooltip'), allowHTML: false, placement: 'bottom', theme: 'material', maxWidth: 320 }"
 	        @click="emit('importBlueprintSettings')"
@@ -632,7 +632,7 @@ function buildDraftWaresTooltip(entry: { wares: Array<{ name: string; amount: nu
         </draggable>
       </div>
 
-	      <div v-if="selectedClusterId && !queueEditState.editing" class="task-log-tabs">
+	      <div v-if="selectedClusterId && !queueEditState.editing && isLiveMode" class="task-log-tabs">
 	        <button
 	          class="task-log-tab"
 	          :class="{ active: taskLogMode === 'queue' }"

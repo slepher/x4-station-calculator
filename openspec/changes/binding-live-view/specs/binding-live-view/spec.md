@@ -214,6 +214,13 @@ task log SHALL 在同一面板内部提供当前队列与已执行视图切换�
 - **那么** 右列 task log SHALL 保持原面板结构
 - **并且** 系统 SHALL NOT 将 task log 改成三栏切换布局
 
+#### Scenario: hide toggle in blueprint mode
+
+- **前提** terraforming 页面处于 blueprint（非 live）模式
+- **当** 页面渲染 task log
+- **那么** "当前队列 / 已执行"切换栏 SHALL NOT 显示
+- **并且** task log SHALL 仅显示当前队列视图
+
 #### Scenario: executed view is read-only
 
 - **前提** 用户打开已执行视图

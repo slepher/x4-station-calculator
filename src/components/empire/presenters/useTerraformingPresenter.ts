@@ -292,7 +292,7 @@ export interface TerraformingQueueEditState {
 
 export interface TerraformingResourcePanelProps {
   selectedClusterId: ComputedRef<string | null>
-  canImportBlueprintSettings: ComputedRef<boolean>
+  isLiveMode: ComputedRef<boolean>
   executionTimeline: ComputedRef<TerraformingExecutionTimelineEntry[]>
   taskLogMode: ComputedRef<'queue' | 'executed'>
   currentQueueDisplayEntries: ComputedRef<TerraformingCurrentQueueDisplayEntry[]>
@@ -3153,7 +3153,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     },
 	    resourcePanel: {
 	      selectedClusterId,
-	      canImportBlueprintSettings: store.terraformingIsLiveMode,
+	      isLiveMode: store.terraformingIsLiveMode,
 	      executionTimeline,
 	      taskLogMode: computed(() => taskLogMode.value),
 	      currentQueueDisplayEntries,
