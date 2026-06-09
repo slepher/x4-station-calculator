@@ -90,7 +90,7 @@ interface TerraformingExecutedSnapshot {
 baseline 不代表用户输入，不进入 task log 排序，也不得在首次读取 archive runtime 时自动写入。
 当当前 cluster 没有 baseline 时，比较逻辑以空 baseline 作为对照，archive runtime 中已有的 completed project / 一次性 event 全部视为尚未确认的 archive 差额。只有用户直接确认扣除后的队列，或完成编辑保存后，才将当前 archive executed snapshot 写入 baseline。
 
-live task log 提供“导入”动作，用于将蓝图 plan 中的 terraforming 设置复制到当前 live plan，并清空当前 live plan 的 baseline。非 live 模式不显示该动作。导入后下一次比较同样按空 baseline 处理，archive 已完成/正在执行状态必须重新由用户确认，不得在导入动作中自动同步 baseline。
+live task log 提供“导入”动作，用于将蓝图 plan 中**当前 cluster**的 terraforming 设置复制到 live plan 的同一 cluster，仅清空当前 cluster 的 baseline，不影响其他 cluster。蓝图没有当前 cluster 数据时将队列清空。非 live 模式不显示该动作。导入后下一次比较同样按空 baseline 处理，archive 已完成/正在执行状态必须重新由用户确认，不得在导入动作中自动同步 baseline。
 
 ### executedProjectOrder
 

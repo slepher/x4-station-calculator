@@ -48,7 +48,7 @@
   - 完成次数减少表示 archive 回退或切换到不一致存档，应提示风险。
   - stats/rebates/activeProject 与 baseline 不一致时，应提示存档状态已变化并重新校验队列。
 - 用户确认同步后，`syncedExecutedBaseline` 更新为当前 archive executed 状态。
-- live 模式页面 SHALL 提供“导入”按钮，用于将蓝图中的 terraforming 设置导入当前 live plan，并清空当前 live plan 已保存的 `syncedExecutedBaseline`，使 archive 已完成/正在执行状态重新进入用户确认流程。
+- live 模式页面 SHALL 提供“导入”按钮，用于将蓝图当前 cluster 的 terraforming 设置导入 live plan 同一 cluster，仅清空当前 cluster 的 `syncedExecutedBaseline`，使 archive 已完成/正在执行状态重新进入用户确认流程。
 - 非 live 模式 SHALL NOT 显示该“导入”按钮。
 
 ### 4. 队列扣除规则

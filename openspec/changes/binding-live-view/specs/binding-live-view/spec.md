@@ -333,12 +333,14 @@ task log SHALL 在同一面板内部提供当前队列与已执行视图切换�
 - **前提** 当前 cluster 已保存 `syncedExecutedBaseline`
 - **并且** 页面处于 live 模式
 - **并且** 蓝图 plan 中存在 terraforming 设置
-- **当** 用户点击“导入”按钮
+- **当** 用户点击"导入"按钮
 - **那么** 系统 SHALL 将蓝图 terraforming 设置导入当前 live plan
-- **并且** 系统 SHALL 清空当前 live plan 的 `syncedExecutedBaseline`
+- **并且** 系统 SHALL 仅导入当前选中 cluster 的 `executionLog`，不影响其他 cluster
+- **并且** 蓝图没有当前 cluster 数据时 SHALL 将当前 cluster 队列清空
+- **并且** 系统 SHALL 仅清空当前 cluster 的 `syncedExecutedBaseline`，不影响其他 cluster
 - **并且** 系统 SHALL NOT 删除 archive runtime 中的已完成项目、已发生事件或正在执行项目
 - **并且** 系统 SHALL NOT 在导入时自动确认 archive 已执行状态
-- **并且** 系统 SHALL NOT 修改 `terraformingExecutionLog`
+- **并且** 系统 SHALL NOT 修改其他 cluster 的 `terraformingExecutionLog`
 
 #### Scenario: hide blueprint import outside live mode
 

@@ -447,11 +447,18 @@ export const useTerraformingStore = defineStore('terraforming', () => {
   function importBlueprintSettingsToActivePlan(): void {
     const plan = activePlan.value
     if (!plan || plan.mode !== 'live') return
+    const clusterId = plan.selectedClusterId
+    if (!clusterId) return
     const blueprintPlan = savedPlans.value.list.find(item => item.mode === 'blueprint' && item.planId === '__default__')
     if (!blueprintPlan) return
-    plan.selectedClusterId = blueprintPlan.selectedClusterId
-    plan.executionLogByCluster = { ...blueprintPlan.executionLogByCluster }
-    plan.syncedExecutedBaselineByCluster = {}
+    const blueprintLog = blueprintPlan.executionLogByCluster?.[clusterId] ?? []
+    plan.executionLogByCluster = {
+      ...plan.executionLogByCluster,
+      [clusterId]: blueprintLog,
+    }
+    const nextBaselines = { ...(plan.syncedExecutedBaselineByCluster ?? {}) }
+    delete nextBaselines[clusterId]
+    plan.syncedExecutedBaselineByCluster = nextBaselines
     hydrateExecutionLogs()
     saveToStorage()
   }

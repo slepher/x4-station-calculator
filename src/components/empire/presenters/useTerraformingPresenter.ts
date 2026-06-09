@@ -1974,7 +1974,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     const deduced = store.terraformingDeductedExecution.value
     const deductedCount = deduced.deductedEntries.length
     const archiveOnlyCount = deduced.archiveOnlyEntries.reduce((sum, entry) => sum + entry.count, 0)
-    if (!delta.hasArchiveAdvance && !delta.hasArchiveRollbackRisk && !delta.hasRuntimeStateChange && deductedCount === 0 && archiveOnlyCount === 0) {
+    if (!delta.hasArchiveAdvance && !delta.hasArchiveRollbackRisk && deductedCount === 0 && archiveOnlyCount === 0) {
       return null
     }
     const message = delta.hasArchiveRollbackRisk

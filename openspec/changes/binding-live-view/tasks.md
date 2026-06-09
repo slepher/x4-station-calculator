@@ -22,7 +22,7 @@
 - [x] 完成编辑或直接确认后，将 baseline 更新为当前 archive executed snapshot。
 - [x] archive runtime 与 baseline 相同时，确保不会再次扣除同一批项目/一次性事件。
 - [x] 提供明确的同步 baseline action 或确认保存路径，但不得静默吞掉未确认差额。
-- [x] 增加“导入” action，用于导入蓝图 terraforming 设置并清空当前 live plan 已同步 baseline。
+- [x] 增加201c导入201d action，用于导入蓝图 terraforming 设置：仅导入当前 cluster，仅清空当前 cluster baseline，蓝图无数据时清空当前队列。
 
 ### 3. 实现队列扣除逻辑
 
