@@ -937,6 +937,7 @@ export interface TerraformingExecutedSnapshot {
   stats: Record<string, number>
   rebates: Array<{ id: string; type: 'ware' | 'wareGroup'; value: number }>
   activeProjectId?: string
+  executedProjectOrder?: string[]
 }
 
 export interface SavedTerraformingState {

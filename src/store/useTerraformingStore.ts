@@ -253,8 +253,8 @@ export const useTerraformingStore = defineStore('terraforming', () => {
   }
 
   function replaceExecutionLogAndSyncBaseline(entries: TerraformingExecutionEntry[]): void {
-    replaceExecutionLog(entries)
     syncExecutedBaselineForSelectedCluster()
+    replaceExecutionLog(entries)
   }
 
   function clearExecutionQueue(): void {
@@ -332,6 +332,28 @@ export const useTerraformingStore = defineStore('terraforming', () => {
   function createExecutedSnapshot(base: TerraformingArchiveRuntimeBaseState | null): TerraformingExecutedSnapshot | null {
     const archive = saveStore.selectedArchive
     if (!archive || !base) return null
+
+    const logInstanceOrder = executionLog.value.map(entry => entry.projectId)
+
+    const usedCount = new Map<string, number>()
+    const executedProjectOrder: string[] = []
+
+    for (const pid of logInstanceOrder) {
+      const archiveCount = base.completedProjects.get(pid) ?? 0
+      const alreadyUsed = usedCount.get(pid) ?? 0
+      if (alreadyUsed < archiveCount) {
+        executedProjectOrder.push(pid)
+        usedCount.set(pid, alreadyUsed + 1)
+      }
+    }
+
+    for (const [pid, count] of base.completedProjects) {
+      const alreadyUsed = usedCount.get(pid) ?? 0
+      for (let i = alreadyUsed; i < count; i++) {
+        executedProjectOrder.push(pid)
+      }
+    }
+
     return {
       archiveGuid: archive.meta.guid,
       archiveTime: archive.meta.time,
@@ -340,6 +362,7 @@ export const useTerraformingStore = defineStore('terraforming', () => {
       stats: { ...base.stats },
       rebates: base.rebates.map(rb => ({ ...rb })),
       activeProjectId: base.activeProject?.projectId,
+      executedProjectOrder,
     }
   }
 

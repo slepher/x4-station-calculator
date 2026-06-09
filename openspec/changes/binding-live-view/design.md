@@ -83,6 +83,7 @@ interface TerraformingExecutedSnapshot {
   stats: Record<string, number>
   rebates: Array<{ id: string; type: 'ware' | 'wareGroup'; value: number }>
   activeProjectId?: string
+  executedProjectOrder?: string[]
 }
 ```
 
@@ -90,6 +91,24 @@ baseline 不代表用户输入，不进入 task log 排序，也不得在首次�
 当当前 cluster 没有 baseline 时，比较逻辑以空 baseline 作为对照，archive runtime 中已有的 completed project / 一次性 event 全部视为尚未确认的 archive 差额。只有用户直接确认扣除后的队列，或完成编辑保存后，才将当前 archive executed snapshot 写入 baseline。
 
 live task log 提供“导入”动作，用于将蓝图 plan 中的 terraforming 设置复制到当前 live plan，并清空当前 live plan 的 baseline。非 live 模式不显示该动作。导入后下一次比较同样按空 baseline 处理，archive 已完成/正在执行状态必须重新由用户确认，不得在导入动作中自动同步 baseline。
+
+### executedProjectOrder
+
+`executedProjectOrder` 记录 project 在已执行视图中的排列顺序，每个实例一个 entry（同 project 多次完成则出现多次）。
+
+snapshot 构建逻辑：
+
+1. 读取 `executionLog` 的实例顺序：`executionLog.value.map(e => e.projectId)`
+2. 从左到右遍历 log 实例，每遇到一个 projectId 就消耗一次 archive completed 配额，写入 `executedProjectOrder`
+3. log 遍历完成后，剩余未消耗的 archive completed 项（archive-only）追加到 `executedProjectOrder` 末尾
+
+已执行视图渲染时：
+
+1. 从 `executedProjectOrder` 逐个消费每个 projectId
+2. 每次消费从 `projectGroups` 取一个实例（`archive-project-{projectId}-{i}`）
+3. order 中同 project 的多个实例按 log 中位置交错排列，不合并
+
+baseline 不存在时（旧数据兼容或首次使用），`executedEntries` 直接按当前 `executionLog` 实例顺序排列。
 
 ## 扣除模型
 

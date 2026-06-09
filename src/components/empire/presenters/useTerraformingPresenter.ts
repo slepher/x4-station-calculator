@@ -37,7 +37,7 @@ import {
   type RebateKey,
 } from '@/store/logic/terraformingRuntime'
 import type { ArchiveStationData } from '@/types/saveArchive'
-import type { SavedModule, X4MapCluster, X4MapSector, X4Module } from '@/types/x4'
+import type { SavedModule, X4MapCluster, X4MapSector, X4Module, TerraformingExecutedSnapshot } from '@/types/x4'
 import i18n from '@/i18n'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useX4I18n } from '@/utils/UseX4I18n'
@@ -407,6 +407,7 @@ export interface TerraformingPresenterStore {
   terraformingRuntimeProjectIds: ComputedRef<string[]>
   terraformingExecutionLog: ComputedRef<TerraformingExecutionEntry[]>
   terraformingArchiveRuntimeBaseState: ComputedRef<TerraformingArchiveRuntimeBaseState | null>
+  terraformingSyncedExecutedBaseline: ComputedRef<TerraformingExecutedSnapshot | null>
   terraformingExecutedDelta: ComputedRef<TerraformingExecutedDelta>
   terraformingDeductedExecution: ComputedRef<DeductExecutionResult>
   terraformingHqStationName: ComputedRef<string>
@@ -1880,27 +1881,28 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     const names = projectDisplayNames.value
     const base = store.terraformingArchiveRuntimeBaseState.value
     if (!base) return []
-    const entries: TerraformingExecutedDisplayEntry[] = []
-    for (const [projectId, count] of base.completedProjects) {
-      if (count <= 0) continue
+    const baseline = store.terraformingSyncedExecutedBaseline.value
+    const order = baseline?.executedProjectOrder
+
+    const buildProjectEntry = (projectId: string, instance: number): TerraformingExecutedDisplayEntry => {
       const project = projectMap.value.get(projectId)
-      entries.push({
-        id: `archive-project-${projectId}`,
+      return {
+        id: `archive-project-${projectId}-${instance}`,
         projectId,
         projectName: names.get(projectId) || projectId,
         kind: 'project',
         status: 'executed',
-        count,
+        count: 1,
         source: 'archive-runtime',
         archiveConsumedWares: (project?.resources?.wares ?? [])
-          .map(item => ({ ware: item.ware, amount: (item.actualAmount ?? item.amount) * count })),
+          .map(item => ({ ware: item.ware, amount: (item.actualAmount ?? item.amount) })),
         deliveryDetails: buildProjectDeliveryDetails(project),
-      })
+      }
     }
-    for (const [projectId, count] of base.completedEvents) {
-      if (count <= 0) continue
+
+    const buildEventEntry = (projectId: string, count: number): TerraformingExecutedDisplayEntry => {
       const project = projectMap.value.get(projectId)
-      entries.push({
+      return {
         id: `archive-event-${projectId}`,
         projectId,
         projectName: names.get(projectId) || projectId,
@@ -1911,8 +1913,59 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
         archiveConsumedWares: (project?.resources?.wares ?? [])
           .map(item => ({ ware: item.ware, amount: (item.actualAmount ?? item.amount) * count })),
         deliveryDetails: buildProjectDeliveryDetails(project),
-      })
+      }
     }
+
+    const projectGroups = new Map<string, TerraformingExecutedDisplayEntry[]>()
+    for (const [projectId, count] of base.completedProjects) {
+      if (count <= 0) continue
+      const items: TerraformingExecutedDisplayEntry[] = []
+      for (let i = 0; i < count; i++) {
+        items.push(buildProjectEntry(projectId, i))
+      }
+      projectGroups.set(projectId, items)
+    }
+
+    const eventEntries = new Map<string, TerraformingExecutedDisplayEntry>()
+    for (const [projectId, count] of base.completedEvents) {
+      if (count <= 0) continue
+      eventEntries.set(projectId, buildEventEntry(projectId, count))
+    }
+
+    const entries: TerraformingExecutedDisplayEntry[] = []
+
+    if (order && order.length > 0) {
+      const remainingInstances = new Map<string, TerraformingExecutedDisplayEntry[]>()
+      for (const [pid, items] of projectGroups) {
+        remainingInstances.set(pid, [...items])
+      }
+      for (const pid of order) {
+        const items = remainingInstances.get(pid)
+        if (items && items.length > 0) {
+          entries.push(items.shift()!)
+        }
+      }
+      for (const items of remainingInstances.values()) {
+        entries.push(...items)
+      }
+    } else {
+      const remainingInstances = new Map<string, TerraformingExecutedDisplayEntry[]>()
+      for (const [pid, items] of projectGroups) {
+        remainingInstances.set(pid, [...items])
+      }
+      for (const entry of store.terraformingExecutionLog.value) {
+        const items = remainingInstances.get(entry.projectId)
+        if (items && items.length > 0) {
+          entries.push(items.shift()!)
+        }
+      }
+      for (const items of remainingInstances.values()) {
+        entries.push(...items)
+      }
+    }
+
+    entries.push(...eventEntries.values())
+
     return entries
   })
 

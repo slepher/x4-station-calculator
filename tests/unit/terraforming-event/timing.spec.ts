@@ -44,6 +44,7 @@ function makeStore(cluster: TerraformingCluster) {
     terraformingRuntimeProjectIds: computed(() => cluster.taskProjectIds),
     terraformingExecutionLog: computed(() => executionLog.value),
     terraformingArchiveRuntimeBaseState: computed(() => null),
+    terraformingSyncedExecutedBaseline: computed(() => null),
     terraformingExecutedDelta: computed(() => ({
       hasDelta: false,
       completedProjectDeltas: [],

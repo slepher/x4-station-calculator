@@ -13,6 +13,8 @@
 
 - [x] 扩展 terraforming plan 持久结构，按 cluster 保存 `syncedExecutedBaseline`。
 - [x] baseline 保存 archive guid/time、completedProjects、completedOneTimeEvents、stats、rebates、activeProjectId。
+- [x] baseline 保存 `executedProjectOrder`，按 `executionLog` 实例顺序记录 project 排列。
+- [x] snapshot 构建时读取当前 `executionLog` 的实例顺序，与 archive completed 次数对齐，生成 `executedProjectOrder`。
 - [x] 实现 archive runtime 与 baseline 的比较逻辑。
 - [x] 识别 archive 新增完成项、完成次数减少风险、stats/rebates/activeProject 变化。
 - [x] 从 archive runtime 与 baseline 计算正向 `executedDelta`，作为唯一扣除输入。
@@ -48,6 +50,8 @@
 - [x] presenter 使用扣除后的 `remainingLog` 生成当前队列 timeline。
 - [x] presenter 生成当前队列显示 entries，使非编辑态初始进入时扣除项依旧显示但带已执行/已发生标记。
 - [x] presenter 生成 `executedEntries`，直接同步当前 archive runtime 全量已完成项目和一次性事件。
+- [x] `executedEntries` 按 baseline 的 `executedProjectOrder` 顺序排列 project，同 project 的多次完成拆分为独立 entry。
+- [x] baseline 不存在时，`executedEntries` 按当前 `executionLog` 实例顺序排列。
 - [x] presenter 生成 archive sync notice。
 - [x] presenter 生成 activeProject 和 retainedProjects 展示模型。
 - [x] presenter 提供 task log 内部切换状态与切换 action。

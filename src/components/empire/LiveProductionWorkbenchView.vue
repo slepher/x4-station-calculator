@@ -84,6 +84,7 @@ const terraformingPresenter = useTerraformingPresenter({
   terraformingRuntimeProjectIds: computed(() => terraformingStore.runtimeProjectIds),
   terraformingExecutionLog: computed(() => terraformingStore.executionLog),
   terraformingArchiveRuntimeBaseState: computed(() => terraformingStore.archiveRuntimeBaseState),
+  terraformingSyncedExecutedBaseline: computed(() => terraformingStore.syncedExecutedBaseline),
   terraformingExecutedDelta: computed(() => terraformingStore.archiveExecutedDelta),
   terraformingDeductedExecution: computed(() => terraformingStore.deductedExecution),
   terraformingHqStationName: computed(() => terraformingStore.hqStationName),

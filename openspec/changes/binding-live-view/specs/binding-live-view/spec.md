@@ -91,6 +91,38 @@
 - **那么** 已执行视图 SHALL 显示 `project_a`
 - **并且** 系统 SHALL NOT 仅使用 `archiveRuntimeExecuted - syncedExecutedBaseline` 的差额作为已执行视图数据源
 
+#### Scenario: executed projects ordered by execution log instance order
+
+- **前提** `terraformingExecutionLog` 顺序为 `[project_a, project_b, project_a]`
+- **并且** archive runtime 的 `completedProjects` 包含 `project_a` 完成 2 次、`project_b` 完成 1 次
+- **当** 用户同步 baseline 后打开已执行视图
+- **那么** 已执行视图 SHALL 按 `[project_a, project_b, project_a]` 的顺序显示
+- **并且** 两个 `project_a` 实例 SHALL NOT 被合并为一个 entry
+
+#### Scenario: repeated project instances are independent entries
+
+- **前提** archive runtime 的 `completedProjects` 包含 `project_a` 完成 2 次
+- **当** 系统生成 `executedEntries`
+- **那么** `project_a` SHALL 显示为两个独立 entry
+- **并且** 每个 entry SHALL 有独立的 `id` (如 `archive-project-project_a-0`、`archive-project-project_a-1`)
+- **并且** 每个 entry 的 `count` SHALL 为 `1`
+
+#### Scenario: baseline stores per-instance executed project order
+
+- **前提** `executionLog` 顺序为 `[project_a, project_b, project_a]`
+- **并且** archive runtime 包含所有这些项目的完成记录
+- **当** 系统同步 baseline
+- **那么** `TerraformingExecutedSnapshot.executedProjectOrder` SHALL 为 `["project_a", "project_b", "project_a"]`
+- **并且** 顺序 SHALL 反映每个实例在 log 中的位置
+
+#### Scenario: archive-only projects appended after log order
+
+- **前提** `executionLog` 顺序为 `[project_a]`
+- **并且** archive runtime 包含 `project_a` 完成 1 次、`project_c` 完成 1 次（project_c 不在 log 中）
+- **当** 系统同步 baseline
+- **那么** `executedProjectOrder` SHALL 为 `["project_a", "project_c"]`
+- **并且** archive-only 条目 SHALL 排在 log 内条目之后
+
 ### Requirement: Deduct Queue By Archive Executed Counts
 
 系统 SHALL 在 replay 前使用 archive 相对 `syncedExecutedBaseline` 的新增已执行项目和新增一次性事件扣除 `terraformingExecutionLog`。
