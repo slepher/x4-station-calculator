@@ -514,11 +514,10 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   })
 
   const terraformingHqStationCode = computed<string | null>(() => {
-    const semantics = tabSemanticsById.value
-    const stations = orderedStationsBySector.value
-    for (const station of stations) {
-      if (semantics[station.id]?.tag === 'playerhq') {
-        return station.id
+    for (const record of playerStationRecords.value) {
+      const entry = record.data as PlayerStationEntry
+      if (entry.is_headquarter && record.type === 'station') {
+        return record.code
       }
     }
     return null
