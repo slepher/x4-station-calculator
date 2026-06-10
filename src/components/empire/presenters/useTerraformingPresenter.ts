@@ -321,6 +321,7 @@ export interface TerraformingCurrentQueueDisplayEntry {
   runtimeStatus?: 'active' | 'has-progress'
   fixedFirst?: boolean
   archiveConsumedWares?: Array<{ ware: string; amount: number }>
+  archiveSubmittedWares?: Array<{ ware: string; amount: number }>
   runtimeTimelineEntry?: TerraformingExecutionTimelineEntry
 }
 
@@ -1901,11 +1902,14 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
         runtimeStatus: 'active',
         fixedFirst: true,
         archiveConsumedWares: active?.scaledResources.map(item => ({ ware: item.ware, amount: item.amount })) ?? [],
+        archiveSubmittedWares: active?.submittedResources.map(item => ({ ware: item.ware, amount: item.amount })) ?? [],
       })
     }
 
     for (const entry of store.terraformingDeductedExecution.value.currentQueueDisplayEntries) {
       if (activeProjectId && entry.projectId === activeProjectId) continue
+      const retained = store.terraformingArchiveRuntimeBaseState.value?.retainedProjects
+        .find(rp => rp.projectId === entry.projectId)
       entries.push({
         ...entry,
         projectName: names.get(entry.projectId) || entry.projectId,
@@ -1913,6 +1917,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
         runtimeStatus: hasProgressIds.has(entry.projectId) ? 'has-progress' : undefined,
         archiveConsumedWares: (projectMap.value.get(entry.projectId)?.resources?.wares ?? [])
           .map(item => ({ ware: item.ware, amount: item.actualAmount ?? item.amount })),
+        archiveSubmittedWares: retained?.submittedResources.map(item => ({ ware: item.ware, amount: item.amount })) ?? [],
       })
     }
 
@@ -2821,7 +2826,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
   })
 
   const unsatisfiedDerivedGoalCount = computed(() => {
-    return generatedGoals.value.filter(g => g.kind !== 'cluster' && !g.satisfied).length
+    return generatedGoals.value.filter(g => g.kind !== 'cluster' && g.kind !== 'preventive' && !g.satisfied).length
   })
 
   const canCompleteQueueEdit = computed(() => isQueueEditing.value && unsatisfiedDerivedGoalCount.value === 0)

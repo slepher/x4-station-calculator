@@ -83,12 +83,13 @@ const draggableContainerRef = ref<any>(null)
   return entries
 	})
 
-	interface CurrentQueueTimelineEntry extends TerraformingExecutionTimelineEntry {
-	  statusLabel?: string
-	  progressLabel?: string
-	  fixedRuntime?: boolean
-	  archiveDetailMode?: 'consumed-only'
-	}
+  interface CurrentQueueTimelineEntry extends TerraformingExecutionTimelineEntry {
+    statusLabel?: string
+    progressLabel?: string
+    fixedRuntime?: boolean
+    archiveDetailMode?: 'consumed-only'
+    archiveSubmittedWares?: Array<{ ware: string; amount: number }>
+  }
 
 	const timelineById = computed(() => new Map(props.executionTimeline.map(entry => [entry.id, entry])))
 
@@ -96,15 +97,16 @@ const draggableContainerRef = ref<any>(null)
 	  return props.currentQueueDisplayEntries.map(entry => {
 	    if (entry.status === 'pending') {
 	      const timelineEntry = timelineById.value.get(entry.replayEntryId ?? entry.id)
-	      if (timelineEntry) {
-	        return {
-	          ...timelineEntry,
-	          progressLabel: entry.runtimeStatus === 'active'
-	            ? (t('terraforming.activeInArchive') || 'Active')
-	            : entry.runtimeStatus === 'has-progress' ? (t('terraforming.hasProgress') || 'Has progress') : undefined,
-	          fixedRuntime: entry.fixedFirst,
-	        }
-	      }
+      if (timelineEntry) {
+        return {
+          ...timelineEntry,
+          progressLabel: entry.runtimeStatus === 'active'
+            ? (t('terraforming.activeInArchive') || 'Active')
+            : entry.runtimeStatus === 'has-progress' ? (t('terraforming.hasProgress') || 'Has progress') : undefined,
+          fixedRuntime: entry.fixedFirst,
+          archiveSubmittedWares: entry.archiveSubmittedWares,
+        }
+      }
 	    }
 	    const isActive = entry.runtimeStatus === 'active'
 	    return {
@@ -116,6 +118,7 @@ const draggableContainerRef = ref<any>(null)
 	      projectGroupName: '',
 	      showGroupMarker: false,
 	      wares: entry.archiveConsumedWares?.map(item => ({ ware: item.ware, amount: item.amount })) ?? [],
+	      archiveSubmittedWares: entry.archiveSubmittedWares,
 	      deliveries: [],
 	      deliveryDetails: [],
 	      dockModules: [],
@@ -320,18 +323,42 @@ function getDiscountedWaresMap(entry: TerraformingExecutionTimelineEntry): Map<s
   return map
 }
 
-function getWareDiscount(entry: TerraformingExecutionTimelineEntry, wareId: string): string {
-  const dw = getDiscountedWaresMap(entry).get(wareId)
-  if (!dw || dw.discount <= 0) return ''
-  return '\u2212' + dw.discount.toLocaleString()
-}
-
-function getWareConsumed(entry: TerraformingExecutionTimelineEntry, wareId: string): number {
+function getWareDiscounted(entry: TerraformingExecutionTimelineEntry, wareId: string): number {
   const qty = entry.wares.find(w => w.ware === wareId)?.actualAmount
     ?? entry.wares.find(w => w.ware === wareId)?.amount
     ?? 0
   const dw = getDiscountedWaresMap(entry).get(wareId)
   return dw ? dw.final : qty
+}
+
+function getWareRemaining(entry: CurrentQueueTimelineEntry | TerraformingExecutionTimelineEntry, wareId: string): number {
+  const qty = entry.wares.find(w => w.ware === wareId)?.actualAmount
+    ?? entry.wares.find(w => w.ware === wareId)?.amount
+    ?? 0
+  const dw = getDiscountedWaresMap(entry as TerraformingExecutionTimelineEntry).get(wareId)
+  const sub = getWareSubmitted(entry as CurrentQueueTimelineEntry, wareId)
+  const afterDiscount = dw ? dw.final : qty
+  return afterDiscount - sub
+}
+
+function getWareSubmitted(entry: CurrentQueueTimelineEntry, wareId: string): number {
+  return (entry as any).archiveSubmittedWares?.find((w: any) => w.ware === wareId)?.amount ?? 0
+}
+
+function getWareRemaining(entry: CurrentQueueTimelineEntry | TerraformingExecutionTimelineEntry, wareId: string): number {
+  const qty = entry.wares.find(w => w.ware === wareId)?.actualAmount
+    ?? entry.wares.find(w => w.ware === wareId)?.amount
+    ?? 0
+  const dw = getDiscountedWaresMap(entry as TerraformingExecutionTimelineEntry).get(wareId)
+  const sub = getWareSubmitted(entry as CurrentQueueTimelineEntry, wareId)
+  const afterDiscount = dw ? dw.final : qty
+  return afterDiscount - sub
+}
+
+function getWareQtyTooltip(entry: TerraformingExecutionTimelineEntry, wareId: string): string {
+  const dw = getDiscountedWaresMap(entry).get(wareId)
+  if (!dw || dw.discount <= 0) return ''
+  return `${t('terraforming.wareQty')}: ${dw.original.toLocaleString()}<br/>${t('terraforming.discount')}: ${dw.discount.toLocaleString()}`
 }
 
 function getTotalVolume(entry: TerraformingExecutionTimelineEntry): number {
@@ -713,14 +740,18 @@ function buildDraftWaresTooltip(entry: { wares: Array<{ name: string; amount: nu
 	            <div v-if="expandedEntryId === entry.id && entry.archiveDetailMode === 'consumed-only' && entry.wares.length > 0" class="timeline-body">
 	              <div class="detail-section">
 	                <div class="section-title">{{ t('terraforming.materialPrice') }}</div>
-	                <div class="archive-consumed-row detail-header">
-	                  <span>{{ t('terraforming.wareName') || 'Name' }}</span>
-	                  <span>{{ t('terraforming.consumed') || 'Consumed' }}</span>
-	                </div>
-	                <div v-for="ware in entry.wares" :key="`${entry.id}-archive-ware-${ware.ware}`" class="archive-consumed-row">
-	                  <span>{{ getWareName(ware.ware) }}</span>
-	                  <span>{{ (ware.actualAmount ?? ware.amount).toLocaleString() }}</span>
-	                </div>
+	                <div class="detail-row detail-header">
+                  <span class="col-name">{{ t('terraforming.wareName') }}</span>
+                  <span class="col-qty">{{ t('terraforming.consumed') }}</span>
+                  <span v-if="(entry as any).archiveSubmittedWares?.length" class="col-qty">{{ t('terraforming.submitted') }}</span>
+                  <span class="col-qty">{{ t('terraforming.remain') }}</span>
+                </div>
+                <div v-for="ware in entry.wares" :key="`${entry.id}-archive-ware-${ware.ware}`" class="detail-row">
+                  <span class="col-name">{{ getWareName(ware.ware) }}</span>
+                  <span class="col-qty">{{ (ware.actualAmount ?? ware.amount).toLocaleString() }}</span>
+                  <span v-if="(entry as any).archiveSubmittedWares?.length" class="col-qty">{{ getWareSubmitted(entry as any, ware.ware).toLocaleString() }}</span>
+                  <span class="col-qty">{{ ((ware.actualAmount ?? ware.amount) - getWareSubmitted(entry as any, ware.ware)).toLocaleString() }}</span>
+                </div>
 	              </div>
 	            </div>
 	          </div>
@@ -753,16 +784,19 @@ function buildDraftWaresTooltip(entry: { wares: Array<{ name: string; amount: nu
               <div v-if="entry.wares.length > 0" class="detail-section">
                 <div class="section-title">{{ t('terraforming.materialPrice') }}</div>
                 <div class="detail-row detail-header">
-                  <span class="col-name">{{ t('terraforming.wareName') || 'Name' }}</span>
-                  <span class="col-qty">{{ t('terraforming.wareQty') || 'Qty' }}</span>
-                  <span class="col-discount">{{ t('terraforming.discount') || 'Discount' }}</span>
-                  <span class="col-consumed">{{ t('terraforming.consumed') || 'Consumed' }}</span>
+                  <span class="col-name">{{ t('terraforming.wareName') }}</span>
+                  <span class="col-qty">{{ t('terraforming.consumed') }}</span>
+                  <span v-if="(entry as any).archiveSubmittedWares?.length" class="col-qty">{{ t('terraforming.submitted') }}</span>
+                  <span v-if="(entry as any).archiveSubmittedWares?.length" class="col-qty">{{ t('terraforming.remain') }}</span>
                 </div>
                 <div v-for="ware in entry.wares" :key="`${entry.id}-ware-${ware.ware}`" class="detail-row">
                   <span class="col-name">{{ getWareName(ware.ware) }}</span>
-                  <span class="col-qty">{{ (ware.actualAmount ?? ware.amount).toLocaleString() }}</span>
-                  <span class="col-discount">{{ getWareDiscount(entry, ware.ware) }}</span>
-                  <span class="col-consumed">{{ getWareConsumed(entry, ware.ware).toLocaleString() }}</span>
+                  <span class="col-qty">
+                    <span v-if="entry.discountedWares.length > 0" class="info-i" v-tippy="{ content: getWareQtyTooltip(entry, ware.ware), allowHTML: true, placement: 'top', theme: 'material' }">ⓘ</span>
+                    {{ getWareDiscounted(entry, ware.ware).toLocaleString() }}
+                  </span>
+                  <span v-if="(entry as any).archiveSubmittedWares?.length" class="col-qty">{{ getWareSubmitted(entry as any, ware.ware).toLocaleString() }}</span>
+                  <span v-if="(entry as any).archiveSubmittedWares?.length" class="col-qty">{{ getWareRemaining(entry as any, ware.ware).toLocaleString() }}</span>
                 </div>
                 <div class="detail-row detail-separator"></div>
                 <template v-if="entry.discountAmount > 0">
@@ -980,7 +1014,7 @@ function buildDraftWaresTooltip(entry: { wares: Array<{ name: string; amount: nu
 }
 
 .archive-consumed-row {
-  @apply grid grid-cols-[1fr_auto] gap-3 text-xs text-slate-300 py-1;
+  @apply flex items-center justify-between gap-3 text-xs text-slate-300;
 }
 
 .group-marker {
@@ -1203,10 +1237,11 @@ function buildDraftWaresTooltip(entry: { wares: Array<{ name: string; amount: nu
 }
 
 .detail-row .col-name { @apply flex-1 min-w-0; }
-.detail-row .col-qty { @apply w-16 text-right; }
-.detail-row .col-discount { @apply w-16 text-right text-amber-400; }
-.detail-row .col-consumed { @apply w-16 text-right; }
+.detail-row .col-qty { @apply w-[4.5rem] text-right whitespace-nowrap; }
 .detail-row.detail-header { @apply text-slate-500 text-[11px]; }
+.info-i {
+  @apply text-[9px] cursor-help align-text-top mr-0.5 opacity-60 hover:opacity-100 text-sky-400;
+}
 .detail-row.detail-separator {
   @apply border-t border-slate-700/40 my-1;
   height: 0;

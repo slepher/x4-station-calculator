@@ -53,7 +53,8 @@
   - `selectedCluster`: 从 `terraformingData` 和 `selectedClusterId` 查找
   - `executionLog`: 当前 cluster 的 expanded execution entries
   - `completedProjects`: `buildCompletedProjectsFromExecutionLog(executionLog)`
-  - `currentStats`: `computeTerraformingRuntimeStats(selectedCluster, completedProjects, terraformingData)`
+  - `currentStats`: `replayExecutionLog(deductedExecution.value.remainingLog, ...).finalStats`
+  - `currentCumulativeRebates`: `replayExecutionLog(...).finalRebates`，基于 baseState.rebates + task log 回放得出累计 rebates
   - `runtimeProjectIds`: `getRuntimeTerraformingProjectIds(selectedCluster, currentStats, completedProjects, terraformingData)`
   - `terraformingData`: 来自 `useGameDataStore()` 的 game data
 
@@ -78,6 +79,7 @@
 
 - [x] 文件: No changes needed — presenter uses generic `TerraformingPresenterStore` interface, view provides adapter
 - [x] Presenter 的蓝图 HQ context 处理：`hqBuildDocks` 已处理 `null` → `{ totalSlots: 1 }`，其余通过 HQ context 默认值处理
+- [x] `TerraformingPresenterStore` 接口增加 `terraformingCurrentCumulativeRebates: ComputedRef<RebateKey[]>`，`activeRebates` 改为从 store 获取而非从 completedProjects 静态数据累加
 
 ## Task 8: 更新 LiveProductionWorkbenchView.vue
 

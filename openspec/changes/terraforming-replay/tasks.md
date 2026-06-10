@@ -9,7 +9,7 @@
 - [x] 新增 `RebateKey` interface（`id: string`, `type: 'wareGroup' | 'ware'`, `value: number`）
 - [x] 新增 `ReplayStep` interface（`projectId`, `type`, `valid`, `statsBefore?`, `statsAfter?`, `completedBefore?`, `completedAfter?`, `cumulativeRebatesBefore?`, `cumulativeRebatesAfter?`, `rebateChanges?`, `evaluation?`）
 - [x] 新增 `GoalEntry` interface（`id`, `kind`, `position`, `dependentTaskIds`, `statGoal?`, `projectGoal?`）
-- [x] 新增 `TerraformingReplayResult` interface（`steps`, `goalEntries`, `finalStats`, `finalCompleted`）
+- [x] 新增 `TerraformingReplayResult` interface（`steps`, `goalEntries`, `finalStats`, `finalCompleted`, `finalRebates`）
 
 ---
 
@@ -27,7 +27,7 @@
 - [x] 遍历 log 每个 entry 时的 eval + goals 分支逻辑
 - [x] 实现 `generateGoalsForEntry()` — project dependency goal 虚拟满足，stat condition goal 实际设置 runningStats，重新评估 entry
 - [x] 末尾调用 `injectEventsAtPosition()`
-- [x] 返回 `{ steps, goalEntries, finalStats: currentStats(), finalCompleted }`
+- [x] 返回 `{ steps, goalEntries, finalStats: currentStats(), finalCompleted, finalRebates: snapshotRebates().list }`
 - [x] export `replayExecutionLog`
 
 ---
@@ -42,6 +42,7 @@
 - [x] `availableBeforeExecution` 从 `step.valid` 取
 - [x] `blockedReason` 从 `step.evaluation?.reasons` 取
 - [x] `cumulativeRebates` / `rebateChanges` 从 engine step 取 raw ID，presenter `resolveRebateName()` 译名
+- [x] 折扣计算使用 `step.cumulativeRebatesBefore`（项目自己的 rebates 不应对自身生效）
 
 ---
 

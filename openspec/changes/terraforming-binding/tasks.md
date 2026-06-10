@@ -47,7 +47,9 @@
 
 - [x] 只输出带 `completed` 属性的 event。
 - [x] event 输出 `eventId`, `completedCount`, `startTime?`。
-- [x] 解析 `<rebates>` 为 cluster runtime 累计值。
+- [x] 解析 `<rebates>` 为 cluster runtime 累计值
+  - 存档 XML 使用 `value` 属性（非 `amount`）：`<rebate waregroup="food" value="10"/>`
+  - 仅捕获 `<terraforming>` 直子级 `<rebate>`（`project_depth == 0`），排除 `<project>` 内部的项目定义 rebates
 
 ### 7. 更新 IndexedDB archive 分离与合并
 
