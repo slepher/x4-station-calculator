@@ -866,7 +866,8 @@
       "moduleEmpire": "Sector",
       "moduleLogicFlow": "Flow",
       "moduleShipBlueprints": "Ship",
-      "moduleNameLabel": "Name"
+      "moduleNameLabel": "Name",
+      "showBeta": "Show beta versions"
     },
     "dlc": {
       "title": "DLC Settings",

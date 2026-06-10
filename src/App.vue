@@ -13,6 +13,7 @@ import { useSaveStore } from '@/store/useSaveStore'
 import { useMapStore } from '@/store/useMapStore'
 import { useSaveBindingStore } from '@/store/useSaveBindingStore'
 import { useActiveViewStore } from '@/store/useActiveViewStore'
+import { useBuildPlanStore } from '@/store/useBuildPlanStore'
 import { saveArchiveToDB, createArchiveId, loadPlayerStationsFlatByArchiveId } from '@/db/saveArchiveDB'
 
 const gameDataStore = useGameDataStore()
@@ -24,6 +25,7 @@ const saveStore = useSaveStore()
 const mapStore = useMapStore()
 const saveBindingStore = useSaveBindingStore()
 const activeViewStore = useActiveViewStore()
+const buildPlanStore = useBuildPlanStore()
 
 const currentView = ref<'main' | 'drag-test' | 'template-flow' | 'metric-panel-test'>('main')
 const isInitializing = ref(true)
@@ -36,6 +38,8 @@ async function initializeApp() {
     await gameDataStore.initialize()
     console.log('[App] GameData initialized')
 
+    activeViewStore.init()
+
     await saveStore.initialize()
     await saveBindingStore.initialize()
     
@@ -47,6 +51,8 @@ async function initializeApp() {
       mapStore.initialize(),
       shipBuildStore.initialize()
     ])
+
+    await buildPlanStore.init()
 
     console.log('[App] All stores initialized')
   } catch (e) {

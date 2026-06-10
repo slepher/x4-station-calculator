@@ -620,8 +620,13 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
     { deep: true },
   )
 
-  loadPlansFromStorage()
-  resolveLogicFlowStateForBuildPlan()
+  async function init() {
+    if (!gameData.isReady) {
+      await gameData.initialize()
+    }
+    loadPlansFromStorage()
+    resolveLogicFlowStateForBuildPlan()
+  }
 
   return {
     buildGoals,
@@ -657,5 +662,6 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
     updateFleetEntryQuantity,
     updateFleetShipyardCount,
     clearFleetGroup,
+    init,
   }
 })

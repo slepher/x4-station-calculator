@@ -40,6 +40,7 @@ type DirtyModuleOption = {
 }
 
 const selectedVersionKey = ref('')
+const showBeta = ref(gameData.isBeta)
 const selectedModuleKeys = ref<DirtyModuleKey[]>([])
 const moduleNames = ref<Record<DirtyModuleKey, string>>({
   empire: '',
@@ -49,11 +50,15 @@ const moduleNames = ref<Record<DirtyModuleKey, string>>({
 
 const versionOptions = computed<VersionOption[]>(() => gameData.versionOptions)
 
+const filteredVersionOptions = computed<VersionOption[]>(() =>
+  showBeta.value ? versionOptions.value : versionOptions.value.filter(o => !o.beta)
+)
+
 const toVersionKey = (option: Pick<VersionOption, 'version' | 'beta'>) =>
   `${option.version}::${option.beta ? 'beta' : 'stable'}`
 
 const selectedOption = computed(() =>
-  versionOptions.value.find(option => toVersionKey(option) === selectedVersionKey.value) || null
+  filteredVersionOptions.value.find(option => toVersionKey(option) === selectedVersionKey.value) || null
 )
 
 const getDefaultName = (key: DirtyModuleKey): string => {
@@ -139,6 +144,15 @@ watch(() => props.visible, (visible) => {
     }
   }
 }, { immediate: true })
+
+watch(showBeta, (show) => {
+  if (!show && !selectedOption.value) {
+    const firstStable = filteredVersionOptions.value[0]
+    if (firstStable) {
+      selectedVersionKey.value = toVersionKey(firstStable)
+    }
+  }
+})
 
 watch(isSameVersionSelection, (isSame) => {
   if (isSame) {
@@ -237,13 +251,21 @@ const handleBackdropClick = (event: MouseEvent) => {
             data-testid="version-select"
           >
             <option
-              v-for="option in versionOptions"
+              v-for="option in filteredVersionOptions"
               :key="`${option.version}-${option.beta}`"
               :value="toVersionKey(option)"
             >
               {{ option.label }}
             </option>
           </select>
+          <label class="hide-beta-check">
+            <input
+              v-model="showBeta"
+              type="checkbox"
+              data-testid="hide-beta-checkbox"
+            >
+            <span>{{ t('settings.gameVersion.showBeta') }}</span>
+          </label>
           <p class="data-isolation-hint">{{ t('settings.gameVersion.dataIsolationHint') }}</p>
 
           <div
@@ -372,6 +394,14 @@ const handleBackdropClick = (event: MouseEvent) => {
 
 .data-isolation-hint {
   @apply mt-2 text-xs text-slate-400;
+}
+
+.hide-beta-check {
+  @apply mt-2 flex items-center gap-2 text-xs text-slate-400 cursor-pointer;
+}
+
+.hide-beta-check input[type="checkbox"] {
+  @apply accent-sky-500 w-4 h-4;
 }
 
 .modal-footer {

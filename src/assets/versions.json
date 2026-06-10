@@ -1,5 +1,5 @@
 {
-  "current_version": "8.0",
+  "current_version": "9.0",
   "beta": false,
   "versions": [
     {
@@ -20,7 +20,7 @@
     },
     {
       "version": "9.0",
-      "beta": false,
+      "beta": true,
       "beta_type": "rc",
       "codename": "Empire",
       "mini_version": 4,
@@ -35,6 +35,22 @@
         "terraforming": "x4_terraforming_data_v9_beta"
       },
       "indexeddb_name": "x4_save_archive_db_v9_beta"
+    },
+    {
+      "version": "9.0",
+      "beta": false,
+      "codename": "Empire",
+      "folder_name": "9.0-Empire",
+      "storage_keys": {
+        "empire": "x4_empire_data_v9",
+        "logic_flow": "x4_logic_flow_plans_v9",
+        "ship_blueprints": "x4_ship_blueprints_v9",
+        "setting": "x4-setting_v9",
+        "save_archives": "x4_save_archives_v9",
+        "build_plan_goals": "x4_build_plan_goals_v9",
+        "terraforming": "x4_terraforming_data_v9"
+      },
+      "indexeddb_name": "x4_save_archive_db_v9"
     }
   ]
 }

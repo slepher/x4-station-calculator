@@ -83,7 +83,7 @@ function saveToStorage(state: ActiveViewState): void {
 }
 
 export const useActiveViewStore = defineStore('activeView', () => {
-  const state = ref<ActiveViewState>(loadFromStorage())
+  const state = ref<ActiveViewState>({ ...DEFAULT_STATE })
 
   const activeEmpireId = computed({
     get: () => state.value.activeEmpireId,
@@ -292,6 +292,10 @@ export const useActiveViewStore = defineStore('activeView', () => {
     return state.value
   }
 
+  async function init() {
+    state.value = loadFromStorage()
+  }
+
   return {
     state,
     productionSource,
@@ -326,6 +330,7 @@ export const useActiveViewStore = defineStore('activeView', () => {
     resetToOverview,
     switchToBinding,
     switchToEmpire,
-    loadState
+    loadState,
+    init
   }
 })

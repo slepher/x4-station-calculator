@@ -690,27 +690,6 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     loadedBuiltInConnectionsSnapshot.value = null
   }
 
-  // Auto-load blueprints from storage on store creation
-  loadBlueprintsFromStorage()
-
-  // If active blueprint exists, auto-load the corresponding blueprint after a tick
-  if (savedBlueprints.value.activeBlueprintId) {
-    const activeBlueprint = findBlueprintById(savedBlueprints.value.activeBlueprintId)
-    if (activeBlueprint) {
-      // Use queueMicrotask to defer the update until after current execution context
-      queueMicrotask(() => {
-        viewMode.value = 'workbench'
-        blueprint.value = JSON.parse(JSON.stringify(activeBlueprint)) as ShipBlueprint
-
-        // Set dirty to false by directly setting lastSavedSnapshot
-        lastSavedSnapshot.value = JSON.stringify({
-          shipId: activeBlueprint.shipId,
-          blueprint: activeBlueprint
-        })
-      })
-    }
-  }
-
   // isDirty computed
   const isDirty = computed(() => {
     if (isEmptyForSave()) return false
