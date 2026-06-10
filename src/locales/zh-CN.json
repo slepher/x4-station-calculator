@@ -1003,6 +1003,7 @@
     "mode_incremental": "增量",
     "modules": "模块",
     "module_count": "{count} 条数据",
+    "module_count_compare": "导入: {importCount} / 现有: {currentCount}",
     "save_module_description": "包含存档索引和正文，文件体积较大",
     "sanitize_summary_title": "已移除的失效引用",
     "sanitize_summary_line": "{module}：已移除 {details}。",

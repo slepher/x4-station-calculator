@@ -64,7 +64,8 @@
 
 **前提** 加载任意 JSON 文件  
 **那么** 导入列表 SHALL 显示 empire / flow / ship / save / binding / build-plan / terraforming 共 7 项  
-**并且** 不在 JSON 中的模块 SHALL 显示 count = 0
+**并且** 不在 JSON 中的模块 SHALL 显示 count = 0  
+**并且** 每项 SHALL 额外显示当前版本已有数据条数（格式：导入: X / 现有: Y）
 
 ### Requirement: Import Overwrite Cleanup
 

@@ -1002,6 +1002,7 @@
     "mode_incremental": "Incremental",
     "modules": "Modules",
     "module_count": "{count} items",
+    "module_count_compare": "Import: {importCount} / Current: {currentCount}",
     "save_module_description": "Includes archive index and content, large file size",
     "sanitize_summary_title": "Removed Invalid References",
     "sanitize_summary_line": "{module}: removed {details}.",

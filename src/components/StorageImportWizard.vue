@@ -61,12 +61,50 @@ const allModuleKeys: ImportModuleKey[] = ['x4_empire_data', 'x4_logic_flow_plans
 
 const displayModules = computed(() => {
   const countMap = new Map(moduleStats.value.map(s => [s.key, s.count]))
+  const currentCountMap = getCurrentModuleCounts()
   return allModuleKeys.map(key => ({
     key,
     count: countMap.get(key) ?? 0,
-    inPayload: countMap.has(key)
+    currentCount: currentCountMap.get(key) ?? 0
   }))
 })
+
+const getCurrentModuleCounts = (): Map<string, number> => {
+  const result = new Map<string, number>()
+  const moduleToStorageParam: Record<string, string> = {
+    x4_empire_data: 'empire',
+    x4_logic_flow_plans: 'logic_flow',
+    x4_ship_blueprints: 'ship_blueprints',
+    x4_save_archives: 'save_archives',
+    x4_build_plan_goals: 'build_plan_goals',
+    x4_terraforming_data: 'terraforming',
+  }
+  for (const [key, param] of Object.entries(moduleToStorageParam)) {
+    try {
+      const raw = localStorage.getItem(gameDataStore.getStorageKey(param as any))
+      if (raw) {
+        const parsed = JSON.parse(raw)
+        result.set(key, Array.isArray(parsed?.list) ? parsed.list.length : 0)
+        continue
+      }
+    } catch {}
+    result.set(key, 0)
+  }
+  // save_bindings has derived key
+  try {
+    const saveBindingsKey = gameDataStore.getStorageKey('save_archives').replace('save_archives', 'save_bindings')
+    const raw = localStorage.getItem(saveBindingsKey)
+    if (raw) {
+      const parsed = JSON.parse(raw)
+      result.set('x4_save_bindings', Array.isArray(parsed?.list) ? parsed.list.length : 0)
+    } else {
+      result.set('x4_save_bindings', 0)
+    }
+  } catch {
+    result.set('x4_save_bindings', 0)
+  }
+  return result
+}
 
 const versionState = computed(() => preparedPayload.value?.versionState || null)
 const sanitizeSummaries = computed(() => preparedPayload.value?.sanitizeSummaries || [])
@@ -310,7 +348,7 @@ const handleApplyImport = async () => {
                   />
                   <span class="text-sm text-slate-100">{{ moduleTitle(entry.key) }}</span>
                 </div>
-                <span class="text-xs text-slate-400">{{ t('importExport.module_count', { count: entry.count }) }}</span>
+                <span class="text-xs text-slate-400">{{ t('importExport.module_count_compare', { importCount: entry.count, currentCount: entry.currentCount }) }}</span>
               </label>
             </div>
           </div>

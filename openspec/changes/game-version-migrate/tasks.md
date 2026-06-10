@@ -19,7 +19,7 @@
 
 ## 4. 导入流水线
 
-- [x] 4.1 导入列表始终显示 7 个模块（不在 JSON 中的显示 count=0）。
+- [x] 4.1 导入列表始终显示 7 个模块（不在 JSON 中的显示 count=0），每项显示导入/现有数据对比。
 - [x] 4.2 `getStorageKey` 全 key 显式映射，未知 key throw。
 - [x] 4.3 覆盖清空改为写入合法空状态（`getEmptyModuleState` 而非 `removeItem`）。
 - [x] 4.4 导入 `handleApplyImport` try-catch UI 报错。

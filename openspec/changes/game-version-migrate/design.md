@@ -40,9 +40,9 @@ terraformingStore.init()
 
 ## 4. 导入流水线修复
 
-### 4.1 导入列表始终显示 7 个模块
+### 4.1 导入列表始终显示 7 个模块（含现有数据对比）
 
-`StorageImportWizard` 改为始终展示全部 7 个模块类型（`allModuleKeys` 硬编码），不在 JSON 中的显示「0 条数据」。覆盖模式默认全选。
+`StorageImportWizard` 改为始终展示全部 7 个模块类型（`allModuleKeys` 硬编码），不在 JSON 中的显示「0 条数据」。每个模块额外显示当前版本的已有数据条数，格式「导入: X / 现有: Y」。覆盖模式默认全选。
 
 ### 4.2 getStorageKey 全 key 显式映射
 
