@@ -131,6 +131,7 @@ const isSameVersionSelection = computed(() => {
 })
 const shouldPersistCurrentVersion = computed(() => isSameVersionSelection.value && !gameData.hasStoredVersion)
 const isSwitchDisabled = computed(() => isSameVersionSelection.value && gameData.hasStoredVersion)
+const showMigrationActions = computed(() => isSameVersionSelection.value && gameData.hasStableCounterpart)
 const shouldShowDirtyModules = computed(() => !isSameVersionSelection.value && dirtyModules.value.length > 0)
 const switchButtonLabel = computed(() =>
   shouldPersistCurrentVersion.value ? t('settings.gameVersion.save') : t('settings.gameVersion.switch')
@@ -459,7 +460,7 @@ const handleBackdropClick = (event: MouseEvent) => {
           </label>
           <p class="data-isolation-hint">{{ t('settings.gameVersion.dataIsolationHint') }}</p>
           <p
-            v-if="gameData.hasStableCounterpart"
+            v-if="showMigrationActions"
             class="beta-migration-hint"
           >
             {{ t('settings.gameVersion.betaMigrationHint') }}
@@ -531,7 +532,7 @@ const handleBackdropClick = (event: MouseEvent) => {
             {{ t('common.cancel') }}
           </button>
           <button
-            v-if="gameData.hasStableCounterpart"
+            v-if="showMigrationActions"
             v-tippy="{ content: t('settings.gameVersion.downloadAndCleanTooltip'), allowHTML: false, placement: 'top', theme: 'material' }"
             type="button"
             class="btn btn-amber"
@@ -541,7 +542,7 @@ const handleBackdropClick = (event: MouseEvent) => {
             {{ t('settings.gameVersion.downloadAndClean') }}
           </button>
           <button
-            v-if="gameData.hasStableCounterpart"
+            v-if="showMigrationActions"
             v-tippy="{ content: t('settings.gameVersion.migrateTooltip'), allowHTML: false, placement: 'top', theme: 'material' }"
             type="button"
             class="btn btn-amber"
@@ -550,26 +551,28 @@ const handleBackdropClick = (event: MouseEvent) => {
           >
             {{ t('settings.gameVersion.migrate') }}
           </button>
-          <button
-            v-if="!hasSelectedModules"
-            type="button"
-            class="btn btn-primary"
-            data-testid="version-switch"
-            :disabled="isSwitchDisabled"
-            @click="handleSwitch"
-          >
-            {{ switchButtonLabel }}
-          </button>
-          <button
-            v-else
-            type="button"
-            class="btn btn-primary"
-            data-testid="version-save-switch"
-            :disabled="!canSaveAndSwitch"
-            @click="handleSaveAndSwitch"
-          >
-            {{ t('settings.gameVersion.saveAndSwitch') }}
-          </button>
+          <template v-if="!showMigrationActions">
+            <button
+              v-if="!hasSelectedModules"
+              type="button"
+              class="btn btn-primary"
+              data-testid="version-switch"
+              :disabled="isSwitchDisabled"
+              @click="handleSwitch"
+            >
+              {{ switchButtonLabel }}
+            </button>
+            <button
+              v-else
+              type="button"
+              class="btn btn-primary"
+              data-testid="version-save-switch"
+              :disabled="!canSaveAndSwitch"
+              @click="handleSaveAndSwitch"
+            >
+              {{ t('settings.gameVersion.saveAndSwitch') }}
+            </button>
+          </template>
         </div>
       </div>
     </div>
