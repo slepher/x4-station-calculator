@@ -143,7 +143,7 @@ export const useGameDataStore = defineStore('gameData', () => {
       || currentVersionConfig.value?.codename
       || ''
     const betaType = config?.beta_type || 'beta'
-    const miniSuffix = miniVersion !== undefined ? `-${miniVersion}` : ''
+    const miniSuffix = beta && miniVersion !== undefined ? `-${miniVersion}` : ''
     return `${version}${resolvedCodename ? `-${resolvedCodename}` : ''}${beta ? `-${betaType}` : ''}${miniSuffix}`
   }
 
@@ -157,7 +157,7 @@ export const useGameDataStore = defineStore('gameData', () => {
       ? currentVersionConfig.value
       : versionsConfig.value.find(v => v.version === version && v.beta === beta)
     const betaType = config?.beta_type || 'beta'
-    const miniSuffix = showMiniVersion && config?.mini_version !== undefined ? `-${config.mini_version}` : ''
+    const miniSuffix = beta && showMiniVersion && config?.mini_version !== undefined ? `-${config.mini_version}` : ''
     return `${version}${beta ? `-${betaType}` : ''}${miniSuffix}`
   }
 

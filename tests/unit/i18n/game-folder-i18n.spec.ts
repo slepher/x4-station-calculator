@@ -12,7 +12,7 @@ describe('i18n game folder loading', () => {
   it('切到 9.0 后会重新载入英文游戏语言包', async () => {
     const mod = await import('@/i18n')
 
-    mod.setGameFolderName('9.0-Empire-beta')
+    mod.setGameFolderName('9.0-Empire')
     await mod.loadLanguageAsync('en')
 
     expect(mod.default.global.t('{20201,7601}')).toBe('Allographyne')

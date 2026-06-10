@@ -13,7 +13,7 @@ import type {
 } from '@/store/logic/terraformingTaskResolver'
 import type { TerraformingExecutionEntry } from '@/store/logic/terraformingRuntime'
 import type { DeductExecutionResult } from '@/store/logic/terraformingRuntime'
-import terraformingJson from '@/assets/x4_game_data/9.0-Empire-beta/data/terraforming.json'
+import terraformingJson from '@/assets/x4_game_data/9.0-Empire/data/terraforming.json'
 
 const raw = terraformingJson as unknown as TerraformingData & {
   stats: TerraformingStat[]; projects: TerraformingProject[]; clusters: TerraformingCluster[]

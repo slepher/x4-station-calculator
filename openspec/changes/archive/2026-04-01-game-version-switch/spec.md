@@ -13,7 +13,7 @@ interface VersionConfig {
   version: string        // "8.0" | "9.0"
   beta: boolean          // false | true
   codename: string       // "Diplomacy" | "Empire"
-  folder_name: string    // "8.0-Diplomacy" | "9.0-Empire-beta"
+  folder_name: string    // "8.0-Diplomacy" | "9.0-Empire"
   storage_keys: {
     empire: string
     logic_flow: string

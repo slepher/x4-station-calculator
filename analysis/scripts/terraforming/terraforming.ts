@@ -4,7 +4,7 @@
  * Usage:
  *   npx vite-node analysis/scripts/terraforming/terraforming.ts --planet=ScalePlateGreen
  *   npx vite-node analysis/scripts/terraforming/terraforming.ts --planet=ScalePlateGreen --temperature=4 --oxygen=9 --completed=pwr_antimatter,wat_import
- *   npx vite-node analysis/scripts/terraforming/terraforming.ts --planet=ScalePlateGreen --version=9.0-Empire-beta
+ *   npx vite-node analysis/scripts/terraforming/terraforming.ts --planet=ScalePlateGreen --version=9.0-Empire
  */
 
 import getopts from 'getopts'

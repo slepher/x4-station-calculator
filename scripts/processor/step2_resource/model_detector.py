@@ -11,7 +11,7 @@ def detect_map_resource_model(version_str: str) -> str:
     规则：主版本号 < 9 使用 'regions' 模型，>= 9 使用 'resourceareas' 模型。
 
     Args:
-        version_str: 版本字符串，如 "8.0", "9.0", "9.0-Empire-beta"
+        version_str: 版本字符串，如 "8.0", "9.0", "9.0-Empire"
 
     Returns:
         "regions" 或 "resourceareas"

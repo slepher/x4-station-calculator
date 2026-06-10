@@ -328,7 +328,7 @@ const buildCandidateScore = (resourceSectorIds: string[]) => {
 
 #### 游戏数据
 9. `src/assets/x4_game_data/8.0-Diplomacy/data/res.json`
-10. `src/assets/x4_game_data/9.0-Empire-beta/data/res.json`
+10. `src/assets/x4_game_data/9.0-Empire/data/res.json`
 
 #### 国际化
 11. `src/locales/en.json`

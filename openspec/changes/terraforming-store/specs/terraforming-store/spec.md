@@ -19,7 +19,7 @@ Terraforming 状态 MUST 由独立的 `useTerraformingStore` Pinia store 管理�
 
 #### Scenario: Terraforming store key switches with game version
 
-**前提** 用户切换到 `9.0-Empire-beta` 游戏版本  
+**前提** 用户切换到 `9.0-Empire` 游戏版本  
 **并且** `VersionConfig.storage_keys.terraforming = "x4_terraforming_data_v9_beta"`  
 **当** terraforming store 读取状态  
 **那么** 从 `x4_terraforming_data_v9_beta` 读取  

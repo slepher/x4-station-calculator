@@ -74,7 +74,7 @@
 versionsConfig: VersionConfig[]      // 从 versions.json 加载
 currentVersion: string               // '8.0' | '9.0'
 isBeta: boolean                      // false | true
-folderName: string                   // '8.0-Diplomacy' | '9.0-Empire-beta'
+folderName: string                   // '8.0-Diplomacy' | '9.0-Empire'
 hasStoredVersion: boolean            // localStorage['x4_game_version'] 是否存在
 
 // Computed
@@ -97,7 +97,7 @@ interface VersionConfig {
   version: string        // "8.0" | "9.0"
   beta: boolean          // false | true
   codename: string       // "Diplomacy" | "Empire"
-  folder_name: string    // "8.0-Diplomacy" | "9.0-Empire-beta"
+  folder_name: string    // "8.0-Diplomacy" | "9.0-Empire"
   storage_keys: {
     empire: string       // "x4_empire_data" | "x4_empire_data_v9_beta"
     logic_flow: string   // "x4_logic_flow_plans" | "x4_logic_flow_plans_v9_beta"

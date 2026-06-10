@@ -7,11 +7,11 @@ const uiLocaleLoaders = import.meta.glob('/src/locales/!(en).json')
 
 // Pre-load all game locale loaders at build time
 const gameLocaleLoaders8 = import.meta.glob('/src/assets/x4_game_data/8.0-Diplomacy/locales/*.json')
-const gameLocaleLoaders9 = import.meta.glob('/src/assets/x4_game_data/9.0-Empire-beta/locales/*.json')
+const gameLocaleLoaders9 = import.meta.glob('/src/assets/x4_game_data/9.0-Empire/locales/*.json')
 
 const gameLocaleLoadersMap: Record<string, Record<string, () => Promise<any>>> = {
   '8.0-Diplomacy': gameLocaleLoaders8,
-  '9.0-Empire-beta': gameLocaleLoaders9
+  '9.0-Empire': gameLocaleLoaders9
 }
 
 let currentGameFolderName = '8.0-Diplomacy'

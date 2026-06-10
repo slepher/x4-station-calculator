@@ -44,7 +44,7 @@
       "version": "9.0",
       "beta": true,
       "codename": "Empire",
-      "folder_name": "9.0-Empire-beta",
+      "folder_name": "9.0-Empire",
       "storage_keys": {
         "empire": "x4_empire_data_v9_beta",
         "logic_flow": "x4_logic_flow_plans_v9_beta",

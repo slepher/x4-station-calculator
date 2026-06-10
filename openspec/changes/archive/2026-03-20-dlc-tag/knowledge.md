@@ -29,9 +29,9 @@
 - `src/assets/x4_game_data/8.0-Diplomacy/data/wares.json`
 - `src/assets/x4_game_data/8.0-Diplomacy/data/maps.json`
 - `src/assets/x4_game_data/8.0-Diplomacy/data/dlcs.json`
-- `src/assets/x4_game_data/9.0-Empire-beta/data/wares.json`
-- `src/assets/x4_game_data/9.0-Empire-beta/data/maps.json`
-- `src/assets/x4_game_data/9.0-Empire-beta/data/dlcs.json`
+- `src/assets/x4_game_data/9.0-Empire/data/wares.json`
+- `src/assets/x4_game_data/9.0-Empire/data/maps.json`
+- `src/assets/x4_game_data/9.0-Empire/data/dlcs.json`
 
 ## 测试运行
 

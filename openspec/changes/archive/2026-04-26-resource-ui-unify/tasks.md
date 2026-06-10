@@ -8,7 +8,7 @@
 
 **步骤**：
 1. 检查 `src/assets/x4_game_data/8.0-Diplomacy/data/res.json` 是否包含 `color_rgb` 字段
-2. 检查 `src/assets/x4_game_data/9.0-Empire-beta/data/res.json` 是否包含 `color_rgb` 字段
+2. 检查 `src/assets/x4_game_data/9.0-Empire/data/res.json` 是否包含 `color_rgb` 字段
 3. 如缺失，为每个资源条目添加 `color_rgb` 字段
 
 **验收**：两个版本的 `res.json` 都包含完整的 `color_rgb` 数据

@@ -6,7 +6,7 @@ from collections import defaultdict
 from pathlib import Path
 
 # 读取 maps.json
-maps_path = Path(__file__).parent.parent / "src/assets/x4_game_data/9.0-Empire-beta/data/maps.json"
+maps_path = Path(__file__).parent.parent / "src/assets/x4_game_data/9.0-Empire/data/maps.json"
 with open(maps_path, 'r', encoding='utf-8') as f:
     data = json.load(f)
 
