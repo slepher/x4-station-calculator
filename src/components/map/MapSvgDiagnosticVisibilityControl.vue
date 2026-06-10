@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const props = defineProps<{
   visibility: {
     sectorLabels: boolean
     sectorLinks: boolean
-    resourceBadges: boolean
   }
+  expanded: boolean
 }>()
 
 const emit = defineEmits<{
@@ -16,16 +15,15 @@ const emit = defineEmits<{
     visibility: {
       sectorLabels: boolean
       sectorLinks: boolean
-      resourceBadges: boolean
     }
   ): void
+  (e: 'toggle'): void
 }>()
 
 const { t } = useI18n()
-const isExpanded = ref(false)
 
 function toggleExpanded() {
-  isExpanded.value = !isExpanded.value
+  emit('toggle')
 }
 
 function onToggle<K extends keyof typeof props.visibility>(key: K, checked: boolean) {
@@ -41,7 +39,7 @@ function onToggle<K extends keyof typeof props.visibility>(key: K, checked: bool
     <button
       type="button"
       class="toggle-btn"
-      :class="{ active: isExpanded }"
+      :class="{ active: expanded }"
       @click="toggleExpanded"
     >
       <svg class="toggle-icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -60,7 +58,7 @@ function onToggle<K extends keyof typeof props.visibility>(key: K, checked: bool
     </button>
 
     <Transition name="slide-down">
-      <div v-if="isExpanded" class="checkbox-panel">
+      <div v-if="expanded" class="checkbox-panel">
         <div class="checkbox-item">
           <label class="checkbox-label">
             <input
@@ -80,17 +78,6 @@ function onToggle<K extends keyof typeof props.visibility>(key: K, checked: bool
               @change="onToggle('sectorLinks', ($event.target as HTMLInputElement).checked)"
             />
             <span class="label-text">{{ t('map.debug_visibility_sector_links') }}</span>
-          </label>
-        </div>
-
-        <div class="checkbox-item">
-          <label class="checkbox-label">
-            <input
-              type="checkbox"
-              :checked="visibility.resourceBadges"
-              @change="onToggle('resourceBadges', ($event.target as HTMLInputElement).checked)"
-            />
-            <span class="label-text">{{ t('map.debug_visibility_resource_badges') }}</span>
           </label>
         </div>
       </div>

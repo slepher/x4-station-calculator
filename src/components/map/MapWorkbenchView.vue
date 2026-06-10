@@ -167,9 +167,9 @@ const focusedSavePoiKey = ref<string | null>(null)
 const savePoiTooltipItem = ref<SavePoiOverlayItem | null>(null)
 const mapDiagnosticVisibility = ref({
   sectorLabels: true,
-  sectorLinks: true,
-  resourceBadges: true
+  sectorLinks: true
 })
+const activeControlPanel = ref<'diagnostic' | 'poi' | null>(null)
 const settledSavePoiViewportContentBounds = ref<{
   left: number
   top: number
@@ -1617,7 +1617,6 @@ const onSaveVisibilityChange = (visibility: SavePoiVisibility) => {
 const onMapDiagnosticVisibilityChange = (visibility: {
   sectorLabels: boolean
   sectorLinks: boolean
-  resourceBadges: boolean
 }) => {
   mapDiagnosticVisibility.value = visibility
 }
@@ -2068,7 +2067,7 @@ onBeforeUnmount(() => {
               :faction-color-map="factionColorMap"
               :show-sector-labels="mapDiagnosticVisibility.sectorLabels"
               :show-sector-links="mapDiagnosticVisibility.sectorLinks"
-              :show-resource-badges="mapDiagnosticVisibility.resourceBadges"
+              :show-resource-badges="true"
               @content-size="onCanvasSize"
               @sector-layout="onSectorLayout"
               @layout-state="onLayoutState"
@@ -2103,13 +2102,17 @@ onBeforeUnmount(() => {
         <div class="map-top-right-controls">
           <MapSvgDiagnosticVisibilityControl
             :visibility="mapDiagnosticVisibility"
+            :expanded="activeControlPanel === 'diagnostic'"
             @visibility-change="onMapDiagnosticVisibilityChange"
+            @toggle="activeControlPanel = activeControlPanel === 'diagnostic' ? null : 'diagnostic'"
           />
 
           <MapSavePoiVisibilityControl
             :visibility="savePoiVisibility"
             :archive="activeMapArchive"
+            :expanded="activeControlPanel === 'poi'"
             @visibility-change="onSaveVisibilityChange"
+            @toggle="activeControlPanel = activeControlPanel === 'poi' ? null : 'poi'"
           />
         </div>
 

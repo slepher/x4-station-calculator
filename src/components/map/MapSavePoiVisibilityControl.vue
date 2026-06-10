@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useSaveStore } from '@/store/useSaveStore'
 import type { SaveArchive, SavePoiCategory, SavePoiVisibility } from '@/types/saveArchive'
@@ -7,16 +7,20 @@ import type { SaveArchive, SavePoiCategory, SavePoiVisibility } from '@/types/sa
 const props = defineProps<{
   visibility: SavePoiVisibility
   archive: SaveArchive | null
+  expanded: boolean
 }>()
 
 const emit = defineEmits<{
   (e: 'visibility-change', visibility: SavePoiVisibility): void
+  (e: 'toggle'): void
 }>()
 
 const { t } = useI18n()
 const saveStore = useSaveStore()
 
-const isExpanded = ref(false)
+function toggleExpanded() {
+  emit('toggle')
+}
 
 interface CategoryInfo {
   key: SavePoiCategory
@@ -38,10 +42,6 @@ const categories = computed<CategoryInfo[]>(() => {
   ]
 })
 
-function toggleExpanded() {
-  isExpanded.value = !isExpanded.value
-}
-
 function onCheckboxChange(category: SavePoiCategory, checked: boolean) {
   const newVisibility = { ...props.visibility, [category]: checked }
   emit('visibility-change', newVisibility)
@@ -53,7 +53,7 @@ function onCheckboxChange(category: SavePoiCategory, checked: boolean) {
     <button
       type="button"
       class="toggle-btn"
-      :class="{ active: isExpanded }"
+      :class="{ active: expanded }"
       @click="toggleExpanded"
     >
       <svg class="toggle-icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -69,7 +69,7 @@ function onCheckboxChange(category: SavePoiCategory, checked: boolean) {
     </button>
 
     <Transition name="slide-down">
-      <div v-if="isExpanded" class="checkbox-panel">
+      <div v-if="expanded" class="checkbox-panel">
         <div
           v-for="cat in categories"
           :key="cat.key"

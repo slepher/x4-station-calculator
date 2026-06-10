@@ -91,13 +91,13 @@ function createEmptySaveArchivesState(): SavedSaveArchivesState {
 
 function createDefaultSavePoiVisibility(): Record<SavePoiCategory, boolean> {
   return {
-    playerStation: false,
-    npcStation: false,
-    xenonStation: false,
-    khaakStation: false,
-    abandonedShip: false,
-    datavault: false,
-    erlkingVault: false
+    playerStation: true,
+    npcStation: true,
+    xenonStation: true,
+    khaakStation: true,
+    abandonedShip: true,
+    datavault: true,
+    erlkingVault: true
   }
 }
 
