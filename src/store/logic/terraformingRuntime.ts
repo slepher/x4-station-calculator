@@ -69,6 +69,7 @@ export interface TerraformingReplayResult {
   goalEntries: GoalEntry[]
   finalStats: Record<string, number>
   finalCompleted: Map<string, number>
+  finalRebates: RebateKey[]
 }
 
 export interface TerraformingArchiveRuntimeBaseState extends ReplayBaseState {
@@ -511,13 +512,13 @@ export function replayExecutionLog(
     ...(baseState?.completedProjects ? [...baseState.completedProjects.entries()] : []),
     ...(baseState?.completedEvents ? [...baseState.completedEvents.entries()] : []),
   ])
+  const projectMap = buildProjectMap(data)
   const runningRebates = new Map<string, number>()
   if (baseState?.rebates) {
     for (const rb of baseState.rebates) {
       runningRebates.set(`${rb.type === 'wareGroup' ? 'g' : 'w'}:${rb.id}`, rb.value)
     }
   }
-  const projectMap = buildProjectMap(data)
   const ignoredStats = getTerraformingIgnoredStats(cluster)
 
   function currentStats(): Record<string, number> {
@@ -834,6 +835,7 @@ export function replayExecutionLog(
     goalEntries,
     finalStats: currentStats(),
     finalCompleted: new Map(runningCompleted),
+    finalRebates: snapshotRebates().list,
   }
 }
 

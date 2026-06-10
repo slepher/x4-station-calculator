@@ -91,6 +91,7 @@ const terraformingPresenter = useTerraformingPresenter({
   terraformingHqArchiveStation: computed(() => terraformingStore.hqArchiveStation),
   terraformingHqEffectiveModules: computed(() => terraformingStore.hqEffectiveModules),
   terraformingHqClusterId: computed(() => terraformingStore.hqClusterId),
+  terraformingCurrentCumulativeRebates: computed(() => terraformingStore.currentCumulativeRebates),
   selectTerraformingCluster: (id: string) => terraformingStore.selectCluster(id),
   setTerraformingCompletedProjects: (projects: Map<string, number>) => {
     for (const [projectId, count] of projects) {

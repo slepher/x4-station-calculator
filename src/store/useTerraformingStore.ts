@@ -482,6 +482,16 @@ export const useTerraformingStore = defineStore('terraforming', () => {
     }).finalStats
   })
 
+  const currentCumulativeRebates = computed<RebateKey[]>(() => {
+    const cluster = selectedCluster.value
+    if (!cluster) return []
+    const data = terraformingData.value
+    if (!data) return []
+    return replayExecutionLog(deductedExecution.value.remainingLog, cluster, data, {
+      baseState: archiveRuntimeBaseState.value ?? undefined,
+    }).finalRebates
+  })
+
   const runtimeProjectIds = computed<string[]>(() => {
     const cluster = selectedCluster.value
     if (!cluster) return []
@@ -565,6 +575,7 @@ export const useTerraformingStore = defineStore('terraforming', () => {
     syncedExecutedBaseline,
     completedProjects,
     currentStats,
+    currentCumulativeRebates,
     runtimeProjectIds,
     hqStationName,
     hqArchiveStation,

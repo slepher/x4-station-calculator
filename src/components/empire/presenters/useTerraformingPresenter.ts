@@ -419,6 +419,7 @@ export interface TerraformingPresenterStore {
   terraformingHqArchiveStation: ComputedRef<ArchiveStationData | null>
   terraformingHqEffectiveModules: ComputedRef<SavedModule[]>
   terraformingHqClusterId: ComputedRef<string | null>
+  terraformingCurrentCumulativeRebates: ComputedRef<RebateKey[]>
   selectTerraformingCluster: (clusterId: string) => void
   setTerraformingCompletedProjects: (projects: Map<string, number>) => void
   appendTerraformingProjectExecution: (projectId: string, count?: number) => void
@@ -1722,7 +1723,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
         repeatRole = prevTask?.projectId === step.projectId ? 'duplicate' : 'first'
       }
 
-      const cumulativeRebatesRaw = step.cumulativeRebatesAfter ?? []
+      const cumulativeRebatesRaw = step.cumulativeRebatesBefore ?? []
       const { discountedWares: entryDw, discountAmount: entryDiscAmt } = computeProjectDiscount(
         project?.resources, cumulativeRebatesRaw,
         store.wareGroupMap, store.wareNames, useGameDataStore().waresMap,
@@ -2151,30 +2152,21 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
   })
 
   const activeRebates = computed<string[]>(() => {
-    const data = store.terraformingData.value
-    const completed = effectiveCompletedProjects.value
-    if (!data) return []
+    const rebates = store.terraformingCurrentCumulativeRebates.value
     const wareNames = store.wareNames.value
     const moduleGroupNames = store.moduleGroupNames.value
-    const aggregated: Record<string, number> = {}
-    for (const [projectId, count] of completed) {
-      if (count <= 0) continue
-      const project = data.projects.find(p => p.id === projectId)
-      if (!project?.rebates) continue
-      for (const rb of project.rebates) {
-        let name = ''
-        if (rb.wareGroup) {
-          name = moduleGroupNames.get(rb.wareGroup) || rb.wareGroup
-        } else if (rb.ware) {
-          name = wareNames.get(rb.ware) || rb.ware
-        }
-        if (!name) continue
-        aggregated[name] = (aggregated[name] ?? 0) + rb.value
-      }
-    }
-    return Object.entries(aggregated)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([name, value]) => `${name} ${value}%`)
+    return rebates
+      .map(rb => {
+        const name = rb.type === 'wareGroup'
+          ? (moduleGroupNames.get(rb.id) || rb.id)
+          : rb.type === 'ware'
+            ? (wareNames.get(rb.id) || rb.id)
+            : rb.id
+        if (!name) return null
+        return `${name} ${rb.value}%`
+      })
+      .filter((s): s is string => s !== null)
+      .sort((a, b) => a.localeCompare(b))
   })
 
   const statDisplayNames = computed<Map<string, string>>(() => {
@@ -2302,7 +2294,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
         .map(snapshot => buildTimelineStatLineModel(snapshot, data))
         .filter((model): model is TerraformingStatLineModel => model !== null)
 
-      const cumulativeRebatesRaw = step.cumulativeRebatesAfter ?? []
+      const cumulativeRebatesRaw = step.cumulativeRebatesBefore ?? []
       const cumulativeRebateEntries = cumulativeRebatesRaw.map(rb => ({
         name: resolveRebateName(rb.id, rb.type, store.moduleGroupNames.value, store.wareNames.value),
         value: rb.value,

@@ -157,17 +157,21 @@ impl TerraformingParser {
         }
 
         if name == "rebate" {
-            let amount = attrs
-                .get("amount")
-                .cloned()
-                .and_then(|v| v.parse::<i64>().ok())
-                .unwrap_or(0);
-            if amount != 0 {
-                state.rebates.push(SaveTerraformingRebateAmount {
-                    ware: attrs.get("ware").cloned(),
-                    ware_group: attrs.get("waregroup").cloned(),
-                    amount,
-                });
+            // Only capture runtime rebates directly under <terraforming>,
+            // not project-definition rebates inside <project>.
+            if state.project_depth == 0 {
+                let amount = attrs
+                    .get("value")
+                    .cloned()
+                    .and_then(|v| v.parse::<i64>().ok())
+                    .unwrap_or(0);
+                if amount != 0 {
+                    state.rebates.push(SaveTerraformingRebateAmount {
+                        ware: attrs.get("ware").cloned(),
+                        ware_group: attrs.get("waregroup").cloned(),
+                        amount,
+                    });
+                }
             }
         }
     }
