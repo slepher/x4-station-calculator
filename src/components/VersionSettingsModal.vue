@@ -5,7 +5,13 @@ import { useGameDataStore } from '@/store/useGameDataStore'
 import { useBlueprintProductionStore } from '@/store/useBlueprintProductionStore'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
+import { useSaveStore } from '@/store/useSaveStore'
+import { useSaveBindingStore } from '@/store/useSaveBindingStore'
+import { useBuildPlanStore } from '@/store/useBuildPlanStore'
+import { useTerraformingStore } from '@/store/useTerraformingStore'
 import { useX4I18n } from '@/utils/UseX4I18n'
+import { buildExportPayload, buildSaveExportData, triggerJsonDownload, normalizeImportPayload, prepareImportPayload, applyImportPayload } from '@/store/logic/importExport'
+import { clearLegacySaveDB, deleteCurrentArchiveDB } from '@/db/saveArchiveDB'
 
 const props = defineProps<{
   visible: boolean
@@ -20,7 +26,14 @@ const gameData = useGameDataStore()
 const blueprintStore = useBlueprintProductionStore()
 const logicFlowStore = useLogicFlowStore()
 const shipBuildStore = useShipBuildStore()
+const saveStore = useSaveStore()
+const saveBindingStore = useSaveBindingStore()
+const buildPlanStore = useBuildPlanStore()
+const terraformingStore = useTerraformingStore()
 const { translateShip } = useX4I18n()
+
+const migrateConfirmOpen = ref(false)
+const migrateConfirmCounts = ref<{ beta: Record<string, number>; stable: Record<string, number> }>({ beta: {}, stable: {} })
 
 type VersionOption = {
   version: string
@@ -205,6 +218,179 @@ const handleSaveAndSwitch = async () => {
   await handleSwitch()
 }
 
+const handleDownloadAndClean = async () => {
+  terraformingStore.init()
+  const basePayload = buildExportPayload(
+    blueprintStore.savedEmpires,
+    logicFlowStore.savedPlans,
+    shipBuildStore.savedBlueprints,
+    gameData,
+    saveBindingStore.savedBindings,
+    buildPlanStore.savedPlans,
+    terraformingStore.savedPlans
+  )
+
+  let payload: Record<string, unknown>
+  if (saveStore.savedArchivesState.list.length > 0) {
+    const saveExportData = await buildSaveExportData(saveStore.savedArchivesState, gameData)
+    payload = {
+      ...basePayload,
+      data: { ...basePayload.data, x4_save_archives: saveExportData }
+    } as Record<string, unknown>
+  } else {
+    payload = basePayload as Record<string, unknown>
+  }
+
+  const now = new Date()
+  const yyyy = now.getFullYear()
+  const mm = String(now.getMonth() + 1).padStart(2, '0')
+  const dd = String(now.getDate()).padStart(2, '0')
+  const hh = String(now.getHours()).padStart(2, '0')
+  const min = String(now.getMinutes()).padStart(2, '0')
+  const fileName = `x4-export-${gameData.currentVersion}-beta-${yyyy}${mm}${dd}-${hh}${min}.json`
+  triggerJsonDownload(fileName, payload)
+
+  for (const module of ['empire', 'logic_flow', 'ship_blueprints', 'setting', 'save_archives', 'build_plan_goals', 'terraforming'] as const) {
+    localStorage.removeItem(gameData.getStorageKey(module))
+  }
+  const saveBindingsKey = gameData.getStorageKey('save_archives').replace('save_archives', 'save_bindings')
+  localStorage.removeItem(saveBindingsKey)
+  localStorage.removeItem('x4_game_version')
+  await deleteCurrentArchiveDB(gameData)
+  await clearLegacySaveDB()
+  gameData.setVersion(gameData.currentVersion, false)
+}
+
+const handleMigrate = async () => {
+  terraformingStore.init()
+
+  const stableConfig = gameData.versionsConfig.find(v => v.version === gameData.currentVersion && !v.beta)
+  if (!stableConfig) return
+
+  const counts = checkStableCounts(stableConfig)
+  if (Object.values(counts.stable).some(c => c > 0)) {
+    migrateConfirmCounts.value = counts
+    migrateConfirmOpen.value = true
+    return
+  }
+
+  await doMigrate(stableConfig)
+}
+
+const checkStableCounts = (stableConfig: typeof gameData.versionsConfig[number]) => {
+  const moduleLabels: Record<string, string> = {
+    empire: t('moduleNames.sector'),
+    flow: t('moduleNames.flow'),
+    ship: t('moduleNames.ship'),
+    save_archives: t('moduleNames.save'),
+    save_bindings: t('moduleNames.save_binding'),
+    build_plan_goals: t('moduleNames.build_plan'),
+    terraforming: t('moduleNames.terraforming', 'Terraforming')
+  }
+
+  const beta: Record<string, number> = {}
+  const stable: Record<string, number> = {}
+
+  const countList = (key: string): number => {
+    try {
+      const raw = localStorage.getItem(key)
+      if (!raw) return 0
+      const parsed = JSON.parse(raw)
+      return Array.isArray(parsed?.list) ? parsed.list.length : 0
+    } catch { return 0 }
+  }
+
+  const stableKeys = stableConfig.storage_keys as Record<string, string>
+
+  for (const m of ['empire', 'logic_flow', 'ship_blueprints', 'save_archives', 'build_plan_goals', 'terraforming'] as const) {
+    const label = moduleLabels[m] || m
+    beta[label] = countList(gameData.getStorageKey(m))
+    stable[label] = countList(stableKeys[m] as string)
+  }
+
+  const betaSaveBindingsKey = gameData.getStorageKey('save_archives').replace('save_archives', 'save_bindings')
+  const stableSaveBindingsKey = stableConfig.storage_keys.save_archives.replace('save_archives', 'save_bindings')
+  const saveBindingsLabel = moduleLabels.save_bindings as string
+  beta[saveBindingsLabel] = countList(betaSaveBindingsKey)
+  stable[saveBindingsLabel] = countList(stableSaveBindingsKey)
+
+  return { beta, stable }
+}
+
+const confirmMigrate = async () => {
+  migrateConfirmOpen.value = false
+  const stableConfig = gameData.versionsConfig.find(v => v.version === gameData.currentVersion && !v.beta)
+  if (!stableConfig) return
+  try {
+    await doMigrate(stableConfig)
+  } catch (e) {
+    console.error('[VersionSettingsModal] migrate failed:', e)
+  }
+}
+
+const cancelMigrate = () => {
+  migrateConfirmOpen.value = false
+}
+
+const doMigrate = async (stableConfig: typeof gameData.versionsConfig[number]) => {
+  const basePayload = buildExportPayload(
+    blueprintStore.savedEmpires,
+    logicFlowStore.savedPlans,
+    shipBuildStore.savedBlueprints,
+    gameData,
+    saveBindingStore.savedBindings,
+    buildPlanStore.savedPlans,
+    terraformingStore.savedPlans
+  )
+
+  const saveExportData = await buildSaveExportData(saveStore.savedArchivesState, gameData)
+  const fullPayload = {
+    ...basePayload,
+    data: { ...basePayload.data, x4_save_archives: saveExportData }
+  }
+
+  const stableGameDataStore = {
+    modulesMap: gameData.modulesMap,
+    modulesByMacroId: gameData.modulesByMacroId,
+    maps: gameData.maps,
+    ships: gameData.ships,
+    equipments: gameData.equipments,
+    currentVersion: stableConfig.version,
+    isBeta: false,
+    getStorageKey: (module: string) => (stableConfig.storage_keys as Record<string, string>)[module] ?? `x4_${module}`,
+    getIndexedDBName: () => stableConfig.indexeddb_name ?? 'x4_save_archive_db'
+  }
+
+  const normalized = normalizeImportPayload(fullPayload)
+  const prepared = prepareImportPayload(normalized, stableGameDataStore, shipBuildStore)
+
+  await applyImportPayload({
+    mode: 'overwrite',
+    selectedModules: Object.fromEntries(prepared.moduleStats.map(s => [s.key, true])),
+    currentView: shipBuildStore.activeView,
+    payload: normalized,
+    preparedPayload: prepared,
+    gameDataStore: stableGameDataStore,
+    blueprintStore,
+    logicFlowStore,
+    shipBuildStore,
+    saveStore,
+    saveBindingStore,
+    buildPlanStore,
+    terraformingStore
+  })
+
+  for (const module of ['empire', 'logic_flow', 'ship_blueprints', 'setting', 'save_archives', 'build_plan_goals', 'terraforming'] as const) {
+    localStorage.removeItem(gameData.getStorageKey(module))
+  }
+  const betaSaveBindingsKey = gameData.getStorageKey('save_archives').replace('save_archives', 'save_bindings')
+  localStorage.removeItem(betaSaveBindingsKey)
+  localStorage.removeItem('x4_game_version')
+  await deleteCurrentArchiveDB(gameData)
+  await clearLegacySaveDB()
+  gameData.setVersion(gameData.currentVersion, false)
+}
+
 const handleBackdropClick = (event: MouseEvent) => {
   if (event.target === event.currentTarget) {
     handleClose()
@@ -345,6 +531,26 @@ const handleBackdropClick = (event: MouseEvent) => {
             {{ t('common.cancel') }}
           </button>
           <button
+            v-if="gameData.hasStableCounterpart"
+            v-tippy="{ content: t('settings.gameVersion.downloadAndCleanTooltip'), allowHTML: false, placement: 'top', theme: 'material' }"
+            type="button"
+            class="btn btn-amber"
+            data-testid="version-download-clean"
+            @click="handleDownloadAndClean"
+          >
+            {{ t('settings.gameVersion.downloadAndClean') }}
+          </button>
+          <button
+            v-if="gameData.hasStableCounterpart"
+            v-tippy="{ content: t('settings.gameVersion.migrateTooltip'), allowHTML: false, placement: 'top', theme: 'material' }"
+            type="button"
+            class="btn btn-amber"
+            data-testid="version-migrate"
+            @click="handleMigrate"
+          >
+            {{ t('settings.gameVersion.migrate') }}
+          </button>
+          <button
             v-if="!hasSelectedModules"
             type="button"
             class="btn btn-primary"
@@ -364,6 +570,37 @@ const handleBackdropClick = (event: MouseEvent) => {
           >
             {{ t('settings.gameVersion.saveAndSwitch') }}
           </button>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="migrateConfirmOpen" class="modal-backdrop" @click="cancelMigrate">
+      <div class="modal-content" @click.stop>
+        <div class="modal-header">
+          <h3 class="modal-title">{{ t('settings.gameVersion.migrateConfirmTitle') }}</h3>
+        </div>
+        <div class="modal-body">
+          <p class="mb-3 text-sm text-slate-300">{{ t('settings.gameVersion.migrateConfirmHint') }}</p>
+          <table class="migrate-counts-table">
+            <thead>
+              <tr>
+                <th></th>
+                <th>{{ t('settings.gameVersion.migrateBetaColumn') }}</th>
+                <th>{{ t('settings.gameVersion.migrateStableColumn') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(stableCount, label) in migrateConfirmCounts.stable" :key="label">
+                <td class="text-slate-300">{{ label }}</td>
+                <td>{{ migrateConfirmCounts.beta[label] || 0 }}</td>
+                <td>{{ stableCount }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" @click="cancelMigrate">{{ t('ui.cancel') }}</button>
+          <button class="btn btn-primary" @click="confirmMigrate">{{ t('settings.gameVersion.migrateConfirm') }}</button>
         </div>
       </div>
     </div>
@@ -465,5 +702,26 @@ const handleBackdropClick = (event: MouseEvent) => {
 
 .btn-primary:disabled {
   @apply cursor-not-allowed bg-slate-600 text-slate-300 hover:bg-slate-600;
+}
+
+.btn-amber {
+  @apply bg-amber-600 text-white hover:bg-amber-500;
+}
+
+.migrate-counts-table {
+  @apply w-full text-sm border-collapse;
+}
+
+.migrate-counts-table th,
+.migrate-counts-table td {
+  @apply px-3 py-1.5 text-left border-b border-slate-700;
+}
+
+.migrate-counts-table th {
+  @apply text-slate-400 font-medium text-xs uppercase;
+}
+
+.migrate-counts-table td {
+  @apply text-slate-200;
 }
 </style>

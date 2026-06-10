@@ -84,15 +84,16 @@ isBeta && versionsConfig 中存在 v.version === currentVersion && !v.beta
 
 `showVersionIndicator` 条件扩展为 `needsVersionSetup || hasStableCounterpart`，提示用户存在可迁移的 beta 数据。
 
-### 7.3 导出弹窗「下载并清理」
+### 7.3 版本选择弹窗迁移
 
-入口：`StorageExportWizard.vue` 底部，「下载」按钮左侧，仅 `hasStableCounterpart` 时显示。文案「下载并清理」，`v-tippy` tooltip 说明。打开弹窗时默认勾选存档 checkbox。
+入口：`VersionSettingsModal.vue`，「迁移」按钮，仅 `hasStableCounterpart` 时显示。
 
-流程：复用 `doExport()` 导出 → 逐 key 清除 localStorage（含 save_bindings 派生 key） → 清除 IndexedDB 表数据 → 删除当前版本 IndexedDB → 删除遗留 DB → `gameDataStore.setVersion(...)` 切换正式版并刷新。
+功能：导出 beta 全部数据 → 以覆盖模式导入正式版 → 清理 beta 数据 → 切换版本并刷新。正式版有数据时弹出确认框展示数量对比。
+
+详细设计见 `openspec/changes/game-version-migrate/design.md`。
 
 ### 7.4 版本选择弹窗迁移提示与过滤
 
-- `hasStableCounterpart` 时在 `dataIsolationHint` 下方显示琥珀色迁移提示。
+- `hasStableCounterpart` 时在 `dataIsolationHint` 下方显示琥珀色迁移提示和「迁移」按钮。
 - checkbox 重命名为 `showAllBeta`，默认值 `hasStableCounterpart`。
-- `filteredVersionOptions`：勾选显示全部；取消时仅隐藏有同名稳定版的 beta（`hasStableOption` 检查），无稳定版的独立 beta 始终显示。
-- 导出 payload 构建逻辑与 `handleDownload` 共用
+- `filteredVersionOptions`：勾选显示全部；取消时仅隐藏有同名稳定版的 beta，无稳定版的独立 beta 始终显示。

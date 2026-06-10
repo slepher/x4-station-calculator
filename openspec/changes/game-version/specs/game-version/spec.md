@@ -136,26 +136,12 @@ Store SHALL 提供 `hasStableCounterpart` computed，判断当前 beta 版本是
 **当** StationToolbar 渲染  
 **那么** 版本按钮 SHALL 显示红点
 
-#### Scenario: Export dialog shows Download & Clean button
-
-**前提** `hasStableCounterpart = true`  
-**当** 打开导出弹窗  
-**那么** 底部 SHALL 显示「下载并清理」按钮，位于「下载」按钮左侧  
-**并且** hover 时 SHALL 显示 tooltip 说明会清除数据并可导入正式版  
-**并且** 存档 checkbox SHALL 默认勾选
-
-#### Scenario: Download and Clean clears all beta storage
-
-**前提** 用户点击「下载并清理」  
-**当** 导出完成后  
-**那么** SHALL 依次清理：所有 localStorage keys / `x4_game_version` / IndexedDB 两张表 / 遗留 DB  
-**并且** SHALL 自动切换至对应正式版并刷新页面
-
-#### Scenario: Version settings modal shows migration hint
+#### Scenario: Version settings modal shows migration hint and button
 
 **前提** `hasStableCounterpart = true`  
 **当** 打开版本选择弹窗  
-**那么** SHALL 显示迁移提示，引导用户使用「下载并清理」后切换至正式版
+**那么** SHALL 显示迁移提示和「迁移」按钮  
+**并且** 点击后执行 beta → 正式版迁移（详见 game-version-migrate specification）
 
 #### Scenario: Show all beta checkbox filters only stable-counterpart betas
 

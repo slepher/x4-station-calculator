@@ -35,11 +35,10 @@
 
 - [x] 5.1 Store 新增 `hasStableCounterpart` computed。
 - [x] 5.2 StationToolbar 版本按钮红点条件加上 `hasStableCounterpart`。
-- [x] 5.3 `StorageExportWizard` 新增「下载并清理」按钮（`hasStableCounterpart` 时显示），hover tooltip + 默认勾选存档。
-- [x] 5.4 点击后导出 → 清理 localStorage / IndexedDB 表数据 / 删除 IndexedDB 数据库 / 遗留 DB → 自动切换至对应正式版并刷新页面。
-- [x] 5.5 `VersionSettingsModal`：`hasStableCounterpart` 时显示迁移提示。
-- [x] 5.6 `VersionSettingsModal`：checkbox 改为 `showAllBeta`，默认值 `hasStableCounterpart`，取消时仅隐藏有稳定版的 beta。
-- [x] 5.7 相关 i18n：`download_and_clean`、`download_and_clean_tooltip`、`betaMigrationHint`、`showAllBeta`。
+- [x] 5.3 `VersionSettingsModal`：`hasStableCounterpart` 时显示迁移提示和「迁移」按钮（迁移功能见 game-version-migrate）。
+- [x] 5.4 `VersionSettingsModal`：checkbox 改为 `showAllBeta`，默认值 `hasStableCounterpart`，取消时仅隐藏有稳定版的 beta。
+- [x] 5.5 相关 i18n：`betaMigrationHint`、`showAllBeta`。
+- [x] 5.6 `deleteCurrentArchiveDB` 用于迁移功能清理 IndexedDB。
 
 ## 6. 构建验证
 

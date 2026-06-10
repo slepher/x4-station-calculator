@@ -41,11 +41,9 @@
 
 - Store 新增 `hasStableCounterpart` computed：当前版本 `isBeta` 且 `versions.json` 中存在同 version 号的稳定版。
 - StationToolbar 版本按钮在 `hasStableCounterpart` 为 true 时显示红点。
-- 版本选择弹窗中 `hasStableCounterpart` 为 true 时，显示迁移提示文字。
-- 导出弹窗中 `hasStableCounterpart` 为 true 时：
-  - 「下载」按钮左侧显示「下载并清理」按钮，hover 显示 tooltip。
-  - 打开弹窗默认勾选存档 checkbox。
-  - 点击后导出并依次清理 localStorage keys、IndexedDB、遗留数据库，然后自动切换至对应正式版并刷新页面。
+- 版本选择弹窗中 `hasStableCounterpart` 为 true 时：
+  - 显示迁移提示文字
+  - 底部新增「下载并清理」和「迁移」按钮（详见 game-version-migrate）
 - 版本选择弹窗 checkbox 改为「显示全部测试版」（`showAllBeta`）：
   - 默认值改为 `hasStableCounterpart`。
   - 勾选时显示所有 beta；取消时仅隐藏存在同名稳定版的 beta。
