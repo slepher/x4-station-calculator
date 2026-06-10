@@ -299,7 +299,7 @@ function onBindMenuSelectSector(sectorMacro: string) {
     const sectorGraphData = buildSectorGraphFromMaps(gameDataStore.maps?.clusters || {}, gameDataStore.maps?.sectors || {})
     
     const sectorJumpMap = new Map<string, number>()
-    for (let jump = 1; jump <= draft.value.jumpRange; jump++) {
+    for (let jump = 0; jump <= draft.value.jumpRange; jump++) {
       const result = getCoverageSectors(sectorMacro, jump, sectorGraphData.sectorGraph, sectorGraphData.sectorClusterMap)
       for (const s of result) {
         if (s.sectorMacro !== sectorMacro && !sectorJumpMap.has(s.sectorMacro)) {
@@ -509,7 +509,7 @@ function updateDraftJumpRange(newValue: number, _oldValue?: number) {
   
   // 获取每个星区的实际跳数
   const sectorJumpMap = new Map<string, number>()
-  for (let jump = 1; jump <= Math.max(oldValue, newValue, 5); jump++) {
+  for (let jump = 0; jump <= Math.max(oldValue, newValue, 5); jump++) {
     const result = getCoverageSectors(anchorMacro, jump, sectorGraphData.sectorGraph, sectorGraphData.sectorClusterMap)
     for (const s of result) {
       if (s.sectorMacro !== anchorMacro && !sectorJumpMap.has(s.sectorMacro)) {
@@ -551,6 +551,10 @@ function getCoverageJumps() {
   return Array.from(new Set(draft.value.coverage.map((entry) => entry.jump))).sort((a, b) => a - b)
 }
 
+function getJumpRangeValues(jumpRange: number): number[] {
+  return Array.from({ length: jumpRange + 1 }, (_, i) => i)
+}
+
 function getCollapsedCoverageByJump(coverageEntries: CoverageSectorEntry[]): Map<number, string[]> {
   const result = new Map<number, string[]>()
 
@@ -574,7 +578,7 @@ function getCandidateSectorsAtJump(jump: number): string[] {
   const result = getCoverageSectors(anchorMacro, jump, sectorGraphData.sectorGraph, sectorGraphData.sectorClusterMap)
   
   // 获取前一跳的结果
-  const prevResult = jump > 1 
+  const prevResult = jump > 0 
     ? getCoverageSectors(anchorMacro, jump - 1, sectorGraphData.sectorGraph, sectorGraphData.sectorClusterMap)
     : []
   
@@ -592,7 +596,7 @@ function getCandidateSectorsAtJump(jump: number): string[] {
 
 function getCandidateJumps() {
   const jumps: number[] = []
-  for (let jump = 1; jump <= draft.value.jumpRange; jump++) {
+  for (let jump = 0; jump <= draft.value.jumpRange; jump++) {
     if (getCandidateSectorsAtJump(jump).length > 0) {
       jumps.push(jump)
     }
@@ -640,7 +644,7 @@ function getConnectedSectorCandidates() {
       const anchorMacro = sector.sectorMacro
       if (!anchorMacro) return null
       const jump = distanceMap.get(anchorMacro)
-      if (jump === undefined || jump <= 0 || jump > 5) return null
+      if (jump === undefined || jump > 5) return null
       return {
         sectorId: sector.id,
         name: sector.name,
@@ -969,7 +973,7 @@ watch(() => draft.value.sectorGroupId, async (sectorId) => {
               </span>
             </div>
             <div
-              v-for="jump in sector.jumpRange"
+              v-for="jump in getJumpRangeValues(sector.jumpRange)"
               :key="jump"
               class="collapsed-pill-row"
             >
