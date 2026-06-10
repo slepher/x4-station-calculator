@@ -17,6 +17,7 @@ import {
   triggerJsonDownload,
   type ImportModuleKey
 } from '@/store/logic/importExport'
+import { clearLegacySaveDB, deleteCurrentArchiveDB } from '@/db/saveArchiveDB'
 
 const props = defineProps<{
   isOpen: boolean
@@ -103,8 +104,8 @@ watch(
   async (open) => {
     if (!open) return
     exportFileName.value = buildDefaultFileName()
-    includeSaveArchives.value = false
-    
+    includeSaveArchives.value = gameDataStore.hasStableCounterpart
+
     const basePayload = buildExportPayload(
       blueprintStore.savedEmpires,
       logicFlowStore.savedPlans,
@@ -126,6 +127,8 @@ watch(
     moduleStats.value = getModuleImportStats(normalizeImportPayload(statsPayload))
   }
 )
+
+const isBeta = computed(() => gameDataStore.hasStableCounterpart)
 
 const moduleTitle = (key: ImportModuleKey) => {
   switch (key) {
@@ -156,47 +159,50 @@ const moduleDescription = (key: ImportModuleKey) => {
 }
 
 const handleDownload = async () => {
+  await doExport()
+  emit('close')
+}
+
+const handleDownloadAndClean = async () => {
+  await doExport()
+  for (const module of ['empire', 'logic_flow', 'ship_blueprints', 'setting', 'save_archives', 'build_plan_goals', 'terraforming'] as const) {
+    localStorage.removeItem(gameDataStore.getStorageKey(module))
+  }
+  const saveBindingsKey = gameDataStore.getStorageKey('save_archives').replace('save_archives', 'save_bindings')
+  localStorage.removeItem(saveBindingsKey)
+  localStorage.removeItem('x4_game_version')
+  await deleteCurrentArchiveDB(gameDataStore)
+  await clearLegacySaveDB()
+  gameDataStore.setVersion(gameDataStore.currentVersion, false)
+}
+
+const doExport = async () => {
   const raw = exportFileName.value.trim()
   const withExt = raw ? (raw.endsWith('.json') ? raw : `${raw}.json`) : buildDefaultFileName()
   
-  if (includeSaveArchives.value) {
-    const basePayload = buildExportPayload(
-      blueprintStore.savedEmpires,
-      logicFlowStore.savedPlans,
-      shipBuildStore.savedBlueprints,
-      gameDataStore,
-      saveBindingStore.savedBindings,
-      buildPlanStore.savedPlans,
-      terraformingStore.savedPlans
-    )
+  const basePayload = buildExportPayload(
+    blueprintStore.savedEmpires,
+    logicFlowStore.savedPlans,
+    shipBuildStore.savedBlueprints,
+    gameDataStore,
+    saveBindingStore.savedBindings,
+    buildPlanStore.savedPlans,
+    terraformingStore.savedPlans
+  )
 
-    if (saveStore.savedArchivesState.list.length > 0) {
-      const saveExportData = await buildSaveExportData(saveStore.savedArchivesState, gameDataStore)
-      const payload = {
-        ...basePayload,
-        data: {
-          ...basePayload.data,
-          x4_save_archives: saveExportData
-        }
+  if (includeSaveArchives.value && saveStore.savedArchivesState.list.length > 0) {
+    const saveExportData = await buildSaveExportData(saveStore.savedArchivesState, gameDataStore)
+    const payload = {
+      ...basePayload,
+      data: {
+        ...basePayload.data,
+        x4_save_archives: saveExportData
       }
-      triggerJsonDownload(withExt, payload)
-    } else {
-      triggerJsonDownload(withExt, basePayload)
     }
+    triggerJsonDownload(withExt, payload)
   } else {
-    const basePayload = buildExportPayload(
-      blueprintStore.savedEmpires,
-      logicFlowStore.savedPlans,
-      shipBuildStore.savedBlueprints,
-      gameDataStore,
-      saveBindingStore.savedBindings,
-      buildPlanStore.savedPlans,
-      terraformingStore.savedPlans
-    )
     triggerJsonDownload(withExt, basePayload)
   }
-
-  emit('close')
 }
 </script>
 
@@ -254,6 +260,20 @@ const handleDownload = async () => {
       <div class="px-6 py-4 border-t border-slate-700 bg-slate-900/30 flex justify-end gap-3">
         <button class="px-4 py-2 rounded text-sm font-bold bg-slate-600 hover:bg-slate-500 text-white transition" @click="emit('close')">
           {{ t('ui.cancel') }}
+        </button>
+        <button
+          v-if="isBeta"
+          v-tippy="{ content: t('importExport.download_and_clean_tooltip'), allowHTML: false, placement: 'top', theme: 'material' }"
+          class="px-5 py-2 rounded text-sm font-bold bg-amber-600 hover:bg-amber-500 text-white transition inline-flex items-center gap-2"
+          data-testid="storage-export-clean-btn"
+          @click="handleDownloadAndClean"
+        >
+          <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3v12" />
+            <path d="m7 10 5 5 5-5" />
+            <path d="M4 19h16" />
+          </svg>
+          <span>{{ t('importExport.download_and_clean') }}</span>
         </button>
         <button
           class="px-5 py-2 rounded text-sm font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition inline-flex items-center gap-2"

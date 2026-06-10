@@ -69,3 +69,30 @@ gameData → activeView.init() → save/binding → blueprint/live
 - 不自动迁移 `_v9_beta` 数据到 `_v9`。
 - 不改资源 JSON/XML 内容。
 - 不把资源处理脚本改成读取 `src/assets/versions.json`。
+
+## 7. Beta 迁移引导
+
+### 7.1 hasStableCounterpart
+
+Store 新增 computed `hasStableCounterpart`：
+```
+isBeta && versionsConfig 中存在 v.version === currentVersion && !v.beta
+```
+仅当当前 beta 版本有对应正式版时才为 true，作为后续所有迁移引导功能的统一条件。
+
+### 7.2 StationToolbar 红点
+
+`showVersionIndicator` 条件扩展为 `needsVersionSetup || hasStableCounterpart`，提示用户存在可迁移的 beta 数据。
+
+### 7.3 导出弹窗「下载并清理」
+
+入口：`StorageExportWizard.vue` 底部，「下载」按钮左侧，仅 `hasStableCounterpart` 时显示。文案「下载并清理」，`v-tippy` tooltip 说明。打开弹窗时默认勾选存档 checkbox。
+
+流程：复用 `doExport()` 导出 → 逐 key 清除 localStorage（含 save_bindings 派生 key） → 清除 IndexedDB 表数据 → 删除当前版本 IndexedDB → 删除遗留 DB → `gameDataStore.setVersion(...)` 切换正式版并刷新。
+
+### 7.4 版本选择弹窗迁移提示与过滤
+
+- `hasStableCounterpart` 时在 `dataIsolationHint` 下方显示琥珀色迁移提示。
+- checkbox 重命名为 `showAllBeta`，默认值 `hasStableCounterpart`。
+- `filteredVersionOptions`：勾选显示全部；取消时仅隐藏有同名稳定版的 beta（`hasStableOption` 检查），无稳定版的独立 beta 始终显示。
+- 导出 payload 构建逻辑与 `handleDownload` 共用

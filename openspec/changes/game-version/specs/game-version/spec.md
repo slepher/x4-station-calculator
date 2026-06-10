@@ -108,3 +108,59 @@
 **当** 用户取消勾选  
 **那么** beta 版本 SHALL 从列表中移除  
 **并且** 选中 SHALL 自动切到第一个稳定版
+
+## ADDED Requirements
+
+### Requirement: Stable Counterpart Detection
+
+Store SHALL 提供 `hasStableCounterpart` computed，判断当前 beta 版本是否存在同名稳定版。
+
+#### Scenario: hasStableCounterpart true when stable exists
+
+**前提** 当前版本为 `beta = true`  
+**并且** `versions.json` 中存在同 `version` 的 `beta = false` 条目  
+**那么** `hasStableCounterpart` SHALL 为 `true`
+
+#### Scenario: hasStableCounterpart false for standalone beta or stable
+
+**前提** 当前版本为 `beta = false`，或不存在同 version 的稳定版  
+**那么** `hasStableCounterpart` SHALL 为 `false`
+
+### Requirement: Beta Migration Guidance
+
+当 `hasStableCounterpart` 为 true 时，系统 SHALL 在多处引导用户迁移至正式版。
+
+#### Scenario: StationToolbar shows red dot indicator
+
+**前提** `hasStableCounterpart = true`  
+**当** StationToolbar 渲染  
+**那么** 版本按钮 SHALL 显示红点
+
+#### Scenario: Export dialog shows Download & Clean button
+
+**前提** `hasStableCounterpart = true`  
+**当** 打开导出弹窗  
+**那么** 底部 SHALL 显示「下载并清理」按钮，位于「下载」按钮左侧  
+**并且** hover 时 SHALL 显示 tooltip 说明会清除数据并可导入正式版  
+**并且** 存档 checkbox SHALL 默认勾选
+
+#### Scenario: Download and Clean clears all beta storage
+
+**前提** 用户点击「下载并清理」  
+**当** 导出完成后  
+**那么** SHALL 依次清理：所有 localStorage keys / `x4_game_version` / IndexedDB 两张表 / 遗留 DB  
+**并且** SHALL 自动切换至对应正式版并刷新页面
+
+#### Scenario: Version settings modal shows migration hint
+
+**前提** `hasStableCounterpart = true`  
+**当** 打开版本选择弹窗  
+**那么** SHALL 显示迁移提示，引导用户使用「下载并清理」后切换至正式版
+
+#### Scenario: Show all beta checkbox filters only stable-counterpart betas
+
+**前提** 打开版本选择弹窗  
+**当** `showAllBeta` checkbox 取消勾选  
+**那么** SHALL 隐藏存在同名稳定版的 beta  
+**并且** 无稳定版的独立 beta SHALL 始终显示  
+**并且** checkbox 默认值 SHALL 为 `hasStableCounterpart`

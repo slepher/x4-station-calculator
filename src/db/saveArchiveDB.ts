@@ -174,6 +174,12 @@ export async function clearArchivesFromDB(gameDataStore: GameDataStoreLike): Pro
   await db.player_stations.clear()
 }
 
+export async function deleteCurrentArchiveDB(gameDataStore: GameDataStoreLike): Promise<void> {
+  const dbName = getDBName(gameDataStore)
+  dbCache.delete(dbName)
+  await Dexie.delete(dbName)
+}
+
 export async function clearLegacySaveDB(): Promise<void> {
   dbCache.clear()
   await Dexie.delete('X4SaveArchiveDB')

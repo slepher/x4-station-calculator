@@ -859,6 +859,7 @@
       "title": "游戏版本",
       "select": "选择游戏数据版本",
       "dataIsolationHint": "版本之间数据不互通，如需迁移数据请使用导入导出功能。",
+      "betaMigrationHint": "当前为测试版本。如需迁移至正式版，请先在导出弹窗中使用「下载并清理」，然后切换到正式版并导入文件。",
       "save": "保存",
       "switch": "切换",
       "saveAndSwitch": "保存并切换",
@@ -869,7 +870,8 @@
       "moduleLogicFlow": "流程",
       "moduleShipBlueprints": "舰船",
       "moduleNameLabel": "名称",
-      "showBeta": "显示 beta 版本"
+      "showBeta": "显示 beta 版本",
+      "showAllBeta": "显示全部测试版"
     },
     "dlc": {
       "title": "DLC 设定",
@@ -966,7 +968,8 @@
     "ship": "舰船",
     "save": "存档",
     "save_binding": "存档绑定",
-    "build_plan": "建造方案"
+    "build_plan": "建造方案",
+    "terraforming": "地球化"
   },
   "production": {
     "source_empire": "帝国",
@@ -979,6 +982,9 @@
   "importExport": {
     "title": "导入数据",
     "export_title": "导出数据",
+    "export_and_clean": "下载并清理",
+    "download_and_clean": "下载并清理",
+    "download_and_clean_tooltip": "下载当前数据后清除所有 beta 版本地存储。清除后可将下载的文件导入到正式版中继续使用。",
     "export_filename": "导出文件名",
     "file_game_version": "文件游戏版本",
     "current_game_version": "当前游戏版本",

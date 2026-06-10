@@ -40,7 +40,7 @@ type DirtyModuleOption = {
 }
 
 const selectedVersionKey = ref('')
-const showBeta = ref(gameData.isBeta)
+const showAllBeta = ref(gameData.hasStableCounterpart)
 const selectedModuleKeys = ref<DirtyModuleKey[]>([])
 const moduleNames = ref<Record<DirtyModuleKey, string>>({
   empire: '',
@@ -50,8 +50,13 @@ const moduleNames = ref<Record<DirtyModuleKey, string>>({
 
 const versionOptions = computed<VersionOption[]>(() => gameData.versionOptions)
 
+const hasStableOption = (option: VersionOption) =>
+  option.beta && versionOptions.value.some(o => o.version === option.version && !o.beta)
+
 const filteredVersionOptions = computed<VersionOption[]>(() =>
-  showBeta.value ? versionOptions.value : versionOptions.value.filter(o => !o.beta)
+  showAllBeta.value
+    ? versionOptions.value
+    : versionOptions.value.filter(o => !o.beta || !hasStableOption(o))
 )
 
 const toVersionKey = (option: Pick<VersionOption, 'version' | 'beta'>) =>
@@ -145,7 +150,7 @@ watch(() => props.visible, (visible) => {
   }
 }, { immediate: true })
 
-watch(showBeta, (show) => {
+watch(showAllBeta, (show) => {
   if (!show && !selectedOption.value) {
     const firstStable = filteredVersionOptions.value[0]
     if (firstStable) {
@@ -260,13 +265,19 @@ const handleBackdropClick = (event: MouseEvent) => {
           </select>
           <label class="hide-beta-check">
             <input
-              v-model="showBeta"
+              v-model="showAllBeta"
               type="checkbox"
               data-testid="hide-beta-checkbox"
             >
-            <span>{{ t('settings.gameVersion.showBeta') }}</span>
+            <span>{{ t('settings.gameVersion.showAllBeta') }}</span>
           </label>
           <p class="data-isolation-hint">{{ t('settings.gameVersion.dataIsolationHint') }}</p>
+          <p
+            v-if="gameData.hasStableCounterpart"
+            class="beta-migration-hint"
+          >
+            {{ t('settings.gameVersion.betaMigrationHint') }}
+          </p>
 
           <div
             v-if="shouldShowDirtyModules"
@@ -394,6 +405,10 @@ const handleBackdropClick = (event: MouseEvent) => {
 
 .data-isolation-hint {
   @apply mt-2 text-xs text-slate-400;
+}
+
+.beta-migration-hint {
+  @apply mt-2 text-xs text-amber-300;
 }
 
 .hide-beta-check {

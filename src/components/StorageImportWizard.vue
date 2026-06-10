@@ -198,7 +198,7 @@ const handleApplyImport = async () => {
   }
 
   statusStore.pushMessage('success', 'system', t('importExport.import_success', { count: result.applied.length }))
-  emit('close')
+  window.location.reload()
 }
 
 </script>

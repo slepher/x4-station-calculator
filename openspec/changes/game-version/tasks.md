@@ -31,7 +31,17 @@
 - [x] 4.3 `useActiveViewStore` 新增 `init()`，状态初始化为 `DEFAULT_STATE`。
 - [x] 4.4 `App.vue` 初始化链中接入 `activeViewStore.init()`（gameData 后）和 `buildPlanStore.init()`（logicFlow 后）。
 
-## 5. 构建验证
+## 5. Beta 迁移引导
 
-- [x] 5.1 运行 `npm run build`。
-- [x] 5.2 如果 build 出现编译错误，修复代码并重复运行，直到通过或记录明确 blocker。
+- [x] 5.1 Store 新增 `hasStableCounterpart` computed。
+- [x] 5.2 StationToolbar 版本按钮红点条件加上 `hasStableCounterpart`。
+- [x] 5.3 `StorageExportWizard` 新增「下载并清理」按钮（`hasStableCounterpart` 时显示），hover tooltip + 默认勾选存档。
+- [x] 5.4 点击后导出 → 清理 localStorage / IndexedDB 表数据 / 删除 IndexedDB 数据库 / 遗留 DB → 自动切换至对应正式版并刷新页面。
+- [x] 5.5 `VersionSettingsModal`：`hasStableCounterpart` 时显示迁移提示。
+- [x] 5.6 `VersionSettingsModal`：checkbox 改为 `showAllBeta`，默认值 `hasStableCounterpart`，取消时仅隐藏有稳定版的 beta。
+- [x] 5.7 相关 i18n：`download_and_clean`、`download_and_clean_tooltip`、`betaMigrationHint`、`showAllBeta`。
+
+## 6. 构建验证
+
+- [x] 6.1 运行 `npm run build`。
+- [x] 6.2 如果 build 出现编译错误，修复代码并重复运行，直到通过或记录明确 blocker。

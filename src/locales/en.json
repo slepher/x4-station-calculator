@@ -858,6 +858,7 @@
       "title": "Game Version",
       "select": "Select game data version",
       "dataIsolationHint": "Data is not shared between versions. Use import/export to transfer data.",
+      "betaMigrationHint": "You are on a beta version. To migrate to stable: use \"Download & Clean\" in the export dialog, then switch to the stable version and import the file.",
       "save": "Save",
       "switch": "Switch",
       "saveAndSwitch": "Save and Switch",
@@ -868,7 +869,8 @@
       "moduleLogicFlow": "Flow",
       "moduleShipBlueprints": "Ship",
       "moduleNameLabel": "Name",
-      "showBeta": "Show beta versions"
+      "showBeta": "Show beta versions",
+      "showAllBeta": "Show all beta"
     },
     "dlc": {
       "title": "DLC Settings",
@@ -965,7 +967,8 @@
     "ship": "Ship",
     "save": "Save Archive",
     "save_binding": "Save Binding",
-    "build_plan": "Build Plan"
+    "build_plan": "Build Plan",
+    "terraforming": "Terraforming"
   },
   "production": {
     "source_empire": "Empire",
@@ -978,6 +981,9 @@
   "importExport": {
     "title": "Import Data",
     "export_title": "Export Data",
+    "export_and_clean": "Download & Clean",
+    "download_and_clean": "Download & Clean",
+    "download_and_clean_tooltip": "Download current data and then clear all beta local storage. After clearing, you can import the downloaded file into the stable version to continue using.",
     "export_filename": "File Name",
     "file_game_version": "File Game Version",
     "current_game_version": "Current Game Version",

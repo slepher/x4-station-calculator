@@ -172,6 +172,12 @@ export const useGameDataStore = defineStore('gameData', () => {
 
   const needsVersionSetup = computed(() => !hasStoredVersion.value)
 
+  const hasStableCounterpart = computed(() => {
+    if (!isBeta.value) return false
+    const stableOption = versionsConfig.value.find(v => v.version === currentVersion.value && !v.beta)
+    return !!stableOption
+  })
+
   const filteredModulesGrouped = computed<ModuleGroupResult[]>(() => {
     return generateFilteredModulesGrouped(
       searchQuery.value,
@@ -553,6 +559,7 @@ export const useGameDataStore = defineStore('gameData', () => {
     displayFullVersion,
     versionOptions,
     needsVersionSetup,
+    hasStableCounterpart,
     persistVersionSelection,
     // Core state
     isReady,

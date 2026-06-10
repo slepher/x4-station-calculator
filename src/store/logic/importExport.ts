@@ -15,7 +15,8 @@ import type {
   X4Equipment,
   X4Map,
   SavedSaveBindingsState,
-  SavedTerraformingState
+  SavedTerraformingState,
+  TerraformingPlan
 } from '@/types/x4'
 import type { SavedBuildPlanGoalsState } from '@/types/build-plan'
 import type {
@@ -1388,7 +1389,20 @@ function applySaveBindingImport(options: ImportApplyOptions, warnings: string[])
   if (!bindingData) return false
 
   if (options.saveBindingStore) {
-    options.saveBindingStore.loadData(bindingData)
+    if (options.mode === 'overwrite') {
+      options.saveBindingStore.loadData(bindingData)
+    } else {
+      const current = options.saveBindingStore.savedBindings
+      const existingMap = new Map(current.list.map(b => [b.gameGuid, b]))
+      for (const item of bindingData.list) {
+        existingMap.set(item.gameGuid, item)
+      }
+      const merged: SavedSaveBindingsState = {
+        version: bindingData.version,
+        list: Array.from(existingMap.values())
+      }
+      options.saveBindingStore.loadData(merged)
+    }
     return true
   }
 
@@ -1458,14 +1472,18 @@ function applyTerraformingImport(options: ImportApplyOptions, _warnings: string[
   } else {
     if (options.terraformingStore) {
       const current = deepClone(options.terraformingStore.savedPlans)
-      const remappedList = next.list.map(plan => ({
-        ...deepClone(plan),
-        id: `tp-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
-      }))
+      const existingMap = new Map<string, TerraformingPlan>()
+      for (const plan of current.list) {
+        existingMap.set(`${plan.mode}:${plan.planId}`, plan)
+      }
+      for (const plan of next.list) {
+        const key = `${plan.mode}:${plan.planId}`
+        existingMap.set(key, { ...deepClone(plan), id: existingMap.get(key)?.id ?? plan.id })
+      }
       const merged: SavedTerraformingState = {
         version: next.version,
         activeId: current.activeId,
-        list: [...current.list, ...remappedList]
+        list: Array.from(existingMap.values())
       }
       persistModule(TERRAFORMING_KEY, merged, options.gameDataStore)
     } else {
