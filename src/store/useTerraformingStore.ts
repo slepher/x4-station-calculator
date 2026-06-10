@@ -140,6 +140,15 @@ export const useTerraformingStore = defineStore('terraforming', () => {
     return createPlan(mode, planId)
   }
 
+  function selectCluster(clusterId: string): void {
+    if (!activePlan.value) {
+      createPlan('blueprint', '__default__')
+    }
+    if (!activePlan.value) return
+    activePlan.value.selectedClusterId = clusterId
+    saveToStorage()
+  }
+
   function createPlan(mode: 'live' | 'blueprint', planId: string): string {
     const id = `tp-${Date.now()}`
     const plan: TerraformingPlan = {
@@ -184,12 +193,6 @@ export const useTerraformingStore = defineStore('terraforming', () => {
       [clusterId]: log,
     }
     syncExecutionLogToPlan()
-    saveToStorage()
-  }
-
-  function selectCluster(clusterId: string): void {
-    if (!activePlan.value) return
-    activePlan.value.selectedClusterId = clusterId
     saveToStorage()
   }
 
@@ -556,9 +559,9 @@ export const useTerraformingStore = defineStore('terraforming', () => {
     const stored = loadFromStorage()
     if (stored) {
       savedPlans.value = stored
+      hydrateExecutionLogs()
+      saveToStorage()
     }
-    hydrateExecutionLogs()
-    saveToStorage()
   }
 
   return {

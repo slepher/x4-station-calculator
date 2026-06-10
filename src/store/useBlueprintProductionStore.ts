@@ -613,10 +613,7 @@ function updateStationModules(stationId: string, modules: SavedModule[]) {
     savedEmpires.value = migrated.state
 
     if (migrated.state.list.length === 0) {
-      const defaultEmpire = createDefaultEmpire('')
-      savedEmpires.value.list.push(defaultEmpire)
-      savedEmpires.value.activeId = defaultEmpire.id
-      activeEmpire.value = JSON.parse(JSON.stringify(defaultEmpire))
+      activeEmpire.value = null
       activeStationId.value = null
       takeSnapshot()
       return
@@ -683,10 +680,11 @@ function updateStationModules(stationId: string, modules: SavedModule[]) {
     const empire = createDefaultEmpire(name)
     activeEmpire.value = empire
     savedEmpires.value.activeId = null
-    const defaultStationName = stationName ?? i18n.global.t('sector.new_station_name')
-    const station = createStation(defaultStationName, 'industrial', true)
-    if (station) {
-      initializeAllStationDerived()
+    if (stationName) {
+      const station = createStation(stationName, 'industrial', true)
+      if (station) {
+        initializeAllStationDerived()
+      }
     }
     takeSnapshot()
     return empire
@@ -773,7 +771,6 @@ function updateStationModules(stationId: string, modules: SavedModule[]) {
         activeViewStore.activeEmpireId = activeEmpire.value?.id || null
       }
       isReady.value = true
-      console.log('[BlueprintProductionStore] Initialized with new empire')
 
     } catch (e) {
       console.error('[BlueprintProductionStore] Initialization failed:', e)
