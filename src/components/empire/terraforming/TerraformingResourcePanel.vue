@@ -345,16 +345,6 @@ function getWareSubmitted(entry: CurrentQueueTimelineEntry, wareId: string): num
   return (entry as any).archiveSubmittedWares?.find((w: any) => w.ware === wareId)?.amount ?? 0
 }
 
-function getWareRemaining(entry: CurrentQueueTimelineEntry | TerraformingExecutionTimelineEntry, wareId: string): number {
-  const qty = entry.wares.find(w => w.ware === wareId)?.actualAmount
-    ?? entry.wares.find(w => w.ware === wareId)?.amount
-    ?? 0
-  const dw = getDiscountedWaresMap(entry as TerraformingExecutionTimelineEntry).get(wareId)
-  const sub = getWareSubmitted(entry as CurrentQueueTimelineEntry, wareId)
-  const afterDiscount = dw ? dw.final : qty
-  return afterDiscount - sub
-}
-
 function getWareQtyTooltip(entry: TerraformingExecutionTimelineEntry, wareId: string): string {
   const dw = getDiscountedWaresMap(entry).get(wareId)
   if (!dw || dw.discount <= 0) return ''

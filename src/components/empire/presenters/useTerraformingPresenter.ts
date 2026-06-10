@@ -3178,6 +3178,7 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
       clusterRewardDisplays,
       isLiveMode: store.terraformingIsLiveMode,
       playerRelations: store.terraformingPlayerRelations,
+      floating: false as const,
     },
     taskList: {
       taskTree,
