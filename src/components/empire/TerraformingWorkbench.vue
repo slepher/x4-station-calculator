@@ -7,6 +7,12 @@ import TerraformingSectorPanel from '@/components/empire/terraforming/Terraformi
 import TerraformingTaskList from '@/components/empire/terraforming/TerraformingTaskList.vue'
 import TerraformingResourcePanel from '@/components/empire/terraforming/TerraformingResourcePanel.vue'
 
+const props = withDefaults(defineProps<{
+  playerRelations?: Record<string, number>
+}>(), {
+  playerRelations: () => ({}),
+})
+
 const terraformingStore = useTerraformingStore()
 const gameDataStore = useGameDataStore()
 
@@ -86,6 +92,7 @@ const terraformingPresenter = useTerraformingPresenter({
     }
     return map
   }),
+  terraformingPlayerRelations: computed(() => props.playerRelations ?? {}),
 })
 
 const isQueueEditing = computed(() => terraformingPresenter.props.resourcePanel.queueEditState.editing.value)
@@ -118,6 +125,8 @@ function toggleStatFilter(statId: string) {
         :stat-display-names="terraformingPresenter.props.sectorPanel.statDisplayNames.value"
         :active-rebates="terraformingPresenter.props.sectorPanel.activeRebates.value"
         :cluster-reward-displays="terraformingPresenter.props.sectorPanel.clusterRewardDisplays.value"
+        :is-live-mode="terraformingPresenter.props.sectorPanel.isLiveMode.value"
+        :player-relations="terraformingPresenter.props.sectorPanel.playerRelations.value"
         :floating="terraformingFloating.sectorPanel"
         @click-stat="toggleStatFilter"
         @select-cluster="terraformingPresenter.emits.selectCluster"

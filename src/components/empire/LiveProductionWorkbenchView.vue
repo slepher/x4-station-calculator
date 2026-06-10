@@ -132,6 +132,7 @@ const terraformingPresenter = useTerraformingPresenter({
     }
     return map
   }),
+  terraformingPlayerRelations: computed(() => playerBindingData.value?.relations ?? {}),
 })
 
 const showArchiveModuleList = computed(() => {
@@ -262,7 +263,7 @@ const showArchiveModuleList = computed(() => {
     @close="toolbarPresenter.emits.closeImport"
   />
 
-  <TerraformingWorkbench v-if="toolbarPresenter.props.workbenchMode.value === 'terraforming'" />
+  <TerraformingWorkbench v-if="toolbarPresenter.props.workbenchMode.value === 'terraforming'" :player-relations="playerBindingData?.relations ?? {}" />
 
   <div v-else-if="toolbarPresenter.props.workbenchMode.value === 'tech-tree'" class="">
     <TechTreePlaceholder />

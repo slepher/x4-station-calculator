@@ -27,6 +27,8 @@ interface Props {
   statDisplayNames: Map<string, string>
   activeRebates: string[]
   clusterRewardDisplays: TerraformingRewardDisplayItem[]
+  isLiveMode: boolean
+  playerRelations: Record<string, number>
   floating: boolean
 }
 
@@ -85,6 +87,11 @@ function getActionLabel(action: string): string {
         >
           <span class="reward-milestone">{{ rw.milestone }}</span>
           <span class="reward-text">{{ rw.text }}</span>
+          <span
+            v-if="rw.tooltip"
+            v-tippy="{ content: rw.tooltip, allowHTML: true, placement: 'top', theme: 'material', maxWidth: 380 }"
+            class="reward-info-icon"
+          >ⓘ</span>
         </div>
       </div>
 
@@ -216,5 +223,9 @@ function getActionLabel(action: string): string {
 
 .reward-text {
   @apply text-slate-300;
+}
+
+.reward-info-icon {
+  @apply text-sky-400 cursor-help text-xs leading-none flex-shrink-0;
 }
 </style>

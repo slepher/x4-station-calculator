@@ -41,6 +41,7 @@ import type { SavedModule, X4MapCluster, X4MapSector, X4Module, TerraformingExec
 import i18n from '@/i18n'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useX4I18n } from '@/utils/UseX4I18n'
+import { rawToDisplayRelation, formatDisplayRelation } from '@/utils/reputation'
 
 export interface TerraformingToolbarProps {
   hqStationName: ComputedRef<string>
@@ -57,6 +58,7 @@ export interface TerraformingToolbarProps {
 export interface TerraformingRewardDisplayItem {
   milestone: string
   text: string
+  tooltip?: string
 }
 
 export interface TerraformingSectorPanelProps {
@@ -76,6 +78,9 @@ export interface TerraformingSectorPanelProps {
   statDisplayNames: ComputedRef<Map<string, string>>
   activeRebates: ComputedRef<string[]>
   clusterRewardDisplays: ComputedRef<TerraformingRewardDisplayItem[]>
+  isLiveMode: ComputedRef<boolean>
+  playerRelations: ComputedRef<Record<string, number>>
+  floating: boolean
 }
 
 export interface TerraformingScaleRange {
@@ -430,6 +435,7 @@ export interface TerraformingPresenterStore {
   wareNames: ComputedRef<Map<string, string>>
   moduleGroupNames: ComputedRef<Map<string, string>>
   wareGroupMap: ComputedRef<Map<string, string>>
+  terraformingPlayerRelations: ComputedRef<Record<string, number>>
 }
 
 function stripMacroPrefix(macro: string): string {
@@ -1408,6 +1414,40 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
     }
 
     const gameData = useGameDataStore()
+    const isLive = store.terraformingIsLiveMode.value
+    const playerRelations = store.terraformingPlayerRelations.value ?? {}
+
+    const REP_DESC = '游戏内部声望数据存储范围为 -1.0 ~ 1.0，<br/>UI 显示时映射为 -30 ~ 30，采用非线性映射。'
+
+
+    function buildRepTooltip(factionId: string, factionName: string, value: number): string {
+      const sign = value >= 0 ? '+' : ''
+
+      if (!isLive || playerRelations[factionId] == null) {
+        const v01 = rawToDisplayRelation(0.01)
+        const v10 = rawToDisplayRelation(0.10)
+        return [
+          REP_DESC,
+          '',
+          `提升前&emsp;&emsp;&emsp;&ensp;→ 提升后（内部 ${sign}${value}）`,
+          `&ensp;&ensp;0 (0.00)&emsp;&nbsp;→ ${formatDisplayRelation(value)} (${sign}${value.toFixed(2)})`,
+          `+${v01} (0.01)&emsp;→ ${formatDisplayRelation(0.01 + value)} (${sign}${(0.01 + value).toFixed(2)})`,
+          `+${v10} (0.10)&emsp;→ ${formatDisplayRelation(0.10 + value)} (${sign}${(0.10 + value).toFixed(2)})`,
+        ].join('<br/>')
+      }
+
+      const currentRaw = playerRelations[factionId]
+      const afterRaw = currentRaw + value
+      const currentDisplay = formatDisplayRelation(currentRaw)
+      const afterDisplay = formatDisplayRelation(afterRaw)
+      return [
+        REP_DESC,
+        '',
+        factionName,
+        `&emsp;当前声望：${currentDisplay}（内部值 ${currentRaw}）`,
+        `&emsp;奖励后：${afterDisplay}（内部值 ${afterRaw.toFixed(4)}）`,
+      ].join('<br/>')
+    }
 
     for (const fr of cluster.factionRewards ?? []) {
       const factionName = _factionDisplayName(fr.faction)
@@ -1416,7 +1456,8 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
         rewards.push({ milestone: label, text: `${factionName} ${vI18nLookup('terraforming.reward.factionUnlock')}` })
       } else {
         const sign = (fr.value ?? 0) >= 0 ? '+' : ''
-        rewards.push({ milestone: label, text: `${factionName} ${vI18nLookup('terraforming.reward.factionAdd') || 'rep'} ${sign}${fr.value}` })
+        const tooltip = buildRepTooltip(fr.faction, factionName, fr.value ?? 0)
+        rewards.push({ milestone: label, text: `${factionName} ${vI18nLookup('terraforming.reward.factionAdd') || 'rep'} ${sign}${fr.value}`, tooltip })
       }
     }
 
@@ -3138,6 +3179,8 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
       statDisplayNames,
       activeRebates,
       clusterRewardDisplays,
+      isLiveMode: store.terraformingIsLiveMode,
+      playerRelations: store.terraformingPlayerRelations,
     },
     taskList: {
       taskTree,

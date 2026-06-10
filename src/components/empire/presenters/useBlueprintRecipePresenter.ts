@@ -1,6 +1,7 @@
 import { computed, ref, type Ref, type ComputedRef } from 'vue'
 import i18n from '@/i18n'
 import type { BlueprintsData, X4Blueprint, BlueprintTypeCategory, BlueprintClassCategory, X4Faction } from '@/types/x4'
+import { rawToDisplayRelationOrNull, formatDisplayRelation } from '@/utils/reputation'
 
 const GENERIC_FACTION_ID = '__generic__'
 
@@ -24,16 +25,11 @@ export interface FactionLicenceEntry {
 }
 
 function repFromMinrelation(mr: number | undefined): number | null {
-  if (mr == null || mr === 0) return null
-  const sign = mr > 0 ? 1 : -1
-  return sign * Math.ceil(10 * Math.log10(Math.abs(mr) * 1000))
+  return rawToDisplayRelationOrNull(mr)
 }
 
 function formatRelation(raw: number | undefined): string {
-  if (raw == null) return ''
-  if (raw === 0) return '0'
-  const sign = raw > 0 ? '+' : '-'
-  return sign + String(Math.ceil(10 * Math.log10(Math.abs(raw) * 1000)))
+  return formatDisplayRelation(raw)
 }
 
 function hasPlayerLicenceForFaction(
