@@ -1062,7 +1062,7 @@ watch(() => draft.value.sectorGroupId, async (sectorId) => {
         :class="{ bound: isSaveSectorBound(sector.sectorMacro) }"
       >
         <div class="save-sector-header">
-          <span class="save-sector-name">
+          <span class="save-sector-name" @click="focusSectorByMacro(sector.sectorMacro)">
             {{ sector.sectorName }}
             <span v-if="sector.showRawSectorName" class="sector-raw">({{ sector.rawSectorName }})</span>
           </span>
@@ -1096,6 +1096,7 @@ watch(() => draft.value.sectorGroupId, async (sectorId) => {
       :occupied-sector-macros="bindMenuOccupiedSectorMacros"
       @close="closeBindMenu"
       @select-sector="onBindMenuSelectSector"
+      @focus-sector="focusSectorByMacro"
     />
   </div>
 </template>
@@ -1358,7 +1359,7 @@ watch(() => draft.value.sectorGroupId, async (sectorId) => {
 }
 
 .save-sector-name {
-  @apply text-sm text-amber-100;
+  @apply cursor-pointer text-sm text-amber-100;
 }
 
 .sector-raw {

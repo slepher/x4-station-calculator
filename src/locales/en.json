@@ -426,6 +426,7 @@
     "binding_reorder_sector": "Reorder sector",
     "binding_visible_sector_candidates": "Visible Sector Candidates",
     "binding_filter_hint_search": "Use search to filter",
+    "binding_locate_sector": "Locate sector",
     "binding_no_unbound_sectors": "No unbound sectors",
     "binding_filter_hint_zoom": "Zoom in to reduce visible range",
     "binding_no_visible_sectors": "No visible sectors",

@@ -22,6 +22,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'close'): void
   (e: 'select-sector', sectorMacro: string): void
+  (e: 'focus-sector', sectorMacro: string): void
 }>()
 
 const { t } = useI18n()
@@ -153,6 +154,10 @@ function onMenuSectorClick(sectorMacro: string) {
   emit('select-sector', sectorMacro)
 }
 
+function onFocusSector(sectorMacro: string) {
+  emit('focus-sector', sectorMacro)
+}
+
 function onGlobalPointerDown(event: MouseEvent) {
   if (!props.open) return
   const menuRoot = bindMenuRef.value
@@ -217,27 +222,36 @@ onBeforeUnmount(() => {
 
       <div class="bind-menu-group">
         <div class="bind-menu-group-title">{{ t('map.binding_save_sector_candidates') }}</div>
-        <template v-if="filteredSaveSectorsDisplay.length <= 10">
-          <button
-            v-for="sector in filteredSaveSectorsDisplay"
-            :key="sector.sectorMacro"
-            type="button"
-            class="bind-menu-item"
-            :class="{ 
-              active: isCurrentBoundSector(sector.sectorMacro),
-              'draft-active': isDraftBoundSector(sector.sectorMacro),
-              orange: isSectorOccupied(sector.sectorMacro)
-            }"
-            :disabled="isSectorOccupied(sector.sectorMacro)"
-            @click="onMenuSectorClick(sector.sectorMacro)"
+        <button
+          v-for="sector in filteredSaveSectorsDisplay"
+          :key="sector.sectorMacro"
+          type="button"
+          class="bind-menu-item"
+          :class="{ 
+            active: isCurrentBoundSector(sector.sectorMacro),
+            'draft-active': isDraftBoundSector(sector.sectorMacro),
+            orange: isSectorOccupied(sector.sectorMacro)
+          }"
+          :disabled="isSectorOccupied(sector.sectorMacro)"
+          @click="onMenuSectorClick(sector.sectorMacro)"
+        >
+          <span class="sector-name">{{ sector.sectorName }}</span>
+          <span v-if="sector.showRawSectorName" class="sector-raw-name">{{ sector.rawSectorName }}</span>
+          <span
+            class="bind-menu-locate-btn"
+            :title="t('map.binding_locate_sector')"
+            @click.stop="onFocusSector(sector.sectorMacro)"
           >
-            <span class="sector-name">{{ sector.sectorName }}</span>
-            <span v-if="sector.showRawSectorName" class="sector-raw-name">{{ sector.rawSectorName }}</span>
-          </button>
-        </template>
-        <div v-else class="bind-menu-hint">
-          {{ t('map.binding_filter_hint_search') }}
-        </div>
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="6" cy="6" r="4"/>
+              <circle cx="6" cy="6" r="1.5"/>
+              <line x1="6" y1="1" x2="6" y2="3"/>
+              <line x1="6" y1="9" x2="6" y2="11"/>
+              <line x1="1" y1="6" x2="3" y2="6"/>
+              <line x1="9" y1="6" x2="11" y2="6"/>
+            </svg>
+          </span>
+        </button>
         <div v-if="filteredSaveSectorsDisplay.length === 0" class="bind-menu-empty">
           {{ t('map.binding_no_unbound_sectors') }}
         </div>
@@ -318,7 +332,7 @@ onBeforeUnmount(() => {
 }
 
 .bind-menu-item {
-  @apply flex items-center justify-between whitespace-nowrap rounded px-3 py-2 text-left text-sm text-amber-100 transition-colors hover:bg-amber-200/10;
+  @apply flex items-center justify-between whitespace-nowrap rounded px-3 py-2 text-left text-sm text-amber-100 transition-colors hover:bg-amber-200/10 w-full;
 }
 
 .bind-menu-item.active {
@@ -347,6 +361,13 @@ onBeforeUnmount(() => {
 
 .sector-raw-name {
   @apply ml-2 shrink-0 text-xs text-amber-100/50;
+}
+
+.bind-menu-locate-btn {
+  @apply ml-auto shrink-0 p-0.5 text-amber-100/40 transition-colors hover:text-amber-50;
+  background: none;
+  border: none;
+  cursor: pointer;
 }
 
 .bind-menu-hint {
