@@ -57,14 +57,23 @@ const selectedModules = ref<Record<ImportModuleKey, boolean>>({
 })
 
 const hasParsedPayload = computed(() => parsedPayload.value !== null)
-const availableKeys = computed(() => moduleStats.value.map((item) => item.key))
+const allModuleKeys: ImportModuleKey[] = ['x4_empire_data', 'x4_logic_flow_plans', 'x4_ship_blueprints', 'x4_save_archives', 'x4_save_bindings', 'x4_build_plan_goals', 'x4_terraforming_data']
+
+const displayModules = computed(() => {
+  const countMap = new Map(moduleStats.value.map(s => [s.key, s.count]))
+  return allModuleKeys.map(key => ({
+    key,
+    count: countMap.get(key) ?? 0,
+    inPayload: countMap.has(key)
+  }))
+})
+
 const versionState = computed(() => preparedPayload.value?.versionState || null)
 const sanitizeSummaries = computed(() => preparedPayload.value?.sanitizeSummaries || [])
 
 const setDefaultSelections = (selectAll: boolean) => {
-  const keys = new Set(availableKeys.value)
-  ;(['x4_empire_data', 'x4_logic_flow_plans', 'x4_ship_blueprints', 'x4_save_archives', 'x4_save_bindings', 'x4_build_plan_goals', 'x4_terraforming_data'] as ImportModuleKey[]).forEach((key) => {
-    selectedModules.value[key] = selectAll ? keys.has(key) : selectedModules.value[key] && keys.has(key)
+  allModuleKeys.forEach((key) => {
+    selectedModules.value[key] = selectAll
   })
 }
 
@@ -167,38 +176,43 @@ const onPickFile = async (event: Event) => {
 const handleApplyImport = async () => {
   if (!parsedPayload.value || !preparedPayload.value) return
 
-  const result = await applyImportPayload({
-    mode: mode.value,
-    selectedModules: selectedModules.value,
-    currentView: shipBuildStore.activeView,
-    payload: parsedPayload.value,
-    preparedPayload: preparedPayload.value,
-    gameDataStore,
-    blueprintStore,
-    logicFlowStore,
-    shipBuildStore,
-    saveStore,
-    saveBindingStore,
-    buildPlanStore,
-    terraformingStore
-  })
+  try {
+    const result = await applyImportPayload({
+      mode: mode.value,
+      selectedModules: selectedModules.value,
+      currentView: shipBuildStore.activeView,
+      payload: parsedPayload.value,
+      preparedPayload: preparedPayload.value,
+      gameDataStore,
+      blueprintStore,
+      logicFlowStore,
+      shipBuildStore,
+      saveStore,
+      saveBindingStore,
+      buildPlanStore,
+      terraformingStore
+    })
 
-  if (result.applied.length === 0) {
-    statusStore.pushMessage('warning', 'system', t('importExport.error_no_selection'))
-    return
+    if (result.applied.length === 0) {
+      statusStore.pushMessage('warning', 'system', t('importExport.error_no_selection'))
+      return
+    }
+
+    const warningLines = [...result.warnings]
+    if (result.sanitizeSummaries.length > 0) {
+      warningLines.push(...result.sanitizeSummaries.map(summaryText))
+    }
+
+    if (warningLines.length > 0) {
+      statusStore.pushMessage('warning', 'system', warningLines.join(' '))
+    }
+
+    statusStore.pushMessage('success', 'system', t('importExport.import_success', { count: result.applied.length }))
+    window.location.reload()
+  } catch (error) {
+    statusStore.pushMessage('error', 'system', t('importExport.error_apply_failed'))
+    console.error('[StorageImportWizard] apply failed:', error)
   }
-
-  const warningLines = [...result.warnings]
-  if (result.sanitizeSummaries.length > 0) {
-    warningLines.push(...result.sanitizeSummaries.map(summaryText))
-  }
-
-  if (warningLines.length > 0) {
-    statusStore.pushMessage('warning', 'system', warningLines.join(' '))
-  }
-
-  statusStore.pushMessage('success', 'system', t('importExport.import_success', { count: result.applied.length }))
-  window.location.reload()
 }
 
 </script>
@@ -283,7 +297,7 @@ const handleApplyImport = async () => {
             <div class="text-xs uppercase tracking-wider text-slate-400 mb-2">{{ t('importExport.modules') }}</div>
             <div class="space-y-2">
               <label
-                v-for="entry in moduleStats"
+                v-for="entry in displayModules"
                 :key="entry.key"
                 class="flex items-center justify-between px-3 py-2 rounded border border-slate-700 bg-slate-900/40"
                 :data-testid="`storage-import-module-${entry.key}`"

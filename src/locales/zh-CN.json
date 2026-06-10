@@ -859,7 +859,16 @@
       "title": "游戏版本",
       "select": "选择游戏数据版本",
       "dataIsolationHint": "版本之间数据不互通，如需迁移数据请使用导入导出功能。",
-      "betaMigrationHint": "当前为测试版本。如需迁移至正式版，请先在导出弹窗中使用「下载并清理」，然后切换到正式版并导入文件。",
+      "betaMigrationHint": "当前为测试版本。如需迁移至正式版，可使用下方「下载并清理」导出数据后导入正式版，或点击「迁移」直接覆盖写入正式版。",
+      "downloadAndClean": "下载并清理",
+      "downloadAndCleanTooltip": "下载当前数据后清除所有 beta 版本地存储。清除后可将下载的文件导入到正式版中继续使用。",
+      "migrate": "迁移",
+      "migrateTooltip": "将当前 beta 数据直接覆盖写入正式版，不生成下载文件。正式版已有数据将被替换。",
+      "migrateConfirmTitle": "确认迁移",
+      "migrateConfirmHint": "正式版中已存在数据。迁移将用当前 beta 数据覆盖正式版数据，此操作不可撤销。",
+      "migrateBetaColumn": "Beta",
+      "migrateStableColumn": "正式版",
+      "migrateConfirm": "确认覆盖",
       "save": "保存",
       "switch": "切换",
       "saveAndSwitch": "保存并切换",
@@ -982,9 +991,6 @@
   "importExport": {
     "title": "导入数据",
     "export_title": "导出数据",
-    "export_and_clean": "下载并清理",
-    "download_and_clean": "下载并清理",
-    "download_and_clean_tooltip": "下载当前数据后清除所有 beta 版本地存储。清除后可将下载的文件导入到正式版中继续使用。",
     "export_filename": "导出文件名",
     "file_game_version": "文件游戏版本",
     "current_game_version": "当前游戏版本",
@@ -1013,7 +1019,8 @@
     "import_success": "导入完成：已应用 {count} 个模块。",
     "error_parse_failed": "JSON 文件解析失败。",
     "error_no_module": "上传文件中未找到可导入模块。",
-    "error_no_selection": "请至少选择一个模块。"
+    "error_no_selection": "请至少选择一个模块。",
+    "error_apply_failed": "导入执行失败，请重试。"
   },
   "save_import": {
     "title": "存档同步",

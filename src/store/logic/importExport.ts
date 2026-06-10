@@ -36,7 +36,7 @@ import {
   postProcessRustSaveArchive
 } from '@/workers/saveParser.post'
 import { migrateEmpireStateToCurrent, migrateFlowStateToCurrent, migrateShipBlueprintStateToCurrent } from './stateMigrations'
-import { CURRENT_EMPIRE_VERSION, CURRENT_FLOW_VERSION, CURRENT_SHIP_BLUEPRINT_VERSION, CURRENT_TERRAFORMING_VERSION } from './storageVersions'
+import { CURRENT_EMPIRE_VERSION, CURRENT_FLOW_VERSION, CURRENT_SHIP_BLUEPRINT_VERSION, CURRENT_TERRAFORMING_VERSION, CURRENT_BUILD_PLAN_GOALS_VERSION } from './storageVersions'
 import { normalizeSectorLinkKey, parseSectorLinkKey } from './sectorLinks'
 
 export type ImportMode = 'overwrite' | 'incremental'
@@ -181,7 +181,7 @@ interface GameDataStoreLike {
   equipments?: X4Equipment[]
   currentVersion?: string
   isBeta?: boolean
-  getStorageKey?: (module: 'empire' | 'logic_flow' | 'ship_blueprints' | 'save_archives' | 'build_plan_goals') => string
+  getStorageKey?: (module: 'empire' | 'logic_flow' | 'ship_blueprints' | 'save_archives' | 'build_plan_goals' | 'terraforming' | 'setting') => string
   getIndexedDBName?: () => string
 }
 
@@ -302,12 +302,14 @@ function getStorageKey(moduleKey: ImportModuleKey, gameDataStore?: GameDataStore
   if (moduleKey === EMPIRE_KEY) return gameDataStore.getStorageKey('empire')
   if (moduleKey === FLOW_KEY) return gameDataStore.getStorageKey('logic_flow')
   if (moduleKey === SHIP_KEY) return gameDataStore.getStorageKey('ship_blueprints')
+  if (moduleKey === SAVE_KEY) return gameDataStore.getStorageKey('save_archives')
   if (moduleKey === BUILD_PLAN_KEY) return gameDataStore.getStorageKey('build_plan_goals')
+  if (moduleKey === TERRAFORMING_KEY) return gameDataStore.getStorageKey('terraforming')
   if (moduleKey === BINDING_KEY) {
     const saveKey = gameDataStore.getStorageKey('save_archives')
     return saveKey.includes('save_archives') ? saveKey.replace('save_archives', 'save_bindings') : STORAGE_KEY_MAP[BINDING_KEY]
   }
-  return gameDataStore.getStorageKey('save_archives')
+  throw new Error(`[importExport] unknown module key: ${moduleKey}`)
 }
 
 function buildSanitizeSummary(key: ImportModuleKey, detailMap: Record<string, number>): ImportSanitizeSummary | null {
@@ -1498,6 +1500,18 @@ function applyTerraformingImport(options: ImportApplyOptions, _warnings: string[
   return true
 }
 
+function getEmptyModuleState(key: ImportModuleKey): unknown {
+  switch (key) {
+    case EMPIRE_KEY: return { version: CURRENT_EMPIRE_VERSION, list: [], activeId: null }
+    case FLOW_KEY: return { version: CURRENT_FLOW_VERSION, list: [], activeId: null }
+    case SHIP_KEY: return { version: CURRENT_SHIP_BLUEPRINT_VERSION, ships: [], activeBlueprintId: null, activeShipId: null }
+    case BINDING_KEY: return { version: 1, list: [] }
+    case BUILD_PLAN_KEY: return { version: CURRENT_BUILD_PLAN_GOALS_VERSION, list: [], activeId: null }
+    case TERRAFORMING_KEY: return { version: CURRENT_TERRAFORMING_VERSION, list: [], activeId: null }
+    default: return { list: [] }
+  }
+}
+
 export async function applyImportPayload(options: ImportApplyOptions): Promise<ImportApplyResult> {
   const preparedPayload = options.preparedPayload || prepareImportPayload(options.payload, options.gameDataStore, options.shipBuildStore)
   const warnings: string[] = [...preparedPayload.warnings]
@@ -1524,6 +1538,13 @@ export async function applyImportPayload(options: ImportApplyOptions): Promise<I
       return
     }
 
+    if (options.mode === 'overwrite') {
+      persistModule(key, getEmptyModuleState(key), options.gameDataStore)
+      applied.push(key)
+      return
+
+    }
+
     skipped.push(key)
     warnings.push(`${key} payload is missing or invalid.`)
   })
@@ -1532,9 +1553,12 @@ export async function applyImportPayload(options: ImportApplyOptions): Promise<I
     const saveApplied = await applySaveImport(options, warnings)
     if (saveApplied) {
       applied.push(SAVE_KEY)
+    } else if (options.mode === 'overwrite') {
+      persistModule(SAVE_KEY, getEmptyModuleState(SAVE_KEY), options.gameDataStore)
+      clearArchivesFromDB(options.gameDataStore).catch(() => {})
+      applied.push(SAVE_KEY)
     } else {
       skipped.push(SAVE_KEY)
-      warnings.push(`${SAVE_KEY} payload is missing or invalid.`)
     }
   } else {
     skipped.push(SAVE_KEY)
