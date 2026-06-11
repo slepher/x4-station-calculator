@@ -149,13 +149,13 @@ const fixedItems = computed<ProductionTabItem[]>(() => {
     result.push({ id: 'blueprint-recipe', type: 'blueprint-recipe' as const, name: t('blueprint_recipe.label') })
   }
   if (props.showResearch) {
-    result.push({ id: 'research', type: 'research' as const, name: '研究' })
+    result.push({ id: 'research', type: 'research' as const, name: t('research.label') })
   }
   if (props.showTerraforming) {
-    result.push({ id: 'terraforming', type: 'terraforming' as const, name: '地球化' })
+    result.push({ id: 'terraforming', type: 'terraforming' as const, name: t('moduleNames.terraforming') })
   }
   if (props.showTechTree) {
-    result.push({ id: 'tech-tree', type: 'terraforming' as const, name: '科技树' })
+    result.push({ id: 'tech-tree', type: 'terraforming' as const, name: t('techTree.label') })
   }
   return result
 })
@@ -365,30 +365,30 @@ onUnmounted(() => {
             :data-testid="item.id === 'overview' ? 'sidebar-overview' : item.id === 'terraforming' ? 'sidebar-terraforming' : item.id === 'blueprint-recipe' ? 'sidebar-blueprint-recipe' : 'sidebar-tech-tree'"
           >
             <div class="sidebar-item-active-bar"></div>
-            <button
-              v-if="item.id === 'terraforming'"
-              class="sector-chevron-btn"
-              @click.stop="expandedTerraforming = !expandedTerraforming"
-            >
-              <svg
-                class="sector-chevron w-3 h-3"
-                :class="{ rotated: expandedTerraforming }"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="m9 18 6-6-6-6"></path>
-              </svg>
-            </button>
             <span
               class="sector-click-area flex items-center gap-2 flex-1 min-w-0"
               @click="handleFixedClick(item)"
             >
-              <img v-if="item.id !== 'terraforming'" class="sidebar-item-icon" :class="getTabIconClass(item)" :src="getTabIcon(item)" alt="" />
+              <button
+                v-if="item.id === 'terraforming'"
+                class="w-5 h-5 flex items-center justify-center rounded flex-shrink-0 text-slate-500 hover:text-slate-300 transition-colors"
+                @click.stop="expandedTerraforming = !expandedTerraforming"
+              >
+                <svg
+                  class="sector-chevron w-3 h-3"
+                  :class="{ rotated: expandedTerraforming }"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="m9 18 6-6-6-6"></path>
+                </svg>
+              </button>
+              <img v-else class="sidebar-item-icon" :class="getTabIconClass(item)" :src="getTabIcon(item)" alt="" />
               <span class="sidebar-item-label">{{ item.id === 'overview' ? t('sector.overview') : item.name }}</span>
             </span>
           </div>
