@@ -82,6 +82,13 @@ watch(() => activeViewStore.activeEmpireId, (newId) => {
 
 const sidebarPresenter = useProductionSidebarPresenter(blueprintStore)
 const toolbarPresenter = useProductionToolbarPresenter(blueprintStore)
+
+watch(() => toolbarPresenter.props.workbenchMode.value, (mode) => {
+  if (mode === 'terraforming') {
+    terraformingStore.ensurePlanForContext('blueprint', '__default__')
+  }
+}, { immediate: true })
+
 const planningPresenter = useProductionPlanningPresenter(blueprintStore)
 const wareflowPresenter = useProductionWareflowPresenter(blueprintStore)
 const dashboardPresenter = useProductionDashboardPresenter(blueprintStore)

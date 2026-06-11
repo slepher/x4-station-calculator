@@ -73,6 +73,13 @@ watch(() => activeViewStore.activeBinding, (newGuid) => {
 
 const sidebarPresenter = useProductionSidebarPresenter(liveStore)
 const toolbarPresenter = useProductionToolbarPresenter(liveStore)
+
+watch(() => toolbarPresenter.props.workbenchMode.value, (mode) => {
+  if (mode === 'terraforming' && activeViewStore.activeBinding) {
+    terraformingStore.ensurePlanForContext('live', activeViewStore.activeBinding)
+  }
+}, { immediate: true })
+
 const planningPresenter = useProductionPlanningPresenter(liveStore)
 const wareflowPresenter = useProductionWareflowPresenter(liveStore)
 const dashboardPresenter = useProductionDashboardPresenter(liveStore)
