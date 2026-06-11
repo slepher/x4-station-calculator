@@ -66,8 +66,9 @@ const terraformingClusters = computed(() => {
   })
 })
 
+terraformingStore.init()
+
 onMounted(() => {
-  terraformingStore.init()
   const empireId = activeViewStore.activeEmpireId
   if (empireId && !blueprintStore.activeEmpire) {
     blueprintStore.loadEmpire(empireId)

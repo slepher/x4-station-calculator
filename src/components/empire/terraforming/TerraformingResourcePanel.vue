@@ -782,7 +782,7 @@ function buildDraftWaresTooltip(entry: { wares: Array<{ name: string; amount: nu
                 <div v-for="ware in entry.wares" :key="`${entry.id}-ware-${ware.ware}`" class="detail-row">
                   <span class="col-name">{{ getWareName(ware.ware) }}</span>
                   <span class="col-qty">
-                    <span v-if="entry.discountedWares.length > 0" class="info-i" v-tippy="{ content: getWareQtyTooltip(entry, ware.ware), allowHTML: true, placement: 'top', theme: 'material' }">ⓘ</span>
+                    <span v-if="getDiscountedWaresMap(entry).has(ware.ware)" class="info-i" v-tippy="{ content: getWareQtyTooltip(entry, ware.ware), allowHTML: true, placement: 'top', theme: 'material' }">ⓘ</span>
                     {{ getWareDiscounted(entry, ware.ware).toLocaleString() }}
                   </span>
                   <span v-if="(entry as any).archiveSubmittedWares?.length" class="col-qty">{{ getWareSubmitted(entry as any, ware.ware).toLocaleString() }}</span>

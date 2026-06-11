@@ -55,8 +55,9 @@ const playerBindingData = computed<PlayerBindingData | null>(() => {
 
 const gameDataMaps = computed(() => gameDataStore.maps)
 
+terraformingStore.init()
+
 onMounted(() => {
-  terraformingStore.init()
   const gameGuid = activeViewStore.activeBinding
   if (gameGuid) {
     liveStore.activateBinding(gameGuid)
