@@ -794,30 +794,33 @@ export function applyStandaloneToResult(
 
   const groups = [...result.groups]
 
-  // Collect already-occupied sectors
-  const occupied = new Set<string>()
-  for (const g of groups) {
-    g.coverageSectorMacros.forEach((m) => occupied.add(m))
-    if (g.sectorMacro) occupied.add(g.sectorMacro)
-  }
+  // Default: all player sectors are occupied (already in some group)
+  const occupied = new Set(result.playerSectorMacros)
+  // Release only unselected uncertain sectors (still need resolution)
   for (const a of result.assignments) {
-    // Auto-assigned sectors (with a group) are occupied
-    if (a.status === 'auto' && a.defaultGroupId) {
-      occupied.add(a.sectorMacro)
-    }
-    // Assignments that already have a selectedStandalone option set are also occupied
-    if (a.selectedOptionIndex !== null) {
-      const opt = a.options[a.selectedOptionIndex]
-      if (opt && opt.type === 'standalone') {
-        occupied.add(a.sectorMacro)
-      }
+    if ((a.status === 'uncertain_tie' || a.status === 'uncertain_extend') && a.selectedOptionIndex === null) {
+      occupied.delete(a.sectorMacro)
     }
   }
-  // Always exclude the standalone sector itself
+  // Standalone sector always excluded from its own coverage
   occupied.add(sectorMacro)
 
+  console.log('[applyStandalone] sectorMacro:', sectorMacro, 'prefJumpRange:', prefJumpRange)
+  console.log('[applyStandalone] playerSectorMacros count:', result.playerSectorMacros.length)
+  console.log('[applyStandalone] occupied.size:', occupied.size, 'assignments.count:', result.assignments.length)
+  console.log('[applyStandalone] uncertain unselected:', result.assignments.filter(a => (a.status === 'uncertain_tie' || a.status === 'uncertain_extend') && a.selectedOptionIndex === null).map(a => a.sectorMacro))
+  console.log('[applyStandalone] groups before:', result.groups.map(g => g.name + '(anchor=' + g.sectorMacro + ' cover=' + g.coverageSectorMacros.length + ')'))
+
+  const allSectors = getCoverageSectors(sectorMacro, prefJumpRange, sectorGraph, sectorClusterMap)
+  const withinRange = allSectors.map(c => c.sectorMacro)
+  const playerWithinRange = withinRange.filter(m => result.playerSectorMacros.includes(m))
+  const notOccupied = playerWithinRange.filter(m => !occupied.has(m) && m !== sectorMacro)
+  console.log('[applyStandalone] within range (total):', withinRange.length, 'player:', playerWithinRange.length, 'not occupied:', notOccupied.length)
+  console.log('[applyStandalone] not occupied sectors:', notOccupied)
+
   const groupId = `auto_${crypto.randomUUID()}`
-  const coverage = getCoverageSectors(sectorMacro, prefJumpRange, sectorGraph, sectorClusterMap)
+
+  const coverage = allSectors
     .map((c) => c.sectorMacro)
     .filter((m) =>
       result.playerSectorMacros.includes(m) &&
@@ -871,7 +874,7 @@ export function applyStandaloneToResult(
     groups[i] = { ...groups[i]!, coverageSectorMacros: groups[i]!.coverageSectorMacros.filter((m) => m !== sectorMacro) }
   }
 
-  // Recompute candidates for other sectors: add new group, auto-select if better
+  // Recompute candidates for remaining uncertain sectors: add new group as candidate
   for (let i = 0; i < assignments.length; i++) {
     const a = assignments[i]!
     if (a.sectorMacro === sectorMacro) continue
@@ -898,42 +901,11 @@ export function applyStandaloneToResult(
       else opts.push(newOpt)
       const bestIdx = findBestOptionIndex(opts)
       assignments[i] = { ...a, options: opts, selectedOptionIndex: bestIdx }
-    } else if (a.status === 'auto') {
-      // Auto-assigned sector: if new group is closer, auto-assign to new group
-      const currentDist = a.options[a.selectedOptionIndex ?? 0]?.distance ?? Infinity
-      if (dist < currentDist) {
-        // Remove from current group's coverage
-        const currentGroupId = a.defaultGroupId
-        const currentGroupIdx = groups.findIndex((g) => g.id === currentGroupId)
-        if (currentGroupIdx >= 0) {
-          groups[currentGroupIdx] = {
-            ...groups[currentGroupIdx]!,
-            coverageSectorMacros: groups[currentGroupIdx]!.coverageSectorMacros.filter((m) => m !== a.sectorMacro)
-          }
-        }
-        // Add to new group's coverage (skip if it's the anchor itself)
-        const newGroupIdx = groups.length - 1
-        if (a.sectorMacro !== groups[newGroupIdx]!.sectorMacro) {
-          groups[newGroupIdx] = {
-            ...groups[newGroupIdx]!,
-            coverageSectorMacros: [...groups[newGroupIdx]!.coverageSectorMacros, a.sectorMacro]
-          }
-        }
-
-        const opts = [...a.options]
-        const si = opts.findIndex((o) => o.type === 'standalone')
-        if (si >= 0) opts.splice(si, 0, newOpt)
-        else opts.push(newOpt)
-        assignments[i] = {
-          ...a,
-          options: opts,
-          status: 'auto' as const,
-          defaultGroupId: groupId,
-          selectedOptionIndex: opts.findIndex((o) => o.targetGroupId === groupId)
-        }
-      }
     }
   }
+
+  console.log('[applyStandalone] FINAL groups:',
+    groups.map(g => g.name + ' cover=[' + g.coverageSectorMacros.slice(0,3).join(',') + '...] count=' + g.coverageSectorMacros.length))
 
   return { groups, assignments: assignments as SectorAssignment[], playerSectorMacros: result.playerSectorMacros }
 }

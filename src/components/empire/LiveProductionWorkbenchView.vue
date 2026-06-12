@@ -341,13 +341,19 @@ function handleConfirm() {
       if (opt?.type === 'standalone') {
         const group = saveBindingStore.createGroup(guid, getSectorDisplayName(assignment.sectorMacro))
         if (group && assignment.sectorMacro) {
-          const coverage = getCoverageSectors(assignment.sectorMacro, prefJumpRange.value, sectorGraph, sectorClusterMap)
+          // Use draft group's already-filtered coverage, don't recompute
+          const draftGroup = result.groups.find((g) => g.isNew && g.sectorMacro === assignment.sectorMacro)
+          const coverageEntries = draftGroup
+            ? getCoverageSectors(draftGroup.sectorMacro!, 99, sectorGraph, sectorClusterMap)
+                .filter((c) => draftGroup.coverageSectorMacros.includes(c.sectorMacro))
+                .map((c) => ({ ref: c.sectorMacro, jump: c.distance }))
+            : []
           saveBindingStore.bindSectorGroup({
             gameGuid: guid,
             sectorGroupId: group.id,
             sectorMacro: assignment.sectorMacro,
             jumpRange: prefJumpRange.value,
-            coverageSectorMacros: coverage.map((c) => ({ ref: c.sectorMacro, jump: c.distance }))
+            coverageSectorMacros: coverageEntries
           })
           // Auto-connect to nearest existing group
           const nearest = findNearestGroup(group.id, assignment.sectorMacro, result.groups)
@@ -374,7 +380,7 @@ function handleConfirm() {
       coverageSectorMacros: g.coverageSectorMacros.map((c) => c.ref),
       connectedGroupIds: [...(g.connectedGroupIds || [])],
       isNew: false,
-      isPinned: false,
+      isPinned: true,
       hubScore: undefined
     }))
     autoGroupResult.value = {
