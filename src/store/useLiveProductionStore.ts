@@ -1662,6 +1662,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
 
     await loadPlayerStationRecords()
     syncAllBindingStationsToStateMap()
+    syncLiveFlowMap()
     markAllDirty()
     validateActiveStationId()
     if (activeStationId.value) {
@@ -1947,7 +1948,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       return [
         station.id,
         {
-          tag: liveSemantics?.tag ?? (matchingPlan ? undefined : 'constructionsite'),
+          tag: liveSemantics?.tag ?? semantics?.tag ?? (matchingPlan ? undefined : 'constructionsite'),
           factoryGroup: semantics?.factoryGroup
         }
       ] as const

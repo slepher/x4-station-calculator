@@ -477,10 +477,11 @@ onUnmounted(() => {
                 :class="{ active: isTabActive(item.id) }"
                 data-testid="sidebar-station"
                 :data-station-id="item.id"
+                @click="handleFixedClick(item)"
                 @contextmenu.stop="openMenu(item.id, item.type, $event)"
               >
                 <div class="sidebar-item-active-bar"></div>
-                <span class="flex items-center gap-2 flex-1 min-w-0" @click="handleFixedClick(item)">
+                <span class="flex items-center gap-2 flex-1 min-w-0">
               <img v-if="item.id !== 'terraforming'" class="sidebar-item-icon" :class="getTabIconClass(item)" :src="getTabIcon(item)" alt="" />
                   <span class="sidebar-item-label">{{ item.name }}</span>
                 </span>
