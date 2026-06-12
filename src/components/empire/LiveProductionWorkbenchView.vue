@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { computed, onMounted, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useLiveProductionStore } from '@/store/useLiveProductionStore'
 import { useSaveStore } from '@/store/useSaveStore'
 import { useTerraformingStore } from '@/store/useTerraformingStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useActiveViewStore } from '@/store/useActiveViewStore'
+import { useSaveBindingStore } from '@/store/useSaveBindingStore'
 import { storeToRefs } from 'pinia'
 import type { PlayerBindingData } from '@/components/empire/presenters/useBlueprintRecipePresenter'
 import { useProductionSidebarPresenter } from '@/components/empire/presenters/useProductionSidebarPresenter'
@@ -14,6 +15,10 @@ import { useProductionPlanningPresenter } from '@/components/empire/presenters/u
 import { useProductionWareflowPresenter } from '@/components/empire/presenters/useProductionWareflowPresenter'
 import { useProductionDashboardPresenter } from '@/components/empire/presenters/useProductionDashboardPresenter'
 import { useTerraformingPresenter } from '@/components/empire/presenters/useTerraformingPresenter'
+import { groupCleanSlate, groupIncremental, DEFAULT_JUMP_RANGE, resolveUncertainAssignment, type AutoGroupResult, type GroupDraftInfo } from '@/store/logic/autoGroup'
+import { DEFAULT_HUB_CONFIG } from '@/store/logic/autoGroupHub'
+import { buildSectorGraphFromMaps, getCoverageSectors } from '@/store/logic/saveBindingUtils'
+import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
 import StationPlanningPanelWrapper from '@/components/empire/StationPlanningPanelWrapper.vue'
 import StationDashboard from '@/components/empire/StationDashboard.vue'
 import ProductionSidebar from '@/components/empire/ProductionSidebar.vue'
@@ -33,15 +38,50 @@ import SaveList from '@/components/save/SaveList.vue'
 import TechTreePlaceholder from '@/components/empire/TechTreePlaceholder.vue'
 import ResearchWorkbench from '@/components/empire/ResearchWorkbench.vue'
 import BlueprintRecipeWorkbench from '@/components/empire/BlueprintRecipeWorkbench.vue'
+import SectorConfirmBar from '@/components/empire/sector-overview/SectorConfirmBar.vue'
+import SectorGroupList from '@/components/empire/sector-overview/SectorGroupList.vue'
+import SectorAllocationList from '@/components/empire/sector-overview/SectorAllocationList.vue'
+import AllocationConfirmBar from '@/components/empire/sector-overview/AllocationConfirmBar.vue'
 
 const liveStore = useLiveProductionStore()
 const terraformingStore = useTerraformingStore()
 const activeViewStore = useActiveViewStore()
 const gameDataStore = useGameDataStore()
 const saveStore = useSaveStore()
-const { t } = useI18n()
+const saveBindingStore = useSaveBindingStore()
+const { t, te } = useI18n()
 
 const { selectedArchive } = storeToRefs(saveStore)
+
+function getSectorDisplayName(macro: string): string {
+  const maps = gameDataStore.maps
+  if (maps) {
+    const resolved = resolveMapSectorByMacro(maps, macro)
+    if (resolved) {
+      const nameId = (resolved.sector as any).nameId
+      if (nameId && te(nameId)) return t(nameId)
+      const name = (resolved.sector as any).name
+      if (name) return name
+    }
+  }
+  return macro
+}
+
+function findNearestGroup(excludeGroupId: string, sectorMacro: string, groups: GroupDraftInfo[]): string | null {
+  let nearest: string | null = null
+  let minDist = Infinity
+  const { sectorGraph, sectorClusterMap } = sectorGraphInfo.value
+  for (const g of groups) {
+    if (g.id === excludeGroupId || !g.sectorMacro) continue
+    const distances = getCoverageSectors(g.sectorMacro, 99, sectorGraph, sectorClusterMap)
+    const dist = distances.find((d) => d.sectorMacro === sectorMacro)?.distance
+    if (dist !== undefined && dist < minDist) {
+      minDist = dist
+      nearest = g.id
+    }
+  }
+  return nearest
+}
 
 const playerBindingData = computed<PlayerBindingData | null>(() => {
   const archive = selectedArchive.value
@@ -62,6 +102,7 @@ onMounted(() => {
   if (gameGuid) {
     liveStore.activateBinding(gameGuid)
     terraformingStore.ensurePlanForContext('live', gameGuid)
+    runAutoGroup()
   }
 })
 
@@ -69,6 +110,13 @@ watch(() => activeViewStore.activeBinding, (newGuid) => {
   if (newGuid) {
     liveStore.activateBinding(newGuid)
     terraformingStore.ensurePlanForContext('live', newGuid)
+    runAutoGroup()
+  }
+})
+
+watch(() => saveStore.selectedArchive, (archive) => {
+  if (archive && activeViewStore.activeBinding) {
+    runAutoGroup()
   }
 })
 
@@ -146,6 +194,206 @@ const terraformingPresenter = useTerraformingPresenter({
 
 const showArchiveModuleList = computed(() => {
   return planningPresenter.props.visualMode.value === 'live' && planningPresenter.props.hasArchive.value
+})
+
+const prefJumpRange = ref(DEFAULT_JUMP_RANGE)
+const prefThreshold = ref(DEFAULT_HUB_CONFIG.containerThreshold)
+const autoGroupResult = ref<AutoGroupResult | null>(null)
+const autoGroupConfirmed = ref(false)
+
+const sectorGraphInfo = computed(() => {
+  if (!gameDataStore.maps) return { sectorGraph: {} as Record<string, string[]>, sectorClusterMap: {} as Record<string, string> }
+  return buildSectorGraphFromMaps(
+    gameDataStore.maps.clusters || {},
+    gameDataStore.maps.sectors || {}
+  )
+})
+
+function runAutoGroup() {
+  const archive = saveStore.selectedArchive
+  if (!archive || !archive.isValid) {
+    autoGroupResult.value = null
+    return
+  }
+
+  const guid = activeViewStore.activeBinding
+  if (!guid) {
+    autoGroupResult.value = null
+    return
+  }
+
+  const binding = saveBindingStore.getBindingByGameGuid(guid)
+  const { sectorGraph, sectorClusterMap } = sectorGraphInfo.value
+
+  let result: AutoGroupResult
+  if (binding && binding.groups.length > 0) {
+    result = groupIncremental(
+      archive,
+      binding.groups,
+      gameDataStore.modulesByMacroId,
+      sectorGraph,
+      sectorClusterMap,
+      { containerThreshold: prefThreshold.value },
+      prefJumpRange.value
+    )
+  } else {
+    result = groupCleanSlate(
+      archive,
+      gameDataStore.modulesByMacroId,
+      sectorGraph,
+      sectorClusterMap,
+      { containerThreshold: prefThreshold.value },
+      prefJumpRange.value
+    )
+  }
+
+  // Set display names from localized sector names
+  const namedGroups = result.groups.map((g) => ({
+    ...g,
+    name: g.sectorMacro ? getSectorDisplayName(g.sectorMacro) : g.name,
+  }))
+
+  autoGroupResult.value = { ...result, groups: namedGroups }
+}
+
+function handleRecalculate() {
+  runAutoGroup()
+}
+
+function handleSelectOption(sectorMacro: string, optionIndex: number) {
+  if (!autoGroupResult.value) return
+  const result = autoGroupResult.value
+  const assignments = [...result.assignments]
+  const idx = assignments.findIndex((a) => a.sectorMacro === sectorMacro)
+  if (idx < 0) return
+  assignments[idx] = resolveUncertainAssignment(assignments[idx]!, optionIndex)
+  autoGroupResult.value = { groups: result.groups, assignments, playerSectorMacros: result.playerSectorMacros }
+}
+
+function handleTogglePin(groupId: string) {
+  if (!autoGroupResult.value) return
+  const result = autoGroupResult.value
+  const groups = [...result.groups]
+  const idx = groups.findIndex((g) => g.id === groupId)
+  if (idx < 0) return
+  groups[idx] = { ...groups[idx]!, isPinned: !groups[idx]!.isPinned }
+  autoGroupResult.value = { groups, assignments: result.assignments, playerSectorMacros: result.playerSectorMacros }
+}
+
+function handleUpdateJumpRange(groupId: string, range: number) {
+  if (!autoGroupResult.value) return
+  const result = autoGroupResult.value
+  const groups = [...result.groups]
+  const idx = groups.findIndex((g) => g.id === groupId)
+  if (idx < 0) return
+  const group = groups[idx]!
+
+  // Collect sectors already in other groups' coverage + their anchors
+  const occupiedByOthers = new Set<string>()
+  for (let i = 0; i < groups.length; i++) {
+    if (i === idx) continue
+    const g = groups[i]!
+    g.coverageSectorMacros.forEach((m) => occupiedByOthers.add(m))
+    if (g.sectorMacro) occupiedByOthers.add(g.sectorMacro)
+  }
+
+  const newCoverage = group.sectorMacro
+    ? getCoverageSectors(group.sectorMacro, range, sectorGraphInfo.value.sectorGraph, sectorGraphInfo.value.sectorClusterMap)
+        .map((c) => c.sectorMacro)
+        .filter((m) =>
+          result.playerSectorMacros.includes(m) &&
+          !occupiedByOthers.has(m) &&
+          m !== group.sectorMacro
+        )
+    : group.coverageSectorMacros
+  groups[idx] = { ...group, jumpRange: range, coverageSectorMacros: newCoverage }
+  autoGroupResult.value = { groups, assignments: result.assignments, playerSectorMacros: result.playerSectorMacros }
+}
+
+function handleConfirm() {
+  if (!autoGroupResult.value) return
+  const guid = activeViewStore.activeBinding
+  if (!guid) return
+
+  const result = autoGroupResult.value
+  const { sectorGraph, sectorClusterMap } = sectorGraphInfo.value
+  saveBindingStore.createAutoGroups(guid, result.groups, sectorGraph, sectorClusterMap)
+
+  for (const assignment of result.assignments) {
+    if (assignment.selectedOptionIndex !== null) {
+      const opt = assignment.options[assignment.selectedOptionIndex]
+      if (opt?.type === 'standalone') {
+        const group = saveBindingStore.createGroup(guid, getSectorDisplayName(assignment.sectorMacro))
+        if (group && assignment.sectorMacro) {
+          const coverage = getCoverageSectors(assignment.sectorMacro, prefJumpRange.value, sectorGraph, sectorClusterMap)
+          saveBindingStore.bindSectorGroup({
+            gameGuid: guid,
+            sectorGroupId: group.id,
+            sectorMacro: assignment.sectorMacro,
+            jumpRange: prefJumpRange.value,
+            coverageSectorMacros: coverage.map((c) => ({ ref: c.sectorMacro, jump: c.distance }))
+          })
+          // Auto-connect to nearest existing group
+          const nearest = findNearestGroup(group.id, assignment.sectorMacro, result.groups)
+          if (nearest) {
+            saveBindingStore.setGroupConnection(guid, group.id, nearest, true)
+          }
+        }
+      }
+    }
+  }
+
+  saveBindingStore.saveBinding()
+  autoGroupConfirmed.value = true
+
+  // Replace draft with store-confirmed groups for display
+  const binding = saveBindingStore.activeBinding
+  if (binding && binding.groups.length > 0) {
+    const storeGroups: GroupDraftInfo[] = binding.groups.map((g) => ({
+      id: g.id,
+      name: g.sectorMacro ? getSectorDisplayName(g.sectorMacro) : g.name,
+      sectorMacro: g.sectorMacro,
+      jumpRange: g.jumpRange,
+      originalJumpRange: g.jumpRange,
+      coverageSectorMacros: g.coverageSectorMacros.map((c) => c.ref),
+      connectedGroupIds: [...(g.connectedGroupIds || [])],
+      isNew: false,
+      isPinned: false,
+      hubScore: undefined
+    }))
+    autoGroupResult.value = {
+      groups: storeGroups,
+      assignments: [],
+      playerSectorMacros: result.playerSectorMacros
+    }
+  }
+}
+
+function triggerAutoGroup() {
+  autoGroupConfirmed.value = false
+  runAutoGroup()
+}
+
+defineExpose({ triggerAutoGroup })
+
+const hasUncertainAssignments = computed(() => {
+  if (!autoGroupResult.value) return false
+  return autoGroupResult.value.assignments.some(
+    (a) => a.status === 'uncertain_tie' || a.status === 'uncertain_extend'
+  )
+})
+
+const hasAutoResult = computed(() => autoGroupResult.value !== null && autoGroupResult.value.groups.length > 0)
+
+const stationCounts = computed<Record<string, number>>(() => {
+  const counts: Record<string, number> = {}
+  const archive = saveStore.selectedArchive
+  if (!archive) return counts
+  for (const [macro, sector] of Object.entries(archive.sectors)) {
+    const stCount = sector.player_stations ? Object.keys(sector.player_stations).length : 0
+    if (stCount > 0) counts[macro] = stCount
+  }
+  return counts
 })
 
 </script>
@@ -333,14 +581,75 @@ const showArchiveModuleList = computed(() => {
         <div class="overview-left-panel panel-card">
           <div class="panel-header">{{ t('save_import.title') }}</div>
           <div class="panel-content">
-            <SaveUploadPanel @upload-complete="() => {}" />
-            <SaveList />
+            <SaveUploadPanel @upload-complete="() => { const archive = saveStore.selectedArchive; if (archive) { const guid = archive.meta.guid; if (!activeViewStore.activeBinding || guid === activeViewStore.activeBinding) { saveBindingStore.createOrOpenBinding(guid); activeViewStore.switchToBinding(guid); triggerAutoGroup() } } }" />
+            <SaveList @bind-complete="triggerAutoGroup" />
+          </div>
+          <div class="pref-panel border-t border-slate-700/50">
+            <div class="p-3 flex flex-col gap-2">
+              <div class="flex items-center gap-2">
+                <label class="text-xs text-slate-400 w-24">{{ t('sector.default_jump') }}</label>
+                <select
+                  v-model="prefJumpRange"
+                  class="text-xs bg-slate-900 border border-slate-600 rounded px-2 py-1 text-slate-200 flex-1"
+                >
+                  <option v-for="j in [1,2,3,4,5]" :key="j" :value="j">{{ j }}</option>
+                </select>
+              </div>
+              <div class="flex items-center gap-2">
+                <label class="text-xs text-slate-400 w-24">{{ t('sector.default_threshold') }}</label>
+                <select
+                  v-model="prefThreshold"
+                  class="text-xs bg-slate-900 border border-slate-600 rounded px-2 py-1 text-slate-200 flex-1"
+                >
+                  <option :value="1_000_000">1M</option>
+                  <option :value="3_000_000">3M</option>
+                  <option :value="5_000_000">5M</option>
+                  <option :value="10_000_000">10M</option>
+                  <option :value="20_000_000">20M</option>
+                </select>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
       <div class="col-span-12 lg:col-span-5">
+        <SectorConfirmBar
+          v-if="!autoGroupConfirmed"
+          :pref-jump-range="prefJumpRange"
+          :pref-threshold="prefThreshold"
+          @update:pref-jump-range="prefJumpRange = $event"
+          @update:pref-threshold="prefThreshold = $event"
+          @recalculate="handleRecalculate"
+        />
+        <SectorGroupList
+          :groups="autoGroupResult?.groups ?? []"
+          :assignments="autoGroupResult?.assignments ?? []"
+          :maps="gameDataMaps"
+          :sector-graph="sectorGraphInfo.sectorGraph"
+          :sector-cluster-map="sectorGraphInfo.sectorClusterMap"
+          :player-sector-macros="autoGroupResult?.playerSectorMacros ?? []"
+          @toggle-pin="handleTogglePin"
+          @update-jump-range="handleUpdateJumpRange"
+        />
+      </div>
+
+      <div class="col-span-12 lg:col-span-4">
+        <AllocationConfirmBar
+          v-if="hasAutoResult && !autoGroupConfirmed"
+          :has-uncertain="hasUncertainAssignments"
+          @confirm="handleConfirm"
+        />
+        <SectorAllocationList
+          v-if="hasAutoResult && !autoGroupConfirmed"
+          :assignments="autoGroupResult?.assignments ?? []"
+          :groups="autoGroupResult?.groups ?? []"
+          :maps="gameDataMaps"
+          :station-counts="stationCounts"
+          @select-option="handleSelectOption"
+        />
         <EmpireWareFlowsDashboard
+          v-if="!hasAutoResult || autoGroupConfirmed"
           :production-flows="liveStore.empireDerivedProductionFlows"
           :buy-multiplier="liveStore.overviewBuyMultiplier"
           :sell-multiplier="liveStore.overviewSellMultiplier"
@@ -348,8 +657,6 @@ const showArchiveModuleList = computed(() => {
           @update:sell-multiplier="liveStore.overviewSellMultiplier = $event"
         />
       </div>
-
-      <div class="col-span-12 lg:col-span-4"></div>
     </div>
   </template>
 

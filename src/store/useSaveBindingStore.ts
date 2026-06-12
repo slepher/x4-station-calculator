@@ -6,6 +6,8 @@ import { useSaveStore } from './useSaveStore'
 import { DEFAULT_STATION_SETTINGS } from './state/stationSettings'
 import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
 import { getSectorZoneBoundingCenter } from '@/components/map/utils/coordinates'
+import { getCoverageSectors } from './logic/saveBindingUtils'
+import type { GroupDraftInfo } from './logic/autoGroup'
 import type {
   BindingSectorGroup,
   BindingStationPlan,
@@ -626,6 +628,100 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     })
   }
 
+  function buildCoverageEntries(
+    sectorMacro: string,
+    coverageSectors: string[],
+    sectorGraph: Record<string, string[]>,
+    sectorClusterMap: Record<string, string>
+  ): CoverageSectorEntry[] {
+    const distances = getCoverageSectors(sectorMacro, 99, sectorGraph, sectorClusterMap)
+    const distanceMap = new Map(distances.map((d) => [d.sectorMacro, d.distance]))
+    return coverageSectors.map((sector) => ({
+      ref: sector,
+      jump: distanceMap.get(sector) ?? 0
+    }))
+  }
+
+  function createAutoGroups(
+    gameGuid: string,
+    drafts: GroupDraftInfo[],
+    sectorGraph: Record<string, string[]>,
+    sectorClusterMap: Record<string, string>
+  ) {
+    if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) loadDraftForGameGuid(gameGuid)
+    if (!draftBinding.value) return
+
+    const existingIds = new Set(draftBinding.value.groups.map((g) => g.id))
+    const createdIds = new Set<string>()
+
+    for (const draft of drafts) {
+      if (existingIds.has(draft.id)) {
+        updateGroup(gameGuid, draft.id, {
+          jumpRange: draft.jumpRange
+        })
+        if (draft.sectorMacro && draft.coverageSectorMacros.length > 0) {
+          const entries = buildCoverageEntries(
+            draft.sectorMacro,
+            draft.coverageSectorMacros,
+            sectorGraph,
+            sectorClusterMap
+          )
+          bindSectorGroup({
+            gameGuid,
+            sectorGroupId: draft.id,
+            sectorMacro: draft.sectorMacro,
+            jumpRange: draft.jumpRange,
+            coverageSectorMacros: entries
+          })
+        }
+        createdIds.add(draft.id)
+      } else {
+        const newGroup = createGroup(gameGuid, draft.name)
+        if (newGroup) {
+          createdIds.add(newGroup.id)
+
+          if (draft.sectorMacro) {
+            const entries = buildCoverageEntries(
+              draft.sectorMacro,
+              draft.coverageSectorMacros,
+              sectorGraph,
+              sectorClusterMap
+            )
+            bindSectorGroup({
+              gameGuid,
+              sectorGroupId: newGroup.id,
+              sectorMacro: draft.sectorMacro,
+              jumpRange: draft.jumpRange,
+              coverageSectorMacros: entries
+            })
+          }
+
+          if (draft.connectedGroupIds.length > 0) {
+            for (const targetId of draft.connectedGroupIds) {
+              if (createdIds.has(targetId) || existingIds.has(targetId)) {
+                setGroupConnection(gameGuid, newGroup.id, targetId, true)
+              }
+            }
+          }
+        }
+      }
+    }
+
+    for (const draft of drafts) {
+      const actualId = existingIds.has(draft.id) ? draft.id : undefined
+      if (!actualId) continue
+
+      for (const targetId of draft.connectedGroupIds) {
+        const targetExists = createdIds.has(targetId) || existingIds.has(targetId)
+        if (targetExists) {
+          setGroupConnection(gameGuid, actualId, targetId, true)
+        }
+      }
+    }
+
+    draftBinding.value.updatedAt = Date.now()
+  }
+
   return {
     savedBindings,
     bindings,
@@ -662,6 +758,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     importEmpireStationToSaveStation,
     updateStationPlan,
     createStationPlanInGroup,
+    createAutoGroups,
     loadData,
     writeState
   }

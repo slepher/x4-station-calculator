@@ -11,6 +11,10 @@ const saveStore = useSaveStore()
 const saveBindingStore = useSaveBindingStore()
 const activeViewStore = useActiveViewStore()
 
+const emit = defineEmits<{
+  (e: 'bind-complete', guid: string): void
+}>()
+
 const sortedGroups = computed<ArchiveGroup[]>(() => {
   return [...saveStore.archiveGroups].sort((a, b) => {
     return a.playerName.localeCompare(b.playerName)
@@ -87,10 +91,8 @@ async function bindArchive(guid: string, time: number | null) {
     await saveStore.selectArchive(guid, effectiveTime)
   }
 
-  activeViewStore.isSavePanelOpen = true
-  activeViewStore.mapSavePanelLayer = 'binding-sector'
-  activeViewStore.mapBindingGameGuid = guid
-  activeViewStore.setActiveView('maps')
+  activeViewStore.switchToBinding(guid)
+  emit('bind-complete', guid)
 }
 </script>
 

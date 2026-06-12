@@ -1,6 +1,11 @@
 export type SectorGraphClusterInput = {
   sectors?: string[]
-  sector_links?: Record<string, { sector_a_id: string; sector_b_id: string }>
+  sector_links?: Record<string, {
+    sector_a_id: string
+    sector_b_id: string
+    from_zone_id?: string
+    render?: { lane_count?: number }
+  }>
 }
 
 export type SectorGraphSectorInput = {
@@ -71,8 +76,16 @@ export function buildSectorGraph(
     Object.values(cluster.sector_links || {}).forEach((link) => {
       graph[link.sector_a_id] ||= new Set<string>()
       graph[link.sector_b_id] ||= new Set<string>()
-      graph[link.sector_a_id]!.add(link.sector_b_id)
-      graph[link.sector_b_id]!.add(link.sector_a_id)
+
+      const laneCount = link.render?.lane_count ?? 0
+      if (laneCount === 1) {
+        // One-way superhighway: not traversable for transport (ship can go but can't return)
+        // Don't add edge — treat as disconnected
+      } else {
+        // Bidirectional (lane_count >= 2 or unknown)
+        graph[link.sector_a_id]!.add(link.sector_b_id)
+        graph[link.sector_b_id]!.add(link.sector_a_id)
+      }
     })
   })
 
