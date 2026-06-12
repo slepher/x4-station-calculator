@@ -308,9 +308,21 @@ function handleSelectOption(sectorMacro: string, optionIndex: number) {
   if (opt.type === 'standalone') {
     // Create new group for standalone sector
     const groupId = `auto_${crypto.randomUUID()}`
+
+    // Collect already-occupied sectors from other groups
+    const occupied = new Set<string>()
+    for (const g of groups) {
+      g.coverageSectorMacros.forEach((m) => occupied.add(m))
+      if (g.sectorMacro) occupied.add(g.sectorMacro)
+    }
+
     const coverage = getCoverageSectors(sectorMacro, prefJumpRange.value, sectorGraph, sectorClusterMap)
       .map((c) => c.sectorMacro)
-      .filter((m) => m !== sectorMacro)
+      .filter((m) =>
+        result.playerSectorMacros.includes(m) &&
+        m !== sectorMacro &&
+        !occupied.has(m)
+      )
 
     const newGroup: GroupDraftInfo = {
       id: groupId,
@@ -324,7 +336,8 @@ function handleSelectOption(sectorMacro: string, optionIndex: number) {
       isPinned: false,
       hubScore: undefined
     }
-    // Auto-connect to nearest existing group
+
+    // Auto-connect to nearest existing group (before pushing to groups array)
     const nearest = findNearestGroup(groupId, sectorMacro, groups)
     if (nearest) {
       newGroup.connectedGroupIds = [nearest]
@@ -338,8 +351,15 @@ function handleSelectOption(sectorMacro: string, optionIndex: number) {
     }
     groups.push(newGroup)
 
+    // Remove this sector from all other groups' coverage
+    for (let i = 0; i < groups.length - 1; i++) {
+      groups[i] = {
+        ...groups[i]!,
+        coverageSectorMacros: groups[i]!.coverageSectorMacros.filter((m) => m !== sectorMacro)
+      }
+    }
+
     // Recompute candidates for remaining uncertain sectors
-    // The new group now appears as a candidate for nearby sectors
     for (let i = 0; i < assignments.length; i++) {
       const a = assignments[i]!
       if (a.sectorMacro === sectorMacro) continue
@@ -352,7 +372,6 @@ function handleSelectOption(sectorMacro: string, optionIndex: number) {
         : undefined
 
       if (dist !== undefined && dist <= prefJumpRange.value) {
-        // Add new group as candidate
         const newOpt: AssignmentOption = {
           type: 'absorb' as const,
           targetGroupId: groupId,
@@ -361,7 +380,6 @@ function handleSelectOption(sectorMacro: string, optionIndex: number) {
           resultingGroupSize: 1
         }
         const options = [...a.options]
-        // Insert before standalone option
         const standaloneIdx = options.findIndex((o) => o.type === 'standalone')
         if (standaloneIdx >= 0) {
           options.splice(standaloneIdx, 0, newOpt)
