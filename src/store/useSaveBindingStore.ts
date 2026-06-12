@@ -676,31 +676,32 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
         }
         createdIds.add(draft.id)
       } else {
-        const newGroup = createGroup(gameGuid, draft.name)
-        if (newGroup) {
-          createdIds.add(newGroup.id)
+        // Use draft UUID directly so connectedGroupIds don't need translation
+        const group = createDefaultGroup(draft.name, draftBinding.value!.groups.length)
+        group.id = draft.id
+        draftBinding.value!.groups.push(group)
+        createdIds.add(group.id)
 
-          if (draft.sectorMacro) {
-            const entries = buildCoverageEntries(
-              draft.sectorMacro,
-              draft.coverageSectorMacros,
-              sectorGraph,
-              sectorClusterMap
-            )
-            bindSectorGroup({
-              gameGuid,
-              sectorGroupId: newGroup.id,
-              sectorMacro: draft.sectorMacro,
-              jumpRange: draft.jumpRange,
-              coverageSectorMacros: entries
-            })
-          }
+        if (draft.sectorMacro) {
+          const entries = buildCoverageEntries(
+            draft.sectorMacro,
+            draft.coverageSectorMacros,
+            sectorGraph,
+            sectorClusterMap
+          )
+          bindSectorGroup({
+            gameGuid,
+            sectorGroupId: group.id,
+            sectorMacro: draft.sectorMacro,
+            jumpRange: draft.jumpRange,
+            coverageSectorMacros: entries
+          })
+        }
 
-          if (draft.connectedGroupIds.length > 0) {
-            for (const targetId of draft.connectedGroupIds) {
-              if (createdIds.has(targetId) || existingIds.has(targetId)) {
-                setGroupConnection(gameGuid, newGroup.id, targetId, true)
-              }
+        if (draft.connectedGroupIds.length > 0) {
+          for (const targetId of draft.connectedGroupIds) {
+            if (createdIds.has(targetId) || existingIds.has(targetId)) {
+              setGroupConnection(gameGuid, group.id, targetId, true)
             }
           }
         }
@@ -708,13 +709,10 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     }
 
     for (const draft of drafts) {
-      const actualId = existingIds.has(draft.id) ? draft.id : undefined
-      if (!actualId) continue
-
+      if (!existingIds.has(draft.id)) continue
       for (const targetId of draft.connectedGroupIds) {
-        const targetExists = createdIds.has(targetId) || existingIds.has(targetId)
-        if (targetExists) {
-          setGroupConnection(gameGuid, actualId, targetId, true)
+        if (createdIds.has(targetId) || existingIds.has(targetId)) {
+          setGroupConnection(gameGuid, draft.id, targetId, true)
         }
       }
     }

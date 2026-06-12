@@ -53,7 +53,7 @@ const thresholdOptions = [
 
 <style scoped>
 .confirm-bar {
-  @apply flex items-center justify-between p-2 bg-slate-800/50 rounded border border-slate-700/50 mb-3;
+  @apply flex items-center justify-between p-2 bg-slate-800/50 rounded border border-slate-700/50 mb-2;
 }
 
 .bar-left {

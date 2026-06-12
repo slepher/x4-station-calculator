@@ -178,7 +178,7 @@ function getConnectedGroupNames(group: GroupDraftInfo): string[] {
 }
 
 .group-item {
-  @apply rounded border border-amber-300/20 bg-black/40 p-2;
+  @apply rounded border border-amber-300/20 bg-black/40 p-2 mb-2;
 }
 
 .group-item--new {

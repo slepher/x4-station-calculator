@@ -273,6 +273,11 @@ export function groupCleanSlate(
     }
     if (nearest) {
       group.connectedGroupIds = [nearest]
+      // Also add reverse connection for display
+      const nearestGroup = groups.find((g) => g.id === nearest)
+      if (nearestGroup && !nearestGroup.connectedGroupIds.includes(group.id)) {
+        nearestGroup.connectedGroupIds = [...nearestGroup.connectedGroupIds, group.id]
+      }
     }
   }
 

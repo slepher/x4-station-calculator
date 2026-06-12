@@ -53,6 +53,16 @@ const { t, te } = useI18n()
 
 const { selectedArchive } = storeToRefs(saveStore)
 
+const playerBindingData = computed<PlayerBindingData | null>(() => {
+  const archive = selectedArchive.value
+  if (!archive) return null
+  return {
+    blueprints: archive.playerBlueprints ?? [],
+    relations: archive.playerRelations ?? {},
+    licences: archive.playerLicences ?? {},
+  }
+})
+
 function getSectorDisplayName(macro: string): string {
   const maps = gameDataStore.maps
   if (maps) {
@@ -66,32 +76,6 @@ function getSectorDisplayName(macro: string): string {
   }
   return macro
 }
-
-function findNearestGroup(excludeGroupId: string, sectorMacro: string, groups: GroupDraftInfo[]): string | null {
-  let nearest: string | null = null
-  let minDist = Infinity
-  const { sectorGraph, sectorClusterMap } = sectorGraphInfo.value
-  for (const g of groups) {
-    if (g.id === excludeGroupId || !g.sectorMacro) continue
-    const distances = getCoverageSectors(g.sectorMacro, 99, sectorGraph, sectorClusterMap)
-    const dist = distances.find((d) => d.sectorMacro === sectorMacro)?.distance
-    if (dist !== undefined && dist < minDist) {
-      minDist = dist
-      nearest = g.id
-    }
-  }
-  return nearest
-}
-
-const playerBindingData = computed<PlayerBindingData | null>(() => {
-  const archive = selectedArchive.value
-  if (!archive) return null
-  return {
-    blueprints: archive.playerBlueprints ?? [],
-    relations: archive.playerRelations ?? {},
-    licences: archive.playerLicences ?? {},
-  }
-})
 
 const gameDataMaps = computed(() => gameDataStore.maps)
 
@@ -236,6 +220,28 @@ function runAutoGroup() {
       { containerThreshold: prefThreshold.value },
       prefJumpRange.value
     )
+    // No new unassigned sectors → show confirmed state
+    if (result.assignments.length === 0) {
+      autoGroupConfirmed.value = true
+      const storeGroups: GroupDraftInfo[] = binding.groups.map((g) => ({
+        id: g.id,
+        name: g.sectorMacro ? getSectorDisplayName(g.sectorMacro) : g.name,
+        sectorMacro: g.sectorMacro,
+        jumpRange: g.jumpRange,
+        originalJumpRange: g.jumpRange,
+        coverageSectorMacros: g.coverageSectorMacros.map((c) => c.ref),
+        connectedGroupIds: [...(g.connectedGroupIds || [])],
+        isNew: false,
+        isPinned: true,
+        hubScore: undefined
+      }))
+      autoGroupResult.value = {
+        groups: storeGroups,
+        assignments: [],
+        playerSectorMacros: result.playerSectorMacros
+      }
+      return
+    }
   } else {
     result = groupCleanSlate(
       archive,
@@ -334,36 +340,6 @@ function handleConfirm() {
   const result = autoGroupResult.value
   const { sectorGraph, sectorClusterMap } = sectorGraphInfo.value
   saveBindingStore.createAutoGroups(guid, result.groups, sectorGraph, sectorClusterMap)
-
-  for (const assignment of result.assignments) {
-    if (assignment.selectedOptionIndex !== null) {
-      const opt = assignment.options[assignment.selectedOptionIndex]
-      if (opt?.type === 'standalone') {
-        const group = saveBindingStore.createGroup(guid, getSectorDisplayName(assignment.sectorMacro))
-        if (group && assignment.sectorMacro) {
-          // Use draft group's already-filtered coverage, don't recompute
-          const draftGroup = result.groups.find((g) => g.isNew && g.sectorMacro === assignment.sectorMacro)
-          const coverageEntries = draftGroup
-            ? getCoverageSectors(draftGroup.sectorMacro!, 99, sectorGraph, sectorClusterMap)
-                .filter((c) => draftGroup.coverageSectorMacros.includes(c.sectorMacro))
-                .map((c) => ({ ref: c.sectorMacro, jump: c.distance }))
-            : []
-          saveBindingStore.bindSectorGroup({
-            gameGuid: guid,
-            sectorGroupId: group.id,
-            sectorMacro: assignment.sectorMacro,
-            jumpRange: prefJumpRange.value,
-            coverageSectorMacros: coverageEntries
-          })
-          // Auto-connect to nearest existing group
-          const nearest = findNearestGroup(group.id, assignment.sectorMacro, result.groups)
-          if (nearest) {
-            saveBindingStore.setGroupConnection(guid, group.id, nearest, true)
-          }
-        }
-      }
-    }
-  }
 
   saveBindingStore.saveBinding()
   autoGroupConfirmed.value = true
