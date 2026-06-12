@@ -15,7 +15,7 @@ import { useProductionPlanningPresenter } from '@/components/empire/presenters/u
 import { useProductionWareflowPresenter } from '@/components/empire/presenters/useProductionWareflowPresenter'
 import { useProductionDashboardPresenter } from '@/components/empire/presenters/useProductionDashboardPresenter'
 import { useTerraformingPresenter } from '@/components/empire/presenters/useTerraformingPresenter'
-import { groupCleanSlate, groupIncremental, DEFAULT_JUMP_RANGE, resolveUncertainAssignment, type AutoGroupResult, type GroupDraftInfo, type AssignmentOption, type SectorAssignment } from '@/store/logic/autoGroup'
+import { groupCleanSlate, groupIncremental, DEFAULT_JUMP_RANGE, applyAbsorbToResult, applyStandaloneToResult, type AutoGroupResult, type GroupDraftInfo } from '@/store/logic/autoGroup'
 import { DEFAULT_HUB_CONFIG } from '@/store/logic/autoGroupHub'
 import { buildSectorGraphFromMaps, getCoverageSectors } from '@/store/logic/saveBindingUtils'
 import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
@@ -262,136 +262,27 @@ function handleRecalculate() {
 
 function handleSelectOption(sectorMacro: string, optionIndex: number) {
   if (!autoGroupResult.value) return
-  const result = autoGroupResult.value
-  const assignments = [...result.assignments]
-  const idx = assignments.findIndex((a) => a.sectorMacro === sectorMacro)
-  if (idx < 0) return
+  const assignment = autoGroupResult.value.assignments.find((a) => a.sectorMacro === sectorMacro)
+  if (!assignment) return
+  const opt = assignment.options[optionIndex]
+  if (!opt) return
 
-  const assignment = assignments[idx]!
-  const opt = assignment.options[optionIndex]!
-  assignments[idx] = resolveUncertainAssignment(assignment, optionIndex)
-
-  const groups = [...result.groups]
   const { sectorGraph, sectorClusterMap } = sectorGraphInfo.value
 
   if (opt.type === 'absorb' && opt.targetGroupId) {
-    const targetGroupIdx = groups.findIndex((g) => g.id === opt.targetGroupId)
-    if (targetGroupIdx >= 0) {
-      const g = groups[targetGroupIdx]!
-      // Remove sector from current group (if it was in another's coverage)
-      for (let i = 0; i < groups.length; i++) {
-        if (i !== targetGroupIdx) {
-          groups[i] = {
-            ...groups[i]!,
-            coverageSectorMacros: groups[i]!.coverageSectorMacros.filter((m) => m !== sectorMacro)
-          }
-        }
-      }
-      // Add sector to target group's coverage (with correct jump distance)
-      const currentCoverage = [...g.coverageSectorMacros]
-      if (!currentCoverage.includes(sectorMacro)) {
-        currentCoverage.push(sectorMacro)
-      }
-      // Extend jump range if needed
-      let newJumpRange = g.jumpRange
-      if (opt.extendsRange && g.sectorMacro) {
-        const distances = getCoverageSectors(g.sectorMacro, 99, sectorGraph, sectorClusterMap)
-        const dist = distances.find((d) => d.sectorMacro === sectorMacro)?.distance
-        if (dist !== undefined && dist > newJumpRange) {
-          newJumpRange = dist
-        }
-      }
-      groups[targetGroupIdx] = { ...g, jumpRange: newJumpRange, coverageSectorMacros: currentCoverage }
-    }
+    autoGroupResult.value = applyAbsorbToResult(
+      autoGroupResult.value, sectorMacro, optionIndex,
+      sectorGraph, sectorClusterMap
+    )
   }
-
   if (opt.type === 'standalone') {
-    // Create new group for standalone sector
-    const groupId = `auto_${crypto.randomUUID()}`
-
-    // Collect already-occupied sectors from other groups
-    const occupied = new Set<string>()
-    for (const g of groups) {
-      g.coverageSectorMacros.forEach((m) => occupied.add(m))
-      if (g.sectorMacro) occupied.add(g.sectorMacro)
-    }
-
-    const coverage = getCoverageSectors(sectorMacro, prefJumpRange.value, sectorGraph, sectorClusterMap)
-      .map((c) => c.sectorMacro)
-      .filter((m) =>
-        result.playerSectorMacros.includes(m) &&
-        m !== sectorMacro &&
-        !occupied.has(m)
-      )
-
-    const newGroup: GroupDraftInfo = {
-      id: groupId,
-      name: getSectorDisplayName(sectorMacro),
-      sectorMacro,
-      jumpRange: prefJumpRange.value,
-      originalJumpRange: prefJumpRange.value,
-      coverageSectorMacros: coverage,
-      connectedGroupIds: [],
-      isNew: true,
-      isPinned: false,
-      hubScore: undefined
-    }
-
-    // Auto-connect to nearest existing group (before pushing to groups array)
-    const nearest = findNearestGroup(groupId, sectorMacro, groups)
-    if (nearest) {
-      newGroup.connectedGroupIds = [nearest]
-      const targetIdx = groups.findIndex((g) => g.id === nearest)
-      if (targetIdx >= 0) {
-        groups[targetIdx] = {
-          ...groups[targetIdx]!,
-          connectedGroupIds: [...(groups[targetIdx]!.connectedGroupIds || []), groupId]
-        }
-      }
-    }
-    groups.push(newGroup)
-
-    // Remove this sector from all other groups' coverage
-    for (let i = 0; i < groups.length - 1; i++) {
-      groups[i] = {
-        ...groups[i]!,
-        coverageSectorMacros: groups[i]!.coverageSectorMacros.filter((m) => m !== sectorMacro)
-      }
-    }
-
-    // Recompute candidates for remaining uncertain sectors
-    for (let i = 0; i < assignments.length; i++) {
-      const a = assignments[i]!
-      if (a.sectorMacro === sectorMacro) continue
-      if (a.status !== 'uncertain_tie' && a.status !== 'uncertain_extend') continue
-      if (a.selectedOptionIndex !== null) continue
-
-      const dist = newGroup.sectorMacro
-        ? getCoverageSectors(newGroup.sectorMacro, 99, sectorGraph, sectorClusterMap)
-            .find((d) => d.sectorMacro === a.sectorMacro)?.distance
-        : undefined
-
-      if (dist !== undefined && dist <= prefJumpRange.value) {
-        const newOpt: AssignmentOption = {
-          type: 'absorb' as const,
-          targetGroupId: groupId,
-          distance: dist,
-          extendsRange: false,
-          resultingGroupSize: 1
-        }
-        const options = [...a.options]
-        const standaloneIdx = options.findIndex((o) => o.type === 'standalone')
-        if (standaloneIdx >= 0) {
-          options.splice(standaloneIdx, 0, newOpt)
-        } else {
-          options.push(newOpt)
-        }
-        assignments[i] = { ...a, options, selectedOptionIndex: null }
-      }
-    }
+    autoGroupResult.value = applyStandaloneToResult(
+      autoGroupResult.value, sectorMacro,
+      sectorGraph, sectorClusterMap,
+      prefJumpRange.value,
+      getSectorDisplayName
+    )
   }
-
-  autoGroupResult.value = { groups, assignments: assignments as SectorAssignment[], playerSectorMacros: result.playerSectorMacros }
 }
 
 function handleTogglePin(groupId: string) {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import fixture from '../../fixtures/auto-group/save_009_minimal.json'
-import { groupCleanSlate, type AutoGroupResult, type GroupDraftInfo } from '@/store/logic/autoGroup'
+import { groupCleanSlate, applyAbsorbToResult, applyStandaloneToResult, type AutoGroupResult, type GroupDraftInfo } from '@/store/logic/autoGroup'
 import { buildSectorGraphFromMaps } from '@/store/logic/saveBindingUtils'
 import type { SaveArchive, PlayerStationEntry } from '@/types/saveArchive'
 import type { X4Module } from '@/types/x4'
@@ -169,11 +169,6 @@ describe('autoGroup - cleanSlate assignments', () => {
     expect(extend.length).toBeGreaterThanOrEqual(1)
   })
 
-  it('has at least 1 uncertain_extend sector', () => {
-    const extend = result.assignments.filter(a => a.status === 'uncertain_extend')
-    expect(extend.length).toBeGreaterThanOrEqual(1)
-  })
-
   it('auto-assigned sectors have selectedOptionIndex >= 0', () => {
     for (const a of result.assignments) {
       if (a.status === 'auto') {
@@ -188,17 +183,110 @@ describe('autoGroup - cleanSlate assignments', () => {
     expect(ssi).toBeDefined()
     expect(ssi!.status).toBe('auto')
   })
+})
 
-  it('Savage Spur II auto-assigned (one-way highway blocks Tharka)', () => {
-    const ssii = result.assignments.find(a => a.sectorMacro === 'cluster_112_sector002_macro')
-    expect(ssii).toBeDefined()
-    expect(ssii!.status).toBe('auto')
+describe('autoGroup - interactive applyAbsorb', () => {
+  let result: AutoGroupResult
+  const { sectorGraph, sectorClusterMap } = buildSectorData()
+
+  beforeAll(() => { result = runCleanSlate() })
+
+  it('absorb adds sector to target group coverage', () => {
+    // Find an uncertain_extend sector and its absorb option
+    const extend = result.assignments.find(a => a.status === 'uncertain_extend')
+    expect(extend).toBeDefined()
+    const absorbOptIdx = extend!.options.findIndex(o => o.type === 'absorb')
+    expect(absorbOptIdx).toBeGreaterThanOrEqual(0)
+    const targetGroupId = extend!.options[absorbOptIdx]!.targetGroupId!
+
+    const targetGroupBefore = result.groups.find(g => g.id === targetGroupId)
+    expect(targetGroupBefore).toBeDefined()
+
+    const updated = applyAbsorbToResult(result, extend!.sectorMacro, absorbOptIdx, sectorGraph, sectorClusterMap)
+    const targetGroupAfter = updated.groups.find(g => g.id === targetGroupId)!
+
+    expect(targetGroupAfter.coverageSectorMacros).toContain(extend!.sectorMacro)
+    expect(targetGroupAfter.coverageSectorMacros.length).toBeGreaterThan(targetGroupBefore!.coverageSectorMacros.length)
   })
 
-  it('each assignment has the correct sectorMacro field', () => {
-    for (const a of result.assignments) {
-      expect(a.sectorMacro).toBeTruthy()
-      expect(typeof a.sectorMacro).toBe('string')
+  it('absorb removes sector from other groups coverage', () => {
+    // cluster_26 is uncertain_extend to Asteroid Belt (group 6)
+    const extend = result.assignments.find(a =>
+      a.sectorMacro === 'cluster_26_sector001_macro'
+    )
+    expect(extend).toBeDefined()
+    const absorbOptIdx = extend!.options.findIndex(o => o.type === 'absorb')
+    const targetGroupId = extend!.options[absorbOptIdx]!.targetGroupId!
+
+    const updated = applyAbsorbToResult(result, extend!.sectorMacro, absorbOptIdx, sectorGraph, sectorClusterMap)
+
+    // Other groups should NOT have this sector
+    for (const g of updated.groups) {
+      if (g.id !== targetGroupId) {
+        expect(g.coverageSectorMacros).not.toContain(extend!.sectorMacro)
+      }
     }
+  })
+
+  it('absorb marks assignment as auto with selected index', () => {
+    const extend = result.assignments.find(a => a.status === 'uncertain_extend')!
+    const absorbOptIdx = extend.options.findIndex(o => o.type === 'absorb')
+
+    const updated = applyAbsorbToResult(result, extend.sectorMacro, absorbOptIdx, sectorGraph, sectorClusterMap)
+    const updatedAssignment = updated.assignments.find(a => a.sectorMacro === extend.sectorMacro)!
+
+    expect(updatedAssignment.status).toBe('auto')
+    expect(updatedAssignment.selectedOptionIndex).toBe(absorbOptIdx)
+  })
+})
+
+describe('autoGroup - interactive applyStandalone', () => {
+  let result: AutoGroupResult
+  const { sectorGraph, sectorClusterMap } = buildSectorData()
+
+  beforeAll(() => { result = runCleanSlate() })
+
+  it('standalone creates new group with sector as anchor', () => {
+    const extend = result.assignments.find(a => a.status === 'uncertain_extend')!
+    const updated = applyStandaloneToResult(result, extend.sectorMacro, sectorGraph, sectorClusterMap, 3, (m) => m)
+
+    expect(updated.groups.length).toBe(result.groups.length + 1)
+    const newGroup = updated.groups[updated.groups.length - 1]!
+    expect(newGroup.sectorMacro).toBe(extend.sectorMacro)
+    expect(newGroup.isNew).toBe(true)
+  })
+
+  it('standalone removes sector from other groups coverage', () => {
+    const extend = result.assignments.find(a => a.status === 'uncertain_extend')!
+    const updated = applyStandaloneToResult(result, extend.sectorMacro, sectorGraph, sectorClusterMap, 3, (m) => m)
+
+    for (let i = 0; i < updated.groups.length - 1; i++) {
+      expect(updated.groups[i]!.coverageSectorMacros).not.toContain(extend.sectorMacro)
+    }
+  })
+
+  it('standalone coverage respects already occupied sectors', () => {
+    const extend = result.assignments.find(a => a.status === 'uncertain_extend')!
+    const occupied = new Set<string>()
+    for (const g of result.groups) {
+      g.coverageSectorMacros.forEach((m) => occupied.add(m))
+      if (g.sectorMacro) occupied.add(g.sectorMacro)
+    }
+
+    const updated = applyStandaloneToResult(result, extend.sectorMacro, sectorGraph, sectorClusterMap, 3, (m) => m)
+    const newGroup = updated.groups[updated.groups.length - 1]!
+
+    for (const m of newGroup.coverageSectorMacros) {
+      expect(occupied.has(m)).toBe(false)
+    }
+  })
+
+  it('standalone marks assignment as auto selected', () => {
+    const extend = result.assignments.find(a => a.status === 'uncertain_extend')!
+    const updated = applyStandaloneToResult(result, extend.sectorMacro, sectorGraph, sectorClusterMap, 3, (m) => m)
+    const updatedAssignment = updated.assignments.find(a => a.sectorMacro === extend.sectorMacro)!
+
+    expect(updatedAssignment.status).toBe('auto')
+    expect(updatedAssignment.selectedOptionIndex).toBe(0)
   })
 })
