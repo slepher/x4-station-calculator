@@ -192,3 +192,24 @@ ProductionSidebar:
 - `SectorGroupList` 从 store 读取 group（`isNew=false`, `isPinned=false` → 只读）
 - Col 3 切换为 `EmpireWareFlowsDashboard`
 - Standalone 组：创建 group + bindSectorGroup + 自动连接最近已有 group
+
+### 11. 实时联动
+
+**吸收联动**：
+```
+Col 3 用户选 absorb
+  └→ 目标 group.coverageSectorMacros.push(sector)
+  └→ 旧 group.coverageSectorMacros 移除该 sector
+  └→ 若 extendsRange → jumpRange 扩展至距离值
+  └→ Col 2 覆盖列表实时刷新
+```
+
+**独立成组联动**：
+```
+Col 3 用户选 standalone
+  └→ 创建新 GroupDraftInfo（anchor=sector, 计算覆盖, 自动连接）
+  └→ Col 2 立即显示新 group
+  └→ 遍历 Col 3 未选中的存疑 sector
+      └→ 若新 group 在跳数范围内 → 作为候选加入 options（在 standalone 前）
+  └→ Col 3 该 sector 的选项列表刷新
+```

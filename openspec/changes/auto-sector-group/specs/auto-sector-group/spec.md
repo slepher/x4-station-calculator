@@ -316,3 +316,24 @@ Col 2 SHALL 包含独立的确定栏。
 - 选项结构（standalone 存在, extendsRange 标记）
 - 单向超高速影响（Savage Spur I/II 各归可达 group）
 - anchor 分配列表过滤（不显示纯 hub anchor 的 assignment card）
+
+### Requirement: Real-time Coverage Update on Absorb Selection
+
+当用户在 Col 3 选择星区归入某 group，Col 2 SHALL 实时更新该 group 的覆盖。
+
+**当** 用户点击 absorb 选项（归入某 group）
+**那么** SHALL：
+- 该 sector 立即加入目标 group 的 `coverageSectorMacros`
+- 若该 sector 之前在其他 group 的覆盖中 → 从旧 group 移除
+- 若距离超出 group 的 jumpRange → 自动扩展 `jumpRange` 至覆盖所需值
+- Col 2 覆盖列表即时刷新（含跳数）
+
+### Requirement: Standalone Group Live Creation and Candidate Recalculation
+
+当用户选择「独立成组」，Col 2 SHALL 创建新 group，Col 3 SHALL 为剩余存疑星区重算候选。
+
+**当** 用户点击 standalone 选项（独立成组）
+**那么** SHALL：
+- Col 2 立即新增 group（以该 sector 为 anchor，计算覆盖，自动连接最近已有 group）
+- Col 3 其他存疑星区重算候选：新增的独立 group 若在跳数范围内 → 作为候选加入选项列表（排在 standalone 之前）
+- 若新 group 是某存疑星区的最佳候选 → 不影响选中状态（仍为存疑，等待用户明确选择）

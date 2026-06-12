@@ -105,3 +105,16 @@
 - [x] 提取脚本 `analysis/scripts/auto-sector-group/extract_save_for_tests.py`
 - [x] 紧凑 fixture 格式：仅存档数据，type/cargo/graph 来自游戏数据
 - [x] 21 TDD 测试覆盖：fixture 验证、group/anchor、覆盖排他、assignment 状态、单向超高速、anchor 过滤
+
+## 15. 实时吸收联动
+
+- [x] Col 3 选 absorb → 目标 group 覆盖立即加入该 sector
+- [x] 从旧 group 覆盖中移除（若存在）
+- [x] 若 extendsRange → 自动扩展 jumpRange
+- [x] Col 2 覆盖列表实时刷新
+
+## 16. 独立成组联动
+
+- [x] Col 3 选 standalone → Col 2 立即新建 group（anchor + 覆盖 + 自动连接）
+- [x] Col 3 剩余未选中存疑 sector 遍历重算
+- [x] 新 group 在跳数范围内 → 加入候选选项（排在 standalone 前）
