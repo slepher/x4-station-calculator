@@ -810,20 +810,9 @@ export function applyStandaloneToResult(
   // Standalone sector always excluded from its own coverage
   occupied.add(sectorMacro)
 
-  console.log('[applyStandalone] sectorMacro:', sectorMacro, 'prefJumpRange:', prefJumpRange)
-  console.log('[applyStandalone] playerSectorMacros count:', result.playerSectorMacros.length)
-  console.log('[applyStandalone] occupied.size:', occupied.size, 'assignments.count:', result.assignments.length)
-  console.log('[applyStandalone] uncertain unselected:', result.assignments.filter(a => (a.status === 'uncertain_tie' || a.status === 'uncertain_extend') && a.selectedOptionIndex === null).map(a => a.sectorMacro))
-  console.log('[applyStandalone] groups before:', result.groups.map(g => g.name + '(anchor=' + g.sectorMacro + ' cover=' + g.coverageSectorMacros.length + ')'))
-
-  const allSectors = getCoverageSectors(sectorMacro, prefJumpRange, sectorGraph, sectorClusterMap)
-  const withinRange = allSectors.map(c => c.sectorMacro)
-  const playerWithinRange = withinRange.filter(m => result.playerSectorMacros.includes(m))
-  const notOccupied = playerWithinRange.filter(m => !occupied.has(m) && m !== sectorMacro)
-  console.log('[applyStandalone] within range (total):', withinRange.length, 'player:', playerWithinRange.length, 'not occupied:', notOccupied.length)
-  console.log('[applyStandalone] not occupied sectors:', notOccupied)
 
   const groupId = `auto_${crypto.randomUUID()}`
+  const allSectors = getCoverageSectors(sectorMacro, prefJumpRange, sectorGraph, sectorClusterMap)
 
   const coverage = allSectors
     .map((c) => c.sectorMacro)
@@ -908,9 +897,6 @@ export function applyStandaloneToResult(
       assignments[i] = { ...a, options: opts, selectedOptionIndex: bestIdx }
     }
   }
-
-  console.log('[applyStandalone] FINAL groups:',
-    groups.map(g => g.name + ' cover=[' + g.coverageSectorMacros.slice(0,3).join(',') + '...] count=' + g.coverageSectorMacros.length))
 
   return { groups, assignments: assignments as SectorAssignment[], playerSectorMacros: result.playerSectorMacros }
 }

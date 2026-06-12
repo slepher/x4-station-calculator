@@ -37,11 +37,10 @@ function getSectorName(macro: string): string {
   return macro
 }
 
-function getCoverageByJump(group: GroupDraftInfo): Map<number, string[]> {
-  const byJump = new Map<number, string[]>()
-  if (!group.sectorMacro || group.coverageSectorMacros.length === 0) return byJump
+function getCoverageByJump(group: GroupDraftInfo): Map<number, Array<{ macro: string; connected: boolean }>> {
+  const byJump = new Map<number, Array<{ macro: string; connected: boolean }>>()
+  if (!group.sectorMacro) return byJump
 
-  const playerSet = new Set(props.playerSectorMacros)
   const distances = getCoverageSectors(
     group.sectorMacro, 99,
     props.sectorGraph, props.sectorClusterMap
@@ -49,12 +48,20 @@ function getCoverageByJump(group: GroupDraftInfo): Map<number, string[]> {
   const distMap = new Map(distances.map(d => [d.sectorMacro, d.distance]))
 
   for (const sector of group.coverageSectorMacros) {
-    if (!playerSet.has(sector)) continue
     if (sector === group.sectorMacro) continue
     const jump = distMap.get(sector) ?? 0
     if (!byJump.has(jump)) byJump.set(jump, [])
-    byJump.get(jump)!.push(sector)
+    byJump.get(jump)!.push({ macro: sector, connected: false })
   }
+
+  for (const connId of group.connectedGroupIds) {
+    const connGroup = props.groups.find(g => g.id === connId)
+    if (!connGroup?.sectorMacro || connGroup.sectorMacro === group.sectorMacro) continue
+    const jump = distMap.get(connGroup.sectorMacro) ?? 0
+    if (!byJump.has(jump)) byJump.set(jump, [])
+    byJump.get(jump)!.push({ macro: connGroup.sectorMacro, connected: true })
+  }
+
   return byJump
 }
 
@@ -68,11 +75,6 @@ function getUncertainCount(groupId: string): number {
   ).length
 }
 
-function getConnectedGroupNames(group: GroupDraftInfo): string[] {
-  return group.connectedGroupIds
-    .map(id => props.groups.find(g => g.id === id)?.name)
-    .filter(Boolean) as string[]
-}
 </script>
 
 <template>
@@ -128,32 +130,19 @@ function getConnectedGroupNames(group: GroupDraftInfo): string[] {
           </div>
         </div>
 
-        <div v-if="group.coverageSectorMacros.length > 0" class="config-row">
-          <label class="config-label">{{ t('map.binding_coverage_sectors') }}</label>
-          <div v-for="jump in getCoverageJumps(group)" :key="jump" class="jump-group">
+        <div v-if="getCoverageJumps(group).length > 0" class="config-row">
+          <div v-for="jump in getCoverageJumps(group)" :key="jump" class="jump-group-grid">
             <span class="jump-number">{{ jump }}{{ t('map.resource_filter_jump_suffix') }}</span>
             <div class="pill-list">
               <span
-                v-for="macro in getCoverageByJump(group).get(jump)!"
-                :key="macro"
-                class="pill pill--coverage"
+                v-for="entry in getCoverageByJump(group).get(jump)!"
+                :key="entry.macro"
+                class="pill"
+                :class="entry.connected ? 'pill--connected' : 'pill--coverage'"
               >
-                {{ getSectorName(macro) }}
+                {{ getSectorName(entry.macro) }}
               </span>
             </div>
-          </div>
-        </div>
-
-        <div v-if="getConnectedGroupNames(group).length > 0" class="config-row">
-          <label class="config-label">{{ t('map.binding_connected_sectors') }}</label>
-          <div class="pill-list">
-            <span
-              v-for="name in getConnectedGroupNames(group)"
-              :key="name"
-              class="pill pill--connected"
-            >
-              {{ name }}
-            </span>
           </div>
         </div>
 
@@ -170,7 +159,7 @@ function getConnectedGroupNames(group: GroupDraftInfo): string[] {
 
 <style scoped>
 .group-list {
-  @apply flex flex-col gap-2;
+  @apply flex flex-col gap-2 pb-2;
 }
 
 .empty-hint {
@@ -178,7 +167,7 @@ function getConnectedGroupNames(group: GroupDraftInfo): string[] {
 }
 
 .group-item {
-  @apply rounded border border-amber-300/20 bg-black/40 p-2 mb-2;
+  @apply rounded border border-amber-300/20 bg-black/40 p-2;
 }
 
 .group-item--new {
@@ -223,11 +212,11 @@ function getConnectedGroupNames(group: GroupDraftInfo): string[] {
 }
 
 .group-config {
-  @apply flex flex-col gap-1.5;
+  @apply flex flex-col;
 }
 
 .config-row {
-  @apply flex flex-col gap-0.5;
+  @apply flex flex-col gap-2 mb-2;
 }
 
 .config-label {
@@ -239,19 +228,22 @@ function getConnectedGroupNames(group: GroupDraftInfo): string[] {
 }
 
 .pill {
-  @apply inline-flex items-center rounded px-2 py-0.5 text-xs truncate max-w-[120px];
+  @apply inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs;
+  height: var(--binding-pill-height);
+  line-height: var(--binding-pill-height);
 }
 
 .pill--anchor {
-  @apply border border-amber-300/30 bg-amber-200/10 text-amber-100;
+  @apply border-amber-200/40 bg-amber-200/15 text-amber-50 text-sm;
+  max-width: none;
 }
 
 .pill--coverage {
-  @apply border border-green-300/20 bg-green-200/5 text-green-100;
+  @apply border-amber-300/30 bg-amber-200/10 text-amber-100;
 }
 
 .pill--connected {
-  @apply border border-blue-300/20 bg-blue-200/5 text-blue-100;
+  @apply border-emerald-300/30 bg-emerald-500/10 text-emerald-200;
 }
 
 .jump-control {
@@ -262,16 +254,25 @@ function getConnectedGroupNames(group: GroupDraftInfo): string[] {
   @apply text-xs text-amber-100/60;
 }
 
-.jump-group {
-  @apply flex items-center gap-1;
+.jump-list {
+  @apply flex flex-col gap-0.5;
+}
+
+.jump-group-grid {
+  @apply grid items-start;
+  grid-template-columns: max-content minmax(0, 1fr);
+  --binding-pill-height: 1.375rem;
+  column-gap: 0.375rem;
 }
 
 .jump-number {
-  @apply text-xs text-amber-100/40 w-8 shrink-0;
+  @apply text-xs text-amber-100/40 shrink-0;
+  height: var(--binding-pill-height);
+  line-height: var(--binding-pill-height);
 }
 
 .pill-list {
-  @apply flex flex-wrap gap-1;
+  @apply flex min-w-0 flex-wrap items-center gap-2;
 }
 
 .group-stats {

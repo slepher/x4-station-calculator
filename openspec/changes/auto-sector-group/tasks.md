@@ -108,13 +108,27 @@
 
 ## 15. 实时吸收联动
 
-- [x] Col 3 选 absorb → 目标 group 覆盖立即加入该 sector
-- [x] 从旧 group 覆盖中移除（若存在）
+- [x] Col 3 选 absorb → 目标 group 覆盖立即加入该 sector（applyAbsorbToResult）
+- [x] 从旧 group 覆盖中移除
 - [x] 若 extendsRange → 自动扩展 jumpRange
 - [x] Col 2 覆盖列表实时刷新
+- [x] 从 standalone 切回 absorb → 删除空 standalone group，清除候选
 
 ## 16. 独立成组联动
 
-- [x] Col 3 选 standalone → Col 2 立即新建 group（anchor + 覆盖 + 自动连接）
-- [x] Col 3 剩余未选中存疑 sector 遍历重算
-- [x] 新 group 在跳数范围内 → 加入候选选项（排在 standalone 前）
+- [x] applyStandaloneToResult：创建新 group，覆盖仅从未决 sector 取
+- [x] Auto-connect 双向连接最近已有 group
+- [x] Col 3 剩余未选中存疑 sector 获得新 group 候选
+
+## 17. UUID 持久化与连接显示
+
+- [x] createAutoGroups 使用草案 UUID，无需翻译
+- [x] auto-connect 在草案中设置双向连接
+- [x] 连接星区混入覆盖列表，仅颜色区分（amber/emerald）
+- [x] Pill 样式对齐 MapBindingSectorGroup（rounded-full, pill-height）
+- [x] 无新未分配 sector 时页面刷新直接进入确认状态
+
+## 18. 测试
+
+- [x] 23 TDD 测试覆盖：fixture、group/anchor、覆盖排他、assignment 状态、单向超高速、standalone/absorb 交互
+- [x] 日志：cleanSlate auto-connect、createAutoGroups connecting、SectorGroupList connectedIds

@@ -198,18 +198,39 @@ ProductionSidebar:
 **吸收联动**：
 ```
 Col 3 用户选 absorb
-  └→ 目标 group.coverageSectorMacros.push(sector)
-  └→ 旧 group.coverageSectorMacros 移除该 sector
+  └→ applyAbsorbToResult(): 目标 group coverage 加入 sector
+  └→ 旧 group coverage 移除该 sector
   └→ 若 extendsRange → jumpRange 扩展至距离值
   └→ Col 2 覆盖列表实时刷新
+
+切换回到 absorb（从 standalone）
+  └→ 检测 sector 之前是 standalone（selectedOptionIndex 指向 standalone 选项）
+  └→ 删除空的 standalone group
+  └→ 其他 sector 候选清除已删除 group 的选项
 ```
 
 **独立成组联动**：
 ```
 Col 3 用户选 standalone
-  └→ 创建新 GroupDraftInfo（anchor=sector, 计算覆盖, 自动连接）
+  └→ applyStandaloneToResult(): 创建新 GroupDraftInfo
+  └→ 覆盖仅从 result.assignments 中取（未决 sector）→ 排除已占用的
+  └→ Auto-connect 到最近已有 group（双向）
   └→ Col 2 立即显示新 group
-  └→ 遍历 Col 3 未选中的存疑 sector
-      └→ 若新 group 在跳数范围内 → 作为候选加入 options（在 standalone 前）
-  └→ Col 3 该 sector 的选项列表刷新
+  └→ Col 3 其他未决 sector 获得新 group 候选
 ```
+
+### 12. 连接星区显示
+
+- 连接星区混入覆盖列表，按跳数分组显示——不单独列出
+- 仅通过颜色区分：覆盖 = amber，连接 = emerald
+- Pill 样式完全对齐 `MapBindingSectorGroup`（rounded-full, gap-1, pill-height）
+
+### 13. UUID 持久化
+
+- `createAutoGroups` 直接使用草案 group 的 UUID（不再重新生成）
+- `connectedGroupIds` 天然正确，无需 ID 翻译映射
+
+### 14. 确认后页面刷新
+
+- `runAutoGroup` 检测到已有 binding group 且无新未分配 sector → `autoGroupConfirmed = true`
+- 确认状态：`SectorConfirmBar` / `AllocationConfirmBar` 隐藏，group 只读
