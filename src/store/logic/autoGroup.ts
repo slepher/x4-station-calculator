@@ -45,6 +45,7 @@ export interface GroupDraftInfo {
   isNew: boolean
   isPinned: boolean
   hubScore?: number
+  hubStationCode?: string
 }
 
 export interface AutoGroupResult {
@@ -248,7 +249,8 @@ export function groupCleanSlate(
       connectedGroupIds: [],
       isNew: true,
       isPinned: false,
-      hubScore: hub.score
+      hubScore: hub.score,
+      hubStationCode: hub.stationCode
     }
     groups.push(group)
     groupMap.set(groupId, group)

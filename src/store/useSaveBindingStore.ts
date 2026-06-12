@@ -673,6 +673,14 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
             jumpRange: draft.jumpRange,
             coverageSectorMacros: entries
           })
+          if (draft.hubStationCode) {
+            upsertTradeStation({
+              gameGuid,
+              groupId: draft.id,
+              saveStationCode: draft.hubStationCode,
+              name: draft.name
+            })
+          }
         }
         createdIds.add(draft.id)
       } else {
@@ -696,6 +704,15 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
             jumpRange: draft.jumpRange,
             coverageSectorMacros: entries
           })
+
+          if (draft.hubStationCode) {
+            upsertTradeStation({
+              gameGuid,
+              groupId: group.id,
+              saveStationCode: draft.hubStationCode,
+              name: draft.name
+            })
+          }
         }
 
         if (draft.connectedGroupIds.length > 0) {

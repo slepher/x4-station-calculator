@@ -144,6 +144,15 @@ describe('autoGroup - cleanSlate groups', () => {
     expect(connected).toBeGreaterThanOrEqual(1)
   })
 
+  it('pure hub groups have hubStationCode set', () => {
+    for (const g of result.groups) {
+      if (g.isNew) {
+        // Pure hub groups from cleanSlate should have station code
+        expect(g.hubStationCode).toBeTruthy()
+      }
+    }
+  })
+
   it('coverage only contains player sectors', () => {
     const playerSet = new Set(result.playerSectorMacros)
     for (const g of result.groups) {
