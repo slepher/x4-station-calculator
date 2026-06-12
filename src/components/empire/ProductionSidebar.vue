@@ -363,11 +363,11 @@ onUnmounted(() => {
             class="sidebar-item"
             :class="{ active: isTabActive(item.id) }"
             :data-testid="item.id === 'overview' ? 'sidebar-overview' : item.id === 'terraforming' ? 'sidebar-terraforming' : item.id === 'blueprint-recipe' ? 'sidebar-blueprint-recipe' : 'sidebar-tech-tree'"
+            @click="handleFixedClick(item)"
           >
             <div class="sidebar-item-active-bar"></div>
             <span
               class="sector-click-area flex items-center gap-2 flex-1 min-w-0"
-              @click="handleFixedClick(item)"
             >
               <button
                 v-if="item.id === 'terraforming'"
@@ -443,11 +443,12 @@ onUnmounted(() => {
             <div
               class="sidebar-item sector-header"
               :class="{ expanded: isSectorExpanded(sector.id), active: isSectorActive(sector.id) }"
+              @click="handleSectorClick(sector.id)"
             >
               <div class="sidebar-item-active-bar"></div>
               <button
                 class="sector-chevron-btn"
-                @click="toggleSectorCollapse(sector.id)"
+                @click.stop="toggleSectorCollapse(sector.id)"
               >
                 <svg
                   class="sector-chevron w-3 h-3"
@@ -463,7 +464,7 @@ onUnmounted(() => {
                   <path d="m9 18 6-6-6-6"></path>
                 </svg>
               </button>
-              <span class="sector-click-area flex items-center gap-2 flex-1 min-w-0" @click="handleSectorClick(sector.id)">
+              <span class="sector-click-area flex items-center gap-2 flex-1 min-w-0">
                 <img class="sidebar-item-icon icon-orange w-5 h-5 flex-shrink-0" :src="tradestationIconUrl" alt="" />
                 <span class="sidebar-item-label">{{ sector.name }}</span>
               </span>
