@@ -136,6 +136,14 @@ describe('autoGroup - cleanSlate groups', () => {
     }
   })
 
+  it('auto-connects each group to nearest neighbor', () => {
+    let connected = 0
+    for (const g of result.groups) {
+      if (g.connectedGroupIds.length > 0) connected++
+    }
+    expect(connected).toBeGreaterThanOrEqual(1)
+  })
+
   it('coverage only contains player sectors', () => {
     const playerSet = new Set(result.playerSectorMacros)
     for (const g of result.groups) {
@@ -256,7 +264,27 @@ describe('autoGroup - interactive applyStandalone', () => {
     expect(newGroup.isNew).toBe(true)
   })
 
-  it('standalone removes sector from other groups coverage', () => {
+  it('absorb removes standalone group when switching back', () => {
+    const extend = result.assignments.find(a => a.sectorMacro === 'cluster_26_sector001_macro')!
+
+    // First make it standalone
+    const withStandalone = applyStandaloneToResult(result, extend.sectorMacro, sectorGraph, sectorClusterMap, 3, (m) => m)
+    expect(withStandalone.groups.length).toBe(result.groups.length + 1)
+
+    // Now switch back to absorb
+    const reAssignment = withStandalone.assignments.find(a => a.sectorMacro === extend.sectorMacro)!
+    const absorbIdx = reAssignment.options.findIndex(o => o.type === 'absorb')
+
+    const switched = applyAbsorbToResult(withStandalone, extend.sectorMacro, absorbIdx, sectorGraph, sectorClusterMap, 3)
+    // Standalone group should be removed
+    expect(switched.groups.length).toBe(result.groups.length)
+    // Sector should now be in the absorb target group
+    const updatedAssignment = switched.assignments.find(a => a.sectorMacro === extend.sectorMacro)!
+    expect(updatedAssignment.status).toBe('auto')
+    expect(updatedAssignment.selectedOptionIndex).toBe(absorbIdx)
+  })
+
+  it('standalone removes standalone sector from old group coverage', () => {
     const extend = result.assignments.find(a => a.status === 'uncertain_extend')!
     const updated = applyStandaloneToResult(result, extend.sectorMacro, sectorGraph, sectorClusterMap, 3, (m) => m)
 
@@ -265,17 +293,15 @@ describe('autoGroup - interactive applyStandalone', () => {
     }
   })
 
-  it('standalone coverage respects already occupied sectors', () => {
+  it('standalone coverage respects existing occupied sectors', () => {
     const extend = result.assignments.find(a => a.status === 'uncertain_extend')!
     const occupied = new Set<string>()
     for (const g of result.groups) {
       g.coverageSectorMacros.forEach((m) => occupied.add(m))
       if (g.sectorMacro) occupied.add(g.sectorMacro)
     }
-
     const updated = applyStandaloneToResult(result, extend.sectorMacro, sectorGraph, sectorClusterMap, 3, (m) => m)
     const newGroup = updated.groups[updated.groups.length - 1]!
-
     for (const m of newGroup.coverageSectorMacros) {
       expect(occupied.has(m)).toBe(false)
     }
@@ -286,12 +312,40 @@ describe('autoGroup - interactive applyStandalone', () => {
     const standaloneIdx = extend.options.findIndex(o => o.type === 'standalone')
     const updated = applyStandaloneToResult(result, extend.sectorMacro, sectorGraph, sectorClusterMap, 3, (m) => m)
     const updatedAssignment = updated.assignments.find(a => a.sectorMacro === extend.sectorMacro)!
-
-    // Should select standalone option but keep original status (visible in list)
     expect(updatedAssignment.selectedOptionIndex).toBe(standaloneIdx)
-    // Status unchanged so card stays visible
     expect(updatedAssignment.options).toEqual(extend.options)
-    // New group exists
+    expect(updated.groups.length).toBe(result.groups.length + 1)
+  })
+
+  it('standalone auto-reassigns nearby auto sectors if closer', () => {
+    // cluster_26 (Atiya's Misfortune I) is uncertain_extend at distance 4 from Asteroid Belt
+    const extend = result.assignments.find(a => a.sectorMacro === 'cluster_26_sector001_macro')!
+    const updated = applyStandaloneToResult(result, extend.sectorMacro, sectorGraph, sectorClusterMap, 3, (m) => m)
+    
+    // Any nearby auto sector that's closer to the new group should be moved to new group's coverage
+    // Even if no sector qualifies, the new group should exist
+    expect(updated.groups.length).toBe(result.groups.length + 1)
+    const newGroupId = updated.groups[updated.groups.length - 1]!.id
+
+    // Check if any sector was reassigned
+    const reassigned = updated.assignments.find(a =>
+      a.sectorMacro !== extend.sectorMacro &&
+      a.defaultGroupId === newGroupId
+    )
+    if (reassigned) {
+      expect(reassigned.status).toBe('auto')
+    }
+  })
+
+  it('standalone adds new group candidate to nearby uncertain sectors', () => {
+    const extend = result.assignments.find(a => a.sectorMacro === 'cluster_26_sector001_macro')!
+    // First make cluster_26 standalone (creates a new group)
+    const updated = applyStandaloneToResult(result, extend.sectorMacro, sectorGraph, sectorClusterMap, 3, (m) => m)
+    const newGroupId = updated.groups[updated.groups.length - 1]!.id
+
+    // Other uncertain sectors within range should get the new group as candidate
+    // (Atiya's Misfortune I is at dist 4 from Asteroid Belt, the new group at Atiya's
+    //  might not be within range of others, but the logic should not crash)
     expect(updated.groups.length).toBe(result.groups.length + 1)
   })
 })

@@ -272,7 +272,8 @@ function handleSelectOption(sectorMacro: string, optionIndex: number) {
   if (opt.type === 'absorb' && opt.targetGroupId) {
     autoGroupResult.value = applyAbsorbToResult(
       autoGroupResult.value, sectorMacro, optionIndex,
-      sectorGraph, sectorClusterMap
+      sectorGraph, sectorClusterMap,
+      prefJumpRange.value
     )
   }
   if (opt.type === 'standalone') {
@@ -394,7 +395,8 @@ defineExpose({ triggerAutoGroup })
 const hasUncertainAssignments = computed(() => {
   if (!autoGroupResult.value) return false
   return autoGroupResult.value.assignments.some(
-    (a) => a.status === 'uncertain_tie' || a.status === 'uncertain_extend'
+    (a) => a.selectedOptionIndex === null &&
+      (a.status === 'uncertain_tie' || a.status === 'uncertain_extend')
   )
 })
 
@@ -644,6 +646,7 @@ const stationCounts = computed<Record<string, number>>(() => {
           :sector-graph="sectorGraphInfo.sectorGraph"
           :sector-cluster-map="sectorGraphInfo.sectorClusterMap"
           :player-sector-macros="autoGroupResult?.playerSectorMacros ?? []"
+          :editable="!autoGroupConfirmed"
           @toggle-pin="handleTogglePin"
           @update-jump-range="handleUpdateJumpRange"
         />

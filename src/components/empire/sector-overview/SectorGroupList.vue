@@ -14,6 +14,7 @@ const props = defineProps<{
   sectorGraph: Record<string, string[]>
   sectorClusterMap: Record<string, string>
   playerSectorMacros: string[]
+  editable: boolean
 }>()
 
 const emit = defineEmits<{
@@ -49,6 +50,7 @@ function getCoverageByJump(group: GroupDraftInfo): Map<number, string[]> {
 
   for (const sector of group.coverageSectorMacros) {
     if (!playerSet.has(sector)) continue
+    if (sector === group.sectorMacro) continue
     const jump = distMap.get(sector) ?? 0
     if (!byJump.has(jump)) byJump.set(jump, [])
     byJump.get(jump)!.push(sector)
@@ -91,7 +93,7 @@ function getConnectedGroupNames(group: GroupDraftInfo): string[] {
         </div>
         <div class="group-actions">
           <button
-            v-if="group.isNew"
+            v-if="group.isNew && props.editable"
             class="action-btn pin-btn"
             :class="{ 'pin-btn--active': group.isPinned }"
             :title="t('sector.pin_group')"
@@ -112,7 +114,7 @@ function getConnectedGroupNames(group: GroupDraftInfo): string[] {
               {{ getSectorName(group.sectorMacro || '') }}
             </span>
             <div class="jump-control">
-              <template v-if="!group.isPinned && group.isNew">
+              <template v-if="!props.editable || (!group.isPinned && group.isNew)">
                 <span class="jump-readonly">{{ group.jumpRange }}</span>
               </template>
               <JumpInput

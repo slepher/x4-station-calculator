@@ -258,6 +258,24 @@ export function groupCleanSlate(
     coverage.forEach((m) => occupiedSectors.add(m))
   }
 
+  // Auto-connect each new group to its nearest neighbor
+  for (const group of groups) {
+    if (!group.sectorMacro) continue
+    let nearest: string | null = null
+    let minDist = Infinity
+    for (const other of groups) {
+      if (other.id === group.id || !other.sectorMacro) continue
+      const dist = getDistance(group.sectorMacro, other.sectorMacro, sectorGraph, sectorClusterMap)
+      if (dist !== null && dist < minDist) {
+        minDist = dist
+        nearest = other.id
+      }
+    }
+    if (nearest) {
+      group.connectedGroupIds = [nearest]
+    }
+  }
+
   // Phase A: Greedy assignment
   const unassignedSectors = playerSectorMacros.filter((s) => !assignedSectors.has(s))
 
@@ -675,7 +693,8 @@ export function applyAbsorbToResult(
   sectorMacro: string,
   optionIndex: number,
   sectorGraph: Record<string, string[]>,
-  sectorClusterMap: Record<string, string>
+  sectorClusterMap: Record<string, string>,
+  _prefJumpRange: number = 3
 ): AutoGroupResult {
   const assignments = [...result.assignments]
   const idx = assignments.findIndex((a) => a.sectorMacro === sectorMacro)
@@ -685,11 +704,34 @@ export function applyAbsorbToResult(
   const opt = assignment.options[optionIndex]!
   if (opt.type !== 'absorb' || !opt.targetGroupId) return result
 
+  const wasStandalone = assignment.selectedOptionIndex !== null
+    && assignment.options[assignment.selectedOptionIndex]?.type === 'standalone'
+
   assignments[idx] = resolveUncertainAssignment(assignment, optionIndex)
 
-  const groups = [...result.groups]
+  let groups = [...result.groups]
+
+  // If switching back from standalone, remove the now-empty standalone group
+  let removedGroupId: string | null = null
+  if (wasStandalone) {
+    const standaloneGroupIdx = groups.findIndex((g) =>
+      g.isNew && g.sectorMacro === sectorMacro
+    )
+    if (standaloneGroupIdx >= 0) {
+      removedGroupId = groups[standaloneGroupIdx]!.id
+      groups.splice(standaloneGroupIdx, 1)
+      // Remove connections to removed group
+      for (let i = 0; i < groups.length; i++) {
+        groups[i] = {
+          ...groups[i]!,
+          connectedGroupIds: groups[i]!.connectedGroupIds.filter((id) => id !== removedGroupId)
+        }
+      }
+    }
+  }
+
   const targetGroupIdx = groups.findIndex((g) => g.id === opt.targetGroupId)
-  if (targetGroupIdx < 0) return result
+  if (targetGroupIdx < 0) return { groups, assignments: assignments as SectorAssignment[], playerSectorMacros: result.playerSectorMacros }
 
   const g = groups[targetGroupIdx]!
 
@@ -718,6 +760,21 @@ export function applyAbsorbToResult(
 
   groups[targetGroupIdx] = { ...g, jumpRange: newJumpRange, coverageSectorMacros: newCoverage }
 
+  // If standalone group was removed, recompute candidates for remaining uncertain sectors
+  if (removedGroupId) {
+    for (let i = 0; i < assignments.length; i++) {
+      const a = assignments[i]!
+      if (a.sectorMacro === sectorMacro) continue
+      if (a.status !== 'uncertain_tie' && a.status !== 'uncertain_extend') continue
+      if (a.selectedOptionIndex !== null) continue
+      // Remove the removed group's options
+      assignments[i] = {
+        ...a,
+        options: a.options.filter((o) => o.targetGroupId !== removedGroupId)
+      }
+    }
+  }
+
   return { groups, assignments: assignments as SectorAssignment[], playerSectorMacros: result.playerSectorMacros }
 }
 
@@ -743,6 +800,21 @@ export function applyStandaloneToResult(
     g.coverageSectorMacros.forEach((m) => occupied.add(m))
     if (g.sectorMacro) occupied.add(g.sectorMacro)
   }
+  for (const a of result.assignments) {
+    // Auto-assigned sectors (with a group) are occupied
+    if (a.status === 'auto' && a.defaultGroupId) {
+      occupied.add(a.sectorMacro)
+    }
+    // Assignments that already have a selectedStandalone option set are also occupied
+    if (a.selectedOptionIndex !== null) {
+      const opt = a.options[a.selectedOptionIndex]
+      if (opt && opt.type === 'standalone') {
+        occupied.add(a.sectorMacro)
+      }
+    }
+  }
+  // Always exclude the standalone sector itself
+  occupied.add(sectorMacro)
 
   const groupId = `auto_${crypto.randomUUID()}`
   const coverage = getCoverageSectors(sectorMacro, prefJumpRange, sectorGraph, sectorClusterMap)
@@ -787,7 +859,7 @@ export function applyStandaloneToResult(
   }
   groups.push(newGroup)
 
-  // Select standalone option, keep assignment visible for switching back
+  // Select standalone option, keep card visible
   const standaloneIdx = assignment.options.findIndex((o) => o.type === 'standalone')
   assignments[idx] = {
     ...assignment,
@@ -799,31 +871,83 @@ export function applyStandaloneToResult(
     groups[i] = { ...groups[i]!, coverageSectorMacros: groups[i]!.coverageSectorMacros.filter((m) => m !== sectorMacro) }
   }
 
-  // Recompute candidates for remaining uncertain sectors
+  // Recompute candidates for other sectors: add new group, auto-select if better
   for (let i = 0; i < assignments.length; i++) {
     const a = assignments[i]!
     if (a.sectorMacro === sectorMacro) continue
-    if (a.status !== 'uncertain_tie' && a.status !== 'uncertain_extend') continue
-    if (a.selectedOptionIndex !== null) continue
+    if (a.status === 'exception') continue
 
     const dist = getCoverageSectors(sectorMacro, 99, sectorGraph, sectorClusterMap)
       .find((d) => d.sectorMacro === a.sectorMacro)?.distance
 
-    if (dist !== undefined && dist <= prefJumpRange) {
-      const newOpt: AssignmentOption = {
-        type: 'absorb' as const,
-        targetGroupId: groupId,
-        distance: dist,
-        extendsRange: false,
-        resultingGroupSize: 1
-      }
+    if (dist === undefined || dist > prefJumpRange) continue
+
+    const newOpt: AssignmentOption = {
+      type: 'absorb' as const,
+      targetGroupId: groupId,
+      distance: dist,
+      extendsRange: false,
+      resultingGroupSize: 1
+    }
+
+    if (a.status === 'uncertain_tie' || a.status === 'uncertain_extend') {
+      if (a.selectedOptionIndex !== null) continue
       const opts = [...a.options]
       const si = opts.findIndex((o) => o.type === 'standalone')
       if (si >= 0) opts.splice(si, 0, newOpt)
       else opts.push(newOpt)
-      assignments[i] = { ...a, options: opts, selectedOptionIndex: null }
+      const bestIdx = findBestOptionIndex(opts)
+      assignments[i] = { ...a, options: opts, selectedOptionIndex: bestIdx }
+    } else if (a.status === 'auto') {
+      // Auto-assigned sector: if new group is closer, auto-assign to new group
+      const currentDist = a.options[a.selectedOptionIndex ?? 0]?.distance ?? Infinity
+      if (dist < currentDist) {
+        // Remove from current group's coverage
+        const currentGroupId = a.defaultGroupId
+        const currentGroupIdx = groups.findIndex((g) => g.id === currentGroupId)
+        if (currentGroupIdx >= 0) {
+          groups[currentGroupIdx] = {
+            ...groups[currentGroupIdx]!,
+            coverageSectorMacros: groups[currentGroupIdx]!.coverageSectorMacros.filter((m) => m !== a.sectorMacro)
+          }
+        }
+        // Add to new group's coverage (skip if it's the anchor itself)
+        const newGroupIdx = groups.length - 1
+        if (a.sectorMacro !== groups[newGroupIdx]!.sectorMacro) {
+          groups[newGroupIdx] = {
+            ...groups[newGroupIdx]!,
+            coverageSectorMacros: [...groups[newGroupIdx]!.coverageSectorMacros, a.sectorMacro]
+          }
+        }
+
+        const opts = [...a.options]
+        const si = opts.findIndex((o) => o.type === 'standalone')
+        if (si >= 0) opts.splice(si, 0, newOpt)
+        else opts.push(newOpt)
+        assignments[i] = {
+          ...a,
+          options: opts,
+          status: 'auto' as const,
+          defaultGroupId: groupId,
+          selectedOptionIndex: opts.findIndex((o) => o.targetGroupId === groupId)
+        }
+      }
     }
   }
 
   return { groups, assignments: assignments as SectorAssignment[], playerSectorMacros: result.playerSectorMacros }
+}
+
+function findBestOptionIndex(options: AssignmentOption[]): number | null {
+  let bestIdx: number | null = null
+  let bestDist = Infinity
+  for (let i = 0; i < options.length; i++) {
+    const o = options[i]!
+    if (o.type !== 'absorb') continue
+    if (o.distance < bestDist && !o.extendsRange) {
+      bestDist = o.distance
+      bestIdx = i
+    }
+  }
+  return bestIdx
 }
