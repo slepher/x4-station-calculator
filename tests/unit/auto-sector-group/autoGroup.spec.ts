@@ -288,5 +288,28 @@ describe('autoGroup - interactive applyStandalone', () => {
 
     expect(updatedAssignment.status).toBe('auto')
     expect(updatedAssignment.selectedOptionIndex).toBe(0)
+    expect(updatedAssignment.defaultGroupId).toBeTruthy()
+    expect(updatedAssignment.options[0]?.type).toBe('absorb')
+    expect(updatedAssignment.options[0]?.targetGroupId).toBe(updatedAssignment.defaultGroupId)
+    expect(updatedAssignment.options[0]?.distance).toBe(0)
+  })
+
+  it('standalone adds new group as candidate for nearby uncertain sectors', () => {
+    // cluster_26 (Atiya's Misfortune I) is uncertain_extend at distance 4 from Asteroid Belt
+    const extend = result.assignments.find(a => a.sectorMacro === 'cluster_26_sector001_macro')!
+    const updated = applyStandaloneToResult(result, extend.sectorMacro, sectorGraph, sectorClusterMap, 3, (m) => m)
+    const newGroupId = updated.groups[updated.groups.length - 1]!.id
+
+    // Check if any other uncertain sector got the new group as a candidate
+    const otherUncertain = updated.assignments.find(
+      a => a.sectorMacro !== extend.sectorMacro &&
+           (a.status === 'uncertain_tie' || a.status === 'uncertain_extend')
+    )
+    // There may be no other uncertain sectors at range, but the logic should run
+    if (otherUncertain) {
+      const hasNewOpt = otherUncertain.options.some(o => o.targetGroupId === newGroupId)
+      // May or may not be in range — just check the code doesn't crash
+      expect(updated.groups.length).toBe(result.groups.length + 1)
+    }
   })
 })

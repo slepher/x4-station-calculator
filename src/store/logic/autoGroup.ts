@@ -734,7 +734,6 @@ export function applyStandaloneToResult(
   if (idx < 0) return result
 
   const assignment = assignments[idx]!
-  assignments[idx] = { ...assignment, selectedOptionIndex: 0, status: 'auto' }
 
   const groups = [...result.groups]
 
@@ -787,6 +786,21 @@ export function applyStandaloneToResult(
     }
   }
   groups.push(newGroup)
+
+  // Update this sector's assignment to point to new group
+  assignments[idx] = {
+    ...assignment,
+    status: 'auto' as const,
+    defaultGroupId: groupId,
+    selectedOptionIndex: 0,
+    options: [{
+      type: 'absorb' as const,
+      targetGroupId: groupId,
+      distance: 0,
+      extendsRange: false,
+      resultingGroupSize: 1
+    }]
+  }
 
   // Remove this sector from other groups' coverage
   for (let i = 0; i < groups.length - 1; i++) {
