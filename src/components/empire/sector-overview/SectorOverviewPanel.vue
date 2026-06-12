@@ -227,26 +227,6 @@ const stationCounts = computed<Record<string, number>>(() => {
           <SaveUploadPanel @upload-complete="() => { const archive = saveStore.selectedArchive; if (archive) { const guid = archive.meta.guid; if (!activeViewStore.activeBinding || guid === activeViewStore.activeBinding) { saveBindingStore.createOrOpenBinding(guid); activeViewStore.switchToBinding(guid); triggerAutoGroup() } } }" />
           <SaveList @bind-complete="triggerAutoGroup" />
         </div>
-        <div class="pref-panel border-t border-slate-700/50">
-          <div class="p-3 flex flex-col gap-2">
-            <div class="flex items-center gap-2">
-              <label class="text-xs text-slate-400 w-24">{{ t('sector.default_jump') }}</label>
-              <select v-model="prefJumpRange" class="text-xs bg-slate-900 border border-slate-600 rounded px-2 py-1 text-slate-200 flex-1">
-                <option v-for="j in [1,2,3,4,5]" :key="j" :value="j">{{ j }}</option>
-              </select>
-            </div>
-            <div class="flex items-center gap-2">
-              <label class="text-xs text-slate-400 w-24">{{ t('sector.default_threshold') }}</label>
-              <select v-model="prefThreshold" class="text-xs bg-slate-900 border border-slate-600 rounded px-2 py-1 text-slate-200 flex-1">
-                <option :value="1_000_000">1M</option>
-                <option :value="3_000_000">3M</option>
-                <option :value="5_000_000">5M</option>
-                <option :value="10_000_000">10M</option>
-                <option :value="20_000_000">20M</option>
-              </select>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
 
