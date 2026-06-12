@@ -679,7 +679,10 @@ export class StationDerivedMap {
 
   private buildSemantics(snapshot: StationDerivedSnapshot, deps: StationDerivedStaticDeps): StationSemanticDerived {
     if (snapshot.modulesMode === 'plan') {
-      return buildSemanticsFromModules(snapshot.inputModules, deps)
+      const modules = snapshot.referenceModules?.length
+        ? (snapshot.fullModules.length > 0 ? snapshot.fullModules : snapshot.inputModules)
+        : snapshot.inputModules
+      return buildSemanticsFromModules(modules, deps)
     }
 
     const fallback = buildSemanticsFromModules(snapshot.fullModules, deps)
