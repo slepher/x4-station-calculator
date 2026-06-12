@@ -163,11 +163,16 @@ function getUncertainCount(groupId: string): number {
 }
 
 .empty-hint {
-  @apply text-sm text-amber-100/40 text-center py-4;
+  @apply text-sm text-slate-500 text-center py-4;
 }
 
+.action-btn {
+  @apply text-xs p-1 rounded text-slate-400 hover:text-slate-200 hover:bg-slate-700/50;
+}
+
+
 .group-item {
-  @apply rounded border border-amber-300/20 bg-black/40 p-2;
+  @apply rounded border border-slate-700/50 bg-slate-800/40 p-2;
 }
 
 .group-item--new {
@@ -175,7 +180,7 @@ function getUncertainCount(groupId: string): number {
 }
 
 .group-item--pinned {
-  @apply border-amber-300/30;
+  @apply border-blue-500/30 bg-blue-500/5;
 }
 
 .group-header {
@@ -187,7 +192,7 @@ function getUncertainCount(groupId: string): number {
 }
 
 .group-name {
-  @apply truncate text-sm text-amber-100;
+  @apply truncate text-sm text-slate-200;
 }
 
 .group-actions {
@@ -199,7 +204,7 @@ function getUncertainCount(groupId: string): number {
 }
 
 .pin-btn--active {
-  @apply text-amber-400;
+  @apply text-sky-400;
 }
 
 .pin-icon {
@@ -220,7 +225,7 @@ function getUncertainCount(groupId: string): number {
 }
 
 .config-label {
-  @apply text-xs font-semibold uppercase tracking-wider text-amber-100/60;
+  @apply text-xs font-semibold uppercase tracking-wider text-slate-400;
 }
 
 .config-value {
@@ -251,7 +256,7 @@ function getUncertainCount(groupId: string): number {
 }
 
 .jump-readonly {
-  @apply text-xs text-amber-100/60;
+  @apply text-xs text-slate-400;
 }
 
 .jump-list {
@@ -266,7 +271,7 @@ function getUncertainCount(groupId: string): number {
 }
 
 .jump-number {
-  @apply text-xs text-amber-100/40 shrink-0;
+  @apply text-xs text-slate-500 shrink-0;
   height: var(--binding-pill-height);
   line-height: var(--binding-pill-height);
 }
@@ -276,6 +281,6 @@ function getUncertainCount(groupId: string): number {
 }
 
 .group-stats {
-  @apply flex items-center gap-3 text-xs text-amber-100/50;
+  @apply flex items-center gap-3 text-xs text-slate-500;
 }
 </style>
