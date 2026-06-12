@@ -787,19 +787,11 @@ export function applyStandaloneToResult(
   }
   groups.push(newGroup)
 
-  // Update this sector's assignment to point to new group
+  // Select standalone option, keep assignment visible for switching back
+  const standaloneIdx = assignment.options.findIndex((o) => o.type === 'standalone')
   assignments[idx] = {
     ...assignment,
-    status: 'auto' as const,
-    defaultGroupId: groupId,
-    selectedOptionIndex: 0,
-    options: [{
-      type: 'absorb' as const,
-      targetGroupId: groupId,
-      distance: 0,
-      extendsRange: false,
-      resultingGroupSize: 1
-    }]
+    selectedOptionIndex: standaloneIdx >= 0 ? standaloneIdx : assignment.options.length,
   }
 
   // Remove this sector from other groups' coverage
