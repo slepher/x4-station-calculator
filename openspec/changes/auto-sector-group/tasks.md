@@ -27,15 +27,15 @@
 ## 4. LiveProductionWorkbenchView Layout
 
 - [x] 修改 `LiveProductionWorkbenchView.vue` overview 模式模板：替换 `EmpireWareFlowsDashboard` 位置
-- [x] Col 1 (col-span-3)：保持 `SaveUploadPanel` + 新增预制跳数 input + 预制容量 input + `SaveList`
+- [x] Col 1 (col-span-3)：保持 `SaveUploadPanel` + 新增分组覆盖跳数 input + 预制容量 input + `SaveList`
 - [x] Col 2 (col-span-5)：新增 `SectorConfirmBar` + `SectorGroupList`
 - [x] Col 3 (col-span-4)：新增 `AllocationConfirmBar` + `SectorAllocationList`（有未决时），或 `EmpireWareFlowsDashboard`（无未决时）
-- [x] 预制值 binding：`DEFAULT_JUMP_RANGE`、`CONTAINER_THRESHOLD` 默认值
+- [x] 预制值 binding：`DEFAULT_JUMP_RANGE = 2`、`CONTAINER_THRESHOLD` 默认值
 
 ## 5. Col 2 Components
 
 - [x] 创建 `src/components/empire/sector-overview/SectorConfirmBar.vue`
-- [x] 默认跳数输入（仅影响新 group）；默认容量输入（hub 阈值）
+- [x] 分组覆盖跳数输入（默认 2，仅影响新 group）；默认容量输入（hub 阈值）
 - [x] [重新计算] 按钮：重跑算法 → 更新 Col 3
 - [x] 创建 `src/components/empire/sector-overview/SectorGroupList.vue`
 - [x] 星区 group 列表形态与 `MapBindingSectorGroup` 一致
@@ -109,16 +109,20 @@
 ## 15. 实时吸收联动
 
 - [x] Col 3 选 absorb → 目标 group 覆盖立即加入该 sector（applyAbsorbToResult）
+- [x] Col 3 默认 auto absorb → Col 2 目标 group 覆盖同步显示该 sector
 - [x] 从旧 group 覆盖中移除
 - [x] 若 extendsRange → 自动扩展 jumpRange
 - [x] Col 2 覆盖列表实时刷新
-- [x] 从 standalone 切回 absorb → 删除空 standalone group，清除候选
+- [x] 从 standalone 切回 absorb → 删除空 standalone group，仅清除该 standalone 派生候选
 
 ## 16. 独立成组联动
 
 - [x] applyStandaloneToResult：创建新 group，覆盖仅从未决 sector 取
 - [x] Auto-connect 双向连接最近已有 group
-- [x] Col 3 剩余未选中存疑 sector 获得新 group 候选
+- [x] Col 3 其他可覆盖 sector 获得新 group 派生候选
+- [x] 派生候选只追加，不移除初始候选
+- [x] 若派生候选成为最佳候选，自动切换选中；用户仍可切回初始候选
+- [x] standalone 撤销时按来源移除派生候选，并在剩余候选中重选最佳项
 
 ## 17. UUID 持久化与连接显示
 
@@ -132,3 +136,10 @@
 
 - [x] 23 TDD 测试覆盖：fixture、group/anchor、覆盖排他、assignment 状态、单向超高速、standalone/absorb 交互
 - [x] 日志：cleanSlate auto-connect、createAutoGroups connecting、SectorGroupList connectedIds
+
+## 19. Col 3 card 身份与顺序稳定
+
+- [x] 为 Col 3 assignment card 增加生成时固定的 `displayBucket` / 等价字段
+- [x] `unresolved` card 被用户选择后仍保持 `unresolved` 身份，不移动到 `resolved` 区
+- [x] absorb / standalone 选择只更新 card 内部状态和 Col 2 draft，不改变 Col 3 既有 card 顺序
+- [x] 只有 [重新计算] 或重新运行自动分组时才重建 Col 3 card 顺序和身份

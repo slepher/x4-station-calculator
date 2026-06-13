@@ -3,11 +3,13 @@ import { useI18n } from 'vue-i18n'
 
 defineProps<{
   prefJumpRange: number
+  bridgeSearchJumpRange: number
   prefThreshold: number
 }>()
 
 const emit = defineEmits<{
   (e: 'update:prefJumpRange', value: number): void
+  (e: 'update:bridgeSearchJumpRange', value: number): void
   (e: 'update:prefThreshold', value: number): void
   (e: 'recalculate'): void
 }>()
@@ -15,6 +17,7 @@ const emit = defineEmits<{
 const { t } = useI18n()
 
 const jumpOptions = [1, 2, 3, 4, 5]
+const bridgeJumpOptions = [2, 3, 4, 5]
 const thresholdOptions = [
   { label: '1M', value: 1_000_000 },
   { label: '3M', value: 3_000_000 },
@@ -27,13 +30,29 @@ const thresholdOptions = [
 <template>
   <div class="confirm-bar">
     <div class="bar-left">
-      <label class="bar-label">{{ t('sector.default_jump') }}</label>
+      <label class="bar-label">{{ t('sector.group_coverage_jump') }}</label>
       <select
         class="bar-select"
         :value="prefJumpRange"
         @change="emit('update:prefJumpRange', Number(($event.target as HTMLSelectElement).value))"
       >
         <option v-for="j in jumpOptions" :key="j" :value="j">{{ j }}</option>
+      </select>
+
+      <label class="bar-label ml-3">{{ t('sector.bridge_search_jump') }}</label>
+      <select
+        class="bar-select"
+        :value="bridgeSearchJumpRange"
+        @change="emit('update:bridgeSearchJumpRange', Number(($event.target as HTMLSelectElement).value))"
+      >
+        <option
+          v-for="j in bridgeJumpOptions"
+          :key="j"
+          :value="j"
+          :disabled="j < prefJumpRange"
+        >
+          {{ j }}
+        </option>
       </select>
 
       <label class="bar-label ml-3">{{ t('sector.default_threshold') }}</label>
@@ -53,11 +72,11 @@ const thresholdOptions = [
 
 <style scoped>
 .confirm-bar {
-  @apply flex items-center justify-between p-2 bg-slate-800/50 rounded border border-slate-700/50 mb-3;
+  @apply flex flex-wrap items-center justify-between gap-2 p-2 bg-slate-800/50 rounded border border-slate-700/50 mb-3;
 }
 
 .bar-left {
-  @apply flex items-center gap-1;
+  @apply flex flex-wrap items-center gap-1;
 }
 
 .bar-label {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import fixture from '../../fixtures/auto-group/save_009_minimal.json'
-import { groupCleanSlate, applyAbsorbToResult, applyStandaloneToResult, type AutoGroupResult, type GroupDraftInfo } from '@/store/logic/autoGroup'
+import { groupCleanSlate, applyAbsorbToResult, applyStandaloneToResult, applyBridgePlanToDraft, type AutoGroupResult, type GroupDraftInfo } from '@/store/logic/autoGroup'
 import { buildSectorGraphFromMaps } from '@/store/logic/saveBindingUtils'
 import type { SaveArchive, PlayerStationEntry } from '@/types/saveArchive'
 import type { X4Module } from '@/types/x4'
@@ -200,6 +200,18 @@ describe('autoGroup - cleanSlate assignments', () => {
     expect(ssi).toBeDefined()
     expect(ssi!.status).toBe('auto')
   })
+
+  it('selected absorb assignments are reflected in group coverage', () => {
+    for (const assignment of result.assignments) {
+      if (assignment.selectedOptionIndex === null) continue
+      const selected = assignment.options[assignment.selectedOptionIndex]
+      if (!selected || selected.type !== 'absorb' || !selected.targetGroupId) continue
+      const targetGroup = result.groups.find((g) => g.id === selected.targetGroupId)
+      expect(targetGroup).toBeDefined()
+      if (targetGroup!.sectorMacro === assignment.sectorMacro) continue
+      expect(targetGroup!.coverageSectorMacros).toContain(assignment.sectorMacro)
+    }
+  })
 })
 
 describe('autoGroup - interactive applyAbsorb', () => {
@@ -356,5 +368,186 @@ describe('autoGroup - interactive applyStandalone', () => {
     // (Atiya's Misfortune I is at dist 4 from Asteroid Belt, the new group at Atiya's
     //  might not be within range of others, but the logic should not crash)
     expect(updated.groups.length).toBe(result.groups.length + 1)
+  })
+
+  it('standalone derived candidates append, auto-select, and roll back without removing original candidates', () => {
+    const sectorGraph = {
+      A: ['B'],
+      B: ['A', 'C'],
+      C: ['B', 'D'],
+      D: ['C']
+    }
+    const sectorClusterMap = { A: 'A', B: 'B', C: 'C', D: 'D' }
+    const base: AutoGroupResult = {
+      groups: [
+        {
+          id: 'g1',
+          name: 'Group A',
+          sectorMacro: 'A',
+          jumpRange: 2,
+          originalJumpRange: 2,
+          coverageSectorMacros: ['B'],
+          connectedGroupIds: [],
+          isNew: true,
+          isPinned: false
+        },
+        {
+          id: 'g2',
+          name: 'Group D',
+          sectorMacro: 'D',
+          jumpRange: 2,
+          originalJumpRange: 2,
+          coverageSectorMacros: [],
+          connectedGroupIds: [],
+          isNew: true,
+          isPinned: false
+        }
+      ],
+      assignments: [
+        {
+          sectorMacro: 'B',
+          status: 'auto',
+          displayBucket: 'resolved',
+          defaultGroupId: 'g1',
+          selectedOptionIndex: 0,
+          options: [
+            { type: 'absorb', targetGroupId: 'g1', distance: 1, extendsRange: false, resultingGroupSize: 2 },
+            { type: 'standalone', distance: 0, extendsRange: false, resultingGroupSize: 1 }
+          ]
+        },
+        {
+          sectorMacro: 'C',
+          status: 'auto',
+          displayBucket: 'resolved',
+          defaultGroupId: 'g2',
+          selectedOptionIndex: 0,
+          options: [
+            { type: 'absorb', targetGroupId: 'g2', distance: 2, extendsRange: false, resultingGroupSize: 2 },
+            { type: 'standalone', distance: 0, extendsRange: false, resultingGroupSize: 1 }
+          ]
+        }
+      ],
+      bridgePlans: [],
+      playerSectorMacros: ['A', 'B', 'C', 'D']
+    }
+
+    const withStandalone = applyStandaloneToResult(base, 'B', sectorGraph, sectorClusterMap, 2, (m) => m)
+    const newGroup = withStandalone.groups[withStandalone.groups.length - 1]!
+    const cAssignment = withStandalone.assignments.find((a) => a.sectorMacro === 'C')!
+    const derivedIndex = cAssignment.options.findIndex((o) => o.sourceGroupId === newGroup.id)
+
+    expect(derivedIndex).toBeGreaterThanOrEqual(0)
+    expect(cAssignment.options.some((o) => o.targetGroupId === 'g2')).toBe(true)
+    expect(cAssignment.selectedOptionIndex).toBe(derivedIndex)
+    expect(withStandalone.groups.find((g) => g.id === newGroup.id)!.coverageSectorMacros).toContain('C')
+
+    const bAssignment = withStandalone.assignments.find((a) => a.sectorMacro === 'B')!
+    const absorbIdx = bAssignment.options.findIndex((o) => o.targetGroupId === 'g1')
+    const rolledBack = applyAbsorbToResult(withStandalone, 'B', absorbIdx, sectorGraph, sectorClusterMap, 2)
+    const rolledBackC = rolledBack.assignments.find((a) => a.sectorMacro === 'C')!
+
+    expect(rolledBackC.options.some((o) => o.sourceGroupId === newGroup.id)).toBe(false)
+    expect(rolledBackC.options.some((o) => o.targetGroupId === 'g2')).toBe(true)
+    expect(rolledBackC.selectedOptionIndex).toBe(0)
+  })
+})
+
+describe('autoGroup - bridge adoption', () => {
+  it('rebuilds assignments from adopted bridge groups as fixed anchors', () => {
+    const sectorGraph = {
+      A: ['B'],
+      B: ['A', 'C'],
+      C: ['B', 'D'],
+      D: ['C', 'E'],
+      E: ['D']
+    }
+    const sectorClusterMap = { A: 'A', B: 'B', C: 'C', D: 'D', E: 'E' }
+    const base: AutoGroupResult = {
+      groups: [
+        {
+          id: 'gA',
+          name: 'Group A',
+          sectorMacro: 'A',
+          jumpRange: 2,
+          originalJumpRange: 2,
+          coverageSectorMacros: [],
+          connectedGroupIds: [],
+          isNew: true,
+          isPinned: false
+        },
+        {
+          id: 'gE',
+          name: 'Group E',
+          sectorMacro: 'E',
+          jumpRange: 2,
+          originalJumpRange: 2,
+          coverageSectorMacros: ['C'],
+          connectedGroupIds: [],
+          isNew: true,
+          isPinned: false
+        }
+      ],
+      assignments: [
+        {
+          sectorMacro: 'B',
+          status: 'auto',
+          displayBucket: 'resolved',
+          defaultGroupId: 'gA',
+          selectedOptionIndex: 0,
+          options: [
+            { type: 'absorb', targetGroupId: 'gA', distance: 1, extendsRange: false, resultingGroupSize: 2 },
+            { type: 'standalone', distance: 0, extendsRange: false, resultingGroupSize: 1 }
+          ]
+        },
+        {
+          sectorMacro: 'C',
+          status: 'auto',
+          displayBucket: 'resolved',
+          defaultGroupId: 'gE',
+          selectedOptionIndex: 0,
+          options: [
+            { type: 'absorb', targetGroupId: 'gE', distance: 2, extendsRange: false, resultingGroupSize: 2 },
+            { type: 'standalone', distance: 0, extendsRange: false, resultingGroupSize: 1 }
+          ]
+        }
+      ],
+      bridgePlans: [],
+      playerSectorMacros: ['A', 'B', 'C', 'D', 'E']
+    }
+    const plan = {
+      id: 'planB',
+      recommended: true,
+      selected: false,
+      planScore: 100,
+      totalJump: 2,
+      maxJump: 1,
+      stableKey: 'unitB',
+      units: [{
+        unitId: 'unitB',
+        label: 'B',
+        reaches: [],
+        candidates: [{ sectorMacro: 'B', score: 100 }],
+        selectedSectorMacro: 'B'
+      }]
+    }
+
+    const updated = applyBridgePlanToDraft(
+      { ...base, bridgePlans: [plan] },
+      plan,
+      2,
+      (macro) => macro,
+      sectorGraph,
+      sectorClusterMap,
+      5
+    )
+    const bridgeGroup = updated.groups.find((group) => group.sectorMacro === 'B')!
+    const bridgeAssignment = updated.assignments.find((assignment) => assignment.sectorMacro === 'B')!
+    const cAssignment = updated.assignments.find((assignment) => assignment.sectorMacro === 'C')!
+    const selectedCOption = cAssignment.options[cAssignment.selectedOptionIndex!]
+
+    expect(bridgeAssignment.defaultGroupId).toBe(bridgeGroup.id)
+    expect(selectedCOption.targetGroupId).toBe(bridgeGroup.id)
+    expect(bridgeGroup.coverageSectorMacros).toContain('C')
+    expect(updated.groups.find((group) => group.id === 'gE')!.coverageSectorMacros).not.toContain('C')
   })
 })

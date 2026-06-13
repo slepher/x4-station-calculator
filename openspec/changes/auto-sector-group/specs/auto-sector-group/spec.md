@@ -47,6 +47,8 @@ This spec defines the auto sector grouping feature for Live Production mode. It 
 
 系统 SHALL 支持在无任何已有 binding group 时，从零自动划分星区组。
 
+**并且** 新建 group 的默认 `jumpRange` SHALL 来自“分组覆盖跳数”，默认值为 2。
+
 **前提** jue 存档已绑定，无任何已有 group
 
 **当** 触发自动分组
@@ -100,7 +102,7 @@ This spec defines the auto sector grouping feature for Live Production mode. It 
 
 | Col | Span | 内容 |
 |---|---|---|
-| Col 1 | 3 | `SaveUploadPanel` + 预制跳数 + 预制容量 + `SaveList` |
+| Col 1 | 3 | `SaveUploadPanel` + 分组覆盖跳数 + 预制容量 + `SaveList` |
 | Col 2 | 5 | [确定栏] + 星区 group 列表（与 MapBindingSectorGroup 同形态） |
 | Col 3 | 4 | 存在未决 sector 时：分配列表 + 存疑列表；无未决时：`EmpireWareFlowsDashboard` |
 
@@ -126,6 +128,63 @@ Col 3 SHALL 展示所有 sector 的统一分配列表，支持候选切换。
 **当** 点击 [确定]
 **那么** 系统 SHALL 一次性写入 `saveBindingStore` → Col 3 切换为资源视图 → `ProductionSidebar` 刷新
 
+### Requirement: Col 2 Draft Coverage Synchronization
+
+Col 2 SHALL reflect the currently selected Col 3 absorb decisions, including default auto decisions.
+
+#### Scenario: Show selected absorb sectors in target group coverage
+
+**前提** Col 3 card 当前选中 absorb 到某个 group
+
+**当** Col 2 渲染该 group
+**那么** 该 sector SHALL 出现在目标 group 的 coverage 药丸列表中
+**并且** 若该 sector 原先存在于其他 group 的 coverage 中，其他 group SHALL 不再显示该 sector。
+
+### Requirement: Standalone-Derived Candidate Lifecycle
+
+Standalone 新建 group SHALL only append derived candidates to other cards and SHALL remove only those derived candidates when rolled back.
+
+#### Scenario: Append derived candidate without removing original candidates
+
+**前提** Col 3 中 sector A 选择“独立成组”
+
+**当** 新 group 可覆盖 sector B
+**那么** sector B 的 card SHALL 追加一个指向 sector A 新 group 的 absorb 候选
+**并且** sector B 原有候选 SHALL 保留
+**并且** 若新候选是当前最佳候选，sector B SHALL 自动切换选中该新候选。
+
+#### Scenario: Remove derived candidate when standalone group is removed
+
+**前提** sector A 曾选择“独立成组”，并向 sector B 追加了派生候选
+
+**当** sector A 切回 absorb，导致该 standalone group 被删除
+**那么** 系统 SHALL 只移除来源于该 standalone group 的派生候选
+**并且** 不得移除 sector B 的初始候选
+**并且** 若 sector B 当前选中的正是被移除的派生候选，系统 SHALL 在剩余候选中重新选择当前最佳候选。
+
+### Requirement: Col 3 Card Identity and Order Stability
+
+Col 3 card 的显示身份和排序 SHALL 在一次算法输出后保持稳定。
+
+#### Scenario: Preserve unresolved card identity after selection
+
+**前提** 自动分组或重新计算已经生成 Col 3 cards
+
+**当** 系统为 card 建立显示状态
+**那么** 系统 SHALL：
+- 将算法已有默认选择的 card 标记为 `resolved`
+- 将算法没有默认选择、需要用户决策的 card 标记为 `unresolved`
+- 仅在本次算法输出生成时确定该身份
+
+**当** 用户为 `unresolved` card 选择 absorb、standalone 或其他候选
+**那么** 系统 SHALL：
+- 保持该 card 的 `unresolved` 身份
+- 不因 `selectedOptionIndex !== null` 将其移动到 `resolved` 区
+- 不改变该 card 与其他已有 cards 的显示顺序
+- 仅更新 card 内部选中态和 Col 2 draft 预览
+
+**并且** 只有显式 [重新计算] 或重新运行自动分组时，系统 MAY 重建 Col 3 card 的顺序和显示身份。
+
 ### Requirement: Col 2 Confirm Bar
 
 Col 2 SHALL 包含独立的确定栏。
@@ -134,7 +193,7 @@ Col 2 SHALL 包含独立的确定栏。
 
 **当** 确定栏渲染
 **那么** 包含：
-- 默认跳数输入（仅影响新建 group，不影响已有 group 的 jumpRange）
+- 分组覆盖跳数输入（默认 2，仅影响新建 group，不影响已有 group 的 jumpRange）
 - 默认容量输入（hub 识别 THRESHOLD）
 - [重新计算] 按钮
 
@@ -143,7 +202,7 @@ Col 2 SHALL 包含独立的确定栏。
 
 ### Requirement: Jump Range Auto-Extend and Rollback
 
-系统 SHALL 在分配超出预制跳数时自动扩展 jumpRange，撤销时自动回退。
+系统 SHALL 在分配超出分组覆盖跳数时自动扩展 jumpRange，撤销时自动回退。
 
 **前提** 某 sector 被分配到 group，但其距离 > group 的 jumpRange
 

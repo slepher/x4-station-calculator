@@ -6,11 +6,11 @@
 LiveProductionWorkbenchView.vue (overview mode)
 ├── Col 1 (3/12)
 │   ├── SaveUploadPanel.vue       ← 上传触发自动分析
-│   ├── PrefJumpInput              ← 预制跳数 (仅影响新 group)
+│   ├── GroupCoverageJumpInput     ← 分组覆盖跳数，默认 2 (仅影响新 group)
 │   ├── PrefThresholdInput         ← 预制容量 (hub 阈值)
 │   └── SaveList.vue               ← 绑定按钮触发分组
 ├── Col 2 (5/12)
-│   ├── SectorConfirmBar           ← [默认跳数] [默认容量] [重新计算]
+│   ├── SectorConfirmBar           ← [分组覆盖跳数] [默认容量] [重新计算]
 │   └── SectorGroupList            ← 已有 group + 新 group 列表
 │       └── (复用 MapBindingSectorGroup 形态，或抽取共享组件)
 └── Col 3 (4/12)
@@ -64,6 +64,7 @@ autoGroup.ts
 interface SectorAssignment {
   sectorMacro: string
   status: 'auto' | 'uncertain_tie' | 'uncertain_extend' | 'standalone'
+  displayBucket: 'resolved' | 'unresolved'
   defaultGroupId?: string
   options: AssignmentOption[]
   selectedOptionIndex: number | null
@@ -134,6 +135,7 @@ ProductionSidebar:
 
 用户交互 (Col 3 选候选 / Col 2 改跳数)
   └→ UI Draft 即时更新 (不写 store)
+  └→ 不重排 Col 3 cards，不改变 card 的 displayBucket
 
 用户点击 [确定]
   └→ saveBindingStore.createAutoGroups(draft)
@@ -146,7 +148,25 @@ ProductionSidebar:
   └→ 用各 group 当前 jumpRange 重跑算法 → Col 3 重建
 ```
 
-### 6. 扩展/回退机制
+### 6. Col 3 card 身份与顺序稳定
+
+`SectorAllocationList` 不得用当前选择状态动态分组。`displayBucket` 只在算法输出时确定：
+
+```typescript
+displayBucket = selectedOptionIndex === null ? 'unresolved' : 'resolved'
+```
+
+该表达式只用于创建 assignment 的初始显示身份。之后用户选择候选时：
+
+- `selectedOptionIndex` 可以变化
+- `status` 可以用于业务处理
+- `displayBucket` 不变化
+- card 在 Col 3 的相对顺序不变化
+- Col 2 draft 可以实时刷新
+
+只有用户显式点击 [重新计算]、上传/绑定新存档触发自动分组、或其他重新运行算法的入口，才允许重建 `assignments` 并重新计算 `displayBucket` 与显示顺序。
+
+### 7. 扩展/回退机制
 
 ```
 分配 triggered (col 3 selection)
@@ -162,14 +182,14 @@ ProductionSidebar:
       └─ 否 → 回退到 max(original_range, 其他 sector 所需最小值)
 ```
 
-### 7. 复用与兼容
+### 8. 复用与兼容
 
 - Col 2 星区列表形态与 `MapBindingSectorGroup.vue` 一致（可抽取共享组件或保持独立）
 - 跳数计算复用 `saveBindingUtils.ts:getCoverageSectors()`
 - 绑定写入复用 `saveBindingStore:createGroup/bindSectorGroup/updateGroup/setGroupConnection`
 - `ProductionSidebar` 不改动，仅在确定后通过 store 响应式刷新
 
-### 8. 单向超高速处理
+### 9. 单向超高速处理
 
 - `maps.json` 中 `sector_links` 的 `render.lane_count` 字段标识方向性：
   - `lane_count >= 2` → 双向通道
@@ -177,7 +197,7 @@ ProductionSidebar:
 - `from_zone_id` 不可靠（Grand Exchange 的两条双向超高速均指向同一方向）
 - 仅 Savage Spur 存在 `lane_count === 1` 的单向超高速
 
-### 9. 覆盖排他与 Anchor 互不侵犯
+### 10. 覆盖排他与 Anchor 互不侵犯
 
 - 计算覆盖按 group 优先级（高分 hub 优先）依次进行
 - 已被占用的星区不出现在后续 group 的覆盖中
@@ -185,7 +205,7 @@ ProductionSidebar:
 - anchor 自身不包含在 `coverageSectorMacros` 中（单独展示）
 - 仅处理 `playerStations.length > 0` 的星区（排除仅含 NPC 贸易站的 sector）
 
-### 10. 确认后展示
+### 11. 确认后展示
 
 - `autoGroupConfirmed` 状态标记
 - 确认后 `SectorConfirmBar`、`AllocationConfirmBar` 隐藏
@@ -193,7 +213,7 @@ ProductionSidebar:
 - Col 3 切换为 `EmpireWareFlowsDashboard`
 - Standalone 组：创建 group + bindSectorGroup + 自动连接最近已有 group
 
-### 11. 实时联动
+### 12. 实时联动
 
 **吸收联动**：
 ```
@@ -203,34 +223,41 @@ Col 3 用户选 absorb
   └→ 若 extendsRange → jumpRange 扩展至距离值
   └→ Col 2 覆盖列表实时刷新
 
+算法默认选中的 absorb
+  └→ syncSelectedAbsorptionsToCoverage(): 目标 group coverage 同步加入 sector
+  └→ anchor 自身不进入 coverage
+
 切换回到 absorb（从 standalone）
   └→ 检测 sector 之前是 standalone（selectedOptionIndex 指向 standalone 选项）
   └→ 删除空的 standalone group
-  └→ 其他 sector 候选清除已删除 group 的选项
+  └→ 其他 sector 只清除来源于该 standalone group 的派生候选
+  └→ 若当前选中项被移除，则在剩余候选中重选最佳项
 ```
 
 **独立成组联动**：
 ```
 Col 3 用户选 standalone
   └→ applyStandaloneToResult(): 创建新 GroupDraftInfo
-  └→ 覆盖仅从 result.assignments 中取（未决 sector）→ 排除已占用的
-  └→ Auto-connect 到最近已有 group（双向）
+  └→ 覆盖排除已占用 sector
+  └→ computeGroupGraph() 重算 MST
   └→ Col 2 立即显示新 group
-  └→ Col 3 其他未决 sector 获得新 group 候选
+  └→ Col 3 其他可覆盖 sector 追加 derived-from-standalone 候选
+  └→ 原始候选保留，不因追加派生候选而删除
+  └→ 若派生候选为当前最佳候选，则自动切换选中
 ```
 
-### 12. 连接星区显示
+### 13. 连接星区显示
 
 - 连接星区混入覆盖列表，按跳数分组显示——不单独列出
 - 仅通过颜色区分：覆盖 = amber，连接 = emerald
 - Pill 样式完全对齐 `MapBindingSectorGroup`（rounded-full, gap-1, pill-height）
 
-### 13. UUID 持久化
+### 14. UUID 持久化
 
 - `createAutoGroups` 直接使用草案 group 的 UUID（不再重新生成）
 - `connectedGroupIds` 天然正确，无需 ID 翻译映射
 
-### 14. 确认后页面刷新
+### 15. 确认后页面刷新
 
 - `runAutoGroup` 检测到已有 binding group 且无新未分配 sector → `autoGroupConfirmed = true`
 - 确认状态：`SectorConfirmBar` / `AllocationConfirmBar` 隐藏，group 只读

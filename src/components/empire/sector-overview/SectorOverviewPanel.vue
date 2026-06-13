@@ -6,7 +6,7 @@ import { useGameDataStore } from '@/store/useGameDataStore'
 import { useActiveViewStore } from '@/store/useActiveViewStore'
 import { useSaveBindingStore } from '@/store/useSaveBindingStore'
 import { useLiveProductionStore } from '@/store/useLiveProductionStore'
-import { groupCleanSlate, groupIncremental, DEFAULT_JUMP_RANGE, applyAbsorbToResult, applyStandaloneToResult, type AutoGroupResult, type GroupDraftInfo } from '@/store/logic/autoGroup'
+import { groupCleanSlate, groupIncremental, DEFAULT_JUMP_RANGE, DEFAULT_BRIDGE_SEARCH_JUMP_RANGE, applyAbsorbToResult, applyStandaloneToResult, applyBridgePlanToDraft, computeGroupGraph, type AutoGroupResult, type GroupDraftInfo } from '@/store/logic/autoGroup'
 import { DEFAULT_HUB_CONFIG } from '@/store/logic/autoGroupHub'
 import { buildSectorGraphFromMaps, getCoverageSectors } from '@/store/logic/saveBindingUtils'
 import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
@@ -26,6 +26,7 @@ const liveStore = useLiveProductionStore()
 const { t, te } = useI18n()
 
 const prefJumpRange = ref(DEFAULT_JUMP_RANGE)
+const bridgeSearchJumpRange = ref(DEFAULT_BRIDGE_SEARCH_JUMP_RANGE)
 const prefThreshold = ref(DEFAULT_HUB_CONFIG.containerThreshold)
 const autoGroupResult = ref<AutoGroupResult | null>(null)
 const autoGroupConfirmed = ref(false)
@@ -72,7 +73,7 @@ function runAutoGroup() {
     const result = groupIncremental(
       archive, binding.groups, gameDataStore.modulesByMacroId,
       sectorGraph, sectorClusterMap,
-      { containerThreshold: prefThreshold.value }, prefJumpRange.value
+      { containerThreshold: prefThreshold.value }, prefJumpRange.value, bridgeSearchJumpRange.value
     )
     if (result.assignments.length === 0) {
       autoGroupConfirmed.value = true
@@ -83,14 +84,14 @@ function runAutoGroup() {
         connectedGroupIds: [...(g.connectedGroupIds || [])],
         isNew: false, isPinned: true, hubScore: undefined
       }))
-      autoGroupResult.value = { groups: storeGroups, assignments: [], playerSectorMacros: result.playerSectorMacros }
+      autoGroupResult.value = { groups: storeGroups, assignments: [], bridgePlans: [], playerSectorMacros: result.playerSectorMacros }
       return
     }
     autoGroupResult.value = result
   } else {
     const result = groupCleanSlate(
       archive, gameDataStore.modulesByMacroId, sectorGraph, sectorClusterMap,
-      { containerThreshold: prefThreshold.value }, prefJumpRange.value
+      { containerThreshold: prefThreshold.value }, prefJumpRange.value, bridgeSearchJumpRange.value
     )
     const namedGroups = result.groups.map((g) => ({
       ...g, name: g.sectorMacro ? getSectorDisplayName(g.sectorMacro) : g.name,
@@ -101,6 +102,17 @@ function runAutoGroup() {
 
 function handleRecalculate() { runAutoGroup() }
 
+function handleUpdatePrefJumpRange(range: number) {
+  prefJumpRange.value = range
+  if (bridgeSearchJumpRange.value < range) {
+    bridgeSearchJumpRange.value = range
+  }
+}
+
+function handleUpdateBridgeSearchJumpRange(range: number) {
+  bridgeSearchJumpRange.value = Math.max(range, prefJumpRange.value)
+}
+
 function handleSelectOption(sectorMacro: string, optionIndex: number) {
   if (!autoGroupResult.value) return
   const assignment = autoGroupResult.value.assignments.find((a) => a.sectorMacro === sectorMacro)
@@ -109,10 +121,10 @@ function handleSelectOption(sectorMacro: string, optionIndex: number) {
   if (!opt) return
   const { sectorGraph, sectorClusterMap } = sectorGraphInfo.value
   if (opt.type === 'absorb' && opt.targetGroupId) {
-    autoGroupResult.value = applyAbsorbToResult(autoGroupResult.value, sectorMacro, optionIndex, sectorGraph, sectorClusterMap, prefJumpRange.value)
+    autoGroupResult.value = applyAbsorbToResult(autoGroupResult.value, sectorMacro, optionIndex, sectorGraph, sectorClusterMap, prefJumpRange.value, bridgeSearchJumpRange.value)
   }
   if (opt.type === 'standalone') {
-    autoGroupResult.value = applyStandaloneToResult(autoGroupResult.value, sectorMacro, sectorGraph, sectorClusterMap, prefJumpRange.value, getSectorDisplayName)
+    autoGroupResult.value = applyStandaloneToResult(autoGroupResult.value, sectorMacro, sectorGraph, sectorClusterMap, prefJumpRange.value, getSectorDisplayName, bridgeSearchJumpRange.value)
   }
 }
 
@@ -123,7 +135,8 @@ function handleTogglePin(groupId: string) {
   const idx = groups.findIndex((g) => g.id === groupId)
   if (idx < 0) return
   groups[idx] = { ...groups[idx]!, isPinned: !groups[idx]!.isPinned }
-  autoGroupResult.value = { groups, assignments: result.assignments, playerSectorMacros: result.playerSectorMacros }
+  computeGroupGraph(groups, sectorGraphInfo.value.sectorGraph, sectorGraphInfo.value.sectorClusterMap, bridgeSearchJumpRange.value)
+  autoGroupResult.value = { ...result, groups, assignments: result.assignments }
 }
 
 function handleUpdateJumpRange(groupId: string, range: number) {
@@ -145,7 +158,39 @@ function handleUpdateJumpRange(groupId: string, range: number) {
         .filter((m) => result.playerSectorMacros.includes(m) && !occupiedByOthers.has(m) && m !== group.sectorMacro)
     : group.coverageSectorMacros
   groups[idx] = { ...group, jumpRange: range, coverageSectorMacros: newCoverage }
-  autoGroupResult.value = { groups, assignments: result.assignments, playerSectorMacros: result.playerSectorMacros }
+  computeGroupGraph(groups, sectorGraphInfo.value.sectorGraph, sectorGraphInfo.value.sectorClusterMap, bridgeSearchJumpRange.value)
+  autoGroupResult.value = { ...result, groups, assignments: result.assignments }
+}
+
+function handleSelectBridgeCenter(planId: string, unitId: string, sectorMacro: string) {
+  if (!autoGroupResult.value) return
+  const result = autoGroupResult.value
+  const bridgePlans = result.bridgePlans.map((plan) => {
+    if (plan.id !== planId) return plan
+    return {
+      ...plan,
+      units: plan.units.map((unit) =>
+        unit.unitId === unitId ? { ...unit, selectedSectorMacro: sectorMacro } : unit
+      )
+    }
+  })
+  autoGroupResult.value = { ...result, bridgePlans }
+}
+
+function handleSelectBridgePlan(planId: string) {
+  if (!autoGroupResult.value) return
+  const result = autoGroupResult.value
+  const plan = result.bridgePlans.find((p) => p.id === planId)
+  if (!plan) return
+  autoGroupResult.value = applyBridgePlanToDraft(
+    result,
+    plan,
+    prefJumpRange.value,
+    getSectorDisplayName,
+    sectorGraphInfo.value.sectorGraph,
+    sectorGraphInfo.value.sectorClusterMap,
+    bridgeSearchJumpRange.value
+  )
 }
 
 function handleConfirm() {
@@ -165,7 +210,7 @@ function handleConfirm() {
       connectedGroupIds: [...(g.connectedGroupIds || [])],
       isNew: false, isPinned: true, hubScore: undefined
     }))
-    autoGroupResult.value = { groups: storeGroups, assignments: [], playerSectorMacros: result.playerSectorMacros }
+    autoGroupResult.value = { groups: storeGroups, assignments: [], bridgePlans: [], playerSectorMacros: result.playerSectorMacros }
   }
 }
 
@@ -199,9 +244,15 @@ onMounted(() => {
 
 const hasUncertainAssignments = computed(() => {
   if (!autoGroupResult.value) return false
+  if (hasPendingBridgeDecision.value) return true
   return autoGroupResult.value.assignments.some(
     (a) => a.selectedOptionIndex === null && (a.status === 'uncertain_tie' || a.status === 'uncertain_extend')
   )
+})
+
+const hasPendingBridgeDecision = computed(() => {
+  const plans = autoGroupResult.value?.bridgePlans ?? []
+  return plans.length > 1 && !plans.some((p) => p.selected)
 })
 
 const hasAutoResult = computed(() => autoGroupResult.value !== null && autoGroupResult.value.groups.length > 0)
@@ -234,8 +285,10 @@ const stationCounts = computed<Record<string, number>>(() => {
       <SectorConfirmBar
         v-if="!autoGroupConfirmed"
         :pref-jump-range="prefJumpRange"
+        :bridge-search-jump-range="bridgeSearchJumpRange"
         :pref-threshold="prefThreshold"
-        @update:pref-jump-range="prefJumpRange = $event"
+        @update:pref-jump-range="handleUpdatePrefJumpRange"
+        @update:bridge-search-jump-range="handleUpdateBridgeSearchJumpRange"
         @update:pref-threshold="prefThreshold = $event"
         @recalculate="handleRecalculate"
       />
@@ -261,10 +314,13 @@ const stationCounts = computed<Record<string, number>>(() => {
       <SectorAllocationList
         v-if="hasAutoResult && !autoGroupConfirmed"
         :assignments="autoGroupResult?.assignments ?? []"
+        :bridge-plans="autoGroupResult?.bridgePlans ?? []"
         :groups="autoGroupResult?.groups ?? []"
         :maps="gameDataMaps"
         :station-counts="stationCounts"
         @select-option="handleSelectOption"
+        @select-bridge-plan="handleSelectBridgePlan"
+        @select-bridge-center="handleSelectBridgeCenter"
       />
       <EmpireWareFlowsDashboard
         v-if="!hasAutoResult || autoGroupConfirmed"

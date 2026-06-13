@@ -246,6 +246,51 @@ export function getCoverageSectors(
   }))
 }
 
+export function buildSectorPath(
+  from: string,
+  to: string,
+  sectorGraph: Record<string, string[]>,
+  sectorClusterMap: Record<string, string>
+): string[] | null {
+  if (!sectorGraph[from] || !sectorGraph[to]) return null
+
+  const distances = new Map<string, number>()
+  const previous = new Map<string, string>()
+  const queue: Array<{ sector: string; distance: number }> = [{ sector: from, distance: 0 }]
+  distances.set(from, 0)
+
+  while (queue.length > 0) {
+    queue.sort((a, b) => a.distance - b.distance || a.sector.localeCompare(b.sector))
+    const current = queue.shift()!
+    if (current.distance !== distances.get(current.sector)) continue
+    if (current.sector === to) break
+
+    const currentClusterId = sectorClusterMap[current.sector]
+    for (const next of sectorGraph[current.sector] || []) {
+      const nextClusterId = sectorClusterMap[next]
+      const depthIncrease = (currentClusterId && nextClusterId && currentClusterId !== nextClusterId) ? 1 : 0
+      const nextDistance = current.distance + depthIncrease
+      const prevDistance = distances.get(next)
+      if (prevDistance !== undefined && prevDistance <= nextDistance) continue
+      distances.set(next, nextDistance)
+      previous.set(next, current.sector)
+      queue.push({ sector: next, distance: nextDistance })
+    }
+  }
+
+  if (!distances.has(to)) return null
+
+  const path = [to]
+  let current = to
+  while (current !== from) {
+    const prev = previous.get(current)
+    if (!prev) return null
+    path.push(prev)
+    current = prev
+  }
+  return path.reverse()
+}
+
 export function buildSectorGraphFromMaps(
   clusters: Record<string, {
     sectors?: string[]
