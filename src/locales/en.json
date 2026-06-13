@@ -1079,6 +1079,8 @@
     "download_json": "Download JSON",
     "remove_archive": "Remove archive",
     "confirm_remove": "Are you sure you want to delete archive \"{filename}\"? This action cannot be undone.",
+    "bind_to_latest_save": "Bind to latest save \u2014 automatically uses the newest save of this player archive",
+    "bind_to_specific_save": "Bind to this save \u2014 locks to this specific save version",
     "select_archive_hint": "Select an archive to view details",
     "stations": "Stations",
     "datavaults": "Data Vaults",

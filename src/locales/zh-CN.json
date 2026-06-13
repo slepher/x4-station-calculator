@@ -1080,6 +1080,8 @@
     "download_json": "下载 JSON",
     "remove_archive": "删除存档",
     "confirm_remove": "确定要删除存档 {filename} 吗？此操作不可撤销。",
+    "bind_to_latest_save": "绑定到最新存档 — 自动使用该玩家存档组中最新的一份存档",
+    "bind_to_specific_save": "绑定到此存档 — 锁定使用该特定版本的存档",
     "select_archive_hint": "选择存档查看详情",
     "stations": "空间站",
     "datavaults": "日志数据仓库",

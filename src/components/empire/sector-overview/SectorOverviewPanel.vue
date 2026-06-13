@@ -495,7 +495,7 @@ const stationCounts = computed<Record<string, number>>(() => {
       />
     </div>
 
-    <div class="col-span-12 lg:col-span-4">
+    <div class="col-span-12 lg:col-span-4 pb-4">
       <div class="col3-workspace" :class="{ 'col3-workspace--editing': calculationMode === 'edit' }">
         <AllocationConfirmBar
           v-if="hasAutoResult && !autoGroupConfirmed && !hasPendingBridgeDecision"

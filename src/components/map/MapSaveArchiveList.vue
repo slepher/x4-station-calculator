@@ -187,7 +187,7 @@ function onGroupTitleClick(group: ArchiveGroup) {
               :data-testid="shouldShowGroupBindActive(group) ? 'save-group-bind-active' : 'save-group-bind'"
               type="button"
               :aria-label="`${group.playerName} bind`"
-              :title="t('map.save_archive_bind')"
+              :title="t('save_import.bind_to_latest_save')"
               @click.stop="onArchiveBind(group, null)"
             >
               <svg class="save-icon-svg" viewBox="0 0 24 24" aria-hidden="true">
@@ -245,8 +245,8 @@ function onGroupTitleClick(group: ArchiveGroup) {
                 :data-testid="shouldShowTimeBindActive(group, archive.meta.time) ? 'save-time-bind-active' : 'save-time-bind'"
                 type="button"
                 :aria-label="`${formatTime(archive.meta.time)} bind`"
-                :title="t('map.save_archive_bind')"
-                @click.stop="onArchiveBind(group, archive.meta.time)"
+              :title="t('save_import.bind_to_specific_save')"
+              @click.stop="onArchiveBind(group, archive.meta.time)"
               >
                 <svg class="save-icon-svg" viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M10.5 13.5L13.5 10.5" />

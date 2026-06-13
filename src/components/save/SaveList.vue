@@ -110,7 +110,7 @@ async function bindArchive(guid: string, time: number | null) {
             <button
               class="action-btn bind-btn"
               :class="{ 'bind-btn--active': isGuidLevelBinding(group) }"
-              :title="t('map.save_archive_bind')"
+              :title="t('save_import.bind_to_latest_save')"
               @click.stop="bindArchive(group.guid, null)"
             >
               <svg class="w-4 h-4" viewBox="0 0 24 24" aria-hidden="true">
@@ -151,7 +151,7 @@ async function bindArchive(guid: string, time: number | null) {
                 v-if="archive.isValid"
                 class="action-btn bind-btn"
                 :class="{ 'bind-btn--active': shouldShowBindActive(group, archive.meta.time) }"
-                :title="t('map.save_archive_bind')"
+                :title="t('save_import.bind_to_specific_save')"
                 @click.stop="bindArchive(group.guid, archive.meta.time)"
               >
                 <svg class="w-4 h-4" viewBox="0 0 24 24" aria-hidden="true">
