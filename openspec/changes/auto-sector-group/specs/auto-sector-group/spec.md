@@ -162,6 +162,23 @@ Standalone 新建 group SHALL only append derived candidates to other cards and 
 **并且** 不得移除 sector B 的初始候选
 **并且** 若 sector B 当前选中的正是被移除的派生候选，系统 SHALL 在剩余候选中重新选择当前最佳候选。
 
+### Requirement: Assignment Baseline Reset
+
+Col 3 SHALL allow resetting the current ordinary assignment draft to the baseline that existed when ordinary assignment started.
+
+#### Scenario: Reset ordinary assignment draft
+
+**前提** 系统已经进入普通 assignment 阶段
+
+**当** 用户点击 Col 3 status bar 中 [重置]
+**那么** 系统 SHALL：
+- 恢复进入普通 assignment 阶段时的 groups 和 assignments
+- 保留已采用的 bridge 方案
+- 不回到 bridge 方案选择前
+- 清除普通 assignment 阶段产生的 absorb、standalone、派生候选和跳数扩展影响
+
+**并且** 无 bridge、唯一 bridge 自动采用、多 bridge 用户选择后，均 SHALL 建立同一种普通 assignment baseline。
+
 ### Requirement: Col 3 Card Identity and Order Stability
 
 Col 3 card 的显示身份和排序 SHALL 在一次算法输出后保持稳定。
@@ -187,18 +204,49 @@ Col 3 card 的显示身份和排序 SHALL 在一次算法输出后保持稳定�
 
 ### Requirement: Col 2 Confirm Bar
 
-Col 2 SHALL 包含独立的确定栏。
+Col 2 SHALL 包含独立的计算状态栏。
 
-**前提** Col 2 可见
+#### Scenario: Result mode shows fixed parameters
 
-**当** 确定栏渲染
-**那么** 包含：
-- 分组覆盖跳数输入（默认 2，仅影响新建 group，不影响已有 group 的 jumpRange）
-- 默认容量输入（hub 识别 THRESHOLD）
-- [重新计算] 按钮
+**前提** 当前处于计算结果态
 
-**当** 用户修改已有/pin 后 group 的跳数并点击 [重新计算]
-**那么** SHALL 用各 group 当前 jumpRange 重跑增量分配算法 → Col 3 重建内容
+**当** Col 2 状态栏渲染
+**那么** SHALL 只读展示：
+- 分组覆盖跳数
+- 桥接搜索跳数
+- Hub 阈值
+
+**并且** SHALL 显示 [编辑] 按钮。
+
+#### Scenario: Enter input edit mode
+
+**前提** 当前处于计算结果态
+
+**当** 用户点击 [编辑]
+**那么** SHALL 进入编辑输入态
+**并且** SHALL 复制当前计算结果作为可取消恢复的快照
+**并且** Col 2 SHALL 允许编辑：
+- 三个全局参数
+- group `normal / pin / exclude` 三态
+- pinned group jumpRange
+- pinned coverage/link 参与状态
+
+#### Scenario: Cancel input edit mode
+
+**前提** 当前处于编辑输入态
+
+**当** 用户点击 [取消]
+**那么** SHALL 放弃编辑输入态中的所有修改
+**并且** SHALL 恢复进入编辑前的计算结果态、Col 2 结果、Col 3 状态和三个参数。
+
+#### Scenario: Calculate from input edit mode
+
+**前提** 当前处于编辑输入态
+
+**当** 用户点击 [计算]
+**那么** SHALL 使用当前编辑输入重新计算
+**并且** SHALL 将三个参数固化为本次计算结果的只读值
+**并且** SHALL 进入计算结果态并重建 Col 3 内容。
 
 ### Requirement: Jump Range Auto-Extend and Rollback
 
@@ -214,19 +262,136 @@ Col 2 SHALL 包含独立的确定栏。
 **那么** jumpRange SHALL 回退到无需扩展的最小值
 **并且** 移除多余覆盖星区
 
-### Requirement: Pin Mechanism for New Groups
+### Requirement: Recalculation State for Groups
 
-新创建的 group SHALL 支持 Pin 操作。
+Col 2 group SHALL 支持 `normal / pin / exclude` 三态重新计算状态。
 
-**前提** Col 2 中存在算法新建的 group（非已有 group）
+**前提** Col 2 中存在 group
 
-**当** 用户点击 group 的 Pin 按钮
-**那么** 该 group SHALL 被视为已有 group：
-- 重新计算不会消除其地位
-- 可以编辑跳数
+**当** group 来源于已持久化 binding
+**那么** 进入自动分组界面时 SHALL 默认显示为 `pin`
 
-**当** 用户取消 Pin
-**那么** 该 group SHALL 恢复为新 group 状态，重新计算可能吸收/重组它
+**当** group 来源于本轮算法新建 group 或 bridge draft group
+**那么** SHALL 默认显示为 `normal`
+
+**当** 用户在编辑输入态将 group 切换到 `pin`
+**那么** 该 group 的 anchor sector SHALL 作为点击 [重新计算] 时的固定 hub 输入
+**并且** 重新计算不得消除该 hub 地位
+
+**当** 用户在编辑输入态将 group 切换到 `normal`
+**那么** 该 group SHALL 不作为固定初始 hub，重新计算 MAY 由算法重新决定其归属或是否成组
+
+**当** 用户在编辑输入态将 group 切换到 `exclude`
+**那么** 点击 [计算] 时 SHALL 排除该 group 的 anchor sector 作为 hub 候选
+**并且** SHALL 排除该 anchor sector 作为 bridge 候选
+
+**并且** 三态切换 SHALL 只影响点击 [计算] 时的初始输入，不立即改变当前 Col 2 coverage、Col 3 cards、候选选中态或当前连接图。
+
+#### Scenario: Edit pinned group jump range as recalculation input only
+
+**前提** 当前处于编辑输入态，且 Col 2 中存在 `pin` group
+
+**当** 用户修改该 group 的跳数
+**那么** 系统 SHALL：
+- 只更新该 group 的 jumpRange 数值
+- 不立即重算 coverageSectorMacros
+- 不立即改变 Col 2 范围星区药丸
+- 不立即重算 Col 3 assignments
+
+**并且** 新 jumpRange SHALL 只作为用户点击 [计算] 时的初始输入数据。
+
+### Requirement: Col 3 Input Edit Overlay
+
+编辑输入态下 Col 3 SHALL 保留主界面显示但禁止操作。
+
+#### Scenario: Col 3 locked while editing inputs
+
+**前提** 当前处于编辑输入态
+
+**当** Col 3 渲染
+**那么** SHALL 保留当前主界面内容作为背景
+**并且** SHALL 显示遮罩
+**并且** SHALL 禁止 bridge、assignment、standalone、重置、确定等所有 Col 3 操作
+**并且** 若当前是分配候选视图，遮罩 SHALL 显示“编辑输入中，分配面板暂不可操作”
+**并且** status bar SHALL NOT 重复显示编辑态提示。
+
+#### Scenario: Resource view overlay has no prompt text
+
+**前提** 当前处于编辑输入态，且 Col 3 当前是资源视图
+
+**当** Col 3 渲染
+**那么** SHALL 保留资源视图作为背景并显示遮罩
+**并且** SHALL NOT 显示“分配面板暂不可操作”提示文案。
+
+#### Scenario: Col 3 restored after cancel
+
+**前提** 当前处于编辑输入态，且 Col 3 已显示遮罩
+
+**当** 用户点击 [取消]
+**那么** SHALL 移除遮罩
+**并且** SHALL 恢复进入编辑前的 Col 3 状态和用户已做选择。
+
+#### Scenario: Col 3 replaced after calculate
+
+**前提** 当前处于编辑输入态，且 Col 3 已显示遮罩
+
+**当** 用户点击 [计算]
+**那么** SHALL 移除遮罩
+**并且** SHALL 使用新计算结果替换 Col 3 内容。
+
+#### Scenario: Calculate does not use initial full-coverage short-circuit
+
+**前提** 当前处于编辑输入态，且所有玩家星区在进入编辑前均已有 group
+
+**当** 用户点击 [计算]
+**那么** 系统 SHALL 按当前编辑输入重新计算
+**并且** SHALL 退出已确认资源视图状态，展示新计算生成的 bridge 或 assignment 结果
+**并且** SHALL NOT 使用初始化时的“无未归组星区则跳过计算”判断直接返回资源视图。
+
+### Requirement: Pinned Coverage and Link Input Editing
+
+`pin` group 的 coverage/link SHALL 作为重新计算输入编辑态展示，而不是直接编辑当前结果。
+
+#### Scenario: Pinned coverage as default assignment only
+
+**前提** 某 `pin` group 的 coverage 中包含 sector X
+
+**当** 用户点击 [计算] 后，sector X 按正常 assignment 流程生成 Col 3 card
+**那么** 该 card 的默认选择 SHALL 优先指向该 pinned hub
+**并且** 用户 SHALL 仍可切换为其他 coverage 候选或选择「独立成组」
+
+**当** sector X 未按正常 assignment 流程生成 Col 3 card
+**那么** 系统 SHALL NOT 仅因为 pinned coverage 额外生成 card。
+
+#### Scenario: Pinned coverage does not become hub
+
+**前提** 某 `pin` group 的 coverage 中包含 sector X
+
+**当** 用户点击 [计算]
+**那么** sector X SHALL NOT 因为出现在 pinned coverage 中而成为 hub
+**并且** sector X SHALL 只作为归属默认值输入参与 assignment 默认选择。
+
+#### Scenario: Toggle pinned coverage/link participation
+
+**前提** Col 2 中存在 `pin` group，且其 coverage pill 或 link pill 可见
+
+**当** 用户点击 pill 上的 `x`
+**那么** 该 coverage/link SHALL 暂停参与下次 [计算]
+**并且** pill SHALL 保留显示为可恢复状态
+**并且** 当前 Col 2 coverage、Col 3 cards、候选选中态 SHALL NOT 立即改变
+
+**当** 用户点击已暂停 pill 上的 `+`
+**那么** 该 coverage/link SHALL 恢复参与下次 [计算]
+**并且** 当前 Col 2 coverage、Col 3 cards、候选选中态 SHALL NOT 立即改变
+
+#### Scenario: Recalculate uses edited pinned inputs
+
+**前提** 用户已编辑 `pin` group 的 coverage/link 参与状态
+
+**当** 用户点击 [计算]
+**那么** 系统 SHALL 使用当前启用的 pinned coverage 作为对应 sector 的默认归属输入
+**并且** 使用当前启用的 pinned link 作为 pinned 内部连接输入
+**并且** pinned 节点与外部新节点之间的 link MAY 重新生成。
 
 ### Requirement: SaveList Bind Button Behavior
 
@@ -319,7 +484,7 @@ Col 2 SHALL 包含独立的确定栏。
 **当** 用户点击 [确定] 写入 store
 **那么**：
 - `SectorConfirmBar` 和 `AllocationConfirmBar` 隐藏
-- `SectorGroupList` 从 store 读取已确认的 group（`isNew=false`, `isPinned=false`，跳数不可编辑，无存疑计数）
+- `SectorGroupList` 从 store 读取已确认的 group（`isNew=false`, `recalcState=pin`，作为重新计算固定输入，无存疑计数）
 - `SectorAllocationList` 隐藏
 - Col 3 显示 `EmpireWareFlowsDashboard`
 

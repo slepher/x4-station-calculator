@@ -22,6 +22,8 @@
 - [x] bridge unit 按同 cluster 内有效双向可达 sector component 划分，不直接等同 raw cluster
 - [x] 单向 superhighway 或不可往返导致的 cluster 内断裂必须拆分为不同 unit
 - [x] 新增 `buildBridgePlanOptions()`：生成能连通断裂分量的完整 bridge unit 组合
+- [x] bridge 方案不要求连通全部断裂分量，只要能减少断裂分量数量即有效
+- [x] 若存在更大连通覆盖方案，仅保留当前可达到最大连通覆盖的方案
 - [x] `buildBridgePlanOptions()` 使用桥接搜索跳数作为最大搜索距离
 - [x] 无可连通 bridge 方案时跳过 bridge 决策
 - [x] 仅保留前 5 个 bridge 方案
@@ -41,6 +43,7 @@
 - [x] 被采用方案中的每个 bridge unit 创建一个普通 `GroupDraftInfo`
 - [x] 单 sector unit 直接使用该 sector 作为 anchor
 - [x] 多 sector unit 使用用户选择的 center sector 作为 anchor
+- [x] bridge draft group 默认 `normal`，不默认 `pin`
 - [x] bridge draft groups 加入 groups 后调用 `computeGroupGraph()`
 - [x] bridge draft groups 成为固定起点后重新生成普通 assignments
 - [x] bridge 选择前生成的普通 assignments 不得复用
@@ -62,7 +65,8 @@
 - [x] `applyStandaloneToResult()`：替换 nearest-neighbor auto-connect 为 `computeGroupGraph()`
 - [x] `applyAbsorbToResult()`：删除 standalone group 后调用 `computeGroupGraph()`
 - [x] `groupIncremental()`：构建 groups 后调用 `computeGroupGraph()` + bridge 方案流程
-- [x] Col 2 [重新计算] 和 Pin/Unpin 触发连接图重算
+- [x] Col 2 三态重新计算状态切换不即时触发连接图重算，仅影响下次 [重新计算] 输入
+- [x] `exclude` group 的 anchor sector 在 [重新计算] 时不得作为 bridge 候选
 
 ## 8. Bridge 搜索跳数配置
 

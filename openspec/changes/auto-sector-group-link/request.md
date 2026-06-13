@@ -22,7 +22,9 @@
 **Phase 3 — bridge 方案生成（断裂分量间）**：
 - 若 MST 后已全连通 → 不生成 bridge 方案
 - 若无法找到能连通断裂分量的 bridge 组合 → 跳过 bridge 决策，保留断裂分量，继续普通节点处理
-- 若存在可连通组合 → 生成完整 bridge 方案列表，每个方案由一个或多个 bridge unit 组成
+- 若存在可连通组合 → 生成 bridge 方案列表，每个方案由一个或多个 bridge unit 组成
+- bridge 方案只要能减少断裂分量数量即有效，不要求一次连通全部断裂分量
+- 若存在覆盖更多断裂分量的组合，只保留当前可达到最大连通覆盖的方案
 - 方案最多保留前 5 个推荐组合
 
 ### 2. Bridge 方案与评分
@@ -38,10 +40,12 @@
 - 一个 bridge 方案是若干 bridge unit 的组合，例如 `Cluster A + Sector BA`、`Sector BA + Cluster C`
 - 方案被采用后，每个 bridge unit 创建一个普通 `GroupDraftInfo`
 - 该 draft group 的 anchor 为 unit 内选中的 sector
+- bridge draft group 默认 `normal`，不默认 `pin`
 - bridge draft group 采用后成为新的固定起点，普通 assignment cards 必须重新计算
 - bridge 选择前生成的普通 assignment 结果不得继续复用
 - 点击 [确定] 后，已采用方案中的 bridge draft group 作为普通 `BindingSectorGroup` 写入 store
 - 不新增 `BindingSectorGroup.bridgeSectors` 或其他 bridge marker 持久化字段
+- 若用户将某 group 切到 `exclude`，点击 [重新计算] 时该 group 的 anchor sector 不得作为 bridge 候选
 
 **评分规则**：
 - 每个 bridge unit 的 score = 该 unit 内所有 station 的最高 hub score
@@ -60,7 +64,7 @@
 | `applyAbsorbToResult()` 吸收/删除 group | 全量重算 `computeGroupGraph()` |
 | `groupIncremental()` 构建 groups 后 | 全量重算 `computeGroupGraph()` |
 | Col 2 [重新计算] | 自然触发 |
-| Pin/Unpin | 触发 `computeGroupGraph()` |
+| 三态重新计算状态切换 | 仅更新下次 [重新计算] 的输入状态，不即时触发 `computeGroupGraph()` |
 
 ### 4. Col 3 bridge 决策交互
 
@@ -113,7 +117,7 @@
 ## 验收标准（DoD）
 
 1. `groupCleanSlate()` 输出：`connectedGroupIds` 形成 MST，所有桥接搜索跳数内可连通的 anchor 在同一个连通分量内
-2. 存在可连通断裂分量的 bridge 组合时，生成最多 5 个 bridge 方案并按 planScore 规则排序
+2. 存在可连通断裂分量的 bridge 组合时，生成当前可达到最大连通覆盖的最多 5 个 bridge 方案并按 planScore 规则排序
 3. 仅有一个 bridge 方案时自动采用；多个 bridge 方案时 Col 3 先只显示 bridge 方案并要求用户选择
 4. 多 sector unit 在 unit 级展示名称，连接节点/跳数另起一行用 pill 展示，sector 子项只负责选择中心 sector；单 sector unit 直接显示 sector + 连接节点/跳数 pill
 5. 被采用的 bridge 方案在 Col 2 创建普通 draft groups，点击 [确定] 后作为普通 `BindingSectorGroup` 写入

@@ -11,6 +11,7 @@ const props = defineProps<{
   groups: GroupDraftInfo[]
   maps: { clusters: Record<string, X4MapCluster>; sectors: Record<string, X4MapSector> } | null | undefined
   stationCounts: Record<string, number>
+  disabled?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -143,7 +144,8 @@ const sortedAssignments = computed(() => {
                 type="button"
                 class="bridge-sector-option"
                 :class="{ 'bridge-sector-option--selected': unit.selectedSectorMacro === candidate.sectorMacro }"
-                @click.stop="emit('select-bridge-center', plan.id, unit.unitId, candidate.sectorMacro)"
+                :disabled="disabled"
+                @click.stop="!disabled && emit('select-bridge-center', plan.id, unit.unitId, candidate.sectorMacro)"
               >
                 <span>{{ unit.selectedSectorMacro === candidate.sectorMacro ? '●' : '○' }}</span>
                 <span>{{ getSectorDisplayName(candidate.sectorMacro) }}</span>
@@ -151,7 +153,7 @@ const sortedAssignments = computed(() => {
             </div>
           </div>
         </div>
-        <button type="button" class="bridge-plan-select" @click="emit('select-bridge-plan', plan.id)">
+        <button type="button" class="bridge-plan-select" :disabled="disabled" @click="!disabled && emit('select-bridge-plan', plan.id)">
           {{ t('sector.select_bridge_plan') }}
         </button>
       </div>
@@ -191,7 +193,7 @@ const sortedAssignments = computed(() => {
               'option-selected': assignment.selectedOptionIndex === idx,
               'option-hoverable': assignment.status !== 'auto' || assignment.options.length > 1
             }"
-            @click="assignment.options.length > 1 && (assignment.status !== 'auto' || true) && emit('select-option', assignment.sectorMacro, idx)"
+            @click="!disabled && assignment.options.length > 1 && (assignment.status !== 'auto' || true) && emit('select-option', assignment.sectorMacro, idx)"
           >
             <span class="option-radio" :class="{ 'radio-checked': assignment.selectedOptionIndex === idx }">
               {{ assignment.selectedOptionIndex === idx ? '●' : '○' }}
@@ -266,7 +268,7 @@ const sortedAssignments = computed(() => {
 }
 
 .bridge-sector-option {
-  @apply flex items-center gap-2 rounded px-2 py-1 text-xs text-slate-300 hover:bg-slate-700/40;
+  @apply flex items-center gap-2 rounded px-2 py-1 text-xs text-slate-300 hover:bg-slate-700/40 disabled:cursor-not-allowed disabled:opacity-60;
 }
 
 .bridge-sector-option--selected {
@@ -274,7 +276,7 @@ const sortedAssignments = computed(() => {
 }
 
 .bridge-plan-select {
-  @apply self-start rounded border border-sky-400/30 bg-sky-500/10 px-2 py-1 text-xs text-sky-200 hover:bg-sky-500/20;
+  @apply self-start rounded border border-sky-400/30 bg-sky-500/10 px-2 py-1 text-xs text-sky-200 hover:bg-sky-500/20 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-sky-500/10;
 }
 
 .empty-hint {

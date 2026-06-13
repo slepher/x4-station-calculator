@@ -18,8 +18,10 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'toggle-pin', groupId: string): void
+  (e: 'cycle-recalc-state', groupId: string): void
   (e: 'update-jump-range', groupId: string, range: number): void
+  (e: 'toggle-coverage-input', groupId: string, sectorMacro: string): void
+  (e: 'toggle-connected-input', groupId: string, connectedGroupId: string): void
 }>()
 
 const { t, te } = useI18n()
@@ -37,8 +39,8 @@ function getSectorName(macro: string): string {
   return macro
 }
 
-function getCoverageByJump(group: GroupDraftInfo): Map<number, Array<{ macro: string; connected: boolean }>> {
-  const byJump = new Map<number, Array<{ macro: string; connected: boolean }>>()
+function getCoverageByJump(group: GroupDraftInfo): Map<number, Array<{ macro: string; connected: boolean; active: boolean; connectedGroupId?: string }>> {
+  const byJump = new Map<number, Array<{ macro: string; connected: boolean; active: boolean; connectedGroupId?: string }>>()
   if (!group.sectorMacro) return byJump
 
   const distances = getCoverageSectors(
@@ -51,7 +53,11 @@ function getCoverageByJump(group: GroupDraftInfo): Map<number, Array<{ macro: st
     if (sector === group.sectorMacro) continue
     const jump = distMap.get(sector) ?? 0
     if (!byJump.has(jump)) byJump.set(jump, [])
-    byJump.get(jump)!.push({ macro: sector, connected: false })
+    byJump.get(jump)!.push({
+      macro: sector,
+      connected: false,
+      active: !group.disabledCoverageSectorMacros.includes(sector)
+    })
   }
 
   for (const connId of group.connectedGroupIds) {
@@ -59,10 +65,19 @@ function getCoverageByJump(group: GroupDraftInfo): Map<number, Array<{ macro: st
     if (!connGroup?.sectorMacro || connGroup.sectorMacro === group.sectorMacro) continue
     const jump = distMap.get(connGroup.sectorMacro) ?? 0
     if (!byJump.has(jump)) byJump.set(jump, [])
-    byJump.get(jump)!.push({ macro: connGroup.sectorMacro, connected: true })
+    byJump.get(jump)!.push({
+      macro: connGroup.sectorMacro,
+      connected: true,
+      active: !group.disabledConnectedGroupIds.includes(connId),
+      connectedGroupId: connId
+    })
   }
 
   return byJump
+}
+
+function canEditPinnedInput(group: GroupDraftInfo): boolean {
+  return props.editable && group.recalcState === 'pin'
 }
 
 function getCoverageJumps(group: GroupDraftInfo): number[] {
@@ -73,6 +88,18 @@ function getUncertainCount(groupId: string): number {
   return props.assignments.filter((a) =>
     (a.status === 'uncertain_tie' || a.status === 'uncertain_extend') && a.defaultGroupId === groupId
   ).length
+}
+
+function getRecalcStateTitle(group: GroupDraftInfo): string {
+  if (group.recalcState === 'pin') return t('sector.recalc_state_pin')
+  if (group.recalcState === 'exclude') return t('sector.recalc_state_exclude')
+  return t('sector.recalc_state_normal')
+}
+
+function canEditJumpRange(group: GroupDraftInfo): boolean {
+  if (!props.editable) return false
+  if (group.recalcState === 'exclude') return false
+  return !group.isNew || group.recalcState === 'pin'
 }
 
 </script>
@@ -87,7 +114,11 @@ function getUncertainCount(groupId: string): number {
       v-for="group in groups"
       :key="group.id"
       class="group-item"
-      :class="{ 'group-item--new': group.isNew, 'group-item--pinned': group.isPinned }"
+      :class="{
+        'group-item--new': group.isNew,
+        'group-item--pin': group.recalcState === 'pin',
+        'group-item--exclude': group.recalcState === 'exclude'
+      }"
     >
       <div class="group-header">
         <div class="group-title-row">
@@ -95,14 +126,24 @@ function getUncertainCount(groupId: string): number {
         </div>
         <div class="group-actions">
           <button
-            v-if="group.isNew && props.editable"
-            class="action-btn pin-btn"
-            :class="{ 'pin-btn--active': group.isPinned }"
-            :title="t('sector.pin_group')"
-            @click="emit('toggle-pin', group.id)"
+            v-if="props.editable"
+            class="action-btn state-btn"
+            :class="`state-btn--${group.recalcState}`"
+            :title="getRecalcStateTitle(group)"
+            @click="emit('cycle-recalc-state', group.id)"
           >
-            <svg class="pin-icon" :class="{ 'pin-icon--active': group.isPinned }" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z"/>
+            <svg class="state-icon" :class="`state-icon--${group.recalcState}`" viewBox="0 0 24 24" fill="none">
+              <template v-if="group.recalcState === 'pin'">
+                <path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z" fill="currentColor"/>
+              </template>
+              <template v-else-if="group.recalcState === 'exclude'">
+                <circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="2"/>
+                <path d="M7 17L17 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </template>
+              <template v-else>
+                <circle cx="12" cy="12" r="7" stroke="currentColor" stroke-width="2"/>
+                <circle cx="12" cy="12" r="2" fill="currentColor"/>
+              </template>
             </svg>
           </button>
         </div>
@@ -116,7 +157,7 @@ function getUncertainCount(groupId: string): number {
               {{ getSectorName(group.sectorMacro || '') }}
             </span>
             <div class="jump-control">
-              <template v-if="!props.editable || (!group.isPinned && group.isNew)">
+              <template v-if="!canEditJumpRange(group)">
                 <span class="jump-readonly">{{ group.jumpRange }}</span>
               </template>
               <JumpInput
@@ -136,11 +177,24 @@ function getUncertainCount(groupId: string): number {
             <div class="pill-list">
               <span
                 v-for="entry in getCoverageByJump(group).get(jump)!"
-                :key="entry.macro"
+                :key="`${entry.connected ? 'link' : 'coverage'}:${entry.macro}`"
                 class="pill"
-                :class="entry.connected ? 'pill--connected' : 'pill--coverage'"
+                :class="[
+                  entry.connected ? 'pill--connected' : 'pill--coverage',
+                  !entry.active ? 'pill--disabled' : ''
+                ]"
               >
                 {{ getSectorName(entry.macro) }}
+                <button
+                  v-if="canEditPinnedInput(group)"
+                  type="button"
+                  class="pill-toggle"
+                  @click.stop="entry.connected && entry.connectedGroupId
+                    ? emit('toggle-connected-input', group.id, entry.connectedGroupId)
+                    : emit('toggle-coverage-input', group.id, entry.macro)"
+                >
+                  {{ entry.active ? 'x' : '+' }}
+                </button>
               </span>
             </div>
           </div>
@@ -179,8 +233,12 @@ function getUncertainCount(groupId: string): number {
   @apply border-sky-500/20 bg-sky-500/5;
 }
 
-.group-item--pinned {
+.group-item--pin {
   @apply border-blue-500/30 bg-blue-500/5;
+}
+
+.group-item--exclude {
+  @apply border-rose-500/30 bg-rose-500/5;
 }
 
 .group-header {
@@ -203,16 +261,23 @@ function getUncertainCount(groupId: string): number {
   @apply text-xs p-1 rounded hover:bg-amber-500/10;
 }
 
-.pin-btn--active {
+.state-btn--pin {
   @apply text-sky-400;
 }
 
-.pin-icon {
-  @apply w-4 h-4 transition-transform;
-  transform: rotate(-90deg);
+.state-btn--exclude {
+  @apply text-rose-300;
 }
 
-.pin-icon--active {
+.state-btn--normal {
+  @apply text-slate-400;
+}
+
+.state-icon {
+  @apply w-4 h-4 transition-transform;
+}
+
+.state-icon--pin {
   transform: rotate(0deg);
 }
 
@@ -249,6 +314,14 @@ function getUncertainCount(groupId: string): number {
 
 .pill--connected {
   @apply border-emerald-300/30 bg-emerald-500/10 text-emerald-200;
+}
+
+.pill--disabled {
+  @apply border-dashed opacity-45;
+}
+
+.pill-toggle {
+  @apply inline-flex h-4 w-4 items-center justify-center rounded-full text-[10px] leading-none text-current hover:bg-white/10;
 }
 
 .jump-control {

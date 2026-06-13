@@ -39,8 +39,15 @@
 - [x] [重新计算] 按钮：重跑算法 → 更新 Col 3
 - [x] 创建 `src/components/empire/sector-overview/SectorGroupList.vue`
 - [x] 星区 group 列表形态与 `MapBindingSectorGroup` 一致
-- [x] 支持 Pin 按钮（仅新 group）
-- [x] Pin 后支持跳数编辑（已有 group 也支持）
+- [x] 将 Pin/Unpin 改为 `normal / pin / exclude` 三态重新计算状态
+- [x] 已持久化 group 默认 `pin`；新建 group 和 bridge draft group 默认 `normal`
+- [x] `exclude` 在 [重新计算] 时排除该 anchor 作为 hub 和 bridge 候选
+- [x] `pin` group 支持跳数编辑，且只作为 [重新计算] 输入
+- [x] `pin` group 的 coverage/link pill 支持 `x/+` 暂停/恢复参与下次 [重新计算]，pill 保留显示
+- [x] pinned coverage 只影响正常生成的 Col 3 card 默认选项，不额外生成 card，不锁定归属
+- [x] Col 2 状态栏实现计算结果态/编辑输入态：[编辑]、[取消]、[计算]
+- [x] 编辑输入态中 Col 3 主界面保留但加遮罩，并禁用所有 Col 3 操作
+- [x] 编辑输入态中 Col 3 标题/status 文案切换为编辑输入提示
 - [x] 新建 group 自动连接跳数最近的已有 group
 
 ## 6. Col 3 Components
@@ -143,3 +150,18 @@
 - [x] `unresolved` card 被用户选择后仍保持 `unresolved` 身份，不移动到 `resolved` 区
 - [x] absorb / standalone 选择只更新 card 内部状态和 Col 2 draft，不改变 Col 3 既有 card 顺序
 - [x] 只有 [重新计算] 或重新运行自动分组时才重建 Col 3 card 顺序和身份
+
+## 20. Assignment baseline reset
+
+- [x] Col 3 status bar 在 [确定] 左侧增加 [重置]
+- [x] 进入普通 assignment 阶段时保存 baseline
+- [x] 无 bridge、唯一 bridge 自动采用、多 bridge 用户选择后均进入 post-bridge baseline
+- [x] [重置] 恢复 post-bridge baseline，不回到 bridge 选择前
+- [x] 重置清除普通 assignment 阶段产生的 absorb、standalone、派生候选和跳数扩展影响
+
+## 21. Pin jump range delayed effect
+
+- [x] Pin/已有 group 修改跳数只更新 jumpRange 数值
+- [x] 修改跳数不立即重算 coverage，不改变范围星区药丸
+- [x] 修改跳数不立即重算 Col 3 assignments
+- [x] 修改后的跳数只作为 [重新计算] 的初始输入数据

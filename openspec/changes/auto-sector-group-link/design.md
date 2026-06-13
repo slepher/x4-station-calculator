@@ -100,7 +100,9 @@ interface BridgeReach {
 
 **方案生成**：
 - 输入为 MST 后的断裂 connected components、玩家 sector、hub score、sector graph
-- 输出为能把断裂 components 连通的完整 bridge unit 组合
+- 输出为能减少断裂 components 数量的 bridge unit 组合
+- 若无法连通全部 components，但至少能合并两个 components，方案仍有效
+- 若存在更大连通覆盖的组合，只保留当前可达到最大连通覆盖的方案
 - 搜索边界使用桥接搜索跳数
 - 如果没有可连通组合，返回空列表，UI 跳过 bridge 决策
 - 如果有组合，按评分保留前 5 个
@@ -128,12 +130,18 @@ function applyBridgePlanToDraft(
 - 对方案中的每个 unit 创建一个普通 `GroupDraftInfo`
 - anchor = `unit.selectedSectorMacro`
 - `isNew = true`
+- `recalcState = normal`
 - 可选 draft-only 标记 `role = 'bridge'` 仅用于 Col 2 预览；确认时不持久化
 - 创建后调用 `computeGroupGraph()`，让原 group 与 bridge groups 一起形成 MST
 - bridge groups 成为新的固定起点后，调用 assignment 构建逻辑重新生成普通 cards
 - bridge 选择前生成的普通 assignments 必须丢弃，避免 bridge sector 继续作为普通候选出现
 - 点击 [确定] 时，这些 bridge draft groups 作为普通 `BindingSectorGroup` 写入 store
 - 不新增 `BindingSectorGroup.bridgeSectors`，不新增 bridge marker 持久化字段
+
+三态重新计算状态与 bridge：
+- bridge draft group 默认 `normal`，不默认 `pin`
+- `exclude` group 的 anchor sector 在点击 [重新计算] 时不得作为 bridge unit 候选
+- 三态切换不即时触发 `computeGroupGraph()`；只有点击 [重新计算] 或普通 assignment/bridge 采用流程才重算连接图
 
 ### 4. Col 3 bridge 决策 UI
 

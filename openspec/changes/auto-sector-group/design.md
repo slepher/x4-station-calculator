@@ -144,8 +144,23 @@ ProductionSidebar:
       └─ 一次性 persist
   └→ ProductionSidebar 刷新
 
-用户点击 [重新计算] (Col 2)
-  └→ 用各 group 当前 jumpRange 重跑算法 → Col 3 重建
+用户点击 [重置] (Col 3)
+  └→ current draft = ordinary assignment baseline
+  └→ 不回到 bridge 选择前，不改变已采用 bridge 方案
+
+用户点击 [编辑] (Col 2 计算结果态)
+  └→ 保存当前 result/参数快照
+  └→ 进入编辑输入态
+  └→ Col 3 主界面保留显示但加遮罩，禁止操作
+
+用户点击 [取消] (Col 2 编辑输入态)
+  └→ 恢复进入编辑前的 result/参数快照
+  └→ 回到计算结果态，移除 Col 3 遮罩
+
+用户点击 [计算] (Col 2 编辑输入态)
+  └→ 用当前三态、pinned jumpRange、pinned coverage/link 参与状态和参数重跑算法
+  └→ 三个参数固化为只读展示
+  └→ Col 3 使用新计算结果重建，移除遮罩
 ```
 
 ### 6. Col 3 card 身份与顺序稳定
@@ -165,6 +180,12 @@ displayBucket = selectedOptionIndex === null ? 'unresolved' : 'resolved'
 - Col 2 draft 可以实时刷新
 
 只有用户显式点击 [重新计算]、上传/绑定新存档触发自动分组、或其他重新运行算法的入口，才允许重建 `assignments` 并重新计算 `displayBucket` 与显示顺序。
+
+进入普通 assignment 阶段时保存 baseline：
+- 无 bridge：自动分组结果就是 baseline
+- 唯一 bridge：自动采用 bridge 后的结果就是 baseline
+- 多 bridge：用户选择 bridge 后的结果就是 baseline
+- reset 只恢复 baseline，不重选 bridge
 
 ### 7. 扩展/回退机制
 
@@ -209,9 +230,48 @@ displayBucket = selectedOptionIndex === null ? 'unresolved' : 'resolved'
 
 - `autoGroupConfirmed` 状态标记
 - 确认后 `SectorConfirmBar`、`AllocationConfirmBar` 隐藏
-- `SectorGroupList` 从 store 读取 group（`isNew=false`, `isPinned=false` → 只读）
+- `SectorGroupList` 从 store 读取 group（`isNew=false`, `recalcState=pin` → 作为重新计算固定输入展示）
 - Col 3 切换为 `EmpireWareFlowsDashboard`
 - Standalone 组：创建 group + bindSectorGroup + 自动连接最近已有 group
+
+### 11.1 三态重新计算状态
+
+Col 2 group 不再使用 Pin/Unpin 二态，而是使用 `normal / pin / exclude`，且只在编辑输入态可修改：
+
+- `normal`：不作为重新计算固定输入，算法可重新处理
+- `pin`：anchor 作为固定 hub 输入；已持久化 group 默认进入 `pin`
+- `exclude`：点击 [重新计算] 时排除该 anchor 作为 hub 和 bridge 候选
+- 新建 group 和 bridge draft group 默认 `normal`
+- 状态切换不即时触发 `computeGroupGraph()`，也不改变当前 Col 3 card 顺序/身份/选中态
+- 计算结果态中三态、pinned jumpRange、pinned coverage/link 均只读
+
+Pin group 的 jumpRange 编辑：
+- 只更新当前 draft 中的 jumpRange 数值
+- 不即时重算 coverage
+- 不即时改变 Col 2 范围药丸
+- 该值只在 [重新计算] 时作为初始输入参与算法
+
+### 11.2 Pinned coverage/link 输入编辑
+
+Pinned group 的 coverage/link 不是“当前结果的直接编辑”，而是“下次重新计算的输入编辑”：
+
+- coverage pill 和 link pill 保留显示
+- 每个 pill 有参与状态：启用时显示 `x` 可暂停，暂停时显示 `+` 可恢复
+- 暂停/恢复只影响下一次 [重新计算]，不即时改变 Col 3 card
+- pinned coverage 不会额外制造 Col 3 card；若该 sector 正常生成 card，则默认选项优先指向原 pinned hub
+- 用户仍可在该 card 中选择其他 group 或独立成组
+- coverage sector 不因为属于 pinned coverage 而成为 hub
+- pinned link 中仍启用的 link 作为 pinned 内部连接输入保留；pinned 与外部新节点之间的 link 可重新生成
+
+### 11.3 Col 3 编辑态遮罩
+
+- 编辑输入态不销毁 Col 3 当前内容
+- Col 3 主界面整体加遮罩并禁用所有交互
+- 若当前是分配候选视图，遮罩显示“编辑输入中，分配面板暂不可操作”
+- Col 3 status bar 不重复显示编辑态提示
+- 若当前 Col 3 是资源视图，遮罩不显示提示文案
+- [取消] 恢复原 Col 3 状态；[计算] 用新结果替换 Col 3
+- [计算] 必须退出 `autoGroupConfirmed` 资源视图状态；初始化时的“无未归组星区则跳过计算”短路不得用于编辑态计算
 
 ### 12. 实时联动
 

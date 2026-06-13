@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import fixture from '../../fixtures/auto-group/save_009_minimal.json'
-import { groupCleanSlate, applyAbsorbToResult, applyStandaloneToResult, applyBridgePlanToDraft, type AutoGroupResult, type GroupDraftInfo } from '@/store/logic/autoGroup'
+import { groupCleanSlate, groupIncremental, applyAbsorbToResult, applyStandaloneToResult, applyBridgePlanToDraft, buildBridgePlanOptions, type AutoGroupResult, type GroupDraftInfo } from '@/store/logic/autoGroup'
 import { buildSectorGraphFromMaps } from '@/store/logic/saveBindingUtils'
 import type { SaveArchive, PlayerStationEntry } from '@/types/saveArchive'
 import type { X4Module } from '@/types/x4'
@@ -214,6 +214,39 @@ describe('autoGroup - cleanSlate assignments', () => {
   })
 })
 
+describe('autoGroup - recalculation with pinned hubs', () => {
+  it('keeps generating new pure hubs outside pinned base groups', () => {
+    const archive = buildArchive(fixture as CompactFixture)
+    const modulesByMacroId = buildModulesByMacroId()
+    const { sectorGraph, sectorClusterMap } = buildSectorData()
+    const clean = groupCleanSlate(archive, modulesByMacroId, sectorGraph, sectorClusterMap)
+    const pinnedGroups = clean.groups.slice(0, 2).map((group, index) => ({
+      id: group.id,
+      name: group.name,
+      order: index,
+      sectorMacro: group.sectorMacro,
+      jumpRange: group.jumpRange,
+      coverageSectorMacros: [],
+      connectedGroupIds: []
+    }))
+
+    const recalculated = groupIncremental(
+      archive,
+      pinnedGroups,
+      modulesByMacroId,
+      sectorGraph,
+      sectorClusterMap
+    )
+
+    expect(recalculated.groups.length).toBeGreaterThan(pinnedGroups.length)
+    expect(recalculated.groups.some((group) =>
+      group.isNew &&
+      group.recalcState === 'normal' &&
+      !pinnedGroups.some((pinned) => pinned.sectorMacro === group.sectorMacro)
+    )).toBe(true)
+  })
+})
+
 describe('autoGroup - interactive applyAbsorb', () => {
   let result: AutoGroupResult
   const { sectorGraph, sectorClusterMap } = buildSectorData()
@@ -389,7 +422,9 @@ describe('autoGroup - interactive applyStandalone', () => {
           coverageSectorMacros: ['B'],
           connectedGroupIds: [],
           isNew: true,
-          isPinned: false
+          disabledCoverageSectorMacros: [],
+          disabledConnectedGroupIds: [],
+          recalcState: 'normal'
         },
         {
           id: 'g2',
@@ -400,7 +435,9 @@ describe('autoGroup - interactive applyStandalone', () => {
           coverageSectorMacros: [],
           connectedGroupIds: [],
           isNew: true,
-          isPinned: false
+          disabledCoverageSectorMacros: [],
+          disabledConnectedGroupIds: [],
+          recalcState: 'normal'
         }
       ],
       assignments: [
@@ -473,7 +510,9 @@ describe('autoGroup - bridge adoption', () => {
           coverageSectorMacros: [],
           connectedGroupIds: [],
           isNew: true,
-          isPinned: false
+          disabledCoverageSectorMacros: [],
+          disabledConnectedGroupIds: [],
+          recalcState: 'normal'
         },
         {
           id: 'gE',
@@ -484,7 +523,9 @@ describe('autoGroup - bridge adoption', () => {
           coverageSectorMacros: ['C'],
           connectedGroupIds: [],
           isNew: true,
-          isPinned: false
+          disabledCoverageSectorMacros: [],
+          disabledConnectedGroupIds: [],
+          recalcState: 'normal'
         }
       ],
       assignments: [
@@ -519,6 +560,7 @@ describe('autoGroup - bridge adoption', () => {
       recommended: true,
       selected: false,
       planScore: 100,
+      connectedComponentCount: 2,
       totalJump: 2,
       maxJump: 1,
       stableKey: 'unitB',
@@ -549,5 +591,72 @@ describe('autoGroup - bridge adoption', () => {
     expect(selectedCOption.targetGroupId).toBe(bridgeGroup.id)
     expect(bridgeGroup.coverageSectorMacros).toContain('C')
     expect(updated.groups.find((group) => group.id === 'gE')!.coverageSectorMacros).not.toContain('C')
+  })
+
+  it('keeps the best partial bridge plan when full component connection is impossible', () => {
+    const groups: GroupDraftInfo[] = [
+      {
+        id: 'gA',
+        name: 'Group A',
+        sectorMacro: 'A',
+        jumpRange: 1,
+        originalJumpRange: 1,
+        coverageSectorMacros: [],
+        connectedGroupIds: [],
+        isNew: true,
+        disabledCoverageSectorMacros: [],
+          disabledConnectedGroupIds: [],
+          recalcState: 'normal'
+      },
+      {
+        id: 'gC',
+        name: 'Group C',
+        sectorMacro: 'C',
+        jumpRange: 1,
+        originalJumpRange: 1,
+        coverageSectorMacros: [],
+        connectedGroupIds: [],
+        isNew: true,
+        disabledCoverageSectorMacros: [],
+          disabledConnectedGroupIds: [],
+          recalcState: 'normal'
+      },
+      {
+        id: 'gE',
+        name: 'Group E',
+        sectorMacro: 'E',
+        jumpRange: 1,
+        originalJumpRange: 1,
+        coverageSectorMacros: [],
+        connectedGroupIds: [],
+        isNew: true,
+        disabledCoverageSectorMacros: [],
+          disabledConnectedGroupIds: [],
+          recalcState: 'normal'
+      }
+    ]
+    const sectorGraph = {
+      A: ['B'],
+      B: ['A', 'C'],
+      C: ['B'],
+      E: []
+    }
+    const sectorClusterMap = { A: 'A', B: 'B', C: 'C', E: 'E' }
+    const sectorHubMap = new Map([
+      ['B', [{ score: 100 } as any]]
+    ])
+
+    const plans = buildBridgePlanOptions(
+      groups,
+      ['A', 'B', 'C', 'E'],
+      sectorHubMap,
+      sectorGraph,
+      sectorClusterMap,
+      1
+    )
+
+    expect(plans.length).toBeGreaterThan(0)
+    expect(plans[0]!.connectedComponentCount).toBe(2)
+    expect(plans[0]!.units.map((unit) => unit.selectedSectorMacro)).toContain('B')
   })
 })

@@ -3,9 +3,12 @@ import { useI18n } from 'vue-i18n'
 
 defineProps<{
   hasUncertain: boolean
+  disabled?: boolean
+  statusText?: string
 }>()
 
 const emit = defineEmits<{
+  (e: 'reset'): void
   (e: 'confirm'): void
 }>()
 
@@ -15,15 +18,20 @@ const { t } = useI18n()
 <template>
   <div class="confirm-bar">
     <span class="bar-status">
-      {{ hasUncertain ? t('sector.resolve_all_uncertain') : t('sector.all_resolved') }}
+      {{ statusText || (hasUncertain ? t('sector.resolve_all_uncertain') : t('sector.all_resolved')) }}
     </span>
-    <button
-      class="bar-btn confirm-btn"
-      :disabled="hasUncertain"
-      @click="emit('confirm')"
-    >
-      {{ t('sector.confirm') }}
-    </button>
+    <div class="bar-actions">
+      <button class="bar-btn reset-btn" :disabled="disabled" @click="emit('reset')">
+        {{ t('sector.reset') }}
+      </button>
+      <button
+        class="bar-btn confirm-btn"
+        :disabled="hasUncertain || disabled"
+        @click="emit('confirm')"
+      >
+        {{ t('sector.confirm') }}
+      </button>
+    </div>
   </div>
 </template>
 
@@ -38,6 +46,14 @@ const { t } = useI18n()
 
 .bar-btn {
   @apply px-4 py-1 text-xs font-bold rounded transition-colors disabled:opacity-40 disabled:cursor-not-allowed;
+}
+
+.bar-actions {
+  @apply flex items-center gap-2;
+}
+
+.reset-btn {
+  @apply bg-slate-700/30 text-slate-300 border border-slate-500/30 hover:bg-slate-700/50;
 }
 
 .confirm-btn {

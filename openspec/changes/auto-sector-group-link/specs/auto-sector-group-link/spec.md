@@ -62,9 +62,10 @@ The system SHALL recalculate the full MST whenever groups change.
 - `applyAbsorbToResult()` 合并或删除 standalone group
 - `groupIncremental()` 构建 groups 后
 - Col 2 [重新计算] 按钮点击
-- Pin/Unpin
+- 三态重新计算状态切换
 
-**那么** 系统 SHALL 调用 `computeGroupGraph()` 全量重算 `connectedGroupIds`
+**那么** 系统 SHALL 仅更新下次 [重新计算] 的输入状态
+**并且** SHALL NOT 立即调用 `computeGroupGraph()` 改变当前 `connectedGroupIds`
 
 ### Requirement: Bridge Plan Decision Flow
 
@@ -76,7 +77,9 @@ The system SHALL generate bridge plans for disconnected group components and res
 
 **当** 系统尝试生成 bridge 方案
 **那么** 系统 SHALL：
-- 生成能连通断裂分量的完整 bridge unit 组合
+- 生成能减少断裂分量数量的 bridge unit 组合
+- 若无法连通所有断裂分量，但可连通其中至少两个分量，该方案 SHALL 视为有效 bridge
+- 若存在更大连通覆盖的组合，系统 SHALL 只保留当前可达到最大连通覆盖的方案
 - 若无可连通方案，则跳过 bridge 决策并继续普通节点处理
 - 若仅有一个方案，则自动采用该方案
 - 若存在多个方案，则最多展示前 5 个推荐方案
@@ -118,12 +121,21 @@ The system SHALL turn adopted bridge units into ordinary sector groups.
 - 以 unit 内选中的 center sector 作为 `sectorMacro`
 - 若 unit 只有一个玩家 sector，则该 sector 自动作为 center sector
 - 若 unit 有多个玩家 sector，则默认选择 score 最高的 sector，用户可调整
+- 创建出的 bridge draft group SHALL 默认进入 `normal` 状态，不默认进入 `pin` 状态
 - 将创建出的 bridge draft groups 纳入 `computeGroupGraph()` 重新计算
 - 将 bridge draft groups 视为与原 hub 一样的固定起点，重新生成剩余普通 assignment cards
 - 不得复用 bridge 选择前已经生成的普通 assignment 结果
 - 点击 [确定] 后，将 bridge draft groups 作为普通 `BindingSectorGroup` 写入 store
 
 **并且** 系统 SHALL NOT 新增 `BindingSectorGroup.bridgeSectors` 或其他 bridge marker 持久化字段。
+
+#### Scenario: Excluded group is not bridge candidate
+
+**前提** Col 2 中某 group 被用户切换为 `exclude`
+
+**当** 用户点击 [重新计算]
+**那么** 该 group 的 anchor sector SHALL NOT 作为 bridge unit 候选
+**并且** 该 group 的 anchor sector SHALL NOT 作为自动 hub 候选。
 
 ### Requirement: Bridge Plan UI Display
 
