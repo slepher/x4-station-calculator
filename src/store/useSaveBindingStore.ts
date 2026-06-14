@@ -7,6 +7,7 @@ import { DEFAULT_STATION_SETTINGS } from './state/stationSettings'
 import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
 import { getSectorZoneBoundingCenter } from '@/components/map/utils/coordinates'
 import { getCoverageSectors } from './logic/saveBindingUtils'
+import { detectStationHub } from './logic/autoGroupHub'
 import type { GroupDraftInfo } from './logic/autoGroup'
 import type {
   BindingSectorGroup,
@@ -531,6 +532,14 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
       if (input.sectorMacro !== undefined) ts.sectorMacro = input.sectorMacro
       if (input.position !== undefined) ts.position = input.position
     }
+    // Remove same station from other groups
+    if (input.saveStationCode) {
+      for (const other of draftBinding.value.groups) {
+        if (other.id !== group.id && other.tradeStation?.saveStationCode === input.saveStationCode) {
+          other.tradeStation = undefined
+        }
+      }
+    }
     draftBinding.value.updatedAt = Date.now()
     return ts
   }
@@ -680,6 +689,33 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
               saveStationCode: draft.hubStationCode,
               name: draft.name
             })
+          } else if (draft.sectorMacro) {
+            const archive = saveStore.selectedArchive
+            const sectorStations = archive?.sectors?.[draft.sectorMacro]?.player_stations
+            if (sectorStations) {
+              // Pick station with highest container capacity as fallback hub
+              let bestCode: string | undefined
+              let bestScore = -1
+              for (const [code, st] of Object.entries(sectorStations)) {
+                const hub = detectStationHub(
+                  { ...st, code } as any,
+                  gameData.modulesByMacroId,
+                  { containerThreshold: 0 }
+                )
+                if (hub.score > bestScore) {
+                  bestScore = hub.score
+                  bestCode = code
+                }
+              }
+              if (bestCode) {
+                upsertTradeStation({
+                  gameGuid,
+                  groupId: draft.id,
+                  saveStationCode: bestCode,
+                  name: draft.name
+                })
+              }
+            }
           }
         }
         createdIds.add(draft.id)
@@ -712,6 +748,34 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
               saveStationCode: draft.hubStationCode,
               name: draft.name
             })
+          } else {
+            // For standalone/bridge groups without explicit hubStationCode,
+            // assign the player station with highest hub score from the sector
+            const archive = saveStore.selectedArchive
+            const sectorStations = archive?.sectors?.[draft.sectorMacro]?.player_stations
+            if (sectorStations) {
+              let bestCode: string | undefined
+              let bestScore = -1
+              for (const [code, st] of Object.entries(sectorStations)) {
+                const hub = detectStationHub(
+                  { ...st, code } as any,
+                  gameData.modulesByMacroId,
+                  { containerThreshold: 0 }
+                )
+                if (hub.score > bestScore) {
+                  bestScore = hub.score
+                  bestCode = code
+                }
+              }
+              if (bestCode) {
+                upsertTradeStation({
+                  gameGuid,
+                  groupId: group.id,
+                  saveStationCode: bestCode,
+                  name: draft.name
+                })
+              }
+            }
           }
         }
 
