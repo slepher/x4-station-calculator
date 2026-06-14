@@ -176,8 +176,8 @@ function buildRecalculateBaseGroups(): { baseGroups: BindingSectorGroup[]; exclu
       order: index,
       sectorMacro: group.sectorMacro,
       jumpRange: group.jumpRange,
-      connectedGroupIds: [...group.connectedGroupIds],
-      coverageSectorMacros: group.coverageSectorMacros
+      connectedGroupIds: group.connectionRetainEnabled ? [...group.connectedGroupIds] : [],
+      coverageSectorMacros: (group.coverageRetainEnabled ? group.coverageSectorMacros : [])
         .filter((ref) => {
           if (!group.excludedDefaultAssignmentSectorMacros.includes(ref)) return true
           // Only exclude player sectors; non-player coverage always retained
