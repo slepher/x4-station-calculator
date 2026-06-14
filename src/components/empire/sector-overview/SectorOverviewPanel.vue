@@ -674,6 +674,8 @@ function handleConfirm() {
   const result = autoGroupResult.value
   saveBindingStore.createAutoGroups(guid, result.groups, sectorGraphInfo.value.sectorGraph, sectorGraphInfo.value.sectorClusterMap)
   saveBindingStore.saveBinding()
+  liveStore.syncAllBindingStationsToStateMap()
+  liveStore.syncLiveFlowMap()
   autoGroupConfirmed.value = true
   const binding = saveBindingStore.activeBinding
   if (binding && binding.groups.length > 0) {

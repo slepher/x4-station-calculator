@@ -2061,6 +2061,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     titlePlaceholder,
     derivedBindingStations,
     syncAllBindingStationsToStateMap,
+    syncLiveFlowMap,
     empireDerivedProductionFlows,
     overviewBuyMultiplier,
     overviewSellMultiplier,
