@@ -179,6 +179,28 @@
 - 关闭 group 连接保留后，connected pill 仍显示但无 `+`、`×`。
 - toggle 不触发重新计算、不改变当前数据，只影响 [计算] 输入和 UI 操作可用性。
 
+### Case 15: 保留 checkbox 关闭时 [计算] 空输入
+
+测试目的：
+- 覆盖关闭覆盖/连接保留后点击 [计算]，不提交当前编辑数据，完全自动生成。
+
+应观察：
+- 关闭覆盖保留后点击 [计算]，coverage 由算法重新生成，不受编辑态 coverage 影响。
+- 关闭连接保留后点击 [计算]，连接由 MST 从零重算（不保留固定边），受桥接搜索跳数限制。
+- 桥接上限 4 跳时，结果中不应出现 5 跳连接。
+
+### Case 16: Standalone 组 ID 复用与 stationPlan 重分配
+
+测试目的：
+- 覆盖多次对同一 sector 独立成组时，不产生重复 group 和 transit hub。
+- 覆盖 group 变更后 stationPlans 按最终 coverage 正确重分配。
+
+应观察：
+- 第一次确认 standalone group 后再次编辑-计算-独立成组同一 sector。
+- 确认后 binding 中只有 1 个该 sector 的 group，tradeStation 不重复。
+- 废弃的 standalone group 从 binding 移除。
+- 该 sector 的 stationPlans 被正确重分配到当前 group，不被误删。
+
 ## 不作为 E2E 主责的内容
 
 以下内容优先由 unit 测试覆盖，E2E 只在主路径中间接观察：
