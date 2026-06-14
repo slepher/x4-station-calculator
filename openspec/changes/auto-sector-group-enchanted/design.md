@@ -63,7 +63,7 @@ interface GroupDraftInfo {
 
 进入编辑态时在 `SectorOverviewPanel` 保存当前状态快照，用于 [取消] 时恢复。
 
-进入编辑时，所有当前存在的 group 统一设为 `isPinned: true`、`baseline: true`。编辑中通过 [添加] 新建的 hub 才是 `isPinned: false`。
+进入编辑时，所有当前存在的 group 统一设为 `isPinned: true`、`baseline: true`。编辑中通过 [添加] 新建的 hub 同样 `isPinned: true`。
 
 baseline 用途：
 - 粗边框视觉：仅 coverage pill 中，进入编辑时已在 group coverage 中的 sector 显示粗边框（数据源为 `editSnapshot.coverageByGroupId`）
@@ -76,9 +76,22 @@ connection 不使用 baseline 行为。
 
 ## SectorConfirmBar
 
-参数顺序：`[桥接下拉 保留☑] [节点☑] [阈值下拉] [覆盖下拉 保留☑]`
+编辑态布局：
+- Row 1: `[桥接下拉 保留☑] [节点☑] [阈值下拉] [覆盖下拉 保留☑]`
+- Row 2: `[添加枢纽]` 左对齐，`[取消] [计算]` 右对齐
 
-第二行：`[添加枢纽]` 左对齐，`[取消] [计算]` 右对齐
+计算结果态：
+- Row 1: 只读展示桥接/节点/阈值/覆盖状态，最右 `[编辑]` 按钮右对齐
+- Row 2 不显示
+- 节点 checkbox 与保留 checkbox 在结果态不显示
+
+「保留」checkbox：
+- 桥接「保留」☑ 和覆盖「保留」☑ 默认勾选
+- 勾选：[计算] 时提交当前 coverage / bridge 数据
+- 取消：完全由算法自动生成，不提交编辑中 coverage / bridge 数据
+- 保留 checkbox 嵌入对应下拉字段框内，不作为独立控件
+- 保留 checkbox 为三态总控（全选/部分选/全不选），联动所有 group 对应 checkbox
+- 部分 group 开启、部分关闭时，保留 checkbox 显示 indeterminate 态
 
 props / emits：
 
@@ -95,11 +108,7 @@ canDisableNode: boolean
 规则：
 - `canDisableNode=false` 时 checkbox disabled 且保持勾选
 - `nodeEnabled=false` 时 `prefThreshold` 与 `prefJumpRange` 下拉 disabled
-- 计算结果态只读展示节点状态
-- 编辑输入态按钮顺序为 `[取消] [计算] [添加]`
 - [添加] 触发 hub 选择 popup，不传目标 group
-- 桥接「保留」☑ 和覆盖「保留」☑，默认勾选
-- 保留 checkbox 为三态总控，联动所有 group 的对应 checkbox
 
 ## Hub 添加菜单
 
@@ -113,7 +122,7 @@ canDisableNode: boolean
 - sector 行仅显示 `●/○` + 星区名，不显示 raw sector_id
 - 已是任意 group anchor 的 sector 不显示 `+`
 - 点击 `+` 创建新的 `GroupDraftInfo`，菜单关闭
-- 新 group 默认 `isPinned=false`、`baseline=false`、可删除
+- 新 group 默认 `isPinned=true`、`baseline=false`、可删除
 
 ## Unified Pill Rows
 
@@ -153,14 +162,21 @@ interface UnifiedPillEntry {
 
 非 pin hub（`isPinned=false`）的所有 pill action 为 null，覆盖/候选/连接均只读显示。
 
-### 覆盖/连接保留 checkbox
+### Per-group 保留 checkbox
 
 每个 group 的 pin 按钮左边显示两个 checkbox：`[覆盖☑] [连接☑]`。
 
-- 覆盖☑ 取消时：该 group 所有星区显示为候选（只读，无操作按钮）。勾回时恢复原样（纯视觉，不改数据）。
-- 连接☑ 取消时：连接的 `+/×` 按钮不可操作。勾回时恢复。
-- 连接双向生效：两个 group 任一方 `connectionRetainEnabled` 即显示连接 pill。
-- ConfirmBar 的保留 checkbox 作为三态总控，联动所有 group。
+- 标签为 `覆盖` / `连接`，不使用"保留"标签，放置于 pin 按钮左侧
+- group 未 pin（`isPinned=false`）时两个 checkbox SHALL 处于 disabled 状态
+- 覆盖☑ 关闭时：coverage pill 保持显示但无 `×` 按钮；candidate pill 保持显示但无 `+`/`→` 按钮。视觉效果与 unpin 相同（只读）。
+- 连接☑ 关闭时：connected pill 保持显示但无 `+`/`×` 按钮。视觉效果与 unpin 相同（只读）。
+- 保留 toggle 是纯 UI 状态（v-show 控制），不触发数据重算，不修改任何 coverage/connected 数据。
+- connected pill 始终可见，不受保留状态影响是否隐藏。
+
+### 候选 pill 显示规则
+
+- 候选 pill SHALL 仅在编辑态显示
+- 计算结果态（非编辑态）不显示候选 pill
 
 ## Coverage / Candidate 规则
 
@@ -223,6 +239,11 @@ hub anchor 统一作为绿色连接 pill 显示。
 - [计算] 输入直接使用编辑后的 `connectedGroupIds`
 
 connection 不使用 baseline 行为，不使用 excluded/default-off 字段。
+
+### 计算时连接规则
+
+- [计算] 时，`connectedGroupIds` 视为固定的 MST 边
+- Kruskal 算法仅在此基础上添加新边，不删除已存在边
 
 ## unpinned baseline hub
 

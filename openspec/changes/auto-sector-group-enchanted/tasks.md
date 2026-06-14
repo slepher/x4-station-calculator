@@ -61,9 +61,9 @@
 
 ## 7. 当前实现修正：excludedDefaultAssignmentSectorMacros
 
-- [ ] 写入 `excludedDefaultAssignmentSectorMacros` 前必须判断 sector 有玩家空间站
-- [ ] 新增 hub draft、coverage 转移、重新计算输入构建中，非玩家 sector 不进入 `excludedDefaultAssignmentSectorMacros`
-- [ ] 非玩家 coverage 参与计算时全部保留
+- [x] 写入 `excludedDefaultAssignmentSectorMacros` 前必须判断 sector 有玩家空间站
+- [x] 新增 hub draft、coverage 转移、重新计算输入构建中，非玩家 sector 不进入 `excludedDefaultAssignmentSectorMacros`
+- [x] 非玩家 coverage 参与计算时全部保留
 - [x] Col 3 默认选项生成时，excluded 玩家 sector 不可默认选中对应 group，但仍可手动选择
 - [x] 修复重新计算时 excluded default 信息丢失的问题
 
@@ -100,4 +100,20 @@
 
 - [x] `npm run build` 通过
 - [x] 确认无 TypeScript 编译错误
-- [ ] 确认 locales JSON 格式正确
+- [x] 确认 locales JSON 格式正确
+
+## 13. 保留 Checkbox 实现
+
+- [x] SectorConfirmBar: 在桥接下拉和覆盖下拉字段框内各自嵌入「保留」checkbox
+- [x] 保留 checkbox 默认勾选，取消时提交标志为全自动生成
+- [x] 保留 checkbox 三态总控（全选/部分选/全不选），支持 indeterminate
+- [x] 结果态不显示节点与保留 checkbox，仅显示 [编辑] 按钮
+- [x] 每个 group pin 按钮左边添加 `[覆盖☑] [连接☑]` checkbox，标签为「覆盖」「连接」
+- [x] group 未 pin 时 per-group 保留 checkbox disabled
+- [x] 保留 toggle 纯 UI 状态（v-show），不触发数据重算
+- [x] 覆盖☑ 关闭：coverage/candidate pill 只读（无 ×/+/→ 按钮），视觉同 unpin
+- [x] 连接☑ 关闭：connected pill 只读（无 +/× 按钮），视觉同 unpin
+- [x] connected pill 始终可见，不受保留状态影响隐藏
+- [x] 候选 pill 仅在编辑态显示，计算结果态不显示
+- [x] 计算时 connectedGroupIds 视为固定 MST 边，Kruskal 仅添加新边
+- [x] SectorHubAddMenu 新增 hub 默认 `isPinned: true`

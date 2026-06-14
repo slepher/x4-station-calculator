@@ -71,7 +71,7 @@ SectorConfirmBar SHALL 新增「节点」checkbox，位于桥接和阈值之间�
 - **前提** hub 选择菜单已打开
 - **当** 用户点击 sector S 的 `+`
 - **那么** 系统 SHALL 创建一个以 S 为 anchor 的新 GroupDraftInfo
-- **并且** 新 group 的 `isPinned` SHALL 为 `false`
+- **并且** 新 group 的 `isPinned` SHALL 为 `true`
 - **并且** 新 group SHALL 可删除
 
 ### Requirement: 基线快照
@@ -324,6 +324,102 @@ Col 3 每个玩家星区 card 的 options SHALL 包含所有当前范围命中 g
 - **那么** Live 页面 SHALL 通过 `BindingSectorGroup.tradeStation` 构建 transit hub
 - **并且** 新增非玩家星区 hub SHALL 可作为 transit hub 展示
 
+### Requirement: SectorConfirmBar 保留 Checkbox
+
+SectorConfirmBar SHALL 在桥接和覆盖字段内各自嵌入「保留」checkbox。勾选时提交对应数据给 [计算]，取消时完全由算法自动生成。
+
+#### Scenario: 保留 checkbox 嵌入字段内
+
+- **前提** 处于编辑输入态
+- **当** 页面渲染 SectorConfirmBar
+- **那么** 桥接保留 SHALL 嵌入桥接字段区域内
+- **并且** 覆盖保留 SHALL 嵌入覆盖字段区域内
+- **并且** SHALL NOT 作为字段外独立控件
+- **并且** 结果态 SHALL NOT 显示节点与保留 checkbox
+
+#### Scenario: 保留默认勾选
+
+- **前提** 进入编辑输入态
+- **当** 页面渲染 SectorConfirmBar
+- **那么** 桥接保留 SHALL 默认勾选
+- **并且** 覆盖保留 SHALL 默认勾选
+
+#### Scenario: 保留取消后全自动生成
+
+- **前提** 用户在编辑态取消保留 checkbox
+- **当** 用户点击 [计算]
+- **那么** 系统 SHALL NOT 提交编辑中的 coverage / bridge 数据
+- **并且** 算法 SHALL 完全自动生成 coverage 和 bridge
+
+#### Scenario: 三态总控 indeterminate
+
+- **前提** 部分 group 保留勾选、部分取消
+- **当** 页面渲染 SectorConfirmBar 保留 checkbox
+- **那么** 保留 checkbox SHALL 显示 indeterminate 态
+
+### Requirement: Per-group 保留 Checkbox
+
+每个 group SHALL 在 pin 按钮左边显示 `[覆盖☑]` `[连接☑]` checkbox，标签为「覆盖」「连接」。
+
+#### Scenario: per-group checkbox 位置
+
+- **前提** 处于编辑输入态
+- **当** 页面渲染 group
+- **那么** `[覆盖☑] [连接☑]` SHALL 显示在 pin 按钮左边
+- **并且** 标签文字 SHALL 为「覆盖」和「连接」
+
+#### Scenario: 未 pin 时 checkbox disabled
+
+- **前提** group 的 `isPinned` 为 false
+- **当** 页面渲染该 group
+- **那么** 覆盖 checkbox SHALL 处于 disabled 状态
+- **并且** 连接 checkbox SHALL 处于 disabled 状态
+
+#### Scenario: 保留 toggle 纯 UI 不触发重算
+
+- **当** 用户切换覆盖 checkbox 或连接 checkbox
+- **那么** 切换 SHALL NOT 触发数据重算
+- **并且** SHALL NOT 修改 coverage 或 connectedGroupIds 数据
+- **并且** SHALL 仅为 v-show 控制的 UI 状态
+
+#### Scenario: 覆盖保留关闭时 pill 只读
+
+- **前提** group 的覆盖 checkbox 关闭
+- **当** 页面渲染该 group
+- **那么** coverage pill SHALL 保持显示但无 `×` 按钮
+- **并且** candidate pill SHALL 保持显示但无 `+` 或 `→` 按钮
+- **并且** 视觉效果 SHALL 与 unpin（isPinned=false）相同
+
+#### Scenario: 连接保留关闭时 connected pill 只读
+
+- **前提** group 的连接 checkbox 关闭
+- **当** 页面渲染该 group
+- **那么** connected pill SHALL 保持显示但无 `+` 或 `×` 按钮
+- **并且** connected pill SHALL 始终可见，不受保留状态影响
+
+### Requirement: Candidate Pill 编辑态可见性
+
+候选 pill SHALL 仅在编辑态显示。计算结果态/只读态 SHALL NOT 显示候选 pill。
+
+#### Scenario: 计算结果态不显示候选
+
+- **前提** 处于计算结果态（非编辑态）
+- **当** 页面渲染 group
+- **那么** 候选 pill SHALL NOT 显示
+- **并且** SHALL NOT 渲染 `+` 或 `→` 候选按钮
+
+### Requirement: 菜单新增 Hub 默认 Pinned
+
+通过 SectorHubAddMenu 菜单添加的 hub SHALL 默认 `isPinned: true`。
+
+#### Scenario: 菜单新增 hub 默认 pinned
+
+- **前提** hub 选择菜单已打开
+- **当** 用户点击 sector S 的 `+`
+- **那么** 新 group 的 `isPinned` SHALL 为 `true`
+- **并且** 新 group 的 `baseline` SHALL 为 `false`
+- **并且** 新 group SHALL 可删除
+
 ## MODIFIED Requirements
 
 ### Requirement: 重新计算状态 SHALL 简化为双态
@@ -338,7 +434,7 @@ Col 3 每个玩家星区 card 的 options SHALL 包含所有当前范围命中 g
 
 #### Scenario: 新建 group 默认 not pinned
 
-- **前提** group 由用户添加 hub、bridge 方案或算法自动生成
+- **前提** group 由 bridge 方案或算法自动生成
 - **当** 新建 GroupDraftInfo
 - **那么** `isPinned` SHALL 为 `false`
 
