@@ -168,11 +168,14 @@ describe('autoGroup - cleanSlate assignments', () => {
 
   beforeAll(() => { result = runCleanSlate() })
 
-  it('covers all 22 player sectors', () => {
-    expect(result.assignments).toHaveLength(22)
+  it('covers all player sectors via assignments or groups', () => {
+    const anchorSectors = new Set(result.groups.filter(g => g.sectorMacro).map(g => g.sectorMacro!))
     const assignedMacros = result.assignments.map(a => a.sectorMacro)
     for (const m of result.playerSectorMacros) {
-      expect(assignedMacros).toContain(m)
+      // Hub anchors don't generate assignment cards
+      if (!anchorSectors.has(m)) {
+        expect(assignedMacros).toContain(m)
+      }
     }
   })
 
@@ -193,6 +196,8 @@ describe('autoGroup - cleanSlate assignments', () => {
         expect(a.defaultGroupId).toBeTruthy()
       }
     }
+    const auto = result.assignments.filter(a => a.status === 'auto')
+    expect(auto.length).toBeGreaterThan(0)
   })
 
   it('Savage Spur I auto-assigned (one-way highway blocks Asteroid Belt)', () => {
@@ -241,7 +246,7 @@ describe('autoGroup - recalculation with pinned hubs', () => {
     expect(recalculated.groups.length).toBeGreaterThan(pinnedGroups.length)
     expect(recalculated.groups.some((group) =>
       group.isNew &&
-      group.recalcState === 'normal' &&
+      !group.isPinned &&
       !pinnedGroups.some((pinned) => pinned.sectorMacro === group.sectorMacro)
     )).toBe(true)
   })
@@ -422,9 +427,9 @@ describe('autoGroup - interactive applyStandalone', () => {
           coverageSectorMacros: ['B'],
           connectedGroupIds: [],
           isNew: true,
-          disabledCoverageSectorMacros: [],
-          disabledConnectedGroupIds: [],
-          recalcState: 'normal'
+          excludedDefaultAssignmentSectorMacros: [],
+          excludedDefaultConnectedGroupIds: [],
+          isPinned: false
         },
         {
           id: 'g2',
@@ -435,9 +440,9 @@ describe('autoGroup - interactive applyStandalone', () => {
           coverageSectorMacros: [],
           connectedGroupIds: [],
           isNew: true,
-          disabledCoverageSectorMacros: [],
-          disabledConnectedGroupIds: [],
-          recalcState: 'normal'
+          excludedDefaultAssignmentSectorMacros: [],
+          excludedDefaultConnectedGroupIds: [],
+          isPinned: false
         }
       ],
       assignments: [
@@ -510,9 +515,9 @@ describe('autoGroup - bridge adoption', () => {
           coverageSectorMacros: [],
           connectedGroupIds: [],
           isNew: true,
-          disabledCoverageSectorMacros: [],
-          disabledConnectedGroupIds: [],
-          recalcState: 'normal'
+          excludedDefaultAssignmentSectorMacros: [],
+          excludedDefaultConnectedGroupIds: [],
+          isPinned: false
         },
         {
           id: 'gE',
@@ -523,9 +528,9 @@ describe('autoGroup - bridge adoption', () => {
           coverageSectorMacros: ['C'],
           connectedGroupIds: [],
           isNew: true,
-          disabledCoverageSectorMacros: [],
-          disabledConnectedGroupIds: [],
-          recalcState: 'normal'
+          excludedDefaultAssignmentSectorMacros: [],
+          excludedDefaultConnectedGroupIds: [],
+          isPinned: false
         }
       ],
       assignments: [
@@ -583,11 +588,12 @@ describe('autoGroup - bridge adoption', () => {
       5
     )
     const bridgeGroup = updated.groups.find((group) => group.sectorMacro === 'B')!
-    const bridgeAssignment = updated.assignments.find((assignment) => assignment.sectorMacro === 'B')!
+    // Hub anchors (bridge groups) don't generate assignment cards
+    const bridgeAssignment = updated.assignments.find((assignment) => assignment.sectorMacro === 'B')
     const cAssignment = updated.assignments.find((assignment) => assignment.sectorMacro === 'C')!
     const selectedCOption = cAssignment.options[cAssignment.selectedOptionIndex!]
 
-    expect(bridgeAssignment.defaultGroupId).toBe(bridgeGroup.id)
+    expect(bridgeAssignment).toBeFalsy()
     expect(selectedCOption.targetGroupId).toBe(bridgeGroup.id)
     expect(bridgeGroup.coverageSectorMacros).toContain('C')
     expect(updated.groups.find((group) => group.id === 'gE')!.coverageSectorMacros).not.toContain('C')
@@ -604,9 +610,9 @@ describe('autoGroup - bridge adoption', () => {
         coverageSectorMacros: [],
         connectedGroupIds: [],
         isNew: true,
-        disabledCoverageSectorMacros: [],
-          disabledConnectedGroupIds: [],
-          recalcState: 'normal'
+        excludedDefaultAssignmentSectorMacros: [],
+          excludedDefaultConnectedGroupIds: [],
+          isPinned: false
       },
       {
         id: 'gC',
@@ -617,9 +623,9 @@ describe('autoGroup - bridge adoption', () => {
         coverageSectorMacros: [],
         connectedGroupIds: [],
         isNew: true,
-        disabledCoverageSectorMacros: [],
-          disabledConnectedGroupIds: [],
-          recalcState: 'normal'
+        excludedDefaultAssignmentSectorMacros: [],
+          excludedDefaultConnectedGroupIds: [],
+          isPinned: false
       },
       {
         id: 'gE',
@@ -630,9 +636,9 @@ describe('autoGroup - bridge adoption', () => {
         coverageSectorMacros: [],
         connectedGroupIds: [],
         isNew: true,
-        disabledCoverageSectorMacros: [],
-          disabledConnectedGroupIds: [],
-          recalcState: 'normal'
+        excludedDefaultAssignmentSectorMacros: [],
+          excludedDefaultConnectedGroupIds: [],
+          isPinned: false
       }
     ]
     const sectorGraph = {

@@ -46,13 +46,15 @@ export interface GroupDraftInfo {
   originalJumpRange: number
   coverageSectorMacros: string[]
   connectedGroupIds: string[]
-  disabledCoverageSectorMacros: string[]
-  disabledConnectedGroupIds: string[]
+  excludedDefaultAssignmentSectorMacros: string[]
+  excludedDefaultConnectedGroupIds: string[]
   isNew: boolean
-  recalcState: 'normal' | 'pin' | 'exclude'
+  isPinned: boolean
   hubScore?: number
   hubStationCode?: string
   role?: 'normal' | 'bridge'
+  baseline?: boolean
+  enteredOtherGroupCoverage?: boolean
 }
 
 export interface BridgeReach {
@@ -496,10 +498,10 @@ export function applyBridgePlanToDraft(
       originalJumpRange: prefJumpRange,
       coverageSectorMacros: [],
       connectedGroupIds: [],
-      disabledCoverageSectorMacros: [],
-      disabledConnectedGroupIds: [],
+      excludedDefaultAssignmentSectorMacros: [],
+      excludedDefaultConnectedGroupIds: [],
       isNew: true,
-      recalcState: 'normal',
+      isPinned: false,
       hubScore: selectedUnitScore(unit),
       role: 'bridge'
     })
@@ -627,7 +629,8 @@ export function groupCleanSlate(
   config: HubDetectionConfig = DEFAULT_HUB_CONFIG,
   prefJumpRange: number = DEFAULT_JUMP_RANGE,
   bridgeSearchJumpRange: number = DEFAULT_BRIDGE_SEARCH_JUMP_RANGE,
-  excludedSectorMacros: string[] = []
+  excludedSectorMacros: string[] = [],
+  generateHubs: boolean = true
 ): AutoGroupResult {
   const resolvedBridgeSearchJumpRange = resolveBridgeSearchJumpRange(prefJumpRange, bridgeSearchJumpRange)
   const excludedSectorSet = new Set(excludedSectorMacros)
@@ -666,41 +669,43 @@ export function groupCleanSlate(
   let groupCounter = 0
 
   // Phase A: Pure hub groups
-  for (const hub of pureHubs) {
-    const sectorMacro = hub.sectorMacro
-    if (assignedSectors.has(sectorMacro)) continue
+  if (generateHubs) {
+    for (const hub of pureHubs) {
+      const sectorMacro = hub.sectorMacro
+      if (assignedSectors.has(sectorMacro)) continue
 
-    const groupId = `auto_${crypto.randomUUID()}`
-    const allCoverage = getSectorCoverageMacros(sectorMacro, prefJumpRange, sectorGraph, sectorClusterMap)
-    const coverage = allCoverage.filter((m) =>
-      playerSectorMacros.includes(m) &&
-      !occupiedSectors.has(m) &&
-      m !== sectorMacro &&
-      // Don't claim other pure hub anchors
-      !pureHubAnchors.has(m)
-    )
+      const groupId = `auto_${crypto.randomUUID()}`
+      const allCoverage = getSectorCoverageMacros(sectorMacro, prefJumpRange, sectorGraph, sectorClusterMap)
+      const coverage = allCoverage.filter((m) =>
+        playerSectorMacros.includes(m) &&
+        !occupiedSectors.has(m) &&
+        m !== sectorMacro &&
+        // Don't claim other pure hub anchors
+        !pureHubAnchors.has(m)
+      )
 
-    const group: GroupDraftInfo = {
-      id: groupId,
-      name: `Sector ${++groupCounter}`,
-      sectorMacro,
-      jumpRange: prefJumpRange,
-      originalJumpRange: prefJumpRange,
-      coverageSectorMacros: coverage,
-      connectedGroupIds: [],
-      disabledCoverageSectorMacros: [],
-      disabledConnectedGroupIds: [],
-      isNew: true,
-      recalcState: 'normal',
-      hubScore: hub.score,
-      hubStationCode: hub.stationCode
+      const group: GroupDraftInfo = {
+        id: groupId,
+        name: `Sector ${++groupCounter}`,
+        sectorMacro,
+        jumpRange: prefJumpRange,
+        originalJumpRange: prefJumpRange,
+        coverageSectorMacros: coverage,
+        connectedGroupIds: [],
+        excludedDefaultAssignmentSectorMacros: [],
+      excludedDefaultConnectedGroupIds: [],
+        isNew: true,
+        isPinned: false,
+        hubScore: hub.score,
+        hubStationCode: hub.stationCode
+      }
+      groups.push(group)
+      groupMap.set(groupId, group)
+      assignedSectors.set(sectorMacro, groupId)
+      // Anchor is always occupied by its own group
+      occupiedSectors.add(sectorMacro)
+      coverage.forEach((m) => occupiedSectors.add(m))
     }
-    groups.push(group)
-    groupMap.set(groupId, group)
-    assignedSectors.set(sectorMacro, groupId)
-    // Anchor is always occupied by its own group
-    occupiedSectors.add(sectorMacro)
-    coverage.forEach((m) => occupiedSectors.add(m))
   }
 
   computeGroupGraph(groups, sectorGraph, sectorClusterMap, resolvedBridgeSearchJumpRange)
@@ -870,7 +875,8 @@ export function groupIncremental(
   config: HubDetectionConfig = DEFAULT_HUB_CONFIG,
   prefJumpRange: number = DEFAULT_JUMP_RANGE,
   bridgeSearchJumpRange: number = DEFAULT_BRIDGE_SEARCH_JUMP_RANGE,
-  excludedSectorMacros: string[] = []
+  excludedSectorMacros: string[] = [],
+  generateHubs: boolean = true
 ): AutoGroupResult {
   const resolvedBridgeSearchJumpRange = resolveBridgeSearchJumpRange(prefJumpRange, bridgeSearchJumpRange)
   const sectorsWithStations = getSaveSectorsWithPlayerStations(archive)
@@ -903,10 +909,10 @@ export function groupIncremental(
     originalJumpRange: group.jumpRange,
     coverageSectorMacros: group.coverageSectorMacros.map((c) => c.ref),
     connectedGroupIds: [...(group.connectedGroupIds || [])],
-    disabledCoverageSectorMacros: [],
-    disabledConnectedGroupIds: [],
+    excludedDefaultAssignmentSectorMacros: [],
+      excludedDefaultConnectedGroupIds: [],
     isNew: false,
-    recalcState: 'pin',
+    isPinned: true,
     hubScore: undefined
   }))
 
@@ -925,47 +931,49 @@ export function groupIncremental(
   }
   rebuildAssignedSectorsFromGroups()
 
-  const pureHubs: SectorPureHub[] = []
-  for (const sectorMacro of playerSectorMacros) {
-    if (excludedSectorSet.has(sectorMacro)) continue
-    if (existingAnchors.has(sectorMacro)) continue
-    if (assignedSectors.has(sectorMacro)) continue
-    const hub = getSectorPureHub(sectorMacro, sectorStationMap.get(sectorMacro) || [], modulesByMacroId, config)
-    if (hub) pureHubs.push(hub)
-  }
-  pureHubs.sort((a, b) => b.score - a.score)
+  if (generateHubs) {
+    const pureHubs: SectorPureHub[] = []
+    for (const sectorMacro of playerSectorMacros) {
+      if (excludedSectorSet.has(sectorMacro)) continue
+      if (existingAnchors.has(sectorMacro)) continue
+      if (assignedSectors.has(sectorMacro)) continue
+      const hub = getSectorPureHub(sectorMacro, sectorStationMap.get(sectorMacro) || [], modulesByMacroId, config)
+      if (hub) pureHubs.push(hub)
+    }
+    pureHubs.sort((a, b) => b.score - a.score)
 
-  const pureHubAnchors = new Set(pureHubs.map((h) => h.sectorMacro))
-  const occupiedSectors = new Set(assignedSectors.keys())
-  let groupCounter = groups.length
-  for (const hub of pureHubs) {
-    if (assignedSectors.has(hub.sectorMacro)) continue
-    const groupId = `auto_${crypto.randomUUID()}`
-    const allCoverage = getSectorCoverageMacros(hub.sectorMacro, prefJumpRange, sectorGraph, sectorClusterMap)
-    const coverage = allCoverage.filter((m) =>
-      playerSectorMacros.includes(m) &&
-      !occupiedSectors.has(m) &&
-      m !== hub.sectorMacro &&
-      !pureHubAnchors.has(m)
-    )
-    groups.push({
-      id: groupId,
-      name: `Sector ${++groupCounter}`,
-      sectorMacro: hub.sectorMacro,
-      jumpRange: prefJumpRange,
-      originalJumpRange: prefJumpRange,
-      coverageSectorMacros: coverage,
-      connectedGroupIds: [],
-      disabledCoverageSectorMacros: [],
-      disabledConnectedGroupIds: [],
-      isNew: true,
-      recalcState: 'normal',
-      hubScore: hub.score,
-      hubStationCode: hub.stationCode
-    })
-    assignedSectors.set(hub.sectorMacro, groupId)
-    occupiedSectors.add(hub.sectorMacro)
-    coverage.forEach((m) => occupiedSectors.add(m))
+    const pureHubAnchors = new Set(pureHubs.map((h) => h.sectorMacro))
+    const occupiedSectors = new Set(assignedSectors.keys())
+    let groupCounter = groups.length
+    for (const hub of pureHubs) {
+      if (assignedSectors.has(hub.sectorMacro)) continue
+      const groupId = `auto_${crypto.randomUUID()}`
+      const allCoverage = getSectorCoverageMacros(hub.sectorMacro, prefJumpRange, sectorGraph, sectorClusterMap)
+      const coverage = allCoverage.filter((m) =>
+        playerSectorMacros.includes(m) &&
+        !occupiedSectors.has(m) &&
+        m !== hub.sectorMacro &&
+        !pureHubAnchors.has(m)
+      )
+      groups.push({
+        id: groupId,
+        name: `Sector ${++groupCounter}`,
+        sectorMacro: hub.sectorMacro,
+        jumpRange: prefJumpRange,
+        originalJumpRange: prefJumpRange,
+        coverageSectorMacros: coverage,
+        connectedGroupIds: [],
+        excludedDefaultAssignmentSectorMacros: [],
+      excludedDefaultConnectedGroupIds: [],
+        isNew: true,
+        isPinned: false,
+        hubScore: hub.score,
+        hubStationCode: hub.stationCode
+      })
+      assignedSectors.set(hub.sectorMacro, groupId)
+      occupiedSectors.add(hub.sectorMacro)
+      coverage.forEach((m) => occupiedSectors.add(m))
+    }
   }
 
   computeGroupGraph(groups, sectorGraph, sectorClusterMap, resolvedBridgeSearchJumpRange)
@@ -1044,8 +1052,11 @@ function buildAssignmentResult(
   const allSectors = [...unassignedSectors, ...Array.from(assignedSectors.keys())]
   const uniqueSectors = [...new Set(allSectors)]
 
+  const anchorSectors = new Set(groups.map((g) => g.sectorMacro).filter(Boolean) as string[])
+
   for (const sectorMacro of uniqueSectors) {
-    const alreadyAssignedTo = assignedSectors.get(sectorMacro)
+    // Hub anchors don't generate assignment cards
+    if (anchorSectors.has(sectorMacro)) continue
 
     const candidates: Array<{ groupId: string; distance: number; jumpRange: number; score?: number }> = []
     for (const group of groups) {
@@ -1071,131 +1082,84 @@ function buildAssignmentResult(
       continue
     }
 
-    const sorted = candidates.sort((a, b) => a.distance - b.distance)
-    const best = sorted[0]!
-    const minDist = best.distance
-    const sameDist = sorted.filter((g) => g.distance === minDist)
+    // Split candidates: current-range hits vs extension hits
+    const currentRangeHits = candidates.filter((g) => g.distance <= g.jumpRange)
+    let optionsSource = currentRangeHits
 
-    if (sameDist.length > 1) {
-      const scores = sameDist.filter((g) => g.score !== undefined).map((g) => g.score!)
-      let hasScoreTie = false
-      if (scores.length === sameDist.length) {
-        const maxScore = Math.max(...scores)
-        hasScoreTie = scores.some((s) => s !== maxScore && (maxScore - s) / maxScore < SCORE_TIE_THRESHOLD)
-      }
-
-      if (hasScoreTie) {
-        const options: AssignmentOption[] = sameDist.map((g) => ({
-          type: 'absorb' as const,
-          targetGroupId: g.groupId,
-          distance: g.distance,
-          extendsRange: g.distance > g.jumpRange,
-          resultingGroupSize: uniqueSectors.length
-        }))
-        options.push({
-          type: 'standalone' as const,
-          distance: 0,
-          extendsRange: false,
-          resultingGroupSize: 1
-        })
-        assignments.push(withDisplayBucket({
-          sectorMacro,
-          status: 'uncertain_tie',
-          options,
-          selectedOptionIndex: null
-        }))
-        continue
-      }
+    if (currentRangeHits.length === 0) {
+      // Only minimum extension distance groups become options
+      const minDist = Math.min(...candidates.map((g) => g.distance))
+      optionsSource = candidates.filter((g) => g.distance === minDist)
     }
 
-    const extendsRange = best.distance > best.jumpRange
+    // Build options from all hit groups
+    const sortedByDist = [...optionsSource].sort((a, b) => a.distance - b.distance)
+    const options: AssignmentOption[] = sortedByDist.map((g) => ({
+      type: 'absorb' as const,
+      targetGroupId: g.groupId,
+      distance: g.distance,
+      extendsRange: g.distance > g.jumpRange,
+      resultingGroupSize: uniqueSectors.length
+    }))
 
-    if (extendsRange && best.distance <= MAX_UNCERTAIN_JUMP) {
-      const options: AssignmentOption[] = [
-        {
-          type: 'absorb' as const,
-          targetGroupId: best.groupId,
-          distance: best.distance,
-          extendsRange: true,
-          resultingGroupSize: uniqueSectors.length
-        },
-        {
-          type: 'standalone' as const,
-          distance: 0,
-          extendsRange: false,
-          resultingGroupSize: 1
-        }
-      ]
-      assignments.push(withDisplayBucket({
-        sectorMacro,
-        status: 'uncertain_extend',
-        defaultGroupId: best.groupId,
-        options,
-        selectedOptionIndex: null
-      }))
-      continue
-    }
-
-    if (extendsRange && best.distance > MAX_UNCERTAIN_JUMP) {
-      assignments.push(withDisplayBucket({
-        sectorMacro,
-        status: 'standalone',
-        options: [{
-          type: 'standalone' as const,
-          distance: 0,
-          extendsRange: false,
-          resultingGroupSize: 1
-        }],
-        selectedOptionIndex: 0
-      }))
-      continue
-    }
-
-    if (alreadyAssignedTo) {
-      const options: AssignmentOption[] = [{
-        type: 'absorb' as const,
-        targetGroupId: alreadyAssignedTo,
-        distance: best.distance,
-        extendsRange: false,
-        resultingGroupSize: uniqueSectors.length
-      }]
-      assignments.push(withDisplayBucket({
-        sectorMacro,
-        status: 'auto',
-        defaultGroupId: alreadyAssignedTo,
-        options,
-        selectedOptionIndex: 0
-      }))
-    } else {
-      const options: AssignmentOption[] = [{
-        type: 'absorb' as const,
-        targetGroupId: best.groupId,
-        distance: best.distance,
-        extendsRange: false,
-        resultingGroupSize: uniqueSectors.length
-      }]
-      assignments.push(withDisplayBucket({
-        sectorMacro,
-        status: 'auto',
-        defaultGroupId: best.groupId,
-        options,
-        selectedOptionIndex: 0
-      }))
-    }
-
-    // For absorbed sectors, add standalone option (unless sector is the group's own anchor)
-    const last = assignments[assignments.length - 1]!
-    const isAnchorOfDefault = last.defaultGroupId
-      ? groups.find((g) => g.id === last.defaultGroupId)?.sectorMacro === last.sectorMacro
-      : false
-    if (!isAnchorOfDefault && last.options.length > 0 && last.options[last.options.length - 1]!.type !== 'standalone') {
-      last.options.push({
+    // Add standalone as last option
+    const noStandalone = !options.some((o) => o.type === 'standalone')
+    if (noStandalone) {
+      options.push({
         type: 'standalone' as const,
         distance: 0,
         extendsRange: false,
         resultingGroupSize: 1
       })
     }
+
+    // Determine default option
+    let defaultOptionIndex: number | null = null
+    if (currentRangeHits.length > 0) {
+      // Find best current-range hit that is NOT excluded default
+      const eligibleDefaults = currentRangeHits
+        .filter((g) => {
+          const group = groups.find((grp) => grp.id === g.groupId)
+          return group && !group.excludedDefaultAssignmentSectorMacros.includes(sectorMacro)
+        })
+      if (eligibleDefaults.length > 0) {
+        // Score tie check among same-distance eligible defaults
+        const bestEligible = eligibleDefaults.sort((a, b) => a.distance - b.distance)[0]!
+        const sameDistEligible = eligibleDefaults.filter((g) => g.distance === bestEligible.distance)
+
+        let hasDefault = true
+        if (sameDistEligible.length > 1) {
+          const scores = sameDistEligible.filter((g) => g.score !== undefined).map((g) => g.score!)
+          if (scores.length === sameDistEligible.length) {
+            const maxScore = Math.max(...scores)
+            const hasScoreTie = scores.some((s) => s !== maxScore && (maxScore - s) / maxScore < SCORE_TIE_THRESHOLD)
+            if (hasScoreTie) hasDefault = false
+          }
+        }
+
+        if (hasDefault) {
+          defaultOptionIndex = options.findIndex((o) => o.targetGroupId === bestEligible.groupId)
+          if (defaultOptionIndex < 0) defaultOptionIndex = null
+        }
+      }
+    }
+
+    const isUncertain = defaultOptionIndex === null && optionsSource.length > 0
+    const status = isUncertain
+      ? (currentRangeHits.length > 0 ? 'uncertain_tie' : 'uncertain_extend')
+      : (defaultOptionIndex !== null ? 'auto' : 'exception')
+
+    const defaultGroupId = defaultOptionIndex !== null
+      ? options[defaultOptionIndex]?.targetGroupId
+      : undefined
+
+    assignments.push(withDisplayBucket({
+      sectorMacro,
+      status: status as SectorAssignment['status'],
+      defaultGroupId,
+      options,
+      selectedOptionIndex: defaultOptionIndex
+    }))
   }
 
   return assignments
@@ -1427,10 +1391,10 @@ export function applyStandaloneToResult(
     originalJumpRange: prefJumpRange,
     coverageSectorMacros: coverage,
     connectedGroupIds: [],
-    disabledCoverageSectorMacros: [],
-    disabledConnectedGroupIds: [],
+    excludedDefaultAssignmentSectorMacros: [],
+      excludedDefaultConnectedGroupIds: [],
     isNew: true,
-    recalcState: 'normal',
+    isPinned: false,
     hubScore: undefined
   }
 

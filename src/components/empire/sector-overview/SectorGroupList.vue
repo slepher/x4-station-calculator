@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { GroupDraftInfo, SectorAssignment } from '@/store/logic/autoGroup'
 import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
@@ -15,6 +15,9 @@ const props = defineProps<{
   sectorClusterMap: Record<string, string>
   playerSectorMacros: string[]
   editable: boolean
+  baselineCoverageByGroupId?: Record<string, string[]>
+  baselineConnectedByGroupId?: Record<string, string[]>
+  baselineAnchorSectorMacros?: string[]
 }>()
 
 const emit = defineEmits<{
@@ -22,9 +25,21 @@ const emit = defineEmits<{
   (e: 'update-jump-range', groupId: string, range: number): void
   (e: 'toggle-coverage-input', groupId: string, sectorMacro: string): void
   (e: 'toggle-connected-input', groupId: string, connectedGroupId: string): void
+  (e: 'add-candidate-coverage', groupId: string, sectorMacro: string): void
+  (e: 'delete-group', groupId: string): void
 }>()
 
 const { t, te } = useI18n()
+
+const activeTabByGroup = ref<Record<string, 'coverage' | 'candidates' | 'connected'>>({})
+
+function getTab(groupId: string): 'coverage' | 'candidates' | 'connected' {
+  return activeTabByGroup.value[groupId] || 'coverage'
+}
+
+function setTab(groupId: string, tab: 'coverage' | 'candidates' | 'connected') {
+  activeTabByGroup.value[groupId] = tab
+}
 
 function getSectorName(macro: string): string {
   if (props.maps) {
@@ -39,8 +54,24 @@ function getSectorName(macro: string): string {
   return macro
 }
 
-function getCoverageByJump(group: GroupDraftInfo): Map<number, Array<{ macro: string; connected: boolean; active: boolean; connectedGroupId?: string }>> {
-  const byJump = new Map<number, Array<{ macro: string; connected: boolean; active: boolean; connectedGroupId?: string }>>()
+function isBaselineCoverage(groupId: string, sectorMacro: string): boolean {
+  return (props.baselineCoverageByGroupId?.[groupId] ?? []).includes(sectorMacro)
+}
+
+function isBaselineConnection(groupId: string, connectedGroupId: string): boolean {
+  return (props.baselineConnectedByGroupId?.[groupId] ?? []).includes(connectedGroupId)
+}
+
+function isBaselineAnchor(sectorMacro: string): boolean {
+  return (props.baselineAnchorSectorMacros ?? []).includes(sectorMacro)
+}
+
+void isBaselineCoverage
+void isBaselineConnection
+void isBaselineAnchor
+
+function getCoverageByJump(group: GroupDraftInfo): Map<number, Array<{ macro: string; connected: boolean; active: boolean; connectedGroupId?: string; isBaseline: boolean }>> {
+  const byJump = new Map<number, Array<{ macro: string; connected: boolean; active: boolean; connectedGroupId?: string; isBaseline: boolean }>>()
   if (!group.sectorMacro) return byJump
 
   const distances = getCoverageSectors(
@@ -56,7 +87,8 @@ function getCoverageByJump(group: GroupDraftInfo): Map<number, Array<{ macro: st
     byJump.get(jump)!.push({
       macro: sector,
       connected: false,
-      active: !group.disabledCoverageSectorMacros.includes(sector)
+      active: !group.excludedDefaultAssignmentSectorMacros.includes(sector),
+      isBaseline: isBaselineCoverage(group.id, sector)
     })
   }
 
@@ -68,20 +100,63 @@ function getCoverageByJump(group: GroupDraftInfo): Map<number, Array<{ macro: st
     byJump.get(jump)!.push({
       macro: connGroup.sectorMacro,
       connected: true,
-      active: !group.disabledConnectedGroupIds.includes(connId),
-      connectedGroupId: connId
+      active: !group.excludedDefaultConnectedGroupIds.includes(connId),
+      connectedGroupId: connId,
+      isBaseline: isBaselineConnection(group.id, connId)
     })
   }
 
   return byJump
 }
 
-function canEditPinnedInput(group: GroupDraftInfo): boolean {
-  return props.editable && group.recalcState === 'pin'
-}
-
 function getCoverageJumps(group: GroupDraftInfo): number[] {
   return Array.from(getCoverageByJump(group).keys()).sort((a, b) => a - b)
+}
+
+function getCandidatesForGroup(group: GroupDraftInfo): Array<{ macro: string; isAnchor: boolean; isActive: boolean }> {
+  if (!group.sectorMacro) return []
+  const allAnchorSectors = new Set(props.groups.filter(g => g.sectorMacro).map(g => g.sectorMacro!))
+  const distances = getCoverageSectors(group.sectorMacro, group.jumpRange, props.sectorGraph, props.sectorClusterMap)
+  const activeCoverage = new Set(group.coverageSectorMacros.filter(
+    m => !group.excludedDefaultAssignmentSectorMacros.includes(m)
+  ))
+  const inactiveCoverage = new Set(group.coverageSectorMacros.filter(
+    m => group.excludedDefaultAssignmentSectorMacros.includes(m)
+  ))
+
+  return distances
+    .filter(d => props.playerSectorMacros.includes(d.sectorMacro) && d.sectorMacro !== group.sectorMacro)
+    .filter(d => !inactiveCoverage.has(d.sectorMacro))
+    .map(d => ({
+      macro: d.sectorMacro,
+      isAnchor: allAnchorSectors.has(d.sectorMacro),
+      isActive: activeCoverage.has(d.sectorMacro)
+    }))
+}
+
+function getConnectedEntries(group: GroupDraftInfo) {
+  return group.connectedGroupIds.map(connId => {
+    const connGroup = props.groups.find(g => g.id === connId)
+    return {
+      groupId: connId,
+      name: connGroup ? (connGroup.sectorMacro ? getSectorName(connGroup.sectorMacro) : connGroup.name) : connId.slice(0, 8),
+      active: !group.excludedDefaultConnectedGroupIds.includes(connId),
+      isBaseline: isBaselineConnection(group.id, connId)
+    }
+  })
+}
+
+function getPinnedTitle(group: GroupDraftInfo): string {
+  return group.isPinned ? t('sector.recalc_state_pin') : t('sector.recalc_state_normal')
+}
+
+function canEditJumpRange(group: GroupDraftInfo): boolean {
+  if (!props.editable) return false
+  return group.isPinned
+}
+
+function canEditPinnedInput(group: GroupDraftInfo): boolean {
+  return props.editable && group.isPinned
 }
 
 function getUncertainCount(groupId: string): number {
@@ -90,18 +165,24 @@ function getUncertainCount(groupId: string): number {
   ).length
 }
 
-function getRecalcStateTitle(group: GroupDraftInfo): string {
-  if (group.recalcState === 'pin') return t('sector.recalc_state_pin')
-  if (group.recalcState === 'exclude') return t('sector.recalc_state_exclude')
-  return t('sector.recalc_state_normal')
+function hasPlayerStation(sectorMacro: string): boolean {
+  return props.playerSectorMacros.includes(sectorMacro)
 }
 
-function canEditJumpRange(group: GroupDraftInfo): boolean {
-  if (!props.editable) return false
-  if (group.recalcState === 'exclude') return false
-  return !group.isNew || group.recalcState === 'pin'
+function getPillClass(entry: {
+  connected: boolean
+  active: boolean
+  isBaseline: boolean
+  isAnchor?: boolean
+}) {
+  return {
+    'pill--coverage': !entry.connected,
+    'pill--connected': entry.connected,
+    'pill--inactive': !entry.active,
+    'pill--baseline': entry.isBaseline,
+    'pill--anchor': entry.isAnchor
+  }
 }
-
 </script>
 
 <template>
@@ -116,8 +197,8 @@ function canEditJumpRange(group: GroupDraftInfo): boolean {
       class="group-item"
       :class="{
         'group-item--new': group.isNew,
-        'group-item--pin': group.recalcState === 'pin',
-        'group-item--exclude': group.recalcState === 'exclude'
+        'group-item--pinned': group.isPinned,
+        'group-item--unpinned': !group.isPinned && group.baseline
       }"
     >
       <div class="group-header">
@@ -126,24 +207,41 @@ function canEditJumpRange(group: GroupDraftInfo): boolean {
         </div>
         <div class="group-actions">
           <button
-            v-if="props.editable"
+            v-if="props.editable && !group.enteredOtherGroupCoverage"
             class="action-btn state-btn"
-            :class="`state-btn--${group.recalcState}`"
-            :title="getRecalcStateTitle(group)"
+            :class="group.isPinned ? 'state-btn--pinned' : 'state-btn--unpinned'"
+            :title="getPinnedTitle(group)"
             @click="emit('cycle-recalc-state', group.id)"
           >
-            <svg class="state-icon" :class="`state-icon--${group.recalcState}`" viewBox="0 0 24 24" fill="none">
-              <template v-if="group.recalcState === 'pin'">
+            <svg class="state-icon" :class="group.isPinned ? 'state-icon--pinned' : 'state-icon--unpinned'" viewBox="0 0 24 24" fill="none">
+              <template v-if="group.isPinned">
                 <path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z" fill="currentColor"/>
-              </template>
-              <template v-else-if="group.recalcState === 'exclude'">
-                <circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="2"/>
-                <path d="M7 17L17 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
               </template>
               <template v-else>
                 <circle cx="12" cy="12" r="7" stroke="currentColor" stroke-width="2"/>
                 <circle cx="12" cy="12" r="2" fill="currentColor"/>
               </template>
+            </svg>
+          </button>
+          <button
+            v-else-if="group.enteredOtherGroupCoverage"
+            class="action-btn state-btn state-btn--unpinned opacity-30 cursor-not-allowed"
+            :title="t('sector.entered_other_coverage')"
+          >
+            <svg class="state-icon state-icon--unpinned" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="7" stroke="currentColor" stroke-width="2"/>
+              <path d="M7 17L17 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+          <button
+            v-if="props.editable && group.isNew && !group.baseline"
+            class="action-btn state-btn state-btn--delete"
+            :title="t('sector.delete_hub')"
+            @click="emit('delete-group', group.id)"
+          >
+            <svg class="state-icon" viewBox="0 0 24 24" fill="none">
+              <path d="M6 7h12l-1 14H7L6 7z" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M9 7V4h6v3" stroke="currentColor" stroke-width="1.5"/>
             </svg>
           </button>
         </div>
@@ -171,32 +269,108 @@ function canEditJumpRange(group: GroupDraftInfo): boolean {
           </div>
         </div>
 
-        <div v-if="getCoverageJumps(group).length > 0" class="config-row">
-          <div v-for="jump in getCoverageJumps(group)" :key="jump" class="jump-group-grid">
-            <span class="jump-number">{{ jump }}{{ t('map.resource_filter_jump_suffix') }}</span>
+        <!-- Tab selectors (edit mode only) -->
+        <div v-if="props.editable" class="tab-bar">
+          <button
+            class="tab-btn"
+            :class="{ 'tab-btn--active': getTab(group.id) === 'coverage' }"
+            @click="setTab(group.id, 'coverage')"
+          >{{ t('sector.tab_coverage') }}</button>
+          <button
+            class="tab-btn"
+            :class="{ 'tab-btn--active': getTab(group.id) === 'candidates' }"
+            @click="setTab(group.id, 'candidates')"
+          >{{ t('sector.tab_candidates') }}</button>
+          <button
+            class="tab-btn"
+            :class="{ 'tab-btn--active': getTab(group.id) === 'connected' }"
+            @click="setTab(group.id, 'connected')"
+          >{{ t('sector.tab_connected') }}</button>
+        </div>
+
+        <!-- Coverage tab -->
+        <div v-if="!props.editable || getTab(group.id) === 'coverage'">
+          <div v-if="getCoverageJumps(group).length > 0" class="config-row">
+            <div v-for="jump in getCoverageJumps(group)" :key="jump" class="jump-group-grid">
+              <span class="jump-number">{{ jump }}{{ t('map.resource_filter_jump_suffix') }}</span>
+              <div class="pill-list">
+                <span
+                  v-for="entry in getCoverageByJump(group).get(jump)!"
+                  :key="`${entry.connected ? 'link' : 'coverage'}:${entry.macro}`"
+                  class="pill"
+                  :class="getPillClass(entry)"
+                >
+                  {{ getSectorName(entry.macro) }}
+                  <button
+                    v-if="canEditPinnedInput(group)"
+                    type="button"
+                    class="pill-toggle"
+                    :title="entry.active ? t('sector.pill_inactive') : ''"
+                    @click.stop="entry.connected && entry.connectedGroupId
+                      ? emit('toggle-connected-input', group.id, entry.connectedGroupId)
+                      : emit('toggle-coverage-input', group.id, entry.macro)"
+                  >
+                    {{ entry.active ? 'x' : '+' }}
+                  </button>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div v-else class="empty-tab">
+            {{ t('sector.no_groups') }}
+          </div>
+        </div>
+
+        <!-- Candidates tab -->
+        <div v-if="props.editable && getTab(group.id) === 'candidates'">
+          <div v-if="getCandidatesForGroup(group).length > 0" class="config-row">
             <div class="pill-list">
               <span
-                v-for="entry in getCoverageByJump(group).get(jump)!"
-                :key="`${entry.connected ? 'link' : 'coverage'}:${entry.macro}`"
+                v-for="cand in getCandidatesForGroup(group)"
+                :key="cand.macro"
                 class="pill"
-                :class="[
-                  entry.connected ? 'pill--connected' : 'pill--coverage',
-                  !entry.active ? 'pill--disabled' : ''
-                ]"
+                :class="getPillClass({ connected: false, active: cand.isActive, isBaseline: false, isAnchor: cand.isAnchor })"
               >
-                {{ getSectorName(entry.macro) }}
+                <span class="pill-dot" :class="hasPlayerStation(cand.macro) ? 'pill-dot--filled' : 'pill-dot--empty'"></span>
+                {{ getSectorName(cand.macro) }}
+                <button
+                  v-if="!cand.isAnchor && !cand.isActive"
+                  type="button"
+                  class="pill-toggle"
+                  @click.stop="emit('add-candidate-coverage', group.id, cand.macro)"
+                >+</button>
+              </span>
+            </div>
+          </div>
+          <div v-else class="empty-tab">
+            {{ t('sector.no_groups') }}
+          </div>
+        </div>
+
+        <!-- Connected tab -->
+        <div v-if="props.editable && getTab(group.id) === 'connected'">
+          <div v-if="getConnectedEntries(group).length > 0" class="config-row">
+            <div class="pill-list">
+              <span
+                v-for="entry in getConnectedEntries(group)"
+                :key="entry.groupId"
+                class="pill pill--connected"
+                :class="getPillClass({ connected: true, active: entry.active, isBaseline: entry.isBaseline })"
+              >
+                {{ entry.name }}
                 <button
                   v-if="canEditPinnedInput(group)"
                   type="button"
                   class="pill-toggle"
-                  @click.stop="entry.connected && entry.connectedGroupId
-                    ? emit('toggle-connected-input', group.id, entry.connectedGroupId)
-                    : emit('toggle-coverage-input', group.id, entry.macro)"
+                  @click.stop="emit('toggle-connected-input', group.id, entry.groupId)"
                 >
                   {{ entry.active ? 'x' : '+' }}
                 </button>
               </span>
             </div>
+          </div>
+          <div v-else class="empty-tab">
+            {{ t('sector.no_groups') }}
           </div>
         </div>
 
@@ -220,6 +394,10 @@ function canEditJumpRange(group: GroupDraftInfo): boolean {
   @apply text-sm text-slate-500 text-center py-4;
 }
 
+.empty-tab {
+  @apply text-xs text-slate-600 text-center py-2;
+}
+
 .action-btn {
   @apply text-xs p-1 rounded text-slate-400 hover:text-slate-200 hover:bg-slate-700/50;
 }
@@ -233,12 +411,12 @@ function canEditJumpRange(group: GroupDraftInfo): boolean {
   @apply border-sky-500/20 bg-sky-500/5;
 }
 
-.group-item--pin {
+.group-item--pinned {
   @apply border-blue-500/30 bg-blue-500/5;
 }
 
-.group-item--exclude {
-  @apply border-rose-500/30 bg-rose-500/5;
+.group-item--unpinned {
+  @apply border-slate-600/30 bg-slate-500/5;
 }
 
 .group-header {
@@ -261,23 +439,27 @@ function canEditJumpRange(group: GroupDraftInfo): boolean {
   @apply text-xs p-1 rounded hover:bg-amber-500/10;
 }
 
-.state-btn--pin {
+.state-btn--pinned {
   @apply text-sky-400;
 }
 
-.state-btn--exclude {
-  @apply text-rose-300;
+.state-btn--unpinned {
+  @apply text-slate-400;
 }
 
-.state-btn--normal {
-  @apply text-slate-400;
+.state-btn--delete {
+  @apply text-rose-400 hover:text-rose-300;
 }
 
 .state-icon {
   @apply w-4 h-4 transition-transform;
 }
 
-.state-icon--pin {
+.state-icon--pinned {
+  transform: rotate(0deg);
+}
+
+.state-icon--unpinned {
   transform: rotate(0deg);
 }
 
@@ -316,12 +498,28 @@ function canEditJumpRange(group: GroupDraftInfo): boolean {
   @apply border-emerald-300/30 bg-emerald-500/10 text-emerald-200;
 }
 
-.pill--disabled {
+.pill--inactive {
   @apply border-dashed opacity-45;
+}
+
+.pill--baseline {
+  @apply border-2;
 }
 
 .pill-toggle {
   @apply inline-flex h-4 w-4 items-center justify-center rounded-full text-[10px] leading-none text-current hover:bg-white/10;
+}
+
+.pill-dot {
+  @apply inline-flex h-1.5 w-1.5 rounded-full;
+}
+
+.pill-dot--filled {
+  @apply bg-emerald-400;
+}
+
+.pill-dot--empty {
+  @apply border border-slate-500 bg-transparent;
 }
 
 .jump-control {
@@ -355,5 +553,17 @@ function canEditJumpRange(group: GroupDraftInfo): boolean {
 
 .group-stats {
   @apply flex items-center gap-3 text-xs text-slate-500;
+}
+
+.tab-bar {
+  @apply flex items-center gap-0.5 mb-2 border-b border-slate-700/50;
+}
+
+.tab-btn {
+  @apply px-2 py-1 text-xs text-slate-500 hover:text-slate-300 transition-colors border-b-2 border-transparent;
+}
+
+.tab-btn--active {
+  @apply text-sky-400 border-sky-500;
 }
 </style>

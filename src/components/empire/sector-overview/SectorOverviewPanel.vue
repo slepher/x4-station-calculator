@@ -18,6 +18,7 @@ import SectorConfirmBar from './SectorConfirmBar.vue'
 import SectorGroupList from './SectorGroupList.vue'
 import SectorAllocationList from './SectorAllocationList.vue'
 import AllocationConfirmBar from './AllocationConfirmBar.vue'
+import SectorHubAddMenu from './SectorHubAddMenu.vue'
 
 const saveStore = useSaveStore()
 const gameDataStore = useGameDataStore()
@@ -29,6 +30,8 @@ const { t, te } = useI18n()
 const prefJumpRange = ref(DEFAULT_JUMP_RANGE)
 const bridgeSearchJumpRange = ref(DEFAULT_BRIDGE_SEARCH_JUMP_RANGE)
 const prefThreshold = ref(DEFAULT_HUB_CONFIG.containerThreshold)
+const nodeEnabled = ref(true)
+const showHubAddMenu = ref(false)
 const autoGroupResult = ref<AutoGroupResult | null>(null)
 const postBridgeBaseline = ref<AutoGroupResult | null>(null)
 const autoGroupConfirmed = ref(false)
@@ -38,6 +41,9 @@ const editSnapshot = ref<{
   prefJumpRange: number
   bridgeSearchJumpRange: number
   prefThreshold: number
+  coverageByGroupId: Record<string, string[]>
+  connectedByGroupId: Record<string, string[]>
+  anchorSectorMacros: string[]
 } | null>(null)
 
 const gameDataMaps = computed(() => gameDataStore.maps)
@@ -89,10 +95,10 @@ function buildStoreGroups(groups: BindingSectorGroup[], playerSectorMacros: stri
     originalJumpRange: g.jumpRange,
     coverageSectorMacros: g.coverageSectorMacros.map((c) => c.ref),
     connectedGroupIds: [...(g.connectedGroupIds || [])],
-    disabledCoverageSectorMacros: [],
-    disabledConnectedGroupIds: [],
+    excludedDefaultAssignmentSectorMacros: [],
+    excludedDefaultConnectedGroupIds: [],
     isNew: false,
-    recalcState: 'pin',
+    isPinned: true,
     hubScore: undefined
   }))
   return { groups: storeGroups, assignments: [], bridgePlans: [], playerSectorMacros }
@@ -161,11 +167,11 @@ function runAutoGroup() {
 
 function buildRecalculateBaseGroups(): { baseGroups: BindingSectorGroup[]; excludedSectorMacros: string[] } | null {
   if (!autoGroupResult.value) return null
+  const pinnedGroups = autoGroupResult.value.groups.filter((group) => group.isPinned && group.sectorMacro)
   const excludedSectorMacros = autoGroupResult.value.groups
-    .filter((group) => group.recalcState === 'exclude' && group.sectorMacro)
+    .filter((group) => !group.isPinned && group.sectorMacro)
     .map((group) => group.sectorMacro!)
-  const baseGroups = autoGroupResult.value.groups
-    .filter((group) => group.recalcState !== 'exclude' && (!group.isNew || group.recalcState === 'pin'))
+  const baseGroups = pinnedGroups
     .map((group, index) => ({
       id: group.id,
       name: group.name,
@@ -173,14 +179,12 @@ function buildRecalculateBaseGroups(): { baseGroups: BindingSectorGroup[]; exclu
       sectorMacro: group.sectorMacro,
       jumpRange: group.jumpRange,
       connectedGroupIds: [...group.connectedGroupIds]
-        .filter((id) => !group.disabledConnectedGroupIds.includes(id)),
+        .filter((id) => !group.excludedDefaultConnectedGroupIds.includes(id)),
       coverageSectorMacros: group.coverageSectorMacros
-        .filter((ref) => !group.disabledCoverageSectorMacros.includes(ref))
+        .filter((ref) => !group.excludedDefaultAssignmentSectorMacros.includes(ref))
         .map((ref) => ({ ref, jump: 0 }))
     }))
-  return baseGroups.length > 0 || excludedSectorMacros.length > 0
-    ? { baseGroups, excludedSectorMacros }
-    : null
+  return { baseGroups, excludedSectorMacros }
 }
 
 function runCalculationFromEditInput() {
@@ -190,10 +194,29 @@ function runCalculationFromEditInput() {
   if (!archive || !archive.isValid || !guid) return
   autoGroupConfirmed.value = false
 
+  // Capture excluded defaults from current edit draft (by anchor sector)
+  const currentDraft = autoGroupResult.value
+  const excludedCoverageByAnchor: Record<string, string[]> = {}
+  const excludedConnectionByAnchor: Record<string, string[]> = {}
+  if (currentDraft) {
+    for (const group of currentDraft.groups) {
+      if (group.sectorMacro) {
+        const anchor = group.sectorMacro
+        if (group.excludedDefaultAssignmentSectorMacros.length > 0) {
+          excludedCoverageByAnchor[anchor] = [...group.excludedDefaultAssignmentSectorMacros]
+        }
+        if (group.excludedDefaultConnectedGroupIds.length > 0) {
+          excludedConnectionByAnchor[anchor] = [...group.excludedDefaultConnectedGroupIds]
+        }
+      }
+    }
+  }
+
+  let result: AutoGroupResult
   if (!recalculateInput || recalculateInput.baseGroups.length === 0) {
     const excludedSectorMacros = recalculateInput?.excludedSectorMacros ?? []
     const { sectorGraph, sectorClusterMap } = sectorGraphInfo.value
-    const result = groupCleanSlate(
+    result = groupCleanSlate(
       archive,
       gameDataStore.modulesByMacroId,
       sectorGraph,
@@ -201,44 +224,78 @@ function runCalculationFromEditInput() {
       { containerThreshold: prefThreshold.value },
       prefJumpRange.value,
       bridgeSearchJumpRange.value,
-      excludedSectorMacros
+      excludedSectorMacros,
+      nodeEnabled.value
     )
-    const namedGroups = result.groups.map((group) => ({
-      ...group,
-      name: group.sectorMacro ? getSectorDisplayName(group.sectorMacro) : group.name
-    }))
-    setAutoGroupResult({ ...result, groups: namedGroups })
-    calculationMode.value = 'result'
-    editSnapshot.value = null
-    return
+    result = {
+      ...result,
+      groups: result.groups.map((group) => ({
+        ...group,
+        name: group.sectorMacro ? getSectorDisplayName(group.sectorMacro) : group.name
+      }))
+    }
+  } else {
+    const { sectorGraph, sectorClusterMap } = sectorGraphInfo.value
+    result = groupIncremental(
+      archive,
+      recalculateInput.baseGroups,
+      gameDataStore.modulesByMacroId,
+      sectorGraph,
+      sectorClusterMap,
+      { containerThreshold: prefThreshold.value },
+      prefJumpRange.value,
+      bridgeSearchJumpRange.value,
+      recalculateInput.excludedSectorMacros,
+      nodeEnabled.value
+    )
+    result = {
+      ...result,
+      groups: result.groups.map((group) => ({
+        ...group,
+        name: group.sectorMacro ? getSectorDisplayName(group.sectorMacro) : group.name
+      }))
+    }
   }
-  const { sectorGraph, sectorClusterMap } = sectorGraphInfo.value
-  const result = groupIncremental(
-    archive,
-    recalculateInput.baseGroups,
-    gameDataStore.modulesByMacroId,
-    sectorGraph,
-    sectorClusterMap,
-    { containerThreshold: prefThreshold.value },
-    prefJumpRange.value,
-    bridgeSearchJumpRange.value,
-    recalculateInput.excludedSectorMacros
-  )
-  const namedGroups = result.groups.map((group) => ({
-    ...group,
-    name: group.sectorMacro ? getSectorDisplayName(group.sectorMacro) : group.name
-  }))
-  setAutoGroupResult({ ...result, groups: namedGroups })
+
+  // Re-apply excluded defaults to groups with matching anchors
+  const restoredGroups = result.groups.map((group) => {
+    if (!group.sectorMacro) return group
+    const anchor = group.sectorMacro
+    const covExcluded = excludedCoverageByAnchor[anchor] ?? []
+    const connExcluded = excludedConnectionByAnchor[anchor] ?? []
+    if (covExcluded.length === 0 && connExcluded.length === 0) return group
+    return {
+      ...group,
+      excludedDefaultAssignmentSectorMacros: covExcluded,
+      excludedDefaultConnectedGroupIds: connExcluded
+    }
+  })
+
+  setAutoGroupResult({ ...result, groups: restoredGroups })
   calculationMode.value = 'result'
   editSnapshot.value = null
 }
 
 function handleEnterEdit() {
+  const result = autoGroupResult.value
   editSnapshot.value = {
-    result: autoGroupResult.value ? cloneAutoGroupResult(autoGroupResult.value) : null,
+    result: result ? cloneAutoGroupResult(result) : null,
     prefJumpRange: prefJumpRange.value,
     bridgeSearchJumpRange: bridgeSearchJumpRange.value,
-    prefThreshold: prefThreshold.value
+    prefThreshold: prefThreshold.value,
+    coverageByGroupId: Object.fromEntries(
+      (result?.groups ?? []).map((g) => [g.id, [...g.coverageSectorMacros]])
+    ),
+    connectedByGroupId: Object.fromEntries(
+      (result?.groups ?? []).map((g) => [g.id, [...g.connectedGroupIds]])
+    ),
+    anchorSectorMacros: (result?.groups ?? [])
+      .filter((g) => g.sectorMacro)
+      .map((g) => g.sectorMacro!)
+  }
+  if (result) {
+    const groupsWithBaseline = result.groups.map((g) => ({ ...g, baseline: true }))
+    autoGroupResult.value = { ...result, groups: groupsWithBaseline }
   }
   calculationMode.value = 'edit'
 }
@@ -251,6 +308,7 @@ function handleCancelEdit() {
   prefJumpRange.value = editSnapshot.value.prefJumpRange
   bridgeSearchJumpRange.value = editSnapshot.value.bridgeSearchJumpRange
   prefThreshold.value = editSnapshot.value.prefThreshold
+  nodeEnabled.value = true
   setAutoGroupResult(editSnapshot.value.result ? cloneAutoGroupResult(editSnapshot.value.result) : null)
   calculationMode.value = 'result'
   editSnapshot.value = null
@@ -290,9 +348,9 @@ function handleCycleRecalcState(groupId: string) {
   const groups = [...result.groups]
   const idx = groups.findIndex((g) => g.id === groupId)
   if (idx < 0) return
-  const current = groups[idx]!.recalcState
-  const next = current === 'normal' ? 'pin' : current === 'pin' ? 'exclude' : 'normal'
-  groups[idx] = { ...groups[idx]!, recalcState: next }
+  const group = groups[idx]!
+  if (group.enteredOtherGroupCoverage) return
+  groups[idx] = { ...group, isPinned: !group.isPinned }
   autoGroupResult.value = { ...result, groups, assignments: result.assignments }
 }
 
@@ -324,7 +382,7 @@ function handleToggleCoverageInput(groupId: string, sectorMacro: string) {
   const group = groups[idx]!
   groups[idx] = {
     ...group,
-    disabledCoverageSectorMacros: toggleArrayValue(group.disabledCoverageSectorMacros, sectorMacro)
+    excludedDefaultAssignmentSectorMacros: toggleArrayValue(group.excludedDefaultAssignmentSectorMacros, sectorMacro)
   }
   autoGroupResult.value = { ...result, groups, assignments: result.assignments }
 }
@@ -339,8 +397,92 @@ function handleToggleConnectedInput(groupId: string, connectedGroupId: string) {
   const group = groups[idx]!
   groups[idx] = {
     ...group,
-    disabledConnectedGroupIds: toggleArrayValue(group.disabledConnectedGroupIds, connectedGroupId)
+    excludedDefaultConnectedGroupIds: toggleArrayValue(group.excludedDefaultConnectedGroupIds, connectedGroupId)
   }
+  autoGroupResult.value = { ...result, groups, assignments: result.assignments }
+}
+
+function handleAddCandidateCoverage(groupId: string, sectorMacro: string) {
+  if (calculationMode.value !== 'edit') return
+  if (!autoGroupResult.value) return
+  const result = autoGroupResult.value
+  const groups = [...result.groups]
+  const idx = groups.findIndex((g) => g.id === groupId)
+  if (idx < 0) return
+  const group = groups[idx]!
+
+  // Add sector to this group's coverage
+  if (!group.coverageSectorMacros.includes(sectorMacro)) {
+    groups[idx] = {
+      ...group,
+      coverageSectorMacros: [...group.coverageSectorMacros, sectorMacro]
+    }
+  }
+
+  // Handle other groups that have this sector in their coverage
+  for (let i = 0; i < groups.length; i++) {
+    if (i === idx) continue
+    const other = groups[i]!
+    if (!other.coverageSectorMacros.includes(sectorMacro)) continue
+
+    if (other.baseline) {
+      // Baseline coverage → add to excluded defaults (but keep in coverage display)
+      if (!other.excludedDefaultAssignmentSectorMacros.includes(sectorMacro)) {
+        groups[i] = {
+          ...other,
+          excludedDefaultAssignmentSectorMacros: [...other.excludedDefaultAssignmentSectorMacros, sectorMacro]
+        }
+      }
+      // Track if unpinned baseline hub's anchor entered other coverage
+      if (!other.isPinned && other.sectorMacro === sectorMacro) {
+        groups[i] = { ...groups[i]!, enteredOtherGroupCoverage: true }
+      }
+    } else {
+      // Edit-added coverage → remove from other group
+      groups[i] = {
+        ...other,
+        coverageSectorMacros: other.coverageSectorMacros.filter((m) => m !== sectorMacro),
+        excludedDefaultAssignmentSectorMacros: other.excludedDefaultAssignmentSectorMacros.filter((m) => m !== sectorMacro)
+      }
+    }
+  }
+
+  autoGroupResult.value = { ...result, groups, assignments: result.assignments }
+}
+
+function handleDeleteGroup(groupId: string) {
+  if (calculationMode.value !== 'edit') return
+  if (!autoGroupResult.value) return
+  const result = autoGroupResult.value
+  const idx = result.groups.findIndex((g) => g.id === groupId)
+  if (idx < 0) return
+  const group = result.groups[idx]!
+  // Only allow deleting new non-baseline groups
+  if (!group.isNew || group.baseline) return
+
+  const groups = [...result.groups]
+  const deletedMacro = groups[idx]!.sectorMacro!
+  groups.splice(idx, 1)
+
+  // Remove connections to deleted group
+  for (let i = 0; i < groups.length; i++) {
+    groups[i] = {
+      ...groups[i]!,
+      connectedGroupIds: groups[i]!.connectedGroupIds.filter((id) => id !== groupId)
+    }
+  }
+
+  // Restore deleted hub's sector in baseline groups that had it excluded
+  for (let i = 0; i < groups.length; i++) {
+    const g = groups[i]!
+    if (g.baseline && g.excludedDefaultAssignmentSectorMacros.includes(deletedMacro)) {
+      groups[i] = {
+        ...g,
+        excludedDefaultAssignmentSectorMacros: g.excludedDefaultAssignmentSectorMacros.filter((m) => m !== deletedMacro)
+      }
+    }
+  }
+
   autoGroupResult.value = { ...result, groups, assignments: result.assignments }
 }
 
@@ -381,6 +523,60 @@ function handleResetAssignments() {
   if (calculationMode.value === 'edit') return
   if (!postBridgeBaseline.value) return
   autoGroupResult.value = cloneAutoGroupResult(postBridgeBaseline.value)
+}
+
+function handleAddHubClick() {
+  if (calculationMode.value !== 'edit') return
+  showHubAddMenu.value = true
+}
+
+function handleAddHubDraft(sectorMacro: string) {
+  if (!autoGroupResult.value) return
+  showHubAddMenu.value = false
+  const result = autoGroupResult.value
+  const groups = [...result.groups]
+
+  // Check conflict: if anchor is baseline coverage of another group
+  for (let i = 0; i < groups.length; i++) {
+    const group = groups[i]!
+    if (group.baseline && group.coverageSectorMacros.includes(sectorMacro)) {
+      groups[i] = {
+        ...group,
+        excludedDefaultAssignmentSectorMacros: [...group.excludedDefaultAssignmentSectorMacros, sectorMacro]
+      }
+    } else if (!group.baseline && group.coverageSectorMacros.includes(sectorMacro)) {
+      groups[i] = {
+        ...group,
+        coverageSectorMacros: group.coverageSectorMacros.filter((m) => m !== sectorMacro)
+      }
+    }
+  }
+
+  const newGroup: GroupDraftInfo = {
+    id: `auto_${crypto.randomUUID()}`,
+    name: getSectorDisplayName(sectorMacro),
+    sectorMacro,
+    jumpRange: prefJumpRange.value,
+    originalJumpRange: prefJumpRange.value,
+    coverageSectorMacros: [],
+    connectedGroupIds: [],
+    excludedDefaultAssignmentSectorMacros: [],
+    excludedDefaultConnectedGroupIds: [],
+    isNew: true,
+    isPinned: false,
+    hubScore: undefined
+  }
+  groups.push(newGroup)
+  autoGroupResult.value = { ...result, groups, assignments: result.assignments }
+}
+
+function getExistingAnchorSectors(): Set<string> {
+  if (!autoGroupResult.value) return new Set()
+  return new Set(
+    autoGroupResult.value.groups
+      .filter((g) => g.sectorMacro)
+      .map((g) => g.sectorMacro!)
+  )
 }
 
 function handleConfirm() {
@@ -452,6 +648,11 @@ const stationCounts = computed<Record<string, number>>(() => {
   }
   return counts
 })
+
+const canDisableNode = computed(() => {
+  if (!autoGroupResult.value) return false
+  return autoGroupResult.value.groups.some((g) => g.isPinned || g.baseline)
+})
 </script>
 
 <template>
@@ -473,12 +674,16 @@ const stationCounts = computed<Record<string, number>>(() => {
         :bridge-search-jump-range="bridgeSearchJumpRange"
         :pref-threshold="prefThreshold"
         :mode="calculationMode"
+        :node-enabled="nodeEnabled"
+        :can-disable-node="canDisableNode"
         @update:pref-jump-range="handleUpdatePrefJumpRange"
         @update:bridge-search-jump-range="handleUpdateBridgeSearchJumpRange"
         @update:pref-threshold="prefThreshold = $event"
+        @update:node-enabled="nodeEnabled = $event"
         @edit="handleEnterEdit"
         @cancel="handleCancelEdit"
         @calculate="runCalculationFromEditInput"
+        @add-hub="handleAddHubClick"
       />
       <SectorGroupList
         :groups="autoGroupResult?.groups ?? []"
@@ -488,10 +693,15 @@ const stationCounts = computed<Record<string, number>>(() => {
         :sector-cluster-map="sectorGraphInfo.sectorClusterMap"
         :player-sector-macros="autoGroupResult?.playerSectorMacros ?? []"
         :editable="calculationMode === 'edit'"
+        :baseline-coverage-by-group-id="editSnapshot?.coverageByGroupId"
+        :baseline-connected-by-group-id="editSnapshot?.connectedByGroupId"
+        :baseline-anchor-sector-macros="editSnapshot?.anchorSectorMacros"
         @cycle-recalc-state="handleCycleRecalcState"
         @update-jump-range="handleUpdateJumpRange"
         @toggle-coverage-input="handleToggleCoverageInput"
         @toggle-connected-input="handleToggleConnectedInput"
+        @add-candidate-coverage="handleAddCandidateCoverage"
+        @delete-group="handleDeleteGroup"
       />
     </div>
 
@@ -530,6 +740,15 @@ const stationCounts = computed<Record<string, number>>(() => {
       </div>
     </div>
   </div>
+  <SectorHubAddMenu
+    v-if="showHubAddMenu"
+    :maps="gameDataMaps"
+    :player-sector-macros="autoGroupResult?.playerSectorMacros ?? []"
+    :existing-anchor-sector-macros="getExistingAnchorSectors()"
+    :station-counts="stationCounts"
+    @add-hub="handleAddHubDraft"
+    @close="showHubAddMenu = false"
+  />
 </template>
 
 <style scoped>

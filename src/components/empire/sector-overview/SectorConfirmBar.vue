@@ -1,20 +1,25 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-defineProps<{
+const props = defineProps<{
   prefJumpRange: number
   bridgeSearchJumpRange: number
   prefThreshold: number
   mode: 'result' | 'edit'
+  nodeEnabled: boolean
+  canDisableNode: boolean
 }>()
 
 const emit = defineEmits<{
   (e: 'update:prefJumpRange', value: number): void
   (e: 'update:bridgeSearchJumpRange', value: number): void
   (e: 'update:prefThreshold', value: number): void
+  (e: 'update:nodeEnabled', value: boolean): void
   (e: 'calculate'): void
   (e: 'edit'): void
   (e: 'cancel'): void
+  (e: 'add-hub'): void
 }>()
 
 const { t } = useI18n()
@@ -32,24 +37,15 @@ const thresholdOptions = [
 function getThresholdLabel(value: number): string {
   return thresholdOptions.find((opt) => opt.value === value)?.label || String(value)
 }
+
+const nodeDisabled = computed(() => props.mode === 'edit' && !props.canDisableNode)
+const thresholdDisabled = computed(() => !props.nodeEnabled)
 </script>
 
 <template>
   <div class="confirm-bar">
     <div class="bar-left">
-      <div class="param-field" :title="t('sector.group_coverage_jump')">
-        <span class="bar-label">{{ t('sector.group_coverage_jump_short') }}</span>
-        <span v-if="mode === 'result'" class="bar-value">{{ prefJumpRange }}{{ t('sector.jump_unit') }}</span>
-        <select
-          v-else
-          class="bar-select bar-select--narrow"
-          :value="prefJumpRange"
-          @change="emit('update:prefJumpRange', Number(($event.target as HTMLSelectElement).value))"
-        >
-          <option v-for="j in jumpOptions" :key="j" :value="j">{{ j }}{{ t('sector.jump_unit') }}</option>
-        </select>
-      </div>
-
+      <!-- 桥接 -->
       <div class="param-field" :title="t('sector.bridge_search_jump')">
         <span class="bar-label">{{ t('sector.bridge_search_jump_short') }}</span>
         <span v-if="mode === 'result'" class="bar-value">{{ bridgeSearchJumpRange }}{{ t('sector.jump_unit') }}</span>
@@ -70,6 +66,25 @@ function getThresholdLabel(value: number): string {
         </select>
       </div>
 
+      <!-- 节点 -->
+      <div class="param-field" :title="t('sector.node_enabled_desc')">
+        <label class="bar-label-inline">
+          <input
+            v-if="mode === 'edit'"
+            type="checkbox"
+            class="bar-checkbox"
+            :checked="nodeEnabled"
+            :disabled="nodeDisabled"
+            @change="emit('update:nodeEnabled', ($event.target as HTMLInputElement).checked)"
+          />
+          <span v-else class="bar-value">
+            {{ nodeEnabled ? '✓' : '✗' }}
+          </span>
+          <span class="bar-label">{{ t('sector.node_enabled') }}</span>
+        </label>
+      </div>
+
+      <!-- 阈值 -->
       <div class="param-field" :title="t('sector.default_threshold')">
         <span class="bar-label">{{ t('sector.default_threshold_short') }}</span>
         <span v-if="mode === 'result'" class="bar-value">{{ getThresholdLabel(prefThreshold) }}{{ t('sector.volume_unit_m3') }}</span>
@@ -77,9 +92,25 @@ function getThresholdLabel(value: number): string {
           v-else
           class="bar-select"
           :value="prefThreshold"
+          :disabled="thresholdDisabled"
           @change="emit('update:prefThreshold', Number(($event.target as HTMLSelectElement).value))"
         >
           <option v-for="opt in thresholdOptions" :key="opt.value" :value="opt.value">{{ opt.label }}{{ t('sector.volume_unit_m3') }}</option>
+        </select>
+      </div>
+
+      <!-- 覆盖 -->
+      <div class="param-field" :title="t('sector.group_coverage_jump')">
+        <span class="bar-label">{{ t('sector.group_coverage_jump_short') }}</span>
+        <span v-if="mode === 'result'" class="bar-value">{{ prefJumpRange }}{{ t('sector.jump_unit') }}</span>
+        <select
+          v-else
+          class="bar-select bar-select--narrow"
+          :value="prefJumpRange"
+          :disabled="thresholdDisabled"
+          @change="emit('update:prefJumpRange', Number(($event.target as HTMLSelectElement).value))"
+        >
+          <option v-for="j in jumpOptions" :key="j" :value="j">{{ j }}{{ t('sector.jump_unit') }}</option>
         </select>
       </div>
     </div>
@@ -89,6 +120,9 @@ function getThresholdLabel(value: number): string {
       </button>
       <button v-if="mode === 'edit'" class="bar-btn recalc-btn" @click="emit('calculate')">
         {{ t('sector.calculate') }}
+      </button>
+      <button v-if="mode === 'edit'" class="bar-btn add-btn" @click="emit('add-hub')">
+        {{ t('sector.add_hub') }}
       </button>
       <button v-else class="bar-btn recalc-btn" @click="emit('edit')">
         {{ t('sector.edit') }}
@@ -114,8 +148,16 @@ function getThresholdLabel(value: number): string {
   @apply text-xs text-slate-400;
 }
 
+.bar-label-inline {
+  @apply inline-flex items-center gap-1 cursor-pointer;
+}
+
+.bar-checkbox {
+  @apply h-3.5 w-3.5 accent-sky-500;
+}
+
 .bar-select {
-  @apply h-6 text-xs bg-slate-900 border border-slate-600 rounded px-1.5 text-slate-200 focus:outline-none focus:border-sky-500;
+  @apply h-6 text-xs bg-slate-900 border border-slate-600 rounded px-1.5 text-slate-200 focus:outline-none focus:border-sky-500 disabled:opacity-40 disabled:cursor-not-allowed;
 }
 
 .bar-select--narrow {
@@ -140,5 +182,9 @@ function getThresholdLabel(value: number): string {
 
 .recalc-btn {
   @apply bg-sky-600/20 text-sky-400 border border-sky-500/30 hover:bg-sky-600/30;
+}
+
+.add-btn {
+  @apply bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-600/30;
 }
 </style>
