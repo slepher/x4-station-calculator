@@ -8,7 +8,7 @@ import { useSaveBindingStore } from '@/store/useSaveBindingStore'
 import { useLiveProductionStore } from '@/store/useLiveProductionStore'
 import { groupCleanSlate, groupIncremental, DEFAULT_JUMP_RANGE, DEFAULT_BRIDGE_SEARCH_JUMP_RANGE, applyAbsorbToResult, applyStandaloneToResult, applyBridgePlanToDraft, type AutoGroupResult, type GroupDraftInfo } from '@/store/logic/autoGroup'
 import { DEFAULT_HUB_CONFIG } from '@/store/logic/autoGroupHub'
-import { buildSectorGraphFromMaps } from '@/store/logic/saveBindingUtils'
+import { buildSectorGraphFromMaps, getCoverageSectors } from '@/store/logic/saveBindingUtils'
 import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
 import type { BindingSectorGroup } from '@/types/x4'
 import SaveUploadPanel from '@/components/save/SaveUploadPanel.vue'
@@ -31,6 +31,8 @@ const prefJumpRange = ref(DEFAULT_JUMP_RANGE)
 const bridgeSearchJumpRange = ref(DEFAULT_BRIDGE_SEARCH_JUMP_RANGE)
 const prefThreshold = ref(DEFAULT_HUB_CONFIG.containerThreshold)
 const nodeEnabled = ref(true)
+const bridgeRetainEnabled = ref(true)
+const coverageRetainEnabled = ref(true)
 const showHubAddMenu = ref(false)
 const autoGroupResult = ref<AutoGroupResult | null>(null)
 const postBridgeBaseline = ref<AutoGroupResult | null>(null)
@@ -42,8 +44,6 @@ const editSnapshot = ref<{
   bridgeSearchJumpRange: number
   prefThreshold: number
   coverageByGroupId: Record<string, string[]>
-  connectedByGroupId: Record<string, string[]>
-  anchorSectorMacros: string[]
 } | null>(null)
 
 const gameDataMaps = computed(() => gameDataStore.maps)
@@ -96,9 +96,10 @@ function buildStoreGroups(groups: BindingSectorGroup[], playerSectorMacros: stri
     coverageSectorMacros: g.coverageSectorMacros.map((c) => c.ref),
     connectedGroupIds: [...(g.connectedGroupIds || [])],
     excludedDefaultAssignmentSectorMacros: [],
-    excludedDefaultConnectedGroupIds: [],
     isNew: false,
     isPinned: true,
+    coverageRetainEnabled: true,
+    connectionRetainEnabled: true,
     hubScore: undefined
   }))
   return { groups: storeGroups, assignments: [], bridgePlans: [], playerSectorMacros }
@@ -168,9 +169,6 @@ function runAutoGroup() {
 function buildRecalculateBaseGroups(): { baseGroups: BindingSectorGroup[]; excludedSectorMacros: string[] } | null {
   if (!autoGroupResult.value) return null
   const pinnedGroups = autoGroupResult.value.groups.filter((group) => group.isPinned && group.sectorMacro)
-  const excludedSectorMacros = autoGroupResult.value.groups
-    .filter((group) => !group.isPinned && group.sectorMacro)
-    .map((group) => group.sectorMacro!)
   const baseGroups = pinnedGroups
     .map((group, index) => ({
       id: group.id,
@@ -178,13 +176,16 @@ function buildRecalculateBaseGroups(): { baseGroups: BindingSectorGroup[]; exclu
       order: index,
       sectorMacro: group.sectorMacro,
       jumpRange: group.jumpRange,
-      connectedGroupIds: [...group.connectedGroupIds]
-        .filter((id) => !group.excludedDefaultConnectedGroupIds.includes(id)),
+      connectedGroupIds: [...group.connectedGroupIds],
       coverageSectorMacros: group.coverageSectorMacros
-        .filter((ref) => !group.excludedDefaultAssignmentSectorMacros.includes(ref))
+        .filter((ref) => {
+          if (!group.excludedDefaultAssignmentSectorMacros.includes(ref)) return true
+          // Only exclude player sectors; non-player coverage always retained
+          return !autoGroupResult.value!.playerSectorMacros.includes(ref)
+        })
         .map((ref) => ({ ref, jump: 0 }))
     }))
-  return { baseGroups, excludedSectorMacros }
+  return { baseGroups, excludedSectorMacros: [] }
 }
 
 function runCalculationFromEditInput() {
@@ -194,20 +195,13 @@ function runCalculationFromEditInput() {
   if (!archive || !archive.isValid || !guid) return
   autoGroupConfirmed.value = false
 
-  // Capture excluded defaults from current edit draft (by anchor sector)
+  // Capture user-edited state from current edit draft (by anchor sector)
   const currentDraft = autoGroupResult.value
   const excludedCoverageByAnchor: Record<string, string[]> = {}
-  const excludedConnectionByAnchor: Record<string, string[]> = {}
   if (currentDraft) {
     for (const group of currentDraft.groups) {
-      if (group.sectorMacro) {
-        const anchor = group.sectorMacro
-        if (group.excludedDefaultAssignmentSectorMacros.length > 0) {
-          excludedCoverageByAnchor[anchor] = [...group.excludedDefaultAssignmentSectorMacros]
-        }
-        if (group.excludedDefaultConnectedGroupIds.length > 0) {
-          excludedConnectionByAnchor[anchor] = [...group.excludedDefaultConnectedGroupIds]
-        }
+      if (group.sectorMacro && group.excludedDefaultAssignmentSectorMacros.length > 0) {
+        excludedCoverageByAnchor[group.sectorMacro] = [...group.excludedDefaultAssignmentSectorMacros]
       }
     }
   }
@@ -260,14 +254,11 @@ function runCalculationFromEditInput() {
   // Re-apply excluded defaults to groups with matching anchors
   const restoredGroups = result.groups.map((group) => {
     if (!group.sectorMacro) return group
-    const anchor = group.sectorMacro
-    const covExcluded = excludedCoverageByAnchor[anchor] ?? []
-    const connExcluded = excludedConnectionByAnchor[anchor] ?? []
-    if (covExcluded.length === 0 && connExcluded.length === 0) return group
+    const covExcluded = excludedCoverageByAnchor[group.sectorMacro] ?? []
+    if (covExcluded.length === 0) return group
     return {
       ...group,
-      excludedDefaultAssignmentSectorMacros: covExcluded,
-      excludedDefaultConnectedGroupIds: connExcluded
+      excludedDefaultAssignmentSectorMacros: covExcluded
     }
   })
 
@@ -285,18 +276,15 @@ function handleEnterEdit() {
     prefThreshold: prefThreshold.value,
     coverageByGroupId: Object.fromEntries(
       (result?.groups ?? []).map((g) => [g.id, [...g.coverageSectorMacros]])
-    ),
-    connectedByGroupId: Object.fromEntries(
-      (result?.groups ?? []).map((g) => [g.id, [...g.connectedGroupIds]])
-    ),
-    anchorSectorMacros: (result?.groups ?? [])
-      .filter((g) => g.sectorMacro)
-      .map((g) => g.sectorMacro!)
+    )
   }
   if (result) {
-    const groupsWithBaseline = result.groups.map((g) => ({ ...g, baseline: true }))
+    const groupsWithBaseline = result.groups.map((g) => ({ ...g, baseline: true, isPinned: true }))
     autoGroupResult.value = { ...result, groups: groupsWithBaseline }
   }
+  // Reset retain to defaults
+  bridgeRetainEnabled.value = true
+  coverageRetainEnabled.value = true
   calculationMode.value = 'edit'
 }
 
@@ -362,15 +350,57 @@ function handleUpdateJumpRange(groupId: string, range: number) {
   const idx = groups.findIndex((g) => g.id === groupId)
   if (idx < 0) return
   const group = groups[idx]!
-  groups[idx] = { ...group, jumpRange: range }
+  const prevRange = group.jumpRange
+
+  if (range === prevRange) return
+
+  // Recompute coverage based on new jumpRange
+  const { sectorGraph, sectorClusterMap } = sectorGraphInfo.value
+  if (group.sectorMacro && sectorGraph) {
+    const distances = getCoverageSectors(group.sectorMacro, range, sectorGraph, sectorClusterMap)
+    const newRangeMacros = new Set(distances.map((d) => d.sectorMacro))
+
+    const allAnchorSectors = new Set(groups.filter((g) => g.sectorMacro).map((g) => g.sectorMacro!))
+
+    let newCoverage: string[]
+    if (range > prevRange) {
+      // Build set of sectors already in other groups' active coverage
+      const otherCoverage = new Set<string>()
+      for (let i = 0; i < groups.length; i++) {
+        if (i === idx) continue
+        for (const m of groups[i]!.coverageSectorMacros) {
+          otherCoverage.add(m)
+        }
+      }
+
+      // Increase: only add sectors at NEW jump levels (prevRange < distance <= range)
+      // Existing coverage and candidates at prior ranges are unchanged.
+      const existing = new Set(group.coverageSectorMacros)
+      for (const d of distances) {
+        if (d.distance <= prevRange) continue
+        if (d.distance > range) continue
+        if (d.sectorMacro === group.sectorMacro) continue
+        if (!result.playerSectorMacros.includes(d.sectorMacro)) continue
+        if (allAnchorSectors.has(d.sectorMacro)) continue
+        if (otherCoverage.has(d.sectorMacro)) continue
+        if (!existing.has(d.sectorMacro)) {
+          existing.add(d.sectorMacro)
+        }
+      }
+      newCoverage = [...existing]
+    } else {
+      // Decrease: remove out-of-range sectors
+      newCoverage = group.coverageSectorMacros.filter((m) => newRangeMacros.has(m))
+    }
+
+    groups[idx] = { ...group, jumpRange: range, coverageSectorMacros: newCoverage }
+  } else {
+    groups[idx] = { ...group, jumpRange: range }
+  }
+
   autoGroupResult.value = { ...result, groups, assignments: result.assignments }
 }
 
-function toggleArrayValue(values: string[], value: string): string[] {
-  return values.includes(value)
-    ? values.filter((item) => item !== value)
-    : [...values, value]
-}
 
 function handleToggleCoverageInput(groupId: string, sectorMacro: string) {
   if (calculationMode.value !== 'edit') return
@@ -380,9 +410,10 @@ function handleToggleCoverageInput(groupId: string, sectorMacro: string) {
   const idx = groups.findIndex((g) => g.id === groupId)
   if (idx < 0) return
   const group = groups[idx]!
+  // Remove from active coverage (becomes candidate in unified pill view)
   groups[idx] = {
     ...group,
-    excludedDefaultAssignmentSectorMacros: toggleArrayValue(group.excludedDefaultAssignmentSectorMacros, sectorMacro)
+    coverageSectorMacros: group.coverageSectorMacros.filter((m) => m !== sectorMacro)
   }
   autoGroupResult.value = { ...result, groups, assignments: result.assignments }
 }
@@ -395,9 +426,26 @@ function handleToggleConnectedInput(groupId: string, connectedGroupId: string) {
   const idx = groups.findIndex((g) => g.id === groupId)
   if (idx < 0) return
   const group = groups[idx]!
+  const has = group.connectedGroupIds.includes(connectedGroupId)
   groups[idx] = {
     ...group,
-    excludedDefaultConnectedGroupIds: toggleArrayValue(group.excludedDefaultConnectedGroupIds, connectedGroupId)
+    connectedGroupIds: has
+      ? group.connectedGroupIds.filter((id) => id !== connectedGroupId)
+      : [...group.connectedGroupIds, connectedGroupId]
+  }
+  // Sync bidirectional: also update the other group's connectedGroupIds
+  const otherIdx = groups.findIndex((g) => g.id === connectedGroupId)
+  if (otherIdx >= 0) {
+    const other = groups[otherIdx]!
+    const otherHas = other.connectedGroupIds.includes(groupId)
+    if (otherHas !== !has) {
+      groups[otherIdx] = {
+        ...other,
+        connectedGroupIds: otherHas
+          ? other.connectedGroupIds.filter((id) => id !== groupId)
+          : [...other.connectedGroupIds, groupId]
+      }
+    }
   }
   autoGroupResult.value = { ...result, groups, assignments: result.assignments }
 }
@@ -426,12 +474,10 @@ function handleAddCandidateCoverage(groupId: string, sectorMacro: string) {
     if (!other.coverageSectorMacros.includes(sectorMacro)) continue
 
     if (other.baseline) {
-      // Baseline coverage → add to excluded defaults (but keep in coverage display)
-      if (!other.excludedDefaultAssignmentSectorMacros.includes(sectorMacro)) {
-        groups[i] = {
-          ...other,
-          excludedDefaultAssignmentSectorMacros: [...other.excludedDefaultAssignmentSectorMacros, sectorMacro]
-        }
+      // Baseline coverage → remove from active coverage, becomes recoverable candidate
+      groups[i] = {
+        ...other,
+        coverageSectorMacros: other.coverageSectorMacros.filter((m) => m !== sectorMacro)
       }
       // Track if unpinned baseline hub's anchor entered other coverage
       if (!other.isPinned && other.sectorMacro === sectorMacro) {
@@ -540,9 +586,11 @@ function handleAddHubDraft(sectorMacro: string) {
   for (let i = 0; i < groups.length; i++) {
     const group = groups[i]!
     if (group.baseline && group.coverageSectorMacros.includes(sectorMacro)) {
-      groups[i] = {
-        ...group,
-        excludedDefaultAssignmentSectorMacros: [...group.excludedDefaultAssignmentSectorMacros, sectorMacro]
+      if (result.playerSectorMacros.includes(sectorMacro)) {
+        groups[i] = {
+          ...group,
+          excludedDefaultAssignmentSectorMacros: [...group.excludedDefaultAssignmentSectorMacros, sectorMacro]
+        }
       }
     } else if (!group.baseline && group.coverageSectorMacros.includes(sectorMacro)) {
       groups[i] = {
@@ -561,9 +609,10 @@ function handleAddHubDraft(sectorMacro: string) {
     coverageSectorMacros: [],
     connectedGroupIds: [],
     excludedDefaultAssignmentSectorMacros: [],
-    excludedDefaultConnectedGroupIds: [],
     isNew: true,
-    isPinned: false,
+    isPinned: true,
+    coverageRetainEnabled: true,
+    connectionRetainEnabled: true,
     hubScore: undefined
   }
   groups.push(newGroup)
@@ -577,6 +626,44 @@ function getExistingAnchorSectors(): Set<string> {
       .filter((g) => g.sectorMacro)
       .map((g) => g.sectorMacro!)
   )
+}
+
+function handleToggleRetainCoverage(groupId: string) {
+  if (calculationMode.value !== 'edit') return
+  if (!autoGroupResult.value) return
+  const result = autoGroupResult.value
+  const groups = [...result.groups]
+  const idx = groups.findIndex((g) => g.id === groupId)
+  if (idx < 0) return
+  groups[idx] = { ...groups[idx]!, coverageRetainEnabled: !groups[idx]!.coverageRetainEnabled }
+  autoGroupResult.value = { ...result, groups, assignments: result.assignments }
+}
+
+function handleToggleRetainConnection(groupId: string) {
+  if (calculationMode.value !== 'edit') return
+  if (!autoGroupResult.value) return
+  const result = autoGroupResult.value
+  const groups = [...result.groups]
+  const idx = groups.findIndex((g) => g.id === groupId)
+  if (idx < 0) return
+  groups[idx] = { ...groups[idx]!, connectionRetainEnabled: !groups[idx]!.connectionRetainEnabled }
+  autoGroupResult.value = { ...result, groups, assignments: result.assignments }
+}
+
+function handleMasterBridgeRetain(enabled: boolean) {
+  bridgeRetainEnabled.value = enabled
+  if (!autoGroupResult.value) return
+  const result = autoGroupResult.value
+  const groups = result.groups.map((g) => ({ ...g, connectionRetainEnabled: enabled }))
+  autoGroupResult.value = { ...result, groups, assignments: result.assignments }
+}
+
+function handleMasterCoverageRetain(enabled: boolean) {
+  coverageRetainEnabled.value = enabled
+  if (!autoGroupResult.value) return
+  const result = autoGroupResult.value
+  const groups = result.groups.map((g) => ({ ...g, coverageRetainEnabled: enabled }))
+  autoGroupResult.value = { ...result, groups, assignments: result.assignments }
 }
 
 function handleConfirm() {
@@ -653,6 +740,24 @@ const canDisableNode = computed(() => {
   if (!autoGroupResult.value) return false
   return autoGroupResult.value.groups.some((g) => g.isPinned || g.baseline)
 })
+
+const bridgeRetainIndeterminate = computed(() => {
+  if (!autoGroupResult.value) return false
+  const groups = autoGroupResult.value.groups
+  if (groups.length === 0) return false
+  const allOn = groups.every((g) => g.connectionRetainEnabled)
+  const allOff = groups.every((g) => !g.connectionRetainEnabled)
+  return !allOn && !allOff
+})
+
+const coverageRetainIndeterminate = computed(() => {
+  if (!autoGroupResult.value) return false
+  const groups = autoGroupResult.value.groups
+  if (groups.length === 0) return false
+  const allOn = groups.every((g) => g.coverageRetainEnabled)
+  const allOff = groups.every((g) => !g.coverageRetainEnabled)
+  return !allOn && !allOff
+})
 </script>
 
 <template>
@@ -676,10 +781,16 @@ const canDisableNode = computed(() => {
         :mode="calculationMode"
         :node-enabled="nodeEnabled"
         :can-disable-node="canDisableNode"
+        :bridge-retain-enabled="bridgeRetainEnabled"
+        :coverage-retain-enabled="coverageRetainEnabled"
+        :bridge-retain-indeterminate="bridgeRetainIndeterminate"
+        :coverage-retain-indeterminate="coverageRetainIndeterminate"
         @update:pref-jump-range="handleUpdatePrefJumpRange"
         @update:bridge-search-jump-range="handleUpdateBridgeSearchJumpRange"
         @update:pref-threshold="prefThreshold = $event"
         @update:node-enabled="nodeEnabled = $event"
+        @update:bridge-retain-enabled="handleMasterBridgeRetain"
+        @update:coverage-retain-enabled="handleMasterCoverageRetain"
         @edit="handleEnterEdit"
         @cancel="handleCancelEdit"
         @calculate="runCalculationFromEditInput"
@@ -694,14 +805,14 @@ const canDisableNode = computed(() => {
         :player-sector-macros="autoGroupResult?.playerSectorMacros ?? []"
         :editable="calculationMode === 'edit'"
         :baseline-coverage-by-group-id="editSnapshot?.coverageByGroupId"
-        :baseline-connected-by-group-id="editSnapshot?.connectedByGroupId"
-        :baseline-anchor-sector-macros="editSnapshot?.anchorSectorMacros"
         @cycle-recalc-state="handleCycleRecalcState"
         @update-jump-range="handleUpdateJumpRange"
         @toggle-coverage-input="handleToggleCoverageInput"
         @toggle-connected-input="handleToggleConnectedInput"
         @add-candidate-coverage="handleAddCandidateCoverage"
         @delete-group="handleDeleteGroup"
+        @toggle-retain-coverage="handleToggleRetainCoverage"
+        @toggle-retain-connection="handleToggleRetainConnection"
       />
     </div>
 

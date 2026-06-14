@@ -9,6 +9,10 @@ const props = defineProps<{
   mode: 'result' | 'edit'
   nodeEnabled: boolean
   canDisableNode: boolean
+  bridgeRetainEnabled: boolean
+  coverageRetainEnabled: boolean
+  bridgeRetainIndeterminate: boolean
+  coverageRetainIndeterminate: boolean
 }>()
 
 const emit = defineEmits<{
@@ -16,6 +20,8 @@ const emit = defineEmits<{
   (e: 'update:bridgeSearchJumpRange', value: number): void
   (e: 'update:prefThreshold', value: number): void
   (e: 'update:nodeEnabled', value: boolean): void
+  (e: 'update:bridgeRetainEnabled', value: boolean): void
+  (e: 'update:coverageRetainEnabled', value: boolean): void
   (e: 'calculate'): void
   (e: 'edit'): void
   (e: 'cancel'): void
@@ -40,100 +46,128 @@ function getThresholdLabel(value: number): string {
 
 const nodeDisabled = computed(() => props.mode === 'edit' && !props.canDisableNode)
 const thresholdDisabled = computed(() => !props.nodeEnabled)
+
+function onBridgeRetainChange(e: Event) {
+  emit('update:bridgeRetainEnabled', (e.target as HTMLInputElement).checked)
+}
+function onCoverageRetainChange(e: Event) {
+  emit('update:coverageRetainEnabled', (e.target as HTMLInputElement).checked)
+}
 </script>
 
 <template>
   <div class="confirm-bar">
-    <div class="bar-left">
-      <!-- 桥接 -->
-      <div class="param-field" :title="t('sector.bridge_search_jump')">
-        <span class="bar-label">{{ t('sector.bridge_search_jump_short') }}</span>
-        <span v-if="mode === 'result'" class="bar-value">{{ bridgeSearchJumpRange }}{{ t('sector.jump_unit') }}</span>
-        <select
-          v-else
-          class="bar-select bar-select--narrow"
-          :value="bridgeSearchJumpRange"
-          @change="emit('update:bridgeSearchJumpRange', Number(($event.target as HTMLSelectElement).value))"
-        >
-          <option
-            v-for="j in bridgeJumpOptions"
-            :key="j"
-            :value="j"
-            :disabled="j < prefJumpRange"
+    <div class="bar-row">
+      <div class="bar-left">
+        <!-- 桥接 + 保留 -->
+        <div class="param-field" :title="t('sector.bridge_search_jump')">
+          <span class="bar-label">{{ t('sector.bridge_search_jump_short') }}</span>
+          <span v-if="mode === 'result'" class="bar-value">{{ bridgeSearchJumpRange }}{{ t('sector.jump_unit') }}</span>
+          <select
+            v-else
+            class="bar-select bar-select--narrow"
+            :value="bridgeSearchJumpRange"
+            @change="emit('update:bridgeSearchJumpRange', Number(($event.target as HTMLSelectElement).value))"
           >
-            {{ j }}{{ t('sector.jump_unit') }}
-          </option>
-        </select>
-      </div>
+            <option v-for="j in bridgeJumpOptions" :key="j" :value="j" :disabled="j < prefJumpRange">{{ j }}{{ t('sector.jump_unit') }}</option>
+          </select>
+          <label v-if="mode === 'edit'" class="bar-label-inline" :title="t('sector.bridge_retain')">
+            <input
+              type="checkbox"
+              class="bar-checkbox"
+              :checked="bridgeRetainEnabled"
+              :indeterminate.prop="bridgeRetainIndeterminate"
+              @change="onBridgeRetainChange"
+            />
+            <span class="bar-label">{{ t('sector.retain') }}</span>
+          </label>
+        </div>
 
-      <!-- 节点 -->
-      <div class="param-field" :title="t('sector.node_enabled_desc')">
-        <label class="bar-label-inline">
-          <input
-            v-if="mode === 'edit'"
-            type="checkbox"
-            class="bar-checkbox"
-            :checked="nodeEnabled"
-            :disabled="nodeDisabled"
-            @change="emit('update:nodeEnabled', ($event.target as HTMLInputElement).checked)"
-          />
-          <span v-else class="bar-value">
-            {{ nodeEnabled ? '✓' : '✗' }}
-          </span>
-          <span class="bar-label">{{ t('sector.node_enabled') }}</span>
-        </label>
-      </div>
+        <!-- 节点 -->
+        <div v-if="mode === 'edit'" class="param-field" :title="t('sector.node_enabled_desc')">
+          <label class="bar-label-inline">
+            <input
+              type="checkbox"
+              class="bar-checkbox"
+              :checked="nodeEnabled"
+              :disabled="nodeDisabled"
+              @change="emit('update:nodeEnabled', ($event.target as HTMLInputElement).checked)"
+            />
+            <span class="bar-label">{{ t('sector.node_enabled') }}</span>
+          </label>
+        </div>
 
-      <!-- 阈值 -->
-      <div class="param-field" :title="t('sector.default_threshold')">
-        <span class="bar-label">{{ t('sector.default_threshold_short') }}</span>
-        <span v-if="mode === 'result'" class="bar-value">{{ getThresholdLabel(prefThreshold) }}{{ t('sector.volume_unit_m3') }}</span>
-        <select
-          v-else
-          class="bar-select"
-          :value="prefThreshold"
-          :disabled="thresholdDisabled"
-          @change="emit('update:prefThreshold', Number(($event.target as HTMLSelectElement).value))"
-        >
-          <option v-for="opt in thresholdOptions" :key="opt.value" :value="opt.value">{{ opt.label }}{{ t('sector.volume_unit_m3') }}</option>
-        </select>
-      </div>
+        <!-- 阈值 -->
+        <div class="param-field" :title="t('sector.default_threshold')">
+          <span class="bar-label">{{ t('sector.default_threshold_short') }}</span>
+          <span v-if="mode === 'result'" class="bar-value">{{ getThresholdLabel(prefThreshold) }}{{ t('sector.volume_unit_m3') }}</span>
+          <select
+            v-else
+            class="bar-select"
+            :value="prefThreshold"
+            :disabled="thresholdDisabled"
+            @change="emit('update:prefThreshold', Number(($event.target as HTMLSelectElement).value))"
+          >
+            <option v-for="opt in thresholdOptions" :key="opt.value" :value="opt.value">{{ opt.label }}{{ t('sector.volume_unit_m3') }}</option>
+          </select>
+        </div>
 
-      <!-- 覆盖 -->
-      <div class="param-field" :title="t('sector.group_coverage_jump')">
-        <span class="bar-label">{{ t('sector.group_coverage_jump_short') }}</span>
-        <span v-if="mode === 'result'" class="bar-value">{{ prefJumpRange }}{{ t('sector.jump_unit') }}</span>
-        <select
-          v-else
-          class="bar-select bar-select--narrow"
-          :value="prefJumpRange"
-          :disabled="thresholdDisabled"
-          @change="emit('update:prefJumpRange', Number(($event.target as HTMLSelectElement).value))"
-        >
-          <option v-for="j in jumpOptions" :key="j" :value="j">{{ j }}{{ t('sector.jump_unit') }}</option>
-        </select>
+        <!-- 覆盖 + 保留 -->
+        <div class="param-field" :title="t('sector.group_coverage_jump')">
+          <span class="bar-label">{{ t('sector.group_coverage_jump_short') }}</span>
+          <span v-if="mode === 'result'" class="bar-value">{{ prefJumpRange }}{{ t('sector.jump_unit') }}</span>
+          <select
+            v-else
+            class="bar-select bar-select--narrow"
+            :value="prefJumpRange"
+            :disabled="thresholdDisabled"
+            @change="emit('update:prefJumpRange', Number(($event.target as HTMLSelectElement).value))"
+          >
+            <option v-for="j in jumpOptions" :key="j" :value="j">{{ j }}{{ t('sector.jump_unit') }}</option>
+          </select>
+          <label v-if="mode === 'edit'" class="bar-label-inline" :title="t('sector.coverage_retain')">
+            <input
+              type="checkbox"
+              class="bar-checkbox"
+              :checked="coverageRetainEnabled"
+              :indeterminate.prop="coverageRetainIndeterminate"
+              @change="onCoverageRetainChange"
+            />
+            <span class="bar-label">{{ t('sector.retain') }}</span>
+          </label>
+        </div>
       </div>
-    </div>
-    <div class="bar-actions">
-      <button v-if="mode === 'edit'" class="bar-btn cancel-btn" @click="emit('cancel')">
-        {{ t('sector.cancel') }}
-      </button>
-      <button v-if="mode === 'edit'" class="bar-btn recalc-btn" @click="emit('calculate')">
-        {{ t('sector.calculate') }}
-      </button>
-      <button v-if="mode === 'edit'" class="bar-btn add-btn" @click="emit('add-hub')">
-        {{ t('sector.add_hub') }}
-      </button>
-      <button v-else class="bar-btn recalc-btn" @click="emit('edit')">
+      <button v-if="mode !== 'edit'" class="bar-btn recalc-btn" @click="emit('edit')">
         {{ t('sector.edit') }}
       </button>
+    </div>
+    <div v-if="mode === 'edit'" class="bar-row bar-row--actions">
+      <button class="bar-btn add-btn" @click="emit('add-hub')">
+        {{ t('sector.add_hub') }}
+      </button>
+      <div class="bar-actions">
+        <button class="bar-btn cancel-btn" @click="emit('cancel')">
+          {{ t('sector.cancel') }}
+        </button>
+        <button class="bar-btn recalc-btn" @click="emit('calculate')">
+          {{ t('sector.calculate') }}
+        </button>
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
 .confirm-bar {
-  @apply flex flex-wrap items-center justify-between gap-2 p-1.5 bg-slate-800/50 rounded border border-slate-700/50 mb-3;
+  @apply flex flex-col gap-2 p-1.5 bg-slate-800/50 rounded border border-slate-700/50 mb-3;
+}
+
+.bar-row {
+  @apply flex items-center justify-between;
+}
+
+.bar-row--actions {
+  @apply gap-1.5;
 }
 
 .bar-left {
@@ -149,7 +183,7 @@ const thresholdDisabled = computed(() => !props.nodeEnabled)
 }
 
 .bar-label-inline {
-  @apply inline-flex items-center gap-1 cursor-pointer;
+  @apply inline-flex items-center gap-0.5 cursor-pointer;
 }
 
 .bar-checkbox {
@@ -173,7 +207,7 @@ const thresholdDisabled = computed(() => !props.nodeEnabled)
 }
 
 .bar-actions {
-  @apply flex items-center gap-1.5;
+  @apply flex items-center gap-1.5 ml-auto;
 }
 
 .cancel-btn {

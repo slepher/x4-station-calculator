@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { GroupDraftInfo, SectorAssignment } from '@/store/logic/autoGroup'
 import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
@@ -16,8 +15,6 @@ const props = defineProps<{
   playerSectorMacros: string[]
   editable: boolean
   baselineCoverageByGroupId?: Record<string, string[]>
-  baselineConnectedByGroupId?: Record<string, string[]>
-  baselineAnchorSectorMacros?: string[]
 }>()
 
 const emit = defineEmits<{
@@ -27,19 +24,11 @@ const emit = defineEmits<{
   (e: 'toggle-connected-input', groupId: string, connectedGroupId: string): void
   (e: 'add-candidate-coverage', groupId: string, sectorMacro: string): void
   (e: 'delete-group', groupId: string): void
+  (e: 'toggle-retain-coverage', groupId: string): void
+  (e: 'toggle-retain-connection', groupId: string): void
 }>()
 
 const { t, te } = useI18n()
-
-const activeTabByGroup = ref<Record<string, 'coverage' | 'candidates' | 'connected'>>({})
-
-function getTab(groupId: string): 'coverage' | 'candidates' | 'connected' {
-  return activeTabByGroup.value[groupId] || 'coverage'
-}
-
-function setTab(groupId: string, tab: 'coverage' | 'candidates' | 'connected') {
-  activeTabByGroup.value[groupId] = tab
-}
 
 function getSectorName(macro: string): string {
   if (props.maps) {
@@ -54,98 +43,6 @@ function getSectorName(macro: string): string {
   return macro
 }
 
-function isBaselineCoverage(groupId: string, sectorMacro: string): boolean {
-  return (props.baselineCoverageByGroupId?.[groupId] ?? []).includes(sectorMacro)
-}
-
-function isBaselineConnection(groupId: string, connectedGroupId: string): boolean {
-  return (props.baselineConnectedByGroupId?.[groupId] ?? []).includes(connectedGroupId)
-}
-
-function isBaselineAnchor(sectorMacro: string): boolean {
-  return (props.baselineAnchorSectorMacros ?? []).includes(sectorMacro)
-}
-
-void isBaselineCoverage
-void isBaselineConnection
-void isBaselineAnchor
-
-function getCoverageByJump(group: GroupDraftInfo): Map<number, Array<{ macro: string; connected: boolean; active: boolean; connectedGroupId?: string; isBaseline: boolean }>> {
-  const byJump = new Map<number, Array<{ macro: string; connected: boolean; active: boolean; connectedGroupId?: string; isBaseline: boolean }>>()
-  if (!group.sectorMacro) return byJump
-
-  const distances = getCoverageSectors(
-    group.sectorMacro, 99,
-    props.sectorGraph, props.sectorClusterMap
-  )
-  const distMap = new Map(distances.map(d => [d.sectorMacro, d.distance]))
-
-  for (const sector of group.coverageSectorMacros) {
-    if (sector === group.sectorMacro) continue
-    const jump = distMap.get(sector) ?? 0
-    if (!byJump.has(jump)) byJump.set(jump, [])
-    byJump.get(jump)!.push({
-      macro: sector,
-      connected: false,
-      active: !group.excludedDefaultAssignmentSectorMacros.includes(sector),
-      isBaseline: isBaselineCoverage(group.id, sector)
-    })
-  }
-
-  for (const connId of group.connectedGroupIds) {
-    const connGroup = props.groups.find(g => g.id === connId)
-    if (!connGroup?.sectorMacro || connGroup.sectorMacro === group.sectorMacro) continue
-    const jump = distMap.get(connGroup.sectorMacro) ?? 0
-    if (!byJump.has(jump)) byJump.set(jump, [])
-    byJump.get(jump)!.push({
-      macro: connGroup.sectorMacro,
-      connected: true,
-      active: !group.excludedDefaultConnectedGroupIds.includes(connId),
-      connectedGroupId: connId,
-      isBaseline: isBaselineConnection(group.id, connId)
-    })
-  }
-
-  return byJump
-}
-
-function getCoverageJumps(group: GroupDraftInfo): number[] {
-  return Array.from(getCoverageByJump(group).keys()).sort((a, b) => a - b)
-}
-
-function getCandidatesForGroup(group: GroupDraftInfo): Array<{ macro: string; isAnchor: boolean; isActive: boolean }> {
-  if (!group.sectorMacro) return []
-  const allAnchorSectors = new Set(props.groups.filter(g => g.sectorMacro).map(g => g.sectorMacro!))
-  const distances = getCoverageSectors(group.sectorMacro, group.jumpRange, props.sectorGraph, props.sectorClusterMap)
-  const activeCoverage = new Set(group.coverageSectorMacros.filter(
-    m => !group.excludedDefaultAssignmentSectorMacros.includes(m)
-  ))
-  const inactiveCoverage = new Set(group.coverageSectorMacros.filter(
-    m => group.excludedDefaultAssignmentSectorMacros.includes(m)
-  ))
-
-  return distances
-    .filter(d => props.playerSectorMacros.includes(d.sectorMacro) && d.sectorMacro !== group.sectorMacro)
-    .filter(d => !inactiveCoverage.has(d.sectorMacro))
-    .map(d => ({
-      macro: d.sectorMacro,
-      isAnchor: allAnchorSectors.has(d.sectorMacro),
-      isActive: activeCoverage.has(d.sectorMacro)
-    }))
-}
-
-function getConnectedEntries(group: GroupDraftInfo) {
-  return group.connectedGroupIds.map(connId => {
-    const connGroup = props.groups.find(g => g.id === connId)
-    return {
-      groupId: connId,
-      name: connGroup ? (connGroup.sectorMacro ? getSectorName(connGroup.sectorMacro) : connGroup.name) : connId.slice(0, 8),
-      active: !group.excludedDefaultConnectedGroupIds.includes(connId),
-      isBaseline: isBaselineConnection(group.id, connId)
-    }
-  })
-}
-
 function getPinnedTitle(group: GroupDraftInfo): string {
   return group.isPinned ? t('sector.recalc_state_pin') : t('sector.recalc_state_normal')
 }
@@ -155,8 +52,111 @@ function canEditJumpRange(group: GroupDraftInfo): boolean {
   return group.isPinned
 }
 
-function canEditPinnedInput(group: GroupDraftInfo): boolean {
-  return props.editable && group.isPinned
+interface UnifiedPillEntry {
+  type: 'coverage' | 'candidate' | 'connected'
+  macro: string
+  jump: number
+  baseline: boolean
+  hasPlayerStation: boolean
+  connectedGroupId?: string
+  connectedGroupName?: string
+  action: 'add' | 'transfer' | 'remove' | null
+  covered?: boolean
+}
+
+function buildUnifiedPills(group: GroupDraftInfo): Map<number, UnifiedPillEntry[]> {
+  const byJump = new Map<number, UnifiedPillEntry[]>()
+  if (!group.sectorMacro) return byJump
+
+  const allAnchorSectors = new Set(props.groups.filter(g => g.sectorMacro).map(g => g.sectorMacro!))
+  const distMap = new Map<string, number>()
+  const distances = getCoverageSectors(group.sectorMacro, 99, props.sectorGraph, props.sectorClusterMap)
+  for (const d of distances) distMap.set(d.sectorMacro, d.distance)
+
+  const otherActiveCoverage = new Map<string, string>()
+  for (const other of props.groups) {
+    if (other.id === group.id) continue
+    for (const m of other.coverageSectorMacros) {
+      otherActiveCoverage.set(m, other.id)
+    }
+  }
+
+  const canEdit = props.editable && group.isPinned
+  const baselineCov = new Set(props.baselineCoverageByGroupId?.[group.id] ?? [])
+
+  // Coverage + candidate pills — single BFS pass, covered sectors get both entries
+  for (const d of distances) {
+    if (d.sectorMacro === group.sectorMacro) continue
+
+    const isCovered = group.coverageSectorMacros.includes(d.sectorMacro)
+    if (isCovered) {
+      if (!byJump.has(d.distance)) byJump.set(d.distance, [])
+      byJump.get(d.distance)!.push({
+        type: 'coverage',
+        macro: d.sectorMacro,
+        jump: d.distance,
+        baseline: baselineCov.has(d.sectorMacro),
+        hasPlayerStation: props.playerSectorMacros.includes(d.sectorMacro),
+        action: canEdit && group.coverageRetainEnabled ? 'remove' : null
+      })
+    }
+    if (d.distance <= group.jumpRange && !allAnchorSectors.has(d.sectorMacro)) {
+      // Candidate pill (semi-gold) — for covered sectors, shown only when retain off
+      const isOtherCoverage = otherActiveCoverage.has(d.sectorMacro)
+      if (!byJump.has(d.distance)) byJump.set(d.distance, [])
+      byJump.get(d.distance)!.push({
+        type: 'candidate',
+        macro: d.sectorMacro,
+        jump: d.distance,
+        baseline: false,
+        hasPlayerStation: props.playerSectorMacros.includes(d.sectorMacro),
+        action: canEdit && group.coverageRetainEnabled ? (isOtherCoverage ? 'transfer' : 'add') : null,
+        covered: isCovered
+      })
+    }
+  }
+
+  // Connected pills (green)
+  const connectedSet = new Set(group.connectedGroupIds)
+  for (const other of props.groups) {
+    if (other.id === group.id) continue
+    if (!other.sectorMacro) continue
+    const jump = distMap.get(other.sectorMacro)
+    if (jump === undefined) continue
+
+    const isConnected = connectedSet.has(other.id)
+    if (isConnected) {
+      if (!byJump.has(jump)) byJump.set(jump, [])
+      byJump.get(jump)!.push({
+        type: 'connected',
+        macro: other.sectorMacro,
+        jump,
+        baseline: false,
+        hasPlayerStation: props.playerSectorMacros.includes(other.sectorMacro),
+        connectedGroupId: other.id,
+        connectedGroupName: other.sectorMacro ? getSectorName(other.sectorMacro) : other.name,
+        action: canEdit && group.connectionRetainEnabled ? 'remove' : null
+      })
+    } else if (canEdit && group.connectionRetainEnabled && jump <= 5) {
+      if (!byJump.has(jump)) byJump.set(jump, [])
+      byJump.get(jump)!.push({
+        type: 'connected',
+        macro: other.sectorMacro,
+        jump,
+        baseline: false,
+        hasPlayerStation: props.playerSectorMacros.includes(other.sectorMacro),
+        connectedGroupId: other.id,
+        connectedGroupName: other.sectorMacro ? getSectorName(other.sectorMacro) : other.name,
+        action: 'add'
+      })
+    }
+  }
+
+  return byJump
+}
+
+function getPillJumps(group: GroupDraftInfo): number[] {
+  return Array.from(buildUnifiedPills(group).keys()).sort((a, b) => a - b)
 }
 
 function getUncertainCount(groupId: string): number {
@@ -165,22 +165,22 @@ function getUncertainCount(groupId: string): number {
   ).length
 }
 
-function hasPlayerStation(sectorMacro: string): boolean {
-  return props.playerSectorMacros.includes(sectorMacro)
-}
-
-function getPillClass(entry: {
-  connected: boolean
-  active: boolean
-  isBaseline: boolean
-  isAnchor?: boolean
-}) {
-  return {
-    'pill--coverage': !entry.connected,
-    'pill--connected': entry.connected,
-    'pill--inactive': !entry.active,
-    'pill--baseline': entry.isBaseline,
-    'pill--anchor': entry.isAnchor
+function onPillAction(entry: UnifiedPillEntry, groupId: string) {
+  if (!props.editable) return
+  if (entry.action === 'remove') {
+    if (entry.type === 'connected' && entry.connectedGroupId) {
+      emit('toggle-connected-input', groupId, entry.connectedGroupId)
+    } else if (entry.type === 'coverage') {
+      emit('toggle-coverage-input', groupId, entry.macro)
+    }
+  } else if (entry.action === 'add') {
+    if (entry.type === 'connected' && entry.connectedGroupId) {
+      emit('toggle-connected-input', groupId, entry.connectedGroupId)
+    } else {
+      emit('add-candidate-coverage', groupId, entry.macro)
+    }
+  } else if (entry.action === 'transfer') {
+    emit('add-candidate-coverage', groupId, entry.macro)
   }
 }
 </script>
@@ -206,6 +206,14 @@ function getPillClass(entry: {
           <span class="group-name">{{ group.name }}</span>
         </div>
         <div class="group-actions">
+          <label v-if="props.editable" class="retain-chk" :title="t('sector.coverage_retain')">
+            <input type="checkbox" class="bar-checkbox" :checked="group.coverageRetainEnabled" :disabled="!group.isPinned" @change="emit('toggle-retain-coverage', group.id)" />
+            <span class="retain-label">{{ t('sector.group_coverage_jump_short') }}</span>
+          </label>
+          <label v-if="props.editable" class="retain-chk" :title="t('sector.bridge_retain')">
+            <input type="checkbox" class="bar-checkbox" :checked="group.connectionRetainEnabled" :disabled="!group.isPinned" @change="emit('toggle-retain-connection', group.id)" />
+            <span class="retain-label">{{ t('sector.tab_connected') }}</span>
+          </label>
           <button
             v-if="props.editable && !group.enteredOtherGroupCoverage"
             class="action-btn state-btn"
@@ -252,6 +260,7 @@ function getPillClass(entry: {
           <label class="config-label">{{ t('map.binding_anchor_sector') }}</label>
           <div class="config-value">
             <span class="pill pill--anchor">
+              <span class="pill-dot" :class="playerSectorMacros.includes(group.sectorMacro || '') ? 'pill-dot--filled' : 'pill-dot--empty'"/>
               {{ getSectorName(group.sectorMacro || '') }}
             </span>
             <div class="jump-control">
@@ -269,108 +278,39 @@ function getPillClass(entry: {
           </div>
         </div>
 
-        <!-- Tab selectors (edit mode only) -->
-        <div v-if="props.editable" class="tab-bar">
-          <button
-            class="tab-btn"
-            :class="{ 'tab-btn--active': getTab(group.id) === 'coverage' }"
-            @click="setTab(group.id, 'coverage')"
-          >{{ t('sector.tab_coverage') }}</button>
-          <button
-            class="tab-btn"
-            :class="{ 'tab-btn--active': getTab(group.id) === 'candidates' }"
-            @click="setTab(group.id, 'candidates')"
-          >{{ t('sector.tab_candidates') }}</button>
-          <button
-            class="tab-btn"
-            :class="{ 'tab-btn--active': getTab(group.id) === 'connected' }"
-            @click="setTab(group.id, 'connected')"
-          >{{ t('sector.tab_connected') }}</button>
-        </div>
-
-        <!-- Coverage tab -->
-        <div v-if="!props.editable || getTab(group.id) === 'coverage'">
-          <div v-if="getCoverageJumps(group).length > 0" class="config-row">
-            <div v-for="jump in getCoverageJumps(group)" :key="jump" class="jump-group-grid">
-              <span class="jump-number">{{ jump }}{{ t('map.resource_filter_jump_suffix') }}</span>
-              <div class="pill-list">
-                <span
-                  v-for="entry in getCoverageByJump(group).get(jump)!"
-                  :key="`${entry.connected ? 'link' : 'coverage'}:${entry.macro}`"
-                  class="pill"
-                  :class="getPillClass(entry)"
-                >
-                  {{ getSectorName(entry.macro) }}
-                  <button
-                    v-if="canEditPinnedInput(group)"
-                    type="button"
-                    class="pill-toggle"
-                    :title="entry.active ? t('sector.pill_inactive') : ''"
-                    @click.stop="entry.connected && entry.connectedGroupId
-                      ? emit('toggle-connected-input', group.id, entry.connectedGroupId)
-                      : emit('toggle-coverage-input', group.id, entry.macro)"
-                  >
-                    {{ entry.active ? 'x' : '+' }}
-                  </button>
-                </span>
-              </div>
-            </div>
-          </div>
-          <div v-else class="empty-tab">
-            {{ t('sector.no_groups') }}
-          </div>
-        </div>
-
-        <!-- Candidates tab -->
-        <div v-if="props.editable && getTab(group.id) === 'candidates'">
-          <div v-if="getCandidatesForGroup(group).length > 0" class="config-row">
+        <div v-if="getPillJumps(group).length > 0" class="config-row">
+          <div v-for="jump in getPillJumps(group)" :key="jump" class="jump-group-grid">
+            <span class="jump-number">{{ jump }}{{ t('map.resource_filter_jump_suffix') }}</span>
             <div class="pill-list">
               <span
-                v-for="cand in getCandidatesForGroup(group)"
-                :key="cand.macro"
+                v-for="entry in buildUnifiedPills(group).get(jump)!"
+                :key="`${entry.type}:${entry.macro}`"
+                v-show="entry.type !== 'candidate' || !entry.covered || !group.coverageRetainEnabled"
                 class="pill"
-                :class="getPillClass({ connected: false, active: cand.isActive, isBaseline: false, isAnchor: cand.isAnchor })"
+                :class="{
+                  'pill--coverage': entry.type === 'coverage',
+                  'pill--candidate': entry.type === 'candidate',
+                  'pill--connected': entry.type === 'connected',
+                  'pill--baseline': entry.baseline
+                }"
               >
-                <span class="pill-dot" :class="hasPlayerStation(cand.macro) ? 'pill-dot--filled' : 'pill-dot--empty'"></span>
-                {{ getSectorName(cand.macro) }}
+                <span class="pill-dot" :class="entry.hasPlayerStation ? 'pill-dot--filled' : 'pill-dot--empty'"/>
+                {{ entry.type === 'connected' && entry.connectedGroupName ? entry.connectedGroupName : getSectorName(entry.macro) }}
                 <button
-                  v-if="!cand.isAnchor && !cand.isActive"
+                  v-if="entry.action && props.editable"
                   type="button"
-                  class="pill-toggle"
-                  @click.stop="emit('add-candidate-coverage', group.id, cand.macro)"
-                >+</button>
-              </span>
-            </div>
-          </div>
-          <div v-else class="empty-tab">
-            {{ t('sector.no_groups') }}
-          </div>
-        </div>
-
-        <!-- Connected tab -->
-        <div v-if="props.editable && getTab(group.id) === 'connected'">
-          <div v-if="getConnectedEntries(group).length > 0" class="config-row">
-            <div class="pill-list">
-              <span
-                v-for="entry in getConnectedEntries(group)"
-                :key="entry.groupId"
-                class="pill pill--connected"
-                :class="getPillClass({ connected: true, active: entry.active, isBaseline: entry.isBaseline })"
-              >
-                {{ entry.name }}
-                <button
-                  v-if="canEditPinnedInput(group)"
-                  type="button"
-                  class="pill-toggle"
-                  @click.stop="emit('toggle-connected-input', group.id, entry.groupId)"
+                  class="pill-action"
+                  :class="{
+                    'pill-action--remove': entry.action === 'remove',
+                    'pill-action--add': entry.action === 'add',
+                    'pill-action--transfer': entry.action === 'transfer'
+                  }"
+                  @click.stop="onPillAction(entry, group.id)"
                 >
-                  {{ entry.active ? 'x' : '+' }}
+                  {{ entry.action === 'remove' ? 'x' : entry.action === 'transfer' ? '→' : '+' }}
                 </button>
               </span>
             </div>
-          </div>
-          <div v-else class="empty-tab">
-            {{ t('sector.no_groups') }}
           </div>
         </div>
 
@@ -394,15 +334,6 @@ function getPillClass(entry: {
   @apply text-sm text-slate-500 text-center py-4;
 }
 
-.empty-tab {
-  @apply text-xs text-slate-600 text-center py-2;
-}
-
-.action-btn {
-  @apply text-xs p-1 rounded text-slate-400 hover:text-slate-200 hover:bg-slate-700/50;
-}
-
-
 .group-item {
   @apply rounded border border-slate-700/50 bg-slate-800/40 p-2;
 }
@@ -418,6 +349,7 @@ function getPillClass(entry: {
 .group-item--unpinned {
   @apply border-slate-600/30 bg-slate-500/5;
 }
+
 
 .group-header {
   @apply flex items-center justify-between gap-2 mb-1;
@@ -494,20 +426,29 @@ function getPillClass(entry: {
   @apply border-amber-300/30 bg-amber-200/10 text-amber-100;
 }
 
-.pill--connected {
-  @apply border-emerald-300/30 bg-emerald-500/10 text-emerald-200;
-}
-
-.pill--inactive {
-  @apply border-dashed opacity-45;
+.pill--candidate {
+  @apply border-amber-300/20 bg-amber-200/5 text-amber-200/70;
 }
 
 .pill--baseline {
   @apply border-2;
 }
 
-.pill-toggle {
-  @apply inline-flex h-4 w-4 items-center justify-center rounded-full text-[10px] leading-none text-current hover:bg-white/10;
+.pill--connected {
+  @apply border-emerald-300/30 bg-emerald-500/10 text-emerald-200;
+}
+
+
+.pill-action--remove {
+  @apply text-rose-300;
+}
+
+.pill-action--add {
+  @apply text-emerald-400;
+}
+
+.pill-action--transfer {
+  @apply text-amber-400;
 }
 
 .pill-dot {
@@ -528,10 +469,6 @@ function getPillClass(entry: {
 
 .jump-readonly {
   @apply text-xs text-slate-400;
-}
-
-.jump-list {
-  @apply flex flex-col gap-0.5;
 }
 
 .jump-group-grid {
@@ -555,15 +492,11 @@ function getPillClass(entry: {
   @apply flex items-center gap-3 text-xs text-slate-500;
 }
 
-.tab-bar {
-  @apply flex items-center gap-0.5 mb-2 border-b border-slate-700/50;
+.retain-chk {
+  @apply inline-flex items-center gap-0.5 cursor-pointer;
 }
 
-.tab-btn {
-  @apply px-2 py-1 text-xs text-slate-500 hover:text-slate-300 transition-colors border-b-2 border-transparent;
-}
-
-.tab-btn--active {
-  @apply text-sky-400 border-sky-500;
+.retain-label {
+  @apply text-[10px] text-slate-500;
 }
 </style>

@@ -47,9 +47,10 @@ export interface GroupDraftInfo {
   coverageSectorMacros: string[]
   connectedGroupIds: string[]
   excludedDefaultAssignmentSectorMacros: string[]
-  excludedDefaultConnectedGroupIds: string[]
   isNew: boolean
   isPinned: boolean
+  coverageRetainEnabled: boolean
+  connectionRetainEnabled: boolean
   hubScore?: number
   hubStationCode?: string
   role?: 'normal' | 'bridge'
@@ -208,6 +209,19 @@ export function computeGroupGraph(
   sectorClusterMap: Record<string, string>,
   maxDistance: number = DEFAULT_BRIDGE_SEARCH_JUMP_RANGE
 ): void {
+  // Save existing connections to preserve as fixed edges
+  const fixedConnections: Array<{ a: number; b: number }> = []
+  const idToIndex = new Map(groups.map((g, i) => [g.id, i]))
+  for (const group of groups) {
+    for (const connId of group.connectedGroupIds) {
+      const ai = idToIndex.get(group.id)
+      const bi = idToIndex.get(connId)
+      if (ai !== undefined && bi !== undefined && ai < bi) {
+        fixedConnections.push({ a: ai, b: bi })
+      }
+    }
+  }
+
   for (const group of groups) {
     group.connectedGroupIds = []
   }
@@ -232,12 +246,30 @@ export function computeGroupGraph(
 
   edges.sort((a, b) => a.weight - b.weight || a.key.localeCompare(b.key))
   const uf = new UnionFind(groups.length)
+
+  // Pre-union fixed connections (user-edited or existing)
+  for (const fc of fixedConnections) {
+    uf.union(fc.a, fc.b)
+  }
+
   for (const edge of edges) {
     if (!uf.union(edge.a, edge.b)) continue
     const ga = groups[edge.a]!
     const gb = groups[edge.b]!
     ga.connectedGroupIds = [...new Set([...ga.connectedGroupIds, gb.id])]
     gb.connectedGroupIds = [...new Set([...gb.connectedGroupIds, ga.id])]
+  }
+
+  // Re-apply fixed connections (user-edited or existing)
+  for (const fc of fixedConnections) {
+    const ga = groups[fc.a]!
+    const gb = groups[fc.b]!
+    if (!ga.connectedGroupIds.includes(gb.id)) {
+      ga.connectedGroupIds.push(gb.id)
+    }
+    if (!gb.connectedGroupIds.includes(ga.id)) {
+      gb.connectedGroupIds.push(ga.id)
+    }
   }
 }
 
@@ -256,7 +288,49 @@ function buildBridgeUnits(
   excludedSectorMacros: Set<string> = new Set()
 ): BridgePlanUnit[] {
   const anchorSectors = new Set(groups.map((g) => g.sectorMacro).filter(Boolean) as string[])
-  const candidates = playerSectorMacros.filter((sector) => !anchorSectors.has(sector) && !excludedSectorMacros.has(sector))
+
+  // Build map: cluster → list of hub anchor sectors in that cluster
+  const hubAnchorsByCluster = new Map<string, string[]>()
+  for (const anchor of anchorSectors) {
+    const cid = sectorClusterMap[anchor]
+    if (!cid) continue
+    if (!hubAnchorsByCluster.has(cid)) hubAnchorsByCluster.set(cid, [])
+    hubAnchorsByCluster.get(cid)!.push(anchor)
+  }
+
+  // Exclude candidates that are in the same cluster as a hub AND reachable within the cluster
+  const candidates = playerSectorMacros.filter((sector) => {
+    if (anchorSectors.has(sector)) return false
+    if (excludedSectorMacros.has(sector)) return false
+    const cid = sectorClusterMap[sector]
+    if (!cid) return true
+    const hubs = hubAnchorsByCluster.get(cid)
+    if (!hubs || hubs.length === 0) return true
+    // Check if any hub in same cluster is reachable within the cluster
+    for (const hub of hubs) {
+      // BFS within same cluster to check reachability
+      const visitedBfs = new Set<string>()
+      const queue = [sector]
+      visitedBfs.add(sector)
+      let found = false
+      for (let qi = 0; qi < queue.length && !found; qi++) {
+        const cur = queue[qi]!
+        for (const nxt of sectorGraph[cur] || []) {
+          if (visitedBfs.has(nxt)) continue
+          // Only traverse within same cluster
+          if ((sectorClusterMap[nxt] || nxt) !== cid) continue
+          visitedBfs.add(nxt)
+          queue.push(nxt)
+          if (nxt === hub) {
+            found = true
+            break
+          }
+        }
+      }
+      if (found) return false // Reachable → exclude
+    }
+    return true // Not reachable (superhighway split) → keep
+  })
   const candidateSet = new Set(candidates)
   const visited = new Set<string>()
   const units: BridgePlanUnit[] = []
@@ -342,16 +416,19 @@ function buildPlanFromUnits(
   sectorClusterMap: Record<string, string>,
   bridgeSearchJumpRange: number
 ): BridgePlanOption | null {
-  const nodes: Array<{ id: string; kind: 'component' | 'unit'; label: string; sectorMacro: string; componentIndex?: number; unit?: BridgePlanUnit }> = []
+  const nodes: Array<{ id: string; kind: 'component' | 'unit'; label: string; sectorMacros: string[]; componentIndex?: number; unit?: BridgePlanUnit }> = []
 
   for (let i = 0; i < components.length; i++) {
-    const firstGroup = groups[components[i]![0]!]!
-    if (!firstGroup.sectorMacro) continue
+    const compGroups = components[i]!
+    const anchors = compGroups
+      .map((gi) => groups[gi]!.sectorMacro)
+      .filter(Boolean) as string[]
+    if (anchors.length === 0) continue
     nodes.push({
       id: `component_${i}`,
       kind: 'component',
-      label: firstGroup.name,
-      sectorMacro: firstGroup.sectorMacro,
+      label: groups[compGroups[0]!]!.name,
+      sectorMacros: anchors,
       componentIndex: i
     })
   }
@@ -361,7 +438,7 @@ function buildPlanFromUnits(
       id: unit.unitId,
       kind: 'unit',
       label: unit.label,
-      sectorMacro: unit.selectedSectorMacro,
+      sectorMacros: [unit.selectedSectorMacro],
       unit
     })
   }
@@ -369,10 +446,18 @@ function buildPlanFromUnits(
   const edges: Array<{ a: number; b: number; weight: number; key: string }> = []
   for (let i = 0; i < nodes.length; i++) {
     for (let j = i + 1; j < nodes.length; j++) {
-      const dist = getDistance(nodes[i]!.sectorMacro, nodes[j]!.sectorMacro, sectorGraph, sectorClusterMap)
-      if (dist === null || dist > bridgeSearchJumpRange) continue
+      let minDist: number | null = null
+      for (const mi of nodes[i]!.sectorMacros) {
+        for (const mj of nodes[j]!.sectorMacros) {
+          const dist = getDistance(mi, mj, sectorGraph, sectorClusterMap)
+          if (dist !== null && (minDist === null || dist < minDist)) {
+            minDist = dist
+          }
+        }
+      }
+      if (minDist === null || minDist > bridgeSearchJumpRange) continue
       const ids = [nodes[i]!.id, nodes[j]!.id].sort()
-      edges.push({ a: i, b: j, weight: dist, key: `${ids[0]}:${ids[1]}` })
+      edges.push({ a: i, b: j, weight: minDist, key: `${ids[0]}:${ids[1]}` })
     }
   }
 
@@ -406,10 +491,10 @@ function buildPlanFromUnits(
     maxJump = Math.max(maxJump, edge.weight)
 
     if (a.kind === 'unit') {
-      unitMap.get(a.id)?.reaches.push({ nodeId: b.id, label: b.label, sectorMacro: b.sectorMacro, jump: edge.weight })
+      unitMap.get(a.id)?.reaches.push({ nodeId: b.id, label: b.label, sectorMacro: b.sectorMacros[0]!, jump: edge.weight })
     }
     if (b.kind === 'unit') {
-      unitMap.get(b.id)?.reaches.push({ nodeId: a.id, label: a.label, sectorMacro: a.sectorMacro, jump: edge.weight })
+      unitMap.get(b.id)?.reaches.push({ nodeId: a.id, label: a.label, sectorMacro: a.sectorMacros[0]!, jump: edge.weight })
     }
   }
 
@@ -461,7 +546,11 @@ export function buildBridgePlanOptions(
   const maxConnectedComponentCount = Math.max(...plans.map((plan) => plan.connectedComponentCount))
   const bestCoveragePlans = plans.filter((plan) => plan.connectedComponentCount === maxConnectedComponentCount)
 
-  bestCoveragePlans.sort((a, b) =>
+  // Keep only plans with the minimum unit count at max cc
+  const minUnitCount = Math.min(...bestCoveragePlans.map((plan) => plan.units.length))
+  const minimalPlans = bestCoveragePlans.filter((plan) => plan.units.length === minUnitCount)
+
+  minimalPlans.sort((a, b) =>
     b.planScore - a.planScore ||
     a.totalJump - b.totalJump ||
     a.maxJump - b.maxJump ||
@@ -469,7 +558,7 @@ export function buildBridgePlanOptions(
     a.stableKey.localeCompare(b.stableKey)
   )
 
-  return bestCoveragePlans.slice(0, 5).map((plan, index) => ({
+  return minimalPlans.slice(0, 5).map((plan, index) => ({
     ...plan,
     recommended: index === 0
   }))
@@ -499,9 +588,10 @@ export function applyBridgePlanToDraft(
       coverageSectorMacros: [],
       connectedGroupIds: [],
       excludedDefaultAssignmentSectorMacros: [],
-      excludedDefaultConnectedGroupIds: [],
       isNew: true,
       isPinned: false,
+      coverageRetainEnabled: true,
+      connectionRetainEnabled: true,
       hubScore: selectedUnitScore(unit),
       role: 'bridge'
     })
@@ -693,9 +783,10 @@ export function groupCleanSlate(
         coverageSectorMacros: coverage,
         connectedGroupIds: [],
         excludedDefaultAssignmentSectorMacros: [],
-      excludedDefaultConnectedGroupIds: [],
         isNew: true,
         isPinned: false,
+      coverageRetainEnabled: true,
+      connectionRetainEnabled: true,
         hubScore: hub.score,
         hubStationCode: hub.stationCode
       }
@@ -910,9 +1001,10 @@ export function groupIncremental(
     coverageSectorMacros: group.coverageSectorMacros.map((c) => c.ref),
     connectedGroupIds: [...(group.connectedGroupIds || [])],
     excludedDefaultAssignmentSectorMacros: [],
-      excludedDefaultConnectedGroupIds: [],
     isNew: false,
     isPinned: true,
+      coverageRetainEnabled: true,
+      connectionRetainEnabled: true,
     hubScore: undefined
   }))
 
@@ -964,9 +1056,10 @@ export function groupIncremental(
         coverageSectorMacros: coverage,
         connectedGroupIds: [],
         excludedDefaultAssignmentSectorMacros: [],
-      excludedDefaultConnectedGroupIds: [],
         isNew: true,
         isPinned: false,
+      coverageRetainEnabled: true,
+      connectionRetainEnabled: true,
         hubScore: hub.score,
         hubStationCode: hub.stationCode
       })
@@ -1392,9 +1485,10 @@ export function applyStandaloneToResult(
     coverageSectorMacros: coverage,
     connectedGroupIds: [],
     excludedDefaultAssignmentSectorMacros: [],
-      excludedDefaultConnectedGroupIds: [],
     isNew: true,
     isPinned: false,
+      coverageRetainEnabled: true,
+      connectionRetainEnabled: true,
     hubScore: undefined
   }
 

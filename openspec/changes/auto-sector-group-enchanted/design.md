@@ -34,8 +34,6 @@ LiveProductionWorkbenchView.vue (overview mode)
 - disabledCoverageSectorMacros: string[]
 + excludedDefaultAssignmentSectorMacros: string[]
 
-- disabledConnectedGroupIds / excludedDefaultConnectedGroupIds
-+ removed
 ```
 
 Draft-only 状态：
@@ -43,6 +41,7 @@ Draft-only 状态：
 ```ts
 interface GroupDraftInfo {
   isPinned: boolean
+  isNew: boolean
   baseline?: boolean
   enteredOtherGroupCoverage?: boolean
   excludedDefaultAssignmentSectorMacros: string[]
@@ -50,39 +49,36 @@ interface GroupDraftInfo {
 ```
 
 语义：
-- `isPinned=true`：作为下次计算固定 hub 输入
-- `isPinned=false`：不作为固定 hub 输入
+- `isPinned=true`：作为下次计算固定 hub 输入，覆盖/候选/连接可编辑
+- `isPinned=false`：覆盖/候选/连接只读，不作为固定 hub 输入
+- `isNew=true`：算法新建或编辑中 [添加] 的 group
 - `baseline=true`：该 group 来自进入编辑前快照，不可真正删除
 - `enteredOtherGroupCoverage=true`：unpinned baseline hub 已进入其他 hub coverage，不允许重新 pin
 - `excludedDefaultAssignmentSectorMacros`：该 group 不可作为这些玩家 sector 的默认选中项，但仍可作为 Col 3 手动 option
+- 连接只由 `connectedGroupIds` 表达：`+` 加入目标 group id，`×` 移除目标 group id
 
 `excludedDefaultAssignmentSectorMacros` 仅适用于有玩家空间站的 sector。非玩家星区没有玩家归属默认值，不进入该字段。
 
 ## Baseline Snapshot
 
-进入编辑态时在 `SectorOverviewPanel` 保存：
+进入编辑态时在 `SectorOverviewPanel` 保存当前状态快照，用于 [取消] 时恢复。
 
-```ts
-interface SectorEditBaseline {
-  groups: GroupDraftInfo[]
-  coverageByGroupId: Record<string, Set<string>>
-  anchorSectorMacros: Set<string>
-}
-```
-
-baseline 的定义是“点击 [编辑] 前的当前显示状态”。
+进入编辑时，所有当前存在的 group 统一设为 `isPinned: true`、`baseline: true`。编辑中通过 [添加] 新建的 hub 才是 `isPinned: false`。
 
 baseline 用途：
-- UI 粗边框
-- coverage 恢复来源
-- baseline coverage 即使被其他 group 获取或因 jumpRange 缩小超出范围，也要能继续显示为可恢复候选
-- 当其他 group 移除该 sector，或 jumpRange 调回覆盖范围时，可恢复为当前 group coverage
+- 粗边框视觉：仅 coverage pill 中，进入编辑时已在 group coverage 中的 sector 显示粗边框（数据源为 `editSnapshot.coverageByGroupId`）
+- 区分 baseline group（不可删除）与编辑新增 group（`isNew && !baseline` 可删除）
+- [取消] 时恢复进入编辑前的完整状态
 
-connection 不使用 baseline 恢复逻辑。
+baseline 不提供 coverage 恢复/历史保留语义。coverage 被其他 group 获取、被移出或因 jumpRange 缩小超出范围后，按普通 candidate/coverage 规则显示或消失。
+
+connection 不使用 baseline 行为。
 
 ## SectorConfirmBar
 
-参数顺序：`桥接 | 节点 | 阈值 | 覆盖`
+参数顺序：`[桥接下拉 保留☑] [节点☑] [阈值下拉] [覆盖下拉 保留☑]`
+
+第二行：`[添加枢纽]` 左对齐，`[取消] [计算]` 右对齐
 
 props / emits：
 
@@ -102,19 +98,21 @@ canDisableNode: boolean
 - 计算结果态只读展示节点状态
 - 编辑输入态按钮顺序为 `[取消] [计算] [添加]`
 - [添加] 触发 hub 选择 popup，不传目标 group
+- 桥接「保留」☑ 和覆盖「保留」☑，默认勾选
+- 保留 checkbox 为三态总控，联动所有 group 的对应 checkbox
 
 ## Hub 添加菜单
 
 复制 `MapBindSectorMenu` 为 `SectorHubAddMenu.vue`，但语义改为添加 hub draft group。
 
 显示规则：
-- popup / popover 方式显示，锚定 [添加] 或使用 modal/dropdown overlay
-- 不作为普通页面流元素显示
-- 无搜索时只列玩家星区
+- 使用 fixed overlay modal 显示（`fixed inset-0 z-50` + backdrop）
+- 不作为普通页面流元素显示；点击背景或 Esc 关闭
+- 无搜索时只列玩家星区（按 cluster 分组）
 - 搜索时遍历全地图 sectors，包含无玩家空间站 sector
-- `showMapButton?: boolean` 默认 false
+- sector 行仅显示 `●/○` + 星区名，不显示 raw sector_id
 - 已是任意 group anchor 的 sector 不显示 `+`
-- 点击 `+` 创建新的 `GroupDraftInfo`
+- 点击 `+` 创建新的 `GroupDraftInfo`，菜单关闭
 - 新 group 默认 `isPinned=false`、`baseline=false`、可删除
 
 ## Unified Pill Rows
@@ -128,9 +126,9 @@ canDisableNode: boolean
 | connected | 绿色 | hub anchor / connected group | `+` 或 `×` |
 
 视觉叠加：
-- baseline：粗边框
-- 有玩家空间站：实心点
-- 无玩家空间站：空心点
+- baseline 粗边框：仅 coverage pill，数据源为 edit-time snapshot
+- 有玩家空间站：实心点 `●`（含定位星区 pill 和所有 pill）
+- 无玩家空间站：空心点 `○`
 - 连接只靠绿色区分，不显示额外 link 图标
 - 不使用 inactive/default-off 的 dashed / 低透明样式
 
@@ -153,6 +151,17 @@ interface UnifiedPillEntry {
 - `transfer` → `→`
 - `remove` → `×`
 
+非 pin hub（`isPinned=false`）的所有 pill action 为 null，覆盖/候选/连接均只读显示。
+
+### 覆盖/连接保留 checkbox
+
+每个 group 的 pin 按钮左边显示两个 checkbox：`[覆盖☑] [连接☑]`。
+
+- 覆盖☑ 取消时：该 group 所有星区显示为候选（只读，无操作按钮）。勾回时恢复原样（纯视觉，不改数据）。
+- 连接☑ 取消时：连接的 `+/×` 按钮不可操作。勾回时恢复。
+- 连接双向生效：两个 group 任一方 `connectionRetainEnabled` 即显示连接 pill。
+- ConfirmBar 的保留 checkbox 作为三态总控，联动所有 group。
+
 ## Coverage / Candidate 规则
 
 ### 范围来源
@@ -163,8 +172,7 @@ coverage/candidate 使用当前 group 的 `jumpRange`。
 - 当前 group anchor 的 `jumpRange` 内
 - 不是当前 group active coverage
 - 不是任意 hub anchor
-- 有玩家空间站的 sector
-- 或 baseline coverage 的可恢复项
+- 包含有玩家空间站和无玩家空间站的 sector
 
 非玩家星区可作为 hub anchor / 连接对象，但不作为玩家 coverage 默认归属问题处理。
 
@@ -173,14 +181,14 @@ coverage/candidate 使用当前 group 的 `jumpRange`。
 修改 group jumpRange 时，采用 `MapBindingSectorGroup` 的覆盖联动语义：
 
 - jumpRange 增大：
-  - 新范围内符合条件的玩家星区自动加入当前 group active coverage
-  - 显示为金色 coverage pill
+  - 仅新增跳数层（`prevRange < distance <= range`）内符合条件的玩家星区自动加入 coverage
+  - 不在其他 group active coverage 中
+  - 原有跳数层的覆盖和候选保持不变
 - jumpRange 缩小：
-  - 超出范围的非 baseline coverage 从当前 group active coverage 移出
-  - baseline coverage 超出范围仍显示为候选/可恢复项
-  - 候选超出范围后不显示
-- jumpRange 改回覆盖 baseline coverage 时：
-  - baseline coverage 可重新进入 active coverage
+  - 超出范围的 coverage 从 active coverage 移出
+  - 若仍符合候选展示条件则显示为候选，否则不显示
+- jumpRange 改回覆盖时，普通候选可通过 `+` 重新加入 active coverage
+- baseline 不改变 jumpRange 缩小时的移出规则，只给仍存在的 baseline coverage pill 增加粗边框
 
 修改 coverage jumpRange 不影响连接。
 
@@ -191,10 +199,9 @@ candidate 可以多 group 共存，active coverage 排他。
 当 sector S 在 group A 中为 active coverage，同时在 group B 中作为 candidate：
 - group B 中 S 显示半金 candidate pill
 - 按钮显示 `→`
-- 点击 `→` 后，S 转入 group B active coverage
-- group A 中：
-  - 若 S 是 baseline coverage，保留为可恢复候选
-  - 若 S 是非 baseline coverage，则从 active coverage 移出；若仍在 group A jumpRange 内，显示为候选
+- 点击 `→` 后，S 转入 group B active coverage，从 group A active coverage 移出
+- group A 中 S 变为常规候选（若仍在 jumpRange 内）
+- baseline 不改变转移后的保留/恢复规则
 
 如果 S 只是其他 group candidate，不显示 `→`，显示普通 `+`。
 
@@ -211,8 +218,9 @@ hub anchor 统一作为绿色连接 pill 显示。
 显示与操作：
 - `connectedGroupIds` 包含目标 group id → 绿色 active connected pill，按钮 `×`
 - 5 跳内但未 connected → 绿色 candidate connected pill，按钮 `+`
-- 点击 `+` → 加入 `connectedGroupIds`
-- 点击 `×` → 从 `connectedGroupIds` 移除
+- 点击 `+` 直接把目标 group id 加入 `connectedGroupIds`
+- 点击 `×` 直接从 `connectedGroupIds` 移除目标 group id
+- [计算] 输入直接使用编辑后的 `connectedGroupIds`
 
 connection 不使用 baseline 行为，不使用 excluded/default-off 字段。
 

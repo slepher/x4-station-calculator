@@ -197,10 +197,6 @@ function onOverlayClick(e: MouseEvent) {
         </button>
       </div>
 
-      <div v-if="!searchQuery" class="hub-add-menu-hint">
-        {{ t('map.save_coord_search_placeholder') }}
-      </div>
-
       <div v-if="searchQuery && displayedItems.length === 0" class="hub-add-menu-empty">
         {{ t('map.binding_no_unbound_sectors') }}
       </div>
@@ -225,7 +221,6 @@ function onOverlayClick(e: MouseEvent) {
               {{ item.hasPlayerStation ? '●' : '○' }}
             </span>
             <span class="sector-name">{{ item.sectorName }}</span>
-            <span v-if="item.sectorName !== item.rawSectorName" class="sector-raw-name">{{ item.rawSectorName }}</span>
             <span class="hub-add-menu-actions">
               <button
                 v-if="!item.isAnchor"
@@ -277,9 +272,6 @@ function onOverlayClick(e: MouseEvent) {
   @apply absolute right-6 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200;
 }
 
-.hub-add-menu-hint {
-  @apply px-4 py-2 text-xs text-slate-500 text-center;
-}
 
 .hub-add-menu-empty {
   @apply px-4 py-2 text-xs text-slate-500 text-center;
@@ -309,9 +301,6 @@ function onOverlayClick(e: MouseEvent) {
   @apply truncate;
 }
 
-.sector-raw-name {
-  @apply ml-1 shrink-0 text-xs text-slate-500;
-}
 
 .hub-add-menu-actions {
   @apply ml-auto flex items-center gap-1 shrink-0;

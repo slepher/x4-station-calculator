@@ -45,14 +45,11 @@
 
 - 若当前页面显示已确认 binding group，则该 store-derived 结果是基线
 - 若当前页面显示刚计算出的 draft 结果，则该 draft 结果是基线
-- 进入编辑态时快照 group anchor、coverage、connected、isPinned、jumpRange 等
+- 进入编辑态时快照 group anchor、coverage、connected、isPinned、jumpRange 等，用于 [取消] 恢复和 UI 标记判断
 - baseline 在 UI 上仅用边框宽度区分
 - baseline 不再决定 x/+ 行为
-- baseline 的核心作用是 coverage 可恢复：
-  - baseline coverage 被其他 group 获取后，不从当前 group 的历史集合中丢失
-  - 其他 group 后续移除该 sector 时，若当前 group jumpRange 仍覆盖它，应可恢复为当前 group 范围星区
-  - baseline coverage 因当前 group jumpRange 缩小而超出范围时，仍留在界面中
-  - jumpRange 改回覆盖它时，可重新进入当前 group 范围
+- baseline coverage 现在只有 UI 展示功能：只标记“进入编辑前已经在该 group active coverage 中”的 pill，不提供恢复/历史保留语义
+- baseline coverage 被其他 group 获取、被 `×` 移出或因 jumpRange 缩小超出范围后，可按普通 candidate/coverage 规则显示或消失，不需要额外恢复
 - connection 不需要 baseline 恢复语义；连接对象始终存在，且可操作范围固定 5 跳
 
 ### 5. `excludedDefaultAssignmentSectorMacros`
@@ -102,8 +99,8 @@ excludedDefaultAssignmentSectorMacros: string[]
 修改 group `jumpRange` 时，coverage/candidate 的联动采用当前 `MapBindingSectorGroup` 的 jumpRange 语义：
 
 - jumpRange 增大：新范围内符合条件的玩家星区自动进入当前 group coverage，显示为金色范围 pill
-- jumpRange 缩小：超出新范围的非 baseline coverage 从当前 group active coverage 移出；若仍在其它展示来源中则显示为候选，否则不显示
-- baseline coverage 超出新范围时仍保留在界面中，显示为可恢复候选；jumpRange 改回覆盖它时可重新进入范围
+- jumpRange 缩小：超出新范围的 coverage 从当前 group active coverage 移出；若仍符合候选展示条件则显示为候选，否则不显示
+- baseline 不改变 jumpRange 缩小时的移出规则；跳数改回后，该 sector 只按普通候选 `+` 重新加入
 - 非玩家 coverage 不因为玩家归属规则被加入 `excludedDefaultAssignmentSectorMacros`
 - 修改 coverage jumpRange 不增删连接，不影响绿色连接 pill 的可见性
 
@@ -119,8 +116,9 @@ excludedDefaultAssignmentSectorMacros: string[]
 - active coverage 同一时间只能属于一个 group
 - 如果 sector S 已是其他 group 的 active coverage，在当前 group 中仍可显示为候选，按钮显示 `→`
 - 点击 `→`：S 转入当前 group active coverage；原 group 中：
-  - 若 S 是 baseline coverage，则保留为可恢复候选/历史项
-  - 若 S 是非 baseline coverage，则从原 group active coverage 移出；若仍在原 group jumpRange 内，显示为候选
+  - S 从原 group active coverage 移出
+  - 若仍在原 group jumpRange 内，按普通 candidate 显示；否则不显示
+  - baseline 只影响原本存在的 coverage pill 边框，不影响转移后的保留/恢复
 - 如果 S 只是其他 group 的 candidate，不显示 `→`，仍显示普通 `+`
 
 ### 8. 连接星区行为
@@ -191,9 +189,9 @@ Col 3 card 已覆盖所有玩家星区；本次修改的是每张 card 的 optio
 2. [添加] 按钮在编辑态可见，点击弹出 hub 选择菜单；无搜索列玩家星区，搜索时遍历全地图 sector；可选择非玩家星区作为新 hub；已是 hub anchor 的星区不可重复添加
 3. 新增 hub draft 默认 unpinned 且可删除；baseline group 只能 unpin，不能真正删除
 4. 编辑态不再显示三 tab；同一个 jump row 中混排金色范围、半金候选、绿色连接 pill
-5. baseline 仅用粗边框区分，并作为 coverage 恢复来源；不再决定按钮行为
+5. baseline 仅用粗边框区分，不作为 coverage 恢复来源，也不决定按钮行为
 6. 范围星区 `×` 后变候选，候选 `+` 后变范围；若候选来自其他 group active coverage，按钮显示 `→` 并执行转入
-7. 修改 group jumpRange 时，范围/候选联动采用 MapBinding 的 jumpRange 语义；baseline coverage 超出范围仍保留可恢复，跳数改回后可重新进入范围
+7. 修改 group jumpRange 时，范围/候选联动采用 MapBinding 的 jumpRange 语义；baseline 只影响仍存在 coverage pill 的粗边框
 8. hub anchor 作为绿色连接 pill；5 跳内未连接显示 `+`，已连接显示 `×`
 9. 连接只由 `connectedGroupIds` 表达，不使用 `excludedDefaultConnectedGroupIds`
 10. 非玩家星区 coverage 参与计算时保留，不进入 `excludedDefaultAssignmentSectorMacros`

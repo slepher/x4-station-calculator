@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import fixture from '../../fixtures/auto-group/save_009_minimal.json'
-import { groupCleanSlate, groupIncremental, applyAbsorbToResult, applyStandaloneToResult, applyBridgePlanToDraft, buildBridgePlanOptions, type AutoGroupResult, type GroupDraftInfo } from '@/store/logic/autoGroup'
+import { groupCleanSlate, groupIncremental, applyAbsorbToResult, applyStandaloneToResult, applyBridgePlanToDraft, buildBridgePlanOptions, collectConnectedComponents, type AutoGroupResult, type GroupDraftInfo } from '@/store/logic/autoGroup'
 import { buildSectorGraphFromMaps } from '@/store/logic/saveBindingUtils'
 import type { SaveArchive, PlayerStationEntry } from '@/types/saveArchive'
 import type { X4Module } from '@/types/x4'
@@ -428,7 +428,6 @@ describe('autoGroup - interactive applyStandalone', () => {
           connectedGroupIds: [],
           isNew: true,
           excludedDefaultAssignmentSectorMacros: [],
-          excludedDefaultConnectedGroupIds: [],
           isPinned: false
         },
         {
@@ -441,7 +440,6 @@ describe('autoGroup - interactive applyStandalone', () => {
           connectedGroupIds: [],
           isNew: true,
           excludedDefaultAssignmentSectorMacros: [],
-          excludedDefaultConnectedGroupIds: [],
           isPinned: false
         }
       ],
@@ -516,7 +514,6 @@ describe('autoGroup - bridge adoption', () => {
           connectedGroupIds: [],
           isNew: true,
           excludedDefaultAssignmentSectorMacros: [],
-          excludedDefaultConnectedGroupIds: [],
           isPinned: false
         },
         {
@@ -529,7 +526,6 @@ describe('autoGroup - bridge adoption', () => {
           connectedGroupIds: [],
           isNew: true,
           excludedDefaultAssignmentSectorMacros: [],
-          excludedDefaultConnectedGroupIds: [],
           isPinned: false
         }
       ],
@@ -611,7 +607,6 @@ describe('autoGroup - bridge adoption', () => {
         connectedGroupIds: [],
         isNew: true,
         excludedDefaultAssignmentSectorMacros: [],
-          excludedDefaultConnectedGroupIds: [],
           isPinned: false
       },
       {
@@ -624,7 +619,6 @@ describe('autoGroup - bridge adoption', () => {
         connectedGroupIds: [],
         isNew: true,
         excludedDefaultAssignmentSectorMacros: [],
-          excludedDefaultConnectedGroupIds: [],
           isPinned: false
       },
       {
@@ -637,7 +631,6 @@ describe('autoGroup - bridge adoption', () => {
         connectedGroupIds: [],
         isNew: true,
         excludedDefaultAssignmentSectorMacros: [],
-          excludedDefaultConnectedGroupIds: [],
           isPinned: false
       }
     ]
@@ -664,5 +657,35 @@ describe('autoGroup - bridge adoption', () => {
     expect(plans.length).toBeGreaterThan(0)
     expect(plans[0]!.connectedComponentCount).toBe(2)
     expect(plans[0]!.units.map((unit) => unit.selectedSectorMacro)).toContain('B')
+  })
+
+  it('bridge plan uses min distance to ANY group in component, not just first', () => {
+    // Component 0: group A (anchor=far) connected to group B (anchor=near) via MST (dist=3)
+    // Component 1: group D (anchor=d)
+    // Bridge unit X can reach B (dist=1) and D (dist=1), but NOT A (dist=5)
+    // Bug: component node uses first group A's anchor → dist(X,component_0)=5 > bridgeRange=4 → no edge
+    // Fix: should use min distance → dist(X,B)=1 ≤ 4 → edge exists → solo plan valid
+    const groups: GroupDraftInfo[] = [
+      { id: 'gA', name: 'A', sectorMacro: 'A', jumpRange: 2, originalJumpRange: 2, coverageSectorMacros: [], connectedGroupIds: ['gB'], excludedDefaultAssignmentSectorMacros: [], isNew: true, isPinned: false },
+      { id: 'gB', name: 'B', sectorMacro: 'B', jumpRange: 2, originalJumpRange: 2, coverageSectorMacros: [], connectedGroupIds: ['gA'], excludedDefaultAssignmentSectorMacros: [], isNew: true, isPinned: false },
+      { id: 'gD', name: 'D', sectorMacro: 'D', jumpRange: 2, originalJumpRange: 2, coverageSectorMacros: [], connectedGroupIds: [], excludedDefaultAssignmentSectorMacros: [], isNew: true, isPinned: false },
+    ]
+
+    const sectorGraph: Record<string, string[]> = {
+      A: ['m1'], m1: ['A', 'm2'], m2: ['m1', 'm3'], m3: ['m2', 'B'],
+      B: ['m3', 'X'], X: ['B', 'D'], D: ['X'],
+    }
+    const sectorClusterMap: Record<string, string> = {
+      A: 'cA', m1: 'c1', m2: 'c2', m3: 'c3', B: 'cB', X: 'cX', D: 'cD'
+    }
+    const playerSectorMacros = ['A', 'B', 'D', 'X']
+    // Hub score for X = 5000
+    const sectorHubMap = new Map([['X', [{ containerCap: 0, prodLines: 0, qualified: false, score: 5000, stationCode: '', stationMacro: '', isPureHub: false }]]])
+
+    const plans = buildBridgePlanOptions(groups, playerSectorMacros, sectorHubMap, sectorGraph, sectorClusterMap, 4)
+
+    const zsPlans = plans.filter(p => p.units.length === 1 && p.units[0]!.selectedSectorMacro === 'X')
+    expect(zsPlans.length).toBeGreaterThan(0)
+    expect(zsPlans[0]!.connectedComponentCount).toBe(2)
   })
 })
