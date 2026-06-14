@@ -100,7 +100,7 @@ function buildUnifiedPills(group: GroupDraftInfo): Map<number, UnifiedPillEntry[
         action: canEdit && group.coverageRetainEnabled ? 'remove' : null
       })
     }
-    if (d.distance <= group.jumpRange && !allAnchorSectors.has(d.sectorMacro) && props.editable) {
+    if (d.distance <= group.jumpRange && !allAnchorSectors.has(d.sectorMacro) && props.editable && group.isPinned && group.coverageRetainEnabled) {
       // Candidate pill (semi-gold) — for covered sectors, shown only when retain off
       const isOtherCoverage = otherActiveCoverage.has(d.sectorMacro)
       if (!byJump.has(d.distance)) byJump.set(d.distance, [])
