@@ -1465,7 +1465,9 @@ export function applyStandaloneToResult(
   occupied.add(sectorMacro)
 
 
-  const groupId = `auto_${crypto.randomUUID()}`
+  // Reuse existing standalone group ID if one already exists for this sector
+  const existingGroup = result.groups.find((g) => g.sectorMacro === sectorMacro)
+  const groupId = existingGroup ? existingGroup.id : `auto_${crypto.randomUUID()}`
   const allSectors = getCoverageSectors(sectorMacro, prefJumpRange, sectorGraph, sectorClusterMap)
 
   const coverage = allSectors

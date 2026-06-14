@@ -228,8 +228,8 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     set: (name: string) => {
       if (draftBinding.value) {
         draftBinding.value.bindingName = name
-        draftBinding.value.updatedAt = Date.now()
-      }
+    draftBinding.value.updatedAt = Date.now()
+  }
     }
   })
   const isDirty = computed(() => serializeBinding(draftBinding.value) !== lastSavedDraftSnapshot.value)
@@ -661,14 +661,24 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     if (!draftBinding.value) return
 
     const existingIds = new Set(draftBinding.value.groups.map((g) => g.id))
+    // Also map by sectorMacro for matching standalone groups that changed UUID
+    const existingBySector = new Map<string, string>()
+    for (const g of draftBinding.value.groups) {
+      if (g.sectorMacro) existingBySector.set(g.sectorMacro, g.id)
+    }
     const createdIds = new Set<string>()
 
     for (const draft of drafts) {
-      if (existingIds.has(draft.id)) {
-        updateGroup(gameGuid, draft.id, {
+      // Match by UUID first, then by sectorMacro
+      let targetId = existingIds.has(draft.id) ? draft.id : undefined
+      if (!targetId && draft.sectorMacro) {
+        targetId = existingBySector.get(draft.sectorMacro)
+      }
+      if (targetId) {
+        updateGroup(gameGuid, targetId, {
           jumpRange: draft.jumpRange
         })
-        if (draft.sectorMacro && draft.coverageSectorMacros.length > 0) {
+        if (draft.sectorMacro) {
           const entries = buildCoverageEntries(
             draft.sectorMacro,
             draft.coverageSectorMacros,
@@ -677,7 +687,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
           )
           bindSectorGroup({
             gameGuid,
-            sectorGroupId: draft.id,
+            sectorGroupId: targetId,
             sectorMacro: draft.sectorMacro,
             jumpRange: draft.jumpRange,
             coverageSectorMacros: entries
@@ -685,7 +695,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
           if (draft.hubStationCode) {
             upsertTradeStation({
               gameGuid,
-              groupId: draft.id,
+              groupId: targetId,
               saveStationCode: draft.hubStationCode,
               name: draft.name
             })
@@ -710,7 +720,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
               if (bestCode) {
                 upsertTradeStation({
                   gameGuid,
-                  groupId: draft.id,
+                  groupId: targetId,
                   saveStationCode: bestCode,
                   name: draft.name
                 })
@@ -718,7 +728,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
             }
           }
         }
-        createdIds.add(draft.id)
+        createdIds.add(targetId)
       } else {
         // Use draft UUID directly so connectedGroupIds don't need translation
         const group = createDefaultGroup(draft.name, draftBinding.value!.groups.length)
@@ -794,6 +804,28 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
       for (const targetId of draft.connectedGroupIds) {
         if (createdIds.has(targetId) || existingIds.has(targetId)) {
           setGroupConnection(gameGuid, draft.id, targetId, true)
+        }
+      }
+    }
+
+    // Remove groups no longer in the drafts
+    draftBinding.value.groups = draftBinding.value.groups.filter((g) => createdIds.has(g.id))
+
+    // Global reconciliation: reassign all stationPlans based on final group coverage
+    if (draftBinding.value) {
+      const sectorToGroup = new Map<string, string>()
+      for (const group of draftBinding.value.groups) {
+        if (group.sectorMacro) sectorToGroup.set(group.sectorMacro, group.id)
+        for (const entry of group.coverageSectorMacros) {
+          if (!sectorToGroup.has(entry.ref)) sectorToGroup.set(entry.ref, group.id)
+        }
+      }
+      for (const plan of draftBinding.value.stationPlans) {
+        if (plan.sectorMacro) {
+          const newGroupId = sectorToGroup.get(plan.sectorMacro) ?? null
+          if (plan.groupId !== newGroupId) {
+            plan.groupId = newGroupId
+          }
         }
       }
     }

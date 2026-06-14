@@ -208,7 +208,18 @@ coverage/candidate 使用当前 group 的 `jumpRange`。
 
 修改 coverage jumpRange 不影响连接。
 
-### 跨 group 获取
+### 确认写入规则
+
+`createAutoGroups` 按 `sectorMacro` 匹配已有 group（UUID 优先，fallback 到 sectorMacro），避免 standalone 重建时 UUID 变化导致重复。处理完所有 draft 后：
+
+1. 移除不在 draft 中的废弃 group
+2. 按最终 groups 的 coverage 重建 `sector → groupId` 映射
+3. 所有 `stationPlans` 按 sector 重新分配到对应 group
+4. standalone/bridge group 无 `hubStationCode` 时，按 hub score 从 archive 选最优站
+
+### standalone 组 ID 复用
+
+`applyStandaloneToResult` 创建 standalone group 时，若 draft 中已有同 `sectorMacro` 的 group，复用其 ID，防止多次独立成组产生重复 group。
 
 candidate 可以多 group 共存，active coverage 排他。
 
