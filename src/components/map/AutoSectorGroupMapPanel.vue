@@ -98,6 +98,7 @@ const activeTab = ref<'hub' | 'allocation' | 'tradeStation'>('hub')
 
 const isEditMode = () => calculationMode.value === 'edit'
 const canSwitchToAllocation = () => !isEditMode()
+const canSwitchToTradeStation = () => !isEditMode()
 
 function onCalculate() {
   runCalculationFromEditInput()
@@ -189,6 +190,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
             :disabled="!canSwitchToAllocation()" :title="canSwitchToAllocation() ? '' : t('auto_sector.edit_overlay_hint')"
             @click="activeTab = 'allocation'">{{ t('auto_sector.allocation_tab') }}</button>
           <button type="button" class="tab-btn" :class="{ active: activeTab === 'tradeStation' }"
+            :disabled="!canSwitchToTradeStation()" :title="canSwitchToTradeStation() ? '' : t('auto_sector.edit_overlay_hint')"
             @click="activeTab = 'tradeStation'">{{ t('auto_sector.trade_station_tab') }}</button>
         </div>
 

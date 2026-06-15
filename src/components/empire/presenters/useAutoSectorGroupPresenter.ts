@@ -779,12 +779,13 @@ function handleQuickCalculate() {
   runCalculationFromEditInput()
 }
 
-function computeTradeStationCandidates(): Record<string, TradeStationCandidate[]> {
+const tradeStationCandidates = computed(() => {
   const archive = saveStore.selectedArchive
-  if (!archive || !autoGroupResult.value) return {}
+  const result = autoGroupResult.value
+  if (!archive || !result) return {} as Record<string, TradeStationCandidate[]>
 
   const candidates: Record<string, TradeStationCandidate[]> = {}
-  for (const group of autoGroupResult.value.groups) {
+  for (const group of result.groups) {
     if (!group.sectorMacro) continue
     const stations = getPlayerStationsInSector(archive, group.sectorMacro)
     if (stations.length === 0) continue
@@ -805,9 +806,7 @@ function computeTradeStationCandidates(): Record<string, TradeStationCandidate[]
     )
   }
   return candidates
-}
-
-const tradeStationCandidates = computed(computeTradeStationCandidates)
+})
 
 function applyTradeStationDefaults() {
   const sel: Record<string, TradeStationSelection> = { ...selectedTradeStations.value }
