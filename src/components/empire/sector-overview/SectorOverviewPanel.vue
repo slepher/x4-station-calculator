@@ -157,6 +157,7 @@ function runAutoGroup() {
     const playerSectorMacros = getPlayerSectorMacrosFromArchive()
     if (!hasUngroupedPlayerSectors(binding.groups, playerSectorMacros)) {
       autoGroupConfirmed.value = true
+      calcBaselinePillState.value = null
       setAutoGroupResult(buildStoreGroups(binding.groups, playerSectorMacros))
       return
     }
@@ -167,6 +168,7 @@ function runAutoGroup() {
     )
     if (result.assignments.length === 0) {
       autoGroupConfirmed.value = true
+      calcBaselinePillState.value = null
       setAutoGroupResult(buildStoreGroups(binding.groups, result.playerSectorMacros))
       return
     }
@@ -727,6 +729,7 @@ function handleConfirm() {
   liveStore.syncAllBindingStationsToStateMap()
   liveStore.syncLiveFlowMap()
   autoGroupConfirmed.value = true
+  calcBaselinePillState.value = null
   const binding = saveBindingStore.activeBinding
   if (binding && binding.groups.length > 0) {
     setAutoGroupResult(buildStoreGroups(binding.groups, result.playerSectorMacros))
@@ -856,6 +859,7 @@ const coverageRetainIndeterminate = computed(() => {
         :sector-cluster-map="sectorGraphInfo.sectorClusterMap"
         :player-sector-macros="autoGroupResult?.playerSectorMacros ?? []"
         :editable="calculationMode === 'edit'"
+        :diff-enabled="!autoGroupConfirmed"
         :baseline-coverage-by-group-id="
           calculationMode === 'edit' ? editSnapshot?.coverageByGroupId : calcBaselinePillState?.coverageByGroupId
         "

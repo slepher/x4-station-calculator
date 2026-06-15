@@ -14,6 +14,7 @@ const props = defineProps<{
   sectorClusterMap: Record<string, string>
   playerSectorMacros: string[]
   editable: boolean
+  diffEnabled: boolean
   baselineCoverageByGroupId?: Record<string, string[]>
   baselineConnectedGroupIdsByGroupId?: Record<string, string[]>
 }>()
@@ -165,7 +166,7 @@ function buildUnifiedPills(group: GroupDraftInfo): Map<number, UnifiedPillEntry[
   }
 
   // In result mode: add removed baseline coverage/connection pills (dashed)
-  if (!props.editable && props.baselineCoverageByGroupId) {
+  if (!props.editable && props.diffEnabled && props.baselineCoverageByGroupId) {
     const currentCov = new Set(group.coverageSectorMacros)
     const currentConn = new Set(group.connectedGroupIds)
     const baselineCovEntries = props.baselineCoverageByGroupId[group.id] ?? []
@@ -357,9 +358,9 @@ function onPillAction(entry: UnifiedPillEntry, groupId: string) {
                   'pill--coverage': entry.type === 'coverage',
                   'pill--candidate': entry.type === 'candidate',
                   'pill--connected': entry.type === 'connected',
-                  'pill--baseline': entry.baseline,
-                  'pill--new': entry.wasInBaseline || (!entry.baseline && !entry.removed && entry.type !== 'candidate' && entry.action !== 'add'),
-                  'pill--removed': entry.removed
+                  'pill--baseline': props.diffEnabled && entry.baseline,
+                  'pill--new': props.diffEnabled && (entry.wasInBaseline || (!entry.baseline && !entry.removed && entry.type !== 'candidate' && entry.action !== 'add')),
+                  'pill--removed': props.diffEnabled && entry.removed
                 }"
               >
                 <span class="pill-dot" :class="entry.hasPlayerStation ? 'pill-dot--filled' : 'pill-dot--empty'"/>
