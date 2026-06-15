@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   prefJumpRange: number
   bridgeSearchJumpRange: number
   prefThreshold: number
@@ -13,7 +13,10 @@ const props = defineProps<{
   coverageRetainEnabled: boolean
   bridgeRetainIndeterminate: boolean
   coverageRetainIndeterminate: boolean
-}>()
+  view?: 'map' | 'live'
+}>(), {
+  view: 'live'
+})
 
 const emit = defineEmits<{
   (e: 'update:prefJumpRange', value: number): void
@@ -56,7 +59,7 @@ function onCoverageRetainChange(e: Event) {
 </script>
 
 <template>
-  <div class="confirm-bar">
+  <div class="confirm-bar" :class="{ 'confirm-bar--map': view === 'map' }">
     <div class="bar-row">
       <div class="bar-left">
         <!-- 桥接 + 保留 -->
@@ -220,5 +223,30 @@ function onCoverageRetainChange(e: Event) {
 
 .add-btn {
   @apply bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-600/30;
+}
+
+/* === Map compact styles === */
+.confirm-bar--map {
+  @apply gap-1 p-1;
+}
+
+.confirm-bar--map .param-field {
+  @apply px-1 py-0.5 gap-0.5;
+}
+
+.confirm-bar--map .bar-label {
+  @apply text-[10px];
+}
+
+.confirm-bar--map .bar-select {
+  @apply h-5 text-[11px] px-1;
+}
+
+.confirm-bar--map .bar-select--narrow {
+  @apply w-10;
+}
+
+.confirm-bar--map .bar-btn {
+  @apply px-1.5 py-0.5 text-[11px];
 }
 </style>

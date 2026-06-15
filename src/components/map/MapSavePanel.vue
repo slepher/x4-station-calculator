@@ -9,7 +9,7 @@ import MapSaveBreadcrumb from './MapSaveBreadcrumb.vue'
 import MapSaveArchiveList from './MapSaveArchiveList.vue'
 import MapSaveCategoryMenu from './MapSaveCategoryMenu.vue'
 import MapSaveCoordList from './MapSaveCoordList.vue'
-import MapBindingSectorGroup from './MapBindingSectorGroup.vue'
+import AutoSectorGroupMapPanel from './AutoSectorGroupMapPanel.vue'
 import MapBindingStation from './MapBindingStation.vue'
 import type { SaveArchive, SavePoiCategory, SavePoiOverlayItem } from '@/types/saveArchive'
 import type { StationPlan } from '@/types/x4'
@@ -271,7 +271,7 @@ watch([layer, selectedBindingGameGuid, selectedSectorGroupId, () => props.open],
         @focus-poi="onPoiFocus"
       />
 
-      <MapBindingSectorGroup
+      <AutoSectorGroupMapPanel
         v-else-if="layer === 'binding-sector' && selectedBindingGameGuid"
         :game-guid="selectedBindingGameGuid"
         @select-group="onSelectBindingGroup"

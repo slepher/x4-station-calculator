@@ -667,6 +667,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
       if (g.sectorMacro) existingBySector.set(g.sectorMacro, g.id)
     }
     const createdIds = new Set<string>()
+    const targetIdsInDraftOrder: string[] = []
 
     for (const draft of drafts) {
       // Match by UUID first, then by sectorMacro
@@ -729,12 +730,14 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
           }
         }
         createdIds.add(targetId)
+        targetIdsInDraftOrder.push(targetId)
       } else {
         // Use draft UUID directly so connectedGroupIds don't need translation
         const group = createDefaultGroup(draft.name, draftBinding.value!.groups.length)
         group.id = draft.id
         draftBinding.value!.groups.push(group)
         createdIds.add(group.id)
+        targetIdsInDraftOrder.push(group.id)
 
         if (draft.sectorMacro) {
           const entries = buildCoverageEntries(
@@ -810,6 +813,9 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
 
     // Remove groups no longer in the drafts
     draftBinding.value.groups = draftBinding.value.groups.filter((g) => createdIds.has(g.id))
+    const groupById = new Map(draftBinding.value.groups.map((group) => [group.id, group]))
+    draftBinding.value.groups = targetIdsInDraftOrder.map((id) => groupById.get(id)!)
+    draftBinding.value.groups.forEach((group, order) => { group.order = order })
 
     // Global reconciliation: reassign all stationPlans based on final group coverage
     if (draftBinding.value) {

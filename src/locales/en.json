@@ -169,6 +169,11 @@
     "entered_other_coverage": "Entered other group coverage, cannot re-pin",
     "confirm": "Confirm"
   },
+  "auto_sector": {
+    "hub_tab": "Hub",
+    "allocation_tab": "Allocation",
+    "edit_overlay_hint": "Editing in progress, allocation panel is temporarily unavailable"
+  },
   "sectorManagement": {
     "title": "Sector Management",
     "new_sector_placeholder": "New sector name",
@@ -477,6 +482,7 @@
     "binding_view_detail": "View Detail",
     "binding_connected_sectors": "Connected Sectors",
     "binding_edit": "Edit",
+    "binding_enter_station": "Enter Station Binding",
     "binding_delete": "Delete",
     "binding_delete_sector_confirm": "Delete this empire sector and clean related bindings?",
     "binding_reorder_sector": "Reorder sector",

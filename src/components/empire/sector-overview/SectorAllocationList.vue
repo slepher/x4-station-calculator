@@ -5,19 +5,23 @@ import type { SectorAssignment, GroupDraftInfo, BridgePlanOption, BridgePlanUnit
 import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
 import type { X4MapCluster, X4MapSector } from '@/types/x4'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   assignments: SectorAssignment[]
   bridgePlans: BridgePlanOption[]
   groups: GroupDraftInfo[]
   maps: { clusters: Record<string, X4MapCluster>; sectors: Record<string, X4MapSector> } | null | undefined
   stationCounts: Record<string, number>
   disabled?: boolean
-}>()
+  view?: 'map' | 'live'
+}>(), {
+  view: 'live'
+})
 
 const emit = defineEmits<{
   (e: 'select-option', sectorMacro: string, optionIndex: number): void
   (e: 'select-bridge-plan', planId: string): void
   (e: 'select-bridge-center', planId: string, unitId: string, sectorMacro: string): void
+  (e: 'focus-sector', sectorMacro: string): void
 }>()
 
 const { t, te } = useI18n()
@@ -100,7 +104,7 @@ const sortedAssignments = computed(() => {
 </script>
 
 <template>
-  <div class="allocation-list">
+  <div class="allocation-list" :class="{ 'allocation-list--map': view === 'map' }">
     <div v-if="hasPendingBridgePlans" class="bridge-plan-list">
       <div class="bridge-plan-title">{{ t('sector.bridge_plans') }}</div>
       <div
@@ -126,13 +130,14 @@ const sortedAssignments = computed(() => {
             class="bridge-unit"
           >
             <div class="bridge-unit-title">
-              <span>{{ getUnitLabel(unit) }}</span>
+              <span @click="view === 'map' && unit.candidates[0] && emit('focus-sector', unit.candidates[0].sectorMacro)">{{ getUnitLabel(unit) }}</span>
             </div>
             <div v-if="unit.reaches.length > 0" class="bridge-unit-reaches">
               <span
                 v-for="reach in unit.reaches"
                 :key="reach.nodeId"
                 class="bridge-reach-pill"
+                @click="view === 'map' && emit('focus-sector', reach.sectorMacro)"
               >
                 {{ getReachDisplayName(reach.sectorMacro, reach.label) }} ({{ reach.jump }})
               </span>
@@ -145,7 +150,7 @@ const sortedAssignments = computed(() => {
                 class="bridge-sector-option"
                 :class="{ 'bridge-sector-option--selected': unit.selectedSectorMacro === candidate.sectorMacro }"
                 :disabled="disabled"
-                @click.stop="!disabled && emit('select-bridge-center', plan.id, unit.unitId, candidate.sectorMacro)"
+                @click.stop="!disabled && emit('select-bridge-center', plan.id, unit.unitId, candidate.sectorMacro); view === 'map' && emit('focus-sector', candidate.sectorMacro)"
               >
                 <span>{{ unit.selectedSectorMacro === candidate.sectorMacro ? '●' : '○' }}</span>
                 <span>{{ getSectorDisplayName(candidate.sectorMacro) }}</span>
@@ -175,7 +180,11 @@ const sortedAssignments = computed(() => {
         }"
       >
         <div class="card-header">
-          <span class="card-sector-name">{{ getSectorDisplayName(assignment.sectorMacro) }}</span>
+          <span
+            class="card-sector-name"
+            :class="{ 'cursor-pointer hover:text-sky-300': view === 'map' }"
+            @click="view === 'map' && emit('focus-sector', assignment.sectorMacro)"
+          >{{ getSectorDisplayName(assignment.sectorMacro) }}</span>
           <span class="card-station-count">{{ getStationCount(assignment.sectorMacro) }} {{ t('sector.stations_count') }}</span>
           <span v-if="assignment.status === 'auto'" class="card-badge badge-auto">{{ t('sector.auto_assigned') }}</span>
           <span v-else-if="assignment.status === 'uncertain_tie'" class="card-badge badge-uncertain">{{ t('sector.uncertain_tie') }}</span>
@@ -358,5 +367,34 @@ const sortedAssignments = computed(() => {
 
 .option-selected .option-label {
   @apply text-sky-200;
+}
+
+/* === Map compact styles === */
+.allocation-list--map .bridge-plan-card {
+  @apply p-2;
+}
+
+.allocation-list--map .bridge-unit {
+  @apply p-1.5;
+}
+
+.allocation-list--map .bridge-sector-option {
+  @apply text-[11px] py-0.5;
+}
+
+.allocation-list--map .allocation-card {
+  @apply p-2;
+}
+
+.allocation-list--map .card-header {
+  @apply gap-1;
+}
+
+.allocation-list--map .card-sector-name {
+  @apply text-xs;
+}
+
+.allocation-list--map .option-row {
+  @apply text-[11px] py-0.5;
 }
 </style>

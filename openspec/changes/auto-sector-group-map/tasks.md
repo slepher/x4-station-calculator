@@ -30,7 +30,7 @@
 - [ ] `SectorGroupList.vue` 新增 `view: 'map' | 'live'` prop，默认 `'live'`
 - [ ] `SectorGroupList.vue` map view 下：紧凑样式（pill 高度 22px，gap 4px，padding 8px）
 - [ ] `SectorGroupList.vue` map view 下：pill 点击 emit `focus-sector`（携带 sectorMacro）
-- [ ] `SectorGroupList.vue` map view 下：集成 `vuedraggable` 包裹 group cards
+- [x] `SectorGroupList.vue` map view 下：集成 `vuedraggable` 包裹 group cards
 - [ ] `SectorGroupList.vue` 支持完成态 group 进入 station binding 按钮，按钮图标保持旧 `MapBindingSectorGroup` 图标
 - [ ] `SectorGroupList.vue` 不再提供旧的单 group 编辑按钮
 - [ ] `SectorAllocationList.vue` 新增 `view: 'map' | 'live'` prop，默认 `'live'`
@@ -71,9 +71,9 @@
 
 ## 7. 排序持久化
 
-- [ ] 拖拽排序只更新 presenter 中 `groups` 数组顺序
-- [ ] `confirmAndWrite()` / `createAutoGroups()` 按 drafts 数组顺序保存 group
-- [ ] 不以 `order` 字段作为排序权威；如保存时必须写 `order`，仅按数组 index 写入兼容值
+- [x] 拖拽排序只更新 presenter 中 `groups` 数组顺序
+- [x] `confirmAndWrite()` / `createAutoGroups()` 按 drafts 数组顺序保存 group
+- [x] 不以 `order` 字段作为排序权威；如保存时必须写 `order`，仅按数组 index 写入兼容值
 
 ## 8. i18n
 

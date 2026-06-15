@@ -21,6 +21,7 @@ const {
   showHubAddMenu,
   autoGroupResult,
   autoGroupConfirmed,
+  canDragGroups,
   calculationMode,
   editSnapshot,
   calcBaselinePillState,
@@ -48,6 +49,7 @@ const {
   handleToggleRetainConnection,
   handleMasterBridgeRetain,
   handleMasterCoverageRetain,
+  handleReorderGroups,
   handleConfirm,
   triggerAutoGroup,
   handleUploadComplete,
@@ -103,6 +105,7 @@ defineExpose({ triggerAutoGroup })
         @add-hub="handleAddHubClick"
       />
       <SectorGroupList
+        :key="canDragGroups ? 'live-draft-draggable-groups' : 'live-static-groups'"
         :groups="autoGroupResult?.groups ?? []"
         :assignments="autoGroupResult?.assignments ?? []"
         :maps="gameDataMaps"
@@ -110,6 +113,7 @@ defineExpose({ triggerAutoGroup })
         :sector-cluster-map="sectorGraphInfo.sectorClusterMap"
         :player-sector-macros="autoGroupResult?.playerSectorMacros ?? []"
         :editable="calculationMode === 'edit'"
+        :draggable="canDragGroups"
         :diff-enabled="calculationMode === 'edit' || !autoGroupConfirmed"
         :baseline-coverage-by-group-id="
           calculationMode === 'edit' ? editSnapshot?.coverageByGroupId : calcBaselinePillState?.coverageByGroupId
@@ -125,6 +129,7 @@ defineExpose({ triggerAutoGroup })
         @delete-group="handleDeleteGroup"
         @toggle-retain-coverage="handleToggleRetainCoverage"
         @toggle-retain-connection="handleToggleRetainConnection"
+        @reorder-groups="handleReorderGroups"
       />
     </div>
 

@@ -29,13 +29,14 @@ const coverageRetainEnabled = ref(true)
 const showHubAddMenu = ref(false)
 const autoGroupResult = ref<AutoGroupResult | null>(null)
 const postBridgeBaseline = ref<AutoGroupResult | null>(null)
-const autoGroupConfirmed = ref(false)
+const autoGroupConfirmed = computed(() => liveStore.isAutoSectorGroupConfirmed(activeViewStore.activeBinding))
 const calculationMode = ref<'result' | 'edit'>('result')
 const editSnapshot = ref<{
   result: AutoGroupResult | null
   prefJumpRange: number
   bridgeSearchJumpRange: number
   prefThreshold: number
+  autoGroupConfirmed: boolean
   coverageByGroupId: Record<string, string[]>
   connectedGroupIdsByGroupId: Record<string, string[]>
 } | null>(null)
@@ -46,6 +47,17 @@ const calcBaselinePillState = ref<{
 } | null>(null)
 
 const gameDataMaps = computed(() => gameDataStore.maps)
+
+const canDragGroups = computed(() => {
+  if (!autoGroupResult.value) return false
+  if (autoGroupConfirmed.value) return false
+  if (calculationMode.value === 'edit') return true
+  return calculationMode.value === 'result'
+})
+
+function setAutoGroupConfirmed(confirmed: boolean) {
+  liveStore.setAutoSectorGroupConfirmed(activeViewStore.activeBinding, confirmed)
+}
 
 function getSectorDisplayName(macro: string): string {
   const maps = gameDataStore.maps
@@ -135,6 +147,7 @@ function hasUngroupedPlayerSectors(groups: BindingSectorGroup[], playerSectorMac
 function runAutoGroup() {
   const archive = saveStore.selectedArchive
   if (!archive || !archive.isValid) {
+    setAutoGroupConfirmed(false)
     setAutoGroupResult(null)
     return
   }
@@ -149,24 +162,26 @@ function runAutoGroup() {
   if (binding && binding.groups.length > 0) {
     const playerSectorMacros = getPlayerSectorMacrosFromArchive()
     if (!hasUngroupedPlayerSectors(binding.groups, playerSectorMacros)) {
-      autoGroupConfirmed.value = true
+      setAutoGroupConfirmed(true)
       calcBaselinePillState.value = null
       setAutoGroupResult(buildStoreGroups(binding.groups, playerSectorMacros))
       return
     }
+    setAutoGroupConfirmed(false)
     const result = groupIncremental(
       archive, binding.groups, gameDataStore.modulesByMacroId,
       sectorGraph, sectorClusterMap,
       { containerThreshold: prefThreshold.value }, prefJumpRange.value, bridgeSearchJumpRange.value
     )
     if (result.assignments.length === 0) {
-      autoGroupConfirmed.value = true
+      setAutoGroupConfirmed(true)
       calcBaselinePillState.value = null
       setAutoGroupResult(buildStoreGroups(binding.groups, result.playerSectorMacros))
       return
     }
     setAutoGroupResult(result)
   } else {
+    setAutoGroupConfirmed(false)
     const result = groupCleanSlate(
       archive, gameDataStore.modulesByMacroId, sectorGraph, sectorClusterMap,
       { containerThreshold: prefThreshold.value }, prefJumpRange.value, bridgeSearchJumpRange.value
@@ -208,7 +223,7 @@ function runCalculationFromEditInput() {
   const guid = activeViewStore.activeBinding
   const recalculateInput = buildRecalculateBaseGroups()
   if (!archive || !archive.isValid || !guid) return
-  autoGroupConfirmed.value = false
+  setAutoGroupConfirmed(false)
 
   // Capture E2 baseline from submitted data (respects retain toggles)
   const preCalcBaseline = recalculateInput
@@ -316,6 +331,7 @@ function handleEnterEdit() {
     prefJumpRange: prefJumpRange.value,
     bridgeSearchJumpRange: bridgeSearchJumpRange.value,
     prefThreshold: prefThreshold.value,
+    autoGroupConfirmed: autoGroupConfirmed.value,
     coverageByGroupId: Object.fromEntries(
       (result?.groups ?? []).map((g) => [g.id, [...g.coverageSectorMacros]])
     ),
@@ -330,6 +346,7 @@ function handleEnterEdit() {
   // Reset retain to defaults
   bridgeRetainEnabled.value = true
   coverageRetainEnabled.value = true
+  setAutoGroupConfirmed(false)
   calculationMode.value = 'edit'
 }
 
@@ -342,6 +359,7 @@ function handleCancelEdit() {
   bridgeSearchJumpRange.value = editSnapshot.value.bridgeSearchJumpRange
   prefThreshold.value = editSnapshot.value.prefThreshold
   nodeEnabled.value = true
+  setAutoGroupConfirmed(editSnapshot.value.autoGroupConfirmed)
   setAutoGroupResult(editSnapshot.value.result ? cloneAutoGroupResult(editSnapshot.value.result) : null)
   calculationMode.value = 'result'
   editSnapshot.value = null
@@ -711,6 +729,25 @@ function handleMasterCoverageRetain(enabled: boolean) {
   autoGroupResult.value = { ...result, groups, assignments: result.assignments }
 }
 
+function canReorderGroups(): boolean {
+  return canDragGroups.value
+}
+
+function handleReorderGroups(nextGroups: GroupDraftInfo[]) {
+  if (!canReorderGroups()) return
+  if (!autoGroupResult.value) return
+  const result = autoGroupResult.value
+  if (nextGroups.length !== result.groups.length) return
+
+  const currentById = new Map(result.groups.map((group) => [group.id, group]))
+  const nextIds = nextGroups.map((group) => group.id)
+  if (new Set(nextIds).size !== result.groups.length) return
+  if (nextIds.some((id) => !currentById.has(id))) return
+
+  const groups = nextIds.map((id) => currentById.get(id)!)
+  autoGroupResult.value = { ...result, groups, assignments: result.assignments }
+}
+
 function handleConfirm() {
   if (calculationMode.value === 'edit') return
   if (!autoGroupResult.value) return
@@ -721,17 +758,17 @@ function handleConfirm() {
   saveBindingStore.saveBinding()
   liveStore.syncAllBindingStationsToStateMap()
   liveStore.syncLiveFlowMap()
-  autoGroupConfirmed.value = true
   calcBaselinePillState.value = null
   const binding = saveBindingStore.activeBinding
   if (binding && binding.groups.length > 0) {
     setAutoGroupResult(buildStoreGroups(binding.groups, result.playerSectorMacros))
   }
+  setAutoGroupConfirmed(true)
   liveStore.clearAutoSectorGroupCheck()
 }
 
 function triggerAutoGroup() {
-  autoGroupConfirmed.value = false
+  setAutoGroupConfirmed(false)
   runAutoGroup()
   calculationMode.value = 'result'
   editSnapshot.value = null
@@ -847,6 +884,7 @@ return {
   showHubAddMenu,
   autoGroupResult,
   autoGroupConfirmed,
+  canDragGroups,
   calculationMode,
   editSnapshot,
   calcBaselinePillState,
@@ -875,6 +913,7 @@ return {
   handleToggleRetainConnection,
   handleMasterBridgeRetain,
   handleMasterCoverageRetain,
+  handleReorderGroups,
   handleConfirm,
   triggerAutoGroup,
   handleUploadComplete,

@@ -169,6 +169,11 @@
     "entered_other_coverage": "已进入其他组覆盖范围，无法重新固定",
     "confirm": "确定"
   },
+  "auto_sector": {
+    "hub_tab": "枢纽",
+    "allocation_tab": "分配方案",
+    "edit_overlay_hint": "编辑输入中，分配面板暂不可操作"
+  },
   "sectorManagement": {
     "title": "星区管理",
     "new_sector_placeholder": "输入星区名称",
@@ -476,6 +481,7 @@
     "binding_view_detail": "查看详情",
     "binding_connected_sectors": "连接星区",
     "binding_edit": "编辑",
+    "binding_enter_station": "进入空间站绑定",
     "binding_delete": "删除",
     "binding_delete_sector_confirm": "删除这个帝国星区并清理相关绑定？",
     "binding_reorder_sector": "调整星区顺序",

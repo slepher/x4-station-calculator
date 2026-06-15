@@ -116,6 +116,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   const liveFlowMap = shallowRef<StationDerivedMap | null>(null)
   const dirtyBindingStationIds = ref<DirtyBindingState>(null)
   const autoSectorGroupCheck = ref<AutoSectorGroupCheckFlag | null>(null)
+  const autoSectorGroupConfirmedByGameGuid = ref<Record<string, boolean>>({})
 
   function getPlayerSectorMacrosFromSelectedArchive(): string[] {
     const archive = selectedArchive.value
@@ -170,6 +171,19 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
 
   function clearAutoSectorGroupCheck(): void {
     autoSectorGroupCheck.value = null
+  }
+
+  function isAutoSectorGroupConfirmed(gameGuid: string | null | undefined): boolean {
+    if (!gameGuid) return false
+    return autoSectorGroupConfirmedByGameGuid.value[gameGuid] === true
+  }
+
+  function setAutoSectorGroupConfirmed(gameGuid: string | null | undefined, confirmed: boolean): void {
+    if (!gameGuid) return
+    autoSectorGroupConfirmedByGameGuid.value = {
+      ...autoSectorGroupConfirmedByGameGuid.value,
+      [gameGuid]: confirmed
+    }
   }
 
   function markAllDirty() {
@@ -2137,6 +2151,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     autoSectorGroupCheck,
     checkAutoSectorGroupCoverageForActiveBinding,
     clearAutoSectorGroupCheck,
+    isAutoSectorGroupConfirmed,
+    setAutoSectorGroupConfirmed,
     saveBinding,
     createStation,
     deleteStation,
