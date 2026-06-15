@@ -168,20 +168,6 @@ calcBaselinePillState = {
 | Coverage (金色) | 金色粗实线 | 金色普通实线 | 金色虚线，pill 保留不消失 |
 | Connected (绿色) | 绿色粗实线 | 绿色普通实线 | 绿色虚线，pill 保留不消失 |
 
-### 特殊场景：移除的 coverage 变成 hub 并被连接
-
-若 sector X 原为 group A 的 E2 基线 coverage，计算后 X 成为 hub 并作为 group A 的 connected：
-
-单个 split pill 左半虚线金色（removed coverage）、右半实线绿色（connected）：
-
-```
-┌──[虚线金色]──┬──[实线绿色]──┐
-│   Sector X   │   Hub Y      │
-└──────────────┴──────────────┘
-```
-
-CSS 实现：父容器 `overflow-hidden rounded-full`，左子元素 `rounded-l-full border-dashed border-amber`，右子元素 `rounded-r-full border-emerald`，各自有独立边框和背景。
-
 ### E2 基线注入流程
 
 ```
@@ -219,10 +205,6 @@ runCalculationFromEditInput()
 | new | `border-2` + `border-l-[3px] border-l-sky-400` | 算法新增 group |
 | baseline | 单线 | 已持久化 / 计算基线 group |
 | unpinned baseline | `border-slate-600/30`（原有样式） | 编辑态 unpinned baseline |
-
-#### Pill→Link 简化
-
-移除 coverage 变为 connected 时，不再显示 split pill，直接作为普通 connected pill 展示。
 
 ## SectorConfirmBar
 
@@ -271,7 +253,7 @@ runCalculationFromEditInput()
 
 ```ts
 interface UnifiedPillEntry {
-  type: 'coverage' | 'candidate' | 'connected' | 'split-removed-connected'
+  type: 'coverage' | 'candidate' | 'connected'
   macro: string
   jump: number
   baseline: boolean
@@ -292,8 +274,7 @@ interface UnifiedPillEntry {
 - group 连接保留关闭时，connected 显示但无 action。
 - connected pill 始终可见，不受保留状态影响隐藏。
 - 结果态 E2 基线中存在但计算结果中移除的 coverage/connected 以虚线 (`.pill--removed`) 保留展示。
-- 移除的 coverage 若变为 connected（split 场景），以 `.pill--split-removed-connected` 单 pill 左虚右实渲染。
-- baseline 粗实线在编辑态（E1）和结果态（E2）下均生效，来源分别为 `editSnapshot` 和 `calcBaselinePillState`。
+- baseline 在编辑态（E1）和结果态（E2）共用 `buildUnifiedPills()` 中的 `wasInBaseline` / `baseline` / `removed` 判定，视觉规范见上文 E1/E2 Diff 视觉规范。
 
 ## Coverage / Candidate 行为
 
