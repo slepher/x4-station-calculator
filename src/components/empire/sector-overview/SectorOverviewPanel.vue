@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
+import { ref, watch } from 'vue'
 import { useAutoSectorGroupPresenter } from '@/components/empire/presenters/useAutoSectorGroupPresenter'
 import SaveUploadPanel from '@/components/save/SaveUploadPanel.vue'
 import SaveList from '@/components/save/SaveList.vue'
@@ -64,6 +64,7 @@ const {
   overviewSellMultiplier,
   hasPendingBridgeDecision,
   hasUncertainAssignments,
+  hasUnresolvedTradeStations,
   hasAutoResult,
   stationCounts,
   canDisableNode,
@@ -79,8 +80,6 @@ const {
 
 const col3ActiveTab = ref<'allocation' | 'tradeStation'>('allocation')
 
-const hasLiveTradeStationCandidates = computed(() => Object.keys(tradeStationCandidates).length > 0)
-
 let initialLiveAutoSwitchDone = false
 watch(autoGroupResult, (result) => {
   if (initialLiveAutoSwitchDone) return
@@ -88,7 +87,7 @@ watch(autoGroupResult, (result) => {
   initialLiveAutoSwitchDone = true
   if (hasUncertainAssignments.value || hasPendingBridgeDecision.value) {
     col3ActiveTab.value = 'allocation'
-  } else if (hasLiveTradeStationCandidates.value) {
+  } else if (hasUnresolvedTradeStations.value) {
     col3ActiveTab.value = 'tradeStation'
   } else {
     col3ActiveTab.value = 'allocation'
@@ -155,7 +154,6 @@ defineExpose({ triggerAutoGroup })
         :baseline-connected-group-ids-by-group-id="
           calculationMode === 'edit' ? editSnapshot?.connectedGroupIdsByGroupId : calcBaselinePillState?.connectedGroupIdsByGroupId
         "
-        :selected-trade-stations="selectedTradeStations"
         @cycle-recalc-state="handleCycleRecalcState"
         @update-jump-range="handleUpdateJumpRange"
         @toggle-coverage-input="handleToggleCoverageInput"
