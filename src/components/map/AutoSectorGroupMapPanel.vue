@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAutoSectorGroupPresenter } from '@/components/empire/presenters/useAutoSectorGroupPresenter'
 import SectorConfirmBar from '@/components/empire/sector-overview/SectorConfirmBar.vue'
@@ -81,6 +81,24 @@ function onCalculate() {
     activeTab.value = 'allocation'
   }
 }
+
+function onQuickCalc() {
+  handleQuickCalculate()
+  if (hasUncertainAssignments.value || hasPendingBridgeDecision.value) {
+    activeTab.value = 'allocation'
+  }
+}
+
+let initialAutoSwitchDone = false
+watch(autoGroupResult, (result) => {
+  if (initialAutoSwitchDone) return
+  if (!result || result.groups.length === 0) return
+  initialAutoSwitchDone = true
+  if (hasUncertainAssignments.value || hasPendingBridgeDecision.value) {
+    activeTab.value = 'allocation'
+  }
+})
+watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
 </script>
 
 <template>
@@ -101,7 +119,7 @@ function onCalculate() {
           @update:pref-jump-range="handleUpdatePrefJumpRange" @update:bridge-search-jump-range="handleUpdateBridgeSearchJumpRange"
           @update:pref-threshold="prefThreshold = $event" @update:node-enabled="nodeEnabled = $event"
           @update:bridge-retain-enabled="handleMasterBridgeRetain" @update:coverage-retain-enabled="handleMasterCoverageRetain"
-          @edit="handleEnterEdit" @cancel="handleCancelEdit" @calculate="onCalculate" @quick-calculate="handleQuickCalculate"
+          @edit="handleEnterEdit" @cancel="handleCancelEdit" @calculate="onCalculate" @quick-calculate="onQuickCalc"
           @add-hub="handleAddHubClick" :show-confirm="false" :confirm-disabled="false" :add-menu-open="showHubAddMenu" @confirm="handleConfirm"
         />
         <HubAddMenu
@@ -150,7 +168,7 @@ function onCalculate() {
             @update:pref-jump-range="handleUpdatePrefJumpRange" @update:bridge-search-jump-range="handleUpdateBridgeSearchJumpRange"
             @update:pref-threshold="prefThreshold = $event" @update:node-enabled="nodeEnabled = $event"
             @update:bridge-retain-enabled="handleMasterBridgeRetain" @update:coverage-retain-enabled="handleMasterCoverageRetain"
-            @edit="handleEnterEdit" @cancel="handleCancelEdit" @calculate="onCalculate" @quick-calculate="handleQuickCalculate" @add-hub="handleAddHubClick"
+            @edit="handleEnterEdit" @cancel="handleCancelEdit" @calculate="onCalculate" @quick-calculate="onQuickCalc" @add-hub="handleAddHubClick"
             :show-confirm="calculationMode === 'result'" :confirm-disabled="hasUncertainAssignments || hasPendingBridgeDecision" :add-menu-open="showHubAddMenu"
             @confirm="handleConfirm"
           />

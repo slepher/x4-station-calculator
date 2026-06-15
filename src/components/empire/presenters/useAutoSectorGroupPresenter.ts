@@ -377,11 +377,12 @@ function handleCancelEdit() {
   nodeEnabled.value = editSnapshot.value.nodeEnabled ?? true
   bridgeRetainEnabled.value = editSnapshot.value.bridgeRetainEnabled ?? true
   coverageRetainEnabled.value = editSnapshot.value.coverageRetainEnabled ?? true
+  syncRetainToGlobal()
   setAutoGroupConfirmed(editSnapshot.value.autoGroupConfirmed)
   setAutoGroupResult(editSnapshot.value.result ? cloneAutoGroupResult(editSnapshot.value.result) : null)
   calculationMode.value = 'result'
   editSnapshot.value = null
-  syncRetainToGlobal()
+  liveStore.clearAutoSectorGroupCheck()
 }
 
 function syncRetainToGlobal() {
@@ -757,8 +758,9 @@ function canReorderGroups(): boolean {
 function setResultModeDefaults() {
   handleMasterBridgeRetain(false)
   handleMasterCoverageRetain(true)
-  const hasGroups = (autoGroupResult.value?.groups.length ?? 0) > 0
-  nodeEnabled.value = !hasGroups
+  const guid = activeViewStore.activeBinding
+  const binding = guid ? saveBindingStore.getBindingByGameGuid(guid) : null
+  nodeEnabled.value = !(binding && binding.groups.length > 0)
 }
 
 function handleQuickCalculate() {
@@ -828,9 +830,9 @@ const overviewSellMultiplier = computed({
   set: (value: number) => { liveStore.overviewSellMultiplier = value }
 })
 
-watch(() => activeViewStore.activeBinding, (newGuid) => {
+watch(() => activeViewStore.activeBinding, async (newGuid) => {
   if (newGuid) {
-    liveStore.activateBinding(newGuid)
+    await liveStore.activateBinding(newGuid)
     runAutoGroup()
   }
 })
@@ -849,10 +851,11 @@ watch(() => liveStore.autoSectorGroupCheck, (check) => {
   liveStore.clearAutoSectorGroupCheck()
 })
 
-onMounted(() => {
+onMounted(async () => {
   const gameGuid = activeViewStore.activeBinding
   if (gameGuid) {
-    liveStore.activateBinding(gameGuid)
+    await liveStore.activateBinding(gameGuid)
+    runAutoGroup()
   }
 })
 
