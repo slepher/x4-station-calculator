@@ -927,22 +927,29 @@ function handleConfirm() {
   if (!guid) return
   const result = autoGroupResult.value
   saveBindingStore.createAutoGroups(guid, result.groups, sectorGraphInfo.value.sectorGraph, sectorGraphInfo.value.sectorClusterMap, prefJumpRange.value, bridgeSearchJumpRange.value, prefThreshold.value)
-  for (const group of result.groups) {
-    const sel = group.selectedTradeStation
-    if (!sel) continue
-    if (sel.type === 'virtual') {
-      saveBindingStore.unbindTradeStation(guid, group.id)
-    } else {
-      const archive = saveStore.selectedArchive
-      const station = archive?.sectors?.[group.sectorMacro!]?.player_stations?.[sel.stationCode]
-      saveBindingStore.upsertTradeStation({
-        gameGuid: guid,
-        groupId: group.id,
-        saveStationCode: sel.stationCode,
-        name: group.name,
-        sectorMacro: group.sectorMacro,
-        position: station?.position
-      })
+  const activeBinding = saveBindingStore.activeBinding
+  if (activeBinding) {
+    for (const group of result.groups) {
+      const sel = group.selectedTradeStation
+      if (!sel) continue
+      const bindingGroup = activeBinding.groups.find((g) =>
+        g.id === group.id || (group.sectorMacro && g.sectorMacro === group.sectorMacro)
+      )
+      if (!bindingGroup) continue
+      if (sel.type === 'virtual') {
+        saveBindingStore.unbindTradeStation(guid, bindingGroup.id)
+      } else {
+        const archive = saveStore.selectedArchive
+        const station = archive?.sectors?.[group.sectorMacro!]?.player_stations?.[sel.stationCode]
+        saveBindingStore.upsertTradeStation({
+          gameGuid: guid,
+          groupId: bindingGroup.id,
+          saveStationCode: sel.stationCode,
+          name: group.name,
+          sectorMacro: group.sectorMacro,
+          position: station?.position
+        })
+      }
     }
   }
   saveBindingStore.saveBinding()
