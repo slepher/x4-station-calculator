@@ -79,7 +79,13 @@
 - [x] `editSnapshot` 补充 retain/node 字段
 - [x] `handleQuickCalculate` 尊重 checkbox 当前值
 
-## 11. 构建验证
+## 12. Map 面板挂载与 Tab 切换
+
+- [x] Map panel mount 时设置 `activeViewStore.activeBinding` + 调用 `activateBinding`
+- [x] 初始 auto-calc 有存疑→切 allocation；只触发一次
+- [x] `[计算]` 后存疑→allocation，无存疑→hub
+
+## 13. 构建验证
 
 - [x] `npm run build` 通过
 
