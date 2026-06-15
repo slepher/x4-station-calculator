@@ -2,6 +2,8 @@
 import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAutoSectorGroupPresenter } from '@/components/empire/presenters/useAutoSectorGroupPresenter'
+import { useActiveViewStore } from '@/store/useActiveViewStore'
+import { useLiveProductionStore } from '@/store/useLiveProductionStore'
 import SectorConfirmBar from '@/components/empire/sector-overview/SectorConfirmBar.vue'
 import SectorGroupList from '@/components/empire/sector-overview/SectorGroupList.vue'
 import SectorAllocationList from '@/components/empire/sector-overview/SectorAllocationList.vue'
@@ -19,6 +21,7 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+const activeViewStore = useActiveViewStore()
 
 const presenter = useAutoSectorGroupPresenter()
 const {
@@ -70,6 +73,15 @@ const {
   coverageRetainIndeterminate
 } = presenter
 
+const liveStore = useLiveProductionStore()
+
+watch(() => props.gameGuid, async (guid) => {
+  if (guid) {
+    activeViewStore.activeBinding = guid
+    await liveStore.activateBinding(guid)
+  }
+}, { immediate: true })
+
 const activeTab = ref<'hub' | 'allocation'>('hub')
 
 const isEditMode = () => calculationMode.value === 'edit'
@@ -79,6 +91,8 @@ function onCalculate() {
   runCalculationFromEditInput()
   if (hasUncertainAssignments.value || hasPendingBridgeDecision.value) {
     activeTab.value = 'allocation'
+  } else {
+    activeTab.value = 'hub'
   }
 }
 
@@ -86,6 +100,8 @@ function onQuickCalc() {
   handleQuickCalculate()
   if (hasUncertainAssignments.value || hasPendingBridgeDecision.value) {
     activeTab.value = 'allocation'
+  } else {
+    activeTab.value = 'hub'
   }
 }
 
