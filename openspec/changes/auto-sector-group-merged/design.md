@@ -119,26 +119,82 @@ interface BridgePlanOption {
 }
 ```
 
-## Baseline Snapshot
+## E1 编辑基线 (Edit Baseline)
 
-进入编辑态时，`SectorOverviewPanel` 保存当前显示状态快照：
-- group anchor
-- coverage
-- connected ids
-- jumpRange
-- isPinned
-- Col 3 当前结果
+触发时机：用户点击 Col 2 [编辑]。
 
-用途：
+进入编辑态时 `SectorOverviewPanel.handleEnterEdit()` 保存 `editSnapshot`：
+- `result`: 完整 `AutoGroupResult` deep clone（含 `groups[].connectedGroupIds`）
+- `coverageByGroupId`: 每个 group 的覆盖星区列表
+- `connectedGroupIdsByGroupId`: 每个 group 的连接目标 group ID 列表
+- `prefJumpRange`, `bridgeSearchJumpRange`, `prefThreshold`
+
+E1 基线用途：
 - [取消] 恢复进入编辑前完整状态。
-- baseline group 不可真正删除。
-- baseline coverage pill 显示粗边框。
+- baseline group (`baseline=true`) 不可真正删除。
+- 编辑态 coverage pill 在 E1 基线中 → 粗实线边框（`pill--baseline`）。
+- 编辑态 connected pill 在 E1 基线中 → 粗实线边框。
 - 判断 baseline sector 在无当前命中、无扩展命中时是否可以按 baseline group 重新吸收。
 
-非用途：
-- baseline 不提供 coverage 恢复语义。
-- baseline 不影响 `+`、`×`、`→` 行为。
-- connection 不区分 baseline。
+## E2 计算基线 (Calculation Baseline)
+
+触发时机：用户点击 [计算]。
+
+计算前捕获编辑态最终配置为 E2 基线，保存到独立 ref `calcBaselinePillState`（不随 `editSnapshot` 清空而丢失）。E2 基线用于计算结果态 diff 展示。
+
+### E2 基线数据
+
+```
+calcBaselinePillState = {
+  coverageByGroupId:    group.id → [...计算前的 coverageSectorMacros]
+  connectedGroupIdsByGroupId: group.id → [...计算前的 connectedGroupIds]
+}
+```
+
+### E2 基线 Pill 展示（计算结果态）
+
+计算结果态中 pill 有三种边框语义：
+
+| `baseline` | `removed` | 边框 | 含义 |
+|-----------|-----------|------|------|
+| `true` | `false` | **粗实线** (border-2) | E2 基线存在，计算结果中仍保留 |
+| `false` | `false` | 普通实线 | 计算结果新增（算法生成） |
+| `false` | `true` | **虚线** (border-dashed, opacity-60) | E2 基线存在，计算结果中被移除 |
+
+按 pill 类型：
+
+| 类型 | 仍保留 | 新增 | 已移除 |
+|------|--------|------|--------|
+| Coverage (金色) | 金色粗实线 | 金色普通实线 | 金色虚线，pill 保留不消失 |
+| Connected (绿色) | 绿色粗实线 | 绿色普通实线 | 绿色虚线，pill 保留不消失 |
+
+### 特殊场景：移除的 coverage 变成 hub 并被连接
+
+若 sector X 原为 group A 的 E2 基线 coverage，计算后 X 成为 hub 并作为 group A 的 connected：
+
+单个 split pill 左半虚线金色（removed coverage）、右半实线绿色（connected）：
+
+```
+┌──[虚线金色]──┬──[实线绿色]──┐
+│   Sector X   │   Hub Y      │
+└──────────────┴──────────────┘
+```
+
+CSS 实现：父容器 `overflow-hidden rounded-full`，左子元素 `rounded-l-full border-dashed border-amber`，右子元素 `rounded-r-full border-emerald`，各自有独立边框和背景。
+
+### E2 基线注入流程
+
+```
+runCalculationFromEditInput()
+  ├─ 1. buildRecalculateBaseGroups() → 提交数据（遵循 retain + link 独立判决规则）
+  ├─ 2. 从提交数据构建 preCalcBaseline（仅 pinned group，link 已是双向）
+  ├─ 3. groupIncremental / groupCleanSlate
+  ├─ 4. 按 ID 匹配: result.groups[id].baseline = preCalc.has(id)
+  ├─ 5. calcBaselinePillState ← preCalcBaseline 的 coverage + connections
+  └─ 6. setAutoGroupResult(), clear editSnapshot
+```
+
+结果态 `SectorGroupList` 通过 `baselineCoverageByGroupId` / `baselineConnectedGroupIdsByGroupId` props 接收 E2 基线数据（来自 `calcBaselinePillState`），与编辑态共用 `buildUnifiedPills()` 中的 baseline 判定 + 新增 removed pill 回填逻辑。
 
 ## SectorConfirmBar
 
@@ -187,13 +243,16 @@ interface BridgePlanOption {
 
 ```ts
 interface UnifiedPillEntry {
-  type: 'coverage' | 'candidate' | 'connected'
+  type: 'coverage' | 'candidate' | 'connected' | 'split-removed-connected'
   macro: string
   jump: number
   baseline: boolean
+  removed: boolean
   hasPlayerStation: boolean
   connectedGroupId?: string
+  connectedGroupName?: string
   action: 'add' | 'transfer' | 'remove' | null
+  covered?: boolean
 }
 ```
 
@@ -204,6 +263,9 @@ interface UnifiedPillEntry {
 - group 覆盖保留关闭时，coverage/candidate 显示但无 action。
 - group 连接保留关闭时，connected 显示但无 action。
 - connected pill 始终可见，不受保留状态影响隐藏。
+- 结果态 E2 基线中存在但计算结果中移除的 coverage/connected 以虚线 (`.pill--removed`) 保留展示。
+- 移除的 coverage 若变为 connected（split 场景），以 `.pill--split-removed-connected` 单 pill 左虚右实渲染。
+- baseline 粗实线在编辑态（E1）和结果态（E2）下均生效，来源分别为 `editSnapshot` 和 `calcBaselinePillState`。
 
 ## Coverage / Candidate 行为
 
@@ -244,6 +306,17 @@ jumpRange 缩小：
 计算时：
 - 用户保留的 `connectedGroupIds` 作为固定 MST 边。
 - Kruskal 仅补充新边，不删除固定边。
+
+连接保留（`connectionRetainEnabled`）提交规则：
+- 每条 link 独立判决，不整体处理。
+- 对 group A 的 `connectedGroupIds` 中的每个 connId（目标 group B）：
+  - `A.connectionRetainEnabled || B.connectionRetainEnabled` 为 true → 该 link 双向提交
+  - 两者都为 false → 该 link 不提交
+- 示例：A retain ON，B retain OFF，C retain OFF。A↔B 提交（A 侧带动），A↔C 提交（A 侧带动），B↔C 不提交（两侧都 OFF）。
+
+E2 基线使用提交数据构建：
+- 提交 link 双向输出，E2 baseline `connectedGroupIdsByGroupId` 自然两侧都有。
+- E2 baseline 不再需要二次双向扩展。
 
 ## 自动分组流程
 

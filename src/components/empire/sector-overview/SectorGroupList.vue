@@ -15,6 +15,7 @@ const props = defineProps<{
   playerSectorMacros: string[]
   editable: boolean
   baselineCoverageByGroupId?: Record<string, string[]>
+  baselineConnectedGroupIdsByGroupId?: Record<string, string[]>
 }>()
 
 const emit = defineEmits<{
@@ -57,6 +58,8 @@ interface UnifiedPillEntry {
   macro: string
   jump: number
   baseline: boolean
+  removed: boolean
+  wasInBaseline: boolean
   hasPlayerStation: boolean
   connectedGroupId?: string
   connectedGroupName?: string
@@ -96,6 +99,8 @@ function buildUnifiedPills(group: GroupDraftInfo): Map<number, UnifiedPillEntry[
         macro: d.sectorMacro,
         jump: d.distance,
         baseline: baselineCov.has(d.sectorMacro),
+        removed: false,
+        wasInBaseline: false,
         hasPlayerStation: props.playerSectorMacros.includes(d.sectorMacro),
         action: canEdit && group.coverageRetainEnabled ? 'remove' : null
       })
@@ -109,6 +114,8 @@ function buildUnifiedPills(group: GroupDraftInfo): Map<number, UnifiedPillEntry[
         macro: d.sectorMacro,
         jump: d.distance,
         baseline: false,
+        removed: false,
+        wasInBaseline: baselineCov.has(d.sectorMacro),
         hasPlayerStation: props.playerSectorMacros.includes(d.sectorMacro),
         action: canEdit && group.coverageRetainEnabled ? (isOtherCoverage ? 'transfer' : 'add') : null,
         covered: isCovered
@@ -118,6 +125,7 @@ function buildUnifiedPills(group: GroupDraftInfo): Map<number, UnifiedPillEntry[
 
   // Connected pills (green)
   const connectedSet = new Set(group.connectedGroupIds)
+  const baselineConns = new Set(props.baselineConnectedGroupIdsByGroupId?.[group.id] ?? [])
   for (const other of props.groups) {
     if (other.id === group.id) continue
     if (!other.sectorMacro) continue
@@ -131,7 +139,9 @@ function buildUnifiedPills(group: GroupDraftInfo): Map<number, UnifiedPillEntry[
         type: 'connected',
         macro: other.sectorMacro,
         jump,
-        baseline: false,
+        baseline: baselineConns.has(other.id),
+        removed: false,
+        wasInBaseline: false,
         hasPlayerStation: props.playerSectorMacros.includes(other.sectorMacro),
         connectedGroupId: other.id,
         connectedGroupName: other.sectorMacro ? getSectorName(other.sectorMacro) : other.name,
@@ -144,10 +154,65 @@ function buildUnifiedPills(group: GroupDraftInfo): Map<number, UnifiedPillEntry[
         macro: other.sectorMacro,
         jump,
         baseline: false,
+        removed: false,
+        wasInBaseline: baselineConns.has(other.id),
         hasPlayerStation: props.playerSectorMacros.includes(other.sectorMacro),
         connectedGroupId: other.id,
         connectedGroupName: other.sectorMacro ? getSectorName(other.sectorMacro) : other.name,
         action: 'add'
+      })
+    }
+  }
+
+  // In result mode: add removed baseline coverage/connection pills (dashed)
+  if (!props.editable && props.baselineCoverageByGroupId) {
+    const currentCov = new Set(group.coverageSectorMacros)
+    const currentConn = new Set(group.connectedGroupIds)
+    const baselineCovEntries = props.baselineCoverageByGroupId[group.id] ?? []
+    const baselineConnEntries = props.baselineConnectedGroupIdsByGroupId?.[group.id] ?? []
+
+    // Removed coverage pills (dashed gold)
+    for (const sectorMacro of baselineCovEntries) {
+      if (currentCov.has(sectorMacro)) continue
+      const jump = distMap.get(sectorMacro)
+      if (jump === undefined) continue
+
+      // If this removed coverage sector is now a connected target, skip — already shown as normal connected pill
+      if (props.groups.some(g => g.sectorMacro === sectorMacro && connectedSet.has(g.id))) continue
+
+      if (!byJump.has(jump)) byJump.set(jump, [])
+      byJump.get(jump)!.push({
+        type: 'coverage',
+        macro: sectorMacro,
+        jump,
+        baseline: false,
+        removed: true,
+        wasInBaseline: false,
+        hasPlayerStation: props.playerSectorMacros.includes(sectorMacro),
+        action: null
+      })
+    }
+
+    // Removed connected pills (dashed green)
+    for (const connId of baselineConnEntries) {
+      if (currentConn.has(connId)) continue
+      const targetGroup = props.groups.find(g => g.id === connId)
+      if (!targetGroup || !targetGroup.sectorMacro) continue
+      const jump = distMap.get(targetGroup.sectorMacro)
+      if (jump === undefined) continue
+
+      if (!byJump.has(jump)) byJump.set(jump, [])
+      byJump.get(jump)!.push({
+        type: 'connected',
+        macro: targetGroup.sectorMacro,
+        jump,
+        baseline: false,
+        removed: true,
+        wasInBaseline: false,
+        hasPlayerStation: props.playerSectorMacros.includes(targetGroup.sectorMacro),
+        connectedGroupId: connId,
+        connectedGroupName: targetGroup.sectorMacro ? getSectorName(targetGroup.sectorMacro) : targetGroup.name,
+        action: null
       })
     }
   }
@@ -198,7 +263,8 @@ function onPillAction(entry: UnifiedPillEntry, groupId: string) {
       :class="{
         'group-item--new': group.isNew,
         'group-item--pinned': group.isPinned,
-        'group-item--unpinned': !group.isPinned && group.baseline
+        'group-item--unpinned': !group.isPinned && group.baseline,
+        'group-item--baseline': group.baseline && !editable
       }"
     >
       <div class="group-header">
@@ -284,14 +350,16 @@ function onPillAction(entry: UnifiedPillEntry, groupId: string) {
             <div class="pill-list">
               <span
                 v-for="entry in buildUnifiedPills(group).get(jump)!"
-                :key="`${entry.type}:${entry.macro}`"
+                :key="`${entry.type}:${entry.connectedGroupId || entry.macro}:${entry.removed}`"
                 v-show="entry.type !== 'candidate' || !entry.covered || !group.coverageRetainEnabled"
                 class="pill"
                 :class="{
                   'pill--coverage': entry.type === 'coverage',
                   'pill--candidate': entry.type === 'candidate',
                   'pill--connected': entry.type === 'connected',
-                  'pill--baseline': entry.baseline
+                  'pill--baseline': entry.baseline,
+                  'pill--new': entry.wasInBaseline || (!entry.baseline && !entry.removed && entry.type !== 'candidate' && entry.action !== 'add'),
+                  'pill--removed': entry.removed
                 }"
               >
                 <span class="pill-dot" :class="entry.hasPlayerStation ? 'pill-dot--filled' : 'pill-dot--empty'"/>
@@ -339,7 +407,7 @@ function onPillAction(entry: UnifiedPillEntry, groupId: string) {
 }
 
 .group-item--new {
-  @apply border-sky-500/20 bg-sky-500/5;
+  @apply border-sky-500/20 bg-sky-500/5 border-2 border-l-[3px] border-l-sky-400;
 }
 
 .group-item--pinned {
@@ -348,6 +416,10 @@ function onPillAction(entry: UnifiedPillEntry, groupId: string) {
 
 .group-item--unpinned {
   @apply border-slate-600/30 bg-slate-500/5;
+}
+
+.group-item--baseline {
+  /* baseline groups keep default style */
 }
 
 
@@ -431,7 +503,16 @@ function onPillAction(entry: UnifiedPillEntry, groupId: string) {
 }
 
 .pill--baseline {
+  border-width: 1px;
+}
+
+.pill--new {
   @apply border-2;
+  box-shadow: inset 5px 0 0 0 rgb(56 189 248 / 0.35);
+}
+
+.pill--removed {
+  @apply border-dashed opacity-60;
 }
 
 .pill--connected {

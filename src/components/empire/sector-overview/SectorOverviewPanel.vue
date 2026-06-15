@@ -44,6 +44,12 @@ const editSnapshot = ref<{
   bridgeSearchJumpRange: number
   prefThreshold: number
   coverageByGroupId: Record<string, string[]>
+  connectedGroupIdsByGroupId: Record<string, string[]>
+} | null>(null)
+
+const calcBaselinePillState = ref<{
+  coverageByGroupId: Record<string, string[]>
+  connectedGroupIdsByGroupId: Record<string, string[]>
 } | null>(null)
 
 const gameDataMaps = computed(() => gameDataStore.maps)
@@ -84,6 +90,17 @@ function setAutoGroupResult(result: AutoGroupResult | null) {
   postBridgeBaseline.value = result && !hasPendingBridgeDecisionInResult(result)
     ? cloneAutoGroupResult(result)
     : null
+  // Populate calcBaselinePillState from persisted groups if not already set (e.g., page refresh)
+  if (result && !calcBaselinePillState.value) {
+    calcBaselinePillState.value = {
+      coverageByGroupId: Object.fromEntries(
+        result.groups.map((g) => [g.id, [...g.coverageSectorMacros]])
+      ),
+      connectedGroupIdsByGroupId: Object.fromEntries(
+        result.groups.map((g) => [g.id, [...g.connectedGroupIds]])
+      )
+    }
+  }
 }
 
 function buildStoreGroups(groups: BindingSectorGroup[], playerSectorMacros: string[]): AutoGroupResult {
@@ -176,11 +193,14 @@ function buildRecalculateBaseGroups(): { baseGroups: BindingSectorGroup[]; exclu
       order: index,
       sectorMacro: group.sectorMacro,
       jumpRange: group.jumpRange,
-      connectedGroupIds: group.connectionRetainEnabled ? [...group.connectedGroupIds] : [],
+      connectedGroupIds: group.connectedGroupIds.filter((connId) => {
+        const other = pinnedGroups.find((g) => g.id === connId)
+        if (!other) return false
+        return group.connectionRetainEnabled || other.connectionRetainEnabled
+      }),
       coverageSectorMacros: (group.coverageRetainEnabled ? group.coverageSectorMacros : [])
         .filter((ref) => {
           if (!group.excludedDefaultAssignmentSectorMacros.includes(ref)) return true
-          // Only exclude player sectors; non-player coverage always retained
           return !autoGroupResult.value!.playerSectorMacros.includes(ref)
         })
         .map((ref) => ({ ref, jump: 0 }))
@@ -194,6 +214,15 @@ function runCalculationFromEditInput() {
   const recalculateInput = buildRecalculateBaseGroups()
   if (!archive || !archive.isValid || !guid) return
   autoGroupConfirmed.value = false
+
+  // Capture E2 baseline from submitted data (respects retain toggles)
+  const preCalcBaseline = recalculateInput
+    ? recalculateInput.baseGroups.map((bg) => ({
+        id: bg.id,
+        connectedGroupIds: [...(bg.connectedGroupIds || [])],
+        coverageSectorMacros: bg.coverageSectorMacros.map((c) => c.ref)
+      }))
+    : []
 
   // Capture user-edited state from current edit draft (by anchor sector)
   const currentDraft = autoGroupResult.value
@@ -262,7 +291,25 @@ function runCalculationFromEditInput() {
     }
   })
 
-  setAutoGroupResult({ ...result, groups: restoredGroups })
+  // Inject E2 baseline markers into result groups
+  const preCalcIdSet = new Set(preCalcBaseline.map((pc) => pc.id))
+  const groupsWithBaseline = restoredGroups.map((g) => ({
+    ...g,
+    baseline: preCalcIdSet.has(g.id),
+    isPinned: true
+  }))
+
+  // Save E2 baseline pill data for result-mode display
+  calcBaselinePillState.value = {
+    coverageByGroupId: Object.fromEntries(
+      preCalcBaseline.map((pc) => [pc.id, pc.coverageSectorMacros])
+    ),
+    connectedGroupIdsByGroupId: Object.fromEntries(
+      preCalcBaseline.map((pc) => [pc.id, pc.connectedGroupIds])
+    )
+  }
+
+  setAutoGroupResult({ ...result, groups: groupsWithBaseline })
   calculationMode.value = 'result'
   editSnapshot.value = null
 }
@@ -276,6 +323,9 @@ function handleEnterEdit() {
     prefThreshold: prefThreshold.value,
     coverageByGroupId: Object.fromEntries(
       (result?.groups ?? []).map((g) => [g.id, [...g.coverageSectorMacros]])
+    ),
+    connectedGroupIdsByGroupId: Object.fromEntries(
+      (result?.groups ?? []).map((g) => [g.id, [...g.connectedGroupIds]])
     )
   }
   if (result) {
@@ -806,7 +856,12 @@ const coverageRetainIndeterminate = computed(() => {
         :sector-cluster-map="sectorGraphInfo.sectorClusterMap"
         :player-sector-macros="autoGroupResult?.playerSectorMacros ?? []"
         :editable="calculationMode === 'edit'"
-        :baseline-coverage-by-group-id="editSnapshot?.coverageByGroupId"
+        :baseline-coverage-by-group-id="
+          calculationMode === 'edit' ? editSnapshot?.coverageByGroupId : calcBaselinePillState?.coverageByGroupId
+        "
+        :baseline-connected-group-ids-by-group-id="
+          calculationMode === 'edit' ? editSnapshot?.connectedGroupIdsByGroupId : calcBaselinePillState?.connectedGroupIdsByGroupId
+        "
         @cycle-recalc-state="handleCycleRecalcState"
         @update-jump-range="handleUpdateJumpRange"
         @toggle-coverage-input="handleToggleCoverageInput"
