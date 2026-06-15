@@ -2,28 +2,28 @@
 
 ## 1. Presenter 抽取
 
-- [ ] 创建 `src/components/empire/presenters/useAutoSectorGroupPresenter.ts`
-- [ ] 将 `SectorOverviewPanel.vue` 中的所有 `ref()` 声明迁移到 presenter
-- [ ] 将 `SectorOverviewPanel.vue` 中的所有 `computed()` 派生迁移到 presenter
-- [ ] 将 `runAutoGroup()` 及其调用链迁移到 presenter（含 `buildStoreGroups`、`getPlayerSectorMacrosFromArchive`、`hasUngroupedPlayerSectors`）
-- [ ] 将 `enterEditMode()`、`cancelEdit()`、`runCalculationFromEditInput()` 迁移到 presenter
-- [ ] 将 `confirmAndWrite()` 迁移到 presenter
-- [ ] 将 add/remove/toggle group、coverage/connection 修改方法迁移到 presenter
-- [ ] 将 `selectAssignmentOption()`、`selectBridgePlan()` 迁移到 presenter
-- [ ] 将 `getSectorDisplayName()`、`setAutoGroupResult()`、`cloneAutoGroupResult()` 迁移到 presenter
-- [ ] presenter 监听 `liveProductionStore` 的自动分组检查 flag，匹配当前 binding 时执行 `runAutoGroup()`
-- [ ] presenter 在自动分组执行完成后调用 store API 清除自动分组检查 flag
-- [ ] 重构 `SectorOverviewPanel.vue`：移除直接 store import，改为通过 presenter 获取所有状态和方法
-- [ ] 确认 `SectorOverviewPanel.vue` 不再直接 import `useSaveBindingStore`、`useLiveProductionStore`
+- [x] 创建 `src/components/empire/presenters/useAutoSectorGroupPresenter.ts`
+- [x] 将 `SectorOverviewPanel.vue` 中的所有 `ref()` 声明迁移到 presenter
+- [x] 将 `SectorOverviewPanel.vue` 中的所有 `computed()` 派生迁移到 presenter
+- [x] 将 `runAutoGroup()` 及其调用链迁移到 presenter（含 `buildStoreGroups`、`getPlayerSectorMacrosFromArchive`、`hasUngroupedPlayerSectors`）
+- [x] 将 `enterEditMode()`、`cancelEdit()`、`runCalculationFromEditInput()` 迁移到 presenter
+- [x] 将 `confirmAndWrite()` 迁移到 presenter
+- [x] 将 add/remove/toggle group、coverage/connection 修改方法迁移到 presenter
+- [x] 将 `selectAssignmentOption()`、`selectBridgePlan()` 迁移到 presenter
+- [x] 将 `getSectorDisplayName()`、`setAutoGroupResult()`、`cloneAutoGroupResult()` 迁移到 presenter
+- [x] presenter 监听 `liveProductionStore` 的自动分组检查 flag，匹配当前 binding 时执行 `runAutoGroup()`
+- [x] presenter 在自动分组执行完成后调用 store API 清除自动分组检查 flag
+- [x] 重构 `SectorOverviewPanel.vue`：移除直接 store import，改为通过 presenter 获取所有状态和方法
+- [x] 确认 `SectorOverviewPanel.vue` 不再直接 import `useSaveBindingStore`、`useLiveProductionStore`
 
 ## 2. liveProductionStore 自动检查
 
-- [ ] `useLiveProductionStore.ts` 新增自动分组检查 flag 状态（含 gameGuid/reason）
-- [ ] `useLiveProductionStore.ts` 新增检查当前 binding 玩家 sector 是否全部归组的方法
-- [ ] 刷新恢复 active binding / selected archive 后触发自动分组检查
-- [ ] 手动切换 active binding 后触发自动分组检查
-- [ ] 上传新存档或 archive timing 切换导致 selected archive 变化后触发自动分组检查
-- [ ] `useLiveProductionStore.ts` 新增清除自动分组检查 flag 的方法
+- [x] `useLiveProductionStore.ts` 新增自动分组检查 flag 状态（含 gameGuid/reason）
+- [x] `useLiveProductionStore.ts` 新增检查当前 binding 玩家 sector 是否全部归组的方法
+- [x] 刷新恢复 active binding / selected archive 后触发自动分组检查
+- [x] 手动切换 active binding 后触发自动分组检查
+- [x] 上传新存档或 archive timing 切换导致 selected archive 变化后触发自动分组检查
+- [x] `useLiveProductionStore.ts` 新增清除自动分组检查 flag 的方法
 
 ## 3. 子组件 view prop 适配
 
@@ -64,10 +64,10 @@
 
 ## 6. Live overview 适配
 
-- [ ] `SectorOverviewPanel.vue` 保持三列布局：Col 1 存档、Col 2 `SectorConfirmBar + SectorGroupList`、Col 3 allocation 或完成态内容
-- [ ] live edit 模式下 Col 3 allocation 区域显示遮罩并禁用操作
-- [ ] live 完成态不显示 `SectorAllocationList`
-- [ ] 确保 live 侧自动分组功能不受影响
+- [x] `SectorOverviewPanel.vue` 保持三列布局：Col 1 存档、Col 2 `SectorConfirmBar + SectorGroupList`、Col 3 allocation 或完成态内容
+- [x] live edit 模式下 Col 3 allocation 区域显示遮罩并禁用操作
+- [x] live 完成态不显示 `SectorAllocationList`
+- [x] 确保 live 侧自动分组功能不受影响
 
 ## 7. 排序持久化
 
@@ -83,4 +83,4 @@
 
 ## 9. 构建验证
 
-- [ ] `npm run build` 通过
+- [x] `npm run build` 通过

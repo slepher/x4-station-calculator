@@ -44,6 +44,14 @@ import { createProductionWareRuleActions } from './actions/productionWareRuleAct
 import { createProductionSettingActions, doesStationSettingsAffectFlowMap } from './actions/productionSettingActions'
 import { maxSavedModules } from './logic/planningRecommendedModules'
 
+export type AutoSectorGroupCheckReason = 'refresh' | 'binding-switch' | 'archive-timing-switch'
+
+export interface AutoSectorGroupCheckFlag {
+  needed: boolean
+  reason: AutoSectorGroupCheckReason
+  gameGuid: string
+}
+
 function mergeSavedModules(modules: SavedModule[]): SavedModule[] {
   const counts = new Map<string, number>()
   const order: string[] = []
@@ -107,6 +115,62 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   const planningDerivedMap = shallowRef<StationDerivedMap | null>(null)
   const liveFlowMap = shallowRef<StationDerivedMap | null>(null)
   const dirtyBindingStationIds = ref<DirtyBindingState>(null)
+  const autoSectorGroupCheck = ref<AutoSectorGroupCheckFlag | null>(null)
+
+  function getPlayerSectorMacrosFromSelectedArchive(): string[] {
+    const archive = selectedArchive.value
+    if (!archive || !archive.isValid) return []
+    const sectors: string[] = []
+    for (const [sectorMacro, sector] of Object.entries(archive.sectors)) {
+      if (sector.player_stations && Object.keys(sector.player_stations).length > 0) {
+        sectors.push(sectorMacro)
+      }
+    }
+    return sectors
+  }
+
+  function bindingCoversPlayerSectors(playerSectorMacros: string[]): boolean {
+    const binding = activeBinding.value
+    if (!binding) return false
+    const covered = new Set<string>()
+    for (const group of binding.groups) {
+      if (group.sectorMacro) covered.add(group.sectorMacro)
+      for (const entry of group.coverageSectorMacros) {
+        covered.add(entry.ref)
+      }
+    }
+    return playerSectorMacros.every((sectorMacro) => covered.has(sectorMacro))
+  }
+
+  function checkAutoSectorGroupCoverageForActiveBinding(reason: AutoSectorGroupCheckReason): void {
+    const binding = activeBinding.value
+    const archive = selectedArchive.value
+    if (!binding || !archive || !archive.isValid || archive.meta.guid !== binding.gameGuid) {
+      autoSectorGroupCheck.value = null
+      return
+    }
+
+    const playerSectorMacros = getPlayerSectorMacrosFromSelectedArchive()
+    if (playerSectorMacros.length === 0) {
+      autoSectorGroupCheck.value = null
+      return
+    }
+
+    if (bindingCoversPlayerSectors(playerSectorMacros)) {
+      autoSectorGroupCheck.value = null
+      return
+    }
+
+    autoSectorGroupCheck.value = {
+      needed: true,
+      reason,
+      gameGuid: binding.gameGuid
+    }
+  }
+
+  function clearAutoSectorGroupCheck(): void {
+    autoSectorGroupCheck.value = null
+  }
 
   function markAllDirty() {
     dirtyBindingStationIds.value = 'all'
@@ -274,9 +338,13 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     const archive = selectedArchive.value
     const binding = activeBinding.value
     if (!archive || !binding || archive.meta.guid !== binding.gameGuid) return
-    if (binding.selectedArchiveTime) return
+    if (binding.selectedArchiveTime) {
+      checkAutoSectorGroupCoverageForActiveBinding('archive-timing-switch')
+      return
+    }
     await loadPlayerStationRecords()
     syncLiveFlowMap()
+    checkAutoSectorGroupCoverageForActiveBinding('archive-timing-switch')
   })
 
   watch(
@@ -1639,7 +1707,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   }
 
   let _activating = false
-  async function activateBinding(gameGuid: string): Promise<boolean> {
+  async function activateBinding(gameGuid: string, autoGroupReason: AutoSectorGroupCheckReason = 'binding-switch'): Promise<boolean> {
     if (_activating) return false
     _activating = true
     try {
@@ -1668,6 +1736,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     if (activeStationId.value) {
       mode.value = initialMode.value
     }
+    checkAutoSectorGroupCoverageForActiveBinding(autoGroupReason)
 
     return true
     } finally {
@@ -1688,7 +1757,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
 
       const storedGuid = activeViewStore.activeBinding
       if (storedGuid) {
-        const activated = await activateBinding(storedGuid)
+        const activated = await activateBinding(storedGuid, 'refresh')
         if (activated) {
           isReady.value = true
           console.log('[LiveProductionStore] Loaded saved binding')
@@ -1703,7 +1772,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       })
 
       if (validBinding) {
-        await activateBinding(validBinding.gameGuid)
+        await activateBinding(validBinding.gameGuid, 'refresh')
         isReady.value = true
         console.log('[LiveProductionStore] Fallback to first valid binding:', validBinding.gameGuid)
         return
@@ -2065,6 +2134,9 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     empireDerivedProductionFlows,
     overviewBuyMultiplier,
     overviewSellMultiplier,
+    autoSectorGroupCheck,
+    checkAutoSectorGroupCoverageForActiveBinding,
+    clearAutoSectorGroupCheck,
     saveBinding,
     createStation,
     deleteStation,
