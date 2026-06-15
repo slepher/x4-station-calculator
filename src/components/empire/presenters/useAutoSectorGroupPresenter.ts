@@ -130,7 +130,12 @@ function buildStoreGroups(groups: BindingSectorGroup[], playerSectorMacros: stri
     coverageRetainEnabled: true,
     connectionRetainEnabled: true,
     hubScore: undefined,
-    savedTradeStationCode: g.tradeStation?.saveStationCode
+    savedTradeStationCode: g.tradeStation?.saveStationCode,
+    selectedTradeStation: g.tradeStation
+      ? (g.tradeStation.saveStationCode
+          ? { type: 'player' as const, stationCode: g.tradeStation.saveStationCode }
+          : { type: 'virtual' as const, stationCode: '__virtual__' })
+      : undefined
   }))
   return { groups: storeGroups, assignments: [], bridgePlans: [], playerSectorMacros }
 }
