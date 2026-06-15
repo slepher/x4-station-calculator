@@ -91,7 +91,6 @@ interface AutoGroupResult {
   bridgePlans: BridgePlanOption[]
   selectedBridgePlanId?: string
   playerSectorMacros: string[]
-  autoGroupConfirmed?: boolean
 }
 ```
 

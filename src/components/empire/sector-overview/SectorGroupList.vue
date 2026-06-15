@@ -279,7 +279,7 @@ function onPillAction(entry: UnifiedPillEntry, groupId: string) {
           </label>
           <label v-if="props.editable" class="retain-chk" :title="t('sector.bridge_retain')">
             <input type="checkbox" class="bar-checkbox" :checked="group.connectionRetainEnabled" :disabled="!group.isPinned" @change="emit('toggle-retain-connection', group.id)" />
-            <span class="retain-label">{{ t('sector.tab_connected') }}</span>
+            <span class="retain-label">{{ t('sector.connected') }}</span>
           </label>
           <button
             v-if="props.editable && !group.enteredOtherGroupCoverage"
