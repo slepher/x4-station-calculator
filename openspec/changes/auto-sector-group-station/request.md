@@ -42,6 +42,8 @@
 - tab 顺序：Hub → Allocation → TradeStation
 - Allocation tab 和 TradeStation tab 内各自放置 `AllocationConfirmBar`
 - tradeStation tab 仅在未确认状态下展示
+- 初次计算完成以及点击计算后，自动跳转到首个有未解决内容的 tab（allocation > tradeStation）
+- Map: 全部解决后跳转到 hub tab；Live Col3: 全部解决后跳转到 allocation tab
 
 **Live Col3 (`SectorOverviewPanel.vue`)：**
 - 未确认状态下 Col3 改为 tab 结构（Allocation | TradeStation）
@@ -67,12 +69,13 @@ Allocation tab 传入 `['sector.allocation_unresolved']`，TradeStation tab 传�
 
 ### 6. 保留 (Retain) Trade Station
 
-- SectorConfirmBar 阈值区域添加 `tradeStationRetainEnabled` checkbox（`sector.trade_station_retain`）
+- SectorConfirmBar 阈值 `param-field` 的 label 改为 `sector.trade_station_short`（"交易站"/"Trade Station"），与桥接控件模式一致：同一 box 内 label + dropdown + checkbox
+- result 模式仅显示 flat 值；edit 模式显示 dropdown + `保留` checkbox（`sector.retain`）
+- `tradeStationRetainEnabled` checkbox 支持三态 indeterminate，与 group cards 双向联动
 - Edit 模式下 group cards 显示 `tradeStationRetainEnabled` 开关（SectorGroupCard 内）
 - GroupDraftInfo 新增 `tradeStationRetainEnabled` 字段
-- 保留的 trade station 仅在计算时提供默认选中值；如用户未改变该选择，提交时写入该 `saveStationCode`
-- 用户手动选择始终优先于 retain 默认值
-- 虚拟交易站 code `__virtual__` 仅用于 UI/提交计算层表示“已选择虚拟站”，不得写入最终持久化结构
+- 保留的 trade station 仅在计算时提供默认选中值；用户手动选择始终优先于 retain 默认值
+- 虚拟交易站 code `__virtual__` 仅用于 UI/计算层，不得写入最终持久化结构
 
 ### 7. 确认按钮 Gate
 

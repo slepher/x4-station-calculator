@@ -110,6 +110,31 @@ interface GroupDraftInfo {
 
 按钮 disabled 不只看当前 tab 的 `unresolved`。所有确认按钮必须接收全局 unresolved/gate，确保任一 tab 中点击确认都满足 allocation、bridge、trade station 三类问题全部解决。
 
+### D4: SectorConfirmBar 阈值字段改造
+
+- `param-field` 的 label 由 `sector.default_threshold_short`（"阈"/"Hub"）改为 `sector.trade_station_short`（"交易站"/"Trade Station"）
+- result 模式：`[交易站] [flat 显示值]` — 不显示 checkbox
+- edit 模式：`[交易站] [dropdown] [☑ 保留]` — dropdown + checkbox 在同一 box，与桥接控件模式一致
+- `tradeStationRetainEnabled` checkbox 仅 edit 模式可见，具备三态 indeterminate（随 group cards 联动）
+
+### D5: TradeStation Card 显示
+
+- 候选站显示 `stationCode`（而非 `macro`）
+- 每项显示 containerCap 格式化值
+- 虚拟站选项独立 `<li>`，与候选站并列
+- 无候选站的 group 不显示该 card
+
+### D6: Tab 自动跳转逻辑
+
+**Map panel：**
+- 计算后跳转到首个有未解决内容的 tab（allocation > tradeStation）
+- 所有已解决 → hub tab
+- 初始 `autoGroupResult` 变化时相同逻辑
+
+**Live Col3：**
+- 同 map 逻辑
+- 所有已解决 → allocation tab
+
 ### D4: 确认按钮统一入口但分 tab 放置
 
 Map 面板和 Live Col3 的确认按钮在各自 tab 内通过 `AllocationConfirmBar` 呈现，事件均路由到 presenter 的同一个 `handleConfirm()`。SectorConfirmBar 上的确认按钮功能相同。
