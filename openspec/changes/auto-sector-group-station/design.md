@@ -211,6 +211,10 @@ runAutoGroup() / runCalculationFromEditInput()
   └→ 写入 saveBindingStore
 ```
 
+### Recalculation 时保留交易站信息
+
+`runCalculationFromEditInput()` 生成新的 `AutoGroupResult` 后，需将前次 draft groups 中的 `savedTradeStationCode` 和 `tradeStationRetainEnabled` 按 group ID 匹配回填到新 groups，确保 `applyTradeStationDefaultsToResult()` 中 retain 逻辑生效。
+
 ## File Impact
 
 ### 新增

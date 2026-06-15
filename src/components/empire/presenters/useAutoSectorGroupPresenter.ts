@@ -327,10 +327,21 @@ function runCalculationFromEditInput() {
 
   // Inject E2 baseline markers into result groups
   const preCalcIdSet = new Set(preCalcBaseline.map((pc) => pc.id))
+  // Preserve trade station retain info from previous groups (matched by ID)
+  const prevTradeStationByGroupId: Record<string, { savedTradeStationCode?: string; tradeStationRetainEnabled?: boolean }> = {}
+  if (currentDraft) {
+    for (const g of currentDraft.groups) {
+      prevTradeStationByGroupId[g.id] = {
+        savedTradeStationCode: g.savedTradeStationCode,
+        tradeStationRetainEnabled: g.tradeStationRetainEnabled
+      }
+    }
+  }
   const groupsWithBaseline = restoredGroups.map((g) => ({
     ...g,
     baseline: preCalcIdSet.has(g.id),
-    isPinned: true
+    isPinned: true,
+    ...prevTradeStationByGroupId[g.id]
   }))
 
   // Save E2 baseline pill data for result-mode display
