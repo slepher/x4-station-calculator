@@ -966,7 +966,6 @@ export interface X4SettingStorage {
 
 export interface X4MapSector {
   id: string
-  macro?: string
   cluster_id: string
   nameId: string
   name: string

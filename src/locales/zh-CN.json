@@ -489,6 +489,7 @@
     "binding_filter_hint_search": "请使用搜索框筛选",
     "binding_locate_sector": "定位星区",
     "binding_no_unbound_sectors": "无未绑定星区",
+    "binding_search_results": "搜索结果",
     "binding_filter_hint_zoom": "请缩小地图范围",
     "binding_no_visible_sectors": "无可见星区",
     "binding_belongs_to": "归属",

@@ -346,7 +346,6 @@ function handleEnterEdit() {
   // Reset retain to defaults
   bridgeRetainEnabled.value = true
   coverageRetainEnabled.value = true
-  setAutoGroupConfirmed(false)
   calculationMode.value = 'edit'
 }
 
@@ -645,21 +644,13 @@ function handleAddHubDraft(sectorMacro: string) {
   const result = autoGroupResult.value
   const groups = [...result.groups]
 
-  // Check conflict: if anchor is baseline coverage of another group
+  // Remove sector from other groups' coverage (it's now a hub anchor)
   for (let i = 0; i < groups.length; i++) {
     const group = groups[i]!
-    if (group.baseline && group.coverageSectorMacros.includes(sectorMacro)) {
-      if (result.playerSectorMacros.includes(sectorMacro)) {
-        groups[i] = {
-          ...group,
-          excludedDefaultAssignmentSectorMacros: [...group.excludedDefaultAssignmentSectorMacros, sectorMacro]
-        }
-      }
-    } else if (!group.baseline && group.coverageSectorMacros.includes(sectorMacro)) {
-      groups[i] = {
-        ...group,
-        coverageSectorMacros: group.coverageSectorMacros.filter((m) => m !== sectorMacro)
-      }
+    if (!group.coverageSectorMacros.includes(sectorMacro)) continue
+    groups[i] = {
+      ...group,
+      coverageSectorMacros: group.coverageSectorMacros.filter((m) => m !== sectorMacro)
     }
   }
 
@@ -909,6 +900,7 @@ return {
   handleAddHubClick,
   handleAddHubDraft,
   getExistingAnchorSectors,
+  getSectorDisplayName,
   handleToggleRetainCoverage,
   handleToggleRetainConnection,
   handleMasterBridgeRetain,

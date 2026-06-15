@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import draggable from 'vuedraggable'
-import { computed, ref, watch } from 'vue'
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { GroupDraftInfo, SectorAssignment } from '@/store/logic/autoGroup'
 import type { X4MapSector } from '@/types/x4'
@@ -37,20 +37,9 @@ const emit = defineEmits<{
   (e: 'toggle-retain-connection', groupId: string): void
   (e: 'focus-sector', sectorMacro: string): void
   (e: 'select-group', sectorGroupId: string): void
-  (e: 'reorder-groups', groups: GroupDraftInfo[]): void
 }>()
 
 const { t } = useI18n()
-
-const dragGroups = ref<GroupDraftInfo[]>([...props.groups])
-
-watch(
-  () => props.groups,
-  (groups) => {
-    dragGroups.value = [...groups]
-  },
-  { immediate: true }
-)
 
 const cardBase = computed(() => ({
   assignments: props.assignments,
@@ -76,14 +65,6 @@ function onToggleRetainCoverage(groupId: string) { emit('toggle-retain-coverage'
 function onToggleRetainConnection(groupId: string) { emit('toggle-retain-connection', groupId) }
 function onFocusSector(sectorMacro: string) { emit('focus-sector', sectorMacro) }
 function onSelectGroup(sectorGroupId: string) { emit('select-group', sectorGroupId) }
-function onMoveGroup() {
-  return props.draggable
-}
-function onReorderGroups(groups: GroupDraftInfo[]) {
-  dragGroups.value = [...groups]
-  if (!props.draggable) return
-  emit('reorder-groups', groups)
-}
 </script>
 
 <template>
@@ -92,17 +73,20 @@ function onReorderGroups(groups: GroupDraftInfo[]) {
       {{ t('sector.no_groups') }}
     </div>
 
-    <div v-if="draggable" key="draggable">
     <draggable
-      :model-value="dragGroups"
+      v-if="draggable"
+      :list="groups"
       item-key="id"
       class="flex flex-col gap-2"
       handle=".drag-handle"
       :animation="200"
-      :disabled="!draggable"
-      :sort="draggable"
-      :move="onMoveGroup"
-      @update:modelValue="onReorderGroups"
+      :force-fallback="true"
+      :fallback-on-body="true"
+      :fallback-tolerance="0"
+      :scroll="true"
+      :scroll-sensitivity="100"
+      :scroll-speed="15"
+    >
     >
       <template #item="{ element: group }">
         <SectorGroupCard
@@ -124,9 +108,8 @@ function onReorderGroups(groups: GroupDraftInfo[]) {
         />
       </template>
     </draggable>
-    </div>
 
-    <div v-else key="static" class="static-group-list flex flex-col gap-2">
+    <div v-else class="flex flex-col gap-2">
       <SectorGroupCard
         v-for="group in groups"
         :key="`static:${group.id}`"

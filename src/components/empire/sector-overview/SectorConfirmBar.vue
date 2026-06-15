@@ -14,8 +14,12 @@ const props = withDefaults(defineProps<{
   bridgeRetainIndeterminate: boolean
   coverageRetainIndeterminate: boolean
   view?: 'map' | 'live'
+  showConfirm?: boolean
+  confirmDisabled?: boolean
 }>(), {
-  view: 'live'
+  view: 'live',
+  showConfirm: false,
+  confirmDisabled: false
 })
 
 const emit = defineEmits<{
@@ -29,6 +33,7 @@ const emit = defineEmits<{
   (e: 'edit'): void
   (e: 'cancel'): void
   (e: 'add-hub'): void
+  (e: 'confirm'): void
 }>()
 
 const { t } = useI18n()
@@ -140,9 +145,19 @@ function onCoverageRetainChange(e: Event) {
           </label>
         </div>
       </div>
-      <button v-if="mode !== 'edit'" class="bar-btn recalc-btn" @click="emit('edit')">
-        {{ t('sector.edit') }}
-      </button>
+      <div class="bar-right">
+        <button v-if="mode !== 'edit'" class="bar-btn recalc-btn" @click="emit('edit')">
+          {{ t('sector.edit') }}
+        </button>
+        <button
+          v-if="mode !== 'edit' && showConfirm"
+          class="bar-btn confirm-btn"
+          :disabled="confirmDisabled"
+          @click="emit('confirm')"
+        >
+          {{ t('sector.confirm') }}
+        </button>
+      </div>
     </div>
     <div v-if="mode === 'edit'" class="bar-row bar-row--actions">
       <button class="bar-btn add-btn" @click="emit('add-hub')">
@@ -219,6 +234,14 @@ function onCoverageRetainChange(e: Event) {
 
 .recalc-btn {
   @apply bg-sky-600/20 text-sky-400 border border-sky-500/30 hover:bg-sky-600/30;
+}
+
+.confirm-btn {
+  @apply bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-600/30 disabled:opacity-40 disabled:cursor-not-allowed;
+}
+
+.bar-right {
+  @apply flex items-center gap-1.5;
 }
 
 .add-btn {

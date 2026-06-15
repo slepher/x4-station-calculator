@@ -490,6 +490,7 @@
     "binding_filter_hint_search": "Use search to filter",
     "binding_locate_sector": "Locate sector",
     "binding_no_unbound_sectors": "No unbound sectors",
+    "binding_search_results": "Search Results",
     "binding_filter_hint_zoom": "Zoom in to reduce visible range",
     "binding_no_visible_sectors": "No visible sectors",
     "binding_belongs_to": "Belongs to",

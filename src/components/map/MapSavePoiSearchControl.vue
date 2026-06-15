@@ -56,7 +56,7 @@ const sectorsList = computed(() => {
       localizedName = t(sector.nameId)
     }
     sectors.push({
-      id: sector.macro || sector.id,
+      id: sector.id,
       englishName,
       localizedName
     })

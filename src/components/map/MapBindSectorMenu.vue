@@ -68,7 +68,7 @@ function getAllMapSectors(): MapSectorCandidate[] {
     ;(cluster.sectors || []).forEach((sectorId: string) => {
       const sector = sectors[sectorId]
       if (!sector) return
-      const sectorMacro = sector.macro || sector.id
+      const sectorMacro = sector.id
       result.push(buildMapSectorCandidate(sectorMacro))
     })
   })
@@ -271,6 +271,20 @@ onBeforeUnmount(() => {
           >
             <span class="sector-name">{{ sector.sectorName }}</span>
             <span v-if="sector.showRawSectorName" class="sector-raw-name">{{ sector.rawSectorName }}</span>
+            <span
+              class="bind-menu-locate-btn"
+              :title="t('map.binding_locate_sector')"
+              @click.stop="onFocusSector(sector.sectorMacro)"
+            >
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="6" cy="6" r="4"/>
+                <circle cx="6" cy="6" r="1.5"/>
+                <line x1="6" y1="1" x2="6" y2="3"/>
+                <line x1="6" y1="9" x2="6" y2="11"/>
+                <line x1="1" y1="6" x2="3" y2="6"/>
+                <line x1="9" y1="6" x2="11" y2="6"/>
+              </svg>
+            </span>
           </button>
         </template>
         <div v-else-if="filteredMapSectorsDisplay.length > 10" class="bind-menu-hint">

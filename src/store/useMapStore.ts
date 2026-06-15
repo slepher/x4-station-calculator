@@ -132,7 +132,7 @@ export const useMapStore = defineStore('map', () => {
         const normalizedSectorId = normalizeMacro(sectorId)
         if (normalizedSectorId) nextIndex.set(normalizedSectorId, resolved)
 
-        const normalizedSectorMacro = normalizeMacro(sector.macro || sector.id)
+        const normalizedSectorMacro = normalizeMacro(sector.id)
         if (normalizedSectorMacro) nextIndex.set(normalizedSectorMacro, resolved)
       })
     })
@@ -204,7 +204,7 @@ export const useMapStore = defineStore('map', () => {
           sectorCenter.y >= bounds.top &&
           sectorCenter.y <= bounds.bottom
         if (visible) {
-          const sectorMacro = sector.macro || sector.id
+          const sectorMacro = sector.id
           const displayName = sector.nameId && te(sector.nameId) ? t(sector.nameId) : (sector.name || sector.id)
           visibleSectors.push({ sectorMacro, displayName })
         }

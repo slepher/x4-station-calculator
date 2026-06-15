@@ -7,7 +7,7 @@ import SectorConfirmBar from './SectorConfirmBar.vue'
 import SectorGroupList from './SectorGroupList.vue'
 import SectorAllocationList from './SectorAllocationList.vue'
 import AllocationConfirmBar from './AllocationConfirmBar.vue'
-import SectorHubAddMenu from './SectorHubAddMenu.vue'
+import HubAddMenu from '@/components/map/HubAddMenu.vue'
 
 const presenter = useAutoSectorGroupPresenter()
 const {
@@ -49,7 +49,6 @@ const {
   handleToggleRetainConnection,
   handleMasterBridgeRetain,
   handleMasterCoverageRetain,
-  handleReorderGroups,
   handleConfirm,
   triggerAutoGroup,
   handleUploadComplete,
@@ -129,7 +128,6 @@ defineExpose({ triggerAutoGroup })
         @delete-group="handleDeleteGroup"
         @toggle-retain-coverage="handleToggleRetainCoverage"
         @toggle-retain-connection="handleToggleRetainConnection"
-        @reorder-groups="handleReorderGroups"
       />
     </div>
 
@@ -168,18 +166,24 @@ defineExpose({ triggerAutoGroup })
       </div>
     </div>
   </div>
-  <SectorHubAddMenu
-    v-if="showHubAddMenu"
-    :maps="gameDataMaps"
-    :player-sector-macros="autoGroupResult?.playerSectorMacros ?? []"
-    :existing-anchor-sector-macros="getExistingAnchorSectors()"
-    :station-counts="stationCounts"
-    @add-hub="handleAddHubDraft"
-    @close="showHubAddMenu = false"
-  />
+  <div v-if="showHubAddMenu" class="hub-add-overlay" @click.self="showHubAddMenu = false">
+    <HubAddMenu
+      mode="overlay"
+      :open="showHubAddMenu"
+      :player-sector-macros="autoGroupResult?.playerSectorMacros ?? []"
+      :occupied-sector-macros="[...getExistingAnchorSectors()]"
+      @close="showHubAddMenu = false"
+      @add-hub="(m: string) => { handleAddHubDraft(m); showHubAddMenu = false }"
+      @focus-sector="() => {}"
+    />
+  </div>
 </template>
 
 <style scoped>
+.hub-add-overlay {
+  @apply fixed inset-0 z-50 flex items-start justify-center pt-20 bg-black/60;
+}
+
 .main-layout {
   @apply grid grid-cols-12 gap-8 items-start px-4 pt-4;
 }

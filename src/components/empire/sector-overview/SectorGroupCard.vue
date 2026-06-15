@@ -258,6 +258,19 @@ function onAnchorPillClick(macro: string) {
           </svg>
         </div>
         <span class="group-name">{{ group.name }}</span>
+        <button
+          v-if="showSelectGroupButton"
+          class="station-bind-icon-btn"
+          :title="t('map.binding_view_detail')"
+          @click="emit('select-group', group.id)"
+        >
+          <svg viewBox="0 0 24 24" class="station-bind-svg" aria-hidden="true">
+            <path d="M5 6.5C5 5.67 5.67 5 6.5 5H17.5C18.33 5 19 5.67 19 6.5V17.5C19 18.33 18.33 19 17.5 19H6.5C5.67 19 5 18.33 5 17.5V6.5Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M8 9H16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M8 12H16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M8 15H13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
       </div>
       <div class="group-actions">
         <label v-if="props.editable" class="retain-chk" :title="t('sector.coverage_retain')">
@@ -381,16 +394,6 @@ function onAnchorPillClick(macro: string) {
         <span v-if="getUncertainCount(group.id) > 0" class="text-amber-400">
           {{ t('sector.uncertain') }}: {{ getUncertainCount(group.id) }}
         </span>
-        <button
-          v-if="showSelectGroupButton"
-          class="station-bind-btn"
-          @click="emit('select-group', group.id)"
-        >
-          <svg class="station-bind-icon" viewBox="0 0 24 24" fill="none" width="14" height="14">
-            <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <span>{{ t('map.binding_enter_station') }}</span>
-        </button>
       </div>
     </div>
   </div>
@@ -611,13 +614,13 @@ function onAnchorPillClick(macro: string) {
   @apply cursor-grabbing;
 }
 
-/* Station binding button */
-.station-bind-btn {
-  @apply ml-auto inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded border border-sky-400/30 bg-sky-500/10 text-sky-200 hover:bg-sky-500/20 transition-colors;
+/* Station binding icon button */
+.station-bind-icon-btn {
+  @apply inline-flex h-7 w-7 items-center justify-center rounded text-amber-100/65 transition-colors hover:bg-amber-200/10 hover:text-amber-50 shrink-0;
 }
 
-.station-bind-icon {
-  @apply shrink-0;
+.station-bind-svg {
+  @apply w-4 h-4;
 }
 
 /* Map compact */

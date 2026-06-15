@@ -89,7 +89,7 @@ export function isSectorReachable(
 function findSectorIdByMacro(maps: X4Map, sectorMacro: string): string | null {
   const normalizedTarget = sectorMacro.toLowerCase()
   for (const sector of Object.values(maps.sectors || {})) {
-    const sectorMacroLower = (sector.macro || sector.id).toLowerCase()
+    const sectorMacroLower = sector.id.toLowerCase()
     if (sectorMacroLower === normalizedTarget) {
       return sector.id
     }
