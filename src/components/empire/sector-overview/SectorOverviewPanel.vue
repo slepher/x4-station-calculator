@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { useAutoSectorGroupPresenter } from '@/components/empire/presenters/useAutoSectorGroupPresenter'
 import SaveUploadPanel from '@/components/save/SaveUploadPanel.vue'
 import SaveList from '@/components/save/SaveList.vue'
@@ -64,7 +64,6 @@ const {
   overviewSellMultiplier,
   hasPendingBridgeDecision,
   hasUncertainAssignments,
-  hasUnresolvedTradeStations,
   hasAutoResult,
   stationCounts,
   canDisableNode,
@@ -80,6 +79,8 @@ const {
 
 const col3ActiveTab = ref<'allocation' | 'tradeStation'>('allocation')
 
+const hasLiveTradeStationCandidates = computed(() => Object.keys(tradeStationCandidates).length > 0)
+
 let initialLiveAutoSwitchDone = false
 watch(autoGroupResult, (result) => {
   if (initialLiveAutoSwitchDone) return
@@ -87,7 +88,7 @@ watch(autoGroupResult, (result) => {
   initialLiveAutoSwitchDone = true
   if (hasUncertainAssignments.value || hasPendingBridgeDecision.value) {
     col3ActiveTab.value = 'allocation'
-  } else if (hasUnresolvedTradeStations.value) {
+  } else if (hasLiveTradeStationCandidates.value) {
     col3ActiveTab.value = 'tradeStation'
   } else {
     col3ActiveTab.value = 'allocation'

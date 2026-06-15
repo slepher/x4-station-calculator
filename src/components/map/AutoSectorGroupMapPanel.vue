@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAutoSectorGroupPresenter } from '@/components/empire/presenters/useAutoSectorGroupPresenter'
 import { useActiveViewStore } from '@/store/useActiveViewStore'
@@ -110,10 +110,12 @@ function onQuickCalc() {
   switchToFirstUnresolvedTab()
 }
 
+const hasTradeStationCandidates = computed(() => Object.keys(tradeStationCandidates).length > 0)
+
 function switchToFirstUnresolvedTab() {
   if (hasUncertainAssignments.value || hasPendingBridgeDecision.value) {
     activeTab.value = 'allocation'
-  } else if (hasUnresolvedTradeStations.value) {
+  } else if (hasTradeStationCandidates.value) {
     activeTab.value = 'tradeStation'
   } else {
     activeTab.value = 'hub'
