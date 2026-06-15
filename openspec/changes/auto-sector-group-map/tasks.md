@@ -59,21 +59,27 @@
 ## 10. Bug 修复
 
 - [x] `handleAddHubDraft`：添加 hub 时从其他 group coverage 中移除该 sector
-- [x] 确认态 SectorConfirmBar 缺事件处理 → 补全
-- [x] `handleEnterEdit` 不再改变 `autoGroupConfirmed`，保留 Col 3 内容
+- [x] 确认态 SectorConfirmBar/SectorGroupList 缺事件处理 → 补全
+- [x] `handleEnterEdit` 不再改变 `autoGroupConfirmed`
 - [x] vuedraggable `:force-fallback="true"` 恢复滚轮滚动
 - [x] `X4MapSector.macro` 移除，全部替换为 `s.id`
 - [x] HubAddMenu 全地图搜索：`s.id` 作为标识符，接入 `useSectorNameFilter`
-- [x] HubAddMenu 双模式：`inline`（Map） / `overlay`（Live），Live 无定位按钮/默认不显示可见星区
+- [x] HubAddMenu 双模式：`inline`（Map） / `overlay`（Live）
 - [x] 删除 `SectorHubAddMenu.vue`，Live 改用 `HubAddMenu mode="overlay"`
+
+## 11. Stat Bar 重构
+
+- [x] SectorConfirmBar 两行布局，live/map 各异
+- [x] 参数持久化到 `SaveBindingPlan`（`normalizeState` 同步更新）
+- [x] 刷新初始化默认值：bridgeRetain=false, coverageRetain=true, node=有group则false
+- [x] 进入编辑：全局 retain 同步到 card；取消/计算：card 任一 checked → 全局 checked
+- [x] 编辑态不重置 retain 值
+- [x] `editSnapshot` 补充 retain/node 字段
+- [x] `handleQuickCalculate` 尊重 checkbox 当前值
 
 ## 11. 构建验证
 
 - [x] `npm run build` 通过
-
-## 未解决
-
-- [ ] vuedraggable 完成态仍可拖拽（v-if/v-else 分支切换后 Sortable.js 事件残留）
 
 
 ## 未解决

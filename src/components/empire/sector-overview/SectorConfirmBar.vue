@@ -30,6 +30,7 @@ const emit = defineEmits<{
   (e: 'update:bridgeRetainEnabled', value: boolean): void
   (e: 'update:coverageRetainEnabled', value: boolean): void
   (e: 'calculate'): void
+  (e: 'quick-calculate'): void
   (e: 'edit'): void
   (e: 'cancel'): void
   (e: 'add-hub'): void
@@ -65,111 +66,100 @@ function onCoverageRetainChange(e: Event) {
 
 <template>
   <div class="confirm-bar" :class="{ 'confirm-bar--map': view === 'map' }">
+    <!-- Row 1 -->
     <div class="bar-row">
       <div class="bar-left">
-        <!-- 桥接 + 保留 -->
         <div class="param-field" :title="t('sector.bridge_search_jump')">
           <span class="bar-label">{{ t('sector.bridge_search_jump_short') }}</span>
-          <span v-if="mode === 'result'" class="bar-value">{{ bridgeSearchJumpRange }}{{ t('sector.jump_unit') }}</span>
-          <select
-            v-else
-            class="bar-select bar-select--narrow"
-            :value="bridgeSearchJumpRange"
-            @change="emit('update:bridgeSearchJumpRange', Number(($event.target as HTMLSelectElement).value))"
-          >
+          <select class="bar-select bar-select--narrow" :value="bridgeSearchJumpRange" @change="emit('update:bridgeSearchJumpRange', Number(($event.target as HTMLSelectElement).value))">
             <option v-for="j in bridgeJumpOptions" :key="j" :value="j" :disabled="j < prefJumpRange">{{ j }}{{ t('sector.jump_unit') }}</option>
           </select>
-          <label v-if="mode === 'edit'" class="bar-label-inline" :title="t('sector.bridge_retain')">
-            <input
-              type="checkbox"
-              class="bar-checkbox"
-              :checked="bridgeRetainEnabled"
-              :indeterminate.prop="bridgeRetainIndeterminate"
-              @change="onBridgeRetainChange"
-            />
+          <label class="bar-label-inline" :title="t('sector.bridge_retain')">
+            <input type="checkbox" class="bar-checkbox" :checked="bridgeRetainEnabled" :indeterminate.prop="bridgeRetainIndeterminate" @change="onBridgeRetainChange" />
             <span class="bar-label">{{ t('sector.retain') }}</span>
           </label>
         </div>
 
-        <!-- 节点 -->
-        <div v-if="mode === 'edit'" class="param-field" :title="t('sector.node_enabled_desc')">
+        <div class="param-field" :title="t('sector.node_enabled_desc')">
           <label class="bar-label-inline">
-            <input
-              type="checkbox"
-              class="bar-checkbox"
-              :checked="nodeEnabled"
-              :disabled="nodeDisabled"
-              @change="emit('update:nodeEnabled', ($event.target as HTMLInputElement).checked)"
-            />
+            <input type="checkbox" class="bar-checkbox" :checked="nodeEnabled" :disabled="nodeDisabled" @change="emit('update:nodeEnabled', ($event.target as HTMLInputElement).checked)" />
             <span class="bar-label">{{ t('sector.node_enabled') }}</span>
           </label>
         </div>
 
-        <!-- 阈值 -->
+        <template v-if="view === 'live' && mode !== 'edit'">
         <div class="param-field" :title="t('sector.default_threshold')">
           <span class="bar-label">{{ t('sector.default_threshold_short') }}</span>
-          <span v-if="mode === 'result'" class="bar-value">{{ getThresholdLabel(prefThreshold) }}{{ t('sector.volume_unit_m3') }}</span>
-          <select
-            v-else
-            class="bar-select"
-            :value="prefThreshold"
-            :disabled="thresholdDisabled"
-            @change="emit('update:prefThreshold', Number(($event.target as HTMLSelectElement).value))"
-          >
-            <option v-for="opt in thresholdOptions" :key="opt.value" :value="opt.value">{{ opt.label }}{{ t('sector.volume_unit_m3') }}</option>
-          </select>
+          <span class="bar-value">{{ getThresholdLabel(prefThreshold) }}{{ t('sector.volume_unit_m3') }}</span>
         </div>
 
-        <!-- 覆盖 + 保留 -->
         <div class="param-field" :title="t('sector.group_coverage_jump')">
           <span class="bar-label">{{ t('sector.group_coverage_jump_short') }}</span>
-          <span v-if="mode === 'result'" class="bar-value">{{ prefJumpRange }}{{ t('sector.jump_unit') }}</span>
-          <select
-            v-else
-            class="bar-select bar-select--narrow"
-            :value="prefJumpRange"
-            :disabled="thresholdDisabled"
-            @change="emit('update:prefJumpRange', Number(($event.target as HTMLSelectElement).value))"
-          >
-            <option v-for="j in jumpOptions" :key="j" :value="j">{{ j }}{{ t('sector.jump_unit') }}</option>
-          </select>
-          <label v-if="mode === 'edit'" class="bar-label-inline" :title="t('sector.coverage_retain')">
-            <input
-              type="checkbox"
-              class="bar-checkbox"
-              :checked="coverageRetainEnabled"
-              :indeterminate.prop="coverageRetainIndeterminate"
-              @change="onCoverageRetainChange"
-            />
-            <span class="bar-label">{{ t('sector.retain') }}</span>
-          </label>
+          <span class="bar-value">{{ prefJumpRange }}{{ t('sector.jump_unit') }}</span>
         </div>
+        </template>
       </div>
-      <div class="bar-right">
-        <button v-if="mode !== 'edit'" class="bar-btn recalc-btn" @click="emit('edit')">
-          {{ t('sector.edit') }}
-        </button>
-        <button
-          v-if="mode !== 'edit' && showConfirm"
-          class="bar-btn confirm-btn"
-          :disabled="confirmDisabled"
-          @click="emit('confirm')"
-        >
-          {{ t('sector.confirm') }}
-        </button>
+
+      <!-- Live result: buttons on Row 1 right -->
+      <div v-if="mode === 'result' && view === 'live'" class="bar-right">
+        <button class="bar-btn recalc-btn" @click="emit('edit')">{{ t('sector.edit') }}</button>
+        <button class="bar-btn calculate-btn" @click="emit('quick-calculate')">{{ t('sector.calculate') }}</button>
+        <button v-if="showConfirm" class="bar-btn confirm-btn" :disabled="confirmDisabled" @click="emit('confirm')">{{ t('sector.confirm') }}</button>
+      </div>
+
+      <!-- Map result: [计算] [确认] on Row 1 right -->
+      <div v-if="mode === 'result' && view === 'map'" class="bar-right">
+        <button class="bar-btn calculate-btn" @click="emit('quick-calculate')">{{ t('sector.calculate') }}</button>
+        <button v-if="showConfirm" class="bar-btn confirm-btn" :disabled="confirmDisabled" @click="emit('confirm')">{{ t('sector.confirm') }}</button>
+      </div>
+
+      <!-- Edit mode: [取消] [计算] on Row 1 right -->
+      <div v-if="mode === 'edit'" class="bar-right">
+        <button class="bar-btn cancel-btn" @click="emit('cancel')">{{ t('sector.cancel') }}</button>
+        <button class="bar-btn recalc-btn" @click="emit('calculate')">{{ t('sector.calculate') }}</button>
       </div>
     </div>
-    <div v-if="mode === 'edit'" class="bar-row bar-row--actions">
-      <button class="bar-btn add-btn" @click="emit('add-hub')">
-        {{ t('sector.add_hub') }}
-      </button>
-      <div class="bar-actions">
-        <button class="bar-btn cancel-btn" @click="emit('cancel')">
-          {{ t('sector.cancel') }}
-        </button>
-        <button class="bar-btn recalc-btn" @click="emit('calculate')">
-          {{ t('sector.calculate') }}
-        </button>
+
+    <!-- Map/Live result: Row 2 with calculate/confirm, or edit: Row 2 with cancel/calculate -->
+    <template v-if="mode === 'result' && view === 'map'">
+    <div class="bar-row bar-row--result">
+      <div class="bar-left">
+        <span class="param-field" :title="t('sector.default_threshold')">
+          <span class="bar-label">{{ t('sector.default_threshold_short') }}</span>
+          <span class="bar-value">{{ getThresholdLabel(prefThreshold) }}{{ t('sector.volume_unit_m3') }}</span>
+        </span>
+        <span class="param-field" :title="t('sector.group_coverage_jump')">
+          <span class="bar-label">{{ t('sector.group_coverage_jump_short') }}</span>
+          <span class="bar-value">{{ prefJumpRange }}{{ t('sector.jump_unit') }}</span>
+        </span>
+      </div>
+      <div class="bar-right">
+        <button class="bar-btn recalc-btn" @click="emit('edit')">{{ t('sector.edit') }}</button>
+      </div>
+    </div>
+    </template>
+
+    <div v-if="mode === 'edit'" class="bar-row bar-row--result">
+      <div class="bar-left">
+        <span class="param-field" :title="t('sector.default_threshold')">
+          <span class="bar-label">{{ t('sector.default_threshold_short') }}</span>
+          <select class="bar-select" :value="prefThreshold" :disabled="thresholdDisabled" @change="emit('update:prefThreshold', Number(($event.target as HTMLSelectElement).value))">
+            <option v-for="opt in thresholdOptions" :key="opt.value" :value="opt.value">{{ opt.label }}{{ t('sector.volume_unit_m3') }}</option>
+          </select>
+        </span>
+        <span class="param-field" :title="t('sector.group_coverage_jump')">
+          <span class="bar-label">{{ t('sector.group_coverage_jump_short') }}</span>
+          <select class="bar-select bar-select--narrow" :value="prefJumpRange" :disabled="thresholdDisabled" @change="emit('update:prefJumpRange', Number(($event.target as HTMLSelectElement).value))">
+            <option v-for="j in jumpOptions" :key="j" :value="j">{{ j }}{{ t('sector.jump_unit') }}</option>
+          </select>
+          <label class="bar-label-inline" :title="t('sector.coverage_retain')">
+            <input type="checkbox" class="bar-checkbox" :checked="coverageRetainEnabled" :indeterminate.prop="coverageRetainIndeterminate" @change="onCoverageRetainChange" />
+            <span class="bar-label">{{ t('sector.retain') }}</span>
+          </label>
+        </span>
+      </div>
+      <div class="bar-right">
+        <button class="bar-btn add-btn" @click="emit('add-hub')">{{ t('sector.add_hub') }}</button>
       </div>
     </div>
   </div>
@@ -186,6 +176,10 @@ function onCoverageRetainChange(e: Event) {
 
 .bar-row--actions {
   @apply gap-1.5;
+}
+
+.bar-row--result {
+  @apply flex items-center justify-between gap-1.5;
 }
 
 .bar-left {
@@ -234,6 +228,10 @@ function onCoverageRetainChange(e: Event) {
 
 .recalc-btn {
   @apply bg-sky-600/20 text-sky-400 border border-sky-500/30 hover:bg-sky-600/30;
+}
+
+.calculate-btn {
+  @apply bg-amber-500/20 text-amber-400 border border-amber-500/30 hover:bg-amber-500/30;
 }
 
 .confirm-btn {

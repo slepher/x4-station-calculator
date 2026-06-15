@@ -50,6 +50,7 @@ const {
   handleMasterBridgeRetain,
   handleMasterCoverageRetain,
   handleConfirm,
+  handleQuickCalculate,
   triggerAutoGroup,
   handleUploadComplete,
   empireDerivedProductionFlows,
@@ -102,6 +103,7 @@ defineExpose({ triggerAutoGroup })
         @cancel="handleCancelEdit"
         @calculate="runCalculationFromEditInput"
         @add-hub="handleAddHubClick"
+        @quick-calculate="handleQuickCalculate"
       />
       <SectorGroupList
         :key="canDragGroups ? 'live-draft-draggable-groups' : 'live-static-groups'"

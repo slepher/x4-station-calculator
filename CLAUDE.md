@@ -312,7 +312,11 @@ When merging a worktree branch into develop:
 
 **违反后果：** 每次违反都需要向用户说明原因并道歉。没有例外，无论代码多简单。
 
-## Refactoring Rules
+## Data Persistence Rules
+
+- **给 `SaveBindingPlan` 等持久化类型新增字段时，必须同步更新 `useSaveBindingStore.ts` 中的 `normalizeState()` 函数**，否则新字段会在加载时被丢弃。
+- `normalizeState` 显式构造返回对象，不保留未列出的 key。
+- 已知案例：`prefJumpRange`、`bridgeSearchJumpRange`、`prefThreshold` 新增到 `SaveBindingPlan` 后未更新 `normalizeState`，导致持久化正常但刷新后值丢失。
 
 - **禁止在重构中使用 fallback 链**（如 `a || b || c`、`?.modules?.length ?? 0 > 0` 等兜底逻辑）
 - 分支条件必须精确映射业务状态，每个分支只做一件事，不依赖 sequential fallback 掩盖逻辑缺失

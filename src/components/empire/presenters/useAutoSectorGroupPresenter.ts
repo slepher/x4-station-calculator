@@ -37,6 +37,9 @@ const editSnapshot = ref<{
   bridgeSearchJumpRange: number
   prefThreshold: number
   autoGroupConfirmed: boolean
+  bridgeRetainEnabled: boolean
+  coverageRetainEnabled: boolean
+  nodeEnabled: boolean
   coverageByGroupId: Record<string, string[]>
   connectedGroupIdsByGroupId: Record<string, string[]>
 } | null>(null)
@@ -159,12 +162,20 @@ function runAutoGroup() {
   const binding = saveBindingStore.getBindingByGameGuid(guid)
   const { sectorGraph, sectorClusterMap } = sectorGraphInfo.value
 
+  // Load persisted params
+  if (binding) {
+    if (binding.prefJumpRange !== undefined) prefJumpRange.value = binding.prefJumpRange
+    if (binding.bridgeSearchJumpRange !== undefined) bridgeSearchJumpRange.value = binding.bridgeSearchJumpRange
+    if (binding.prefThreshold !== undefined) prefThreshold.value = binding.prefThreshold
+  }
+
   if (binding && binding.groups.length > 0) {
     const playerSectorMacros = getPlayerSectorMacrosFromArchive()
     if (!hasUngroupedPlayerSectors(binding.groups, playerSectorMacros)) {
       setAutoGroupConfirmed(true)
       calcBaselinePillState.value = null
       setAutoGroupResult(buildStoreGroups(binding.groups, playerSectorMacros))
+      setResultModeDefaults()
       return
     }
     setAutoGroupConfirmed(false)
@@ -177,9 +188,11 @@ function runAutoGroup() {
       setAutoGroupConfirmed(true)
       calcBaselinePillState.value = null
       setAutoGroupResult(buildStoreGroups(binding.groups, result.playerSectorMacros))
+      setResultModeDefaults()
       return
     }
     setAutoGroupResult(result)
+    setResultModeDefaults()
   } else {
     setAutoGroupConfirmed(false)
     const result = groupCleanSlate(
@@ -190,6 +203,7 @@ function runAutoGroup() {
       ...g, name: g.sectorMacro ? getSectorDisplayName(g.sectorMacro) : g.name,
     }))
     setAutoGroupResult({ ...result, groups: namedGroups })
+    setResultModeDefaults()
   }
 }
 
@@ -322,6 +336,7 @@ function runCalculationFromEditInput() {
   setAutoGroupResult({ ...result, groups: groupsWithBaseline })
   calculationMode.value = 'result'
   editSnapshot.value = null
+  syncRetainToGlobal()
 }
 
 function handleEnterEdit() {
@@ -332,6 +347,9 @@ function handleEnterEdit() {
     bridgeSearchJumpRange: bridgeSearchJumpRange.value,
     prefThreshold: prefThreshold.value,
     autoGroupConfirmed: autoGroupConfirmed.value,
+    bridgeRetainEnabled: bridgeRetainEnabled.value,
+    coverageRetainEnabled: coverageRetainEnabled.value,
+    nodeEnabled: nodeEnabled.value,
     coverageByGroupId: Object.fromEntries(
       (result?.groups ?? []).map((g) => [g.id, [...g.coverageSectorMacros]])
     ),
@@ -339,13 +357,13 @@ function handleEnterEdit() {
       (result?.groups ?? []).map((g) => [g.id, [...g.connectedGroupIds]])
     )
   }
+  handleMasterBridgeRetain(bridgeRetainEnabled.value)
+  handleMasterCoverageRetain(coverageRetainEnabled.value)
   if (result) {
     const groupsWithBaseline = result.groups.map((g) => ({ ...g, baseline: true, isPinned: true }))
     autoGroupResult.value = { ...result, groups: groupsWithBaseline }
   }
   // Reset retain to defaults
-  bridgeRetainEnabled.value = true
-  coverageRetainEnabled.value = true
   calculationMode.value = 'edit'
 }
 
@@ -357,11 +375,24 @@ function handleCancelEdit() {
   prefJumpRange.value = editSnapshot.value.prefJumpRange
   bridgeSearchJumpRange.value = editSnapshot.value.bridgeSearchJumpRange
   prefThreshold.value = editSnapshot.value.prefThreshold
-  nodeEnabled.value = true
+  nodeEnabled.value = editSnapshot.value.nodeEnabled ?? true
+  bridgeRetainEnabled.value = editSnapshot.value.bridgeRetainEnabled ?? true
+  coverageRetainEnabled.value = editSnapshot.value.coverageRetainEnabled ?? true
   setAutoGroupConfirmed(editSnapshot.value.autoGroupConfirmed)
   setAutoGroupResult(editSnapshot.value.result ? cloneAutoGroupResult(editSnapshot.value.result) : null)
   calculationMode.value = 'result'
   editSnapshot.value = null
+  syncRetainToGlobal()
+}
+
+function syncRetainToGlobal() {
+  if (!autoGroupResult.value) return
+  const anyBridgeChecked = autoGroupResult.value.groups.some(g => g.connectionRetainEnabled)
+  const anyCoverageChecked = autoGroupResult.value.groups.some(g => g.coverageRetainEnabled)
+  if (anyBridgeChecked) handleMasterBridgeRetain(true)
+  else handleMasterBridgeRetain(false)
+  if (anyCoverageChecked) handleMasterCoverageRetain(true)
+  else handleMasterCoverageRetain(false)
 }
 
 function handleUpdatePrefJumpRange(range: number) {
@@ -724,6 +755,17 @@ function canReorderGroups(): boolean {
   return canDragGroups.value
 }
 
+function setResultModeDefaults() {
+  handleMasterBridgeRetain(false)
+  handleMasterCoverageRetain(true)
+  const hasGroups = (autoGroupResult.value?.groups.length ?? 0) > 0
+  nodeEnabled.value = !hasGroups
+}
+
+function handleQuickCalculate() {
+  runCalculationFromEditInput()
+}
+
 function handleReorderGroups(nextGroups: GroupDraftInfo[]) {
   if (!canReorderGroups()) return
   if (!autoGroupResult.value) return
@@ -745,7 +787,7 @@ function handleConfirm() {
   const guid = activeViewStore.activeBinding
   if (!guid) return
   const result = autoGroupResult.value
-  saveBindingStore.createAutoGroups(guid, result.groups, sectorGraphInfo.value.sectorGraph, sectorGraphInfo.value.sectorClusterMap)
+  saveBindingStore.createAutoGroups(guid, result.groups, sectorGraphInfo.value.sectorGraph, sectorGraphInfo.value.sectorClusterMap, prefJumpRange.value, bridgeSearchJumpRange.value, prefThreshold.value)
   saveBindingStore.saveBinding()
   liveStore.syncAllBindingStationsToStateMap()
   liveStore.syncLiveFlowMap()
@@ -812,7 +854,6 @@ onMounted(() => {
   const gameGuid = activeViewStore.activeBinding
   if (gameGuid) {
     liveStore.activateBinding(gameGuid)
-    runAutoGroup()
   }
 })
 
@@ -906,6 +947,7 @@ return {
   handleMasterBridgeRetain,
   handleMasterCoverageRetain,
   handleReorderGroups,
+  handleQuickCalculate,
   handleConfirm,
   triggerAutoGroup,
   handleUploadComplete,

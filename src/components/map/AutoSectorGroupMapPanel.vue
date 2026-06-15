@@ -60,6 +60,7 @@ const {
   handleMasterBridgeRetain,
   handleMasterCoverageRetain,
   handleConfirm,
+  handleQuickCalculate,
   hasUncertainAssignments,
   hasPendingBridgeDecision,
   hasAutoResult,
@@ -100,7 +101,7 @@ function onCalculate() {
           @update:pref-jump-range="handleUpdatePrefJumpRange" @update:bridge-search-jump-range="handleUpdateBridgeSearchJumpRange"
           @update:pref-threshold="prefThreshold = $event" @update:node-enabled="nodeEnabled = $event"
           @update:bridge-retain-enabled="handleMasterBridgeRetain" @update:coverage-retain-enabled="handleMasterCoverageRetain"
-          @edit="handleEnterEdit" @cancel="handleCancelEdit" @calculate="onCalculate"
+          @edit="handleEnterEdit" @cancel="handleCancelEdit" @calculate="onCalculate" @quick-calculate="handleQuickCalculate"
           @add-hub="handleAddHubClick" :show-confirm="false" :confirm-disabled="false" @confirm="handleConfirm"
         />
         <HubAddMenu
@@ -149,7 +150,7 @@ function onCalculate() {
             @update:pref-jump-range="handleUpdatePrefJumpRange" @update:bridge-search-jump-range="handleUpdateBridgeSearchJumpRange"
             @update:pref-threshold="prefThreshold = $event" @update:node-enabled="nodeEnabled = $event"
             @update:bridge-retain-enabled="handleMasterBridgeRetain" @update:coverage-retain-enabled="handleMasterCoverageRetain"
-            @edit="handleEnterEdit" @cancel="handleCancelEdit" @calculate="onCalculate" @add-hub="handleAddHubClick"
+            @edit="handleEnterEdit" @cancel="handleCancelEdit" @calculate="onCalculate" @quick-calculate="handleQuickCalculate" @add-hub="handleAddHubClick"
             :show-confirm="calculationMode === 'result'" :confirm-disabled="hasUncertainAssignments || hasPendingBridgeDecision"
             @confirm="handleConfirm"
           />

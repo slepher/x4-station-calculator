@@ -116,6 +116,9 @@ function normalizeState(input: Partial<SavedSaveBindingsState> | null | undefine
             blueprintEmpireId: item.blueprintEmpireId,
             groups,
             stationPlans: normalizedStationPlans,
+            prefJumpRange: item.prefJumpRange,
+            bridgeSearchJumpRange: item.bridgeSearchJumpRange,
+            prefThreshold: item.prefThreshold,
             updatedAt: Number.isFinite(Number(item.updatedAt)) ? Number(item.updatedAt) : Date.now()
           }
         })
@@ -655,10 +658,17 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     gameGuid: string,
     drafts: GroupDraftInfo[],
     sectorGraph: Record<string, string[]>,
-    sectorClusterMap: Record<string, string>
+    sectorClusterMap: Record<string, string>,
+    prefJumpRange?: number,
+    bridgeSearchJumpRange?: number,
+    prefThreshold?: number
   ) {
     if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) loadDraftForGameGuid(gameGuid)
     if (!draftBinding.value) return
+
+    if (prefJumpRange !== undefined) draftBinding.value.prefJumpRange = prefJumpRange
+    if (bridgeSearchJumpRange !== undefined) draftBinding.value.bridgeSearchJumpRange = bridgeSearchJumpRange
+    if (prefThreshold !== undefined) draftBinding.value.prefThreshold = prefThreshold
 
     const existingIds = new Set(draftBinding.value.groups.map((g) => g.id))
     // Also map by sectorMacro for matching standalone groups that changed UUID

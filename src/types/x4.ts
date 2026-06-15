@@ -1297,6 +1297,9 @@ export interface SaveBindingPlan {
   blueprintEmpireId?: string
   groups: BindingSectorGroup[]
   stationPlans: BindingStationPlan[]
+  bridgeSearchJumpRange?: number
+  prefJumpRange?: number
+  prefThreshold?: number
   updatedAt: number
 }
 
