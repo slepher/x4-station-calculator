@@ -381,12 +381,10 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     
     // Ensure tradestation exists at anchor sector center
     if (input.sectorMacro) {
-      const position = getSectorCenterPosition(gameData.maps, input.sectorMacro)
       if (group.tradeStation) {
         group.tradeStation.sectorMacro = input.sectorMacro
-        group.tradeStation.saveStationCode = undefined
-        group.tradeStation.position = position
       } else {
+        const position = getSectorCenterPosition(gameData.maps, input.sectorMacro)
         group.tradeStation = {
           id: crypto.randomUUID(),
           name: 'Trade Station',
@@ -394,8 +392,8 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
           position
         }
       }
-      draftBinding.value.updatedAt = Date.now()
     }
+      draftBinding.value.updatedAt = Date.now()
   }
 
   function setGroupConnection(gameGuid: string, sourceGroupId: string, targetGroupId: string, connected: boolean) {
@@ -703,15 +701,18 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
             jumpRange: draft.jumpRange,
             coverageSectorMacros: entries
           })
-          if (draft.hubStationCode) {
+          const archive = saveStore.selectedArchive
+           if (draft.hubStationCode) {
+            const station = archive?.sectors?.[draft.sectorMacro!]?.player_stations?.[draft.hubStationCode]
             upsertTradeStation({
               gameGuid,
               groupId: targetId,
               saveStationCode: draft.hubStationCode,
-              name: draft.name
-            })
+              name: draft.name,
+              sectorMacro: draft.sectorMacro,
+            position: station?.position
+          })
           } else if (draft.sectorMacro) {
-            const archive = saveStore.selectedArchive
             const sectorStations = archive?.sectors?.[draft.sectorMacro]?.player_stations
             if (sectorStations) {
               // Pick station with highest container capacity as fallback hub
@@ -728,12 +729,15 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
                   bestCode = code
                 }
               }
-              if (bestCode) {
+               if (bestCode) {
+                const station = archive.sectors[draft.sectorMacro!]!.player_stations![bestCode]
                 upsertTradeStation({
                   gameGuid,
                   groupId: targetId,
                   saveStationCode: bestCode,
-                  name: draft.name
+                  name: draft.name,
+                  sectorMacro: draft.sectorMacro,
+                  position: station!.position
                 })
               }
             }
@@ -765,11 +769,15 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
           })
 
           if (draft.hubStationCode) {
+            const archive = saveStore.selectedArchive
+            const station = archive?.sectors?.[draft.sectorMacro!]?.player_stations?.[draft.hubStationCode]
             upsertTradeStation({
               gameGuid,
               groupId: group.id,
               saveStationCode: draft.hubStationCode,
-              name: draft.name
+              name: draft.name,
+              sectorMacro: draft.sectorMacro,
+              position: station?.position
             })
           } else {
             // For standalone/bridge groups without explicit hubStationCode,
@@ -790,12 +798,15 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
                   bestCode = code
                 }
               }
-              if (bestCode) {
+               if (bestCode) {
+                const station = archive.sectors![draft.sectorMacro!]!.player_stations![bestCode]
                 upsertTradeStation({
                   gameGuid,
                   groupId: group.id,
                   saveStationCode: bestCode,
-                  name: draft.name
+                  name: draft.name,
+                  sectorMacro: draft.sectorMacro,
+                  position: station!.position
                 })
               }
             }
