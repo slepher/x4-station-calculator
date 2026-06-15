@@ -58,8 +58,6 @@ const cardBase = computed(() => ({
   baselineConnectedGroupIdsByGroupId: props.baselineConnectedGroupIdsByGroupId
 }))
 
-const selectedStations = props.selectedTradeStations ?? {}
-
 function onUpdateJumpRange(groupId: string, range: number) { emit('update-jump-range', groupId, range) }
 function onToggleCoverageInput(groupId: string, sectorMacro: string) { emit('toggle-coverage-input', groupId, sectorMacro) }
 function onToggleConnectedInput(groupId: string, connectedGroupId: string) { emit('toggle-connected-input', groupId, connectedGroupId) }
@@ -101,7 +99,7 @@ function onSelectGroup(sectorGroupId: string) { emit('select-group', sectorGroup
           :groups="groups"
           v-bind="cardBase"
           :show-drag-handle="true"
-          :selected-trade-station="selectedStations[group.id] ?? null"
+          :selected-trade-station="(selectedTradeStations ?? {})[group.id] ?? null"
           @cycle-recalc-state="onCycleRecalcState"
           @update-jump-range="onUpdateJumpRange"
           @toggle-coverage-input="onToggleCoverageInput"
@@ -125,7 +123,7 @@ function onSelectGroup(sectorGroupId: string) { emit('select-group', sectorGroup
         :groups="groups"
         v-bind="cardBase"
         :show-drag-handle="false"
-        :selected-trade-station="selectedStations[group.id] ?? null"
+        :selected-trade-station="(selectedTradeStations ?? {})[group.id] ?? null"
         @cycle-recalc-state="onCycleRecalcState"
         @update-jump-range="onUpdateJumpRange"
         @toggle-coverage-input="onToggleCoverageInput"
