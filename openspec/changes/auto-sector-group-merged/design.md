@@ -196,6 +196,34 @@ runCalculationFromEditInput()
 
 结果态 `SectorGroupList` 通过 `baselineCoverageByGroupId` / `baselineConnectedGroupIdsByGroupId` props 接收 E2 基线数据（来自 `calcBaselinePillState`），与编辑态共用 `buildUnifiedPills()` 中的 baseline 判定 + 新增 removed pill 回填逻辑。
 
+### E1/E2 Diff 视觉规范
+
+新增 = 加粗强调 + 左实心，baseline = 普通，removed = 虚线。编辑态下 baseline 变为候选/unlink 视为变更（加粗）。
+
+#### Pill
+
+| 状态 | 边框 | 左实心 | 说明 |
+|------|------|--------|------|
+| baseline | `border-2` | 无 | 未变更的 E1/E2 基线项 |
+| new（coverage） | `border-2` | `amber-300/30` | 编辑态新增覆盖 / 结果态算法新增 |
+| new（connected） | `border-2` | `emerald-300/30` | 编辑态新增连接 / 结果态算法新增 |
+| new（candidate from baseline） | `border-2` | `amber-300/20` | 编辑态 baseline coverage 被 `×` 变成候选 |
+| new（unlink from baseline） | `border-2` | `emerald-300/30` | 编辑态 baseline link 被 `×` 变 unlink |
+| removed | `border-dashed opacity-60` | 无 | E2 基线存在但计算结果中消失 |
+| candidate / unlinked（非 baseline） | 单线 | 无 | 普通候选/可连接，非变更 |
+
+#### Group Card
+
+| 状态 | 边框 | 说明 |
+|------|------|------|
+| new | `border-2` + `border-l-[3px] border-l-sky-400` | 算法新增 group |
+| baseline | 单线 | 已持久化 / 计算基线 group |
+| unpinned baseline | `border-slate-600/30`（原有样式） | 编辑态 unpinned baseline |
+
+#### Pill→Link 简化
+
+移除 coverage 变为 connected 时，不再显示 split pill，直接作为普通 connected pill 展示。
+
 ## SectorConfirmBar
 
 编辑态：
