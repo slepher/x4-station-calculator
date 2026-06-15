@@ -167,6 +167,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
           :player-sector-macros="autoGroupResult?.playerSectorMacros ?? []"
           :editable="calculationMode === 'edit'" :diff-enabled="false" :show-select-group-button="calculationMode !== 'edit'"
           :draggable="false" view="map"
+          :selected-trade-stations="selectedTradeStations"
           @cycle-recalc-state="handleCycleRecalcState"
           @update-jump-range="handleUpdateJumpRange"
           @toggle-coverage-input="handleToggleCoverageInput"

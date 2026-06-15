@@ -3,6 +3,7 @@ import draggable from 'vuedraggable'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { GroupDraftInfo, SectorAssignment } from '@/store/logic/autoGroup'
+import type { TradeStationSelection } from '@/store/logic/tradeStationSelection'
 import type { X4MapSector } from '@/types/x4'
 import SectorGroupCard from './SectorGroupCard.vue'
 
@@ -20,6 +21,7 @@ const props = withDefaults(defineProps<{
   draggable?: boolean
   baselineCoverageByGroupId?: Record<string, string[]>
   baselineConnectedGroupIdsByGroupId?: Record<string, string[]>
+  selectedTradeStations?: Record<string, TradeStationSelection>
 }>(), {
   view: 'live',
   showSelectGroupButton: false,
@@ -55,6 +57,8 @@ const cardBase = computed(() => ({
   baselineCoverageByGroupId: props.baselineCoverageByGroupId,
   baselineConnectedGroupIdsByGroupId: props.baselineConnectedGroupIdsByGroupId
 }))
+
+const selectedStations = props.selectedTradeStations ?? {}
 
 function onUpdateJumpRange(groupId: string, range: number) { emit('update-jump-range', groupId, range) }
 function onToggleCoverageInput(groupId: string, sectorMacro: string) { emit('toggle-coverage-input', groupId, sectorMacro) }
@@ -97,6 +101,7 @@ function onSelectGroup(sectorGroupId: string) { emit('select-group', sectorGroup
           :groups="groups"
           v-bind="cardBase"
           :show-drag-handle="true"
+          :selected-trade-station="selectedStations[group.id] ?? null"
           @cycle-recalc-state="onCycleRecalcState"
           @update-jump-range="onUpdateJumpRange"
           @toggle-coverage-input="onToggleCoverageInput"
@@ -120,6 +125,7 @@ function onSelectGroup(sectorGroupId: string) { emit('select-group', sectorGroup
         :groups="groups"
         v-bind="cardBase"
         :show-drag-handle="false"
+        :selected-trade-station="selectedStations[group.id] ?? null"
         @cycle-recalc-state="onCycleRecalcState"
         @update-jump-range="onUpdateJumpRange"
         @toggle-coverage-input="onToggleCoverageInput"

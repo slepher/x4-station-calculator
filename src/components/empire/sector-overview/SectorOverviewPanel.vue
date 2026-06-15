@@ -154,6 +154,7 @@ defineExpose({ triggerAutoGroup })
         :baseline-connected-group-ids-by-group-id="
           calculationMode === 'edit' ? editSnapshot?.connectedGroupIdsByGroupId : calcBaselinePillState?.connectedGroupIdsByGroupId
         "
+        :selected-trade-stations="selectedTradeStations"
         @cycle-recalc-state="handleCycleRecalcState"
         @update-jump-range="handleUpdateJumpRange"
         @toggle-coverage-input="handleToggleCoverageInput"

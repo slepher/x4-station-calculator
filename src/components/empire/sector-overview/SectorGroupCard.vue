@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import type { GroupDraftInfo, SectorAssignment } from '@/store/logic/autoGroup'
+import type { TradeStationSelection } from '@/store/logic/tradeStationSelection'
 import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
 import { getCoverageSectors } from '@/store/logic/saveBindingUtils'
 import JumpInput from '@/components/common/JumpInput.vue'
@@ -21,6 +22,7 @@ const props = withDefaults(defineProps<{
   showDragHandle?: boolean
   baselineCoverageByGroupId?: Record<string, string[]>
   baselineConnectedGroupIdsByGroupId?: Record<string, string[]>
+  selectedTradeStation?: TradeStationSelection | null
 }>(), {
   view: 'live',
   showSelectGroupButton: false,
@@ -343,6 +345,15 @@ function onAnchorPillClick(macro: string) {
             <span class="pill-dot" :class="playerSectorMacros.includes(group.sectorMacro || '') ? 'pill-dot--filled' : 'pill-dot--empty'"/>
             {{ getSectorName(group.sectorMacro || '') }}
           </span>
+          <span
+            v-if="selectedTradeStation"
+            class="pill pill--trade-station"
+            :class="{ 'cursor-pointer hover:text-sky-300': view === 'map' }"
+            @click="view === 'map' && group.sectorMacro && emit('focus-sector', group.sectorMacro)"
+          >
+            <span class="pill-dot pill-dot--small" :class="selectedTradeStation.type === 'virtual' ? 'pill-dot--empty' : 'pill-dot--filled'"/>
+            {{ selectedTradeStation.type === 'virtual' ? t('sector.virtual_trade_station') : selectedTradeStation.stationCode }}
+          </span>
           <div class="jump-control">
             <template v-if="!canEditJumpRange(group)">
               <span class="jump-readonly">{{ group.jumpRange }}</span>
@@ -574,6 +585,14 @@ function onAnchorPillClick(macro: string) {
 
 .pill-dot--empty {
   @apply border border-slate-500 bg-transparent;
+}
+
+.pill--trade-station {
+  @apply inline-flex items-center gap-1 rounded-full border border-sky-500/30 bg-sky-500/10 px-2 py-0.5 text-xs text-sky-200;
+}
+
+.pill-dot--small {
+  @apply h-1 w-1;
 }
 
 .jump-control {
