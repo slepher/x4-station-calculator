@@ -859,7 +859,7 @@ const coverageRetainIndeterminate = computed(() => {
         :sector-cluster-map="sectorGraphInfo.sectorClusterMap"
         :player-sector-macros="autoGroupResult?.playerSectorMacros ?? []"
         :editable="calculationMode === 'edit'"
-        :diff-enabled="!autoGroupConfirmed"
+        :diff-enabled="calculationMode === 'edit' || !autoGroupConfirmed"
         :baseline-coverage-by-group-id="
           calculationMode === 'edit' ? editSnapshot?.coverageByGroupId : calcBaselinePillState?.coverageByGroupId
         "
