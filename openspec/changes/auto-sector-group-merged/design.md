@@ -56,16 +56,21 @@ Vue 组件仍遵守 `store -> presenter -> vue` 三层结构。Vue 不直接拼�
 interface GroupDraftInfo {
   id: string
   name: string
-  sectorMacro: string
+  sectorMacro?: string
   jumpRange: number
-  coverageSectorMacros: CoverageSectorEntry[]
+  originalJumpRange: number
+  coverageSectorMacros: string[]
   connectedGroupIds: string[]
+  excludedDefaultAssignmentSectorMacros: string[]
   isNew: boolean
   isPinned: boolean
+  coverageRetainEnabled: boolean
+  connectionRetainEnabled: boolean
+  hubScore?: number
+  hubStationCode?: string
   baseline?: boolean
   role?: 'normal' | 'bridge'
   enteredOtherGroupCoverage?: boolean
-  excludedDefaultAssignmentSectorMacros: string[]
 }
 ```
 
@@ -132,9 +137,8 @@ interface BridgePlanOption {
 E1 基线用途：
 - [取消] 恢复进入编辑前完整状态。
 - baseline group (`baseline=true`) 不可真正删除。
-- 编辑态 coverage pill 在 E1 基线中 → 粗实线边框（`pill--baseline`）。
-- 编辑态 connected pill 在 E1 基线中 → 粗实线边框。
 - 判断 baseline sector 在无当前命中、无扩展命中时是否可以按 baseline group 重新吸收。
+- 视觉 diff 见下方 E1/E2 Diff 视觉规范。
 
 ## E2 计算基线 (Calculation Baseline)
 
@@ -153,20 +157,7 @@ calcBaselinePillState = {
 
 ### E2 基线 Pill 展示（计算结果态）
 
-计算结果态中 pill 有三种边框语义：
-
-| `baseline` | `removed` | 边框 | 含义 |
-|-----------|-----------|------|------|
-| `true` | `false` | **粗实线** (border-2) | E2 基线存在，计算结果中仍保留 |
-| `false` | `false` | 普通实线 | 计算结果新增（算法生成） |
-| `false` | `true` | **虚线** (border-dashed, opacity-60) | E2 基线存在，计算结果中被移除 |
-
-按 pill 类型：
-
-| 类型 | 仍保留 | 新增 | 已移除 |
-|------|--------|------|--------|
-| Coverage (金色) | 金色粗实线 | 金色普通实线 | 金色虚线，pill 保留不消失 |
-| Connected (绿色) | 绿色粗实线 | 绿色普通实线 | 绿色虚线，pill 保留不消失 |
+计算结果态中 pill 三种边框，详见下方 E1/E2 Diff 视觉规范。本章节保留作为概念总览，精确样式以视觉规范表为准。
 
 ### E2 基线注入流程
 
@@ -190,7 +181,7 @@ runCalculationFromEditInput()
 
 | 状态 | 边框 | 左实心 | 说明 |
 |------|------|--------|------|
-| baseline | `border-2` | 无 | 未变更的 E1/E2 基线项 |
+| baseline | `border-width: 1px` | 无 | 未变更的 E1/E2 基线项 |
 | new（coverage） | `border-2` | `amber-300/30` | 编辑态新增覆盖 / 结果态算法新增 |
 | new（connected） | `border-2` | `emerald-300/30` | 编辑态新增连接 / 结果态算法新增 |
 | new（candidate from baseline） | `border-2` | `amber-300/20` | 编辑态 baseline coverage 被 `×` 变成候选 |
@@ -258,6 +249,7 @@ interface UnifiedPillEntry {
   jump: number
   baseline: boolean
   removed: boolean
+  wasInBaseline: boolean
   hasPlayerStation: boolean
   connectedGroupId?: string
   connectedGroupName?: string
