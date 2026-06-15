@@ -106,6 +106,7 @@
     "new_station_name": "新建空间站",
     "add_station": "添加空间站",
     "add_hub": "添加枢纽",
+    "cancel_add_hub": "取消添加",
     "rename_station": "重命名",
     "duplicate_station": "复制分站",
     "delete_station": "删除分站",

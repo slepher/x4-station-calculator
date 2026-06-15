@@ -66,6 +66,8 @@
 - [x] HubAddMenu 全地图搜索：`s.id` 作为标识符，接入 `useSectorNameFilter`
 - [x] HubAddMenu 双模式：`inline`（Map） / `overlay`（Live）
 - [x] 删除 `SectorHubAddMenu.vue`，Live 改用 `HubAddMenu mode="overlay"`
+- [x] Map 添加枢纽按钮 toggle：打开/取消添加
+- [x] i18n `sector.cancel_add_hub` 中英文
 
 ## 11. Stat Bar 重构
 

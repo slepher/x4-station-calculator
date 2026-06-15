@@ -106,6 +106,7 @@
     "new_station_name": "New Station",
     "add_station": "Add Station",
     "add_hub": "Add Hub",
+    "cancel_add_hub": "Cancel Add",
     "rename_station": "Rename",
     "duplicate_station": "Duplicate",
     "delete_station": "Delete",

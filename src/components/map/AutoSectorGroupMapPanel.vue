@@ -102,7 +102,7 @@ function onCalculate() {
           @update:pref-threshold="prefThreshold = $event" @update:node-enabled="nodeEnabled = $event"
           @update:bridge-retain-enabled="handleMasterBridgeRetain" @update:coverage-retain-enabled="handleMasterCoverageRetain"
           @edit="handleEnterEdit" @cancel="handleCancelEdit" @calculate="onCalculate" @quick-calculate="handleQuickCalculate"
-          @add-hub="handleAddHubClick" :show-confirm="false" :confirm-disabled="false" @confirm="handleConfirm"
+          @add-hub="handleAddHubClick" :show-confirm="false" :confirm-disabled="false" :add-menu-open="showHubAddMenu" @confirm="handleConfirm"
         />
         <HubAddMenu
           :open="showHubAddMenu"
@@ -151,7 +151,7 @@ function onCalculate() {
             @update:pref-threshold="prefThreshold = $event" @update:node-enabled="nodeEnabled = $event"
             @update:bridge-retain-enabled="handleMasterBridgeRetain" @update:coverage-retain-enabled="handleMasterCoverageRetain"
             @edit="handleEnterEdit" @cancel="handleCancelEdit" @calculate="onCalculate" @quick-calculate="handleQuickCalculate" @add-hub="handleAddHubClick"
-            :show-confirm="calculationMode === 'result'" :confirm-disabled="hasUncertainAssignments || hasPendingBridgeDecision"
+            :show-confirm="calculationMode === 'result'" :confirm-disabled="hasUncertainAssignments || hasPendingBridgeDecision" :add-menu-open="showHubAddMenu"
             @confirm="handleConfirm"
           />
           <HubAddMenu

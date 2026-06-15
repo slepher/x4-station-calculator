@@ -16,6 +16,7 @@ const props = withDefaults(defineProps<{
   view?: 'map' | 'live'
   showConfirm?: boolean
   confirmDisabled?: boolean
+  addMenuOpen?: boolean
 }>(), {
   view: 'live',
   showConfirm: false,
@@ -159,7 +160,7 @@ function onCoverageRetainChange(e: Event) {
         </span>
       </div>
       <div class="bar-right">
-        <button class="bar-btn add-btn" @click="emit('add-hub')">{{ t('sector.add_hub') }}</button>
+        <button class="bar-btn add-btn" @click="emit('add-hub')">{{ addMenuOpen ? t('sector.cancel_add_hub') : t('sector.add_hub') }}</button>
       </div>
     </div>
   </div>

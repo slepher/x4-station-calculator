@@ -336,7 +336,6 @@ function runCalculationFromEditInput() {
   setAutoGroupResult({ ...result, groups: groupsWithBaseline })
   calculationMode.value = 'result'
   editSnapshot.value = null
-  syncRetainToGlobal()
 }
 
 function handleEnterEdit() {
@@ -666,7 +665,7 @@ function handleResetAssignments() {
 
 function handleAddHubClick() {
   if (calculationMode.value !== 'edit') return
-  showHubAddMenu.value = true
+  showHubAddMenu.value = !showHubAddMenu.value
 }
 
 function handleAddHubDraft(sectorMacro: string) {
