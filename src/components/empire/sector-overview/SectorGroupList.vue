@@ -508,7 +508,18 @@ function onPillAction(entry: UnifiedPillEntry, groupId: string) {
 
 .pill--new {
   @apply border-2;
-  box-shadow: inset 5px 0 0 0 rgb(56 189 248 / 0.35);
+}
+
+.pill--new.pill--coverage {
+  box-shadow: inset 5px 0 0 0 rgb(252 211 77 / 0.30);
+}
+
+.pill--new.pill--connected {
+  box-shadow: inset 5px 0 0 0 rgb(110 231 183 / 0.30);
+}
+
+.pill--new.pill--candidate {
+  box-shadow: inset 5px 0 0 0 rgb(252 211 77 / 0.20);
 }
 
 .pill--removed {
