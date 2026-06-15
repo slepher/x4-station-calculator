@@ -13,6 +13,8 @@ const props = withDefaults(defineProps<{
   coverageRetainEnabled: boolean
   bridgeRetainIndeterminate: boolean
   coverageRetainIndeterminate: boolean
+  tradeStationRetainEnabled?: boolean
+  tradeStationRetainIndeterminate?: boolean
   view?: 'map' | 'live'
   showConfirm?: boolean
   confirmDisabled?: boolean
@@ -30,6 +32,7 @@ const emit = defineEmits<{
   (e: 'update:nodeEnabled', value: boolean): void
   (e: 'update:bridgeRetainEnabled', value: boolean): void
   (e: 'update:coverageRetainEnabled', value: boolean): void
+  (e: 'update:tradeStationRetainEnabled', value: boolean): void
   (e: 'calculate'): void
   (e: 'quick-calculate'): void
   (e: 'edit'): void
@@ -63,6 +66,9 @@ function onBridgeRetainChange(e: Event) {
 function onCoverageRetainChange(e: Event) {
   emit('update:coverageRetainEnabled', (e.target as HTMLInputElement).checked)
 }
+function onTradeStationRetainChange(e: Event) {
+  emit('update:tradeStationRetainEnabled', (e.target as HTMLInputElement).checked)
+}
 </script>
 
 <template>
@@ -90,7 +96,7 @@ function onCoverageRetainChange(e: Event) {
 
         <template v-if="view === 'live' && mode !== 'edit'">
         <div class="param-field" :title="t('sector.default_threshold')">
-          <span class="bar-label">{{ t('sector.default_threshold_short') }}</span>
+          <span class="bar-label">{{ t('sector.trade_station_short') }}</span>
           <span class="bar-value">{{ getThresholdLabel(prefThreshold) }}{{ t('sector.volume_unit_m3') }}</span>
         </div>
 
@@ -126,7 +132,7 @@ function onCoverageRetainChange(e: Event) {
     <div class="bar-row bar-row--result">
       <div class="bar-left">
         <span class="param-field" :title="t('sector.default_threshold')">
-          <span class="bar-label">{{ t('sector.default_threshold_short') }}</span>
+          <span class="bar-label">{{ t('sector.trade_station_short') }}</span>
           <span class="bar-value">{{ getThresholdLabel(prefThreshold) }}{{ t('sector.volume_unit_m3') }}</span>
         </span>
         <span class="param-field" :title="t('sector.group_coverage_jump')">
@@ -143,10 +149,14 @@ function onCoverageRetainChange(e: Event) {
     <div v-if="mode === 'edit'" class="bar-row bar-row--result">
       <div class="bar-left">
         <span class="param-field" :title="t('sector.default_threshold')">
-          <span class="bar-label">{{ t('sector.default_threshold_short') }}</span>
+          <span class="bar-label">{{ t('sector.trade_station_short') }}</span>
           <select class="bar-select" :value="prefThreshold" :disabled="thresholdDisabled" @change="emit('update:prefThreshold', Number(($event.target as HTMLSelectElement).value))">
             <option v-for="opt in thresholdOptions" :key="opt.value" :value="opt.value">{{ opt.label }}{{ t('sector.volume_unit_m3') }}</option>
           </select>
+          <label class="bar-label-inline" :title="t('sector.trade_station_retain')">
+            <input type="checkbox" class="bar-checkbox" :checked="tradeStationRetainEnabled" :indeterminate.prop="tradeStationRetainIndeterminate" @change="onTradeStationRetainChange" />
+            <span class="bar-label">{{ t('sector.retain') }}</span>
+          </label>
         </span>
         <span class="param-field" :title="t('sector.group_coverage_jump')">
           <span class="bar-label">{{ t('sector.group_coverage_jump_short') }}</span>

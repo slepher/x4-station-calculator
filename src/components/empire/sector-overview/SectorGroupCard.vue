@@ -36,6 +36,7 @@ const emit = defineEmits<{
   (e: 'delete-group', groupId: string): void
   (e: 'toggle-retain-coverage', groupId: string): void
   (e: 'toggle-retain-connection', groupId: string): void
+  (e: 'toggle-retain-trade-station', groupId: string): void
   (e: 'focus-sector', sectorMacro: string): void
   (e: 'select-group', sectorGroupId: string): void
 }>()
@@ -62,6 +63,10 @@ function getPinnedTitle(group: GroupDraftInfo): string {
 function canEditJumpRange(group: GroupDraftInfo): boolean {
   if (!props.editable) return false
   return group.isPinned
+}
+
+function emitToggleTradeStationRetain(groupId: string) {
+  emit('toggle-retain-trade-station', groupId)
 }
 
 interface UnifiedPillEntry {
@@ -280,6 +285,10 @@ function onAnchorPillClick(macro: string) {
         <label v-if="props.editable" class="retain-chk" :title="t('sector.bridge_retain')">
           <input type="checkbox" class="bar-checkbox" :checked="group.connectionRetainEnabled" :disabled="!group.isPinned" @change="emit('toggle-retain-connection', group.id)" />
           <span class="retain-label">{{ t('sector.connected') }}</span>
+        </label>
+        <label v-if="props.editable" class="retain-chk" :title="t('sector.trade_station_retain')">
+          <input type="checkbox" class="bar-checkbox" :checked="!!group.tradeStationRetainEnabled" :disabled="!group.isPinned" @change="emitToggleTradeStationRetain(group.id)" />
+          <span class="retain-label">{{ t('sector.trade_station_short') }}</span>
         </label>
         <button
           v-if="props.editable && !group.enteredOtherGroupCoverage"

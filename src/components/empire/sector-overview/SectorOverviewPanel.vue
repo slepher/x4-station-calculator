@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref, watch } from 'vue'
 import { useAutoSectorGroupPresenter } from '@/components/empire/presenters/useAutoSectorGroupPresenter'
 import SaveUploadPanel from '@/components/save/SaveUploadPanel.vue'
 import SaveList from '@/components/save/SaveList.vue'
@@ -6,6 +7,7 @@ import EmpireWareFlowsDashboard from '@/components/empire/EmpireWareFlowsDashboa
 import SectorConfirmBar from './SectorConfirmBar.vue'
 import SectorGroupList from './SectorGroupList.vue'
 import SectorAllocationList from './SectorAllocationList.vue'
+import SectorTradeStationList from './SectorTradeStationList.vue'
 import AllocationConfirmBar from './AllocationConfirmBar.vue'
 import HubAddMenu from '@/components/map/HubAddMenu.vue'
 
@@ -47,23 +49,50 @@ const {
   getExistingAnchorSectors,
   handleToggleRetainCoverage,
   handleToggleRetainConnection,
+  handleToggleTradeStationRetain,
   handleMasterBridgeRetain,
   handleMasterCoverageRetain,
+  handleMasterTradeStationRetain,
   handleConfirm,
   handleQuickCalculate,
+  handleResetTradeStations,
+  handleSelectTradeStation,
   triggerAutoGroup,
   handleUploadComplete,
   empireDerivedProductionFlows,
   overviewBuyMultiplier,
   overviewSellMultiplier,
-  hasUncertainAssignments,
   hasPendingBridgeDecision,
+  hasUncertainAssignments,
+  hasUnresolvedTradeStations,
   hasAutoResult,
   stationCounts,
   canDisableNode,
   bridgeRetainIndeterminate,
-  coverageRetainIndeterminate
+  coverageRetainIndeterminate,
+  tradeStationRetainIndeterminate,
+  tradeStationRetainEnabled,
+  tradeStationCandidates,
+  selectedTradeStations,
+  unresolvedAllocationGroups,
+  unresolvedTradeStationGroups
 } = presenter
+
+const col3ActiveTab = ref<'allocation' | 'tradeStation'>('allocation')
+
+let initialLiveAutoSwitchDone = false
+watch(autoGroupResult, (result) => {
+  if (initialLiveAutoSwitchDone) return
+  if (!result || result.groups.length === 0) return
+  initialLiveAutoSwitchDone = true
+  if (hasUncertainAssignments.value || hasPendingBridgeDecision.value) {
+    col3ActiveTab.value = 'allocation'
+  } else if (hasUnresolvedTradeStations.value) {
+    col3ActiveTab.value = 'tradeStation'
+  } else {
+    col3ActiveTab.value = 'allocation'
+  }
+})
 
 defineExpose({ triggerAutoGroup })
 </script>
@@ -93,12 +122,15 @@ defineExpose({ triggerAutoGroup })
         :coverage-retain-enabled="coverageRetainEnabled"
         :bridge-retain-indeterminate="bridgeRetainIndeterminate"
         :coverage-retain-indeterminate="coverageRetainIndeterminate"
+        :trade-station-retain-enabled="tradeStationRetainEnabled"
+        :trade-station-retain-indeterminate="tradeStationRetainIndeterminate"
         @update:pref-jump-range="handleUpdatePrefJumpRange"
         @update:bridge-search-jump-range="handleUpdateBridgeSearchJumpRange"
         @update:pref-threshold="prefThreshold = $event"
         @update:node-enabled="nodeEnabled = $event"
         @update:bridge-retain-enabled="handleMasterBridgeRetain"
         @update:coverage-retain-enabled="handleMasterCoverageRetain"
+        @update:trade-station-retain-enabled="handleMasterTradeStationRetain"
         @edit="handleEnterEdit"
         @cancel="handleCancelEdit"
         @calculate="runCalculationFromEditInput"
@@ -130,30 +162,55 @@ defineExpose({ triggerAutoGroup })
         @delete-group="handleDeleteGroup"
         @toggle-retain-coverage="handleToggleRetainCoverage"
         @toggle-retain-connection="handleToggleRetainConnection"
+        @toggle-retain-trade-station="handleToggleTradeStationRetain"
       />
     </div>
 
     <div class="col-span-12 lg:col-span-4 pb-4">
       <div class="col3-workspace" :class="{ 'col3-workspace--editing': calculationMode === 'edit' }">
-        <AllocationConfirmBar
-          v-if="hasAutoResult && !autoGroupConfirmed && !hasPendingBridgeDecision"
-          :has-uncertain="hasUncertainAssignments"
-          :disabled="calculationMode === 'edit'"
-          @reset="handleResetAssignments"
-          @confirm="handleConfirm"
-        />
-        <SectorAllocationList
-          v-if="hasAutoResult && !autoGroupConfirmed"
-          :assignments="autoGroupResult?.assignments ?? []"
-          :bridge-plans="autoGroupResult?.bridgePlans ?? []"
-          :groups="autoGroupResult?.groups ?? []"
-          :maps="gameDataMaps"
-          :station-counts="stationCounts"
-          :disabled="calculationMode === 'edit'"
-          @select-option="handleSelectOption"
-          @select-bridge-plan="handleSelectBridgePlan"
-          @select-bridge-center="handleSelectBridgeCenter"
-        />
+        <template v-if="hasAutoResult && !autoGroupConfirmed">
+          <div class="tab-bar">
+            <button type="button" class="tab-btn" :class="{ active: col3ActiveTab === 'allocation' }"
+              @click="col3ActiveTab = 'allocation'">{{ t('auto_sector.allocation_tab') }}</button>
+            <button type="button" class="tab-btn" :class="{ active: col3ActiveTab === 'tradeStation' }"
+              @click="col3ActiveTab = 'tradeStation'">{{ t('auto_sector.trade_station_tab') }}</button>
+          </div>
+          <div v-show="col3ActiveTab === 'allocation'">
+            <AllocationConfirmBar
+              v-if="!hasPendingBridgeDecision"
+              :unresolved="unresolvedAllocationGroups"
+              :disabled="calculationMode === 'edit'"
+              @reset="handleResetAssignments"
+              @confirm="handleConfirm"
+            />
+            <SectorAllocationList
+              :assignments="autoGroupResult?.assignments ?? []"
+              :bridge-plans="autoGroupResult?.bridgePlans ?? []"
+              :groups="autoGroupResult?.groups ?? []"
+              :maps="gameDataMaps"
+              :station-counts="stationCounts"
+              :disabled="calculationMode === 'edit'"
+              @select-option="handleSelectOption"
+              @select-bridge-plan="handleSelectBridgePlan"
+              @select-bridge-center="handleSelectBridgeCenter"
+            />
+          </div>
+          <div v-show="col3ActiveTab === 'tradeStation'">
+            <AllocationConfirmBar
+              :unresolved="unresolvedTradeStationGroups"
+              :disabled="calculationMode === 'edit'"
+              @reset="handleResetTradeStations"
+              @confirm="handleConfirm"
+            />
+            <SectorTradeStationList
+              :groups="autoGroupResult?.groups ?? []"
+              :candidates="tradeStationCandidates"
+              :selected="selectedTradeStations"
+              :disabled="calculationMode === 'edit'"
+              @select="handleSelectTradeStation"
+            />
+          </div>
+        </template>
         <EmpireWareFlowsDashboard
           v-if="!hasAutoResult || autoGroupConfirmed"
           :production-flows="empireDerivedProductionFlows"
@@ -220,5 +277,26 @@ defineExpose({ triggerAutoGroup })
 
 .col3-overlay-text {
   @apply rounded border border-slate-600/60 bg-slate-900/90 px-3 py-2 text-xs text-slate-200 shadow-lg;
+}
+
+/* Tab Bar */
+.tab-bar {
+  @apply flex border-b border-slate-700/50 mb-3;
+}
+
+.tab-btn {
+  @apply px-3 py-1.5 text-xs font-medium text-slate-400 border-b-2 border-transparent transition-colors;
+}
+
+.tab-btn:hover:not(:disabled) {
+  @apply text-slate-200;
+}
+
+.tab-btn.active {
+  @apply text-sky-400 border-sky-400;
+}
+
+.tab-btn:disabled {
+  @apply text-slate-600 cursor-not-allowed;
 }
 </style>

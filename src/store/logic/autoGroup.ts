@@ -53,6 +53,8 @@ export interface GroupDraftInfo {
   connectionRetainEnabled: boolean
   hubScore?: number
   hubStationCode?: string
+  savedTradeStationCode?: string
+  tradeStationRetainEnabled?: boolean
   role?: 'normal' | 'bridge'
   baseline?: boolean
   enteredOtherGroupCoverage?: boolean
@@ -788,7 +790,8 @@ export function groupCleanSlate(
       coverageRetainEnabled: true,
       connectionRetainEnabled: true,
         hubScore: hub.score,
-        hubStationCode: hub.stationCode
+        hubStationCode: hub.stationCode,
+        savedTradeStationCode: hub.stationCode
       }
       groups.push(group)
       groupMap.set(groupId, group)
@@ -1061,7 +1064,8 @@ export function groupIncremental(
       coverageRetainEnabled: true,
       connectionRetainEnabled: true,
         hubScore: hub.score,
-        hubStationCode: hub.stationCode
+        hubStationCode: hub.stationCode,
+        savedTradeStationCode: hub.stationCode
       })
       assignedSectors.set(hub.sectorMacro, groupId)
       occupiedSectors.add(hub.sectorMacro)

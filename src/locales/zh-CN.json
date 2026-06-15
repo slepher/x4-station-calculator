@@ -168,11 +168,19 @@
     "editing_input_status": "编辑输入中，点击计算后生成新的分配候选",
     "editing_input_overlay": "编辑输入中，分配面板暂不可操作",
     "entered_other_coverage": "已进入其他组覆盖范围，无法重新固定",
-    "confirm": "确定"
+    "confirm": "确定",
+    "allocation_unresolved": "星区分配未解决",
+    "trade_station_unresolved": "空间站分配未解决",
+    "trade_station_retain": "保留交易站",
+    "trade_station_short": "交易站",
+    "virtual_trade_station": "虚拟交易站",
+    "no_trade_station_candidates": "无可用交易站",
+    "container_cap": "货仓"
   },
   "auto_sector": {
     "hub_tab": "枢纽",
     "allocation_tab": "分配方案",
+    "trade_station_tab": "交易站",
     "edit_overlay_hint": "编辑输入中，分配面板暂不可操作"
   },
   "sectorManagement": {

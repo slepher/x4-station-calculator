@@ -7,8 +7,10 @@ import { useSaveBindingStore } from '@/store/useSaveBindingStore'
 import { useLiveProductionStore } from '@/store/useLiveProductionStore'
 import { groupCleanSlate, groupIncremental, DEFAULT_JUMP_RANGE, DEFAULT_BRIDGE_SEARCH_JUMP_RANGE, applyAbsorbToResult, applyStandaloneToResult, applyBridgePlanToDraft, type AutoGroupResult, type GroupDraftInfo } from '@/store/logic/autoGroup'
 import { DEFAULT_HUB_CONFIG } from '@/store/logic/autoGroupHub'
-import { buildSectorGraphFromMaps, getCoverageSectors } from '@/store/logic/saveBindingUtils'
+import { buildSectorGraphFromMaps, getCoverageSectors, getPlayerStationsInSector } from '@/store/logic/saveBindingUtils'
 import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
+import { selectTradeStationCandidates, determineDefaultTradeStation, type TradeStationCandidate, type TradeStationSelection } from '@/store/logic/tradeStationSelection'
+import { detectStationHub } from '@/store/logic/autoGroupHub'
 import type { BindingSectorGroup } from '@/types/x4'
 
 
@@ -26,9 +28,11 @@ const prefThreshold = ref(DEFAULT_HUB_CONFIG.containerThreshold)
 const nodeEnabled = ref(true)
 const bridgeRetainEnabled = ref(true)
 const coverageRetainEnabled = ref(true)
+const tradeStationRetainEnabled = ref(false)
 const showHubAddMenu = ref(false)
 const autoGroupResult = ref<AutoGroupResult | null>(null)
 const postBridgeBaseline = ref<AutoGroupResult | null>(null)
+const selectedTradeStations = ref<Record<string, TradeStationSelection>>({})
 const autoGroupConfirmed = computed(() => liveStore.isAutoSectorGroupConfirmed(activeViewStore.activeBinding))
 const calculationMode = ref<'result' | 'edit'>('result')
 const editSnapshot = ref<{
@@ -39,6 +43,7 @@ const editSnapshot = ref<{
   autoGroupConfirmed: boolean
   bridgeRetainEnabled: boolean
   coverageRetainEnabled: boolean
+  tradeStationRetainEnabled: boolean
   nodeEnabled: boolean
   coverageByGroupId: Record<string, string[]>
   connectedGroupIdsByGroupId: Record<string, string[]>
@@ -125,7 +130,8 @@ function buildStoreGroups(groups: BindingSectorGroup[], playerSectorMacros: stri
     isPinned: true,
     coverageRetainEnabled: true,
     connectionRetainEnabled: true,
-    hubScore: undefined
+    hubScore: undefined,
+    savedTradeStationCode: g.tradeStation?.saveStationCode
   }))
   return { groups: storeGroups, assignments: [], bridgePlans: [], playerSectorMacros }
 }
@@ -348,6 +354,7 @@ function handleEnterEdit() {
     autoGroupConfirmed: autoGroupConfirmed.value,
     bridgeRetainEnabled: bridgeRetainEnabled.value,
     coverageRetainEnabled: coverageRetainEnabled.value,
+    tradeStationRetainEnabled: tradeStationRetainEnabled.value,
     nodeEnabled: nodeEnabled.value,
     coverageByGroupId: Object.fromEntries(
       (result?.groups ?? []).map((g) => [g.id, [...g.coverageSectorMacros]])
@@ -377,6 +384,7 @@ function handleCancelEdit() {
   nodeEnabled.value = editSnapshot.value.nodeEnabled ?? true
   bridgeRetainEnabled.value = editSnapshot.value.bridgeRetainEnabled ?? true
   coverageRetainEnabled.value = editSnapshot.value.coverageRetainEnabled ?? true
+  tradeStationRetainEnabled.value = editSnapshot.value.tradeStationRetainEnabled ?? false
   syncRetainToGlobal()
   setAutoGroupConfirmed(editSnapshot.value.autoGroupConfirmed)
   setAutoGroupResult(editSnapshot.value.result ? cloneAutoGroupResult(editSnapshot.value.result) : null)
@@ -389,10 +397,13 @@ function syncRetainToGlobal() {
   if (!autoGroupResult.value) return
   const anyBridgeChecked = autoGroupResult.value.groups.some(g => g.connectionRetainEnabled)
   const anyCoverageChecked = autoGroupResult.value.groups.some(g => g.coverageRetainEnabled)
+  const anyTradeStationChecked = autoGroupResult.value.groups.some(g => g.tradeStationRetainEnabled)
   if (anyBridgeChecked) handleMasterBridgeRetain(true)
   else handleMasterBridgeRetain(false)
   if (anyCoverageChecked) handleMasterCoverageRetain(true)
   else handleMasterCoverageRetain(false)
+  if (anyTradeStationChecked) handleMasterTradeStationRetain(true)
+  else handleMasterTradeStationRetain(false)
 }
 
 function handleUpdatePrefJumpRange(range: number) {
@@ -758,6 +769,7 @@ function canReorderGroups(): boolean {
 function setResultModeDefaults() {
   handleMasterBridgeRetain(false)
   handleMasterCoverageRetain(true)
+  handleMasterTradeStationRetain(false)
   const guid = activeViewStore.activeBinding
   const binding = guid ? saveBindingStore.getBindingByGameGuid(guid) : null
   nodeEnabled.value = !(binding && binding.groups.length > 0)
@@ -765,6 +777,107 @@ function setResultModeDefaults() {
 
 function handleQuickCalculate() {
   runCalculationFromEditInput()
+}
+
+function computeTradeStationCandidates(): Record<string, TradeStationCandidate[]> {
+  const archive = saveStore.selectedArchive
+  if (!archive || !autoGroupResult.value) return {}
+
+  const candidates: Record<string, TradeStationCandidate[]> = {}
+  for (const group of autoGroupResult.value.groups) {
+    if (!group.sectorMacro) continue
+    const stations = getPlayerStationsInSector(archive, group.sectorMacro)
+    if (stations.length === 0) continue
+
+    const isUserAdded = !group.hubStationCode
+    let requireQualified = false
+    if (isUserAdded) {
+      const hasQualified = stations.some((s) => {
+        const info = detectStationHub(s, gameDataStore.modulesByMacroId, { containerThreshold: prefThreshold.value })
+        return info.qualified
+      })
+      requireQualified = hasQualified
+    }
+
+    candidates[group.id] = selectTradeStationCandidates(
+      stations, gameDataStore.modulesByMacroId, requireQualified,
+      { containerThreshold: prefThreshold.value }
+    )
+  }
+  return candidates
+}
+
+const tradeStationCandidates = computed(computeTradeStationCandidates)
+
+function applyTradeStationDefaults() {
+  const sel: Record<string, TradeStationSelection> = { ...selectedTradeStations.value }
+  for (const [groupId, cands] of Object.entries(tradeStationCandidates.value)) {
+    if (sel[groupId]) continue
+    const group = autoGroupResult.value?.groups.find((g) => g.id === groupId)
+    if (group?.tradeStationRetainEnabled && group.savedTradeStationCode) {
+      sel[groupId] = { type: 'player', stationCode: group.savedTradeStationCode }
+      continue
+    }
+    const aDefault = determineDefaultTradeStation(cands)
+    if (aDefault) {
+      sel[groupId] = aDefault
+    }
+  }
+  // Remove selections for groups no longer in candidates
+  const validIds = new Set(Object.keys(tradeStationCandidates.value))
+  for (const id of Object.keys(sel)) {
+    if (!validIds.has(id)) delete sel[id]
+  }
+  selectedTradeStations.value = sel
+}
+
+const hasUnresolvedTradeStations = computed(() => {
+  if (!autoGroupResult.value) return false
+  const groupsWithCandidates = Object.keys(tradeStationCandidates.value)
+  return groupsWithCandidates.length > 0 && groupsWithCandidates.some((id) => !selectedTradeStations.value[id])
+})
+
+const unresolvedTradeStationGroups = computed<string[]>(() => {
+  if (!hasUnresolvedTradeStations.value) return []
+  return ['sector.trade_station_unresolved']
+})
+
+const unresolvedAllocationGroups = computed<string[]>(() => {
+  if (hasUncertainAssignments.value || hasPendingBridgeDecision.value) {
+    return ['sector.allocation_unresolved']
+  }
+  return []
+})
+
+function handleSelectTradeStation(groupId: string, selection: TradeStationSelection) {
+  selectedTradeStations.value = { ...selectedTradeStations.value, [groupId]: selection }
+}
+
+function handleResetTradeStations() {
+  const defaults: Record<string, TradeStationSelection> = {}
+  for (const [groupId, cands] of Object.entries(tradeStationCandidates.value)) {
+    const aDefault = determineDefaultTradeStation(cands)
+    if (aDefault) defaults[groupId] = aDefault
+  }
+  selectedTradeStations.value = defaults
+}
+
+function handleMasterTradeStationRetain(enabled: boolean) {
+  tradeStationRetainEnabled.value = enabled
+  if (!autoGroupResult.value) return
+  const result = autoGroupResult.value
+  const groups = result.groups.map((g) => ({ ...g, tradeStationRetainEnabled: enabled }))
+  autoGroupResult.value = { ...result, groups, assignments: result.assignments }
+}
+
+function handleToggleTradeStationRetain(groupId: string) {
+  if (!autoGroupResult.value) return
+  const result = autoGroupResult.value
+  const groups = [...result.groups]
+  const idx = groups.findIndex((g) => g.id === groupId)
+  if (idx < 0) return
+  groups[idx] = { ...groups[idx]!, tradeStationRetainEnabled: !groups[idx]!.tradeStationRetainEnabled }
+  autoGroupResult.value = { ...result, groups, assignments: result.assignments }
 }
 
 function handleReorderGroups(nextGroups: GroupDraftInfo[]) {
@@ -789,6 +902,24 @@ function handleConfirm() {
   if (!guid) return
   const result = autoGroupResult.value
   saveBindingStore.createAutoGroups(guid, result.groups, sectorGraphInfo.value.sectorGraph, sectorGraphInfo.value.sectorClusterMap, prefJumpRange.value, bridgeSearchJumpRange.value, prefThreshold.value)
+  for (const [groupId, selection] of Object.entries(selectedTradeStations.value)) {
+    const group = result.groups.find((g) => g.id === groupId)
+    if (!group) continue
+    if (selection.type === 'virtual') {
+      saveBindingStore.unbindTradeStation(guid, groupId)
+    } else {
+      const archive = saveStore.selectedArchive
+      const station = archive?.sectors?.[group.sectorMacro!]?.player_stations?.[selection.stationCode]
+      saveBindingStore.upsertTradeStation({
+        gameGuid: guid,
+        groupId,
+        saveStationCode: selection.stationCode,
+        name: group.name,
+        sectorMacro: group.sectorMacro,
+        position: station?.position
+      })
+    }
+  }
   saveBindingStore.saveBinding()
   liveStore.syncAllBindingStationsToStateMap()
   liveStore.syncLiveFlowMap()
@@ -851,6 +982,10 @@ watch(() => liveStore.autoSectorGroupCheck, (check) => {
   liveStore.clearAutoSectorGroupCheck()
 })
 
+watch(autoGroupResult, () => {
+  applyTradeStationDefaults()
+})
+
 onMounted(async () => {
   const gameGuid = activeViewStore.activeBinding
   if (gameGuid) {
@@ -904,6 +1039,15 @@ const coverageRetainIndeterminate = computed(() => {
   if (groups.length === 0) return false
   const allOn = groups.every((g) => g.coverageRetainEnabled)
   const allOff = groups.every((g) => !g.coverageRetainEnabled)
+  return !allOn && !allOff
+})
+
+const tradeStationRetainIndeterminate = computed(() => {
+  if (!autoGroupResult.value) return false
+  const groups = autoGroupResult.value.groups
+  if (groups.length === 0) return false
+  const allOn = groups.every((g) => !!g.tradeStationRetainEnabled)
+  const allOff = groups.every((g) => !g.tradeStationRetainEnabled)
   return !allOn && !allOff
 })
 
@@ -962,6 +1106,17 @@ return {
   stationCounts,
   canDisableNode,
   bridgeRetainIndeterminate,
-  coverageRetainIndeterminate
+  coverageRetainIndeterminate,
+  tradeStationRetainIndeterminate,
+  tradeStationRetainEnabled,
+  tradeStationCandidates,
+  selectedTradeStations,
+  hasUnresolvedTradeStations,
+  unresolvedTradeStationGroups,
+  unresolvedAllocationGroups,
+  handleSelectTradeStation,
+  handleResetTradeStations,
+  handleMasterTradeStationRetain,
+  handleToggleTradeStationRetain
 }
 }

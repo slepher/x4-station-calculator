@@ -1,10 +1,10 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-defineProps<{
-  hasUncertain: boolean
+const props = defineProps<{
+  unresolved: string[]
   disabled?: boolean
-  statusText?: string
 }>()
 
 const emit = defineEmits<{
@@ -13,12 +13,17 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+
+const statusText = computed(() => {
+  if (props.unresolved.length > 0) return props.unresolved.map((k) => t(k)).join(', ')
+  return t('sector.all_resolved')
+})
 </script>
 
 <template>
   <div class="confirm-bar">
-    <span class="bar-status">
-      {{ statusText || (hasUncertain ? t('sector.resolve_all_uncertain') : t('sector.all_resolved')) }}
+    <span class="bar-status" :class="{ 'bar-status--unresolved': unresolved.length > 0 }">
+      {{ statusText }}
     </span>
     <div class="bar-actions">
       <button class="bar-btn reset-btn" :disabled="disabled" @click="emit('reset')">
@@ -26,7 +31,7 @@ const { t } = useI18n()
       </button>
       <button
         class="bar-btn confirm-btn"
-        :disabled="hasUncertain || disabled"
+        :disabled="unresolved.length > 0 || disabled"
         @click="emit('confirm')"
       >
         {{ t('sector.confirm') }}
@@ -42,6 +47,10 @@ const { t } = useI18n()
 
 .bar-status {
   @apply text-xs;
+}
+
+.bar-status--unresolved {
+  @apply text-amber-400;
 }
 
 .bar-btn {

@@ -35,6 +35,7 @@ const emit = defineEmits<{
   (e: 'delete-group', groupId: string): void
   (e: 'toggle-retain-coverage', groupId: string): void
   (e: 'toggle-retain-connection', groupId: string): void
+  (e: 'toggle-retain-trade-station', groupId: string): void
   (e: 'focus-sector', sectorMacro: string): void
   (e: 'select-group', sectorGroupId: string): void
 }>()
@@ -63,6 +64,7 @@ function onCycleRecalcState(groupId: string) { emit('cycle-recalc-state', groupI
 function onDeleteGroup(groupId: string) { emit('delete-group', groupId) }
 function onToggleRetainCoverage(groupId: string) { emit('toggle-retain-coverage', groupId) }
 function onToggleRetainConnection(groupId: string) { emit('toggle-retain-connection', groupId) }
+function onToggleRetainTradeStation(groupId: string) { emit('toggle-retain-trade-station', groupId) }
 function onFocusSector(sectorMacro: string) { emit('focus-sector', sectorMacro) }
 function onSelectGroup(sectorGroupId: string) { emit('select-group', sectorGroupId) }
 </script>
@@ -103,6 +105,7 @@ function onSelectGroup(sectorGroupId: string) { emit('select-group', sectorGroup
           @delete-group="onDeleteGroup"
           @toggle-retain-coverage="onToggleRetainCoverage"
           @toggle-retain-connection="onToggleRetainConnection"
+          @toggle-retain-trade-station="onToggleRetainTradeStation"
           @focus-sector="onFocusSector"
           @select-group="onSelectGroup"
         />
@@ -125,6 +128,7 @@ function onSelectGroup(sectorGroupId: string) { emit('select-group', sectorGroup
         @delete-group="onDeleteGroup"
         @toggle-retain-coverage="onToggleRetainCoverage"
         @toggle-retain-connection="onToggleRetainConnection"
+        @toggle-retain-trade-station="onToggleRetainTradeStation"
         @focus-sector="onFocusSector"
         @select-group="onSelectGroup"
       />
