@@ -55,6 +55,7 @@ export interface GroupDraftInfo {
   hubStationCode?: string
   savedTradeStationCode?: string
   tradeStationRetainEnabled?: boolean
+  selectedTradeStation?: { type: 'player' | 'virtual'; stationCode: string } | null
   role?: 'normal' | 'bridge'
   baseline?: boolean
   enteredOtherGroupCoverage?: boolean

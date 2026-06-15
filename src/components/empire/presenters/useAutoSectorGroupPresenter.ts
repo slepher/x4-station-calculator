@@ -32,7 +32,6 @@ const tradeStationRetainEnabled = ref(false)
 const showHubAddMenu = ref(false)
 const autoGroupResult = ref<AutoGroupResult | null>(null)
 const postBridgeBaseline = ref<AutoGroupResult | null>(null)
-const selectedTradeStations = ref<Record<string, TradeStationSelection>>({})
 const autoGroupConfirmed = computed(() => liveStore.isAutoSectorGroupConfirmed(activeViewStore.activeBinding))
 const calculationMode = ref<'result' | 'edit'>('result')
 const editSnapshot = ref<{
@@ -103,7 +102,6 @@ function setAutoGroupResult(result: AutoGroupResult | null) {
   postBridgeBaseline.value = result && !hasPendingBridgeDecisionInResult(result)
     ? cloneAutoGroupResult(result)
     : null
-  // Populate calcBaselinePillState from persisted groups if not already set (e.g., page refresh)
   if (result && !calcBaselinePillState.value) {
     calcBaselinePillState.value = {
       coverageByGroupId: Object.fromEntries(
@@ -114,6 +112,7 @@ function setAutoGroupResult(result: AutoGroupResult | null) {
       )
     }
   }
+  applyTradeStationDefaultsToResult()
 }
 
 function buildStoreGroups(groups: BindingSectorGroup[], playerSectorMacros: string[]): AutoGroupResult {
@@ -808,27 +807,41 @@ const tradeStationCandidates = computed(() => {
   return candidates
 })
 
-function applyTradeStationDefaults() {
-  const sel: Record<string, TradeStationSelection> = { ...selectedTradeStations.value }
-  for (const [groupId, cands] of Object.entries(tradeStationCandidates.value)) {
-    if (sel[groupId]) continue
-    const group = autoGroupResult.value?.groups.find((g) => g.id === groupId)
-    if (group?.tradeStationRetainEnabled && group.savedTradeStationCode) {
-      sel[groupId] = { type: 'player', stationCode: group.savedTradeStationCode }
+function applyTradeStationDefaultsToResult() {
+  const result = autoGroupResult.value
+  if (!result) return
+  const groups = [...result.groups]
+  let changed = false
+  for (let i = 0; i < groups.length; i++) {
+    const group = groups[i]!
+    const cands = tradeStationCandidates.value[group.id]
+    if (!cands || cands.length === 0) continue
+    if (group.selectedTradeStation) continue
+    if (group.tradeStationRetainEnabled && group.savedTradeStationCode) {
+      groups[i] = { ...group, selectedTradeStation: { type: 'player' as const, stationCode: group.savedTradeStationCode } }
+      changed = true
       continue
     }
     const aDefault = determineDefaultTradeStation(cands)
     if (aDefault) {
-      sel[groupId] = aDefault
+      groups[i] = { ...group, selectedTradeStation: aDefault }
+      changed = true
     }
   }
-  // Remove selections for groups no longer in candidates
-  const validIds = new Set(Object.keys(tradeStationCandidates.value))
-  for (const id of Object.keys(sel)) {
-    if (!validIds.has(id)) delete sel[id]
+  if (changed) {
+    autoGroupResult.value = { ...result, groups, assignments: result.assignments }
   }
-  selectedTradeStations.value = sel
 }
+
+const selectedTradeStations = computed<Record<string, TradeStationSelection>>(() => {
+  const sel: Record<string, TradeStationSelection> = {}
+  for (const group of autoGroupResult.value?.groups ?? []) {
+    if (group.selectedTradeStation) {
+      sel[group.id] = group.selectedTradeStation
+    }
+  }
+  return sel
+})
 
 const hasUnresolvedTradeStations = computed(() => {
   if (!autoGroupResult.value) return false
@@ -849,16 +862,29 @@ const unresolvedAllocationGroups = computed<string[]>(() => {
 })
 
 function handleSelectTradeStation(groupId: string, selection: TradeStationSelection) {
-  selectedTradeStations.value = { ...selectedTradeStations.value, [groupId]: selection }
+  if (!autoGroupResult.value) return
+  const result = autoGroupResult.value
+  const groups = [...result.groups]
+  const idx = groups.findIndex((g) => g.id === groupId)
+  if (idx < 0) return
+  groups[idx] = { ...groups[idx]!, selectedTradeStation: selection }
+  autoGroupResult.value = { ...result, groups, assignments: result.assignments }
 }
 
 function handleResetTradeStations() {
-  const defaults: Record<string, TradeStationSelection> = {}
-  for (const [groupId, cands] of Object.entries(tradeStationCandidates.value)) {
+  if (!autoGroupResult.value) return
+  const result = autoGroupResult.value
+  const groups = result.groups.map((group) => {
+    const cands = tradeStationCandidates.value[group.id]
+    if (!cands || cands.length === 0) return group
+    if (group.tradeStationRetainEnabled && group.savedTradeStationCode) {
+      return { ...group, selectedTradeStation: { type: 'player' as const, stationCode: group.savedTradeStationCode } }
+    }
     const aDefault = determineDefaultTradeStation(cands)
-    if (aDefault) defaults[groupId] = aDefault
-  }
-  selectedTradeStations.value = defaults
+    if (aDefault) return { ...group, selectedTradeStation: aDefault }
+    return { ...group, selectedTradeStation: undefined }
+  })
+  autoGroupResult.value = { ...result, groups, assignments: result.assignments }
 }
 
 function handleMasterTradeStationRetain(enabled: boolean) {
@@ -901,18 +927,18 @@ function handleConfirm() {
   if (!guid) return
   const result = autoGroupResult.value
   saveBindingStore.createAutoGroups(guid, result.groups, sectorGraphInfo.value.sectorGraph, sectorGraphInfo.value.sectorClusterMap, prefJumpRange.value, bridgeSearchJumpRange.value, prefThreshold.value)
-  for (const [groupId, selection] of Object.entries(selectedTradeStations.value)) {
-    const group = result.groups.find((g) => g.id === groupId)
-    if (!group) continue
-    if (selection.type === 'virtual') {
-      saveBindingStore.unbindTradeStation(guid, groupId)
+  for (const group of result.groups) {
+    const sel = group.selectedTradeStation
+    if (!sel) continue
+    if (sel.type === 'virtual') {
+      saveBindingStore.unbindTradeStation(guid, group.id)
     } else {
       const archive = saveStore.selectedArchive
-      const station = archive?.sectors?.[group.sectorMacro!]?.player_stations?.[selection.stationCode]
+      const station = archive?.sectors?.[group.sectorMacro!]?.player_stations?.[sel.stationCode]
       saveBindingStore.upsertTradeStation({
         gameGuid: guid,
-        groupId,
-        saveStationCode: selection.stationCode,
+        groupId: group.id,
+        saveStationCode: sel.stationCode,
         name: group.name,
         sectorMacro: group.sectorMacro,
         position: station?.position
@@ -979,10 +1005,6 @@ watch(() => liveStore.autoSectorGroupCheck, (check) => {
   if (check.gameGuid !== activeViewStore.activeBinding) return
   triggerAutoGroup()
   liveStore.clearAutoSectorGroupCheck()
-})
-
-watch(autoGroupResult, () => {
-  applyTradeStationDefaults()
 })
 
 onMounted(async () => {
