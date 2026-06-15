@@ -283,14 +283,18 @@ When merging a worktree branch into develop:
 - Run `git merge <branch-name>` directly in the develop working directory
 
 ### Git Operations Safety
+
 - **当用户说"提交"时，必须先检查本地变动**（`git status`、`git diff`），不得从对话记录里假设没有变动
 - **用户说"提交"就是提交，不要做任何额外操作**：不修 warning、不改代码、不删未使用的 struct、不调查警告原因
 - **我不是仓库的唯一编辑人**，用户可能在其他终端、编辑器或工具中修改了文件
 - 任何 git 操作前，必须先确认当前状态，不得假设状态与对话记录一致
-- Do NOT push to remote unless explicitly requested
 - Example workflow: commit on branch → switch to develop → merge branch
+- **禁止擅自认为 bug 已修复或功能已完成**。必须由用户确认后再提交。
+- **调试日志（`console.log` 等）不得在用户确认修复前删除或提交**。日志是排查依据，擅自删除导致需要反复添加。
+- **提交前必须等用户验证通过**，不得在用户反馈"依旧不行"/"没能成功应用"时自行提交代码。
 
 ### Git Command Concurrency
+
 - **禁止并行执行会写入 git index 的 git 命令**，例如 `git add`、`git commit`、`git merge`
 - 这类命令必须串行执行：前一个完成后才能执行下一个
 - 原因：并行执行容易触发 `.git/index.lock` 冲突
@@ -320,9 +324,3 @@ When merging a worktree branch into develop:
 
 - **禁止在重构中使用 fallback 链**（如 `a || b || c`、`?.modules?.length ?? 0 > 0` 等兜底逻辑）
 - 分支条件必须精确映射业务状态，每个分支只做一件事，不依赖 sequential fallback 掩盖逻辑缺失
-
-## Bug 修复与功能开发纪律
-
-- **禁止擅自认为 bug 已修复或功能已完成**。必须由用户确认后再提交。
-- **调试日志（`console.log` 等）不得在用户确认修复前删除或提交**。日志是排查依据，擅自删除导致需要反复添加。
-- **提交前必须等用户验证通过**，不得在用户反馈"依旧不行"/"没能成功应用"时自行提交代码。
