@@ -7,7 +7,6 @@ import { DEFAULT_STATION_SETTINGS } from './state/stationSettings'
 import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
 import { getSectorZoneBoundingCenter } from '@/components/map/utils/coordinates'
 import { getCoverageSectors } from './logic/saveBindingUtils'
-import { detectStationHub } from './logic/autoGroupHub'
 import type { GroupDraftInfo } from './logic/autoGroup'
 import type {
   BindingSectorGroup,
@@ -701,47 +700,6 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
             jumpRange: draft.jumpRange,
             coverageSectorMacros: entries
           })
-          const archive = saveStore.selectedArchive
-           if (draft.hubStationCode) {
-            const station = archive?.sectors?.[draft.sectorMacro!]?.player_stations?.[draft.hubStationCode]
-            upsertTradeStation({
-              gameGuid,
-              groupId: targetId,
-              saveStationCode: draft.hubStationCode,
-              name: draft.name,
-              sectorMacro: draft.sectorMacro,
-            position: station?.position
-          })
-          } else if (draft.sectorMacro) {
-            const sectorStations = archive?.sectors?.[draft.sectorMacro]?.player_stations
-            if (sectorStations) {
-              // Pick station with highest container capacity as fallback hub
-              let bestCode: string | undefined
-              let bestScore = -1
-              for (const [code, st] of Object.entries(sectorStations)) {
-                const hub = detectStationHub(
-                  { ...st, code } as any,
-                  gameData.modulesByMacroId,
-                  { containerThreshold: 0 }
-                )
-                if (hub.score > bestScore) {
-                  bestScore = hub.score
-                  bestCode = code
-                }
-              }
-               if (bestCode) {
-                const station = archive.sectors[draft.sectorMacro!]!.player_stations![bestCode]
-                upsertTradeStation({
-                  gameGuid,
-                  groupId: targetId,
-                  saveStationCode: bestCode,
-                  name: draft.name,
-                  sectorMacro: draft.sectorMacro,
-                  position: station!.position
-                })
-              }
-            }
-          }
         }
         createdIds.add(targetId)
         targetIdsInDraftOrder.push(targetId)
@@ -767,50 +725,6 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
             jumpRange: draft.jumpRange,
             coverageSectorMacros: entries
           })
-
-          if (draft.hubStationCode) {
-            const archive = saveStore.selectedArchive
-            const station = archive?.sectors?.[draft.sectorMacro!]?.player_stations?.[draft.hubStationCode]
-            upsertTradeStation({
-              gameGuid,
-              groupId: group.id,
-              saveStationCode: draft.hubStationCode,
-              name: draft.name,
-              sectorMacro: draft.sectorMacro,
-              position: station?.position
-            })
-          } else {
-            // For standalone/bridge groups without explicit hubStationCode,
-            // assign the player station with highest hub score from the sector
-            const archive = saveStore.selectedArchive
-            const sectorStations = archive?.sectors?.[draft.sectorMacro]?.player_stations
-            if (sectorStations) {
-              let bestCode: string | undefined
-              let bestScore = -1
-              for (const [code, st] of Object.entries(sectorStations)) {
-                const hub = detectStationHub(
-                  { ...st, code } as any,
-                  gameData.modulesByMacroId,
-                  { containerThreshold: 0 }
-                )
-                if (hub.score > bestScore) {
-                  bestScore = hub.score
-                  bestCode = code
-                }
-              }
-               if (bestCode) {
-                const station = archive.sectors![draft.sectorMacro!]!.player_stations![bestCode]
-                upsertTradeStation({
-                  gameGuid,
-                  groupId: group.id,
-                  saveStationCode: bestCode,
-                  name: draft.name,
-                  sectorMacro: draft.sectorMacro,
-                  position: station!.position
-                })
-              }
-            }
-          }
         }
 
         if (draft.connectedGroupIds.length > 0) {

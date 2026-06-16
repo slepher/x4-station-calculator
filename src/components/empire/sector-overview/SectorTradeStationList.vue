@@ -22,11 +22,11 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 
-const groupsWithCandidates = computed(() =>
-  props.groups.filter((g) => props.candidates[g.id] && props.candidates[g.id]!.length > 0)
+const hubGroups = computed(() =>
+  props.groups.filter((g) => g.sectorMacro)
 )
 
-const hasEntries = computed(() => groupsWithCandidates.value.length > 0)
+const hasEntries = computed(() => hubGroups.value.length > 0)
 </script>
 
 <template>
@@ -36,7 +36,7 @@ const hasEntries = computed(() => groupsWithCandidates.value.length > 0)
     </div>
 
     <SectorTradeStationCard
-      v-for="group in groupsWithCandidates"
+      v-for="group in hubGroups"
       v-else
       :key="group.id"
       :group="group"

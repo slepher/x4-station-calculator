@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 
 const props = defineProps<{
   unresolved: string[]
+  globalUnresolved?: boolean
   disabled?: boolean
 }>()
 
@@ -31,7 +32,7 @@ const statusText = computed(() => {
       </button>
       <button
         class="bar-btn confirm-btn"
-        :disabled="unresolved.length > 0 || disabled"
+        :disabled="unresolved.length > 0 || (globalUnresolved ?? false) || disabled"
         @click="emit('confirm')"
       >
         {{ t('sector.confirm') }}

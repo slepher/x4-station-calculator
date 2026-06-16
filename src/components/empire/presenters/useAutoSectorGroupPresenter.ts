@@ -711,6 +711,28 @@ function handleAddHubDraft(sectorMacro: string) {
     }
   }
 
+  // Compute default trade station code for retain support
+  const archive = saveStore.selectedArchive
+  let savedTradeStationCode: string | undefined
+  if (archive) {
+    const stations = getPlayerStationsInSector(archive, sectorMacro)
+    if (stations.length > 0) {
+      const hasQualified = stations.some((s) => {
+        const info = detectStationHub(s, gameDataStore.modulesByMacroId, { containerThreshold: prefThreshold.value })
+        return info.qualified
+      })
+      const requireQualified = hasQualified
+      const candidates = selectTradeStationCandidates(
+        stations, gameDataStore.modulesByMacroId, requireQualified,
+        { containerThreshold: prefThreshold.value }
+      )
+      const aDefault = determineDefaultTradeStation(candidates)
+      if (aDefault && aDefault.type === 'player') {
+        savedTradeStationCode = aDefault.stationCode
+      }
+    }
+  }
+
   const newGroup: GroupDraftInfo = {
     id: `auto_${crypto.randomUUID()}`,
     name: getSectorDisplayName(sectorMacro),
@@ -724,7 +746,8 @@ function handleAddHubDraft(sectorMacro: string) {
     isPinned: true,
     coverageRetainEnabled: true,
     connectionRetainEnabled: true,
-    hubScore: undefined
+    source: 'manual',
+    savedTradeStationCode
   }
   groups.push(newGroup)
   autoGroupResult.value = { ...result, groups, assignments: result.assignments }
@@ -803,16 +826,20 @@ const tradeStationCandidates = computed(() => {
   for (const group of result.groups) {
     if (!group.sectorMacro) continue
     const stations = getPlayerStationsInSector(archive, group.sectorMacro)
-    if (stations.length === 0) continue
 
-    const isUserAdded = !group.hubStationCode
+    const skipQualifiedThreshold = group.source !== 'auto'
     let requireQualified = false
-    if (isUserAdded) {
+    if (skipQualifiedThreshold && stations.length > 0) {
       const hasQualified = stations.some((s) => {
         const info = detectStationHub(s, gameDataStore.modulesByMacroId, { containerThreshold: prefThreshold.value })
         return info.qualified
       })
       requireQualified = hasQualified
+    }
+
+    if (stations.length === 0) {
+      candidates[group.id] = []
+      continue
     }
 
     candidates[group.id] = selectTradeStationCandidates(
@@ -830,11 +857,18 @@ function applyTradeStationDefaultsToResult() {
   let changed = false
   for (let i = 0; i < groups.length; i++) {
     const group = groups[i]!
+    if (!group.sectorMacro) continue
     const cands = tradeStationCandidates.value[group.id]
-    if (!cands || cands.length === 0) continue
+    if (cands === undefined) continue
+
     if (group.selectedTradeStation) continue
     if (group.tradeStationRetainEnabled && group.savedTradeStationCode) {
       groups[i] = { ...group, selectedTradeStation: { type: 'player' as const, stationCode: group.savedTradeStationCode } }
+      changed = true
+      continue
+    }
+    if (cands.length === 0) {
+      groups[i] = { ...group, selectedTradeStation: { type: 'virtual' as const, stationCode: '__virtual__' } }
       changed = true
       continue
     }
@@ -862,7 +896,20 @@ const selectedTradeStations = computed<Record<string, TradeStationSelection>>(()
 const hasUnresolvedTradeStations = computed(() => {
   if (!autoGroupResult.value) return false
   const groupsWithCandidates = Object.keys(tradeStationCandidates.value)
-  return groupsWithCandidates.length > 0 && groupsWithCandidates.some((id) => !selectedTradeStations.value[id])
+  if (groupsWithCandidates.length === 0) return false
+  return groupsWithCandidates.some((id) => !selectedTradeStations.value[id])
+})
+
+const tradeStationCaps = computed<Record<string, number>>(() => {
+  const caps: Record<string, number> = {}
+  for (const group of autoGroupResult.value?.groups ?? []) {
+    const sel = group.selectedTradeStation
+    if (!sel || sel.type !== 'player') continue
+    const cands = tradeStationCandidates.value[group.id] ?? []
+    const match = cands.find((c) => c.stationCode === sel.stationCode)
+    if (match) caps[group.id] = match.containerCap
+  }
+  return caps
 })
 
 const unresolvedTradeStationGroups = computed<string[]>(() => {
@@ -876,6 +923,12 @@ const unresolvedAllocationGroups = computed<string[]>(() => {
   }
   return []
 })
+
+const hasGlobalUnresolved = computed(() =>
+  hasUncertainAssignments.value ||
+  hasPendingBridgeDecision.value ||
+  hasUnresolvedTradeStations.value
+)
 
 function handleSelectTradeStation(groupId: string, selection: TradeStationSelection) {
   if (!autoGroupResult.value) return
@@ -891,10 +944,14 @@ function handleResetTradeStations() {
   if (!autoGroupResult.value) return
   const result = autoGroupResult.value
   const groups = result.groups.map((group) => {
+    if (!group.sectorMacro) return group
     const cands = tradeStationCandidates.value[group.id]
-    if (!cands || cands.length === 0) return group
+    if (cands === undefined) return group
     if (group.tradeStationRetainEnabled && group.savedTradeStationCode) {
       return { ...group, selectedTradeStation: { type: 'player' as const, stationCode: group.savedTradeStationCode } }
+    }
+    if (cands.length === 0) {
+      return { ...group, selectedTradeStation: { type: 'virtual' as const, stationCode: '__virtual__' } }
     }
     const aDefault = determineDefaultTradeStation(cands)
     if (aDefault) return { ...group, selectedTradeStation: aDefault }
@@ -939,6 +996,7 @@ function handleReorderGroups(nextGroups: GroupDraftInfo[]) {
 function handleConfirm() {
   if (calculationMode.value === 'edit') return
   if (!autoGroupResult.value) return
+  if (hasGlobalUnresolved.value) return
   const guid = activeViewStore.activeBinding
   if (!guid) return
   const result = autoGroupResult.value
@@ -1146,6 +1204,8 @@ return {
   overviewSellMultiplier,
   hasUncertainAssignments,
   hasPendingBridgeDecision,
+  hasGlobalUnresolved,
+  tradeStationCaps,
   hasAutoResult,
   stationCounts,
   canDisableNode,

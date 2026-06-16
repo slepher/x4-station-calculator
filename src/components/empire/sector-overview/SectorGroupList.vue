@@ -20,6 +20,7 @@ const props = withDefaults(defineProps<{
   draggable?: boolean
   baselineCoverageByGroupId?: Record<string, string[]>
   baselineConnectedGroupIdsByGroupId?: Record<string, string[]>
+  tradeStationCaps?: Record<string, number>
 }>(), {
   view: 'live',
   showSelectGroupButton: false,
@@ -53,7 +54,8 @@ const cardBase = computed(() => ({
   view: props.view,
   showSelectGroupButton: props.showSelectGroupButton,
   baselineCoverageByGroupId: props.baselineCoverageByGroupId,
-  baselineConnectedGroupIdsByGroupId: props.baselineConnectedGroupIdsByGroupId
+  baselineConnectedGroupIdsByGroupId: props.baselineConnectedGroupIdsByGroupId,
+  tradeStationCaps: props.tradeStationCaps ?? {}
 }))
 
 function onUpdateJumpRange(groupId: string, range: number) { emit('update-jump-range', groupId, range) }

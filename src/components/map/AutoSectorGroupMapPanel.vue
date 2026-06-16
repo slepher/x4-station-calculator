@@ -44,6 +44,7 @@ const {
   sectorGraphInfo,
   tradeStationCandidates,
   selectedTradeStations,
+  tradeStationCaps,
   unresolvedAllocationGroups,
   unresolvedTradeStationGroups,
   runCalculationFromEditInput,
@@ -76,6 +77,7 @@ const {
   handleQuickCalculate,
   hasUncertainAssignments,
   hasPendingBridgeDecision,
+  hasGlobalUnresolved,
   hasUnresolvedTradeStations,
   hasAutoResult,
   stationCounts,
@@ -168,6 +170,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
           :player-sector-macros="autoGroupResult?.playerSectorMacros ?? []"
           :editable="calculationMode === 'edit'" :diff-enabled="false" :show-select-group-button="calculationMode !== 'edit'"
           :draggable="false" view="map"
+          :trade-station-caps="tradeStationCaps"
           @cycle-recalc-state="handleCycleRecalcState"
           @update-jump-range="handleUpdateJumpRange"
           @toggle-coverage-input="handleToggleCoverageInput"
@@ -208,7 +211,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
             @update:bridge-retain-enabled="handleMasterBridgeRetain" @update:coverage-retain-enabled="handleMasterCoverageRetain"
             @update:trade-station-retain-enabled="handleMasterTradeStationRetain"
             @edit="handleEnterEdit" @cancel="handleCancelEdit" @calculate="onCalculate" @quick-calculate="onQuickCalc" @add-hub="handleAddHubClick"
-            :show-confirm="calculationMode === 'result'" :confirm-disabled="hasUncertainAssignments || hasPendingBridgeDecision || hasUnresolvedTradeStations" :add-menu-open="showHubAddMenu"
+            :show-confirm="calculationMode === 'result'" :confirm-disabled="hasGlobalUnresolved" :add-menu-open="showHubAddMenu"
             @confirm="handleConfirm"
           />
           <HubAddMenu
@@ -228,6 +231,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
             :baseline-coverage-by-group-id="calculationMode === 'edit' ? editSnapshot?.coverageByGroupId : calcBaselinePillState?.coverageByGroupId"
             :baseline-connected-group-ids-by-group-id="calculationMode === 'edit' ? editSnapshot?.connectedGroupIdsByGroupId : calcBaselinePillState?.connectedGroupIdsByGroupId"
             view="map" :draggable="canDragGroups"
+            :trade-station-caps="tradeStationCaps"
             @cycle-recalc-state="handleCycleRecalcState" @update-jump-range="handleUpdateJumpRange"
             @toggle-coverage-input="handleToggleCoverageInput" @toggle-connected-input="handleToggleConnectedInput"
             @add-candidate-coverage="handleAddCandidateCoverage" @delete-group="handleDeleteGroup"
@@ -240,7 +244,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
         <!-- Allocation Tab -->
         <div v-show="activeTab === 'allocation'">
           <AllocationConfirmBar v-if="!hasPendingBridgeDecision"
-            :unresolved="unresolvedAllocationGroups" :disabled="calculationMode === 'edit'"
+            :unresolved="unresolvedAllocationGroups" :global-unresolved="hasGlobalUnresolved" :disabled="calculationMode === 'edit'"
             @reset="handleResetAssignments" @confirm="handleConfirm"
           />
           <SectorAllocationList
@@ -255,7 +259,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
         <!-- TradeStation Tab -->
         <div v-show="activeTab === 'tradeStation'">
           <AllocationConfirmBar
-            :unresolved="unresolvedTradeStationGroups" :disabled="calculationMode === 'edit'"
+            :unresolved="unresolvedTradeStationGroups" :global-unresolved="hasGlobalUnresolved" :disabled="calculationMode === 'edit'"
             @reset="handleResetTradeStations" @confirm="handleConfirm"
           />
           <SectorTradeStationList

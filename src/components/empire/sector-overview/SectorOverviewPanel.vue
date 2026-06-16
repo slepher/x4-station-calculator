@@ -64,6 +64,7 @@ const {
   overviewSellMultiplier,
   hasPendingBridgeDecision,
   hasUncertainAssignments,
+  hasGlobalUnresolved,
   hasUnresolvedTradeStations,
   hasAutoResult,
   stationCounts,
@@ -75,7 +76,8 @@ const {
   tradeStationCandidates,
   selectedTradeStations,
   unresolvedAllocationGroups,
-  unresolvedTradeStationGroups
+  unresolvedTradeStationGroups,
+  tradeStationCaps
 } = presenter
 
 const col3ActiveTab = ref<'allocation' | 'tradeStation'>('allocation')
@@ -154,6 +156,7 @@ defineExpose({ triggerAutoGroup })
         :baseline-connected-group-ids-by-group-id="
           calculationMode === 'edit' ? editSnapshot?.connectedGroupIdsByGroupId : calcBaselinePillState?.connectedGroupIdsByGroupId
         "
+        :trade-station-caps="tradeStationCaps"
         @cycle-recalc-state="handleCycleRecalcState"
         @update-jump-range="handleUpdateJumpRange"
         @toggle-coverage-input="handleToggleCoverageInput"
@@ -179,6 +182,7 @@ defineExpose({ triggerAutoGroup })
             <AllocationConfirmBar
               v-if="!hasPendingBridgeDecision"
               :unresolved="unresolvedAllocationGroups"
+              :global-unresolved="hasGlobalUnresolved"
               :disabled="calculationMode === 'edit'"
               @reset="handleResetAssignments"
               @confirm="handleConfirm"
@@ -198,6 +202,7 @@ defineExpose({ triggerAutoGroup })
           <div v-show="col3ActiveTab === 'tradeStation'">
             <AllocationConfirmBar
               :unresolved="unresolvedTradeStationGroups"
+              :global-unresolved="hasGlobalUnresolved"
               :disabled="calculationMode === 'edit'"
               @reset="handleResetTradeStations"
               @confirm="handleConfirm"

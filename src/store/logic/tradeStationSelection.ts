@@ -62,17 +62,29 @@ export function selectTradeStationCandidates(
   const top5 = scored.slice(0, 5).map(stationHubToCandidate)
 
   const pureHubsInTop = top5.filter((c) => c.isPureHub)
-  if (pureHubsInTop.length < 2) {
+  if (pureHubsInTop.length < 2 && top5.length >= 2) {
     const remainingPureHubs = scored
       .slice(5)
       .filter((h) => h.isPureHub)
       .map(stationHubToCandidate)
     const needed = 2 - pureHubsInTop.length
-    const toAdd = remainingPureHubs.slice(0, needed)
-    top5.push(...toAdd)
+    const pureHubsToAdd = remainingPureHubs.slice(0, needed)
+
+    for (let i = pureHubsToAdd.length - 1; i >= 0; i--) {
+      const replaceIdx = findLastNonPureHubIndex(top5)
+      if (replaceIdx === -1) break
+      top5[replaceIdx] = pureHubsToAdd[i]!
+    }
   }
 
   return top5
+}
+
+function findLastNonPureHubIndex(candidates: TradeStationCandidate[]): number {
+  for (let i = candidates.length - 1; i >= 0; i--) {
+    if (!candidates[i]!.isPureHub) return i
+  }
+  return -1
 }
 
 export function determineDefaultTradeStation(

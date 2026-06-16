@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { GroupDraftInfo, SectorAssignment } from '@/store/logic/autoGroup'
 import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
@@ -21,6 +22,7 @@ const props = withDefaults(defineProps<{
   showDragHandle?: boolean
   baselineCoverageByGroupId?: Record<string, string[]>
   baselineConnectedGroupIdsByGroupId?: Record<string, string[]>
+  tradeStationCaps?: Record<string, number>
 }>(), {
   view: 'live',
   showSelectGroupButton: false,
@@ -67,6 +69,16 @@ function canEditJumpRange(group: GroupDraftInfo): boolean {
 
 function emitToggleTradeStationRetain(groupId: string) {
   emit('toggle-retain-trade-station', groupId)
+}
+
+const tradeStationCap = computed<number | null>(() => {
+  const caps = props.tradeStationCaps
+  if (!caps) return null
+  return caps[props.group.id] ?? null
+})
+
+function formatCapM(cap: number): string {
+  return Math.floor(cap / 1_000_000) + 'M'
 }
 
 interface UnifiedPillEntry {
@@ -350,7 +362,8 @@ function onAnchorPillClick(macro: string) {
             @click="view === 'map' && group.sectorMacro && emit('focus-sector', group.sectorMacro)"
           >
             <span class="pill-dot pill-dot--small" :class="group.selectedTradeStation.type === 'virtual' ? 'pill-dot--empty' : 'pill-dot--filled'"/>
-            {{ group.selectedTradeStation.type === 'virtual' ? t('sector.virtual_trade_station') : group.selectedTradeStation.stationCode }}
+            <template v-if="group.selectedTradeStation.type === 'virtual'">{{ t('sector.virtual_trade_station') }}</template>
+            <template v-else>{{ group.selectedTradeStation.stationCode }}<span v-if="tradeStationCap !== null">&nbsp;{{ formatCapM(tradeStationCap) }}</span></template>
           </span>
           <div class="jump-control">
             <template v-if="!canEditJumpRange(group)">

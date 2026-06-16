@@ -56,7 +56,7 @@ export interface GroupDraftInfo {
   savedTradeStationCode?: string
   tradeStationRetainEnabled?: boolean
   selectedTradeStation?: { type: 'player' | 'virtual'; stationCode: string } | null
-  role?: 'normal' | 'bridge'
+  source?: 'auto' | 'manual' | 'bridge'
   baseline?: boolean
   enteredOtherGroupCoverage?: boolean
 }
@@ -596,7 +596,7 @@ export function applyBridgePlanToDraft(
       coverageRetainEnabled: true,
       connectionRetainEnabled: true,
       hubScore: selectedUnitScore(unit),
-      role: 'bridge'
+      source: 'bridge'
     })
   }
 
@@ -792,7 +792,8 @@ export function groupCleanSlate(
       connectionRetainEnabled: true,
         hubScore: hub.score,
         hubStationCode: hub.stationCode,
-        savedTradeStationCode: hub.stationCode
+        savedTradeStationCode: hub.stationCode,
+        source: 'auto'
       }
       groups.push(group)
       groupMap.set(groupId, group)
@@ -818,7 +819,7 @@ export function groupCleanSlate(
     groups.splice(0, groups.length, ...applied.groups)
     bridgePlans = applied.bridgePlans
     for (const group of groups) {
-      if (group.role === 'bridge' && group.sectorMacro) {
+      if (group.source === 'bridge' && group.sectorMacro) {
         assignedSectors.set(group.sectorMacro, group.id)
       }
     }
@@ -1066,7 +1067,8 @@ export function groupIncremental(
       connectionRetainEnabled: true,
         hubScore: hub.score,
         hubStationCode: hub.stationCode,
-        savedTradeStationCode: hub.stationCode
+        savedTradeStationCode: hub.stationCode,
+        source: 'auto'
       })
       assignedSectors.set(hub.sectorMacro, groupId)
       occupiedSectors.add(hub.sectorMacro)
