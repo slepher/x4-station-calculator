@@ -9,6 +9,8 @@ import { getCoverageSectors } from '@/store/logic/saveBindingUtils'
 import JumpInput from '@/components/common/JumpInput.vue'
 import type { X4MapSector } from '@/types/x4'
 
+defineOptions({ inheritAttrs: false })
+
 const props = withDefaults(defineProps<{
   group: GroupDraftInfo
   groups: GroupDraftInfo[]

@@ -1295,6 +1295,7 @@ export interface SaveBindingPlan {
   gameGuid: string
   bindingName?: string
   selectedArchiveTime: number | null
+  appliedAutoGroupArchiveTime?: number
   blueprintEmpireId?: string
   groups: BindingSectorGroup[]
   stationPlans: BindingStationPlan[]

@@ -1,12 +1,12 @@
 import { computed, onMounted, ref, watch } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import { useSaveStore } from '@/store/useSaveStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useActiveViewStore } from '@/store/useActiveViewStore'
 import { useSaveBindingStore } from '@/store/useSaveBindingStore'
 import { useLiveProductionStore } from '@/store/useLiveProductionStore'
-import { groupCleanSlate, groupIncremental, DEFAULT_JUMP_RANGE, DEFAULT_BRIDGE_SEARCH_JUMP_RANGE, applyAbsorbToResult, applyStandaloneToResult, applyBridgePlanToDraft, type AutoGroupResult, type GroupDraftInfo, getDistance } from '@/store/logic/autoGroup'
-import { DEFAULT_HUB_CONFIG } from '@/store/logic/autoGroupHub'
+import { groupCleanSlate, groupIncremental, applyAbsorbToResult, applyStandaloneToResult, applyBridgePlanToDraft, type AutoGroupResult, type GroupDraftInfo, getDistance } from '@/store/logic/autoGroup'
 import { buildSectorGraphFromMaps, getCoverageSectors, getPlayerStationsInSector } from '@/store/logic/saveBindingUtils'
 import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
 import { stabilizeHubColors, stabilizeEditedHubColor, type HubColorContext } from '@/store/logic/hubColor'
@@ -21,11 +21,8 @@ const gameDataStore = useGameDataStore()
 const activeViewStore = useActiveViewStore()
 const saveBindingStore = useSaveBindingStore()
 const liveStore = useLiveProductionStore()
+const { autoGroupResult, calculationMode, prefJumpRange, bridgeSearchJumpRange, prefThreshold } = storeToRefs(liveStore)
 const { t, te } = useI18n()
-
-const prefJumpRange = ref(DEFAULT_JUMP_RANGE)
-const bridgeSearchJumpRange = ref(DEFAULT_BRIDGE_SEARCH_JUMP_RANGE)
-const prefThreshold = ref(DEFAULT_HUB_CONFIG.containerThreshold)
 const nodeEnabled = ref(true)
 
 function buildHubColorContext(): HubColorContext {
@@ -54,10 +51,8 @@ const bridgeRetainEnabled = ref(true)
 const coverageRetainEnabled = ref(true)
 const tradeStationRetainEnabled = ref(false)
 const showHubAddMenu = ref(false)
-const autoGroupResult = ref<AutoGroupResult | null>(null)
 const postBridgeBaseline = ref<AutoGroupResult | null>(null)
 const autoGroupConfirmed = computed(() => liveStore.isAutoSectorGroupConfirmed(activeViewStore.activeBinding))
-const calculationMode = ref<'result' | 'edit'>('result')
 const editSnapshot = ref<{
   result: AutoGroupResult | null
   prefJumpRange: number
@@ -165,32 +160,10 @@ function buildStoreGroups(groups: BindingSectorGroup[], playerSectorMacros: stri
   return { groups: storeGroups, assignments: [], bridgePlans: [], playerSectorMacros }
 }
 
-function getPlayerSectorMacrosFromArchive(): string[] {
-  const archive = saveStore.selectedArchive
-  if (!archive) return []
-  return Object.entries(archive.sectors)
-    .filter(([, sector]) => sector.player_stations && Object.keys(sector.player_stations).length > 0)
-    .map(([sectorMacro]) => sectorMacro)
-}
-
-function hasUngroupedPlayerSectors(groups: BindingSectorGroup[], playerSectorMacros: string[]): boolean {
-  const covered = new Set<string>()
-  for (const group of groups) {
-    if (group.sectorMacro) covered.add(group.sectorMacro)
-    for (const entry of group.coverageSectorMacros) covered.add(entry.ref)
-  }
-  return playerSectorMacros.some((sectorMacro) => !covered.has(sectorMacro))
-}
-
 function runAutoGroup() {
   const archive = saveStore.selectedArchive
-  if (!archive || !archive.isValid) {
-    setAutoGroupConfirmed(false)
-    setAutoGroupResult(null)
-    return
-  }
   const guid = activeViewStore.activeBinding
-  if (!guid) {
+  if (!archive || !archive.isValid || !guid) {
     setAutoGroupResult(null)
     return
   }
@@ -204,15 +177,14 @@ function runAutoGroup() {
     if (binding.prefThreshold !== undefined) prefThreshold.value = binding.prefThreshold
   }
 
+  const archiveTime = archive.meta?.time ?? 0
+
+  // Skip if archive time unchanged and we already have a result
+  if (binding?.appliedAutoGroupArchiveTime === archiveTime && liveStore.autoGroupResult) {
+    return
+  }
+
   if (binding && binding.groups.length > 0) {
-    const playerSectorMacros = getPlayerSectorMacrosFromArchive()
-    if (!hasUngroupedPlayerSectors(binding.groups, playerSectorMacros)) {
-      setAutoGroupConfirmed(true)
-      calcBaselinePillState.value = null
-      setAutoGroupResult(buildStoreGroups(binding.groups, playerSectorMacros))
-      setResultModeDefaults()
-      return
-    }
     setAutoGroupConfirmed(false)
     const result = groupIncremental(
       archive, binding.groups, gameDataStore.modulesByMacroId,
@@ -241,6 +213,11 @@ function runAutoGroup() {
     stabilizeHubColors(namedGroups, buildHubColorContext())
     setAutoGroupResult({ ...result, groups: namedGroups })
     setResultModeDefaults()
+  }
+
+  // Record applied time
+  if (binding) {
+    binding.appliedAutoGroupArchiveTime = archiveTime
   }
 }
 
@@ -1089,6 +1066,10 @@ function handleConfirm() {
   liveStore.syncLiveFlowMap()
   calcBaselinePillState.value = null
   const binding = saveBindingStore.activeBinding
+  if (binding) {
+    const archiveTime = saveStore.selectedArchive?.meta?.time ?? 0
+    binding.appliedAutoGroupArchiveTime = archiveTime
+  }
   if (binding && binding.groups.length > 0) {
     setAutoGroupResult(buildStoreGroups(binding.groups, result.playerSectorMacros))
   }

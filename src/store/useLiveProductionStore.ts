@@ -25,6 +25,8 @@ import { useSaveStore } from './useSaveStore'
 import { useActiveViewStore } from './useActiveViewStore'
 import { DEFAULT_STATION_SETTINGS, type StationComputeDeps } from './state/stationSettings'
 import { StationDerivedMap, type StationDerivedStaticDeps } from './state/StationDerivedMap'
+import { DEFAULT_HUB_CONFIG } from './logic/autoGroupHub'
+import { DEFAULT_JUMP_RANGE, DEFAULT_BRIDGE_SEARCH_JUMP_RANGE, type AutoGroupResult } from './logic/autoGroup'
 import { deepClone } from '@/utils/deepClone'
 import {
   createEmpireSourceView,
@@ -117,6 +119,12 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   const dirtyBindingStationIds = ref<DirtyBindingState>(null)
   const autoSectorGroupCheck = ref<AutoSectorGroupCheckFlag | null>(null)
   const autoSectorGroupConfirmedByGameGuid = ref<Record<string, boolean>>({})
+
+  const autoGroupResult = shallowRef<AutoGroupResult | null>(null)
+  const calculationMode = ref<'result' | 'edit'>('result')
+  const prefJumpRange = ref(DEFAULT_JUMP_RANGE)
+  const bridgeSearchJumpRange = ref(DEFAULT_BRIDGE_SEARCH_JUMP_RANGE)
+  const prefThreshold = ref(DEFAULT_HUB_CONFIG.containerThreshold)
 
   function getPlayerSectorMacrosFromSelectedArchive(): string[] {
     const archive = selectedArchive.value
@@ -2153,6 +2161,11 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     clearAutoSectorGroupCheck,
     isAutoSectorGroupConfirmed,
     setAutoSectorGroupConfirmed,
+    autoGroupResult,
+    calculationMode,
+    prefJumpRange,
+    bridgeSearchJumpRange,
+    prefThreshold,
     saveBinding,
     createStation,
     deleteStation,

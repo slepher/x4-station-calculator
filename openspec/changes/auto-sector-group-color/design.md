@@ -205,7 +205,7 @@ src/components/map/layers/
 - `useMapSvgSectors` 输出 `clusterPolygons`（已含各 sector 中心坐标、半径）
 - `AutoSectorGroupMapPanel` ← `useAutoSectorGroupPresenter.sectorGroupColorMap`（provide）
 - `MapSvgCanvas` inject `sectorGroupColorMap` → 传给 `MapSectorGroupColorLayer`
-- `MapSectorGroupColorLayer` 接收 `clusterPolygons` + `sectorGroupColorMap` + `hexPoints`，渲染 2/3 半径内六边形（fill-opacity 0.35, no stroke）
+- `MapSectorGroupColorLayer` 接收 `clusterPolygons` + `sectorGroupColorMap` + `hexPoints`，渲染全尺寸六边形替代 faction 色（fill-opacity 0.35, no stroke）
 
 ### 渲染层级
 

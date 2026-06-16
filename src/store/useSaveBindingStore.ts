@@ -113,6 +113,7 @@ function normalizeState(input: Partial<SavedSaveBindingsState> | null | undefine
             gameGuid: item.gameGuid,
             bindingName: item.bindingName,
             selectedArchiveTime: item.selectedArchiveTime ?? null,
+            appliedAutoGroupArchiveTime: item.appliedAutoGroupArchiveTime as number | undefined,
             blueprintEmpireId: item.blueprintEmpireId,
             groups,
             stationPlans: normalizedStationPlans,

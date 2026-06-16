@@ -18,6 +18,7 @@ import { useGameDataStore } from '@/store/useGameDataStore'
 import { useMapStore } from '@/store/useMapStore'
 import { useBlueprintProductionStore } from '@/store/useBlueprintProductionStore'
 import { useSaveBindingStore } from '@/store/useSaveBindingStore'
+import { useLiveProductionStore } from '@/store/useLiveProductionStore'
 import type { SectorResourceFill } from '@/store/logic/mapResourceFilter'
 import type { EntityLocation } from '@/types/x4'
 import { useSaveStore } from '@/store/useSaveStore'
@@ -159,6 +160,7 @@ const mapStore = useMapStore()
 const saveStore = useSaveStore()
 const blueprintStore = useBlueprintProductionStore()
 const saveBindingStore = useSaveBindingStore()
+const liveStore = useLiveProductionStore()
 const activeViewStore = useActiveViewStore()
 
 const { isResourcePanelOpen, isSavePanelOpen, isBindingPanelOpen, mapBindingGameGuid: bindingContextGameGuid, mapBindingStage: bindingContextStage, mapDragBindingSectorGroupId: dragEnabledBindingSectorGroupId } = storeToRefs(activeViewStore)
@@ -168,24 +170,35 @@ const savePoiTooltipItem = ref<SavePoiOverlayItem | null>(null)
 const mapDiagnosticVisibility = ref({
   sectorLabels: true,
   sectorLinks: true,
-  sectorGroupColors: true
+  sectorGroupColors: true,
+  sectorFactionFill: true
 })
 const activeControlPanel = ref<'diagnostic' | 'poi' | null>(null)
 
-const sectorGroupColorMap = computed<Record<string, string>>(() => {
-  const binding = saveBindingStore.activeBinding
-  if (!binding) return {}
+function buildColorMap(groups: { color?: string; sectorMacro?: string; coverageSectorMacros: string[] | { ref: string }[] }[]): Record<string, string> {
   const map: Record<string, string> = {}
-  for (const group of binding.groups) {
+  for (const group of groups) {
     if (!group.color) continue
     if (group.sectorMacro && !map[group.sectorMacro]) {
       map[group.sectorMacro] = group.color
     }
     for (const entry of group.coverageSectorMacros) {
-      if (!map[entry.ref]) map[entry.ref] = group.color
+      const sectorMacro = typeof entry === 'string' ? entry : entry.ref
+      if (!map[sectorMacro]) map[sectorMacro] = group.color
     }
   }
   return map
+}
+
+const sectorGroupColorMap = computed<Record<string, string>>(() => {
+  const isBinding = bindingContextStage.value === 'select-sector'
+                 || bindingContextStage.value === 'select-station'
+  if (isBinding && liveStore.autoGroupResult) {
+    return buildColorMap(liveStore.autoGroupResult.groups)
+  }
+  const binding = saveBindingStore.activeBinding
+  if (!binding) return {}
+  return buildColorMap(binding.groups)
 })
 const settledSavePoiViewportContentBounds = ref<{
   left: number
@@ -1635,6 +1648,7 @@ const onMapDiagnosticVisibilityChange = (visibility: {
   sectorLabels: boolean
   sectorLinks: boolean
   sectorGroupColors: boolean
+  sectorFactionFill: boolean
 }) => {
   mapDiagnosticVisibility.value = visibility
 }
@@ -2087,6 +2101,7 @@ onBeforeUnmount(() => {
               :show-sector-links="mapDiagnosticVisibility.sectorLinks"
               :show-resource-badges="true"
               :show-sector-group-colors="mapDiagnosticVisibility.sectorGroupColors || bindingContextStage === 'select-sector' || bindingContextStage === 'select-station'"
+              :show-faction-fill="mapDiagnosticVisibility.sectorFactionFill && bindingContextStage !== 'select-sector' && bindingContextStage !== 'select-station'"
               :sector-group-color-map="sectorGroupColorMap"
               @content-size="onCanvasSize"
               @sector-layout="onSectorLayout"

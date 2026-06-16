@@ -102,6 +102,7 @@ const props = withDefaults(defineProps<{
   showSectorLinks?: boolean
   showResourceBadges?: boolean
   showSectorGroupColors?: boolean
+  showFactionFill?: boolean
   sectorGroupColorMap?: Record<string, string>
 }>(), {
   searchHighlightedSectorIds: () => [],
@@ -135,7 +136,8 @@ const props = withDefaults(defineProps<{
   showSectorLabels: true,
   showSectorLinks: true,
   showResourceBadges: true,
-  showSectorGroupColors: true
+  showSectorGroupColors: true,
+  showFactionFill: true
 })
 
 const emit = defineEmits<{
@@ -252,6 +254,13 @@ const {
 })
 
 const sectorGroupColorMapComputed = computed(() => props.sectorGroupColorMap ?? {})
+
+const wrappedSectorFillOpacity = (sectorId: string) => {
+  // Sectors with group color always hide faction fill (prevents color interference)
+  if (sectorGroupColorMapComputed.value[sectorId]) return 0
+  if (!props.showFactionFill) return 0
+  return sectorFillOpacity(sectorId)
+}
 
 const sectorFilter = (sectorId: string) => {
   const state = sectorFilterState(sectorId)
@@ -414,6 +423,13 @@ watchEffect(() => {
       :stargate-visual-scale="STARGATE_VISUAL_SCALE"
     />
 
+    <MapSectorGroupColorLayer
+      v-if="showSectorGroupColors"
+      :cluster-polygons="clusterPolygons"
+      :sector-group-color-map="sectorGroupColorMapComputed"
+      :hex-points="hexPoints"
+    />
+
     <MapSectorLayer
       :cluster-polygons="clusterPolygons"
       :game-data-enforce-dlc-activation="gameData.enforceDlcActivation"
@@ -424,7 +440,7 @@ watchEffect(() => {
       :build-pie-slice-geometries="buildPieSliceGeometries"
       :build-resource-group-badge-geometries="buildResourceGroupBadgeGeometries"
       :sector-fill-color="sectorFillColor"
-      :sector-fill-opacity="sectorFillOpacity"
+      :sector-fill-opacity="wrappedSectorFillOpacity"
       :sector-stroke-color="sectorStrokeColor"
       :sector-stroke-width="sectorStrokeWidth"
       :sector-stroke-opacity="sectorStrokeOpacity"
@@ -432,13 +448,6 @@ watchEffect(() => {
       :show-resource-badges="showResourceBadges"
       @sector-hover="emitSectorHover"
       @sector-leave="emitSectorLeave"
-    />
-
-    <MapSectorGroupColorLayer
-      v-if="showSectorGroupColors"
-      :cluster-polygons="clusterPolygons"
-      :sector-group-color-map="sectorGroupColorMapComputed"
-      :hex-points="hexPoints"
     />
 
     <MapOverlayLayer

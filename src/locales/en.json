@@ -510,6 +510,7 @@
     "debug_visibility_sector_labels": "Sector Labels",
     "debug_visibility_sector_links": "Sector Links",
     "debug_visibility_sector_group_colors": "Sector Group Colors",
+    "debug_visibility_sector_faction_fill": "Faction Fill",
     "debug_visibility_resource_badges": "Resource Badges"
   },
   "ship_build": {
