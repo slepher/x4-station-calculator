@@ -5,11 +5,12 @@ import { useI18n } from 'vue-i18n'
 import { useSaveStore } from '@/store/useSaveStore'
 import { useSaveBindingStore } from '@/store/useSaveBindingStore'
 import { useActiveViewStore, type BindingStage } from '@/store/useActiveViewStore'
+import { useLiveProductionStore } from '@/store/useLiveProductionStore'
 import MapSaveBreadcrumb from './MapSaveBreadcrumb.vue'
 import MapSaveArchiveList from './MapSaveArchiveList.vue'
 import MapSaveCategoryMenu from './MapSaveCategoryMenu.vue'
 import MapSaveCoordList from './MapSaveCoordList.vue'
-import AutoSectorGroupMapPanel from './AutoSectorGroupMapPanel.vue'
+import AutoSectorGroupPanel from './AutoSectorGroupPanel.vue'
 import MapBindingStation from './MapBindingStation.vue'
 import type { SaveArchive, SavePoiCategory, SavePoiOverlayItem } from '@/types/saveArchive'
 import type { StationPlan } from '@/types/x4'
@@ -35,6 +36,7 @@ const { t } = useI18n()
 const saveStore = useSaveStore()
 const saveBindingStore = useSaveBindingStore()
 const activeViewStore = useActiveViewStore()
+const liveStore = useLiveProductionStore()
 
 const { mapSavePanelLayer: layer, mapBindingGameGuid: selectedBindingGameGuid, mapSavePanelSectorGroupId: selectedSectorGroupId } = storeToRefs(activeViewStore)
 const selectedCategory = ref<SavePoiCategory | null>(null)
@@ -194,6 +196,14 @@ function onClose() {
 
 watch(() => props.open, (open, prev) => {
   if (open && !prev && !isBindingLayer.value) {
+    if (liveStore.autoGroupResult) {
+      const binding = saveBindingStore.activeBinding
+      if (binding) {
+        selectedBindingGameGuid.value = binding.gameGuid
+        layer.value = 'binding-sector'
+        return
+      }
+    }
     resetToList()
     return
   }
@@ -271,7 +281,7 @@ watch([layer, selectedBindingGameGuid, selectedSectorGroupId, () => props.open],
         @focus-poi="onPoiFocus"
       />
 
-      <AutoSectorGroupMapPanel
+      <AutoSectorGroupPanel
         v-else-if="layer === 'binding-sector' && selectedBindingGameGuid"
         :game-guid="selectedBindingGameGuid"
         @select-group="onSelectBindingGroup"

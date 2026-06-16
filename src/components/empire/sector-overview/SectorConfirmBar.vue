@@ -19,6 +19,8 @@ const props = withDefaults(defineProps<{
   showConfirm?: boolean
   confirmDisabled?: boolean
   addMenuOpen?: boolean
+  needsRecalc?: boolean
+  editDisabled?: boolean
 }>(), {
   view: 'live',
   showConfirm: false,
@@ -109,8 +111,11 @@ function onTradeStationRetainChange(e: Event) {
 
       <!-- Live result: buttons on Row 1 right -->
       <div v-if="mode === 'result' && view === 'live'" class="bar-right">
-        <button class="bar-btn recalc-btn" @click="emit('edit')">{{ t('sector.edit') }}</button>
-        <button class="bar-btn calculate-btn" @click="emit('quick-calculate')">{{ t('sector.calculate') }}</button>
+        <button class="bar-btn recalc-btn" :disabled="editDisabled" @click="emit('edit')">{{ t('sector.edit') }}</button>
+        <button class="bar-btn calculate-btn" :class="{ 'calculate-btn--needs-recalc': needsRecalc }" @click="emit('quick-calculate')">
+          <span v-if="needsRecalc" class="recalc-dot" />
+          {{ t('sector.calculate') }}
+        </button>
         <button v-if="showConfirm" class="bar-btn confirm-btn" :disabled="confirmDisabled" @click="emit('confirm')">{{ t('sector.confirm') }}</button>
       </div>
 
@@ -238,11 +243,19 @@ function onTradeStationRetainChange(e: Event) {
 }
 
 .recalc-btn {
-  @apply bg-sky-600/20 text-sky-400 border border-sky-500/30 hover:bg-sky-600/30;
+  @apply bg-sky-600/20 text-sky-400 border border-sky-500/30 hover:bg-sky-600/30 disabled:opacity-40 disabled:cursor-not-allowed;
 }
 
 .calculate-btn {
-  @apply bg-amber-500/20 text-amber-400 border border-amber-500/30 hover:bg-amber-500/30;
+  @apply bg-amber-500/20 text-amber-400 border border-amber-500/30 hover:bg-amber-500/30 relative;
+}
+
+.calculate-btn--needs-recalc {
+  @apply border-red-500/50;
+}
+
+.recalc-dot {
+  @apply absolute top-0.5 right-0.5 w-2 h-2 bg-red-500 rounded-full;
 }
 
 .confirm-btn {

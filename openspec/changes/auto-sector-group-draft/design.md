@@ -70,36 +70,30 @@ export function useAutoSectorGroupPresenter() {
 }
 ```
 
-### runAutoGroup — 时间比对
+### runAutoGroup
+
+`runAutoGroup` 始终执行计算，每次强制 `autoGroupConfirmed = false`。不再做时间比对跳过 — 因为所有时机都由用户显式触发。
+
+### handleConfirm
+
+记录 `appliedAutoGroupArchiveTime`，设置 `autoGroupConfirmed = true`。不覆盖 `autoGroupResult`（保留计算结果中的 assignments 供后续编辑查看）。
+
+### MapWorkbenchView — sectorGroupColorMap
 
 ```ts
-function runAutoGroup() {
-  // ...
-  const binding = saveBindingStore.getBindingByGameGuid(guid)
-  const archiveTime = archive.meta?.time ?? 0
-
-  // Skip if archive time unchanged and we already have a result
-  if (binding?.appliedAutoGroupArchiveTime === archiveTime && liveStore.autoGroupResult) {
-    return
+const sectorGroupColorMap = computed<Record<string, string>>(() => {
+  const isBinding = bindingContextStage.value === 'select-sector'
+                 || bindingContextStage.value === 'select-station'
+  if (isBinding && !liveStore.autoGroupConfirmed && liveStore.autoGroupResult) {
+    return buildColorMap(liveStore.autoGroupResult.groups)
   }
-
-  // ... compute (groupIncremental or groupCleanSlate) ...
-}
-```
-
-### handleConfirm — 记录 applied time
-
-```ts
-function handleConfirm() {
-  // ... createAutoGroups, write draftBinding ...
-  saveBindingStore.saveBinding()
   const binding = saveBindingStore.activeBinding
-  if (binding) {
-    binding.appliedAutoGroupArchiveTime = saveStore.selectedArchive?.meta?.time ?? 0
-  }
-  // ...
-}
+  if (!binding) return {}
+  return buildColorMap(binding.groups)
+})
 ```
+
+`autoGroupConfirmed = false` 时，`autoGroupResult` 是尚未提交的唯一草案，地图必须读取草案以展示实时编辑；`autoGroupConfirmed = true` 时，结果已经写入 binding，地图必须读取 `activeBinding`，避免继续显示残留草案。
 
 ### handleColorChange
 
@@ -113,10 +107,50 @@ function handleColorChange(groupId: string, color: string | undefined) {
 }
 ```
 
+### 停止自动计算
+
+`onMounted`、`watch(activeBinding)`、`watch(selectedArchive)` 不再调用 `runAutoGroup()`。系统不在任何时机自动触发计算。
+
+### 重算提示
+
+```ts
+const needsAutoGroupRecalc = computed(() => {
+  const archive = saveStore.selectedArchive
+  if (!archive) return false
+  const binding = saveBindingStore.activeBinding
+  const archiveTime = archive.meta?.time ?? 0
+  const applied = binding?.appliedAutoGroupArchiveTime
+  return applied === undefined || applied < archiveTime
+})
+```
+
+- `needsAutoGroupRecalc = true` → 计算按钮显示红点 + tooltip
+- `!autoGroupResult` → 编辑按钮置灰
+
+### Live 面板模式切换（SectorOverviewPanel）
+
+```ts
+const liveMode = ref<'display' | 'calculate'>('display')
+```
+
+**展示模式**：`liveMode = 'display'`
+
+```
+[SaveUploadPanel 3fr] | [SectorGroupList 4fr] | [EmpireWareFlowsDashboard 5fr]
+```
+- 「编辑」→ `triggerAutoGroup()` + `liveMode = 'calculate'`
+- 「计算」→ `runAutoGroup()` + `liveMode = 'calculate'`
+
+**计算模式**：`liveMode = 'calculate'`
+
+三列复用 `AutoSectorGroupPanel`（`layout="columns"`）。columns 布局始终显示三列，不区分 `autoGroupConfirmed`。
+
+Map 模式 `gameGuid` watcher 调用 `triggerAutoGroup()` 加载 binding 数据。
+
+展示模式「编辑」→ 直接切到计算模式，不重置 `autoGroupResult`（保留已有的计算数据）。展示模式列表从 `activeBinding` 读取（`autoGroupResult` 为 null 时）。
+
 ## 注意
 
 - `autoGroupResult` 用 `shallowRef`：整体替换触发更新
 - Pinia setup store 暴露到 store 实例后，handler 中使用 `liveStore.autoGroupResult = nextResult` 这类属性赋值；组件需要 ref 时由 presenter 使用 `storeToRefs(liveStore)` 转出
 - Presenter 的 computed（`hasGlobalUnresolved`、`tradeStationCaps` 等）留在 presenter，自动响应 liveStore ref
-- `onMounted` 调用 `runAutoGroup()`，内部时间比对决定是否重算
-- `watch(selectedArchive)` 同样由 `runAutoGroup` 的时间比对保护

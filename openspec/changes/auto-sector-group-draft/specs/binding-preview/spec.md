@@ -75,18 +75,77 @@
 
 ### Requirement: Map rendering from shared draft
 
-系统 MUST 在 binding 模式（step 2 / step 3）下优先使用 `liveStore.autoGroupResult` 渲染地图。
+系统 MUST 在 binding 模式（step 2 / step 3）下根据确认状态选择地图渲染数据源：未确认草案使用 `liveStore.autoGroupResult`，已确认结果使用 `saveBindingStore.activeBinding`。
 
 #### Scenario: Binding mode map renders from draft
 
 - **前提** `mapBindingStage` 为 `'select-sector'` 或 `'select-station'`
+- **并且** `liveStore.autoGroupConfirmed` 为 false
 - **并且** `liveStore.autoGroupResult` 非 null
 - **当** `MapWorkbenchView` 计算 `sectorGroupColorMap`
 - **那么** SHALL 从 `autoGroupResult.groups` 计算
 - **并且** `handleColorChange` SHALL NOT 调用 `saveBindingStore.updateGroup()`
+
+#### Scenario: Binding mode confirmed result renders from persisted state
+
+- **前提** `mapBindingStage` 为 `'select-sector'` 或 `'select-station'`
+- **并且** `liveStore.autoGroupConfirmed` 为 true
+- **当** `MapWorkbenchView` 计算 `sectorGroupColorMap`
+- **那么** SHALL 从 `saveBindingStore.activeBinding.groups` 计算
+- **并且** SHALL NOT 从残留的 `liveStore.autoGroupResult` 计算
 
 #### Scenario: Non-binding mode renders from persisted state
 
 - **前提** 不在 binding 模式
 - **当** `MapWorkbenchView` 计算 `sectorGroupColorMap`
 - **那么** SHALL 从 `saveBindingStore.activeBinding.groups` 计算
+
+### Requirement: No auto-triggered calculation
+
+系统 SHALL NOT 在任何时机自动执行 `runAutoGroup()`。`onMounted`、`watch(activeBinding)`、`watch(selectedArchive)` 均不触发计算。
+
+#### Scenario: Calculation only on user action
+
+- **前提** 系统处于任何状态
+- **当** `onMounted`、`watch(activeBinding)`、`watch(selectedArchive)` 触发
+- **那么** 系统 SHALL NOT 调用 `runAutoGroup()`
+
+#### Scenario: Recalc hint via red dot
+
+- **前提** `appliedAutoGroupArchiveTime` 为 undefined 或小于当前 `archive.meta.time`
+- **当** 计算按钮渲染
+- **那么** SHALL 显示红点 + tooltip 提示用户重新计算
+
+#### Scenario: Edit button disabled without result
+
+- **前提** `autoGroupResult` 为 null
+- **当** 编辑按钮渲染
+- **那么** SHALL 置灰禁用
+
+### Requirement: Live panel dual mode
+
+系统 SHALL 在 live 面板提供展示模式和计算模式，通过 `liveMode` 切换。
+
+#### Scenario: Display mode layout
+
+- **前提** `liveMode` 为 `'display'`
+- **当** SectorOverviewPanel 渲染
+- **那么** SHALL 显示 `[存档 3fr] | [星区 4fr] | [资源 5fr]` 布局
+
+#### Scenario: Calculate mode layout
+
+- **前提** `liveMode` 为 `'calculate'`
+- **当** SectorOverviewPanel 渲染
+- **那么** SHALL 显示 `[星区 5fr] | [分配 4fr] | [交易站 3fr]` 布局，三列复用 AutoSectorGroupMapPanel 现有结构
+
+#### Scenario: Edit enters calculate mode from confirmed result
+
+- **前提** 展示模式
+- **当** 点击「编辑」
+- **那么** SHALL 调用 `triggerAutoGroup` 加载确认结果，进入计算模式
+
+#### Scenario: Submit returns to display mode
+
+- **前提** 计算模式
+- **当** 点击「提交」
+- **那么** SHALL 调用 `handleConfirm` 后回到展示模式

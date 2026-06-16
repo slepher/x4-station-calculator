@@ -167,15 +167,9 @@ function runAutoGroup() {
     setAutoGroupResult(null)
     return
   }
+  setAutoGroupConfirmed(false)
   const binding = saveBindingStore.getBindingByGameGuid(guid)
   const { sectorGraph, sectorClusterMap } = sectorGraphInfo.value
-
-  // Load persisted params
-  if (binding) {
-    if (binding.prefJumpRange !== undefined) prefJumpRange.value = binding.prefJumpRange
-    if (binding.bridgeSearchJumpRange !== undefined) bridgeSearchJumpRange.value = binding.bridgeSearchJumpRange
-    if (binding.prefThreshold !== undefined) prefThreshold.value = binding.prefThreshold
-  }
 
   const archiveTime = archive.meta?.time ?? 0
 
@@ -1070,16 +1064,24 @@ function handleConfirm() {
     const archiveTime = saveStore.selectedArchive?.meta?.time ?? 0
     binding.appliedAutoGroupArchiveTime = archiveTime
   }
-  if (binding && binding.groups.length > 0) {
-    setAutoGroupResult(buildStoreGroups(binding.groups, result.playerSectorMacros))
-  }
   setAutoGroupConfirmed(true)
   liveStore.clearAutoSectorGroupCheck()
 }
 
 function triggerAutoGroup() {
+  const binding = saveBindingStore.activeBinding
+  if (binding) {
+    if (binding.prefJumpRange !== undefined) prefJumpRange.value = binding.prefJumpRange
+    if (binding.bridgeSearchJumpRange !== undefined) bridgeSearchJumpRange.value = binding.bridgeSearchJumpRange
+    if (binding.prefThreshold !== undefined) prefThreshold.value = binding.prefThreshold
+  }
+  if (binding && binding.groups.length > 0) {
+    setAutoGroupResult(buildStoreGroups(binding.groups, []))
+  } else {
+    setAutoGroupResult(null)
+  }
   setAutoGroupConfirmed(false)
-  runAutoGroup()
+  calcBaselinePillState.value = null
   calculationMode.value = 'result'
   editSnapshot.value = null
 }
@@ -1093,6 +1095,15 @@ function handleUploadComplete() {
   activeViewStore.switchToBinding(guid)
   triggerAutoGroup()
 }
+
+const needsAutoGroupRecalc = computed(() => {
+  const archive = saveStore.selectedArchive
+  if (!archive) return false
+  const binding = saveBindingStore.activeBinding
+  const archiveTime = archive.meta?.time ?? 0
+  const applied = binding?.appliedAutoGroupArchiveTime
+  return applied === undefined || applied < archiveTime
+})
 
 const empireDerivedProductionFlows = computed(() => liveStore.empireDerivedProductionFlows)
 
@@ -1109,21 +1120,17 @@ const overviewSellMultiplier = computed({
 watch(() => activeViewStore.activeBinding, async (newGuid) => {
   if (newGuid) {
     await liveStore.activateBinding(newGuid)
-    runAutoGroup()
   }
 })
 
-watch(() => saveStore.selectedArchive, (archive) => {
-  if (archive && activeViewStore.activeBinding) {
-    runAutoGroup()
-  }
+watch(() => saveStore.selectedArchive, () => {
+  // No auto-run; user explicitly triggers calculation
 })
 
 watch(() => liveStore.autoSectorGroupCheck, (check) => {
   if (!check) return
   if (!check.needed) return
   if (check.gameGuid !== activeViewStore.activeBinding) return
-  triggerAutoGroup()
   liveStore.clearAutoSectorGroupCheck()
 })
 
@@ -1131,7 +1138,6 @@ onMounted(async () => {
   const gameGuid = activeViewStore.activeBinding
   if (gameGuid) {
     await liveStore.activateBinding(gameGuid)
-    runAutoGroup()
   }
 })
 
@@ -1239,6 +1245,7 @@ return {
   handleConfirm,
   triggerAutoGroup,
   handleUploadComplete,
+  needsAutoGroupRecalc,
   empireDerivedProductionFlows,
   overviewBuyMultiplier,
   overviewSellMultiplier,

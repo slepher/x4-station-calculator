@@ -2,39 +2,52 @@
 
 ## 1. liveStore 扩展
 
-- [ ] 导入 `AutoGroupResult` 类型
-- [ ] 新增 `autoGroupResult`、`calculationMode`、`autoGroupConfirmed`
-- [ ] 新增 `prefJumpRange`、`bridgeSearchJumpRange`、`prefThreshold`
-- [ ] 导出所有 6 个状态
-- [ ] 明确 6 个状态为当前 active binding/archive 的唯一 draft 状态
+- [x] 导入 `AutoGroupResult` 类型
+- [x] 新增 `autoGroupResult`、`calculationMode`、`autoGroupConfirmed`
+- [x] 新增 `prefJumpRange`、`bridgeSearchJumpRange`、`prefThreshold`
+- [x] 导出所有 6 个状态
+- [x] 明确 6 个状态为当前 active binding/archive 的唯一 draft 状态
 
 ## 2. SaveBindingPlan 扩展
 
-- [ ] 新增 `appliedAutoGroupArchiveTime?: number` 字段
-- [ ] `normalizeState()` 保留该字段
+- [x] 新增 `appliedAutoGroupArchiveTime?: number` 字段
+- [x] `normalizeState()` 保留该字段
 
 ## 3. Presenter 改造
 
-- [ ] 删除 6 个本地 ref 声明
-- [ ] 改为从 `liveStore` 读取
-- [ ] handler 内统一通过 `liveStore.xxx` 属性读写共享状态，组件 ref 由 presenter 使用 `storeToRefs(liveStore)` 转出
-- [ ] `runAutoGroup` 改为时间比对：当前 archive time 与 `binding.appliedAutoGroupArchiveTime` 一致且已有 `liveStore.autoGroupResult` 时不重算
-- [ ] archive time 更新时，`runAutoGroup` 重新执行 `groupCleanSlate` 或 `groupIncremental`
-- [ ] `handleColorChange` 移除 `saveBindingStore.updateGroup()` 调用
-- [ ] `handleConfirm` 记录 `appliedAutoGroupArchiveTime`
-- [ ] activeBinding 或 selected archive 切换时，用新上下文重新初始化唯一 draft，避免沿用上一上下文未提交草案
-- [ ] `onMounted` 调用 `runAutoGroup()`，内部时间比对决定是否重算
+- [x] 删除 6 个本地 ref 声明
+- [x] 改为从 `liveStore` 读取
+- [x] handler 内统一通过 `liveStore.xxx` 属性读写共享状态，组件 ref 由 presenter 使用 `storeToRefs(liveStore)` 转出
+- [x] `runAutoGroup` 始终执行计算（移除时间跳过）；每次强制 `autoGroupConfirmed = false`
+- [x] `triggerAutoGroup` 加载 binding 数据，`autoGroupConfirmed = false`
+- [x] `handleColorChange` 移除 `updateGroup()` 调用
+- [x] `handleConfirm` 记录 `appliedAutoGroupArchiveTime`；不覆盖 `autoGroupResult`
+- [x] `onMounted`、`watch(activeBinding)`、`watch(selectedArchive)` 不再调用 `runAutoGroup()`
+- [x] 新增 `needsAutoGroupRecalc` computed，计算按钮红点
+- [x] `!autoGroupResult` 时编辑按钮置灰
 
 ## 4. MapWorkbenchView 读取草案
 
-- [ ] `sectorGroupColorMap` 优先从 `liveStore.autoGroupResult` 计算
-- [ ] 非 binding 模式或 autoGroupResult 为 null 时回退到 `saveBindingStore.activeBinding`
+- [x] `sectorGroupColorMap` 从 `liveStore.autoGroupResult` 计算（未确认时）或 `activeBinding`（已确认时）
+- [x] 非 binding 模式回退到 `saveBindingStore.activeBinding`
 
 ## 5. 面板组件适配
 
-- [ ] SectorOverviewPanel 确认从 presenter 拿到的 ref 是 liveStore 的
-- [ ] AutoSectorGroupMapPanel 确认同
+- [x] SectorOverviewPanel 从 presenter 拿到的 ref 是 liveStore 的
+- [x] AutoSectorGroupMapPanel → AutoSectorGroupPanel 重命名
+- [x] 新增 `layout?: 'tabs' | 'columns'` prop；columns 始终三列
+- [x] Map 模式 `gameGuid` watcher 调用 `triggerAutoGroup()`
 
-## 6. 构建验证
+## 6. Live 面板模式切换
 
-- [ ] `npm run build` 通过
+- [x] `liveMode: 'display' | 'calculate'`
+- [x] 展示模式：`[存档3 | 星区4 | 资源5]`，列表从 `activeBinding` 读取
+- [x] 计算模式：嵌入 `AutoSectorGroupPanel layout="columns"`
+- [x] 展示模式「编辑」→ 计算模式（保留 autoGroupResult）
+- [x] 展示模式「计算」→ `runAutoGroup` + 计算模式
+- [x] 确认 → `handleConfirm` → watch(confirmed) → 展示模式
+- [x] 编辑置灰：`!autoGroupResult`
+
+## 7. 构建验证
+
+- [x] `npm run build` 通过
