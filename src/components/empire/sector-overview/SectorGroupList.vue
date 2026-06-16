@@ -39,6 +39,7 @@ const emit = defineEmits<{
   (e: 'toggle-retain-trade-station', groupId: string): void
   (e: 'focus-sector', sectorMacro: string): void
   (e: 'select-group', sectorGroupId: string): void
+  (e: 'color-change', groupId: string, color: string | undefined): void
 }>()
 
 const { t } = useI18n()
@@ -69,6 +70,7 @@ function onToggleRetainConnection(groupId: string) { emit('toggle-retain-connect
 function onToggleRetainTradeStation(groupId: string) { emit('toggle-retain-trade-station', groupId) }
 function onFocusSector(sectorMacro: string) { emit('focus-sector', sectorMacro) }
 function onSelectGroup(sectorGroupId: string) { emit('select-group', sectorGroupId) }
+function onColorChange(groupId: string, color: string | undefined) { emit('color-change', groupId, color) }
 </script>
 
 <template>
@@ -110,6 +112,7 @@ function onSelectGroup(sectorGroupId: string) { emit('select-group', sectorGroup
           @toggle-retain-trade-station="onToggleRetainTradeStation"
           @focus-sector="onFocusSector"
           @select-group="onSelectGroup"
+          @color-change="onColorChange"
         />
       </template>
     </draggable>
@@ -133,6 +136,7 @@ function onSelectGroup(sectorGroupId: string) { emit('select-group', sectorGroup
         @toggle-retain-trade-station="onToggleRetainTradeStation"
         @focus-sector="onFocusSector"
         @select-group="onSelectGroup"
+        @color-change="onColorChange"
       />
     </div>
   </div>

@@ -57,6 +57,7 @@ export interface GroupDraftInfo {
   tradeStationRetainEnabled?: boolean
   selectedTradeStation?: { type: 'player' | 'virtual'; stationCode: string } | null
   source?: 'auto' | 'manual' | 'bridge'
+  color?: string
   baseline?: boolean
   enteredOtherGroupCoverage?: boolean
 }
@@ -128,7 +129,7 @@ function buildSectorDistanceMap(
   return distances
 }
 
-function getDistance(
+export function getDistance(
   from: string,
   to: string,
   sectorGraph: Record<string, string[]>,
@@ -1010,7 +1011,8 @@ export function groupIncremental(
     isPinned: true,
       coverageRetainEnabled: true,
       connectionRetainEnabled: true,
-    hubScore: undefined
+    hubScore: undefined,
+    color: group.color
   }))
 
   let assignedSectors = new Map<string, string>()

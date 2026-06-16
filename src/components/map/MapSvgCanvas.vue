@@ -28,6 +28,7 @@ import MapLinkLayer from '@/components/map/layers/MapLinkLayer.vue'
 import MapOverlayLayer from '@/components/map/layers/MapOverlayLayer.vue'
 import MapSectorLabelLayer from '@/components/map/layers/MapSectorLabelLayer.vue'
 import MapSectorLayer from '@/components/map/layers/MapSectorLayer.vue'
+import MapSectorGroupColorLayer from '@/components/map/layers/MapSectorGroupColorLayer.vue'
 type SectorHoverPayload = {
   sectorId: string
   clusterId: string
@@ -100,6 +101,8 @@ const props = withDefaults(defineProps<{
   showSectorLabels?: boolean
   showSectorLinks?: boolean
   showResourceBadges?: boolean
+  showSectorGroupColors?: boolean
+  sectorGroupColorMap?: Record<string, string>
 }>(), {
   searchHighlightedSectorIds: () => [],
   resourceHighlightedSectorIds: () => [],
@@ -131,7 +134,8 @@ const props = withDefaults(defineProps<{
   factionColorMap: undefined,
   showSectorLabels: true,
   showSectorLinks: true,
-  showResourceBadges: true
+  showResourceBadges: true,
+  showSectorGroupColors: true
 })
 
 const emit = defineEmits<{
@@ -246,6 +250,8 @@ const {
   resolveName,
   resolveOwnerColor
 })
+
+const sectorGroupColorMapComputed = computed(() => props.sectorGroupColorMap ?? {})
 
 const sectorFilter = (sectorId: string) => {
   const state = sectorFilterState(sectorId)
@@ -426,6 +432,13 @@ watchEffect(() => {
       :show-resource-badges="showResourceBadges"
       @sector-hover="emitSectorHover"
       @sector-leave="emitSectorLeave"
+    />
+
+    <MapSectorGroupColorLayer
+      v-if="showSectorGroupColors"
+      :cluster-polygons="clusterPolygons"
+      :sector-group-color-map="sectorGroupColorMapComputed"
+      :hex-points="hexPoints"
     />
 
     <MapOverlayLayer

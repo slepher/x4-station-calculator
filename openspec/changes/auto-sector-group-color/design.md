@@ -190,36 +190,32 @@ pickHubColor(group, fixedColors):
 
 ## 地图染色
 
-### useMapSvgSectors 改动
+采用独立 layer 架构，避免 Hub 内六边形污染 `MapSectorLayer` 的 faction polygon / resource pie / badge / hover target 等职责。
 
-新增参数：
+### 文件结构
 
-```ts
-sectorGroupColorMap: Record<string, string>  // sectorMacro → hub color
+```
+src/components/map/layers/
+├── MapSectorLayer.vue             # faction sector polygon + resource pie + badge
+└── MapSectorGroupColorLayer.vue   # hub coverage 内六边形（独立 layer）
 ```
 
-覆盖星区互斥，一个星区最多属于一个 hub，因此 `sectorGroupColorMap` 不需要处理多个 hub 同时写入同一个 sector 的优先级。
+### 数据流
 
-在 `sectorFillColor` 和 `sectorPolygon` 之间新增内部六边形：
+- `useMapSvgSectors` 输出 `clusterPolygons`（已含各 sector 中心坐标、半径）
+- `AutoSectorGroupMapPanel` ← `useAutoSectorGroupPresenter.sectorGroupColorMap`（provide）
+- `MapSvgCanvas` inject `sectorGroupColorMap` → 传给 `MapSectorGroupColorLayer`
+- `MapSectorGroupColorLayer` 接收 `clusterPolygons` + `sectorGroupColorMap` + `hexPoints`，渲染 2/3 半径内六边形（fill-opacity 0.35, no stroke）
 
-```ts
-const innerPolygons = clusterPolygons.map(p => {
-  if (sectorGroupColorMap[p.sectorMacro]) {
-    return {
-      points: hexPoints(p.center.x, p.center.y, p.radius * 2/3),
-      fill: sectorGroupColorMap[p.sectorMacro],
-      fillOpacity: 0.35,
-      stroke: 'none'
-    }
-  }
-  return null
-}).filter(Boolean)
+### 渲染层级
+
+```
+<MapSectorLayer />              <!-- faction/base sector polygon -->
+<MapSectorGroupColorLayer />    <!-- hub color inner hex -->
+<MapOverlayLayer />             <!-- station overlays -->
 ```
 
-### MapSectorLayer 改动
-
-在 faction sector 六边形之后、resource pie 之前渲染 `innerPolygons`。
-`color` 为 undefined 时不生成内部六边形；透明预设也通过 undefined 表示。
+覆盖星区互斥，一个星区最多属于一个 hub，因此 `sectorGroupColorMap` 不需要处理多 hub 同 sector 优先级。`color` 为 undefined 时不生成内部六边形；透明预设也通过 undefined 表示。
 
 ## 样式覆写（SketchPicker）
 

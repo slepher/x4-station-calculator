@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, provide } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAutoSectorGroupPresenter } from '@/components/empire/presenters/useAutoSectorGroupPresenter'
 import { useActiveViewStore } from '@/store/useActiveViewStore'
@@ -84,8 +84,12 @@ const {
   canDisableNode,
   bridgeRetainIndeterminate,
   coverageRetainIndeterminate,
-  tradeStationRetainIndeterminate
+  tradeStationRetainIndeterminate,
+  handleColorChange,
+  sectorGroupColorMap
 } = presenter
+
+provide('sectorGroupColorMap', sectorGroupColorMap)
 
 const liveStore = useLiveProductionStore()
 
@@ -180,6 +184,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
           @toggle-retain-coverage="handleToggleRetainCoverage"
           @toggle-retain-connection="handleToggleRetainConnection"
           @toggle-retain-trade-station="handleToggleTradeStationRetain"
+          @color-change="handleColorChange"
           @focus-sector="emit('focus-sector', $event)" @select-group="emit('select-group', $event)"
         />
       </template>
@@ -237,6 +242,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
             @add-candidate-coverage="handleAddCandidateCoverage" @delete-group="handleDeleteGroup"
             @toggle-retain-coverage="handleToggleRetainCoverage" @toggle-retain-connection="handleToggleRetainConnection"
             @toggle-retain-trade-station="handleToggleTradeStationRetain"
+            @color-change="handleColorChange"
             @focus-sector="emit('focus-sector', $event)"
           />
         </div>

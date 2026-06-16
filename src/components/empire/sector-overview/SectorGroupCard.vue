@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { SketchPicker } from 'vue-color'
+import { HUB_PALETTE } from '@/store/logic/hubColor'
 import type { GroupDraftInfo, SectorAssignment } from '@/store/logic/autoGroup'
 import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
 import { getCoverageSectors } from '@/store/logic/saveBindingUtils'
@@ -41,9 +43,45 @@ const emit = defineEmits<{
   (e: 'toggle-retain-trade-station', groupId: string): void
   (e: 'focus-sector', sectorMacro: string): void
   (e: 'select-group', sectorGroupId: string): void
+  (e: 'color-change', groupId: string, color: string | undefined): void
 }>()
 
 const { t, te } = useI18n()
+
+const showColorPicker = ref(false)
+
+function onColorChipClick() {
+  if (!props.editable) return
+  showColorPicker.value = !showColorPicker.value
+}
+
+function onColorUpdate(hex: string) {
+  // vue-color SketchPicker may emit object or string
+  const color = typeof hex === 'string' ? hex : '#3b82f6'
+  emit('color-change', props.group.id, color)
+  showColorPicker.value = false
+}
+
+function onPresetClick(e: MouseEvent) {
+  const target = (e.target as HTMLElement).closest('.preset-color')
+  if (target) {
+    const hex = target.getAttribute('data-color')
+    if (hex === 'transparent') {
+      emit('color-change', props.group.id, undefined)
+    } else if (hex) {
+      emit('color-change', props.group.id, hex)
+    }
+    showColorPicker.value = false
+  }
+}
+
+function onPickerOverlayClick() {
+  showColorPicker.value = false
+}
+
+function onEsc(e: KeyboardEvent) {
+  if (e.key === 'Escape') showColorPicker.value = false
+}
 
 function getSectorName(macro: string): string {
   if (props.maps) {
@@ -257,6 +295,7 @@ function onAnchorPillClick(macro: string) {
 <template>
   <div
     class="group-item"
+    @keydown="onEsc"
     :class="{
       'group-item--new': group.isNew,
       'group-item--pinned': group.isPinned,
@@ -275,6 +314,14 @@ function onAnchorPillClick(macro: string) {
           </svg>
         </div>
         <span class="group-name">{{ group.name }}</span>
+        <button
+          class="color-chip"
+          :class="{ 'color-chip--empty': !group.color }"
+          :style="{ background: group.color || 'transparent' }"
+          :disabled="!editable"
+          :title="editable ? t('sector.hub_color') : ''"
+          @click="onColorChipClick"
+        />
         <button
           v-if="showSelectGroupButton"
           class="station-bind-icon-btn"
@@ -428,6 +475,18 @@ function onAnchorPillClick(macro: string) {
       </div>
     </div>
   </div>
+
+  <Teleport to="body">
+    <div v-if="showColorPicker" class="color-picker-overlay" @click="onPickerOverlayClick" />
+    <div v-if="showColorPicker" class="color-picker-popper" @click="onPresetClick" @keydown="onEsc">
+      <SketchPicker
+        :model-value="group.color || '#3b82f6'"
+        :preset-colors="HUB_PALETTE"
+        :disable-alpha="true"
+        @update:model-value="onColorUpdate"
+      />
+    </div>
+  </Teleport>
 </template>
 
 <style scoped>
@@ -693,5 +752,67 @@ function onAnchorPillClick(macro: string) {
 
 .bar-checkbox {
   @apply h-3.5 w-3.5 accent-sky-500;
+}
+
+.color-chip {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 1px solid #475569;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform .15s;
+}
+
+.color-chip:hover {
+  transform: scale(1.15);
+}
+
+.color-chip--empty {
+  border-style: dashed;
+  border-color: #64748b;
+  background: transparent;
+}
+
+.color-chip:disabled {
+  cursor: default;
+  pointer-events: none;
+}
+
+.color-picker-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+}
+
+.color-picker-popper {
+  position: fixed;
+  z-index: 1000;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.color-picker-popper :deep(.vc-sketch-picker) {
+  width: 260px;
+}
+
+.color-picker-popper :deep(.presets) {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 3px;
+  padding: 10px 10px 8px;
+}
+
+.color-picker-popper :deep(.preset-color) {
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 1;
+  margin: 0 !important;
+}
+
+.color-picker-popper :deep(.preset-color[aria-selected="true"]) {
+  box-shadow: 0 0 0 2px #1e293b, 0 0 0 4px #60a5fa !important;
+  z-index: 1;
 }
 </style>

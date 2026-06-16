@@ -174,10 +174,10 @@ const emit = defineEmits<{
               :data-sector-id="sector.id"
               :data-cluster-id="cluster.id"
               :stroke-dasharray="!gameDataEnforceDlcActivation && cluster.isDlcActive === false ? '6,4' : undefined"
-              :stroke-dashoffset="!gameDataEnforceDlcActivation && cluster.isDlcActive === false ? ((sector.sx + sector.sy) % 10).toFixed(1) : undefined"
-            />
-            <g
-              v-if="showResourceBadges !== false"
+            :stroke-dashoffset="!gameDataEnforceDlcActivation && cluster.isDlcActive === false ? ((sector.sx + sector.sy) % 10).toFixed(1) : undefined"
+          />
+          <g
+            v-if="showResourceBadges !== false"
               class="resource-badge"
               v-for="badge in buildResourceGroupBadgeGeometries(sector.id, sector.sx, sector.sy, sector.radius)"
               :key="badge.key"

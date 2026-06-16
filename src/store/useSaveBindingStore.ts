@@ -88,7 +88,8 @@ function normalizeState(input: Partial<SavedSaveBindingsState> | null | undefine
             jumpRange: Number.isFinite(Number(group.jumpRange)) ? Number(group.jumpRange) : 3,
             coverageSectorMacros: Array.isArray(group.coverageSectorMacros) ? group.coverageSectorMacros : [],
             connectedGroupIds: Array.isArray(group.connectedGroupIds) ? group.connectedGroupIds : [],
-            tradeStation: normalizeTradeStation(group.tradeStation)
+            tradeStation: normalizeTradeStation(group.tradeStation),
+            color: group.color as string | undefined
           })) : []
 
           const rawStationPlans = Array.isArray((item as any).stationPlans) ? (item as any).stationPlans as unknown[] : []
@@ -684,7 +685,8 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
       }
       if (targetId) {
         updateGroup(gameGuid, targetId, {
-          jumpRange: draft.jumpRange
+          jumpRange: draft.jumpRange,
+          color: draft.color
         })
         if (draft.sectorMacro) {
           const entries = buildCoverageEntries(
@@ -707,6 +709,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
         // Use draft UUID directly so connectedGroupIds don't need translation
         const group = createDefaultGroup(draft.name, draftBinding.value!.groups.length)
         group.id = draft.id
+        group.color = draft.color
         draftBinding.value!.groups.push(group)
         createdIds.add(group.id)
         targetIdsInDraftOrder.push(group.id)

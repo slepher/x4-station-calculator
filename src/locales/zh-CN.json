@@ -123,6 +123,7 @@
     "default_threshold": "Hub 阈值",
     "default_threshold_short": "阈值",
     "delete_hub": "删除枢纽",
+    "hub_color": "枢纽颜色",
     "jump_unit": "跳",
     "volume_unit_m3": "m³",
     "recalculate": "重新计算",
@@ -507,6 +508,7 @@
     "debug_visibility_toggle": "地图图层",
     "debug_visibility_sector_labels": "星区文本",
     "debug_visibility_sector_links": "星区连线",
+    "debug_visibility_sector_group_colors": "星区组染色",
     "debug_visibility_resource_badges": "资源标签"
   },
   "ship_build": {

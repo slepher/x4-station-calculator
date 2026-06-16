@@ -1274,6 +1274,7 @@ export interface BindingSectorGroup {
   coverageSectorMacros: CoverageSectorEntry[]
   connectedGroupIds?: string[]
   tradeStation?: TradeStationBinding
+  color?: string
 }
 
 export interface BindingStationPlan {

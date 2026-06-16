@@ -5,10 +5,11 @@ import { useGameDataStore } from '@/store/useGameDataStore'
 import { useActiveViewStore } from '@/store/useActiveViewStore'
 import { useSaveBindingStore } from '@/store/useSaveBindingStore'
 import { useLiveProductionStore } from '@/store/useLiveProductionStore'
-import { groupCleanSlate, groupIncremental, DEFAULT_JUMP_RANGE, DEFAULT_BRIDGE_SEARCH_JUMP_RANGE, applyAbsorbToResult, applyStandaloneToResult, applyBridgePlanToDraft, type AutoGroupResult, type GroupDraftInfo } from '@/store/logic/autoGroup'
+import { groupCleanSlate, groupIncremental, DEFAULT_JUMP_RANGE, DEFAULT_BRIDGE_SEARCH_JUMP_RANGE, applyAbsorbToResult, applyStandaloneToResult, applyBridgePlanToDraft, type AutoGroupResult, type GroupDraftInfo, getDistance } from '@/store/logic/autoGroup'
 import { DEFAULT_HUB_CONFIG } from '@/store/logic/autoGroupHub'
 import { buildSectorGraphFromMaps, getCoverageSectors, getPlayerStationsInSector } from '@/store/logic/saveBindingUtils'
 import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
+import { stabilizeHubColors, stabilizeEditedHubColor, type HubColorContext } from '@/store/logic/hubColor'
 import { selectTradeStationCandidates, determineDefaultTradeStation, type TradeStationCandidate, type TradeStationSelection } from '@/store/logic/tradeStationSelection'
 import { detectStationHub } from '@/store/logic/autoGroupHub'
 import type { BindingSectorGroup } from '@/types/x4'
@@ -26,6 +27,29 @@ const prefJumpRange = ref(DEFAULT_JUMP_RANGE)
 const bridgeSearchJumpRange = ref(DEFAULT_BRIDGE_SEARCH_JUMP_RANGE)
 const prefThreshold = ref(DEFAULT_HUB_CONFIG.containerThreshold)
 const nodeEnabled = ref(true)
+
+function buildHubColorContext(): HubColorContext {
+  const maps = gameDataStore.maps
+  const { sectorGraph, sectorClusterMap } = sectorGraphInfo.value
+
+  return {
+    getFactionColor: (sectorMacro: string) => {
+      if (!maps) return undefined
+      const resolved = resolveMapSectorByMacro(maps, sectorMacro)
+      if (!resolved) return undefined
+      if (resolved.sector?.owner_color) return resolved.sector.owner_color
+      if (maps.clusters && resolved.clusterId) {
+        const cluster = maps.clusters[resolved.clusterId]
+        if (cluster?.owner_color) return cluster.owner_color
+      }
+      return undefined
+    },
+    getDistance: (from: string, to: string) => {
+      return getDistance(from, to, sectorGraph, sectorClusterMap)
+    },
+    maxHop: 5
+  }
+}
 const bridgeRetainEnabled = ref(true)
 const coverageRetainEnabled = ref(true)
 const tradeStationRetainEnabled = ref(false)
@@ -135,7 +159,8 @@ function buildStoreGroups(groups: BindingSectorGroup[], playerSectorMacros: stri
       ? (g.tradeStation.saveStationCode
           ? { type: 'player' as const, stationCode: g.tradeStation.saveStationCode }
           : { type: 'virtual' as const, stationCode: '__virtual__' })
-      : undefined
+      : undefined,
+    color: g.color
   }))
   return { groups: storeGroups, assignments: [], bridgePlans: [], playerSectorMacros }
 }
@@ -201,6 +226,7 @@ function runAutoGroup() {
       setResultModeDefaults()
       return
     }
+    stabilizeHubColors(result.groups, buildHubColorContext())
     setAutoGroupResult(result)
     setResultModeDefaults()
   } else {
@@ -212,6 +238,7 @@ function runAutoGroup() {
     const namedGroups = result.groups.map((g) => ({
       ...g, name: g.sectorMacro ? getSectorDisplayName(g.sectorMacro) : g.name,
     }))
+    stabilizeHubColors(namedGroups, buildHubColorContext())
     setAutoGroupResult({ ...result, groups: namedGroups })
     setResultModeDefaults()
   }
@@ -343,6 +370,9 @@ function runCalculationFromEditInput() {
     isPinned: true,
     ...prevTradeStationByGroupId[g.id]
   }))
+
+  // Stabilize hub colors
+  stabilizeHubColors(groupsWithBaseline, buildHubColorContext())
 
   // Save E2 baseline pill data for result-mode display
   calcBaselinePillState.value = {
@@ -612,6 +642,8 @@ function handleAddCandidateCoverage(groupId: string, sectorMacro: string) {
     }
   }
 
+  // Stabilize color for the affected group after coverage change
+  stabilizeEditedHubColor(groups[idx]!, groups, buildHubColorContext())
   autoGroupResult.value = { ...result, groups, assignments: result.assignments }
 }
 
@@ -750,6 +782,7 @@ function handleAddHubDraft(sectorMacro: string) {
     savedTradeStationCode
   }
   groups.push(newGroup)
+  stabilizeEditedHubColor(newGroup, groups, buildHubColorContext())
   autoGroupResult.value = { ...result, groups, assignments: result.assignments }
 }
 
@@ -770,6 +803,16 @@ function handleToggleRetainCoverage(groupId: string) {
   const idx = groups.findIndex((g) => g.id === groupId)
   if (idx < 0) return
   groups[idx] = { ...groups[idx]!, coverageRetainEnabled: !groups[idx]!.coverageRetainEnabled }
+  autoGroupResult.value = { ...result, groups, assignments: result.assignments }
+}
+
+function handleColorChange(groupId: string, color: string | undefined) {
+  if (!autoGroupResult.value) return
+  const result = autoGroupResult.value
+  const groups = [...result.groups]
+  const idx = groups.findIndex((g) => g.id === groupId)
+  if (idx < 0) return
+  groups[idx] = { ...groups[idx]!, color }
   autoGroupResult.value = { ...result, groups, assignments: result.assignments }
 }
 
@@ -929,6 +972,21 @@ const hasGlobalUnresolved = computed(() =>
   hasPendingBridgeDecision.value ||
   hasUnresolvedTradeStations.value
 )
+
+const sectorGroupColorMap = computed<Record<string, string>>(() => {
+  if (!autoGroupResult.value) return {}
+  const map: Record<string, string> = {}
+  for (const group of autoGroupResult.value.groups) {
+    if (!group.color) continue
+    if (group.sectorMacro && !map[group.sectorMacro]) {
+      map[group.sectorMacro] = group.color
+    }
+    for (const sectorMacro of group.coverageSectorMacros) {
+      if (!map[sectorMacro]) map[sectorMacro] = group.color
+    }
+  }
+  return map
+})
 
 function handleSelectTradeStation(groupId: string, selection: TradeStationSelection) {
   if (!autoGroupResult.value) return
@@ -1191,6 +1249,7 @@ return {
   getExistingAnchorSectors,
   getSectorDisplayName,
   handleToggleRetainCoverage,
+  handleColorChange,
   handleToggleRetainConnection,
   handleMasterBridgeRetain,
   handleMasterCoverageRetain,
@@ -1206,6 +1265,7 @@ return {
   hasPendingBridgeDecision,
   hasGlobalUnresolved,
   tradeStationCaps,
+  sectorGroupColorMap,
   hasAutoResult,
   stationCounts,
   canDisableNode,

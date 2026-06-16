@@ -77,7 +77,8 @@ const {
   selectedTradeStations,
   unresolvedAllocationGroups,
   unresolvedTradeStationGroups,
-  tradeStationCaps
+  tradeStationCaps,
+  handleColorChange
 } = presenter
 
 const col3ActiveTab = ref<'allocation' | 'tradeStation'>('allocation')
@@ -166,6 +167,7 @@ defineExpose({ triggerAutoGroup })
         @toggle-retain-coverage="handleToggleRetainCoverage"
         @toggle-retain-connection="handleToggleRetainConnection"
         @toggle-retain-trade-station="handleToggleTradeStationRetain"
+        @color-change="handleColorChange"
       />
     </div>
 

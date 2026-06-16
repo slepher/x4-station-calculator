@@ -167,9 +167,26 @@ const focusedSavePoiKey = ref<string | null>(null)
 const savePoiTooltipItem = ref<SavePoiOverlayItem | null>(null)
 const mapDiagnosticVisibility = ref({
   sectorLabels: true,
-  sectorLinks: true
+  sectorLinks: true,
+  sectorGroupColors: true
 })
 const activeControlPanel = ref<'diagnostic' | 'poi' | null>(null)
+
+const sectorGroupColorMap = computed<Record<string, string>>(() => {
+  const binding = saveBindingStore.activeBinding
+  if (!binding) return {}
+  const map: Record<string, string> = {}
+  for (const group of binding.groups) {
+    if (!group.color) continue
+    if (group.sectorMacro && !map[group.sectorMacro]) {
+      map[group.sectorMacro] = group.color
+    }
+    for (const entry of group.coverageSectorMacros) {
+      if (!map[entry.ref]) map[entry.ref] = group.color
+    }
+  }
+  return map
+})
 const settledSavePoiViewportContentBounds = ref<{
   left: number
   top: number
@@ -1617,6 +1634,7 @@ const onSaveVisibilityChange = (visibility: SavePoiVisibility) => {
 const onMapDiagnosticVisibilityChange = (visibility: {
   sectorLabels: boolean
   sectorLinks: boolean
+  sectorGroupColors: boolean
 }) => {
   mapDiagnosticVisibility.value = visibility
 }
@@ -2068,6 +2086,8 @@ onBeforeUnmount(() => {
               :show-sector-labels="mapDiagnosticVisibility.sectorLabels"
               :show-sector-links="mapDiagnosticVisibility.sectorLinks"
               :show-resource-badges="true"
+              :show-sector-group-colors="mapDiagnosticVisibility.sectorGroupColors || bindingContextStage === 'select-sector' || bindingContextStage === 'select-station'"
+              :sector-group-color-map="sectorGroupColorMap"
               @content-size="onCanvasSize"
               @sector-layout="onSectorLayout"
               @layout-state="onLayoutState"

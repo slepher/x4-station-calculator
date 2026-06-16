@@ -123,6 +123,7 @@
     "default_threshold": "Hub Threshold",
     "default_threshold_short": "Hub",
     "delete_hub": "Delete hub",
+    "hub_color": "Hub color",
     "jump_unit": "j",
     "volume_unit_m3": "m³",
     "recalculate": "Recalculate",
@@ -508,6 +509,7 @@
     "debug_visibility_toggle": "Map Layers",
     "debug_visibility_sector_labels": "Sector Labels",
     "debug_visibility_sector_links": "Sector Links",
+    "debug_visibility_sector_group_colors": "Sector Group Colors",
     "debug_visibility_resource_badges": "Resource Badges"
   },
   "ship_build": {
