@@ -9,8 +9,6 @@ import { getCoverageSectors } from '@/store/logic/saveBindingUtils'
 import JumpInput from '@/components/common/JumpInput.vue'
 import type { X4MapSector } from '@/types/x4'
 
-defineOptions({ inheritAttrs: false })
-
 const props = withDefaults(defineProps<{
   group: GroupDraftInfo
   groups: GroupDraftInfo[]
@@ -476,19 +474,19 @@ function onAnchorPillClick(macro: string) {
         </span>
       </div>
     </div>
-  </div>
 
-  <Teleport to="body">
-    <div v-if="showColorPicker" class="color-picker-overlay" @click="onPickerOverlayClick" />
-    <div v-if="showColorPicker" class="color-picker-popper" @click="onPresetClick" @keydown="onEsc">
-      <SketchPicker
-        :model-value="group.color || '#3b82f6'"
-        :preset-colors="HUB_PALETTE"
-        :disable-alpha="true"
-        @update:model-value="onColorUpdate"
-      />
-    </div>
-  </Teleport>
+    <Teleport to="body">
+      <div v-if="showColorPicker" class="color-picker-overlay" @click="onPickerOverlayClick" />
+      <div v-if="showColorPicker" class="color-picker-popper" @click="onPresetClick" @keydown="onEsc">
+        <SketchPicker
+          :model-value="group.color || '#3b82f6'"
+          :preset-colors="HUB_PALETTE"
+          :disable-alpha="true"
+          @update:model-value="onColorUpdate"
+        />
+      </div>
+    </Teleport>
+  </div>
 </template>
 
 <style scoped>

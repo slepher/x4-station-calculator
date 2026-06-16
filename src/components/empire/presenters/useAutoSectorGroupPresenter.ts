@@ -1055,15 +1055,15 @@ function handleConfirm() {
       }
     }
   }
-  saveBindingStore.saveBinding()
-  liveStore.syncAllBindingStationsToStateMap()
-  liveStore.syncLiveFlowMap()
-  calcBaselinePillState.value = null
   const binding = saveBindingStore.activeBinding
   if (binding) {
     const archiveTime = saveStore.selectedArchive?.meta?.time ?? 0
     binding.appliedAutoGroupArchiveTime = archiveTime
   }
+  saveBindingStore.saveBinding()
+  liveStore.syncAllBindingStationsToStateMap()
+  liveStore.syncLiveFlowMap()
+  calcBaselinePillState.value = null
   setAutoGroupConfirmed(true)
   liveStore.clearAutoSectorGroupCheck()
 }
