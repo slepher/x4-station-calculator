@@ -4,6 +4,7 @@ import { createPinia } from 'pinia'
 import './style.css'
 import 'tippy.js/dist/tippy.css' // 基础样式
 import 'tippy.js/themes/material.css';
+import 'vue-color/style.css';
 import App from './App.vue'
 import i18n, { initI18n } from './i18n'
 

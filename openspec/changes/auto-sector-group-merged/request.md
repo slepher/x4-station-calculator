@@ -176,7 +176,6 @@ In Scope：
 - i18n 文案。
 
 Out of Scope：
-- 地图 canvas 覆盖高亮。
 - `MapBindingSectorGroup` 交互改造。
 - Terraforming / Research / Blueprint Recipe。
 - 把 bridge 扩展为“自动联通所有玩家星区”。

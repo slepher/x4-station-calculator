@@ -43,6 +43,12 @@ const tradeStationCandidates = computed<Record<string, TradeStationCandidate[]>>
 // null 表示未决；'__virtual__' 表示已选择虚拟站
 const selectedTradeStations = ref<Record<string, TradeStationSelection | null>>({})
 
+// stationCode → containerCap，用于 hub pill 容量显示
+const tradeStationCaps = computed<Record<string, number>>()
+
+// 全局确认 gate：allocation / bridge / tradeStation 三者均解决
+const hasGlobalUnresolved = computed<boolean>()
+
 // 保留开关
 const tradeStationRetainEnabled = ref(false)
 
@@ -86,6 +92,8 @@ interface GroupDraftInfo {
   // ... existing fields ...
   savedTradeStationCode?: string    // 上次提交的 trade station code
   tradeStationRetainEnabled?: boolean  // 当前是否保留
+  selectedTradeStation?: { type: 'player' | 'virtual'; stationCode: string } | null  // 当前 UI 选中
+  source?: 'auto' | 'manual' | 'bridge'  // hub 来源，替代原 role + isManualHub
 }
 ```
 
@@ -94,6 +102,8 @@ interface GroupDraftInfo {
 ### D1: 候选筛选复用 `detectStationHub`
 
 直接对星区内玩家空间站调用 `detectStationHub()`，复用既有 hub score 逻辑。无需为新控件单独设计评分体系。
+
+`selectTradeStationCandidates()` 取 top 5，纯 hub 不足 2 时用后续 pureHub **替换**最低分非 pureHub（非追加），保持候选总数 ≤ 5。
 
 ### D2: 虚拟站 code 仅用于 UI/计算层
 
@@ -106,9 +116,12 @@ interface GroupDraftInfo {
 
 ### D3: AllocationConfirmBar 改造为 i18n-key 数组
 
-将 `hasUncertain: boolean` 替换为 `unresolved: string[]`，保留扩展性。未来如需要同时显示多种未解决类型，只需传入多个 key。
+将 `hasUncertain: boolean` 替换为 `unresolved: string[]`（局部 tab 状态），新增 `globalUnresolved: boolean` prop（全局确认 gate）。
 
-按钮 disabled 不只看当前 tab 的 `unresolved`。所有确认按钮必须接收全局 unresolved/gate，确保任一 tab 中点击确认都满足 allocation、bridge、trade station 三类问题全部解决。
+- status 文本：仅按当前 tab 传入局部 unresolved key
+- 确认按钮 disabled：`unresolved.length > 0 || globalUnresolved || edit_disabled`
+- 全局 gate 由 presenter 的 `hasGlobalUnresolved` 提供，覆盖 allocation、bridge、tradeStation 三类未解决项
+- `handleConfirm()` 内部也防御式检查 `hasGlobalUnresolved`，不单依赖 UI disabled
 
 ### D4: SectorConfirmBar 阈值字段改造
 
@@ -122,7 +135,9 @@ interface GroupDraftInfo {
 - 候选站显示 `stationCode`（而非 `macro`）
 - 每项显示 containerCap 格式化值
 - 虚拟站选项独立 `<li>`，与候选站并列
-- 无候选站的 group 不显示该 card
+- `SectorTradeStationList` 遍历所有 hub groups（groups 中有 `sectorMacro` 的），不区分有无 candidates
+- 无候选站（锚点星区无玩家站）时仍渲染 card，仅显示虚拟交易站并默认选中
+- hub 药丸（`SectorGroupCard` anchor row）上显示选中站的容量：`Math.floor(containerCap / 1_000_000) + 'M'`，虚拟站不显示
 
 ### D6: Tab 自动跳转逻辑
 
@@ -172,10 +187,19 @@ const hasGlobalUnresolved = computed(() =>
 
 ### D8: 提交流程覆盖旧自动 trade station 写入
 
-现有 `createAutoGroups()` 会在 group 创建/绑定时自动写入 trade station。该旧行为必须被调整，不能绕过 `selectedTradeStations`：
-- 推荐方案：`createAutoGroups()` 只负责 group/coverage/connection，不再根据 `hubStationCode` 或 fallback best station 写 trade station
-- `handleConfirm()` 在 `createAutoGroups()` 后遍历 `selectedTradeStations` 写入 trade station
-- 如果保留旧自动创建虚拟 trade station 作为基础结构，后续 selection 写入必须覆盖它，并能清除旧 `saveStationCode`
+`createAutoGroups()` 只负责 group/coverage/connection，不再根据 `hubStationCode` 或 fallback best station 写 trade station。`bindSectorGroup()` 创建 tradeStation 基础结构（无 `saveStationCode`）。所有 trade station 写入（玩家站 → `upsertTradeStation`，虚拟站 → `unbindTradeStation`）由 `handleConfirm()` 按 `selectedTradeStation` 显式执行。
+
+### D9: Hub 身份字段统一为 source
+
+`GroupDraftInfo` 不再使用 `role` 和 `isManualHub` 两个独立字段表达 hub 来源，统一为 `source: 'auto' | 'manual' | 'bridge'`：
+
+| 来源 | 设值点 | 候选规则 |
+|------|--------|---------|
+| `'auto'` | `groupCleanSlate` / `groupIncremental` | 星区所有玩家站，无 qualified 限制 |
+| `'manual'` | `handleAddHubDraft` | 有 qualified → 仅 qualified；无 → 全部玩家站 |
+| `'bridge'` | `applyBridgePlanToDraft` | 同 manual，不强制 qualified 阈值 |
+
+`skipQualifiedThreshold = group.source !== 'auto'`。
 
 ## Data Flow
 
@@ -187,9 +211,9 @@ runAutoGroup() / runCalculationFromEditInput()
   │
   ├→ tradeStationCandidates 计算
   │   ├→ 遍历 groups
-  │   │   ├→ auto hub（有 hubStationCode）→ 星区所有玩家站
-  │   │   ├→ user-added hub → 有 qualified → 仅 qualified 站
-  │   │   └→ user-added hub → 无 qualified → 全部玩家站
+  │   │   ├→ source === 'auto' → 星区所有玩家站（不设 qualified 阈值）
+  │   │   ├→ source === 'manual' → 有 qualified → 仅 qualified；无 → 全部玩家站
+  │   │   └→ source === 'bridge' → 同 manual，不强制 qualified 阈值
   │   └→ 每星区调 selectCandidates() + determineDefault()
   │
   ├→ selectedTradeStations 设默认值

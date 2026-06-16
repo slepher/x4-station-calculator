@@ -4,6 +4,7 @@ import MainWorkbench from './components/MainWorkbench.vue'
 import DragTestPage from './components/test/DragTestPage.vue'
 import TestTemplateFlow from './components/test/GLM-Parent.vue'
 import MetricPanelPlayground from './components/test/MetricPanelPlayground.vue'
+import ColorTestPage from './components/test/ColorTestPage.vue'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
@@ -27,7 +28,7 @@ const saveBindingStore = useSaveBindingStore()
 const activeViewStore = useActiveViewStore()
 const buildPlanStore = useBuildPlanStore()
 
-const currentView = ref<'main' | 'drag-test' | 'template-flow' | 'metric-panel-test'>('main')
+const currentView = ref<'main' | 'drag-test' | 'template-flow' | 'metric-panel-test' | 'color-test'>('main')
 const isInitializing = ref(true)
 
 async function initializeApp() {
@@ -74,6 +75,8 @@ onMounted(() => {
     currentView.value = 'template-flow'
   } else if (view === 'metric-panel-test') {
     currentView.value = 'metric-panel-test'
+  } else if (view === 'color-test') {
+    currentView.value = 'color-test'
   } else if (router === 'maps') {
     shipBuildStore.activeView = 'maps'
   }
@@ -117,6 +120,7 @@ setTimeout(checkExportStores, 500);
     <DragTestPage v-if="currentView === 'drag-test'" />
     <TestTemplateFlow v-else-if="currentView === 'template-flow'" />
     <MetricPanelPlayground v-else-if="currentView === 'metric-panel-test'" />
+    <ColorTestPage v-else-if="currentView === 'color-test'" />
     <MainWorkbench v-else-if="isReady"/>
     <div v-else class="loading-gate">Initializing... (GameData: {{ gameDataStore.isReady }}, Blueprint: {{ blueprintStore.isReady }})</div>
   </div>

@@ -29,11 +29,19 @@
 - **当**：用户手动在星区 C 添加 hub
 - **那么**：候选列表包含全部 2 个站（忽略阈值限制）
 
-#### Scenario: 不足 5 个候选
+#### Scenario: bridge hub 的候选列表
 
-- **前提**：星区 D 只有 2 个玩家空间站
+- **前提**：星区 E 成为 bridge plan 中的一个 unit anchor，星区内有 3 个玩家空间站
+- **当**：bridge plan 被采用，该 unit 创建为 bridge group
+- **那么**：候选列表包含全部 3 个站（不强制 qualified 阈值，与手动 hub 同规则）
+
+#### Scenario: 不足 5 个候选且 pureHub 补充
+
+- **前提**：星区 D 有 2 个 pureHub 和 4 个生产站（共 6 个玩家站），pureHub 的 score 排在第 4-6 位
 - **当**：计算候选列表
-- **那么**：返回这 2 个站（不强制 top 5）
+- **那么**：返回前 3 个生产站（score 1-3）+ 2 个 pureHub（score 4-5），共 5 个候选
+- **并且**：pureHub 通过替换最低分非 pureHub 进入 top 5，非追加
+- **并且**：候选总数不超过 5
 
 ### Requirement: TradeStation 默认值算法
 
@@ -70,7 +78,33 @@
 - **那么**：该 group 的候选列表仅包含虚拟交易站
 - **并且**：虚拟交易站被默认选中
 
-### Requirement: TradeStation 选择 UI
+### Requirement: Hub Pill 容量显示
+
+系统 SHALL 在 hub 的 trade station 药丸上显示选中站的 container 容量。
+
+#### Scenario: 选中玩家站时显示容量
+
+- **前提**：用户选中 player station "SYY-377"，其 containerCap = 21_500_000
+- **当**：渲染 SectorGroupCard 的 anchor row
+- **那么**：药丸显示 "SYY-377 21M"
+- **并且**：容量为 `Math.floor(containerCap / 1_000_000)`，不显示 m³
+
+#### Scenario: 虚拟交易站不显示容量
+
+- **前提**：用户选中虚拟交易站
+- **当**：渲染 SectorGroupCard 的 anchor row
+- **那么**：药丸仅显示 "虚拟交易站"（无容量后缀）
+
+### Requirement: 拖动落点虚边
+
+系统 SHALL 在 hub card 拖拽排序时在落点位置显示虚线边框。
+
+#### Scenario: 拖拽时显示落点
+
+- **前提**：用户在 edit 或 result 模式下拖拽 hub card
+- **当**：拖拽过程中
+- **那么**：落点位置显示虚线天蓝边框 + 浅蓝背景
+- **并且**：落点高度至少 48px，视觉可见
 
 系统 SHALL 在 Map 面板和 Live Col3 中提供 trade station 选择界面。
 
@@ -113,7 +147,7 @@
 
 ### Requirement: AllocationConfirmBar 改造
 
-系统 SHALL 将 `AllocationConfirmBar` 的 props 从 `hasUncertain: boolean` 改为 `unresolved: string[]`，并使用全局确认 gate 控制确认按钮。
+系统 SHALL 将 `AllocationConfirmBar` 的 props 从 `hasUncertain: boolean` 改为 `unresolved: string[]`（局部 tab 状态），并新增 `globalUnresolved: boolean` prop（全局确认 gate），控制确认按钮。`handleConfirm()` 内部也防御式检查全局 gate。
 
 #### Scenario: 显示未解决项
 

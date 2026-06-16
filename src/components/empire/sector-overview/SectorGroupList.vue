@@ -90,7 +90,7 @@ function onSelectGroup(sectorGroupId: string) { emit('select-group', sectorGroup
       :scroll="true"
       :scroll-sensitivity="100"
       :scroll-speed="15"
-    >
+      ghost-class="drag-placeholder"
     >
       <template #item="{ element: group }">
         <SectorGroupCard
@@ -145,6 +145,11 @@ function onSelectGroup(sectorGroupId: string) { emit('select-group', sectorGroup
 
 .empty-hint {
   @apply text-sm text-slate-500 text-center py-4;
+}
+
+:deep(.drag-placeholder) {
+  @apply border-2 border-dashed border-sky-500/60 rounded bg-sky-500/10;
+  min-height: 48px;
 }
 
 /* === Map view compact styles === */

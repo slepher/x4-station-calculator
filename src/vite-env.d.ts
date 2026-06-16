@@ -5,3 +5,8 @@ declare module '*.vue' {
   const component: DefineComponent<{}, {}, any>
   export default component
 }
+
+declare module 'culori' {
+  export function differenceCiede2000(): (a: any, b: any) => number
+  export function parse(color: string): any
+}
