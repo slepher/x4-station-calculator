@@ -53,8 +53,9 @@ appliedAutoGroupArchiveTime: item.appliedAutoGroupArchiveTime as number | undefi
 ### liveStore 新增（`useLiveProductionStore.ts`）
 
 ```ts
-import { DEFAULT_JUMP_RANGE, DEFAULT_BRIDGE_SEARCH_JUMP_RANGE, type AutoGroupResult } from './logic/autoGroup'
+import { DEFAULT_JUMP_RANGE, DEFAULT_BRIDGE_SEARCH_JUMP_RANGE, type AutoGroupResult, type GroupDraftInfo, groupCleanSlate, groupIncremental, enrichAutoGroupResult } from './logic/autoGroup'
 import { DEFAULT_HUB_CONFIG } from './logic/autoGroupHub'
+import { buildSectorGraphFromMaps } from './logic/saveBindingUtils'
 
 // 状态
 const autoGroupResult = shallowRef<AutoGroupResult | null>(null)
@@ -75,30 +76,42 @@ const needsAutoGroupRecalc = computed(() => {
 
 // ===== 数据生产方法 =====
 
-/** 初始化草案 — 双路径决策 */
+/** 从已有 binding groups 构建 assignments（不跑分组算法） */
+function buildAssignmentsFromBinding(): AutoGroupResult | null {
+  // 读取 binding.groups 转为 GroupDraftInfo[]
+  // 构建 sectorGraph → 为每个覆盖星区计算所有候选 group
+  // 构建 SectorAssignment[]，根据已有 coverage 设定默认选中
+  return { groups, assignments, bridgePlans: [], playerSectorMacros }
+}
+
+/** 初始化草案 — 双路径决策，并由 enrichAutoGroupResult 富化 */
 function initAutoGroupDraft() {
   if (needsAutoGroupRecalc.value) {
-    // 有变化 flag → 跑分组算法
-    const result = saveBindingStore.activeBinding?.groups.length
-      ? groupIncremental(/* ... */)
-      : groupCleanSlate(/* ... */)
-    autoGroupResult.value = result
+    result = groupCleanSlate(...) 或 groupIncremental(...)
   } else {
-    // 没有变化 flag → 从已有 binding 构建 assignments
-    autoGroupResult.value = buildAssignmentsFromBinding()
+    result = buildAssignmentsFromBinding()
   }
+  // 纯函数富化：名称 i18n 翻译、hub 颜色、交易站默认选择
+  autoGroupResult.value = enrichAutoGroupResult(result, {
+    getSectorName: (macro) => i18n.global.t(sector.nameId) || macro,
+    getFactionColor: (macro) => sector.owner_color || cluster?.owner_color,
+    archive, modulesByMacroId, prefThreshold, prefJumpRange
+  }, sectorGraph, sectorClusterMap)
+  calculationMode.value = 'result'
 }
 ```
 
-`initAutoGroupDraft()` 在以下时机由 store 内部调用：
-- Store 初始化且存在 activeBinding 和存档时
-- `activeBinding` 或 `selectedArchive` 切换时
+`enrichAutoGroupResult` 是 `autoGroup.ts` 中的纯函数，接收 deps 对象，不依赖 store 或 i18n 实例。
+`buildAssignmentsFromBinding` 是 store 内部函数，仅做数据转换。
 
-Live 和 Map 面板不调用此方法，只读取 `autoGroupResult`。
+| 方法 | 位置 | 职责 |
+|------|------|------|
+| `groupCleanSlate` / `groupIncremental` | `autoGroup.ts` | 纯函数，生成原始分组结果 |
+| `buildAssignmentsFromBinding` | `useLiveProductionStore.ts` | 从持久化 groups 构建 assignments |
+| `enrichAutoGroupResult` | `autoGroup.ts` | 纯函数，富化：名称翻译、颜色、交易站默认 |
+| `initAutoGroupDraft` | `useLiveProductionStore.ts` | 编排：计算 → 富化 → 存储 |
 
-### Presenter 改造
-
-Presenter 退化为纯 view 连接层：只暴露 store refs 给组件，不包含计算逻辑。
+Live 和 Map 面板不调用这些方法，只读取 `autoGroupResult`。
 
 ```ts
 export function useAutoSectorGroupPresenter() {
@@ -166,11 +179,9 @@ Live 面板不触发计算，只切换显示模式。数据由 store 在初始�
 ```
 [SaveUploadPanel 3fr] | [SectorGroupList 4fr] | [EmpireWareFlowsDashboard 5fr]
 ```
-- 星区列表列顶部：桥接跳数、覆盖跳数、Hub 阈值（纯数值显示、只读，从 store 读取）
-- 「详情」→ `liveMode = 'calculate'`（仅切换模式，store 数据已就绪）
-- 「地图」→ 跳转到 map binding 面板
-- 详情按钮红点：`liveStore.needsAutoGroupRecalc`
-- 详情按钮置灰：`!liveStore.autoGroupResult`
+- 星区列表列顶部：`SectorOverviewBar.vue`（桥接跳数、覆盖跳数、Hub 阈值纯数值只读）
+- 「详情」→ `liveMode = 'calculate'`（红点在详情按钮上）
+- 「地图」→ 设置 `isSavePanelOpen=true, mapSavePanelLayer='binding-sector', mapBindingGameGuid=guid, setActiveView('maps')`
 
 **计算模式**：`liveMode = 'calculate'`
 
