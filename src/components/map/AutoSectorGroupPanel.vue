@@ -135,7 +135,8 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
               @color-change="handleColorChange" @focus-sector="emit('focus-sector', $event)"
             />
           </div>
-          <div class="column column-allocation">
+          <div class="column column-allocation" :class="{ 'edit-overlay-wrapper': calculationMode === 'edit' }">
+            <div v-if="calculationMode === 'edit'" class="edit-overlay">{{ t('auto_sector.edit_overlay_hint') }}</div>
             <AllocationConfirmBar v-if="!hasPendingBridgeDecision" :unresolved="unresolvedAllocationGroups" :global-unresolved="hasGlobalUnresolved" :disabled="calculationMode === 'edit'"
               @reset="handleResetAssignments" @confirm="handleConfirm"
             />
@@ -145,10 +146,10 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
             />
           </div>
           <div class="column column-tradestation">
-            <AllocationConfirmBar :unresolved="unresolvedTradeStationGroups" :global-unresolved="hasGlobalUnresolved" :disabled="calculationMode === 'edit'"
+            <AllocationConfirmBar :unresolved="unresolvedTradeStationGroups" :global-unresolved="hasGlobalUnresolved"
               @reset="handleResetTradeStations" @confirm="handleConfirm"
             />
-            <SectorTradeStationList :groups="autoGroupResult?.groups ?? []" :candidates="tradeStationCandidates" :selected="selectedTradeStations" :disabled="calculationMode === 'edit'"
+            <SectorTradeStationList :groups="autoGroupResult?.groups ?? []" :candidates="tradeStationCandidates" :selected="selectedTradeStations"
               @select="handleSelectTradeStation" @focus-sector="emit('focus-sector', $event)"
             />
           </div>
@@ -232,4 +233,12 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
 .column-hub { @apply col-span-5; }
 .column-allocation { @apply col-span-4; }
 .column-tradestation { @apply col-span-3; }
+.edit-overlay-wrapper { @apply relative; }
+.edit-overlay {
+  @apply absolute inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-10 rounded-lg;
+}
+.edit-overlay::after {
+  content: '';
+  @apply text-slate-300 text-sm font-medium;
+}
 </style>

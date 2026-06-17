@@ -185,7 +185,12 @@ Live 面板不触发计算，只切换显示模式。数据由 store 在初始�
 
 **计算模式**：`liveMode = 'calculate'`
 
-三列复用 `AutoSectorGroupPanel`（`layout="columns"`），读取 `liveStore.autoGroupResult` 渲染星区列表和分配面板。
+三列复用 `AutoSectorGroupPanel`（`layout="columns"`），读取 `liveStore.autoGroupResult` 渲染。
+
+编辑输入态（`calculationMode === 'edit'`）：
+- Col 1（星区列表/hub 管理）正常可用
+- Col 2（分配面板）加半透明遮罩，提示「编辑输入中，分配面板暂不可操作」
+- Col 3（交易站）不受影响，保持可操作
 
 **Map 模式**：
 
