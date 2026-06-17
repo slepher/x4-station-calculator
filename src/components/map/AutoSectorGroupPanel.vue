@@ -97,6 +97,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
     <div v-if="!hasAutoResult" class="map-panel-empty">{{ t('sector.no_groups') }}</div>
     <template v-else>
       <template v-if="layout === 'columns'">
+        <div class="px-4 pt-4">
         <AutoSectorBar
           :mode="calculationMode === 'edit' ? 'edit' : 'result'"
           view="live"
@@ -133,6 +134,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
         <HubAddMenu :open="showHubAddMenu" :player-sector-macros="autoGroupResult?.playerSectorMacros ?? []" :occupied-sector-macros="[...getExistingAnchorSectors()]"
           @close="showHubAddMenu = false" @add-hub="(m: string) => { handleAddHubDraft(m); showHubAddMenu = false }" @focus-sector="emit('focus-sector', $event)"
         />
+        </div>
         <div class="columns-layout">
           <div class="column column-hub">
             <SectorGroupList :groups="autoGroupResult?.groups ?? []" :assignments="autoGroupResult?.assignments ?? []"

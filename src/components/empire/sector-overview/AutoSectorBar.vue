@@ -80,7 +80,7 @@ const hasUnresolved = computed(() => (props.unresolvedAllocationCount ?? 0) + (p
   <div class="auto-sector-bar" :class="{ 'auto-sector-bar--map': view === 'map' }">
     <!-- Live: single row -->
     <template v-if="view === 'live'">
-      <div class="bar-row">
+      <div class="bar-row bar-row--live">
         <div class="bar-left">
           <div class="param-field" :title="t('sector.bridge_search_jump')">
             <span class="bar-label">{{ t('sector.bridge_search_jump_short') }}</span>
@@ -113,21 +113,21 @@ const hasUnresolved = computed(() => (props.unresolvedAllocationCount ?? 0) + (p
           <div class="param-field" :title="t('sector.bridge_retain')">
             <label class="bar-label-inline">
               <input type="checkbox" class="bar-checkbox" :checked="bridgeRetainEnabled" :indeterminate.prop="bridgeRetainIndeterminate" @change="onBridgeRetainChange" />
-              <span class="bar-label">{{ t('sector.retain') }}</span>
+              <span class="bar-label">{{ t('sector.bridge_search_jump_short') }}</span>
             </label>
           </div>
 
           <div class="param-field" :title="t('sector.coverage_retain')">
             <label class="bar-label-inline">
               <input type="checkbox" class="bar-checkbox" :checked="coverageRetainEnabled" :indeterminate.prop="coverageRetainIndeterminate" @change="onCoverageRetainChange" />
-              <span class="bar-label">{{ t('sector.retain') }}</span>
+              <span class="bar-label">{{ t('sector.group_coverage_jump_short') }}</span>
             </label>
           </div>
 
           <div class="param-field" :title="t('sector.trade_station_retain')">
             <label class="bar-label-inline">
               <input type="checkbox" class="bar-checkbox" :checked="tradeStationRetainEnabled" :indeterminate.prop="tradeStationRetainIndeterminate" @change="onTradeStationRetainChange" />
-              <span class="bar-label">{{ t('sector.retain') }}</span>
+              <span class="bar-label">{{ t('sector.trade_station_short') }}</span>
             </label>
           </div>
         </div>
@@ -151,7 +151,7 @@ const hasUnresolved = computed(() => (props.unresolvedAllocationCount ?? 0) + (p
 
     <!-- Map: multi-row -->
     <template v-else>
-      <div class="bar-row">
+      <div class="bar-row bar-row--map">
         <div class="bar-left">
           <div class="param-field" :title="t('sector.bridge_search_jump')">
             <span class="bar-label">{{ t('sector.bridge_search_jump_short') }}</span>
@@ -173,7 +173,7 @@ const hasUnresolved = computed(() => (props.unresolvedAllocationCount ?? 0) + (p
           </div>
         </div>
       </div>
-      <div class="bar-row">
+      <div class="bar-row bar-row--map">
         <div class="bar-left">
           <div class="param-field" :title="t('sector.node_enabled_desc')">
             <label class="bar-label-inline">
@@ -184,24 +184,24 @@ const hasUnresolved = computed(() => (props.unresolvedAllocationCount ?? 0) + (p
           <div class="param-field" :title="t('sector.bridge_retain')">
             <label class="bar-label-inline">
               <input type="checkbox" class="bar-checkbox" :checked="bridgeRetainEnabled" :indeterminate.prop="bridgeRetainIndeterminate" @change="onBridgeRetainChange" />
-              <span class="bar-label">{{ t('sector.retain') }}</span>
+              <span class="bar-label">{{ t('sector.bridge_search_jump_short') }}</span>
             </label>
           </div>
           <div class="param-field" :title="t('sector.coverage_retain')">
             <label class="bar-label-inline">
               <input type="checkbox" class="bar-checkbox" :checked="coverageRetainEnabled" :indeterminate.prop="coverageRetainIndeterminate" @change="onCoverageRetainChange" />
-              <span class="bar-label">{{ t('sector.retain') }}</span>
+              <span class="bar-label">{{ t('sector.group_coverage_jump_short') }}</span>
             </label>
           </div>
-          <div v-if="tradeStationRetainEnabled !== undefined" class="param-field" :title="t('sector.trade_station_retain')">
+          <div class="param-field" :title="t('sector.trade_station_retain')">
             <label class="bar-label-inline">
               <input type="checkbox" class="bar-checkbox" :checked="tradeStationRetainEnabled" :indeterminate.prop="tradeStationRetainIndeterminate" @change="onTradeStationRetainChange" />
-              <span class="bar-label">{{ t('sector.retain') }}</span>
+              <span class="bar-label">{{ t('sector.trade_station_short') }}</span>
             </label>
           </div>
         </div>
       </div>
-      <div class="bar-row">
+      <div class="bar-row bar-row--map">
         <div class="bar-right">
           <template v-if="mode === 'edit'">
             <button class="bar-btn cancel-btn" @click="emit('cancel')">{{ t('sector.cancel') }}</button>
@@ -230,6 +230,10 @@ const hasUnresolved = computed(() => (props.unresolvedAllocationCount ?? 0) + (p
 
 .bar-row {
   @apply flex items-center justify-between;
+}
+
+.bar-row--live {
+  @apply flex-nowrap;
 }
 
 .bar-left {
