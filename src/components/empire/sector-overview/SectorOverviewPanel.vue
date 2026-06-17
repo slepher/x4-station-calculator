@@ -39,7 +39,21 @@ const canEdit = computed(() => autoGroupResult.value !== null)
 const displayGroups = computed(() => {
   if (autoGroupResult.value) return autoGroupResult.value.groups
   const binding = saveBindingStore.activeBinding
-  return binding?.groups ?? []
+  return (binding?.groups ?? []).map((g) => ({
+    id: g.id,
+    name: g.name,
+    sectorMacro: g.sectorMacro,
+    jumpRange: g.jumpRange,
+    originalJumpRange: g.jumpRange,
+    coverageSectorMacros: g.coverageSectorMacros.map((c) => c.ref),
+    connectedGroupIds: [...(g.connectedGroupIds || [])],
+    excludedDefaultAssignmentSectorMacros: [] as string[],
+    isNew: false,
+    isPinned: true,
+    coverageRetainEnabled: true,
+    connectionRetainEnabled: true,
+    color: g.color
+  }))
 })
 
 function onDetail() {
@@ -83,7 +97,7 @@ defineExpose({ triggerAutoGroup })
           @map="onMap"
         />
         <SectorGroupList
-          :groups="(displayGroups as any[])"
+          :groups="displayGroups"
           :assignments="autoGroupResult?.assignments ?? []"
           :maps="gameDataMaps"
           :sector-graph="sectorGraphInfo.sectorGraph"

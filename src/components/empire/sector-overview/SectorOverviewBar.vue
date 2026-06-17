@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const props = withDefaults(defineProps<{
@@ -54,11 +53,11 @@ function getThresholdLabel(value: number): string {
       </div>
 
       <div class="bar-right">
-        <button class="bar-btn detail-btn" :disabled="editDisabled" @click="emit('detail')">
+        <button class="bar-btn detail-btn" :class="{ 'detail-btn--needs-recalc': needsRecalc }" :disabled="editDisabled" @click="emit('detail')">
+          <span v-if="needsRecalc" class="recalc-dot" />
           {{ t('sector.detail') }}
         </button>
-        <button class="bar-btn calc-hint-btn" :class="{ 'calc-hint-btn--needs-recalc': needsRecalc }" @click="emit('map')">
-          <span v-if="needsRecalc" class="recalc-dot" />
+        <button class="bar-btn map-btn" @click="emit('map')">
           {{ t('sector.map') }}
         </button>
       </div>
@@ -96,19 +95,19 @@ function getThresholdLabel(value: number): string {
 }
 
 .detail-btn {
-  @apply bg-sky-600/20 text-sky-400 border border-sky-500/30 hover:bg-sky-600/30 disabled:opacity-40 disabled:cursor-not-allowed;
+  @apply bg-sky-600/20 text-sky-400 border border-sky-500/30 hover:bg-sky-600/30 disabled:opacity-40 disabled:cursor-not-allowed relative;
 }
 
-.calc-hint-btn {
-  @apply bg-amber-500/20 text-amber-400 border border-amber-500/30 hover:bg-amber-500/30 relative;
-}
-
-.calc-hint-btn--needs-recalc {
+.detail-btn--needs-recalc {
   @apply border-red-500/50;
 }
 
 .recalc-dot {
   @apply absolute top-0.5 right-0.5 w-2 h-2 bg-red-500 rounded-full;
+}
+
+.map-btn {
+  @apply bg-slate-600/20 text-slate-300 border border-slate-500/30 hover:bg-slate-600/30;
 }
 
 .bar-right {

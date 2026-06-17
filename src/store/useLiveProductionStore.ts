@@ -16,7 +16,7 @@ import type { StationComponentGapFlows } from './logic/stationGapViewModel'
 import { buildStationComponentGapFlows } from './logic/stationGapViewModel'
 import { classifyAndEnrichFlows } from './logic/empireFlowFacade'
 import { deriveProductionFlows } from './logic/calculateWareFlowDerived'
-import type { SavedModule, StationSettings, StationPlan, StationType, BindingStationPlan, TradeStationBinding, X4Module } from '@/types/x4'
+import type { SavedModule, StationSettings, StationPlan, StationType, BindingStationPlan, TradeStationBinding, X4Module, X4MapSector } from '@/types/x4'
 
 import i18n from '@/i18n'
 import { useGameDataStore } from './useGameDataStore'
@@ -26,8 +26,9 @@ import { useActiveViewStore } from './useActiveViewStore'
 import { DEFAULT_STATION_SETTINGS, type StationComputeDeps } from './state/stationSettings'
 import { StationDerivedMap, type StationDerivedStaticDeps } from './state/StationDerivedMap'
 import { DEFAULT_HUB_CONFIG } from './logic/autoGroupHub'
-import { DEFAULT_JUMP_RANGE, DEFAULT_BRIDGE_SEARCH_JUMP_RANGE, type AutoGroupResult, type GroupDraftInfo, type SectorAssignment, type AssignmentOption, groupCleanSlate, groupIncremental, getDistance } from './logic/autoGroup'
+import { DEFAULT_JUMP_RANGE, DEFAULT_BRIDGE_SEARCH_JUMP_RANGE, type AutoGroupResult, type GroupDraftInfo, type SectorAssignment, type AssignmentOption, groupCleanSlate, groupIncremental, getDistance, enrichAutoGroupResult } from './logic/autoGroup'
 import { buildSectorGraphFromMaps } from './logic/saveBindingUtils'
+import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
 import { deepClone } from '@/utils/deepClone'
 import {
   createEmpireSourceView,
@@ -148,7 +149,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         ? (g.tradeStation.saveStationCode
             ? { type: 'player' as const, stationCode: g.tradeStation.saveStationCode }
             : { type: 'virtual' as const, stationCode: '__virtual__' })
-        : undefined,
+        : { type: 'virtual' as const, stationCode: '__virtual__' },
       color: g.color
     }))
 
@@ -234,12 +235,12 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       return
     }
 
+    let result: AutoGroupResult
+    const { sectorGraph, sectorClusterMap } = buildSectorGraphFromMaps(
+      gameData.maps.clusters || {},
+      gameData.maps.sectors || {}
+    )
     if (needsAutoGroupRecalc.value) {
-      const { sectorGraph, sectorClusterMap } = buildSectorGraphFromMaps(
-        gameData.maps.clusters || {},
-        gameData.maps.sectors || {}
-      )
-      let result: AutoGroupResult
       if (binding.groups.length > 0) {
         result = groupIncremental(
           archive, binding.groups, gameData.modulesByMacroId,
@@ -254,10 +255,38 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
           prefJumpRange.value, bridgeSearchJumpRange.value
         )
       }
-      autoGroupResult.value = result
     } else {
-      autoGroupResult.value = buildAssignmentsFromBinding()
+      const built = buildAssignmentsFromBinding()
+      if (!built) {
+        autoGroupResult.value = null
+        return
+      }
+      result = built
     }
+    autoGroupResult.value = enrichAutoGroupResult(result, {
+      getSectorName: (macro: string) => {
+        if (!gameData.maps) return macro
+        const resolved = resolveMapSectorByMacro<X4MapSector>(gameData.maps, macro)
+        if (!resolved) return macro
+        if (resolved.sector.nameId) return i18n.global.t(resolved.sector.nameId)
+        return macro
+      },
+      getFactionColor: (macro: string) => {
+        if (!gameData.maps) return undefined
+        const resolved = resolveMapSectorByMacro<X4MapSector>(gameData.maps, macro)
+        if (!resolved) return undefined
+        if (resolved.sector.owner_color) return resolved.sector.owner_color
+        if (gameData.maps.clusters && resolved.clusterId) {
+          const cluster = gameData.maps.clusters[resolved.clusterId]
+          if (cluster?.owner_color) return cluster.owner_color
+        }
+        return undefined
+      },
+      archive,
+      modulesByMacroId: gameData.modulesByMacroId,
+      containerThreshold: prefThreshold.value,
+      prefJumpRange: prefJumpRange.value
+    }, sectorGraph, sectorClusterMap)
     calculationMode.value = 'result'
   }
 

@@ -11,8 +11,11 @@ import {
 } from './autoGroupHub'
 import {
   getCoverageSectors,
-  getSaveSectorsWithPlayerStations
+  getSaveSectorsWithPlayerStations,
+  getPlayerStationsInSector
 } from './saveBindingUtils'
+import { stabilizeHubColors, type HubColorContext } from './hubColor'
+import { selectTradeStationCandidates, determineDefaultTradeStation } from './tradeStationSelection'
 
 export const DEFAULT_JUMP_RANGE = 2
 export const DEFAULT_BRIDGE_SEARCH_JUMP_RANGE = 5
@@ -1579,4 +1582,61 @@ function findBestOptionIndex(options: AssignmentOption[]): number | null {
   if (bestIdx !== null) return bestIdx
   const standaloneIdx = options.findIndex((o) => o.type === 'standalone')
   return standaloneIdx >= 0 ? standaloneIdx : null
+}
+
+export function enrichAutoGroupResult(
+  result: AutoGroupResult,
+  deps: {
+    getSectorName: (macro: string) => string
+    getFactionColor: (macro: string) => string | undefined
+    archive: SaveArchive
+    modulesByMacroId: Record<string, X4Module>
+    containerThreshold: number
+    prefJumpRange: number
+  },
+  sectorGraph: Record<string, string[]>,
+  sectorClusterMap: Record<string, string>
+): AutoGroupResult {
+  const enrichedGroups = result.groups.map((g) => {
+    let name = g.name
+    if (g.sectorMacro) name = deps.getSectorName(g.sectorMacro)
+
+    let selectedTradeStation = g.selectedTradeStation
+    if (!selectedTradeStation && g.sectorMacro) {
+      const stations = getPlayerStationsInSector(deps.archive, g.sectorMacro)
+      if (stations.length > 0) {
+        const hasQualified = stations.some((s) => {
+          const info = detectStationHub(s, deps.modulesByMacroId, { containerThreshold: deps.containerThreshold })
+          return info.qualified
+        })
+        const candidates = selectTradeStationCandidates(
+          stations, deps.modulesByMacroId, hasQualified,
+          { containerThreshold: deps.containerThreshold }
+        )
+        if (candidates.length > 0) {
+          const aDefault = determineDefaultTradeStation(candidates)
+          if (aDefault) {
+            selectedTradeStation = aDefault
+          }
+        }
+      }
+    }
+    if (!selectedTradeStation) {
+      selectedTradeStation = { type: 'virtual' as const, stationCode: '__virtual__' }
+    }
+
+    return { ...g, name, selectedTradeStation }
+  })
+
+  const colorCtx: HubColorContext = {
+    getFactionColor: deps.getFactionColor,
+    getDistance: (from: string, to: string) => {
+      return getDistance(from, to, sectorGraph, sectorClusterMap)
+    },
+    maxHop: 5
+  }
+
+  stabilizeHubColors(enrichedGroups, colorCtx)
+
+  return { ...result, groups: enrichedGroups }
 }

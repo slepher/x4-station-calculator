@@ -12,7 +12,7 @@ import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
 import { stabilizeHubColors, stabilizeEditedHubColor, type HubColorContext } from '@/store/logic/hubColor'
 import { selectTradeStationCandidates, determineDefaultTradeStation, type TradeStationCandidate, type TradeStationSelection } from '@/store/logic/tradeStationSelection'
 import { detectStationHub } from '@/store/logic/autoGroupHub'
-import type { BindingSectorGroup } from '@/types/x4'
+import type { BindingSectorGroup, X4MapSector } from '@/types/x4'
 
 
 export function useAutoSectorGroupPresenter() {
@@ -82,12 +82,9 @@ const canDragGroups = computed(() => {
 function getSectorDisplayName(macro: string): string {
   const maps = gameDataStore.maps
   if (maps) {
-    const resolved = resolveMapSectorByMacro(maps, macro)
+    const resolved = resolveMapSectorByMacro<X4MapSector>(maps, macro)
     if (resolved) {
-      const nameId = (resolved.sector as any).nameId
-      if (nameId && te(nameId)) return t(nameId)
-      const name = (resolved.sector as any).name
-      if (name) return name
+      if (resolved.sector.nameId && te(resolved.sector.nameId)) return t(resolved.sector.nameId)
     }
   }
   return macro
