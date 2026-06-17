@@ -82,7 +82,58 @@ defineExpose({ resetSearch: () => { searchQuery.value = '' } })
 </script>
 
 <template>
-  <div v-if="open" class="hub-add-menu" :class="{ 'hub-add-menu--overlay': isOverlay }">
+  <template v-if="isOverlay && open">
+    <div class="hub-add-menu-backdrop" @click.self="close()">
+      <div class="hub-add-menu hub-add-menu--overlay">
+        <div class="hub-add-menu-header">
+          <span class="hub-add-menu-title">{{ t('sector.add_hub') }}</span>
+          <button class="hub-add-menu-close" type="button" @click="close()">x</button>
+        </div>
+        <div class="hub-add-menu-search hub-add-menu-search--overlay">
+          <input
+            v-model="searchQuery"
+            class="hub-add-menu-search-input"
+            :placeholder="t('map.save_coord_search_placeholder')"
+            @keydown.escape="close()"
+          />
+          <button v-if="searchQuery" class="hub-add-menu-search-clear" type="button" @click="searchQuery = ''">x</button>
+        </div>
+        <div class="hub-add-menu-groups hub-add-menu-groups--overlay">
+        <div class="hub-add-menu-group">
+          <div class="hub-add-menu-group-title">{{ t('map.binding_save_sector_candidates') }}</div>
+          <button
+            v-for="sector in saveSectors"
+            :key="sector.sectorMacro"
+            type="button"
+            class="hub-add-menu-item"
+            :class="{
+              active: isCurrentBoundSector(sector.sectorMacro),
+              'draft-active': isDraftBoundSector(sector.sectorMacro),
+              orange: isSectorOccupied(sector.sectorMacro)
+            }"
+            :disabled="isSectorOccupied(sector.sectorMacro)"
+            @click="onSelect(sector.sectorMacro)"
+          >{{ sector.sectorName }}<span v-if="sector.showRawSectorName" class="sector-raw-name">{{ sector.rawSectorName }}</span></button>
+          <div v-if="saveSectors.length === 0" class="hub-add-menu-empty">{{ t('map.binding_no_unbound_sectors') }}</div>
+        </div>
+        <div v-if="normalizedQuery" class="hub-add-menu-group">
+          <div class="hub-add-menu-group-title">{{ t('map.binding_search_results') }}</div>
+          <button
+            v-for="sector in searchAllSectors"
+            :key="sector.sectorMacro"
+            type="button"
+            class="hub-add-menu-item"
+            :class="{ orange: isSectorOccupied(sector.sectorMacro) }"
+            :disabled="isSectorOccupied(sector.sectorMacro)"
+            @click="onSelect(sector.sectorMacro)"
+          >{{ sector.sectorName }}<span v-if="sector.showRawSectorName" class="sector-raw-name">{{ sector.rawSectorName }}</span></button>
+          <div v-if="searchAllSectors.length === 0" class="hub-add-menu-empty">{{ t('map.binding_no_visible_sectors') }}</div>
+        </div>
+        </div>
+      </div>
+    </div>
+  </template>
+  <div v-else-if="open" class="hub-add-menu">
     <div v-if="isOverlay" class="hub-add-menu-header">
       <span class="hub-add-menu-title">{{ t('sector.add_hub') }}</span>
       <button class="hub-add-menu-close" type="button" @click="close()">x</button>
@@ -188,6 +239,10 @@ defineExpose({ resetSearch: () => { searchQuery.value = '' } })
 </template>
 
 <style scoped>
+.hub-add-menu-backdrop {
+  @apply fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-sm;
+}
+
 .hub-add-menu {
   @apply border border-amber-400/40 bg-slate-900/95 rounded-lg mb-3 overflow-hidden;
 }
