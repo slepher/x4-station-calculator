@@ -95,6 +95,14 @@ const hasUnresolved = computed(() => (props.unresolvedAllocationCount ?? 0) + (p
             </select>
             <label class="bar-label-inline" :title="t('sector.bridge_retain')">
               <input type="checkbox" class="bar-checkbox" :checked="bridgeRetainEnabled" :indeterminate.prop="bridgeRetainIndeterminate" @change="onBridgeRetainChange" />
+              <span class="bar-label">{{ t('sector.retain') }}</span>
+            </label>
+          </div>
+
+          <div class="param-field" :title="t('sector.node_enabled_desc')">
+            <label class="bar-label-inline">
+              <input type="checkbox" class="bar-checkbox" :checked="nodeEnabled" :disabled="nodeDisabled" @change="emit('update:nodeEnabled', ($event.target as HTMLInputElement).checked)" />
+              <span class="bar-label">{{ t('sector.node_enabled') }}</span>
             </label>
           </div>
 
@@ -105,6 +113,7 @@ const hasUnresolved = computed(() => (props.unresolvedAllocationCount ?? 0) + (p
             </select>
             <label class="bar-label-inline" :title="t('sector.coverage_retain')">
               <input type="checkbox" class="bar-checkbox" :checked="coverageRetainEnabled" :indeterminate.prop="coverageRetainIndeterminate" @change="onCoverageRetainChange" />
+              <span class="bar-label">{{ t('sector.retain') }}</span>
             </label>
           </div>
 
@@ -115,13 +124,7 @@ const hasUnresolved = computed(() => (props.unresolvedAllocationCount ?? 0) + (p
             </select>
             <label class="bar-label-inline" :title="t('sector.trade_station_retain')">
               <input type="checkbox" class="bar-checkbox" :checked="tradeStationRetainEnabled" :indeterminate.prop="tradeStationRetainIndeterminate" @change="onTradeStationRetainChange" />
-            </label>
-          </div>
-
-          <div class="param-field" :title="t('sector.node_enabled_desc')">
-            <label class="bar-label-inline">
-              <input type="checkbox" class="bar-checkbox" :checked="nodeEnabled" :disabled="nodeDisabled" @change="emit('update:nodeEnabled', ($event.target as HTMLInputElement).checked)" />
-              <span class="bar-label">{{ t('sector.node_enabled') }}</span>
+              <span class="bar-label">{{ t('sector.retain') }}</span>
             </label>
           </div>
         </div>
@@ -159,6 +162,7 @@ const hasUnresolved = computed(() => (props.unresolvedAllocationCount ?? 0) + (p
             </select>
             <label class="bar-label-inline" :title="t('sector.bridge_retain')">
               <input type="checkbox" class="bar-checkbox" :checked="bridgeRetainEnabled" :indeterminate.prop="bridgeRetainIndeterminate" @change="onBridgeRetainChange" />
+              <span class="bar-label">{{ t('sector.retain') }}</span>
             </label>
           </div>
           <div class="param-field" :title="t('sector.node_enabled_desc')">
@@ -178,6 +182,7 @@ const hasUnresolved = computed(() => (props.unresolvedAllocationCount ?? 0) + (p
             </select>
             <label class="bar-label-inline" :title="t('sector.coverage_retain')">
               <input type="checkbox" class="bar-checkbox" :checked="coverageRetainEnabled" :indeterminate.prop="coverageRetainIndeterminate" @change="onCoverageRetainChange" />
+              <span class="bar-label">{{ t('sector.retain') }}</span>
             </label>
           </div>
           <div class="param-field" :title="t('sector.default_threshold')">
@@ -187,6 +192,7 @@ const hasUnresolved = computed(() => (props.unresolvedAllocationCount ?? 0) + (p
             </select>
             <label class="bar-label-inline" :title="t('sector.trade_station_retain')">
               <input type="checkbox" class="bar-checkbox" :checked="tradeStationRetainEnabled" :indeterminate.prop="tradeStationRetainIndeterminate" @change="onTradeStationRetainChange" />
+              <span class="bar-label">{{ t('sector.retain') }}</span>
             </label>
           </div>
         </div>
