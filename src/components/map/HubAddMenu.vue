@@ -64,6 +64,11 @@ const searchAllSectors = computed(() => {
   return filtered
 })
 
+const filteredSearchAllSectors = computed(() => {
+  const saveMacros = new Set(saveSectors.value.map((s) => s.sectorMacro))
+  return searchAllSectors.value.filter((s) => !saveMacros.has(s.sectorMacro))
+})
+
 function onSelect(macro: string) {
   searchQuery.value = ''
   emit('add-hub', macro)
@@ -119,7 +124,7 @@ defineExpose({ resetSearch: () => { searchQuery.value = '' } })
         <div v-if="normalizedQuery" class="hub-add-menu-group">
           <div class="hub-add-menu-group-title">{{ t('map.binding_search_results') }}</div>
           <button
-            v-for="sector in searchAllSectors"
+            v-for="sector in filteredSearchAllSectors"
             :key="sector.sectorMacro"
             type="button"
             class="hub-add-menu-item"
@@ -127,7 +132,7 @@ defineExpose({ resetSearch: () => { searchQuery.value = '' } })
             :disabled="isSectorOccupied(sector.sectorMacro)"
             @click="onSelect(sector.sectorMacro)"
           >{{ sector.sectorName }}<span v-if="sector.showRawSectorName" class="sector-raw-name">{{ sector.rawSectorName }}</span></button>
-          <div v-if="searchAllSectors.length === 0" class="hub-add-menu-empty">{{ t('map.binding_no_visible_sectors') }}</div>
+          <div v-if="filteredSearchAllSectors.length === 0" class="hub-add-menu-empty">{{ normalizedQuery ? t('map.binding_no_visible_sectors') : '' }}</div>
         </div>
         </div>
       </div>
@@ -184,7 +189,7 @@ defineExpose({ resetSearch: () => { searchQuery.value = '' } })
     <div v-if="normalizedQuery" class="hub-add-menu-group">
       <div class="hub-add-menu-group-title">{{ t('map.binding_search_results') }}</div>
       <button
-        v-for="sector in searchAllSectors"
+        v-for="sector in filteredSearchAllSectors"
         :key="sector.sectorMacro"
         type="button"
         class="hub-add-menu-item"
@@ -202,7 +207,7 @@ defineExpose({ resetSearch: () => { searchQuery.value = '' } })
           </svg>
         </span>
       </button>
-      <div v-if="searchAllSectors.length === 0" class="hub-add-menu-empty">{{ t('map.binding_no_visible_sectors') }}</div>
+      <div v-if="filteredSearchAllSectors.length === 0" class="hub-add-menu-empty">{{ t('map.binding_no_visible_sectors') }}</div>
     </div>
 
     <!-- No search: visible map sectors -->
