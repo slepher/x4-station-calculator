@@ -136,6 +136,7 @@
     "map": "Map",
     "cancel": "Cancel",
     "reset": "Reset",
+    "unresolved": "Pending",
     "no_groups": "No sector groups",
     "new_group": "New",
     "existing_group": "Existing",

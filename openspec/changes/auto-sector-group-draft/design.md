@@ -188,6 +188,24 @@ Live 面板不触发计算，只切换显示模式。数据由 store 在初始�
 
 三列复用 `AutoSectorGroupPanel`（`layout="columns"`），读取 `liveStore.autoGroupResult` 渲染。
 
+统一 Bar `AutoSectorBar` 跨全宽位于列上方，合并原 `SectorConfirmBar` + `AllocationConfirmBar`。
+
+**Live 布局（单行）**：
+```
+[桥接[5]跳] [覆盖[2]跳] [Hub[5M]] [节点☑] [↑☑][↓☑][↔☑]  [取消][计算][+]   ← edit
+[桥接[5]跳] [覆盖[2]跳] [Hub[5M]] [节点☑] [↑☑][↓☑][↔☑]  未决:2+1 [重置][提交] ← result
+```
+
+**Map 布局（三行）**：
+```
+[桥接[5]] [覆盖[2]] [Hub[5M]]
+[节点☑] [↑☑] [↓☑] [↔☑]
+                                [取消][计算][+]   ← edit
+                                2+1 [重置][提交]   ← result
+```
+
+参数 dropdown 和 checkbox 在 result/edit 两态均可用，不再由 `calculationMode` 控制。
+
 编辑输入态（`calculationMode === 'edit'`）：
 - Col 1（星区列表/hub 管理）正常可用
 - Col 2（分配面板）加半透明遮罩，提示「编辑输入中，分配面板暂不可操作」

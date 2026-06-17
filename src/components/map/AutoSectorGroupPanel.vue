@@ -4,10 +4,9 @@ import { useI18n } from 'vue-i18n'
 import { useAutoSectorGroupPresenter } from '@/components/empire/presenters/useAutoSectorGroupPresenter'
 import { useActiveViewStore } from '@/store/useActiveViewStore'
 import { useLiveProductionStore } from '@/store/useLiveProductionStore'
-import SectorConfirmBar from '@/components/empire/sector-overview/SectorConfirmBar.vue'
+import AutoSectorBar from '@/components/empire/sector-overview/AutoSectorBar.vue'
 import SectorGroupList from '@/components/empire/sector-overview/SectorGroupList.vue'
 import SectorAllocationList from '@/components/empire/sector-overview/SectorAllocationList.vue'
-import AllocationConfirmBar from '@/components/empire/sector-overview/AllocationConfirmBar.vue'
 import HubAddMenu from './HubAddMenu.vue'
 import SectorTradeStationList from '@/components/empire/sector-overview/SectorTradeStationList.vue'
 
@@ -42,12 +41,12 @@ const {
   handleToggleCoverageInput, handleToggleConnectedInput,
   handleAddCandidateCoverage, handleDeleteGroup,
   handleSelectBridgeCenter, handleSelectBridgePlan,
-  handleResetAssignments, handleResetTradeStations,
+  handleResetAssignments,
   handleAddHubClick, handleAddHubDraft, getExistingAnchorSectors,
   handleToggleRetainCoverage, handleToggleRetainConnection,
   handleToggleTradeStationRetain, handleMasterBridgeRetain,
   handleMasterCoverageRetain, handleMasterTradeStationRetain,
-  handleSelectTradeStation, handleConfirm, handleQuickCalculate,
+  handleSelectTradeStation, handleConfirm,
   hasUncertainAssignments, hasPendingBridgeDecision,
   hasGlobalUnresolved, hasUnresolvedTradeStations,
   hasAutoResult, stationCounts, canDisableNode,
@@ -76,7 +75,6 @@ const canSwitchToAllocation = () => !isEditMode()
 const canSwitchToTradeStation = () => !isEditMode()
 
 function onCalculate() { runCalculationFromEditInput(); switchToFirstUnresolvedTab() }
-function onQuickCalc() { handleQuickCalculate(); switchToFirstUnresolvedTab() }
 
 function switchToFirstUnresolvedTab() {
   if (hasUncertainAssignments.value || hasPendingBridgeDecision.value) activeTab.value = 'allocation'
@@ -99,27 +97,44 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
     <div v-if="!hasAutoResult" class="map-panel-empty">{{ t('sector.no_groups') }}</div>
     <template v-else>
       <template v-if="layout === 'columns'">
+        <AutoSectorBar
+          :mode="calculationMode === 'edit' ? 'edit' : 'result'"
+          view="live"
+          :pref-jump-range="prefJumpRange"
+          :bridge-search-jump-range="bridgeSearchJumpRange"
+          :pref-threshold="prefThreshold"
+          :node-enabled="nodeEnabled"
+          :can-disable-node="canDisableNode"
+          :bridge-retain-enabled="bridgeRetainEnabled"
+          :coverage-retain-enabled="coverageRetainEnabled"
+          :trade-station-retain-enabled="tradeStationRetainEnabled"
+          :bridge-retain-indeterminate="bridgeRetainIndeterminate"
+          :coverage-retain-indeterminate="coverageRetainIndeterminate"
+          :trade-station-retain-indeterminate="tradeStationRetainIndeterminate"
+          :unresolved-allocation-count="unresolvedAllocationGroups.length"
+          :unresolved-trade-station-count="unresolvedTradeStationGroups.length"
+          :show-add-hub="showHubAddMenu"
+          :show-confirm="true"
+          :confirm-disabled="hasGlobalUnresolved"
+          @update:pref-jump-range="handleUpdatePrefJumpRange"
+          @update:bridge-search-jump-range="handleUpdateBridgeSearchJumpRange"
+          @update:pref-threshold="prefThreshold = $event"
+          @update:node-enabled="nodeEnabled = $event"
+          @update:bridge-retain-enabled="handleMasterBridgeRetain"
+          @update:coverage-retain-enabled="handleMasterCoverageRetain"
+          @update:trade-station-retain-enabled="handleMasterTradeStationRetain"
+          @edit="handleEnterEdit"
+          @cancel="handleCancelEdit"
+          @calculate="onCalculate"
+          @add-hub="handleAddHubClick"
+          @reset="handleResetAssignments"
+          @confirm="handleConfirm"
+        />
+        <HubAddMenu :open="showHubAddMenu" :player-sector-macros="autoGroupResult?.playerSectorMacros ?? []" :occupied-sector-macros="[...getExistingAnchorSectors()]"
+          @close="showHubAddMenu = false" @add-hub="(m: string) => { handleAddHubDraft(m); showHubAddMenu = false }" @focus-sector="emit('focus-sector', $event)"
+        />
         <div class="columns-layout">
           <div class="column column-hub">
-            <SectorConfirmBar
-              :pref-jump-range="prefJumpRange" :bridge-search-jump-range="bridgeSearchJumpRange"
-              :pref-threshold="prefThreshold" :mode="calculationMode"
-              :node-enabled="nodeEnabled" :can-disable-node="canDisableNode"
-              :bridge-retain-enabled="bridgeRetainEnabled" :coverage-retain-enabled="coverageRetainEnabled"
-              :trade-station-retain-enabled="tradeStationRetainEnabled"
-              :trade-station-retain-indeterminate="tradeStationRetainIndeterminate"
-              :bridge-retain-indeterminate="bridgeRetainIndeterminate" :coverage-retain-indeterminate="coverageRetainIndeterminate"
-              view="live" :show-confirm="true" :add-menu-open="showHubAddMenu"
-              @update:pref-jump-range="handleUpdatePrefJumpRange" @update:bridge-search-jump-range="handleUpdateBridgeSearchJumpRange"
-              @update:pref-threshold="prefThreshold = $event" @update:node-enabled="nodeEnabled = $event"
-              @update:bridge-retain-enabled="handleMasterBridgeRetain" @update:coverage-retain-enabled="handleMasterCoverageRetain"
-              @update:trade-station-retain-enabled="handleMasterTradeStationRetain"
-              @edit="handleEnterEdit" @cancel="handleCancelEdit" @calculate="onCalculate" @quick-calculate="onQuickCalc"
-              @add-hub="handleAddHubClick" @confirm="handleConfirm"
-            />
-            <HubAddMenu :open="showHubAddMenu" :player-sector-macros="autoGroupResult?.playerSectorMacros ?? []" :occupied-sector-macros="[...getExistingAnchorSectors()]"
-              @close="showHubAddMenu = false" @add-hub="(m: string) => { handleAddHubDraft(m); showHubAddMenu = false }" @focus-sector="emit('focus-sector', $event)"
-            />
             <SectorGroupList :groups="autoGroupResult?.groups ?? []" :assignments="autoGroupResult?.assignments ?? []"
               :maps="gameDataMaps" :sector-graph="sectorGraphInfo.sectorGraph" :sector-cluster-map="sectorGraphInfo.sectorClusterMap"
               :player-sector-macros="autoGroupResult?.playerSectorMacros ?? []"
@@ -137,18 +152,12 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
           </div>
           <div class="column column-allocation" :class="{ 'edit-overlay-wrapper': calculationMode === 'edit' }">
             <div v-if="calculationMode === 'edit'" class="edit-overlay">{{ t('auto_sector.edit_overlay_hint') }}</div>
-            <AllocationConfirmBar v-if="!hasPendingBridgeDecision" :unresolved="unresolvedAllocationGroups" :global-unresolved="hasGlobalUnresolved" :disabled="calculationMode === 'edit'"
-              @reset="handleResetAssignments" @confirm="handleConfirm"
-            />
             <SectorAllocationList :assignments="autoGroupResult?.assignments ?? []" :bridge-plans="autoGroupResult?.bridgePlans ?? []"
               :groups="autoGroupResult?.groups ?? []" :maps="gameDataMaps" :station-counts="stationCounts" :disabled="calculationMode === 'edit'"
               @select-option="handleSelectOption" @select-bridge-plan="handleSelectBridgePlan" @select-bridge-center="handleSelectBridgeCenter" @focus-sector="emit('focus-sector', $event)"
             />
           </div>
           <div class="column column-tradestation">
-            <AllocationConfirmBar :unresolved="unresolvedTradeStationGroups" :global-unresolved="hasGlobalUnresolved"
-              @reset="handleResetTradeStations" @confirm="handleConfirm"
-            />
             <SectorTradeStationList :groups="autoGroupResult?.groups ?? []" :candidates="tradeStationCandidates" :selected="selectedTradeStations"
               @select="handleSelectTradeStation" @focus-sector="emit('focus-sector', $event)"
             />
@@ -156,6 +165,42 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
         </div>
       </template>
       <template v-else>
+        <AutoSectorBar
+          :mode="calculationMode === 'edit' ? 'edit' : 'result'"
+          view="map"
+          :pref-jump-range="prefJumpRange"
+          :bridge-search-jump-range="bridgeSearchJumpRange"
+          :pref-threshold="prefThreshold"
+          :node-enabled="nodeEnabled"
+          :can-disable-node="canDisableNode"
+          :bridge-retain-enabled="bridgeRetainEnabled"
+          :coverage-retain-enabled="coverageRetainEnabled"
+          :trade-station-retain-enabled="tradeStationRetainEnabled"
+          :bridge-retain-indeterminate="bridgeRetainIndeterminate"
+          :coverage-retain-indeterminate="coverageRetainIndeterminate"
+          :trade-station-retain-indeterminate="tradeStationRetainIndeterminate"
+          :unresolved-allocation-count="unresolvedAllocationGroups.length"
+          :unresolved-trade-station-count="unresolvedTradeStationGroups.length"
+          :show-add-hub="showHubAddMenu"
+          :show-confirm="calculationMode === 'result'"
+          :confirm-disabled="hasGlobalUnresolved"
+          @update:pref-jump-range="handleUpdatePrefJumpRange"
+          @update:bridge-search-jump-range="handleUpdateBridgeSearchJumpRange"
+          @update:pref-threshold="prefThreshold = $event"
+          @update:node-enabled="nodeEnabled = $event"
+          @update:bridge-retain-enabled="handleMasterBridgeRetain"
+          @update:coverage-retain-enabled="handleMasterCoverageRetain"
+          @update:trade-station-retain-enabled="handleMasterTradeStationRetain"
+          @edit="handleEnterEdit"
+          @cancel="handleCancelEdit"
+          @calculate="onCalculate"
+          @add-hub="handleAddHubClick"
+          @reset="handleResetAssignments"
+          @confirm="handleConfirm"
+        />
+        <HubAddMenu :open="showHubAddMenu" :player-sector-macros="autoGroupResult?.playerSectorMacros ?? []" :occupied-sector-macros="[...getExistingAnchorSectors()]"
+          @close="showHubAddMenu = false" @add-hub="(m: string) => { handleAddHubDraft(m); showHubAddMenu = false }" @focus-sector="emit('focus-sector', $event)"
+        />
         <div class="tab-bar">
             <button type="button" class="tab-btn" :class="{ active: activeTab === 'hub' }" @click="activeTab = 'hub'">{{ t('auto_sector.hub_tab') }}</button>
             <button type="button" class="tab-btn" :class="{ active: activeTab === 'allocation' }"
@@ -166,23 +211,6 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
               @click="activeTab = 'tradeStation'">{{ t('auto_sector.trade_station_tab') }}</button>
           </div>
           <div v-show="activeTab === 'hub'">
-            <SectorConfirmBar :pref-jump-range="prefJumpRange" :bridge-search-jump-range="bridgeSearchJumpRange"
-              :pref-threshold="prefThreshold" :mode="calculationMode" view="map"
-              :node-enabled="nodeEnabled" :can-disable-node="canDisableNode"
-              :bridge-retain-enabled="bridgeRetainEnabled" :coverage-retain-enabled="coverageRetainEnabled"
-              :trade-station-retain-enabled="tradeStationRetainEnabled" :trade-station-retain-indeterminate="tradeStationRetainIndeterminate"
-              :bridge-retain-indeterminate="bridgeRetainIndeterminate" :coverage-retain-indeterminate="coverageRetainIndeterminate"
-              @update:pref-jump-range="handleUpdatePrefJumpRange" @update:bridge-search-jump-range="handleUpdateBridgeSearchJumpRange"
-              @update:pref-threshold="prefThreshold = $event" @update:node-enabled="nodeEnabled = $event"
-              @update:bridge-retain-enabled="handleMasterBridgeRetain" @update:coverage-retain-enabled="handleMasterCoverageRetain"
-              @update:trade-station-retain-enabled="handleMasterTradeStationRetain"
-              @edit="handleEnterEdit" @cancel="handleCancelEdit" @calculate="onCalculate" @quick-calculate="onQuickCalc" @add-hub="handleAddHubClick"
-              :show-confirm="calculationMode === 'result'" :confirm-disabled="hasGlobalUnresolved" :add-menu-open="showHubAddMenu"
-              @confirm="handleConfirm"
-            />
-            <HubAddMenu :open="showHubAddMenu" :player-sector-macros="autoGroupResult?.playerSectorMacros ?? []" :occupied-sector-macros="[...getExistingAnchorSectors()]"
-              @close="showHubAddMenu = false" @add-hub="(m: string) => { handleAddHubDraft(m); showHubAddMenu = false }" @focus-sector="emit('focus-sector', $event)"
-            />
             <SectorGroupList :groups="autoGroupResult?.groups ?? []" :assignments="autoGroupResult?.assignments ?? []"
               :maps="gameDataMaps" :sector-graph="sectorGraphInfo.sectorGraph" :sector-cluster-map="sectorGraphInfo.sectorClusterMap"
               :player-sector-macros="autoGroupResult?.playerSectorMacros ?? []"
@@ -199,18 +227,12 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
             />
           </div>
           <div v-show="activeTab === 'allocation'">
-            <AllocationConfirmBar v-if="!hasPendingBridgeDecision" :unresolved="unresolvedAllocationGroups" :global-unresolved="hasGlobalUnresolved" :disabled="calculationMode === 'edit'"
-              @reset="handleResetAssignments" @confirm="handleConfirm"
-            />
             <SectorAllocationList :assignments="autoGroupResult?.assignments ?? []" :bridge-plans="autoGroupResult?.bridgePlans ?? []"
               :groups="autoGroupResult?.groups ?? []" :maps="gameDataMaps" :station-counts="stationCounts" :disabled="calculationMode === 'edit'" view="map"
               @select-option="handleSelectOption" @select-bridge-plan="handleSelectBridgePlan" @select-bridge-center="handleSelectBridgeCenter" @focus-sector="emit('focus-sector', $event)"
             />
           </div>
           <div v-show="activeTab === 'tradeStation'">
-            <AllocationConfirmBar :unresolved="unresolvedTradeStationGroups" :global-unresolved="hasGlobalUnresolved" :disabled="calculationMode === 'edit'"
-              @reset="handleResetTradeStations" @confirm="handleConfirm"
-            />
             <SectorTradeStationList :groups="autoGroupResult?.groups ?? []" :candidates="tradeStationCandidates" :selected="selectedTradeStations" :disabled="calculationMode === 'edit'" view="map"
               @select="handleSelectTradeStation" @focus-sector="emit('focus-sector', $event)"
             />
