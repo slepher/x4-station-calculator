@@ -21,6 +21,8 @@ const props = withDefaults(defineProps<{
   showAddHub?: boolean
   showConfirm?: boolean
   confirmDisabled?: boolean
+  needsRecalc?: boolean
+  editDisabled?: boolean
 }>(), {
   view: 'live',
   tradeStationRetainEnabled: false,
@@ -29,7 +31,9 @@ const props = withDefaults(defineProps<{
   unresolvedTradeStationCount: 0,
   showAddHub: false,
   showConfirm: true,
-  confirmDisabled: false
+  confirmDisabled: false,
+  needsRecalc: false,
+  editDisabled: true
 })
 
 const emit = defineEmits<{
@@ -43,6 +47,7 @@ const emit = defineEmits<{
   (e: 'edit'): void
   (e: 'cancel'): void
   (e: 'calculate'): void
+  (e: 'quick-calculate'): void
   (e: 'add-hub'): void
   (e: 'reset'): void
   (e: 'confirm'): void
@@ -144,6 +149,11 @@ const hasUnresolved = computed(() => (props.unresolvedAllocationCount ?? 0) + (p
             </span>
             <button class="bar-btn reset-btn" @click="emit('reset')">{{ t('sector.reset') }}</button>
             <button v-if="showConfirm" class="bar-btn confirm-btn" :disabled="confirmDisabled" @click="emit('confirm')">{{ t('sector.confirm') }}</button>
+            <button class="bar-btn calc-btn" :class="{ 'calc-btn--needs-recalc': needsRecalc }" @click="emit('quick-calculate')">
+              <span v-if="needsRecalc" class="recalc-dot" />
+              {{ t('sector.calculate') }}
+            </button>
+            <button class="bar-btn recalc-btn" :disabled="editDisabled" @click="emit('edit')">{{ t('sector.edit') }}</button>
           </template>
         </div>
       </div>
@@ -212,6 +222,11 @@ const hasUnresolved = computed(() => (props.unresolvedAllocationCount ?? 0) + (p
             <span v-if="hasUnresolved" class="bar-unresolved">{{ unresolvedAllocationCount }}{{ unresolvedTradeStationCount ? '+' + unresolvedTradeStationCount : '' }}</span>
             <button class="bar-btn reset-btn" @click="emit('reset')">{{ t('sector.reset') }}</button>
             <button class="bar-btn confirm-btn" :disabled="confirmDisabled" @click="emit('confirm')">{{ t('sector.confirm') }}</button>
+            <button class="bar-btn calc-btn" :class="{ 'calc-btn--needs-recalc': needsRecalc }" @click="emit('quick-calculate')">
+              <span v-if="needsRecalc" class="recalc-dot" />
+              {{ t('sector.calculate') }}
+            </button>
+            <button class="bar-btn recalc-btn" :disabled="editDisabled" @click="emit('edit')">{{ t('sector.edit') }}</button>
           </template>
         </div>
       </div>
@@ -221,7 +236,7 @@ const hasUnresolved = computed(() => (props.unresolvedAllocationCount ?? 0) + (p
 
 <style scoped>
 .auto-sector-bar {
-  @apply flex flex-col gap-2 p-1.5 bg-slate-800/50 rounded border border-slate-700/50 mb-3;
+  @apply flex flex-col gap-2 p-1.5 bg-slate-800/50 rounded border border-slate-700/50;
 }
 
 .auto-sector-bar--map {
@@ -286,6 +301,18 @@ const hasUnresolved = computed(() => (props.unresolvedAllocationCount ?? 0) + (p
 
 .add-btn {
   @apply bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-600/30;
+}
+
+.calc-btn {
+  @apply bg-amber-500/20 text-amber-400 border border-amber-500/30 hover:bg-amber-500/30 relative;
+}
+
+.calc-btn--needs-recalc {
+  @apply border-red-500/50;
+}
+
+.recalc-dot {
+  @apply absolute top-0.5 right-0.5 w-2 h-2 bg-red-500 rounded-full;
 }
 
 .bar-unresolved {

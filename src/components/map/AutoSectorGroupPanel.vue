@@ -46,13 +46,13 @@ const {
   handleToggleRetainCoverage, handleToggleRetainConnection,
   handleToggleTradeStationRetain, handleMasterBridgeRetain,
   handleMasterCoverageRetain, handleMasterTradeStationRetain,
-  handleSelectTradeStation, handleConfirm,
+  handleSelectTradeStation, handleConfirm, handleQuickCalculate,
   hasUncertainAssignments, hasPendingBridgeDecision,
   hasGlobalUnresolved, hasUnresolvedTradeStations,
   hasAutoResult, stationCounts, canDisableNode,
   bridgeRetainIndeterminate, coverageRetainIndeterminate,
   tradeStationRetainIndeterminate,
-  handleColorChange, sectorGroupColorMap, triggerAutoGroup,
+  handleColorChange, sectorGroupColorMap, triggerAutoGroup, needsAutoGroupRecalc,
 } = presenter
 
 provide('sectorGroupColorMap', sectorGroupColorMap)
@@ -75,6 +75,7 @@ const canSwitchToAllocation = () => !isEditMode()
 const canSwitchToTradeStation = () => !isEditMode()
 
 function onCalculate() { runCalculationFromEditInput(); switchToFirstUnresolvedTab() }
+function onQuickCalc() { handleQuickCalculate(); switchToFirstUnresolvedTab() }
 
 function switchToFirstUnresolvedTab() {
   if (hasUncertainAssignments.value || hasPendingBridgeDecision.value) activeTab.value = 'allocation'
@@ -97,7 +98,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
     <div v-if="!hasAutoResult" class="map-panel-empty">{{ t('sector.no_groups') }}</div>
     <template v-else>
       <template v-if="layout === 'columns'">
-        <div class="px-4 pt-4">
+        <div class="px-4 pt-3 mb-2">
         <AutoSectorBar
           :mode="calculationMode === 'edit' ? 'edit' : 'result'"
           view="live"
@@ -117,6 +118,8 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
           :show-add-hub="showHubAddMenu"
           :show-confirm="true"
           :confirm-disabled="hasGlobalUnresolved"
+          :needs-recalc="needsAutoGroupRecalc"
+          :edit-disabled="!autoGroupResult"
           @update:pref-jump-range="handleUpdatePrefJumpRange"
           @update:bridge-search-jump-range="handleUpdateBridgeSearchJumpRange"
           @update:pref-threshold="prefThreshold = $event"
@@ -127,6 +130,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
           @edit="handleEnterEdit"
           @cancel="handleCancelEdit"
           @calculate="onCalculate"
+          @quick-calculate="onQuickCalc"
           @add-hub="handleAddHubClick"
           @reset="handleResetAssignments"
           @confirm="handleConfirm"
@@ -186,6 +190,8 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
           :show-add-hub="showHubAddMenu"
           :show-confirm="calculationMode === 'result'"
           :confirm-disabled="hasGlobalUnresolved"
+          :needs-recalc="needsAutoGroupRecalc"
+          :edit-disabled="!autoGroupResult"
           @update:pref-jump-range="handleUpdatePrefJumpRange"
           @update:bridge-search-jump-range="handleUpdateBridgeSearchJumpRange"
           @update:pref-threshold="prefThreshold = $event"
@@ -196,6 +202,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
           @edit="handleEnterEdit"
           @cancel="handleCancelEdit"
           @calculate="onCalculate"
+          @quick-calculate="onQuickCalc"
           @add-hub="handleAddHubClick"
           @reset="handleResetAssignments"
           @confirm="handleConfirm"
@@ -252,7 +259,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
 .tab-btn:hover:not(:disabled) { @apply text-slate-200; }
 .tab-btn.active { @apply text-sky-400 border-sky-400; }
 .tab-btn:disabled { @apply text-slate-600 cursor-not-allowed; }
-.columns-layout { @apply grid grid-cols-12 gap-4 p-4; }
+.columns-layout { @apply grid grid-cols-12 gap-4 px-4 pb-4 pt-2; }
 .column-hub, .column-allocation, .column-tradestation { @apply overflow-hidden; }
 .column-hub { @apply col-span-5; }
 .column-allocation { @apply col-span-4; }
