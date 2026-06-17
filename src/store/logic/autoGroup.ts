@@ -1620,9 +1620,9 @@ export function enrichAutoGroupResult(
           }
         }
       }
-    }
-    if (!selectedTradeStation) {
-      selectedTradeStation = { type: 'virtual' as const, stationCode: '__virtual__' }
+      if (!selectedTradeStation && stations.length === 0) {
+        selectedTradeStation = { type: 'virtual' as const, stationCode: '__virtual__' }
+      }
     }
 
     return { ...g, name, selectedTradeStation }

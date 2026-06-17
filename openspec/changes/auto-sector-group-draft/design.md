@@ -177,11 +177,12 @@ Live 面板不触发计算，只切换显示模式。数据由 store 在初始�
 
 **展示模式**：`liveMode = 'display'`
 ```
-[SaveUploadPanel 3fr] | [SectorGroupList 4fr] | [EmpireWareFlowsDashboard 5fr]
+[SaveUploadPanel 3fr] | [SectorOverviewBar + SectorGroupList 4fr] | [EmpireWareFlowsDashboard 5fr]
 ```
 - 星区列表列顶部：`SectorOverviewBar.vue`（桥接跳数、覆盖跳数、Hub 阈值纯数值只读）
 - 「详情」→ `liveMode = 'calculate'`（红点在详情按钮上）
 - 「地图」→ 设置 `isSavePanelOpen=true, mapSavePanelLayer='binding-sector', mapBindingGameGuid=guid, setActiveView('maps')`
+- `LiveOverviewToolbar` 已移除，overview 界面不再显示 context toolbar
 
 **计算模式**：`liveMode = 'calculate'`
 

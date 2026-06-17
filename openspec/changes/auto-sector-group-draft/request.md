@@ -137,6 +137,7 @@ In Scope：
 - `MapWorkbenchView` 从 liveStore 读取渲染地图
 - `handleColorChange` 移除 `updateGroup` 调用
 - live 面板和 map 面板共享编辑状态
+- 移除 overview 界面的 `LiveOverviewToolbar`
 
 Out of Scope：
 - 全部 presenter 内容搬迁

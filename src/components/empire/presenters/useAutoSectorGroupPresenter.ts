@@ -856,7 +856,11 @@ function applyTradeStationDefaultsToResult() {
     const group = groups[i]!
     if (!group.sectorMacro) continue
     const cands = tradeStationCandidates.value[group.id]
-    if (cands === undefined) continue
+    if (cands === undefined) {
+      groups[i] = { ...group, selectedTradeStation: { type: 'virtual' as const, stationCode: '__virtual__' } }
+      changed = true
+      continue
+    }
 
     if (group.selectedTradeStation) continue
     if (group.tradeStationRetainEnabled && group.savedTradeStationCode) {
@@ -864,11 +868,7 @@ function applyTradeStationDefaultsToResult() {
       changed = true
       continue
     }
-    if (cands.length === 0) {
-      groups[i] = { ...group, selectedTradeStation: { type: 'virtual' as const, stationCode: '__virtual__' } }
-      changed = true
-      continue
-    }
+    if (cands.length === 0) continue
     const aDefault = determineDefaultTradeStation(cands)
     if (aDefault) {
       groups[i] = { ...group, selectedTradeStation: aDefault }

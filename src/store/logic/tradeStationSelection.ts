@@ -103,12 +103,18 @@ export function determineDefaultTradeStation(
   const hasProduction = candidates.some((c) => c.hasProduction)
 
   if (hasPureHub && hasProduction) {
+    const bestPureHub = candidates.find((c) => c.isPureHub)!
+    const bestProduction = candidates.find((c) => c.hasProduction)!
+    if (bestPureHub.score >= bestProduction.score * (1 + scoreTieThreshold)) {
+      return { type: 'player', stationCode: bestPureHub.stationCode }
+    }
     return null
   }
 
   if (!hasPureHub && hasProduction) {
     const second = candidates[1]
-    if (second && first.score > second.score * (1 + scoreTieThreshold)) {
+    if (!second) return { type: 'player', stationCode: first.stationCode }
+    if (first.score > second.score * (1 + scoreTieThreshold)) {
       return { type: 'player', stationCode: first.stationCode }
     }
     return null

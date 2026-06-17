@@ -16,7 +16,6 @@ import { useTerraformingPresenter } from '@/components/empire/presenters/useTerr
 import StationPlanningPanelWrapper from '@/components/empire/StationPlanningPanelWrapper.vue'
 import StationDashboard from '@/components/empire/StationDashboard.vue'
 import ProductionSidebar from '@/components/empire/ProductionSidebar.vue'
-import LiveOverviewToolbar from '@/components/empire/context_toolbar/LiveOverviewToolbar.vue'
 import LiveTransitToolbar from '@/components/empire/context_toolbar/LiveTransitToolbar.vue'
 import LiveStationToolbar from '@/components/empire/context_toolbar/LiveStationToolbar.vue'
 import TerraformingToolbar from '@/components/empire/context_toolbar/TerraformingToolbar.vue'
@@ -174,17 +173,7 @@ const showArchiveModuleList = computed(() => {
       @jump-to-binding="(tabId, tabType) => sidebarPresenter.emits.jumpToBinding(tabId, tabType)"
     />
     <div class="production-content custom-scrollbar">
-  
-  <LiveOverviewToolbar
-    v-if="toolbarPresenter.props.workbenchMode.value === 'overview' && toolbarPresenter.props.hasActiveBinding.value"
-    :title-model="toolbarPresenter.props.titleModel.value"
-    :settings="toolbarPresenter.props.settings.value"
-    :races="toolbarPresenter.props.races"
-    @update-title="toolbarPresenter.emits.updateTitle"
-    @update-race-preference="toolbarPresenter.emits.updateRacePreference"
-    @open-import="toolbarPresenter.emits.openImport"
-  />
-  
+
   <LiveTransitToolbar
     v-if="toolbarPresenter.props.workbenchMode.value === 'transit' && toolbarPresenter.props.hasActiveBinding.value"
     :title-model="toolbarPresenter.props.titleModel.value"
