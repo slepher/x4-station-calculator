@@ -132,6 +132,8 @@
     "coverage_retain": "Keep current coverage sectors",
     "calculate": "Calculate",
     "edit": "Edit",
+    "detail": "Detail",
+    "map": "Map",
     "cancel": "Cancel",
     "reset": "Reset",
     "no_groups": "No sector groups",

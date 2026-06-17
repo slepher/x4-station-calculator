@@ -1,15 +1,17 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
 import { useAutoSectorGroupPresenter } from '@/components/empire/presenters/useAutoSectorGroupPresenter'
 import { useSaveBindingStore } from '@/store/useSaveBindingStore'
+import { useActiveViewStore } from '@/store/useActiveViewStore'
 import SaveUploadPanel from '@/components/save/SaveUploadPanel.vue'
 import SaveList from '@/components/save/SaveList.vue'
 import EmpireWareFlowsDashboard from '@/components/empire/EmpireWareFlowsDashboard.vue'
-import SectorConfirmBar from './SectorConfirmBar.vue'
+import SectorOverviewBar from './SectorOverviewBar.vue'
 import SectorGroupList from './SectorGroupList.vue'
 import AutoSectorGroupPanel from '@/components/map/AutoSectorGroupPanel.vue'
 
 const saveBindingStore = useSaveBindingStore()
+const activeViewStore = useActiveViewStore()
 
 const presenter = useAutoSectorGroupPresenter()
 const {
@@ -17,32 +19,17 @@ const {
   prefJumpRange,
   bridgeSearchJumpRange,
   prefThreshold,
-  nodeEnabled,
-  bridgeRetainEnabled,
-  coverageRetainEnabled,
   autoGroupResult,
-  autoGroupConfirmed,
   gameDataMaps,
   sectorGraphInfo,
-  runAutoGroup,
   triggerAutoGroup,
   handleUploadComplete,
   needsAutoGroupRecalc,
   handleColorChange,
-  handleMasterBridgeRetain,
-  handleMasterCoverageRetain,
-  handleMasterTradeStationRetain,
-  handleUpdatePrefJumpRange,
-  handleUpdateBridgeSearchJumpRange,
-  tradeStationRetainEnabled,
-  tradeStationRetainIndeterminate,
   tradeStationCaps,
   empireDerivedProductionFlows,
   overviewBuyMultiplier,
   overviewSellMultiplier,
-  canDisableNode,
-  bridgeRetainIndeterminate,
-  coverageRetainIndeterminate,
 } = presenter
 
 const liveMode = ref<'display' | 'calculate'>('display')
@@ -55,18 +42,19 @@ const displayGroups = computed(() => {
   return binding?.groups ?? []
 })
 
-function onEdit() {
+function onDetail() {
   liveMode.value = 'calculate'
 }
 
-function onCalculate() {
-  runAutoGroup()
-  liveMode.value = 'calculate'
+function onMap() {
+  const guid = activeViewStore.activeBinding
+  if (guid) {
+    activeViewStore.isSavePanelOpen = true
+    activeViewStore.mapBindingGameGuid = guid
+    activeViewStore.mapSavePanelLayer = 'binding-sector'
+    activeViewStore.setActiveView('maps')
+  }
 }
-
-watch(autoGroupConfirmed, (confirmed) => {
-  if (confirmed) liveMode.value = 'display'
-})
 
 defineExpose({ triggerAutoGroup })
 </script>
@@ -85,31 +73,14 @@ defineExpose({ triggerAutoGroup })
       </div>
 
       <div class="col-span-12 lg:col-span-4">
-        <SectorConfirmBar
+        <SectorOverviewBar
           :pref-jump-range="prefJumpRange"
           :bridge-search-jump-range="bridgeSearchJumpRange"
           :pref-threshold="prefThreshold"
-          mode="result"
-          view="live"
-          :node-enabled="nodeEnabled"
-          :can-disable-node="canDisableNode"
-          :bridge-retain-enabled="bridgeRetainEnabled"
-          :coverage-retain-enabled="coverageRetainEnabled"
-          :bridge-retain-indeterminate="bridgeRetainIndeterminate"
-          :coverage-retain-indeterminate="coverageRetainIndeterminate"
-          :trade-station-retain-enabled="tradeStationRetainEnabled"
-          :trade-station-retain-indeterminate="tradeStationRetainIndeterminate"
           :needs-recalc="needsAutoGroupRecalc"
           :edit-disabled="!canEdit"
-          @update:pref-jump-range="handleUpdatePrefJumpRange"
-          @update:bridge-search-jump-range="handleUpdateBridgeSearchJumpRange"
-          @update:pref-threshold="prefThreshold = $event"
-          @update:node-enabled="nodeEnabled = $event"
-          @update:bridge-retain-enabled="handleMasterBridgeRetain"
-          @update:coverage-retain-enabled="handleMasterCoverageRetain"
-          @update:trade-station-retain-enabled="handleMasterTradeStationRetain"
-          @edit="onEdit"
-          @quick-calculate="onCalculate"
+          @detail="onDetail"
+          @map="onMap"
         />
         <SectorGroupList
           :groups="(displayGroups as any[])"

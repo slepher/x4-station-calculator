@@ -22,25 +22,34 @@
 |------|------|------|
 | `autoGroupResult` | `ShallowRef<AutoGroupResult \| null>` | groups（含 selectedTradeStation、color）+ assignments + bridgePlans |
 | `calculationMode` | `Ref<'edit' \| 'result'>` | 编辑/结果模式 |
-| `autoGroupConfirmed` | `Ref<boolean>` | 当前唯一草案是否已提交 |
 | `prefJumpRange` | `Ref<number>` | 覆盖 hop 数 |
 | `bridgeSearchJumpRange` | `Ref<number>` | bridge 搜索 hop 数 |
 | `prefThreshold` | `Ref<number>` | hub 阈值 |
 
-`autoGroupConfirmed`（Reactive，presenter computed）SHALL 指示当前唯一草案是否已提交确认，不作为 `autoGroupResult` 是否为草案的标志；`autoGroupResult` 可以为非 null 且未确认（编辑中草案），也可以为非 null 且已确认（已提交结果）。
+`autoGroupResult` 可以为非 null 且未确认（编辑中草案），也可以为非 null 且已确认（已提交结果）。确定栏始终显示，不因确认状态隐藏。
 
-### 3. 存档时间比对
+### 3. 存档时间比对与变化 flag
 
-为避免 `runAutoGroup()` 在同一份 save archive 上重复重算，`SaveBindingPlan` 新增：
+`SaveBindingPlan` 新增 `appliedAutoGroupArchiveTime`，与 `needsAutoGroupRecalc` 构成变化 flag：
 
 | 字段 | 类型 | 说明 |
 |------|------|------|
 | `appliedAutoGroupArchiveTime` | `number \| undefined` | 最近一次已应用 auto group 的 `archive.meta.time` |
 
-行为规则：
+**变化 flag**：
+```
+needsAutoGroupRecalc := appliedAutoGroupArchiveTime === undefined
+                     || appliedAutoGroupArchiveTime < archiveTime
+```
 
-- `runAutoGroup()` 始终执行计算（不跳过），每次强制 `autoGroupConfirmed = false`
-- `handleConfirm()` 记录 `appliedAutoGroupArchiveTime`，不覆盖 `autoGroupResult`（保留 assignments 供编辑查看）
+Store 初始化（或 activeBinding/archive 切换）时调用 `initAutoGroupDraft()`，根据变化 flag 分两条路径：
+
+- **有变化 flag** → 运行分组算法（`groupCleanSlate` / `groupIncremental`）生成 `autoGroupResult`
+- **没有变化 flag** → 从已有 binding 的 groups 为每个覆盖星区计算所有候选目标，构建 assignments（不跑分组算法）
+
+Live 面板和 Map 面板均为纯 view 层，直接读取 store 中已生成的数据。「详情」按钮仅切换显示模式，不执行计算。
+
+`handleConfirm()` 记录 `appliedAutoGroupArchiveTime`，不覆盖 `autoGroupResult`。
 
 **不搬的（留在 presenter 本地）：**
 
@@ -51,11 +60,15 @@
 
 ### 4. Presenter 改造
 
-`useAutoSectorGroupPresenter()` 不再自己建 ref，改为从 `liveStore` 读写。两个面板各调一次 presenter，内部状态指向同一份 liveStore 数据。
+Presenter 退化为纯 view 连接层：只从 `liveStore` 读取 refs 暴露给组件，不包含双路径决策或数据生成逻辑。Handler 函数 delegates 到 store 或 `saveBindingStore`。
 
-Handler 函数（`handleColorChange`、`handleAddHubDraft`、`runCalculationFromEditInput` 等）改为读写 `liveStore` ref，不再持有本地状态。
-
-`liveStore` 作为 Pinia setup store 时，handler 内部统一通过 store 属性读写共享状态，例如 `liveStore.autoGroupResult = nextResult`。如果 presenter 需要向 Vue 组件返回 ref，则在 presenter 内使用 `storeToRefs(liveStore)` 获取并返回，不在 handler 中混用 `.value` 与属性赋值。
+```ts
+export function useAutoSectorGroupPresenter() {
+  const liveStore = useLiveProductionStore()
+  const { autoGroupResult, calculationMode, ... } = storeToRefs(liveStore)
+  // computed / handler 不变但 delegate 到 store
+}
+```
 
 ### 5. 地图草案渲染
 
@@ -65,7 +78,7 @@ Handler 函数（`handleColorChange`、`handleAddHubDraft`、`runCalculationFrom
 const sectorGroupColorMap = computed(() => {
   const isBinding = bindingContextStage.value === 'select-sector'
                  || bindingContextStage.value === 'select-station'
-  if (isBinding && !liveStore.autoGroupConfirmed && liveStore.autoGroupResult) {
+  if (isBinding && liveStore.autoGroupResult) {
     return buildColorMap(liveStore.autoGroupResult.groups)
   }
   const binding = saveBindingStore.activeBinding
@@ -74,35 +87,36 @@ const sectorGroupColorMap = computed(() => {
 })
 ```
 
-binding 模式下，`autoGroupConfirmed = false` 表示当前结果仍是草案，地图使用 `liveStore.autoGroupResult` 实时渲染；`autoGroupConfirmed = true` 表示结果已确认提交，地图回到 `saveBindingStore.activeBinding` 作为权威数据。非 binding 模式下始终使用 `saveBindingStore.activeBinding` 的持久数据。
+非 binding 模式下始终使用 `saveBindingStore.activeBinding` 的持久数据。
 
 ### 6. 生命周期
 
-系统不在任何时机自动执行 `runAutoGroup()`。`onMounted`、`watch(activeBinding)`、`watch(selectedArchive)` 均不触发计算。
+Store 在初始化及 activeBinding/archive 切换时调用 `initAutoGroupDraft()` 生成数据。Live 和 Map 面板不负责触发计算。
 
 ### 7. Live 面板模式切换
 
-Live 面板（`SectorOverviewPanel`）新增两种显示模式：
+Live 面板（`SectorOverviewPanel`）两种显示模式（仅切换 UI 布局，store 数据已就绪）：
 
 | 模式 | 布局 | 按钮 |
 |------|------|------|
-| 展示模式 | `[存档 3fr] \| [星区 4fr] \| [资源 5fr]` | 编辑（加载确认结果）、计算（重算+红点） |
-| 计算模式 | `[星区 5fr] \| [分配 4fr] \| [交易站 3fr]` | 计算、返回、提交 |
+| 展示模式 | `[存档 3fr] \| [星区 4fr] \| [资源 5fr]` | 详情、地图 |
+| 计算模式 | `[星区 5fr] \| [分配 4fr] \| [交易站 3fr]` | 返回、提交 |
 
-- 展示模式「编辑」→ 直接切到计算模式，保留当前 `autoGroupResult`
-- 展示模式「计算」→ `runAutoGroup()` 后进入计算模式
+**展示模式内容**（数据直接从 store 读取，只读展示）：
+
+星区列表列顶部参数区（纯数值显示，不可编辑）：
+- 桥接搜索跳数（`bridgeSearchJumpRange`）
+- 分组覆盖跳数（`prefJumpRange`）
+- Hub 阈值（`prefThreshold`，如 5M m³）
+
+- 展示模式「详情」→ `liveMode = 'calculate'`（仅模式切换）
+- 展示模式「地图」→ 跳转到 map binding 面板对应的星区/group 视图
 - 计算模式「提交」→ 写 binding + 回到展示模式
 - 计算模式「返回」→ 回到展示模式（不提交）
-- `!autoGroupResult` 时编辑按钮置灰
-- `needsAutoGroupRecalc` 时计算按钮显示红点 + tooltip
+- 详情按钮红点：`needsAutoGroupRecalc`
+- 详情按钮置灰：`!autoGroupResult`
 
-计算模式三列复用 `AutoSectorGroupMapPanel` 的现有 vue 模块。
-
-**重算提示**：
-
-- `needsAutoGroupRecalc`：`appliedAutoGroupArchiveTime < archiveTime || !appliedAutoGroupArchiveTime` 时为 true
-- 计算按钮显示红点 + tooltip
-- `!autoGroupResult` 时编辑按钮置灰
+计算模式内部列按钮（取消/计算等）保留不变。
 
 | 时机 | 行为 |
 |------|------|
@@ -110,19 +124,19 @@ Live 面板（`SectorOverviewPanel`）新增两种显示模式：
 | binding 中编辑 | 两个面板读写同一份 liveStore ref |
 | 切换 activeBinding 或 archive | 用新 binding/archive 重新初始化唯一草案；旧草案不按 gameGuid 缓存 |
 | 确认提交 | `handleConfirm` → `createAutoGroups` → 写入 `draftBinding` → `saveBinding` |
+| 展示模式「地图」 | 跳转到 map binding 面板 |
 | 退出 binding | 不做回滚（已确认的内容在 draftBinding 中保存） |
 
 ## 边界
 
 In Scope：
-- `liveStore` 新增 6 个状态（`autoGroupResult`、`calculationMode`、`autoGroupConfirmed`、`prefJumpRange`、`bridgeSearchJumpRange`、`prefThreshold`）
+- `liveStore` 新增状态：`autoGroupResult`、`calculationMode`、`prefJumpRange`、`bridgeSearchJumpRange`、`prefThreshold`、`needsAutoGroupRecalc`、`initAutoGroupDraft()`、`buildAssignmentsFromBinding()`
 - `SaveBindingPlan` 新增并持久化 `appliedAutoGroupArchiveTime`
-- `runAutoGroup()` 使用 archive time 比对避免重复重算
-- Presenter 改造为读写 liveStore
+- Store 初始化时根据变化 flag 自动生成 `autoGroupResult`（双路径）
+- Presenter 退化为纯 view 连接层
 - `MapWorkbenchView` 从 liveStore 读取渲染地图
 - `handleColorChange` 移除 `updateGroup` 调用
 - live 面板和 map 面板共享编辑状态
-- activeBinding 或 archive 切换时重新初始化唯一草案
 
 Out of Scope：
 - 全部 presenter 内容搬迁
@@ -134,13 +148,13 @@ Out of Scope：
 ## 验收标准（DoD）
 
 1. live 面板编辑 groups → 切到 map 面板 → 继续编辑 → 切回 live 面板，数据一致
-2. binding 模式且 `autoGroupConfirmed = false` 时修改 group 颜色，地图从 `autoGroupResult` 实时反映
+2. binding 模式时修改 group 颜色，地图从 `autoGroupResult` 实时反映
 3. `handleColorChange` 不再修改 `draftBinding`
-4. binding 模式且 `autoGroupConfirmed = true` 时，地图从 `activeBinding` 渲染已确认数据
+4. binding 模式确认后地图从 `autoGroupResult` 渲染（与 `activeBinding` 数据一致）
 5. 切换 activeBinding 或 archive 后，唯一草案按新上下文重新初始化，不显示上一上下文的未提交草案
-6. 同一 archive time 且已有草案时，`runAutoGroup()` 不重复重算
-7. `needsAutoGroupRecalc` 在 `appliedAutoGroupArchiveTime < archiveTime || !appliedAutoGroupArchiveTime` 时为 true，计算按钮显示红点
-8. `!autoGroupResult` 时编辑按钮置灰
+6. Store 初始化/上下文切换时自动根据变化 flag 生成数据（有 flag → 分组算法，无 flag → 从 binding 构建 assignments）
+7. `needsAutoGroupRecalc = applied === undefined || applied < archiveTime`
+8. Live 面板「详情」仅切换模式不触发计算；红点/置灰状态正确
 9. 确认提交后数据持久化，reload 不丢失
 10. `npm run build` 通过
 

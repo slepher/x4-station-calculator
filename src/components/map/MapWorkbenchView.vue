@@ -193,7 +193,7 @@ function buildColorMap(groups: { color?: string; sectorMacro?: string; coverageS
 const sectorGroupColorMap = computed<Record<string, string>>(() => {
   const isBinding = bindingContextStage.value === 'select-sector'
                  || bindingContextStage.value === 'select-station'
-  if (isBinding && liveStore.autoGroupResult && !liveStore.isAutoSectorGroupConfirmed(bindingContextGameGuid.value)) {
+  if (isBinding && liveStore.autoGroupResult) {
     return buildColorMap(liveStore.autoGroupResult.groups)
   }
   const binding = saveBindingStore.activeBinding

@@ -14,18 +14,20 @@
 
 - **前提** 系统启动
 - **当** `useLiveProductionStore` 初始化
-- **那么** SHALL 包含以下状态：
+- **那么** SHALL 包含以下状态和方法：
   - `autoGroupResult: ShallowRef<AutoGroupResult | null>`
   - `calculationMode: Ref<'result' | 'edit'>`
-  - `autoGroupConfirmed: Ref<boolean>`
   - `prefJumpRange: Ref<number>`
   - `bridgeSearchJumpRange: Ref<number>`
   - `prefThreshold: Ref<number>`
+  - `needsAutoGroupRecalc: Computed<boolean>`
+  - `initAutoGroupDraft()` — 双路径数据生成
+  - `buildAssignmentsFromBinding()` — 从 binding 构建 assignments
 
 #### Scenario: Presenter reads from liveStore
 
 - **前提** `useAutoSectorGroupPresenter` 被调用
-- **当** presenter 需要读写上述 6 个状态
+- **当** presenter 需要读写共享状态
 - **那么** SHALL 通过 `storeToRefs(liveStore)` 获取
 - **并且** `handleColorChange` SHALL NOT 调用 `saveBindingStore.updateGroup()`
 
@@ -43,23 +45,23 @@
 - **并且** SHALL NOT 在新上下文继续显示上一上下文的未提交 draft
 - **并且** SHALL NOT 为旧上下文缓存另一份并行 draft
 
-### Requirement: Archive time-based recalculation
+### Requirement: Store Initialization Data Generation
 
-系统 MUST 通过 `SaveBindingPlan.appliedAutoGroupArchiveTime` 避免重复计算。
+系统 MUST 在 Store 初始化（或 activeBinding/archive 切换）时完成 `autoGroupResult` 的数据生成，根据变化 flag 分两条路径。
 
-#### Scenario: Skip recalculation on same archive time
+#### Scenario: Grouping algorithm runs when change flag is set
 
-- **前提** `binding.appliedAutoGroupArchiveTime` 等于当前存档 `meta.time`
-- **并且** `liveStore.autoGroupResult` 非 null
-- **当** `runAutoGroup()` 被调用
-- **那么** 系统 SHALL NOT 执行重算
-- **并且** SHALL 复用已有 `autoGroupResult`
+- **前提** `needsAutoGroupRecalc` 为 true
+- **当** `initAutoGroupDraft()` 被调用
+- **那么** 系统 SHALL 执行分组算法（`groupCleanSlate` 或 `groupIncremental`）生成 `autoGroupResult`
 
-#### Scenario: Recalculate on newer archive time
+#### Scenario: Assignments built from binding when no change
 
-- **前提** 存档 time 大于 `binding.appliedAutoGroupArchiveTime`
-- **当** `runAutoGroup()` 被调用
-- **那么** 系统 SHALL 执行计算（`groupCleanSlate` 或 `groupIncremental`）
+- **前提** `needsAutoGroupRecalc` 为 false
+- **当** `initAutoGroupDraft()` 被调用
+- **那么** 系统 SHALL 调用 `buildAssignmentsFromBinding()` 从已有 binding groups 构建 assignments
+- **并且** SHALL NOT 执行分组算法
+- **并且** 不重新决定分组结构
 
 #### Scenario: Applied time recorded on confirm
 
@@ -75,24 +77,15 @@
 
 ### Requirement: Map rendering from shared draft
 
-系统 MUST 在 binding 模式（step 2 / step 3）下根据确认状态选择地图渲染数据源：未确认草案使用 `liveStore.autoGroupResult`，已确认结果使用 `saveBindingStore.activeBinding`。
+系统 MUST 在 binding 模式（step 2 / step 3）下从 `liveStore.autoGroupResult` 渲染地图草案。
 
 #### Scenario: Binding mode map renders from draft
 
 - **前提** `mapBindingStage` 为 `'select-sector'` 或 `'select-station'`
-- **并且** `liveStore.autoGroupConfirmed` 为 false
 - **并且** `liveStore.autoGroupResult` 非 null
 - **当** `MapWorkbenchView` 计算 `sectorGroupColorMap`
 - **那么** SHALL 从 `autoGroupResult.groups` 计算
 - **并且** `handleColorChange` SHALL NOT 调用 `saveBindingStore.updateGroup()`
-
-#### Scenario: Binding mode confirmed result renders from persisted state
-
-- **前提** `mapBindingStage` 为 `'select-sector'` 或 `'select-station'`
-- **并且** `liveStore.autoGroupConfirmed` 为 true
-- **当** `MapWorkbenchView` 计算 `sectorGroupColorMap`
-- **那么** SHALL 从 `saveBindingStore.activeBinding.groups` 计算
-- **并且** SHALL NOT 从残留的 `liveStore.autoGroupResult` 计算
 
 #### Scenario: Non-binding mode renders from persisted state
 
@@ -100,49 +93,51 @@
 - **当** `MapWorkbenchView` 计算 `sectorGroupColorMap`
 - **那么** SHALL 从 `saveBindingStore.activeBinding.groups` 计算
 
-### Requirement: No auto-triggered calculation
+### Requirement: Panels do not trigger calculation
 
-系统 SHALL NOT 在任何时机自动执行 `runAutoGroup()`。`onMounted`、`watch(activeBinding)`、`watch(selectedArchive)` 均不触发计算。
+Live 和 Map 面板 SHALL NOT 触发分组算法。数据由 Store 在初始化/上下文切换时生成，面板仅读取。
 
-#### Scenario: Calculation only on user action
+#### Scenario: Panels do not trigger calculation
 
 - **前提** 系统处于任何状态
-- **当** `onMounted`、`watch(activeBinding)`、`watch(selectedArchive)` 触发
-- **那么** 系统 SHALL NOT 调用 `runAutoGroup()`
+- **当** 组件挂载、面板切换、模式切换
+- **那么** Live 和 Map 面板 SHALL NOT 调用分组算法或 `initAutoGroupDraft()`
 
-#### Scenario: Recalc hint via red dot
+#### Scenario: Detail button shows change hint via red dot
 
-- **前提** `appliedAutoGroupArchiveTime` 为 undefined 或小于当前 `archive.meta.time`
-- **当** 计算按钮渲染
+- **前提** `needsAutoGroupRecalc` 为 true
+- **当** 详情按钮渲染
 - **那么** SHALL 显示红点 + tooltip 提示用户重新计算
 
-#### Scenario: Edit button disabled without result
+#### Scenario: Detail button disabled without result
 
 - **前提** `autoGroupResult` 为 null
-- **当** 编辑按钮渲染
+- **当** 详情按钮渲染
 - **那么** SHALL 置灰禁用
 
 ### Requirement: Live panel dual mode
 
-系统 SHALL 在 live 面板提供展示模式和计算模式，通过 `liveMode` 切换。
+系统 SHALL 在 live 面板提供展示模式和计算模式，通过 `liveMode` 切换。两种模式均为纯 view 层，不触发计算，只读取 store 中已有数据。
 
 #### Scenario: Display mode layout
 
 - **前提** `liveMode` 为 `'display'`
 - **当** SectorOverviewPanel 渲染
 - **那么** SHALL 显示 `[存档 3fr] | [星区 4fr] | [资源 5fr]` 布局
+- **并且** 星区列表列顶部 SHALL 展示桥接跳数、覆盖跳数、Hub 阈值（纯数值只读）
+- **并且** SHALL 显示「详情」按钮和「地图」按钮
 
 #### Scenario: Calculate mode layout
 
 - **前提** `liveMode` 为 `'calculate'`
 - **当** SectorOverviewPanel 渲染
-- **那么** SHALL 显示 `[星区 5fr] | [分配 4fr] | [交易站 3fr]` 布局，三列复用 AutoSectorGroupMapPanel 现有结构
+- **那么** SHALL 显示 `[星区 5fr] | [分配 4fr] | [交易站 3fr]` 布局，三列复用 AutoSectorGroupPanel 现有结构
 
-#### Scenario: Edit enters calculate mode from confirmed result
+#### Scenario: Detail button switches to calculate mode
 
 - **前提** 展示模式
-- **当** 点击「编辑」
-- **那么** SHALL 调用 `triggerAutoGroup` 加载确认结果，进入计算模式
+- **当** 点击「详情」
+- **那么** SHALL 仅设置 `liveMode = 'calculate'`（不触发计算，store 数据已由 `initAutoGroupDraft()` 生成）
 
 #### Scenario: Submit returns to display mode
 

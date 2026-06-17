@@ -21,9 +21,10 @@ const gameDataStore = useGameDataStore()
 const activeViewStore = useActiveViewStore()
 const saveBindingStore = useSaveBindingStore()
 const liveStore = useLiveProductionStore()
-const { autoGroupResult, calculationMode, prefJumpRange, bridgeSearchJumpRange, prefThreshold } = storeToRefs(liveStore)
+const { autoGroupResult, calculationMode, prefJumpRange, bridgeSearchJumpRange, prefThreshold, needsAutoGroupRecalc } = storeToRefs(liveStore)
 const { t, te } = useI18n()
 const nodeEnabled = ref(true)
+const liveMode = ref<'display' | 'calculate'>('display')
 
 function buildHubColorContext(): HubColorContext {
   const maps = gameDataStore.maps
@@ -52,13 +53,11 @@ const coverageRetainEnabled = ref(true)
 const tradeStationRetainEnabled = ref(false)
 const showHubAddMenu = ref(false)
 const postBridgeBaseline = ref<AutoGroupResult | null>(null)
-const autoGroupConfirmed = computed(() => liveStore.isAutoSectorGroupConfirmed(activeViewStore.activeBinding))
 const editSnapshot = ref<{
   result: AutoGroupResult | null
   prefJumpRange: number
   bridgeSearchJumpRange: number
   prefThreshold: number
-  autoGroupConfirmed: boolean
   bridgeRetainEnabled: boolean
   coverageRetainEnabled: boolean
   tradeStationRetainEnabled: boolean
@@ -76,14 +75,9 @@ const gameDataMaps = computed(() => gameDataStore.maps)
 
 const canDragGroups = computed(() => {
   if (!autoGroupResult.value) return false
-  if (autoGroupConfirmed.value) return false
   if (calculationMode.value === 'edit') return true
   return calculationMode.value === 'result'
 })
-
-function setAutoGroupConfirmed(confirmed: boolean) {
-  liveStore.setAutoSectorGroupConfirmed(activeViewStore.activeBinding, confirmed)
-}
 
 function getSectorDisplayName(macro: string): string {
   const maps = gameDataStore.maps
@@ -167,7 +161,6 @@ function runAutoGroup() {
     setAutoGroupResult(null)
     return
   }
-  setAutoGroupConfirmed(false)
   const binding = saveBindingStore.getBindingByGameGuid(guid)
   const { sectorGraph, sectorClusterMap } = sectorGraphInfo.value
 
@@ -179,14 +172,12 @@ function runAutoGroup() {
   }
 
   if (binding && binding.groups.length > 0) {
-    setAutoGroupConfirmed(false)
     const result = groupIncremental(
       archive, binding.groups, gameDataStore.modulesByMacroId,
       sectorGraph, sectorClusterMap,
       { containerThreshold: prefThreshold.value }, prefJumpRange.value, bridgeSearchJumpRange.value
     )
     if (result.assignments.length === 0) {
-      setAutoGroupConfirmed(true)
       calcBaselinePillState.value = null
       setAutoGroupResult(buildStoreGroups(binding.groups, result.playerSectorMacros))
       setResultModeDefaults()
@@ -196,7 +187,6 @@ function runAutoGroup() {
     setAutoGroupResult(result)
     setResultModeDefaults()
   } else {
-    setAutoGroupConfirmed(false)
     const result = groupCleanSlate(
       archive, gameDataStore.modulesByMacroId, sectorGraph, sectorClusterMap,
       { containerThreshold: prefThreshold.value }, prefJumpRange.value, bridgeSearchJumpRange.value
@@ -245,7 +235,6 @@ function runCalculationFromEditInput() {
   const guid = activeViewStore.activeBinding
   const recalculateInput = buildRecalculateBaseGroups()
   if (!archive || !archive.isValid || !guid) return
-  setAutoGroupConfirmed(false)
 
   // Capture E2 baseline from submitted data (respects retain toggles)
   const preCalcBaseline = recalculateInput
@@ -367,7 +356,6 @@ function handleEnterEdit() {
     prefJumpRange: prefJumpRange.value,
     bridgeSearchJumpRange: bridgeSearchJumpRange.value,
     prefThreshold: prefThreshold.value,
-    autoGroupConfirmed: autoGroupConfirmed.value,
     bridgeRetainEnabled: bridgeRetainEnabled.value,
     coverageRetainEnabled: coverageRetainEnabled.value,
     tradeStationRetainEnabled: tradeStationRetainEnabled.value,
@@ -402,11 +390,9 @@ function handleCancelEdit() {
   coverageRetainEnabled.value = editSnapshot.value.coverageRetainEnabled ?? true
   tradeStationRetainEnabled.value = editSnapshot.value.tradeStationRetainEnabled ?? false
   syncRetainToGlobal()
-  setAutoGroupConfirmed(editSnapshot.value.autoGroupConfirmed)
   setAutoGroupResult(editSnapshot.value.result ? cloneAutoGroupResult(editSnapshot.value.result) : null)
   calculationMode.value = 'result'
   editSnapshot.value = null
-  liveStore.clearAutoSectorGroupCheck()
 }
 
 function syncRetainToGlobal() {
@@ -1064,8 +1050,6 @@ function handleConfirm() {
   liveStore.syncAllBindingStationsToStateMap()
   liveStore.syncLiveFlowMap()
   calcBaselinePillState.value = null
-  setAutoGroupConfirmed(true)
-  liveStore.clearAutoSectorGroupCheck()
 }
 
 function triggerAutoGroup() {
@@ -1080,7 +1064,6 @@ function triggerAutoGroup() {
   } else {
     setAutoGroupResult(null)
   }
-  setAutoGroupConfirmed(false)
   calcBaselinePillState.value = null
   calculationMode.value = 'result'
   editSnapshot.value = null
@@ -1095,15 +1078,6 @@ function handleUploadComplete() {
   activeViewStore.switchToBinding(guid)
   triggerAutoGroup()
 }
-
-const needsAutoGroupRecalc = computed(() => {
-  const archive = saveStore.selectedArchive
-  if (!archive) return false
-  const binding = saveBindingStore.activeBinding
-  const archiveTime = archive.meta?.time ?? 0
-  const applied = binding?.appliedAutoGroupArchiveTime
-  return applied === undefined || applied < archiveTime
-})
 
 const empireDerivedProductionFlows = computed(() => liveStore.empireDerivedProductionFlows)
 
@@ -1125,13 +1099,6 @@ watch(() => activeViewStore.activeBinding, async (newGuid) => {
 
 watch(() => saveStore.selectedArchive, () => {
   // No auto-run; user explicitly triggers calculation
-})
-
-watch(() => liveStore.autoSectorGroupCheck, (check) => {
-  if (!check) return
-  if (!check.needed) return
-  if (check.gameGuid !== activeViewStore.activeBinding) return
-  liveStore.clearAutoSectorGroupCheck()
 })
 
 onMounted(async () => {
@@ -1207,15 +1174,15 @@ return {
   bridgeRetainEnabled,
   coverageRetainEnabled,
   showHubAddMenu,
-  autoGroupResult,
-  autoGroupConfirmed,
-  canDragGroups,
-  calculationMode,
-  editSnapshot,
-  calcBaselinePillState,
-  gameDataMaps,
-  sectorGraphInfo,
-  runAutoGroup,
+    autoGroupResult,
+    canDragGroups,
+    calculationMode,
+    editSnapshot,
+    calcBaselinePillState,
+    gameDataMaps,
+    sectorGraphInfo,
+    liveMode,
+    runAutoGroup,
   runCalculationFromEditInput,
   handleEnterEdit,
   handleCancelEdit,

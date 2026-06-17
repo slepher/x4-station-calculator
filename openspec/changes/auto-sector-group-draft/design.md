@@ -2,31 +2,36 @@
 
 ## 架构概览
 
-将 6 个核心 group 编辑状态从 presenter 局部实例搬入 `useLiveProductionStore`（Pinia 单例），实现 live 面板和 map 面板状态共享；同时通过 `appliedAutoGroupArchiveTime` 避免同一 save archive 上重复运行 auto group。
+将 6 个核心 group 编辑状态从 presenter 局部实例搬入 `useLiveProductionStore`（Pinia 单例），实现 live 面板和 map 面板状态共享。Store 在初始化/上下文切换时完成数据生成，Live 和 Map 面板均为纯 view 层，直接读取 store 中已算好的值。
 
 ```
-liveStore (Pinia 单例)
+liveStore (Pinia 单例)  ← 数据生产层
   ├─ autoGroupResult       ShallowRef<AutoGroupResult | null>
   ├─ calculationMode       Ref<'edit' | 'result'>
-  ├─ autoGroupConfirmed    Ref<boolean>
   ├─ prefJumpRange         Ref<number>
   ├─ bridgeSearchJumpRange Ref<number>
-  └─ prefThreshold         Ref<number>
+  ├─ prefThreshold         Ref<number>
+  ├─ needsAutoGroupRecalc  Computed<boolean>
+  ├─ initAutoGroupDraft()  → 双路径决策：分组算法 vs 从 binding 构建
+  └─ buildAssignmentsFromBinding() → 从已有 binding 构建 assignments
 
-useAutoSectorGroupPresenter()  ← 读写 liveStore，不再持有本地状态
+useAutoSectorGroupPresenter()  ← 纯 view 连接层
   ├─ SectorOverviewPanel  (live 模式)  → 同一份 liveStore
   └─ AutoSectorGroupMapPanel (map 模式) → 同一份 liveStore
 
 MapWorkbenchView  ← 从 liveStore 读取 sectorGroupColorMap
 ```
 
-## 草案作用域
+## 草案作用域与数据流
 
-`liveStore` 只维护一份全局唯一的 binding draft，不按 `gameGuid` 缓存多份草案。`autoGroupResult`、`calculationMode`、`autoGroupConfirmed`、`prefJumpRange`、`bridgeSearchJumpRange`、`prefThreshold` 均表示当前 active binding/archive 的草案状态。
+`liveStore` 只维护一份全局唯一的 binding draft，不按 `gameGuid` 缓存多份草案。所有状态均表示当前 active binding/archive 的草案状态。
 
-当 `activeBinding` 或 selected archive 切换时，presenter 必须用新上下文重新初始化这份唯一草案。旧草案不得继续用于新上下文，也不需要恢复为 per-gameGuid 草案。
+Store 初始化时（或 activeBinding / archive 切换时）调用 `initAutoGroupDraft()`，根据 `needsAutoGroupRecalc` 分两条路径生成 `autoGroupResult`：
 
-`runAutoGroup` 通过 `appliedAutoGroupArchiveTime` 判断是否需要重算：仅在当前 archive time 与已应用 time 不一致时执行计算；若 time 相同且已有 `liveStore.autoGroupResult`，直接复用已有草案。
+- **有变化 flag** → 运行分组算法（`groupCleanSlate` / `groupIncremental`）→ 生成结果
+- **没有变化 flag** → 调用 `buildAssignmentsFromBinding()` 从已有 binding groups 构建 assignments → 不重新决定分组结构
+
+Live 面板和 Map 面板均为纯 view 层：不直接触发计算，只读取 store 中的结果进行渲染。「详情」按钮仅切换显示模式，不执行计算。
 
 ## 数据模型
 
@@ -51,32 +56,70 @@ appliedAutoGroupArchiveTime: item.appliedAutoGroupArchiveTime as number | undefi
 import { DEFAULT_JUMP_RANGE, DEFAULT_BRIDGE_SEARCH_JUMP_RANGE, type AutoGroupResult } from './logic/autoGroup'
 import { DEFAULT_HUB_CONFIG } from './logic/autoGroupHub'
 
+// 状态
 const autoGroupResult = shallowRef<AutoGroupResult | null>(null)
 const calculationMode = ref<'result' | 'edit'>('result')
-const autoGroupConfirmed = ref(false)
 const prefJumpRange = ref(DEFAULT_JUMP_RANGE)
 const bridgeSearchJumpRange = ref(DEFAULT_BRIDGE_SEARCH_JUMP_RANGE)
 const prefThreshold = ref(DEFAULT_HUB_CONFIG.containerThreshold)
+
+// 变化 flag
+const needsAutoGroupRecalc = computed(() => {
+  const archive = saveStore.selectedArchive
+  if (!archive) return false
+  const binding = saveBindingStore.activeBinding
+  const archiveTime = archive.meta?.time ?? 0
+  const applied = binding?.appliedAutoGroupArchiveTime
+  return applied === undefined || applied < archiveTime
+})
+
+// ===== 数据生产方法 =====
+
+/** 初始化草案 — 双路径决策 */
+function initAutoGroupDraft() {
+  if (needsAutoGroupRecalc.value) {
+    // 有变化 flag → 跑分组算法
+    const result = saveBindingStore.activeBinding?.groups.length
+      ? groupIncremental(/* ... */)
+      : groupCleanSlate(/* ... */)
+    autoGroupResult.value = result
+  } else {
+    // 没有变化 flag → 从已有 binding 构建 assignments
+    autoGroupResult.value = buildAssignmentsFromBinding()
+  }
+}
 ```
 
+`initAutoGroupDraft()` 在以下时机由 store 内部调用：
+- Store 初始化且存在 activeBinding 和存档时
+- `activeBinding` 或 `selectedArchive` 切换时
+
+Live 和 Map 面板不调用此方法，只读取 `autoGroupResult`。
+
 ### Presenter 改造
+
+Presenter 退化为纯 view 连接层：只暴露 store refs 给组件，不包含计算逻辑。
 
 ```ts
 export function useAutoSectorGroupPresenter() {
   const liveStore = useLiveProductionStore()
-  const { autoGroupResult, calculationMode, autoGroupConfirmed, prefJumpRange, bridgeSearchJumpRange, prefThreshold } = storeToRefs(liveStore)
-  // handler 内统一通过 liveStore.xxx 属性读写共享状态
-  // 若要向 Vue 组件返回 ref，则使用 storeToRefs(liveStore)
+  const { autoGroupResult, calculationMode, prefJumpRange, bridgeSearchJumpRange, prefThreshold, needsAutoGroupRecalc } = storeToRefs(liveStore)
+
+  // presenter 本地 computed（不变）
+  const hasGlobalUnresolved = computed(() => /* 从 autoGroupResult 重算 */)
+  // ...
+
+  // handler 直接 delegate 到 store 或 saveBindingStore
+  function handleColorChange(id, color) { /* 更新 liveStore.autoGroupResult */ }
+  function handleConfirm() { /* 写入 saveBindingStore */ }
+
+  return { autoGroupResult, /* ... */, handleColorChange, handleConfirm }
 }
 ```
 
-### runAutoGroup
-
-`runAutoGroup` 始终执行计算，每次强制 `autoGroupConfirmed = false`。不再做时间比对跳过 — 因为所有时机都由用户显式触发。
-
 ### handleConfirm
 
-记录 `appliedAutoGroupArchiveTime`，设置 `autoGroupConfirmed = true`。不覆盖 `autoGroupResult`（保留计算结果中的 assignments 供后续编辑查看）。
+记录 `appliedAutoGroupArchiveTime`，不覆盖 `autoGroupResult`（保留计算结果中的 assignments 供后续编辑查看）。确定栏始终显示，不因确认状态隐藏。
 
 ### MapWorkbenchView — sectorGroupColorMap
 
@@ -84,7 +127,7 @@ export function useAutoSectorGroupPresenter() {
 const sectorGroupColorMap = computed<Record<string, string>>(() => {
   const isBinding = bindingContextStage.value === 'select-sector'
                  || bindingContextStage.value === 'select-station'
-  if (isBinding && !liveStore.autoGroupConfirmed && liveStore.autoGroupResult) {
+  if (isBinding && liveStore.autoGroupResult) {
     return buildColorMap(liveStore.autoGroupResult.groups)
   }
   const binding = saveBindingStore.activeBinding
@@ -93,7 +136,7 @@ const sectorGroupColorMap = computed<Record<string, string>>(() => {
 })
 ```
 
-`autoGroupConfirmed = false` 时，`autoGroupResult` 是尚未提交的唯一草案，地图必须读取草案以展示实时编辑；`autoGroupConfirmed = true` 时，结果已经写入 binding，地图必须读取 `activeBinding`，避免继续显示残留草案。
+binding 模式下始终从 `liveStore.autoGroupResult` 渲染草案（确认后 `autoGroupResult` 与 `activeBinding` 数据一致）。非 binding 模式下从 `saveBindingStore.activeBinding` 渲染。
 
 ### handleColorChange
 
@@ -109,23 +152,7 @@ function handleColorChange(groupId: string, color: string | undefined) {
 
 ### 停止自动计算
 
-`onMounted`、`watch(activeBinding)`、`watch(selectedArchive)` 不再调用 `runAutoGroup()`。系统不在任何时机自动触发计算。
-
-### 重算提示
-
-```ts
-const needsAutoGroupRecalc = computed(() => {
-  const archive = saveStore.selectedArchive
-  if (!archive) return false
-  const binding = saveBindingStore.activeBinding
-  const archiveTime = archive.meta?.time ?? 0
-  const applied = binding?.appliedAutoGroupArchiveTime
-  return applied === undefined || applied < archiveTime
-})
-```
-
-- `needsAutoGroupRecalc = true` → 计算按钮显示红点 + tooltip
-- `!autoGroupResult` → 编辑按钮置灰
+Store 在初始化及 activeBinding/archive 切换时调用 `initAutoGroupDraft()` 生成数据。Live 面板、Map 面板及其他系统组件均不额外触发独立计算。
 
 ### Live 面板模式切换（SectorOverviewPanel）
 
@@ -133,21 +160,25 @@ const needsAutoGroupRecalc = computed(() => {
 const liveMode = ref<'display' | 'calculate'>('display')
 ```
 
-**展示模式**：`liveMode = 'display'`
+Live 面板不触发计算，只切换显示模式。数据由 store 在初始化时生成。
 
+**展示模式**：`liveMode = 'display'`
 ```
 [SaveUploadPanel 3fr] | [SectorGroupList 4fr] | [EmpireWareFlowsDashboard 5fr]
 ```
-- 「编辑」→ `triggerAutoGroup()` + `liveMode = 'calculate'`
-- 「计算」→ `runAutoGroup()` + `liveMode = 'calculate'`
+- 星区列表列顶部：桥接跳数、覆盖跳数、Hub 阈值（纯数值显示、只读，从 store 读取）
+- 「详情」→ `liveMode = 'calculate'`（仅切换模式，store 数据已就绪）
+- 「地图」→ 跳转到 map binding 面板
+- 详情按钮红点：`liveStore.needsAutoGroupRecalc`
+- 详情按钮置灰：`!liveStore.autoGroupResult`
 
 **计算模式**：`liveMode = 'calculate'`
 
-三列复用 `AutoSectorGroupPanel`（`layout="columns"`）。columns 布局始终显示三列，不区分 `autoGroupConfirmed`。
+三列复用 `AutoSectorGroupPanel`（`layout="columns"`），读取 `liveStore.autoGroupResult` 渲染星区列表和分配面板。
 
-Map 模式 `gameGuid` watcher 调用 `triggerAutoGroup()` 加载 binding 数据。
+**Map 模式**：
 
-展示模式「编辑」→ 直接切到计算模式，不重置 `autoGroupResult`（保留已有的计算数据）。展示模式列表从 `activeBinding` 读取（`autoGroupResult` 为 null 时）。
+Map 进入 binding 阶段直接读取 `liveStore.autoGroupResult` 渲染，不通过 `liveMode` 切换。`gameGuid` watcher 不需要调用额外初始化方法（store 已在上下文切换时自动初始化）。
 
 ## 注意
 

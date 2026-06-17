@@ -31,7 +31,7 @@ const presenter = useAutoSectorGroupPresenter()
 const {
   prefJumpRange, bridgeSearchJumpRange, prefThreshold, nodeEnabled,
   bridgeRetainEnabled, coverageRetainEnabled, tradeStationRetainEnabled,
-  showHubAddMenu, autoGroupResult, autoGroupConfirmed, canDragGroups,
+  showHubAddMenu, autoGroupResult, canDragGroups,
   calculationMode, editSnapshot, calcBaselinePillState,
   gameDataMaps, sectorGraphInfo,
   tradeStationCandidates, selectedTradeStations, tradeStationCaps,
@@ -123,7 +123,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
             <SectorGroupList :groups="autoGroupResult?.groups ?? []" :assignments="autoGroupResult?.assignments ?? []"
               :maps="gameDataMaps" :sector-graph="sectorGraphInfo.sectorGraph" :sector-cluster-map="sectorGraphInfo.sectorClusterMap"
               :player-sector-macros="autoGroupResult?.playerSectorMacros ?? []"
-              :editable="calculationMode === 'edit'" :diff-enabled="calculationMode === 'edit' || !autoGroupConfirmed"
+              :editable="calculationMode === 'edit'" :diff-enabled="calculationMode === 'edit'"
               :baseline-coverage-by-group-id="calculationMode === 'edit' ? editSnapshot?.coverageByGroupId : calcBaselinePillState?.coverageByGroupId"
               :baseline-connected-group-ids-by-group-id="calculationMode === 'edit' ? editSnapshot?.connectedGroupIdsByGroupId : calcBaselinePillState?.connectedGroupIdsByGroupId"
               :draggable="canDragGroups" view="live" :trade-station-caps="tradeStationCaps"
@@ -155,38 +155,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
         </div>
       </template>
       <template v-else>
-        <template v-if="autoGroupConfirmed">
-          <SectorConfirmBar :pref-jump-range="prefJumpRange" :bridge-search-jump-range="bridgeSearchJumpRange"
-            :pref-threshold="prefThreshold" :mode="calculationMode" view="map"
-            :node-enabled="nodeEnabled" :can-disable-node="canDisableNode"
-            :bridge-retain-enabled="bridgeRetainEnabled" :coverage-retain-enabled="coverageRetainEnabled"
-            :trade-station-retain-enabled="tradeStationRetainEnabled" :trade-station-retain-indeterminate="tradeStationRetainIndeterminate"
-            :bridge-retain-indeterminate="bridgeRetainIndeterminate" :coverage-retain-indeterminate="coverageRetainIndeterminate"
-            @update:pref-jump-range="handleUpdatePrefJumpRange" @update:bridge-search-jump-range="handleUpdateBridgeSearchJumpRange"
-            @update:pref-threshold="prefThreshold = $event" @update:node-enabled="nodeEnabled = $event"
-            @update:bridge-retain-enabled="handleMasterBridgeRetain" @update:coverage-retain-enabled="handleMasterCoverageRetain"
-            @update:trade-station-retain-enabled="handleMasterTradeStationRetain"
-            @edit="handleEnterEdit" @cancel="handleCancelEdit" @calculate="onCalculate" @quick-calculate="onQuickCalc"
-            @add-hub="handleAddHubClick" :show-confirm="false" :confirm-disabled="false" :add-menu-open="showHubAddMenu" @confirm="handleConfirm"
-          />
-          <HubAddMenu :open="showHubAddMenu" :player-sector-macros="autoGroupResult?.playerSectorMacros ?? []" :occupied-sector-macros="[...getExistingAnchorSectors()]"
-            @close="showHubAddMenu = false" @add-hub="(m: string) => { handleAddHubDraft(m); showHubAddMenu = false }" @focus-sector="emit('focus-sector', $event)"
-          />
-          <SectorGroupList :groups="autoGroupResult?.groups ?? []" :assignments="autoGroupResult?.assignments ?? []"
-            :maps="gameDataMaps" :sector-graph="sectorGraphInfo.sectorGraph" :sector-cluster-map="sectorGraphInfo.sectorClusterMap"
-            :player-sector-macros="autoGroupResult?.playerSectorMacros ?? []"
-            :editable="calculationMode === 'edit'" :diff-enabled="false" :show-select-group-button="calculationMode !== 'edit'"
-            :draggable="false" view="map" :trade-station-caps="tradeStationCaps"
-            @cycle-recalc-state="handleCycleRecalcState" @update-jump-range="handleUpdateJumpRange"
-            @toggle-coverage-input="handleToggleCoverageInput" @toggle-connected-input="handleToggleConnectedInput"
-            @add-candidate-coverage="handleAddCandidateCoverage" @delete-group="handleDeleteGroup"
-            @toggle-retain-coverage="handleToggleRetainCoverage" @toggle-retain-connection="handleToggleRetainConnection"
-            @toggle-retain-trade-station="handleToggleTradeStationRetain"
-            @color-change="handleColorChange" @focus-sector="emit('focus-sector', $event)" @select-group="emit('select-group', $event)"
-          />
-        </template>
-        <template v-else>
-          <div class="tab-bar">
+        <div class="tab-bar">
             <button type="button" class="tab-btn" :class="{ active: activeTab === 'hub' }" @click="activeTab = 'hub'">{{ t('auto_sector.hub_tab') }}</button>
             <button type="button" class="tab-btn" :class="{ active: activeTab === 'allocation' }"
               :disabled="!canSwitchToAllocation()" :title="canSwitchToAllocation() ? '' : t('auto_sector.edit_overlay_hint')"
@@ -216,7 +185,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
             <SectorGroupList :groups="autoGroupResult?.groups ?? []" :assignments="autoGroupResult?.assignments ?? []"
               :maps="gameDataMaps" :sector-graph="sectorGraphInfo.sectorGraph" :sector-cluster-map="sectorGraphInfo.sectorClusterMap"
               :player-sector-macros="autoGroupResult?.playerSectorMacros ?? []"
-              :editable="calculationMode === 'edit'" :diff-enabled="calculationMode === 'edit' || !autoGroupConfirmed"
+              :editable="calculationMode === 'edit'" :diff-enabled="calculationMode === 'edit'"
               :baseline-coverage-by-group-id="calculationMode === 'edit' ? editSnapshot?.coverageByGroupId : calcBaselinePillState?.coverageByGroupId"
               :baseline-connected-group-ids-by-group-id="calculationMode === 'edit' ? editSnapshot?.connectedGroupIdsByGroupId : calcBaselinePillState?.connectedGroupIdsByGroupId"
               view="map" :draggable="canDragGroups" :trade-station-caps="tradeStationCaps"
@@ -245,7 +214,6 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
               @select="handleSelectTradeStation" @focus-sector="emit('focus-sector', $event)"
             />
           </div>
-        </template>
       </template>
     </template>
   </div>
