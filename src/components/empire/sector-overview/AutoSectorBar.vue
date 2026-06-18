@@ -110,6 +110,16 @@ const hasUnresolved = computed(() => (props.unresolvedAllocationCount ?? 0) + (p
               <option v-for="j in bridgeJumpOptions" :key="j" :value="j" :disabled="j < prefJumpRange">{{ j }}</option>
             </select>
           </div>
+          <div class="param-field" :title="t('sector.node_enabled_desc')">
+            <label class="bar-label-inline">
+              <input type="checkbox" class="bar-checkbox" :checked="nodeEnabled" :disabled="nodeDisabled" @change="emit('update:nodeEnabled', ($event.target as HTMLInputElement).checked)" />
+              <span class="bar-label">{{ t('sector.node_enabled') }}</span>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="bar-row bar-row--map">
+        <div class="bar-left">
           <div class="param-field" :title="t('sector.group_coverage_jump')">
             <span class="bar-label">{{ t('sector.group_coverage_jump_short') }}</span>
             <select class="bar-select bar-select--narrow" :value="prefJumpRange" :disabled="thresholdDisabled" @change="emit('update:prefJumpRange', Number(($event.target as HTMLSelectElement).value))">
@@ -121,16 +131,6 @@ const hasUnresolved = computed(() => (props.unresolvedAllocationCount ?? 0) + (p
             <select class="bar-select" :value="prefThreshold" :disabled="thresholdDisabled" @change="emit('update:prefThreshold', Number(($event.target as HTMLSelectElement).value))">
               <option v-for="opt in thresholdOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
             </select>
-          </div>
-        </div>
-      </div>
-      <div class="bar-row bar-row--map">
-        <div class="bar-left">
-          <div class="param-field" :title="t('sector.node_enabled_desc')">
-            <label class="bar-label-inline">
-              <input type="checkbox" class="bar-checkbox" :checked="nodeEnabled" :disabled="nodeDisabled" @change="emit('update:nodeEnabled', ($event.target as HTMLInputElement).checked)" />
-              <span class="bar-label">{{ t('sector.node_enabled') }}</span>
-            </label>
           </div>
         </div>
       </div>
