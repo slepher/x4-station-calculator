@@ -5,6 +5,7 @@ import { useAutoSectorGroupPresenter } from '@/components/empire/presenters/useA
 import { useActiveViewStore } from '@/store/useActiveViewStore'
 import { useLiveProductionStore } from '@/store/useLiveProductionStore'
 import AutoSectorBar from '@/components/empire/sector-overview/AutoSectorBar.vue'
+import SectorGroupStatBar from '@/components/empire/sector-overview/SectorGroupStatBar.vue'
 import SectorGroupList from '@/components/empire/sector-overview/SectorGroupList.vue'
 import SectorAllocationList from '@/components/empire/sector-overview/SectorAllocationList.vue'
 import HubAddMenu from './HubAddMenu.vue'
@@ -107,37 +108,41 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
           :pref-threshold="prefThreshold"
           :node-enabled="nodeEnabled"
           :can-disable-node="canDisableNode"
-          :bridge-retain-enabled="bridgeRetainEnabled"
-          :coverage-retain-enabled="coverageRetainEnabled"
-          :trade-station-retain-enabled="tradeStationRetainEnabled"
-          :bridge-retain-indeterminate="bridgeRetainIndeterminate"
-          :coverage-retain-indeterminate="coverageRetainIndeterminate"
-          :trade-station-retain-indeterminate="tradeStationRetainIndeterminate"
           :unresolved-allocation-count="unresolvedAllocationGroups.length"
           :unresolved-trade-station-count="unresolvedTradeStationGroups.length"
-          :show-add-hub="showHubAddMenu"
           :show-confirm="true"
           :confirm-disabled="hasGlobalUnresolved"
           :needs-recalc="needsAutoGroupRecalc"
-          :edit-disabled="!autoGroupResult"
           @update:pref-jump-range="handleUpdatePrefJumpRange"
           @update:bridge-search-jump-range="handleUpdateBridgeSearchJumpRange"
           @update:pref-threshold="prefThreshold = $event"
           @update:node-enabled="nodeEnabled = $event"
-          @update:bridge-retain-enabled="handleMasterBridgeRetain"
-          @update:coverage-retain-enabled="handleMasterCoverageRetain"
-          @update:trade-station-retain-enabled="handleMasterTradeStationRetain"
-          @edit="handleEnterEdit"
-          @cancel="handleCancelEdit"
           @calculate="onCalculate"
           @quick-calculate="onQuickCalc"
-          @add-hub="handleAddHubClick"
           @reset="handleResetAssignments"
           @confirm="handleConfirm"
         />
         </div>
         <div class="columns-layout">
           <div class="column column-hub">
+            <SectorGroupStatBar
+              :mode="calculationMode === 'edit' ? 'edit' : 'result'"
+              view="live"
+              :bridge-retain-enabled="bridgeRetainEnabled"
+              :coverage-retain-enabled="coverageRetainEnabled"
+              :trade-station-retain-enabled="tradeStationRetainEnabled"
+              :bridge-retain-indeterminate="bridgeRetainIndeterminate"
+              :coverage-retain-indeterminate="coverageRetainIndeterminate"
+              :trade-station-retain-indeterminate="tradeStationRetainIndeterminate"
+              :show-add-hub="showHubAddMenu"
+              :edit-disabled="!autoGroupResult"
+              @update:bridge-retain-enabled="handleMasterBridgeRetain"
+              @update:coverage-retain-enabled="handleMasterCoverageRetain"
+              @update:trade-station-retain-enabled="handleMasterTradeStationRetain"
+              @edit="handleEnterEdit"
+              @cancel="handleCancelEdit"
+              @add-hub="handleAddHubClick"
+            />
             <HubAddMenu mode="overlay" :open="showHubAddMenu" :player-sector-macros="autoGroupResult?.playerSectorMacros ?? []" :occupied-sector-macros="[...getExistingAnchorSectors()]"
               @close="showHubAddMenu = false" @add-hub="(m: string) => { handleAddHubDraft(m); showHubAddMenu = false }" @focus-sector="emit('focus-sector', $event)"
             />
@@ -179,36 +184,19 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
           :pref-threshold="prefThreshold"
           :node-enabled="nodeEnabled"
           :can-disable-node="canDisableNode"
-          :bridge-retain-enabled="bridgeRetainEnabled"
-          :coverage-retain-enabled="coverageRetainEnabled"
-          :trade-station-retain-enabled="tradeStationRetainEnabled"
-          :bridge-retain-indeterminate="bridgeRetainIndeterminate"
-          :coverage-retain-indeterminate="coverageRetainIndeterminate"
-          :trade-station-retain-indeterminate="tradeStationRetainIndeterminate"
           :unresolved-allocation-count="unresolvedAllocationGroups.length"
           :unresolved-trade-station-count="unresolvedTradeStationGroups.length"
-          :show-add-hub="showHubAddMenu"
           :show-confirm="calculationMode === 'result'"
           :confirm-disabled="hasGlobalUnresolved"
           :needs-recalc="needsAutoGroupRecalc"
-          :edit-disabled="!autoGroupResult"
           @update:pref-jump-range="handleUpdatePrefJumpRange"
           @update:bridge-search-jump-range="handleUpdateBridgeSearchJumpRange"
           @update:pref-threshold="prefThreshold = $event"
           @update:node-enabled="nodeEnabled = $event"
-          @update:bridge-retain-enabled="handleMasterBridgeRetain"
-          @update:coverage-retain-enabled="handleMasterCoverageRetain"
-          @update:trade-station-retain-enabled="handleMasterTradeStationRetain"
-          @edit="handleEnterEdit"
-          @cancel="handleCancelEdit"
           @calculate="onCalculate"
           @quick-calculate="onQuickCalc"
-          @add-hub="handleAddHubClick"
           @reset="handleResetAssignments"
           @confirm="handleConfirm"
-        />
-        <HubAddMenu class="mt-1" :open="showHubAddMenu" :player-sector-macros="autoGroupResult?.playerSectorMacros ?? []" :occupied-sector-macros="[...getExistingAnchorSectors()]"
-          @close="showHubAddMenu = false" @add-hub="(m: string) => { handleAddHubDraft(m); showHubAddMenu = false }" @focus-sector="emit('focus-sector', $event)"
         />
         <div class="tab-bar">
             <button type="button" class="tab-btn" :class="{ active: activeTab === 'hub' }" @click="activeTab = 'hub'">{{ t('auto_sector.hub_tab') }}</button>
@@ -220,6 +208,27 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
               @click="activeTab = 'tradeStation'">{{ t('auto_sector.trade_station_tab') }}</button>
           </div>
           <div v-show="activeTab === 'hub'">
+            <SectorGroupStatBar
+              :mode="calculationMode === 'edit' ? 'edit' : 'result'"
+              view="map"
+              :bridge-retain-enabled="bridgeRetainEnabled"
+              :coverage-retain-enabled="coverageRetainEnabled"
+              :trade-station-retain-enabled="tradeStationRetainEnabled"
+              :bridge-retain-indeterminate="bridgeRetainIndeterminate"
+              :coverage-retain-indeterminate="coverageRetainIndeterminate"
+              :trade-station-retain-indeterminate="tradeStationRetainIndeterminate"
+              :show-add-hub="showHubAddMenu"
+              :edit-disabled="!autoGroupResult"
+              @update:bridge-retain-enabled="handleMasterBridgeRetain"
+              @update:coverage-retain-enabled="handleMasterCoverageRetain"
+              @update:trade-station-retain-enabled="handleMasterTradeStationRetain"
+              @edit="handleEnterEdit"
+              @cancel="handleCancelEdit"
+              @add-hub="handleAddHubClick"
+            />
+            <HubAddMenu :open="showHubAddMenu" :player-sector-macros="autoGroupResult?.playerSectorMacros ?? []" :occupied-sector-macros="[...getExistingAnchorSectors()]"
+              @close="showHubAddMenu = false" @add-hub="(m: string) => { handleAddHubDraft(m); showHubAddMenu = false }" @focus-sector="emit('focus-sector', $event)"
+            />
             <SectorGroupList :groups="autoGroupResult?.groups ?? []" :assignments="autoGroupResult?.assignments ?? []"
               :maps="gameDataMaps" :sector-graph="sectorGraphInfo.sectorGraph" :sector-cluster-map="sectorGraphInfo.sectorClusterMap"
               :player-sector-macros="autoGroupResult?.playerSectorMacros ?? []"

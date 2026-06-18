@@ -10,30 +10,18 @@ const props = withDefaults(defineProps<{
   prefThreshold: number
   nodeEnabled: boolean
   canDisableNode: boolean
-  bridgeRetainEnabled: boolean
-  coverageRetainEnabled: boolean
-  tradeStationRetainEnabled?: boolean
-  bridgeRetainIndeterminate: boolean
-  coverageRetainIndeterminate: boolean
-  tradeStationRetainIndeterminate?: boolean
   unresolvedAllocationCount?: number
   unresolvedTradeStationCount?: number
-  showAddHub?: boolean
   showConfirm?: boolean
   confirmDisabled?: boolean
   needsRecalc?: boolean
-  editDisabled?: boolean
 }>(), {
   view: 'live',
-  tradeStationRetainEnabled: false,
-  tradeStationRetainIndeterminate: false,
   unresolvedAllocationCount: 0,
   unresolvedTradeStationCount: 0,
-  showAddHub: false,
   showConfirm: true,
   confirmDisabled: false,
-  needsRecalc: false,
-  editDisabled: true
+  needsRecalc: false
 })
 
 const emit = defineEmits<{
@@ -41,14 +29,8 @@ const emit = defineEmits<{
   (e: 'update:bridgeSearchJumpRange', value: number): void
   (e: 'update:prefThreshold', value: number): void
   (e: 'update:nodeEnabled', value: boolean): void
-  (e: 'update:bridgeRetainEnabled', value: boolean): void
-  (e: 'update:coverageRetainEnabled', value: boolean): void
-  (e: 'update:tradeStationRetainEnabled', value: boolean): void
-  (e: 'edit'): void
-  (e: 'cancel'): void
   (e: 'calculate'): void
   (e: 'quick-calculate'): void
-  (e: 'add-hub'): void
   (e: 'reset'): void
   (e: 'confirm'): void
 }>()
@@ -68,72 +50,42 @@ const thresholdOptions = [
 const nodeDisabled = computed(() => props.mode === 'edit' && !props.canDisableNode)
 const thresholdDisabled = computed(() => !props.nodeEnabled)
 
-function onBridgeRetainChange(e: Event) {
-  emit('update:bridgeRetainEnabled', (e.target as HTMLInputElement).checked)
-}
-function onCoverageRetainChange(e: Event) {
-  emit('update:coverageRetainEnabled', (e.target as HTMLInputElement).checked)
-}
-function onTradeStationRetainChange(e: Event) {
-  emit('update:tradeStationRetainEnabled', (e.target as HTMLInputElement).checked)
-}
-
 const hasUnresolved = computed(() => (props.unresolvedAllocationCount ?? 0) + (props.unresolvedTradeStationCount ?? 0) > 0)
 </script>
 
 <template>
   <div class="auto-sector-bar" :class="{ 'auto-sector-bar--map': view === 'map' }">
-    <!-- Live: single row -->
     <template v-if="view === 'live'">
       <div class="bar-row bar-row--live">
         <div class="bar-left">
-
           <div class="param-field" :title="t('sector.bridge_search_jump')">
             <span class="bar-label">{{ t('sector.bridge_search_jump_short') }}</span>
             <select class="bar-select bar-select--narrow" :value="bridgeSearchJumpRange" @change="emit('update:bridgeSearchJumpRange', Number(($event.target as HTMLSelectElement).value))">
               <option v-for="j in bridgeJumpOptions" :key="j" :value="j" :disabled="j < prefJumpRange">{{ j }}{{ t('sector.jump_unit') }}</option>
             </select>
-            <label class="bar-label-inline" :title="t('sector.bridge_retain')">
-              <input type="checkbox" class="bar-checkbox" :checked="bridgeRetainEnabled" :indeterminate.prop="bridgeRetainIndeterminate" @change="onBridgeRetainChange" />
-              <span class="bar-label">{{ t('sector.retain') }}</span>
-            </label>
           </div>
-
+          <div class="param-field" :title="t('sector.group_coverage_jump')">
+            <span class="bar-label">{{ t('sector.group_coverage_jump_short') }}</span>
+            <select class="bar-select bar-select--narrow" :value="prefJumpRange" :disabled="thresholdDisabled" @change="emit('update:prefJumpRange', Number(($event.target as HTMLSelectElement).value))">
+              <option v-for="j in jumpOptions" :key="j" :value="j">{{ j }}{{ t('sector.jump_unit') }}</option>
+            </select>
+          </div>
+          <div class="param-field" :title="t('sector.default_threshold')">
+            <span class="bar-label">{{ t('sector.trade_station_short') }}</span>
+            <select class="bar-select" :value="prefThreshold" :disabled="thresholdDisabled" @change="emit('update:prefThreshold', Number(($event.target as HTMLSelectElement).value))">
+              <option v-for="opt in thresholdOptions" :key="opt.value" :value="opt.value">{{ opt.label }}{{ t('sector.volume_unit_m3') }}</option>
+            </select>
+          </div>
           <div class="param-field" :title="t('sector.node_enabled_desc')">
             <label class="bar-label-inline">
               <input type="checkbox" class="bar-checkbox" :checked="nodeEnabled" :disabled="nodeDisabled" @change="emit('update:nodeEnabled', ($event.target as HTMLInputElement).checked)" />
               <span class="bar-label">{{ t('sector.node_enabled') }}</span>
             </label>
           </div>
-
-          <div class="param-field" :title="t('sector.group_coverage_jump')">
-            <span class="bar-label">{{ t('sector.group_coverage_jump_short') }}</span>
-            <select class="bar-select bar-select--narrow" :value="prefJumpRange" :disabled="thresholdDisabled" @change="emit('update:prefJumpRange', Number(($event.target as HTMLSelectElement).value))">
-              <option v-for="j in jumpOptions" :key="j" :value="j">{{ j }}{{ t('sector.jump_unit') }}</option>
-            </select>
-            <label class="bar-label-inline" :title="t('sector.coverage_retain')">
-              <input type="checkbox" class="bar-checkbox" :checked="coverageRetainEnabled" :indeterminate.prop="coverageRetainIndeterminate" @change="onCoverageRetainChange" />
-              <span class="bar-label">{{ t('sector.retain') }}</span>
-            </label>
-          </div>
-
-          <div class="param-field" :title="t('sector.default_threshold')">
-            <span class="bar-label">{{ t('sector.trade_station_short') }}</span>
-            <select class="bar-select" :value="prefThreshold" :disabled="thresholdDisabled" @change="emit('update:prefThreshold', Number(($event.target as HTMLSelectElement).value))">
-              <option v-for="opt in thresholdOptions" :key="opt.value" :value="opt.value">{{ opt.label }}{{ t('sector.volume_unit_m3') }}</option>
-            </select>
-            <label class="bar-label-inline" :title="t('sector.trade_station_retain')">
-              <input type="checkbox" class="bar-checkbox" :checked="tradeStationRetainEnabled" :indeterminate.prop="tradeStationRetainIndeterminate" @change="onTradeStationRetainChange" />
-              <span class="bar-label">{{ t('sector.retain') }}</span>
-            </label>
-          </div>
         </div>
-
         <div class="bar-right">
           <template v-if="mode === 'edit'">
-            <button class="bar-btn cancel-btn" @click="emit('cancel')">{{ t('sector.cancel') }}</button>
             <button class="bar-btn recalc-btn" @click="emit('calculate')">{{ t('sector.calculate') }}</button>
-            <button class="bar-btn add-btn" @click="emit('add-hub')">{{ showAddHub ? t('sector.cancel_add_hub') : t('sector.add_hub') }}</button>
           </template>
           <template v-else>
             <span v-if="hasUnresolved" class="bar-unresolved">
@@ -145,13 +97,10 @@ const hasUnresolved = computed(() => (props.unresolvedAllocationCount ?? 0) + (p
               <span v-if="needsRecalc" class="recalc-dot" />
               {{ t('sector.calculate') }}
             </button>
-            <button class="bar-btn recalc-btn" :disabled="editDisabled" @click="emit('edit')">{{ t('sector.edit') }}</button>
           </template>
         </div>
       </div>
     </template>
-
-    <!-- Map: two rows -->
     <template v-else>
       <div class="bar-row bar-row--map">
         <div class="bar-left">
@@ -160,11 +109,23 @@ const hasUnresolved = computed(() => (props.unresolvedAllocationCount ?? 0) + (p
             <select class="bar-select bar-select--narrow" :value="bridgeSearchJumpRange" @change="emit('update:bridgeSearchJumpRange', Number(($event.target as HTMLSelectElement).value))">
               <option v-for="j in bridgeJumpOptions" :key="j" :value="j" :disabled="j < prefJumpRange">{{ j }}</option>
             </select>
-            <label class="bar-label-inline" :title="t('sector.bridge_retain')">
-              <input type="checkbox" class="bar-checkbox" :checked="bridgeRetainEnabled" :indeterminate.prop="bridgeRetainIndeterminate" @change="onBridgeRetainChange" />
-              <span class="bar-label">{{ t('sector.retain') }}</span>
-            </label>
           </div>
+          <div class="param-field" :title="t('sector.group_coverage_jump')">
+            <span class="bar-label">{{ t('sector.group_coverage_jump_short') }}</span>
+            <select class="bar-select bar-select--narrow" :value="prefJumpRange" :disabled="thresholdDisabled" @change="emit('update:prefJumpRange', Number(($event.target as HTMLSelectElement).value))">
+              <option v-for="j in jumpOptions" :key="j" :value="j">{{ j }}</option>
+            </select>
+          </div>
+          <div class="param-field" :title="t('sector.default_threshold')">
+            <span class="bar-label">{{ t('sector.trade_station_short') }}</span>
+            <select class="bar-select" :value="prefThreshold" :disabled="thresholdDisabled" @change="emit('update:prefThreshold', Number(($event.target as HTMLSelectElement).value))">
+              <option v-for="opt in thresholdOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="bar-row bar-row--map">
+        <div class="bar-left">
           <div class="param-field" :title="t('sector.node_enabled_desc')">
             <label class="bar-label-inline">
               <input type="checkbox" class="bar-checkbox" :checked="nodeEnabled" :disabled="nodeDisabled" @change="emit('update:nodeEnabled', ($event.target as HTMLInputElement).checked)" />
@@ -174,35 +135,9 @@ const hasUnresolved = computed(() => (props.unresolvedAllocationCount ?? 0) + (p
         </div>
       </div>
       <div class="bar-row bar-row--map">
-        <div class="bar-left">
-          <div class="param-field" :title="t('sector.group_coverage_jump')">
-            <span class="bar-label">{{ t('sector.group_coverage_jump_short') }}</span>
-            <select class="bar-select bar-select--narrow" :value="prefJumpRange" :disabled="thresholdDisabled" @change="emit('update:prefJumpRange', Number(($event.target as HTMLSelectElement).value))">
-              <option v-for="j in jumpOptions" :key="j" :value="j">{{ j }}</option>
-            </select>
-            <label class="bar-label-inline" :title="t('sector.coverage_retain')">
-              <input type="checkbox" class="bar-checkbox" :checked="coverageRetainEnabled" :indeterminate.prop="coverageRetainIndeterminate" @change="onCoverageRetainChange" />
-              <span class="bar-label">{{ t('sector.retain') }}</span>
-            </label>
-          </div>
-          <div class="param-field" :title="t('sector.default_threshold')">
-            <span class="bar-label">{{ t('sector.trade_station_short') }}</span>
-            <select class="bar-select" :value="prefThreshold" :disabled="thresholdDisabled" @change="emit('update:prefThreshold', Number(($event.target as HTMLSelectElement).value))">
-              <option v-for="opt in thresholdOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-            </select>
-            <label class="bar-label-inline" :title="t('sector.trade_station_retain')">
-              <input type="checkbox" class="bar-checkbox" :checked="tradeStationRetainEnabled" :indeterminate.prop="tradeStationRetainIndeterminate" @change="onTradeStationRetainChange" />
-              <span class="bar-label">{{ t('sector.retain') }}</span>
-            </label>
-          </div>
-        </div>
-      </div>
-      <div class="bar-row bar-row--map">
         <div class="bar-right">
           <template v-if="mode === 'edit'">
-            <button class="bar-btn cancel-btn" @click="emit('cancel')">{{ t('sector.cancel') }}</button>
             <button class="bar-btn recalc-btn" @click="emit('calculate')">{{ t('sector.calculate') }}</button>
-            <button class="bar-btn add-btn" @click="emit('add-hub')">{{ showAddHub ? t('sector.cancel_add_hub') : t('sector.add_hub') }}</button>
           </template>
           <template v-else>
             <span v-if="hasUnresolved" class="bar-unresolved">{{ unresolvedAllocationCount }}{{ unresolvedTradeStationCount ? '+' + unresolvedTradeStationCount : '' }}</span>
@@ -212,7 +147,6 @@ const hasUnresolved = computed(() => (props.unresolvedAllocationCount ?? 0) + (p
               <span v-if="needsRecalc" class="recalc-dot" />
               {{ t('sector.calculate') }}
             </button>
-            <button class="bar-btn recalc-btn" :disabled="editDisabled" @click="emit('edit')">{{ t('sector.edit') }}</button>
           </template>
         </div>
       </div>
@@ -231,10 +165,6 @@ const hasUnresolved = computed(() => (props.unresolvedAllocationCount ?? 0) + (p
 
 .bar-row {
   @apply flex items-center justify-between;
-}
-
-.bar-row--live {
-  @apply flex-nowrap;
 }
 
 .bar-left {
@@ -269,10 +199,6 @@ const hasUnresolved = computed(() => (props.unresolvedAllocationCount ?? 0) + (p
   @apply px-2.5 py-1 text-xs font-medium rounded transition-colors;
 }
 
-.cancel-btn {
-  @apply bg-slate-700/30 text-slate-300 border border-slate-500/30 hover:bg-slate-700/50;
-}
-
 .recalc-btn {
   @apply bg-sky-600/20 text-sky-400 border border-sky-500/30 hover:bg-sky-600/30;
 }
@@ -283,10 +209,6 @@ const hasUnresolved = computed(() => (props.unresolvedAllocationCount ?? 0) + (p
 
 .confirm-btn {
   @apply bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-600/30 disabled:opacity-40 disabled:cursor-not-allowed;
-}
-
-.add-btn {
-  @apply bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-600/30;
 }
 
 .calc-btn {
@@ -313,19 +235,15 @@ const hasUnresolved = computed(() => (props.unresolvedAllocationCount ?? 0) + (p
 .auto-sector-bar--map .param-field {
   @apply px-1 py-0.5 gap-0.5;
 }
-
 .auto-sector-bar--map .bar-label {
   @apply text-[10px];
 }
-
 .auto-sector-bar--map .bar-select {
   @apply h-5 text-[11px] px-1;
 }
-
 .auto-sector-bar--map .bar-select--narrow {
   @apply w-10;
 }
-
 .auto-sector-bar--map .bar-btn {
   @apply px-1.5 py-0.5 text-[11px];
 }
