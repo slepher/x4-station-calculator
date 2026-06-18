@@ -130,7 +130,7 @@ const hasUnresolved = computed(() => (props.unresolvedAllocationCount ?? 0) + (p
           </div>
         </div>
       </div>
-      <div class="bar-row bar-row--map">
+      <div class="bar-row bar-row--map !justify-end">
         <div class="bar-right">
           <template v-if="mode === 'edit'">
             <button class="bar-btn recalc-btn" @click="emit('calculate')">{{ t('sector.calculate') }}</button>
