@@ -71,11 +71,11 @@ watch(() => props.gameGuid, async (guid) => {
 }, { immediate: true })
 
 const activeTab = ref<'hub' | 'allocation' | 'tradeStation'>('hub')
-const isEditMode = () => calculationMode.value === 'edit'
 const canSwitchToAllocation = () => true
 const canSwitchToTradeStation = () => true
 
 function onCalculate() { runCalculationFromEditInput(); switchToFirstUnresolvedTab() }
+function onQuickCalc() { handleQuickCalculate(); switchToFirstUnresolvedTab() }
 function onQuickCalc() { handleQuickCalculate(); switchToFirstUnresolvedTab() }
 
 function switchToFirstUnresolvedTab() {
