@@ -1146,7 +1146,7 @@ function getSectorCoverageMacros(
   return results.map((r) => r.sectorMacro)
 }
 
-function buildAssignmentResult(
+export function buildAssignmentResult(
   unassignedSectors: string[],
   assignedSectors: Map<string, string>,
   groups: GroupDraftInfo[],

@@ -6,7 +6,7 @@ import { useGameDataStore } from '@/store/useGameDataStore'
 import { useActiveViewStore } from '@/store/useActiveViewStore'
 import { useSaveBindingStore } from '@/store/useSaveBindingStore'
 import { useLiveProductionStore } from '@/store/useLiveProductionStore'
-import { groupCleanSlate, groupIncremental, applyAbsorbToResult, applyStandaloneToResult, applyBridgePlanToDraft, type AutoGroupResult, type GroupDraftInfo, getDistance } from '@/store/logic/autoGroup'
+import { groupCleanSlate, groupIncremental, applyAbsorbToResult, applyStandaloneToResult, applyBridgePlanToDraft, buildAssignmentResult, type AutoGroupResult, type GroupDraftInfo, getDistance } from '@/store/logic/autoGroup'
 import { buildSectorGraphFromMaps, getCoverageSectors, getPlayerStationsInSector } from '@/store/logic/saveBindingUtils'
 import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
 import { stabilizeHubColors, stabilizeEditedHubColor, type HubColorContext } from '@/store/logic/hubColor'
@@ -303,6 +303,34 @@ function handleExitEdit() {
   calculationMode.value = 'result'
 }
 
+function rebuildAssignmentsFromGroups() {
+  const result = autoGroupResult.value
+  if (!result) return
+  const { sectorGraph, sectorClusterMap } = sectorGraphInfo.value
+
+  const assignedSectors = new Map<string, string>()
+  for (const group of result.groups) {
+    if (group.sectorMacro) assignedSectors.set(group.sectorMacro, group.id)
+    for (const macro of group.coverageSectorMacros) {
+      if (!assignedSectors.has(macro)) assignedSectors.set(macro, group.id)
+    }
+  }
+
+  const unassigned = result.playerSectorMacros.filter((m) => !assignedSectors.has(m))
+  const newAssignments = buildAssignmentResult(unassigned, assignedSectors, result.groups, sectorGraph, sectorClusterMap)
+
+  const prevSelected = new Map(result.assignments.map((a) => [a.sectorMacro, a.selectedOptionIndex]))
+  for (const a of newAssignments) {
+    const prev = prevSelected.get(a.sectorMacro)
+    if (prev !== undefined && prev !== null && prev < a.options.length) {
+      a.selectedOptionIndex = prev
+      a.displayBucket = 'resolved'
+    }
+  }
+
+  autoGroupResult.value = { ...result, assignments: newAssignments }
+}
+
 function handleUpdateBridgeSearchJumpRange(range: number) {
   bridgeSearchJumpRange.value = Math.max(range, prefJumpRange.value)
 }
@@ -334,6 +362,7 @@ function handleCycleRecalcState(groupId: string) {
   if (group.enteredOtherGroupCoverage) return
   groups[idx] = { ...group, isPinned: !group.isPinned }
   autoGroupResult.value = { ...result, groups, assignments: result.assignments }
+  rebuildAssignmentsFromGroups()
 }
 
 function handleUpdateJumpRange(groupId: string, range: number) {
@@ -393,6 +422,7 @@ function handleUpdateJumpRange(groupId: string, range: number) {
   }
 
   autoGroupResult.value = { ...result, groups, assignments: result.assignments }
+  rebuildAssignmentsFromGroups()
 }
 
 
@@ -410,6 +440,7 @@ function handleToggleCoverageInput(groupId: string, sectorMacro: string) {
     coverageSectorMacros: group.coverageSectorMacros.filter((m) => m !== sectorMacro)
   }
   autoGroupResult.value = { ...result, groups, assignments: result.assignments }
+  rebuildAssignmentsFromGroups()
 }
 
 function handleToggleConnectedInput(groupId: string, connectedGroupId: string) {
@@ -442,6 +473,7 @@ function handleToggleConnectedInput(groupId: string, connectedGroupId: string) {
     }
   }
   autoGroupResult.value = { ...result, groups, assignments: result.assignments }
+  rebuildAssignmentsFromGroups()
 }
 
 function handleAddCandidateCoverage(groupId: string, sectorMacro: string) {
@@ -490,6 +522,7 @@ function handleAddCandidateCoverage(groupId: string, sectorMacro: string) {
   // Stabilize color for the affected group after coverage change
   stabilizeEditedHubColor(groups[idx]!, groups, buildHubColorContext())
   autoGroupResult.value = { ...result, groups, assignments: result.assignments }
+  rebuildAssignmentsFromGroups()
 }
 
 function handleDeleteGroup(groupId: string) {
@@ -526,6 +559,7 @@ function handleDeleteGroup(groupId: string) {
   }
 
   autoGroupResult.value = { ...result, groups, assignments: result.assignments }
+  rebuildAssignmentsFromGroups()
 }
 
 function handleSelectBridgeCenter(planId: string, unitId: string, sectorMacro: string) {
@@ -629,6 +663,7 @@ function handleAddHubDraft(sectorMacro: string) {
   groups.push(newGroup)
   stabilizeEditedHubColor(newGroup, groups, buildHubColorContext())
   autoGroupResult.value = { ...result, groups, assignments: result.assignments }
+  rebuildAssignmentsFromGroups()
 }
 
 function getExistingAnchorSectors(): Set<string> {
@@ -649,6 +684,7 @@ function handleToggleRetainCoverage(groupId: string) {
   if (idx < 0) return
   groups[idx] = { ...groups[idx]!, coverageRetainEnabled: !groups[idx]!.coverageRetainEnabled }
   autoGroupResult.value = { ...result, groups, assignments: result.assignments }
+  rebuildAssignmentsFromGroups()
 }
 
 function handleColorChange(groupId: string, color: string | undefined) {
@@ -659,6 +695,7 @@ function handleColorChange(groupId: string, color: string | undefined) {
   if (idx < 0) return
   groups[idx] = { ...groups[idx]!, color }
   autoGroupResult.value = { ...result, groups, assignments: result.assignments }
+  rebuildAssignmentsFromGroups()
 }
 
 function handleToggleRetainConnection(groupId: string) {
@@ -670,6 +707,7 @@ function handleToggleRetainConnection(groupId: string) {
   if (idx < 0) return
   groups[idx] = { ...groups[idx]!, connectionRetainEnabled: !groups[idx]!.connectionRetainEnabled }
   autoGroupResult.value = { ...result, groups, assignments: result.assignments }
+  rebuildAssignmentsFromGroups()
 }
 
 function handleMasterBridgeRetain(enabled: boolean) {
@@ -678,6 +716,7 @@ function handleMasterBridgeRetain(enabled: boolean) {
   const result = autoGroupResult.value
   const groups = result.groups.map((g) => ({ ...g, connectionRetainEnabled: enabled }))
   autoGroupResult.value = { ...result, groups, assignments: result.assignments }
+  rebuildAssignmentsFromGroups()
 }
 
 function handleMasterCoverageRetain(enabled: boolean) {
@@ -686,6 +725,7 @@ function handleMasterCoverageRetain(enabled: boolean) {
   const result = autoGroupResult.value
   const groups = result.groups.map((g) => ({ ...g, coverageRetainEnabled: enabled }))
   autoGroupResult.value = { ...result, groups, assignments: result.assignments }
+  rebuildAssignmentsFromGroups()
 }
 
 function canReorderGroups(): boolean {
@@ -841,6 +881,7 @@ function handleSelectTradeStation(groupId: string, selection: TradeStationSelect
   if (idx < 0) return
   groups[idx] = { ...groups[idx]!, selectedTradeStation: selection }
   autoGroupResult.value = { ...result, groups, assignments: result.assignments }
+  rebuildAssignmentsFromGroups()
 }
 
 function handleResetTradeStations() {
@@ -861,6 +902,7 @@ function handleResetTradeStations() {
     return { ...group, selectedTradeStation: undefined }
   })
   autoGroupResult.value = { ...result, groups, assignments: result.assignments }
+  rebuildAssignmentsFromGroups()
 }
 
 function handleMasterTradeStationRetain(enabled: boolean) {
@@ -869,6 +911,7 @@ function handleMasterTradeStationRetain(enabled: boolean) {
   const result = autoGroupResult.value
   const groups = result.groups.map((g) => ({ ...g, tradeStationRetainEnabled: enabled }))
   autoGroupResult.value = { ...result, groups, assignments: result.assignments }
+  rebuildAssignmentsFromGroups()
 }
 
 function handleToggleTradeStationRetain(groupId: string) {
@@ -879,6 +922,7 @@ function handleToggleTradeStationRetain(groupId: string) {
   if (idx < 0) return
   groups[idx] = { ...groups[idx]!, tradeStationRetainEnabled: !groups[idx]!.tradeStationRetainEnabled }
   autoGroupResult.value = { ...result, groups, assignments: result.assignments }
+  rebuildAssignmentsFromGroups()
 }
 
 function handleReorderGroups(nextGroups: GroupDraftInfo[]) {
@@ -894,6 +938,7 @@ function handleReorderGroups(nextGroups: GroupDraftInfo[]) {
 
   const groups = nextIds.map((id) => currentById.get(id)!)
   autoGroupResult.value = { ...result, groups, assignments: result.assignments }
+  rebuildAssignmentsFromGroups()
 }
 
 function handleConfirm() {
