@@ -117,6 +117,10 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   const prefJumpRange = ref(DEFAULT_JUMP_RANGE)
   const bridgeSearchJumpRange = ref(DEFAULT_BRIDGE_SEARCH_JUMP_RANGE)
   const prefThreshold = ref(DEFAULT_HUB_CONFIG.containerThreshold)
+  const calcBaselinePillState = ref<{
+    coverageByGroupId: Record<string, string[]>
+    connectedGroupIdsByGroupId: Record<string, string[]>
+  } | null>(null)
 
   const needsAutoGroupRecalc = computed(() => {
     const archive = selectedArchive.value
@@ -150,7 +154,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
             ? { type: 'player' as const, stationCode: g.tradeStation.saveStationCode }
             : { type: 'virtual' as const, stationCode: '__virtual__' })
         : { type: 'virtual' as const, stationCode: '__virtual__' },
-      color: g.color
+      color: g.color,
+      baseline: true
     }))
 
     const playerSectorMacros = getPlayerSectorMacrosFromSelectedArchive()
@@ -287,6 +292,14 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       containerThreshold: prefThreshold.value,
       prefJumpRange: prefJumpRange.value
     }, sectorGraph, sectorClusterMap)
+    calcBaselinePillState.value = {
+      coverageByGroupId: Object.fromEntries(
+        autoGroupResult.value.groups.map((g) => [g.id, [...g.coverageSectorMacros]])
+      ),
+      connectedGroupIdsByGroupId: Object.fromEntries(
+        autoGroupResult.value.groups.map((g) => [g.id, [...g.connectedGroupIds]])
+      )
+    }
     calculationMode.value = 'result'
   }
 
@@ -2265,6 +2278,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     prefJumpRange,
     bridgeSearchJumpRange,
     prefThreshold,
+    calcBaselinePillState,
     needsAutoGroupRecalc,
     initAutoGroupDraft,
     buildAssignmentsFromBinding,

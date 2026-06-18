@@ -228,6 +228,19 @@ result 模式按钮：未决计数 + [重置] [提交] [计算] [编辑]
 | sector 加回覆盖 | 该 sector 新增对应 absorb 选项 |
 | 修改跳数 | 覆盖星区变化 → 涉及 sector 的选项增减（选中项不在了则变空） |
 
+**Baseline 统一语义**：
+
+Baseline = `initAutoGroupDraft()` 完成时的持久化状态快照（hub + 覆盖 + 连接），生成后不再改变。
+
+| 来源 | baseline |
+|------|----------|
+| binding 中已有 group（`buildAssignmentsFromBinding` / `buildStoreGroups`） | `true` |
+| 算法生成新 hub（`groupCleanSlate` / `groupIncremental`） | `false` |
+| bridge 产生新 hub（`applyBridgePlanToDraft`） | `false` |
+| 用户手动添加的 hub（`handleAddHubDraft`） | `false` |
+
+`calcBaselinePillState` 在 `initAutoGroupDraft()` 时写入，存储初始覆盖和连接用作 UI 的加粗基线展示。后续 `runCalculationFromEditInput` 不再重写基线。
+
 **Map 模式**：
 
 Map 进入 binding 阶段直接读取 `liveStore.autoGroupResult` 渲染，不通过 `liveMode` 切换。`gameGuid` watcher 不需要调用额外初始化方法（store 已在上下文切换时自动初始化）。

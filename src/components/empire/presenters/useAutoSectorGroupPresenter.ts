@@ -21,7 +21,7 @@ const gameDataStore = useGameDataStore()
 const activeViewStore = useActiveViewStore()
 const saveBindingStore = useSaveBindingStore()
 const liveStore = useLiveProductionStore()
-const { autoGroupResult, calculationMode, prefJumpRange, bridgeSearchJumpRange, prefThreshold, needsAutoGroupRecalc } = storeToRefs(liveStore)
+const { autoGroupResult, calculationMode, prefJumpRange, bridgeSearchJumpRange, prefThreshold, needsAutoGroupRecalc, calcBaselinePillState } = storeToRefs(liveStore)
 const { t, te } = useI18n()
 const nodeEnabled = ref(true)
 const liveMode = ref<'display' | 'calculate'>('display')
@@ -53,11 +53,6 @@ const coverageRetainEnabled = ref(true)
 const tradeStationRetainEnabled = ref(false)
 const showHubAddMenu = ref(false)
 const postBridgeBaseline = ref<AutoGroupResult | null>(null)
-
-const calcBaselinePillState = ref<{
-  coverageByGroupId: Record<string, string[]>
-  connectedGroupIdsByGroupId: Record<string, string[]>
-} | null>(null)
 
 const gameDataMaps = computed(() => gameDataStore.maps)
 
@@ -134,7 +129,8 @@ function buildStoreGroups(groups: BindingSectorGroup[], playerSectorMacros: stri
           ? { type: 'player' as const, stationCode: g.tradeStation.saveStationCode }
           : { type: 'virtual' as const, stationCode: '__virtual__' })
       : undefined,
-    color: g.color
+    color: g.color,
+    baseline: true
   }))
   return { groups: storeGroups, assignments: [], bridgePlans: [], playerSectorMacros }
 }
@@ -163,7 +159,6 @@ function runAutoGroup() {
       { containerThreshold: prefThreshold.value }, prefJumpRange.value, bridgeSearchJumpRange.value
     )
     if (result.assignments.length === 0) {
-      calcBaselinePillState.value = null
       setAutoGroupResult(buildStoreGroups(binding.groups, result.playerSectorMacros))
       setResultModeDefaults()
       return
@@ -221,15 +216,6 @@ function runCalculationFromEditInput() {
   const recalculateInput = buildRecalculateBaseGroups()
   if (!archive || !archive.isValid || !guid) return
 
-  // Capture E2 baseline from submitted data (respects retain toggles)
-  const preCalcBaseline = recalculateInput
-    ? recalculateInput.baseGroups.map((bg) => ({
-        id: bg.id,
-        connectedGroupIds: [...(bg.connectedGroupIds || [])],
-        coverageSectorMacros: bg.coverageSectorMacros.map((c) => c.ref)
-      }))
-    : []
-
   // Capture user-edited state from current edit draft (by anchor sector)
   const currentDraft = autoGroupResult.value
   const excludedCoverageByAnchor: Record<string, string[]> = {}
@@ -246,15 +232,9 @@ function runCalculationFromEditInput() {
     const excludedSectorMacros = recalculateInput?.excludedSectorMacros ?? []
     const { sectorGraph, sectorClusterMap } = sectorGraphInfo.value
     result = groupCleanSlate(
-      archive,
-      gameDataStore.modulesByMacroId,
-      sectorGraph,
-      sectorClusterMap,
-      { containerThreshold: prefThreshold.value },
-      prefJumpRange.value,
-      bridgeSearchJumpRange.value,
-      excludedSectorMacros,
-      nodeEnabled.value
+      archive, gameDataStore.modulesByMacroId, sectorGraph, sectorClusterMap,
+      { containerThreshold: prefThreshold.value }, prefJumpRange.value, bridgeSearchJumpRange.value,
+      excludedSectorMacros, nodeEnabled.value
     )
     result = {
       ...result,
@@ -266,16 +246,10 @@ function runCalculationFromEditInput() {
   } else {
     const { sectorGraph, sectorClusterMap } = sectorGraphInfo.value
     result = groupIncremental(
-      archive,
-      recalculateInput.baseGroups,
-      gameDataStore.modulesByMacroId,
-      sectorGraph,
-      sectorClusterMap,
-      { containerThreshold: prefThreshold.value },
-      prefJumpRange.value,
-      bridgeSearchJumpRange.value,
-      recalculateInput.excludedSectorMacros,
-      nodeEnabled.value
+      archive, recalculateInput.baseGroups, gameDataStore.modulesByMacroId,
+      sectorGraph, sectorClusterMap,
+      { containerThreshold: prefThreshold.value }, prefJumpRange.value, bridgeSearchJumpRange.value,
+      recalculateInput.excludedSectorMacros, nodeEnabled.value
     )
     result = {
       ...result,
@@ -291,14 +265,9 @@ function runCalculationFromEditInput() {
     if (!group.sectorMacro) return group
     const covExcluded = excludedCoverageByAnchor[group.sectorMacro] ?? []
     if (covExcluded.length === 0) return group
-    return {
-      ...group,
-      excludedDefaultAssignmentSectorMacros: covExcluded
-    }
+    return { ...group, excludedDefaultAssignmentSectorMacros: covExcluded }
   })
 
-  // Inject E2 baseline markers into result groups
-  const preCalcIdSet = new Set(preCalcBaseline.map((pc) => pc.id))
   // Preserve trade station retain info from previous groups (matched by ID)
   const prevTradeStationByGroupId: Record<string, { savedTradeStationCode?: string; tradeStationRetainEnabled?: boolean }> = {}
   if (currentDraft) {
@@ -309,27 +278,13 @@ function runCalculationFromEditInput() {
       }
     }
   }
-  const groupsWithBaseline = restoredGroups.map((g) => ({
+  const groupsWithPrevTrade = restoredGroups.map((g) => ({
     ...g,
-    baseline: preCalcIdSet.has(g.id),
-    isPinned: true,
     ...prevTradeStationByGroupId[g.id]
   }))
 
-  // Stabilize hub colors
-  stabilizeHubColors(groupsWithBaseline, buildHubColorContext())
-
-  // Save E2 baseline pill data for result-mode display
-  calcBaselinePillState.value = {
-    coverageByGroupId: Object.fromEntries(
-      preCalcBaseline.map((pc) => [pc.id, pc.coverageSectorMacros])
-    ),
-    connectedGroupIdsByGroupId: Object.fromEntries(
-      preCalcBaseline.map((pc) => [pc.id, pc.connectedGroupIds])
-    )
-  }
-
-  setAutoGroupResult({ ...result, groups: groupsWithBaseline })
+  stabilizeHubColors(groupsWithPrevTrade, buildHubColorContext())
+  setAutoGroupResult({ ...result, groups: groupsWithPrevTrade })
   calculationMode.value = 'result'
 }
 
@@ -982,7 +937,6 @@ function handleConfirm() {
   saveBindingStore.saveBinding()
   liveStore.syncAllBindingStationsToStateMap()
   liveStore.syncLiveFlowMap()
-  calcBaselinePillState.value = null
 }
 
 function triggerAutoGroup() {
@@ -997,7 +951,6 @@ function triggerAutoGroup() {
   } else {
     setAutoGroupResult(null)
   }
-  calcBaselinePillState.value = null
   calculationMode.value = 'result'
 }
 
