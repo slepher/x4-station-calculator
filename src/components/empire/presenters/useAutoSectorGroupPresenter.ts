@@ -1114,6 +1114,8 @@ watch(autoGroupResult, (result) => {
   }
 })
 
+watch(activeBinding, () => { baselineInitialized = false })
+
 const bridgeRetainIndeterminate = computed(() => {
   if (!autoGroupResult.value) return false
   const groups = autoGroupResult.value.groups
