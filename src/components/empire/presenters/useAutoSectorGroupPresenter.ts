@@ -1105,6 +1105,15 @@ const canDisableNode = computed(() => {
   return autoGroupResult.value.groups.some((g) => g.isPinned || g.baseline)
 })
 
+let baselineInitialized = false
+watch(autoGroupResult, (result) => {
+  if (baselineInitialized) return
+  if (result && result.groups.length > 0) {
+    calculationBaseline.value = cloneAutoGroupResult(result)
+    baselineInitialized = true
+  }
+})
+
 const bridgeRetainIndeterminate = computed(() => {
   if (!autoGroupResult.value) return false
   const groups = autoGroupResult.value.groups
