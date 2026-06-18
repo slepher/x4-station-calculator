@@ -336,7 +336,6 @@ function handleUpdateBridgeSearchJumpRange(range: number) {
 }
 
 function handleSelectOption(sectorMacro: string, optionIndex: number) {
-  if (calculationMode.value === 'edit') return
   if (!autoGroupResult.value) return
   const assignment = autoGroupResult.value.assignments.find((a) => a.sectorMacro === sectorMacro)
   if (!assignment) return
