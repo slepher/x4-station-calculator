@@ -337,13 +337,13 @@ function onAnchorPillClick(macro: string) {
         </button>
       </div>
       <div class="group-actions">
-        <label v-if="props.editable" class="retain-chk" :title="t('sector.coverage_retain')">
-          <input type="checkbox" class="bar-checkbox" :checked="group.coverageRetainEnabled" :disabled="!group.isPinned" @change="emit('toggle-retain-coverage', group.id)" />
-          <span class="retain-label">{{ t('sector.group_coverage_jump_short') }}</span>
-        </label>
         <label v-if="props.editable" class="retain-chk" :title="t('sector.bridge_retain')">
           <input type="checkbox" class="bar-checkbox" :checked="group.connectionRetainEnabled" :disabled="!group.isPinned" @change="emit('toggle-retain-connection', group.id)" />
           <span class="retain-label">{{ t('sector.connected') }}</span>
+        </label>
+        <label v-if="props.editable" class="retain-chk" :title="t('sector.coverage_retain')">
+          <input type="checkbox" class="bar-checkbox" :checked="group.coverageRetainEnabled" :disabled="!group.isPinned" @change="emit('toggle-retain-coverage', group.id)" />
+          <span class="retain-label">{{ t('sector.group_coverage_jump_short') }}</span>
         </label>
         <label v-if="props.editable" class="retain-chk" :title="t('sector.trade_station_retain')">
           <input type="checkbox" class="bar-checkbox" :checked="!!group.tradeStationRetainEnabled" :disabled="!group.isPinned" @change="emitToggleTradeStationRetain(group.id)" />
