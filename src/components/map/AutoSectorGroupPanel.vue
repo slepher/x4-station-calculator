@@ -32,11 +32,11 @@ const {
   prefJumpRange, bridgeSearchJumpRange, prefThreshold, nodeEnabled,
   bridgeRetainEnabled, coverageRetainEnabled, tradeStationRetainEnabled,
   showHubAddMenu, autoGroupResult, canDragGroups,
-  calculationMode, editSnapshot, calcBaselinePillState,
+  calculationMode, calcBaselinePillState,
   gameDataMaps, sectorGraphInfo,
   tradeStationCandidates, selectedTradeStations, tradeStationCaps,
   unresolvedAllocationGroups, unresolvedTradeStationGroups,
-  runCalculationFromEditInput, handleEnterEdit, handleCancelEdit,
+  runCalculationFromEditInput, handleEnterEdit, handleExitEdit,
   handleUpdatePrefJumpRange, handleUpdateBridgeSearchJumpRange,
   handleSelectOption, handleCycleRecalcState, handleUpdateJumpRange,
   handleToggleCoverageInput, handleToggleConnectedInput,
@@ -72,8 +72,8 @@ watch(() => props.gameGuid, async (guid) => {
 
 const activeTab = ref<'hub' | 'allocation' | 'tradeStation'>('hub')
 const isEditMode = () => calculationMode.value === 'edit'
-const canSwitchToAllocation = () => !isEditMode()
-const canSwitchToTradeStation = () => !isEditMode()
+const canSwitchToAllocation = () => true
+const canSwitchToTradeStation = () => true
 
 function onCalculate() { runCalculationFromEditInput(); switchToFirstUnresolvedTab() }
 function onQuickCalc() { handleQuickCalculate(); switchToFirstUnresolvedTab() }
@@ -140,7 +140,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
               @update:coverage-retain-enabled="handleMasterCoverageRetain"
               @update:trade-station-retain-enabled="handleMasterTradeStationRetain"
               @edit="handleEnterEdit"
-              @cancel="handleCancelEdit"
+              @exit="handleExitEdit"
               @add-hub="handleAddHubClick"
             />
             <HubAddMenu mode="overlay" :open="showHubAddMenu" :player-sector-macros="autoGroupResult?.playerSectorMacros ?? []" :occupied-sector-macros="[...getExistingAnchorSectors()]"
@@ -150,8 +150,8 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
               :maps="gameDataMaps" :sector-graph="sectorGraphInfo.sectorGraph" :sector-cluster-map="sectorGraphInfo.sectorClusterMap"
               :player-sector-macros="autoGroupResult?.playerSectorMacros ?? []"
               :editable="calculationMode === 'edit'" :diff-enabled="calculationMode === 'edit'"
-              :baseline-coverage-by-group-id="calculationMode === 'edit' ? editSnapshot?.coverageByGroupId : calcBaselinePillState?.coverageByGroupId"
-              :baseline-connected-group-ids-by-group-id="calculationMode === 'edit' ? editSnapshot?.connectedGroupIdsByGroupId : calcBaselinePillState?.connectedGroupIdsByGroupId"
+              :baseline-coverage-by-group-id="calcBaselinePillState?.coverageByGroupId"
+              :baseline-connected-group-ids-by-group-id="calcBaselinePillState?.connectedGroupIdsByGroupId"
               :draggable="canDragGroups" view="live" :trade-station-caps="tradeStationCaps"
               @cycle-recalc-state="handleCycleRecalcState" @update-jump-range="handleUpdateJumpRange"
               @toggle-coverage-input="handleToggleCoverageInput" @toggle-connected-input="handleToggleConnectedInput"
@@ -161,8 +161,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
               @color-change="handleColorChange" @focus-sector="emit('focus-sector', $event)"
             />
           </div>
-          <div class="column column-allocation" :class="{ 'edit-overlay-wrapper': calculationMode === 'edit' }">
-            <div v-if="calculationMode === 'edit'" class="edit-overlay">{{ t('auto_sector.edit_overlay_hint') }}</div>
+          <div class="column column-allocation">
             <SectorAllocationList :assignments="autoGroupResult?.assignments ?? []" :bridge-plans="autoGroupResult?.bridgePlans ?? []"
               :groups="autoGroupResult?.groups ?? []" :maps="gameDataMaps" :station-counts="stationCounts" :disabled="calculationMode === 'edit'"
               @select-option="handleSelectOption" @select-bridge-plan="handleSelectBridgePlan" @select-bridge-center="handleSelectBridgeCenter" @focus-sector="emit('focus-sector', $event)"
@@ -223,7 +222,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
               @update:coverage-retain-enabled="handleMasterCoverageRetain"
               @update:trade-station-retain-enabled="handleMasterTradeStationRetain"
               @edit="handleEnterEdit"
-              @cancel="handleCancelEdit"
+              @exit="handleExitEdit"
               @add-hub="handleAddHubClick"
             />
             <HubAddMenu :open="showHubAddMenu" :player-sector-macros="autoGroupResult?.playerSectorMacros ?? []" :occupied-sector-macros="[...getExistingAnchorSectors()]"
@@ -233,8 +232,8 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
               :maps="gameDataMaps" :sector-graph="sectorGraphInfo.sectorGraph" :sector-cluster-map="sectorGraphInfo.sectorClusterMap"
               :player-sector-macros="autoGroupResult?.playerSectorMacros ?? []"
               :editable="calculationMode === 'edit'" :diff-enabled="calculationMode === 'edit'"
-              :baseline-coverage-by-group-id="calculationMode === 'edit' ? editSnapshot?.coverageByGroupId : calcBaselinePillState?.coverageByGroupId"
-              :baseline-connected-group-ids-by-group-id="calculationMode === 'edit' ? editSnapshot?.connectedGroupIdsByGroupId : calcBaselinePillState?.connectedGroupIdsByGroupId"
+              :baseline-coverage-by-group-id="calcBaselinePillState?.coverageByGroupId"
+              :baseline-connected-group-ids-by-group-id="calcBaselinePillState?.connectedGroupIdsByGroupId"
               view="map" :draggable="canDragGroups" :trade-station-caps="tradeStationCaps"
               @cycle-recalc-state="handleCycleRecalcState" @update-jump-range="handleUpdateJumpRange"
               @toggle-coverage-input="handleToggleCoverageInput" @toggle-connected-input="handleToggleConnectedInput"

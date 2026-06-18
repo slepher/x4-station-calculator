@@ -212,10 +212,21 @@ result 模式按钮：未决计数 + [重置] [提交] [计算] [编辑]
 
 **搜索结果去重**：搜索从 `filteredSearchAllSectors` 取数，排除已在 "存档星区候选" 中的 sector。
 
-编辑输入态（`calculationMode === 'edit'`）：
-- Col 1（星区列表/hub 管理）正常可用
-- Col 2（分配面板）加半透明遮罩，提示「编辑输入中，分配面板暂不可操作」
-- Col 3（交易站）不受影响，保持可操作
+编辑模式（`calculationMode === 'edit'`）：
+- 编辑内容实时修改当前 draft，不保留 snapshot
+- "取消"→"退出"，仅退出编辑模式，不做状态恢复
+- Col 2（分配栏）不再禁用/遮罩，正常显示当前草稿状态
+- 编辑操作立即反应到 draft
+
+编辑操作联动：
+
+| 操作 | 分配栏变化 |
+|------|-----------|
+| 添加新 hub | 该 sector 从分配列表移除；其他 sector 新增该 hub 候选 |
+| 移除 hub | 该 sector 回到分配列表；其他 sector 移除该 hub 候选（若选中则变空） |
+| sector 移出覆盖 | 该 sector 移除对应 absorb 选项（若选中则变空） |
+| sector 加回覆盖 | 该 sector 新增对应 absorb 选项 |
+| 修改跳数 | 覆盖星区变化 → 涉及 sector 的选项增减（选中项不在了则变空） |
 
 **Map 模式**：
 

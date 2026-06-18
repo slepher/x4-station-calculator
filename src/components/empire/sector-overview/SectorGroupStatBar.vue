@@ -25,7 +25,7 @@ const emit = defineEmits<{
   (e: 'update:coverageRetainEnabled', value: boolean): void
   (e: 'update:tradeStationRetainEnabled', value: boolean): void
   (e: 'edit'): void
-  (e: 'cancel'): void
+  (e: 'exit'): void
   (e: 'add-hub'): void
 }>()
 
@@ -67,7 +67,7 @@ function onTradeStationRetainChange(e: Event) {
       </div>
       <div class="stat-bar-right">
         <template v-if="mode === 'edit'">
-          <button class="bar-btn cancel-btn" @click="emit('cancel')">{{ t('sector.cancel') }}</button>
+          <button class="bar-btn cancel-btn" @click="emit('exit')">{{ t('sector.exit') }}</button>
           <button class="bar-btn add-btn" @click="emit('add-hub')">{{ showAddHub ? t('sector.cancel_add_hub') : t('sector.add_hub') }}</button>
         </template>
         <template v-else>

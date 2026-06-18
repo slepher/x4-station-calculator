@@ -135,6 +135,7 @@
     "detail": "Detail",
     "map": "Map",
     "cancel": "Cancel",
+    "exit": "Exit",
     "reset": "Reset",
     "unresolved": "Pending",
     "no_groups": "No sector groups",

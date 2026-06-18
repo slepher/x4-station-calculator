@@ -53,18 +53,6 @@ const coverageRetainEnabled = ref(true)
 const tradeStationRetainEnabled = ref(false)
 const showHubAddMenu = ref(false)
 const postBridgeBaseline = ref<AutoGroupResult | null>(null)
-const editSnapshot = ref<{
-  result: AutoGroupResult | null
-  prefJumpRange: number
-  bridgeSearchJumpRange: number
-  prefThreshold: number
-  bridgeRetainEnabled: boolean
-  coverageRetainEnabled: boolean
-  tradeStationRetainEnabled: boolean
-  nodeEnabled: boolean
-  coverageByGroupId: Record<string, string[]>
-  connectedGroupIdsByGroupId: Record<string, string[]>
-} | null>(null)
 
 const calcBaselinePillState = ref<{
   coverageByGroupId: Record<string, string[]>
@@ -343,66 +331,6 @@ function runCalculationFromEditInput() {
 
   setAutoGroupResult({ ...result, groups: groupsWithBaseline })
   calculationMode.value = 'result'
-  editSnapshot.value = null
-}
-
-function handleEnterEdit() {
-  const result = autoGroupResult.value
-  editSnapshot.value = {
-    result: result ? cloneAutoGroupResult(result) : null,
-    prefJumpRange: prefJumpRange.value,
-    bridgeSearchJumpRange: bridgeSearchJumpRange.value,
-    prefThreshold: prefThreshold.value,
-    bridgeRetainEnabled: bridgeRetainEnabled.value,
-    coverageRetainEnabled: coverageRetainEnabled.value,
-    tradeStationRetainEnabled: tradeStationRetainEnabled.value,
-    nodeEnabled: nodeEnabled.value,
-    coverageByGroupId: Object.fromEntries(
-      (result?.groups ?? []).map((g) => [g.id, [...g.coverageSectorMacros]])
-    ),
-    connectedGroupIdsByGroupId: Object.fromEntries(
-      (result?.groups ?? []).map((g) => [g.id, [...g.connectedGroupIds]])
-    )
-  }
-  handleMasterBridgeRetain(bridgeRetainEnabled.value)
-  handleMasterCoverageRetain(coverageRetainEnabled.value)
-  if (result) {
-    const groupsWithBaseline = result.groups.map((g) => ({ ...g, baseline: true, isPinned: true }))
-    autoGroupResult.value = { ...result, groups: groupsWithBaseline }
-  }
-  // Reset retain to defaults
-  calculationMode.value = 'edit'
-}
-
-function handleCancelEdit() {
-  if (!editSnapshot.value) {
-    calculationMode.value = 'result'
-    return
-  }
-  prefJumpRange.value = editSnapshot.value.prefJumpRange
-  bridgeSearchJumpRange.value = editSnapshot.value.bridgeSearchJumpRange
-  prefThreshold.value = editSnapshot.value.prefThreshold
-  nodeEnabled.value = editSnapshot.value.nodeEnabled ?? true
-  bridgeRetainEnabled.value = editSnapshot.value.bridgeRetainEnabled ?? true
-  coverageRetainEnabled.value = editSnapshot.value.coverageRetainEnabled ?? true
-  tradeStationRetainEnabled.value = editSnapshot.value.tradeStationRetainEnabled ?? false
-  syncRetainToGlobal()
-  setAutoGroupResult(editSnapshot.value.result ? cloneAutoGroupResult(editSnapshot.value.result) : null)
-  calculationMode.value = 'result'
-  editSnapshot.value = null
-}
-
-function syncRetainToGlobal() {
-  if (!autoGroupResult.value) return
-  const anyBridgeChecked = autoGroupResult.value.groups.some(g => g.connectionRetainEnabled)
-  const anyCoverageChecked = autoGroupResult.value.groups.some(g => g.coverageRetainEnabled)
-  const anyTradeStationChecked = autoGroupResult.value.groups.some(g => g.tradeStationRetainEnabled)
-  if (anyBridgeChecked) handleMasterBridgeRetain(true)
-  else handleMasterBridgeRetain(false)
-  if (anyCoverageChecked) handleMasterCoverageRetain(true)
-  else handleMasterCoverageRetain(false)
-  if (anyTradeStationChecked) handleMasterTradeStationRetain(true)
-  else handleMasterTradeStationRetain(false)
 }
 
 function handleUpdatePrefJumpRange(range: number) {
@@ -410,6 +338,14 @@ function handleUpdatePrefJumpRange(range: number) {
   if (bridgeSearchJumpRange.value < range) {
     bridgeSearchJumpRange.value = range
   }
+}
+
+function handleEnterEdit() {
+  calculationMode.value = 'edit'
+}
+
+function handleExitEdit() {
+  calculationMode.value = 'result'
 }
 
 function handleUpdateBridgeSearchJumpRange(range: number) {
@@ -1063,7 +999,6 @@ function triggerAutoGroup() {
   }
   calcBaselinePillState.value = null
   calculationMode.value = 'result'
-  editSnapshot.value = null
 }
 
 function handleUploadComplete() {
@@ -1174,7 +1109,6 @@ return {
     autoGroupResult,
     canDragGroups,
     calculationMode,
-    editSnapshot,
     calcBaselinePillState,
     gameDataMaps,
     sectorGraphInfo,
@@ -1182,7 +1116,7 @@ return {
     runAutoGroup,
   runCalculationFromEditInput,
   handleEnterEdit,
-  handleCancelEdit,
+  handleExitEdit,
   handleUpdatePrefJumpRange,
   handleUpdateBridgeSearchJumpRange,
   handleSelectOption,
