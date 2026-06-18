@@ -53,7 +53,7 @@ const {
   hasAutoResult, stationCounts, canDisableNode,
   bridgeRetainIndeterminate, coverageRetainIndeterminate,
   tradeStationRetainIndeterminate,
-  handleColorChange, sectorGroupColorMap, triggerAutoGroup,
+  handleColorChange, sectorGroupColorMap, triggerAutoGroup, handleReorderGroups,
 } = presenter
 
 provide('sectorGroupColorMap', sectorGroupColorMap)
@@ -157,6 +157,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
               @toggle-retain-coverage="handleToggleRetainCoverage" @toggle-retain-connection="handleToggleRetainConnection"
               @toggle-retain-trade-station="handleToggleTradeStationRetain"
               @color-change="handleColorChange" @focus-sector="emit('focus-sector', $event)"
+              @reorder="handleReorderGroups"/>
             />
           </div>
           <div class="column column-allocation">
@@ -238,6 +239,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
               @toggle-retain-coverage="handleToggleRetainCoverage" @toggle-retain-connection="handleToggleRetainConnection"
               @toggle-retain-trade-station="handleToggleTradeStationRetain"
               @color-change="handleColorChange" @focus-sector="emit('focus-sector', $event)"
+              @reorder="handleReorderGroups"/>
             />
           </div>
           <div v-show="activeTab === 'allocation'">

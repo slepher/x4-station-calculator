@@ -39,9 +39,9 @@ const emit = defineEmits<{
   (e: 'toggle-retain-trade-station', groupId: string): void
   (e: 'focus-sector', sectorMacro: string): void
   (e: 'select-group', sectorGroupId: string): void
+  (e: 'reorder', groups: GroupDraftInfo[]): void
   (e: 'color-change', groupId: string, color: string | undefined): void
 }>()
-
 const { t } = useI18n()
 
 const cardBase = computed(() => ({
@@ -93,6 +93,7 @@ function onColorChange(groupId: string, color: string | undefined) { emit('color
       :scroll-sensitivity="100"
       :scroll-speed="15"
       ghost-class="drag-placeholder"
+      @change="emit('reorder', groups)"
     >
       <template #item="{ element: group }">
         <SectorGroupCard
