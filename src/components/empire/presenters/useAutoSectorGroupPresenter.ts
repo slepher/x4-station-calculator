@@ -52,7 +52,7 @@ const bridgeRetainEnabled = ref(true)
 const coverageRetainEnabled = ref(true)
 const tradeStationRetainEnabled = ref(true)
 const showHubAddMenu = ref(false)
-const postBridgeBaseline = ref<AutoGroupResult | null>(null)
+const calculationBaseline = ref<AutoGroupResult | null>(null)
 
 const gameDataMaps = computed(() => gameDataStore.maps)
 
@@ -92,9 +92,7 @@ function hasPendingBridgeDecisionInResult(result: AutoGroupResult | null): boole
 
 function setAutoGroupResult(result: AutoGroupResult | null) {
   autoGroupResult.value = result
-  postBridgeBaseline.value = result && !hasPendingBridgeDecisionInResult(result)
-    ? cloneAutoGroupResult(result)
-    : null
+  calculationBaseline.value = result ? cloneAutoGroupResult(result) : null
   if (result && !calcBaselinePillState.value) {
     calcBaselinePillState.value = {
       coverageByGroupId: Object.fromEntries(
@@ -595,8 +593,8 @@ function handleSelectBridgePlan(planId: string) {
 
 function handleResetAssignments() {
   if (calculationMode.value === 'edit') return
-  if (!postBridgeBaseline.value) return
-  autoGroupResult.value = cloneAutoGroupResult(postBridgeBaseline.value)
+  if (!calculationBaseline.value) return
+  autoGroupResult.value = cloneAutoGroupResult(calculationBaseline.value)
 }
 
 function handleAddHubClick() {
@@ -930,13 +928,24 @@ function handleReorderGroups(nextGroups: GroupDraftInfo[]) {
   autoGroupResult.value = { ...result, groups, assignments: result.assignments }
 }
 
+const showConfirmPopup = ref(false)
+
 function handleConfirm() {
   if (calculationMode.value === 'edit') return
   if (!autoGroupResult.value) return
-  if (hasGlobalUnresolved.value) return
+  if (hasUnresolvedTradeStations.value) return
+  if (hasUncertainAssignments.value && !showConfirmPopup.value) {
+    showConfirmPopup.value = true
+    return
+  }
+  showConfirmPopup.value = false
+  doConfirm()
+}
+
+function doConfirm() {
   const guid = activeViewStore.activeBinding
   if (!guid) return
-  const result = autoGroupResult.value
+  const result = autoGroupResult.value!
   saveBindingStore.createAutoGroups(guid, result.groups, sectorGraphInfo.value.sectorGraph, sectorGraphInfo.value.sectorClusterMap, prefJumpRange.value, bridgeSearchJumpRange.value, prefThreshold.value)
   const activeBinding = saveBindingStore.activeBinding
   if (activeBinding) {
@@ -1035,6 +1044,12 @@ onMounted(async () => {
   const gameGuid = activeViewStore.activeBinding
   if (gameGuid) {
     await liveStore.activateBinding(gameGuid)
+  }
+})
+
+watch(autoGroupResult, (result) => {
+  if (result && result.groups.length > 0) {
+    calculationBaseline.value = cloneAutoGroupResult(result)
   }
 })
 
@@ -1160,6 +1175,7 @@ return {
   tradeStationCandidates,
   selectedTradeStations,
   hasUnresolvedTradeStations,
+  showConfirmPopup,
   unresolvedTradeStationGroups,
   unresolvedAllocationGroups,
   handleSelectTradeStation,

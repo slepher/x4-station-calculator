@@ -174,6 +174,7 @@
     "editing_input_overlay": "编辑输入中，分配面板暂不可操作",
     "entered_other_coverage": "已进入其他组覆盖范围，无法重新固定",
     "confirm": "确定",
+    "confirm_unresolved_hint": "部分星区未分配，确认将继续？",
     "allocation_unresolved": "星区分配未解决",
     "trade_station_unresolved": "空间站分配未解决",
     "trade_station_retain": "保留交易站",

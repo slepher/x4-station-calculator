@@ -49,7 +49,7 @@ const {
   handleMasterCoverageRetain, handleMasterTradeStationRetain,
   handleSelectTradeStation, handleConfirm, handleQuickCalculate,
   hasUncertainAssignments, hasPendingBridgeDecision,
-  hasGlobalUnresolved, hasUnresolvedTradeStations,
+  hasUnresolvedTradeStations, showConfirmPopup,
   hasAutoResult, stationCounts, canDisableNode,
   bridgeRetainIndeterminate, coverageRetainIndeterminate,
   tradeStationRetainIndeterminate,
@@ -110,7 +110,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
           :unresolved-allocation-count="unresolvedAllocationGroups.length"
           :unresolved-trade-station-count="unresolvedTradeStationGroups.length"
           :show-confirm="true"
-          :confirm-disabled="hasGlobalUnresolved"
+          :confirm-disabled="hasUnresolvedTradeStations"
           @update:pref-jump-range="handleUpdatePrefJumpRange"
           @update:bridge-search-jump-range="handleUpdateBridgeSearchJumpRange"
           @update:pref-threshold="prefThreshold = $event"
@@ -185,7 +185,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
           :unresolved-allocation-count="unresolvedAllocationGroups.length"
           :unresolved-trade-station-count="unresolvedTradeStationGroups.length"
           :show-confirm="calculationMode === 'result'"
-          :confirm-disabled="hasGlobalUnresolved"
+          :confirm-disabled="hasUnresolvedTradeStations"
           @update:pref-jump-range="handleUpdatePrefJumpRange"
           @update:bridge-search-jump-range="handleUpdateBridgeSearchJumpRange"
           @update:pref-threshold="prefThreshold = $event"
@@ -255,6 +255,15 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
           </div>
       </template>
     </template>
+    <div v-if="showConfirmPopup" class="confirm-popup-backdrop" @click.self="showConfirmPopup = false">
+      <div class="confirm-popup">
+        <div class="confirm-popup-text">{{ t('sector.confirm_unresolved_hint') }}</div>
+        <div class="confirm-popup-actions">
+          <button class="bar-btn reset-btn" @click="showConfirmPopup = false">{{ t('sector.cancel') }}</button>
+          <button class="bar-btn confirm-btn" @click="handleConfirm()">{{ t('sector.confirm') }}</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -278,5 +287,17 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
 .edit-overlay::after {
   content: '';
   @apply text-slate-300 text-sm font-medium;
+}
+.confirm-popup-backdrop {
+  @apply fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-sm;
+}
+.confirm-popup {
+  @apply bg-slate-800 border border-slate-600/60 rounded-lg p-6 shadow-2xl max-w-sm;
+}
+.confirm-popup-text {
+  @apply text-sm text-slate-300 mb-4;
+}
+.confirm-popup-actions {
+  @apply flex justify-end gap-2;
 }
 </style>

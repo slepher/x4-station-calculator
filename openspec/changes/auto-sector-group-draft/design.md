@@ -213,6 +213,15 @@ result 模式按钮：未决计数 + [重置] [提交] [计算] [编辑]
 **搜索结果去重**：搜索从 `filteredSearchAllSectors` 取数，排除已在 "存档星区候选" 中的 sector。
 
 编辑模式（`calculationMode === 'edit'`）：
+
+**重置**：`handleResetAssignments` 从 `calculationBaseline` 恢复（每次计算完成或确认后保存的快照）。
+
+**确认**：仅检查所有 hub 是否有交易站。sector 分配未完成时弹出二次确认 popup，用户确认后仍可提交。
+
+**`calculationBaseline` 保存时机**：
+- `initAutoGroupDraft()` 完成
+- `runCalculationFromEditInput()` 完成
+- `handleConfirm()` 完成
 - 编辑内容实时修改当前 draft，不保留 snapshot
 - "取消"→"退出"，仅退出编辑模式，不做状态恢复
 - Col 2（分配栏）不再禁用/遮罩，正常显示当前草稿状态
