@@ -85,6 +85,8 @@ const hasUnresolved = computed(() => (props.unresolvedAllocationCount ?? 0) + (p
         </div>
         <div class="bar-right">
           <template v-if="mode === 'edit'">
+            <button class="bar-btn reset-btn" @click="emit('reset')">{{ t('sector.reset') }}</button>
+            <button v-if="showConfirm" class="bar-btn confirm-btn" :disabled="confirmDisabled" @click="emit('confirm')">{{ t('sector.confirm') }}</button>
             <button class="bar-btn recalc-btn" @click="emit('calculate')">{{ t('sector.calculate') }}</button>
           </template>
           <template v-else>
@@ -132,6 +134,8 @@ const hasUnresolved = computed(() => (props.unresolvedAllocationCount ?? 0) + (p
       <div class="bar-row bar-row--map !justify-end">
         <div class="bar-right">
           <template v-if="mode === 'edit'">
+            <button class="bar-btn reset-btn" @click="emit('reset')">{{ t('sector.reset') }}</button>
+            <button v-if="showConfirm" class="bar-btn confirm-btn" :disabled="confirmDisabled" @click="emit('confirm')">{{ t('sector.confirm') }}</button>
             <button class="bar-btn recalc-btn" @click="emit('calculate')">{{ t('sector.calculate') }}</button>
           </template>
           <template v-else>
