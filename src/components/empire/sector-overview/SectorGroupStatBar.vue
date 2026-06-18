@@ -49,7 +49,7 @@ function onTradeStationRetainChange(e: Event) {
         <div class="param-field" :title="t('sector.bridge_retain')">
           <label class="bar-label-inline">
             <input type="checkbox" class="bar-checkbox" :checked="bridgeRetainEnabled" :indeterminate.prop="bridgeRetainIndeterminate" @change="onBridgeRetainChange" />
-            <span class="bar-label">{{ t('sector.bridge_search_jump_short') }}</span>
+            <span class="bar-label">{{ t('sector.connected') }}</span>
           </label>
         </div>
         <div class="param-field" :title="t('sector.coverage_retain')">
