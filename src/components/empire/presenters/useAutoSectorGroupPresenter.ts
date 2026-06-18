@@ -937,6 +937,17 @@ function handleConfirm() {
   saveBindingStore.saveBinding()
   liveStore.syncAllBindingStationsToStateMap()
   liveStore.syncLiveFlowMap()
+  // Update baseline to confirmed state
+  const confirmedGroups = result.groups.map((g) => ({ ...g, baseline: true }))
+  autoGroupResult.value = { ...result, groups: confirmedGroups }
+  liveStore.calcBaselinePillState = {
+    coverageByGroupId: Object.fromEntries(
+      confirmedGroups.map((g) => [g.id, [...g.coverageSectorMacros]])
+    ),
+    connectedGroupIdsByGroupId: Object.fromEntries(
+      confirmedGroups.map((g) => [g.id, [...g.connectedGroupIds]])
+    )
+  }
 }
 
 function triggerAutoGroup() {

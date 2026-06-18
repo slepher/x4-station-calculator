@@ -14,14 +14,14 @@ const props = withDefaults(defineProps<{
   unresolvedTradeStationCount?: number
   showConfirm?: boolean
   confirmDisabled?: boolean
-  needsRecalc?: boolean
 }>(), {
   view: 'live',
   unresolvedAllocationCount: 0,
   unresolvedTradeStationCount: 0,
   showConfirm: true,
   confirmDisabled: false,
-  needsRecalc: false
+  needsRecalc: false,
+  editDisabled: true
 })
 
 const emit = defineEmits<{
@@ -93,8 +93,7 @@ const hasUnresolved = computed(() => (props.unresolvedAllocationCount ?? 0) + (p
             </span>
             <button class="bar-btn reset-btn" @click="emit('reset')">{{ t('sector.reset') }}</button>
             <button v-if="showConfirm" class="bar-btn confirm-btn" :disabled="confirmDisabled" @click="emit('confirm')">{{ t('sector.confirm') }}</button>
-            <button class="bar-btn calc-btn" :class="{ 'calc-btn--needs-recalc': needsRecalc }" @click="emit('quick-calculate')">
-              <span v-if="needsRecalc" class="recalc-dot" />
+            <button class="bar-btn calc-btn" @click="emit('quick-calculate')">
               {{ t('sector.calculate') }}
             </button>
           </template>
@@ -139,8 +138,7 @@ const hasUnresolved = computed(() => (props.unresolvedAllocationCount ?? 0) + (p
             <span v-if="hasUnresolved" class="bar-unresolved">{{ unresolvedAllocationCount }}{{ unresolvedTradeStationCount ? '+' + unresolvedTradeStationCount : '' }}</span>
             <button class="bar-btn reset-btn" @click="emit('reset')">{{ t('sector.reset') }}</button>
             <button class="bar-btn confirm-btn" :disabled="confirmDisabled" @click="emit('confirm')">{{ t('sector.confirm') }}</button>
-            <button class="bar-btn calc-btn" :class="{ 'calc-btn--needs-recalc': needsRecalc }" @click="emit('quick-calculate')">
-              <span v-if="needsRecalc" class="recalc-dot" />
+            <button class="bar-btn calc-btn" @click="emit('quick-calculate')">
               {{ t('sector.calculate') }}
             </button>
           </template>

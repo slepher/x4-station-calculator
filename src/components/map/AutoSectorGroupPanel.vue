@@ -53,7 +53,7 @@ const {
   hasAutoResult, stationCounts, canDisableNode,
   bridgeRetainIndeterminate, coverageRetainIndeterminate,
   tradeStationRetainIndeterminate,
-  handleColorChange, sectorGroupColorMap, triggerAutoGroup, needsAutoGroupRecalc,
+  handleColorChange, sectorGroupColorMap, triggerAutoGroup,
 } = presenter
 
 provide('sectorGroupColorMap', sectorGroupColorMap)
@@ -111,7 +111,6 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
           :unresolved-trade-station-count="unresolvedTradeStationGroups.length"
           :show-confirm="true"
           :confirm-disabled="hasGlobalUnresolved"
-          :needs-recalc="needsAutoGroupRecalc"
           @update:pref-jump-range="handleUpdatePrefJumpRange"
           @update:bridge-search-jump-range="handleUpdateBridgeSearchJumpRange"
           @update:pref-threshold="prefThreshold = $event"
@@ -186,7 +185,6 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
           :unresolved-trade-station-count="unresolvedTradeStationGroups.length"
           :show-confirm="calculationMode === 'result'"
           :confirm-disabled="hasGlobalUnresolved"
-          :needs-recalc="needsAutoGroupRecalc"
           @update:pref-jump-range="handleUpdatePrefJumpRange"
           @update:bridge-search-jump-range="handleUpdateBridgeSearchJumpRange"
           @update:pref-threshold="prefThreshold = $event"
