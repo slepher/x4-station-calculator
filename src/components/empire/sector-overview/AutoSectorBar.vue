@@ -33,6 +33,8 @@ const emit = defineEmits<{
   (e: 'quick-calculate'): void
   (e: 'reset'): void
   (e: 'confirm'): void
+  (e: 'back'): void
+  (e: 'map'): void
 }>()
 
 const { t } = useI18n()
@@ -84,10 +86,12 @@ const hasUnresolved = computed(() => (props.unresolvedAllocationCount ?? 0) + (p
           </div>
         </div>
         <div class="bar-right">
+          <button class="bar-btn back-btn" @click="emit('back')">{{ t('sector.back') }}</button>
+          <button class="bar-btn map-btn" @click="emit('map')">{{ t('sector.map') }}</button>
           <template v-if="mode === 'edit'">
             <button class="bar-btn reset-btn" @click="emit('reset')">{{ t('sector.reset') }}</button>
             <button v-if="showConfirm" class="bar-btn confirm-btn" :disabled="confirmDisabled" @click="emit('confirm')">{{ t('sector.confirm') }}</button>
-            <button class="bar-btn recalc-btn" @click="emit('calculate')">{{ t('sector.calculate') }}</button>
+            <button class="bar-btn calc-btn" @click="emit('calculate')">{{ t('sector.calculate') }}</button>
           </template>
           <template v-else>
             <span v-if="hasUnresolved" class="bar-unresolved">
@@ -136,7 +140,7 @@ const hasUnresolved = computed(() => (props.unresolvedAllocationCount ?? 0) + (p
           <template v-if="mode === 'edit'">
             <button class="bar-btn reset-btn" @click="emit('reset')">{{ t('sector.reset') }}</button>
             <button v-if="showConfirm" class="bar-btn confirm-btn" :disabled="confirmDisabled" @click="emit('confirm')">{{ t('sector.confirm') }}</button>
-            <button class="bar-btn recalc-btn" @click="emit('calculate')">{{ t('sector.calculate') }}</button>
+            <button class="bar-btn calc-btn" @click="emit('calculate')">{{ t('sector.calculate') }}</button>
           </template>
           <template v-else>
             <span v-if="hasUnresolved" class="bar-unresolved">{{ unresolvedAllocationCount }}{{ unresolvedTradeStationCount ? '+' + unresolvedTradeStationCount : '' }}</span>
@@ -215,6 +219,14 @@ const hasUnresolved = computed(() => (props.unresolvedAllocationCount ?? 0) + (p
 
 .calc-btn--needs-recalc {
   @apply border-red-500/50;
+}
+
+.back-btn {
+  @apply bg-slate-600/20 text-slate-300 border border-slate-500/30 hover:bg-slate-600/30;
+}
+
+.map-btn {
+  @apply bg-slate-600/20 text-slate-300 border border-slate-500/30 hover:bg-slate-600/30;
 }
 
 .recalc-dot {

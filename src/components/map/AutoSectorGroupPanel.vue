@@ -22,6 +22,8 @@ const emit = defineEmits<{
   (e: 'select-group', sectorGroupId: string): void
   (e: 'focus-sector', sectorMacro: string): void
   (e: 'fit-sectors', sectorMacros: string[]): void
+  (e: 'back'): void
+  (e: 'map'): void
 }>()
 
 const { t } = useI18n()
@@ -119,6 +121,8 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
           @quick-calculate="onQuickCalc"
           @reset="handleResetAssignments"
           @confirm="handleConfirm"
+          @back="emit('back')"
+          @map="emit('map')"
         />
         </div>
         <div class="columns-layout">
@@ -193,6 +197,8 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
           @quick-calculate="onQuickCalc"
           @reset="handleResetAssignments"
           @confirm="handleConfirm"
+          @back="emit('back')"
+          @map="emit('map')"
         />
         <div class="tab-bar">
             <button type="button" class="tab-btn" :class="{ active: activeTab === 'hub' }" @click="activeTab = 'hub'">{{ t('auto_sector.hub_tab') }}</button>
