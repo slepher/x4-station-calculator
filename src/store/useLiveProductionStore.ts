@@ -236,6 +236,9 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   function initAutoGroupDraft() {
     const archive = selectedArchive.value
     const binding = activeBinding.value
+    const draftKey = `${binding?.gameGuid ?? ''}:${archive?.meta?.time ?? 0}`
+    if (_lastDraftInitKey === draftKey) return
+    _lastDraftInitKey = draftKey
     if (!archive || !archive.isValid || !binding) {
       autoGroupResult.value = null
       return
@@ -478,10 +481,11 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     }
   }
 
-  watch(selectedArchive, async () => {
-    const archive = selectedArchive.value
+  watch(selectedArchive, async (newArchive, oldArchive) => {
+    const archive = newArchive
     const binding = activeBinding.value
     if (!archive || !binding || archive.meta.guid !== binding.gameGuid) return
+    if (oldArchive && oldArchive.meta.guid === archive.meta.guid && oldArchive.meta.time === archive.meta.time) return
     await loadPlayerStationRecords()
     syncLiveFlowMap()
     initAutoGroupDraft()
@@ -1847,6 +1851,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   }
 
   let _activating = false
+  let _lastDraftInitKey = ''
   async function activateBinding(gameGuid: string): Promise<boolean> {
     if (_activating) return false
     _activating = true

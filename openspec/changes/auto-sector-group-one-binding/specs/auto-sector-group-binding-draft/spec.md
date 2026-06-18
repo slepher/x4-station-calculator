@@ -47,7 +47,7 @@
 
 ### Requirement: Store Initialization Data Generation
 
-系统 MUST 在 Store 初始化（或 activeBinding/archive 切换）时完成 `autoGroupResult` 的数据生成，根据变化 flag 分两条路径。
+系统 MUST 在 Store 初始化（或 activeBinding/archive 切换）时完成 `autoGroupResult` 的数据生成，根据变化 flag 分两条路径。`initAutoGroupDraft()` MUST 对同一 guid+archiveTime 上下文幂等：内部 SHALL 维护最近一次执行时的 context key（`gameGuid:archiveTime`），调用时若当前 key 与上次相同则直接返回，数据生成 SHALL 只在 key 变化时执行。
 
 #### Scenario: Grouping algorithm runs when change flag is set
 
@@ -62,6 +62,29 @@
 - **那么** 系统 SHALL 调用 `buildAssignmentsFromBinding()` 从已有 binding groups 构建 assignments
 - **并且** SHALL NOT 执行分组算法
 - **并且** 不重新决定分组结构
+
+#### Scenario: Draft is initialized once per binding-archive context
+
+- **前提** activeBinding 为 G，selectedArchive 为 T，context key 为 `G:T`
+- **当** `initAutoGroupDraft()` 被首次调用
+- **那么** 系统 SHALL 执行数据生成并写入 `autoGroupResult`
+- **当** `initAutoGroupDraft()` 在同一 `G:T` 上下文下再次被调用
+- **那么** 系统 SHALL 直接返回，SHALL NOT 重新生成或覆盖 `autoGroupResult`
+
+#### Scenario: Draft reinitializes on context change
+
+- **前提** 当前 context key 为 `G:T`
+- **并且** 用户切换 binding（key 变为 `G2:T`）或上传新存档（key 变为 `G:T2`）
+- **当** `initAutoGroupDraft()` 被调用
+- **那么** 系统 SHALL 重新执行数据生成并写入新的 `autoGroupResult`
+
+#### Scenario: Navigating between panels preserves unsaved edits
+
+- **前提** 用户在 Live 面板编辑了 draft（修改 assignment、coverage 等）
+- **并且** context key 未变化（同一 binding + 同一 archive）
+- **当** Map 面板挂载并间接触发 `initAutoGroupDraft()`
+- **那么** 系统 SHALL 直接返回
+- **并且** `autoGroupResult` SHALL 保留用户编辑内容
 
 #### Scenario: Applied time recorded on confirm
 
