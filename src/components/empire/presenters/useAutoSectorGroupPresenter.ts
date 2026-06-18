@@ -50,7 +50,7 @@ function buildHubColorContext(): HubColorContext {
 }
 const bridgeRetainEnabled = ref(true)
 const coverageRetainEnabled = ref(true)
-const tradeStationRetainEnabled = ref(false)
+const tradeStationRetainEnabled = ref(true)
 const showHubAddMenu = ref(false)
 const postBridgeBaseline = ref<AutoGroupResult | null>(null)
 
@@ -122,6 +122,7 @@ function buildStoreGroups(groups: BindingSectorGroup[], playerSectorMacros: stri
     isPinned: true,
     coverageRetainEnabled: true,
     connectionRetainEnabled: true,
+    tradeStationRetainEnabled: true,
     hubScore: undefined,
     savedTradeStationCode: g.tradeStation?.saveStationCode,
     selectedTradeStation: g.tradeStation
@@ -654,6 +655,7 @@ function handleAddHubDraft(sectorMacro: string) {
     isPinned: true,
     coverageRetainEnabled: true,
     connectionRetainEnabled: true,
+    tradeStationRetainEnabled: true,
     source: 'manual',
     savedTradeStationCode
   }

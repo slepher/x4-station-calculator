@@ -147,6 +147,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       isPinned: true,
       coverageRetainEnabled: true,
       connectionRetainEnabled: true,
+      tradeStationRetainEnabled: true,
       hubScore: undefined,
       savedTradeStationCode: g.tradeStation?.saveStationCode,
       selectedTradeStation: g.tradeStation
