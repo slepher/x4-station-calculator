@@ -49,7 +49,7 @@ const {
   handleMasterCoverageRetain, handleMasterTradeStationRetain,
   handleSelectTradeStation, handleConfirm, handleQuickCalculate,
   hasUncertainAssignments, hasPendingBridgeDecision,
-  hasUnresolvedTradeStations, showConfirmPopup,
+   hasUnresolvedTradeStations, showConfirmPopup, hasChanges,
   hasAutoResult, stationCounts, canDisableNode,
   bridgeRetainIndeterminate, coverageRetainIndeterminate,
   tradeStationRetainIndeterminate,
@@ -110,7 +110,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
           :unresolved-allocation-count="unresolvedAllocationGroups.length"
           :unresolved-trade-station-count="unresolvedTradeStationGroups.length"
           :show-confirm="true"
-          :confirm-disabled="hasUnresolvedTradeStations"
+          :confirm-disabled="hasUnresolvedTradeStations || !hasChanges"
           @update:pref-jump-range="handleUpdatePrefJumpRange"
           @update:bridge-search-jump-range="handleUpdateBridgeSearchJumpRange"
           @update:pref-threshold="prefThreshold = $event"
@@ -185,7 +185,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
           :unresolved-allocation-count="unresolvedAllocationGroups.length"
           :unresolved-trade-station-count="unresolvedTradeStationGroups.length"
           :show-confirm="calculationMode === 'result'"
-          :confirm-disabled="hasUnresolvedTradeStations"
+          :confirm-disabled="hasUnresolvedTradeStations || !hasChanges"
           @update:pref-jump-range="handleUpdatePrefJumpRange"
           @update:bridge-search-jump-range="handleUpdateBridgeSearchJumpRange"
           @update:pref-threshold="prefThreshold = $event"

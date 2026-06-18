@@ -20,6 +20,7 @@ const saveStore = useSaveStore()
 const gameDataStore = useGameDataStore()
 const activeViewStore = useActiveViewStore()
 const saveBindingStore = useSaveBindingStore()
+const { activeBinding } = storeToRefs(saveBindingStore)
 const liveStore = useLiveProductionStore()
 const { autoGroupResult, calculationMode, prefJumpRange, bridgeSearchJumpRange, prefThreshold, needsAutoGroupRecalc, calcBaselinePillState } = storeToRefs(liveStore)
 const { t, te } = useI18n()
@@ -347,6 +348,7 @@ function handleSelectOption(sectorMacro: string, optionIndex: number) {
   if (opt.type === 'standalone') {
     autoGroupResult.value = applyStandaloneToResult(autoGroupResult.value, sectorMacro, sectorGraph, sectorClusterMap, prefJumpRange.value, getSectorDisplayName, bridgeSearchJumpRange.value)
   }
+  applyTradeStationDefaultsToResult()
 }
 
 function handleCycleRecalcState(groupId: string) {
@@ -661,6 +663,7 @@ function handleAddHubDraft(sectorMacro: string) {
   stabilizeEditedHubColor(newGroup, groups, buildHubColorContext())
   autoGroupResult.value = { ...result, groups, assignments: result.assignments }
   rebuildAssignmentsFromGroups()
+  applyTradeStationDefaultsToResult()
 }
 
 function getExistingAnchorSectors(): Set<string> {
@@ -819,6 +822,31 @@ const hasUnresolvedTradeStations = computed(() => {
   if (groupsWithCandidates.length === 0) return false
   return groupsWithCandidates.some((id) => !selectedTradeStations.value[id])
 })
+
+const hasChanges = ref(false)
+watch([autoGroupResult, activeBinding], () => {
+  const result = autoGroupResult.value
+  const binding = activeBinding.value
+  if (!result || !binding) { hasChanges.value = result !== null; return }
+  if (result.groups.length !== binding.groups.length) { hasChanges.value = true; return }
+  const bindingById = new Map(binding.groups.map((g) => [g.id, g]))
+  for (const g of result.groups) {
+    const bg = bindingById.get(g.id)
+    if (!bg) { hasChanges.value = true; return }
+    if (g.jumpRange !== bg.jumpRange) { hasChanges.value = true; return }
+    if (g.color !== bg.color) { hasChanges.value = true; return }
+    const bgCov = bg.coverageSectorMacros.map((c) => c.ref).sort()
+    const gCov = [...g.coverageSectorMacros].sort()
+    if (gCov.length !== bgCov.length || gCov.some((m, i) => m !== bgCov[i])) { hasChanges.value = true; return }
+    const bgConns = [...(bg.connectedGroupIds ?? [])].sort()
+    const gConns = [...g.connectedGroupIds].sort()
+    if (gConns.length !== bgConns.length || gConns.some((c, i) => c !== bgConns[i])) { hasChanges.value = true; return }
+    const savedTS = bg.tradeStation?.saveStationCode ?? ''
+    const currentTS = g.selectedTradeStation?.stationCode ?? ''
+    if (savedTS !== currentTS) { hasChanges.value = true; return }
+  }
+  hasChanges.value = false
+}, { immediate: true })
 
 const tradeStationCaps = computed<Record<string, number>>(() => {
   const caps: Record<string, number> = {}
@@ -1047,12 +1075,6 @@ onMounted(async () => {
   }
 })
 
-watch(autoGroupResult, (result) => {
-  if (result && result.groups.length > 0) {
-    calculationBaseline.value = cloneAutoGroupResult(result)
-  }
-})
-
 const hasUncertainAssignments = computed(() => {
   if (!autoGroupResult.value) return false
   if (hasPendingBridgeDecision.value) return true
@@ -1176,6 +1198,7 @@ return {
   selectedTradeStations,
   hasUnresolvedTradeStations,
   showConfirmPopup,
+  hasChanges,
   unresolvedTradeStationGroups,
   unresolvedAllocationGroups,
   handleSelectTradeStation,
