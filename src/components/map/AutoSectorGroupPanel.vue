@@ -161,7 +161,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
           </div>
           <div class="column column-allocation">
             <SectorAllocationList :assignments="autoGroupResult?.assignments ?? []" :bridge-plans="autoGroupResult?.bridgePlans ?? []"
-              :groups="autoGroupResult?.groups ?? []" :maps="gameDataMaps" :station-counts="stationCounts" :disabled="calculationMode === 'edit'"
+              :groups="autoGroupResult?.groups ?? []" :maps="gameDataMaps" :station-counts="stationCounts"
               @select-option="handleSelectOption" @select-bridge-plan="handleSelectBridgePlan" @select-bridge-center="handleSelectBridgeCenter" @focus-sector="emit('focus-sector', $event)"
             />
           </div>
@@ -242,12 +242,12 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
           </div>
           <div v-show="activeTab === 'allocation'">
             <SectorAllocationList :assignments="autoGroupResult?.assignments ?? []" :bridge-plans="autoGroupResult?.bridgePlans ?? []"
-              :groups="autoGroupResult?.groups ?? []" :maps="gameDataMaps" :station-counts="stationCounts" :disabled="calculationMode === 'edit'" view="map"
+              :groups="autoGroupResult?.groups ?? []" :maps="gameDataMaps" :station-counts="stationCounts" view="map"
               @select-option="handleSelectOption" @select-bridge-plan="handleSelectBridgePlan" @select-bridge-center="handleSelectBridgeCenter" @focus-sector="emit('focus-sector', $event)"
             />
           </div>
           <div v-show="activeTab === 'tradeStation'">
-            <SectorTradeStationList :groups="autoGroupResult?.groups ?? []" :candidates="tradeStationCandidates" :selected="selectedTradeStations" :disabled="calculationMode === 'edit'" view="map"
+            <SectorTradeStationList :groups="autoGroupResult?.groups ?? []" :candidates="tradeStationCandidates" :selected="selectedTradeStations" view="map"
               @select="handleSelectTradeStation" @focus-sector="emit('focus-sector', $event)"
             />
           </div>
