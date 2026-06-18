@@ -1,0 +1,161 @@
+# auto-sector-group-one-core Design
+
+## 总览
+
+本 change 把自动星区分组的领域规则收敛在核心算法和 binding 写入层。UI 可以来自 Live 或 Map，但核心层不关心具体面板布局。Trade station 是 group 确认写入的一部分，因此跟随核心 group 生命周期，而不是单独成为 change。
+
+## 关键数据
+
+### GroupDraftInfo
+
+核心 draft group 至少承载：
+
+- `id`
+- `sectorMacro`
+- `jumpRange`
+- `coverageSectorMacros`
+- `connectedGroupIds`
+- `excludedDefaultAssignmentSectorMacros`
+- `isPinned`
+- `baseline`
+- `isNew`
+- `source: 'auto' | 'manual' | 'bridge'`
+- `tradeStationRetainEnabled`
+- `savedTradeStationCode`
+- `selectedTradeStation`
+
+废弃字段不得重新引入：
+
+- `recalcState`
+- per-group `exclude`
+- `disabledCoverageSectorMacros`
+- `excludedDefaultConnectedGroupIds`
+- bridge marker 持久化字段
+
+### BindingSectorGroup
+
+确认后写入普通 `BindingSectorGroup`。Bridge 和 standalone 都不使用特殊持久化结构。Trade station 写入：
+
+- 玩家站：`tradeStation.saveStationCode = stationCode`
+- 虚拟站：`tradeStation.saveStationCode = undefined`，位置为 anchor sector 中心
+
+## 计算流程
+
+### Clean slate
+
+Clean slate 从 archive player stations 建立初始草案：
+
+1. 统计每个 station 的 container 容量与生产线数。
+2. 按 sector 汇总 hub 候选、最高 hub score、pure hub 标记和玩家站列表。
+3. 当 `generateHubs=true` 时为 pure hub 创建 group；当 `generateHubs=false` 时只使用 pinned/手动输入 hub。
+4. 构建双向星区图，排除单向 superhighway。
+5. 按覆盖跳数为玩家 sector 计算当前命中 groups。
+6. 当前命中且未 excluded 的 group 可作为默认归属；多命中时按距离、hub score、稳定 key 决胜。
+7. 对等距且 score 差距小于 30% 或所有命中均被 excluded 的 sector 生成 unresolved assignment。
+7. 计算 MST connection。
+8. 如图不连通，生成 bridge plan。
+9. 为每个 hub group 初始化 trade station 候选与默认值。
+
+### Incremental
+
+Incremental 从已保存 groups 生成下一版草案：
+
+1. 保存的 groups 作为 baseline groups。
+2. 每个 baseline group 保留自己的 `jumpRange`。
+3. 新玩家 sector 按当前 coverage、扩展覆盖、standalone 规则生成 assignment。
+4. 手动保留的 connection 作为 fixed edges。
+5. 必要时生成 bridge groups。
+6. 按 retain 规则重算 trade station 默认值。
+
+## Link / MST
+
+Link 候选由 group anchor pair 生成：
+
+1. 用排除单向 superhighway 的双向星区图计算 anchor 间距离。
+2. 距离大于 `bridgeSearchJumpRange` 的 pair 不进入 MST。
+3. 用户保留的连接按 link 独立进入 fixed edges：A 或 B 任一端 `connectionRetainEnabled=true` 即固定该 A-B link。
+4. 两端都关闭 retain 时，该旧 link 不进入 fixed edges。
+5. Kruskal 先接纳 fixed edges，再只补充缺失边。
+6. 输出必须双向写入 `connectedGroupIds`。
+
+## 编辑态
+
+编辑态不是最终结果编辑，而是下一次计算输入编辑：
+
+- 进入编辑态时不复制恢复 snapshot。
+- Baseline groups 默认 pinned。
+- Unpin baseline group 只是不参与计算，仍保留展示。
+- 手动新增 hub 默认 pinned，可删除。
+- 修改 coverage 只影响当前 draft。
+- 修改 connection 必须保持双向同步。
+- 退出编辑只切回 result 模式，不恢复 draft。
+- 恢复到最近一次计算结果由 binding 层 [重置] 使用 `calculationBaseline` 完成。
+- 点击计算时，将 pinned groups、保留 coverage、保留 connection、trade station retain 作为下一次算法输入。
+
+## Assignment
+
+Assignment card 只针对非 anchor 玩家 sector。
+
+Option 生成顺序：
+
+1. 当前 coverage 命中 groups。
+2. 无当前命中时，最近扩展距离层 groups。
+3. Standalone。
+
+默认规则：
+
+- 当前命中且未被 excluded default 的 group 可以默认。
+- 扩展 option 不默认。
+- Standalone 不自动 fallback 默认。
+
+用户选择后，只更新 card 内部选择和 draft group 数据，不改变 card 所属 bucket 或排序。
+
+## Draft 变更后的 assignment 同步
+
+Card 或 hub 操作改变 sector 归属后，必须重建 ordinary assignments：
+
+- coverage `×`：sector 从 active coverage 移出，若仍符合候选条件则显示为 candidate，并重新计算该 sector 的 options/default。
+- candidate `+`：sector 加入当前 group coverage；若此前在其他 group active coverage，需要从原 group 移出。
+- transfer `→`：一次完成“从原 group 移出 + 加入目标 group”，不得留下双重 active coverage。
+- jumpRange 增大/缩小：只影响 coverage/candidate，不增删 connections；随后重建受影响 sector 的 assignments。
+- hub add：新增 anchor sector 不再生成 ordinary assignment card，并从其他 groups coverage 中移除。
+- hub remove：移除该 group 和相关 connections 后，原 anchor/coverage 涉及的玩家 sector 重新进入 assignment 生成流程。
+- 对仍存在的 assignment card，保持 card identity 和排序，只更新内部 option、default 和 selected。
+
+## Bridge
+
+Bridge 处理发生在普通 assignment 之前：
+
+- 多个 bridge plan：只展示 bridge cards，阻塞 ordinary assignments。
+- 单个 bridge plan：自动采用。
+- 采用后创建普通 bridge draft groups，再重新生成 ordinary assignment cards。
+- Bridge group 确认后与其他 groups 一样写入 binding。
+
+## Trade station
+
+Trade station 选择与 group 生命周期同步：
+
+- 新增 group 时创建候选列表并按默认值规则设置 `selectedTradeStation`。
+- 删除 group 时删除对应 card 和 draft 中的 trade station 选择。
+- 玩家 sector hub 使用手动 hub 候选规则：有 qualified 站时只列 qualified，否则列全部玩家站。
+- 非玩家 sector hub 无玩家站时使用虚拟交易站，不生成虚拟 `stationPlan`。
+- 重置入口由 binding 层的共用顶部栏统一处理，使用 `calculationBaseline` 恢复整份 shared draft；core 不定义区域级 reset 按钮语义。
+- Confirm gate 同时检查 bridge、assignment 和 trade station。
+
+候选来源：
+
+- 自动 hub：anchor sector 内玩家站，top 5，保护 pure hub。
+- 手动/bridge hub：优先 qualified，否则全部玩家站。
+- 无玩家站：虚拟交易站。
+
+## 持久化
+
+`createAutoGroups()` 或等效确认流程必须：
+
+1. UUID 优先匹配 group。
+2. `sectorMacro` 兜底匹配 standalone/group。
+3. 移除不在 draft 中的废弃 group。
+4. 写入 coverage、connections、jumpRange。
+5. 重建 station plan group assignment。
+6. 显式写入 trade station。
+7. 不让旧自动站点绑定逻辑覆盖用户选择。
