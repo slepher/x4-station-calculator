@@ -76,7 +76,6 @@ const canSwitchToTradeStation = () => true
 
 function onCalculate() { runCalculationFromEditInput(); switchToFirstUnresolvedTab() }
 function onQuickCalc() { handleQuickCalculate(); switchToFirstUnresolvedTab() }
-function onQuickCalc() { handleQuickCalculate(); switchToFirstUnresolvedTab() }
 
 function switchToFirstUnresolvedTab() {
   if (hasUncertainAssignments.value || hasPendingBridgeDecision.value) activeTab.value = 'allocation'
