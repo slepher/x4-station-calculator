@@ -59,7 +59,7 @@ const hasUnresolved = computed(() => (props.unresolvedAllocationCount ?? 0) + (p
       <div class="bar-row bar-row--live">
         <div class="bar-left">
           <div class="param-field" :title="t('sector.bridge_search_jump')">
-            <span class="bar-label">{{ t('sector.bridge_search_jump_short') }}</span>
+            <span class="bar-label">{{ t('sector.connected') }}</span>
             <select class="bar-select bar-select--narrow" :value="bridgeSearchJumpRange" @change="emit('update:bridgeSearchJumpRange', Number(($event.target as HTMLSelectElement).value))">
               <option v-for="j in bridgeJumpOptions" :key="j" :value="j" :disabled="j < prefJumpRange">{{ j }}{{ t('sector.jump_unit') }}</option>
             </select>
@@ -105,7 +105,7 @@ const hasUnresolved = computed(() => (props.unresolvedAllocationCount ?? 0) + (p
       <div class="bar-row bar-row--map">
         <div class="bar-left">
           <div class="param-field" :title="t('sector.bridge_search_jump')">
-            <span class="bar-label">{{ t('sector.bridge_search_jump_short') }}</span>
+            <span class="bar-label">{{ t('sector.connected') }}</span>
             <select class="bar-select bar-select--narrow" :value="bridgeSearchJumpRange" @change="emit('update:bridgeSearchJumpRange', Number(($event.target as HTMLSelectElement).value))">
               <option v-for="j in bridgeJumpOptions" :key="j" :value="j" :disabled="j < prefJumpRange">{{ j }}</option>
             </select>
