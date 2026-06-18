@@ -124,7 +124,7 @@ defineExpose({ triggerAutoGroup })
   </template>
 
   <template v-else>
-    <AutoSectorGroupPanel layout="columns" @back="liveMode = 'display'" @map="onMap" />
+    <AutoSectorGroupPanel layout="columns" @back="liveMode = 'display'" @map="onMap" @confirmed="liveMode = 'display'" />
   </template>
 </template>
 

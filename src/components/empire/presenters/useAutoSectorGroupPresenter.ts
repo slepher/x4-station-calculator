@@ -959,15 +959,16 @@ function handleReorderGroups(nextGroups: GroupDraftInfo[]) {
 const showConfirmPopup = ref(false)
 
 function handleConfirm() {
-  if (calculationMode.value === 'edit') return
-  if (!autoGroupResult.value) return
-  if (hasUnresolvedTradeStations.value) return
+  if (calculationMode.value === 'edit') return false
+  if (!autoGroupResult.value) return false
+  if (hasUnresolvedTradeStations.value) return false
   if (hasUncertainAssignments.value && !showConfirmPopup.value) {
     showConfirmPopup.value = true
-    return
+    return false
   }
   showConfirmPopup.value = false
   doConfirm()
+  return true
 }
 
 function doConfirm() {

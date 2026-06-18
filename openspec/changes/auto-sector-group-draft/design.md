@@ -2,7 +2,7 @@
 
 ## 架构概览
 
-将 6 个核心 group 编辑状态从 presenter 局部实例搬入 `useLiveProductionStore`（Pinia 单例），实现 live 面板和 map 面板状态共享。Store 在初始化/上下文切换时完成数据生成，Live 和 Map 面板均为纯 view 层，直接读取 store 中已算好的值。
+将 6 个核心 group 编辑状态从 presenter 局部实例搬入 `useLiveProductionStore`（Pinia 单例），实现 live 面板和 map 面板状态共享。Store 在初始化/上下文切换时完成初始数据生成，Live 和 Map 面板直接读取 store 中已算好的值；计算模式内用户显式点击「计算」时，由 presenter 编排交互输入并更新共享 draft。
 
 ```
 liveStore (Pinia 单例)  ← 数据生产层
@@ -15,9 +15,9 @@ liveStore (Pinia 单例)  ← 数据生产层
   ├─ initAutoGroupDraft()  → 双路径决策：分组算法 vs 从 binding 构建
   └─ buildAssignmentsFromBinding() → 从已有 binding 构建 assignments
 
-useAutoSectorGroupPresenter()  ← 纯 view 连接层
+useAutoSectorGroupPresenter()  ← view 连接 + 面板交互编排层
   ├─ SectorOverviewPanel  (live 模式)  → 同一份 liveStore
-  └─ AutoSectorGroupMapPanel (map 模式) → 同一份 liveStore
+  └─ AutoSectorGroupPanel (map 模式) → 同一份 liveStore
 
 MapWorkbenchView  ← 从 liveStore 读取 sectorGroupColorMap
 ```
@@ -31,7 +31,7 @@ Store 初始化时（或 activeBinding / archive 切换时）调用 `initAutoGro
 - **有变化 flag** → 运行分组算法（`groupCleanSlate` / `groupIncremental`）→ 生成结果
 - **没有变化 flag** → 调用 `buildAssignmentsFromBinding()` 从已有 binding groups 构建 assignments → 不重新决定分组结构
 
-Live 面板和 Map 面板均为纯 view 层：不直接触发计算，只读取 store 中的结果进行渲染。「详情」按钮仅切换显示模式，不执行计算。
+Live 面板和 Map 面板读取 store 中的共享 draft 进行渲染。「详情」按钮仅切换显示模式，不执行计算；计算模式内用户主动点击「计算」时，仍由 presenter 编排交互输入并调用纯算法更新共享 draft。
 
 ## 数据模型
 
@@ -111,18 +111,18 @@ function initAutoGroupDraft() {
 | `enrichAutoGroupResult` | `autoGroup.ts` | 纯函数，富化：名称翻译、颜色、交易站默认 |
 | `initAutoGroupDraft` | `useLiveProductionStore.ts` | 编排：计算 → 富化 → 存储 |
 
-Live 和 Map 面板不调用这些方法，只读取 `autoGroupResult`。
+Live 和 Map 面板不调用这些初始化方法，只读取 `autoGroupResult`。Presenter 可保留当前面板交互 handler，但这些 handler 必须以 `liveStore.autoGroupResult` 作为唯一共享 draft 数据源。
 
 ```ts
 export function useAutoSectorGroupPresenter() {
   const liveStore = useLiveProductionStore()
   const { autoGroupResult, calculationMode, prefJumpRange, bridgeSearchJumpRange, prefThreshold, needsAutoGroupRecalc } = storeToRefs(liveStore)
 
-  // presenter 本地 computed（不变）
+  // presenter 本地 computed / handler（使用 liveStore 共享 draft）
   const hasGlobalUnresolved = computed(() => /* 从 autoGroupResult 重算 */)
   // ...
 
-  // handler 直接 delegate 到 store 或 saveBindingStore
+  // handler 直接读写 liveStore 共享 draft，持久化动作 delegate 到 saveBindingStore
   function handleColorChange(id, color) { /* 更新 liveStore.autoGroupResult */ }
   function handleConfirm() { /* 写入 saveBindingStore */ }
 
@@ -165,7 +165,7 @@ function handleColorChange(groupId: string, color: string | undefined) {
 
 ### 停止自动计算
 
-Store 在初始化及 activeBinding/archive 切换时调用 `initAutoGroupDraft()` 生成数据。Live 面板、Map 面板及其他系统组件均不额外触发独立计算。
+Store 在初始化及 activeBinding/archive 切换时调用 `initAutoGroupDraft()` 生成数据。Live 面板、Map 面板及其他系统组件均不因挂载、面板切换或详情模式切换触发独立计算。
 
 ### Live 面板模式切换（SectorOverviewPanel）
 

@@ -15,7 +15,7 @@
 ## 3. Presenter 改造
 
 - [x] 删除 6 个本地 ref 声明，改为从 `liveStore` 读取
-- [x] Presenter 退化为纯 view 连接层，不含双路径决策或计算逻辑
+- [x] Presenter 改为使用 liveStore 共享 draft 作为唯一数据源，并保留面板交互编排
 - [x] handler 内统一通过 `liveStore.xxx` 属性读写共享状态，组件 ref 由 presenter 使用 `storeToRefs(liveStore)` 转出
 - [x] `handleColorChange` 移除 `updateGroup()` 调用
 - [x] `handleConfirm` 记录 `appliedAutoGroupArchiveTime`；不覆盖 `autoGroupResult`
@@ -41,7 +41,7 @@
 - [x] 计算模式：嵌入 `AutoSectorGroupPanel layout="columns"`
 - [x] 展示模式「详情」→ `liveMode = 'calculate'`（仅模式切换，不触发计算）
 - [x] 展示模式「地图」→ 跳转到 map binding 面板
-- [x] 确认 → `handleConfirm` → watch(confirmed) → 展示模式
+- [x] 确认 → `handleConfirm` → `@confirmed` → 展示模式
 - [x] 详情按钮红点：`liveStore.needsAutoGroupRecalc`
 - [x] 详情按钮置灰：`!liveStore.autoGroupResult`
 - [x] 展示模式不显示「计算」按钮
@@ -52,9 +52,9 @@
 
 ## 8. Store 数据生成（双路径）
 
-- [ ] 实现 `initAutoGroupDraft()` — store 初始化/上下文切换时调用
-- [ ] 有变化 flag → 跑分组算法（`groupCleanSlate` / `groupIncremental`）→ 生成 `autoGroupResult`
-- [ ] 没有变化 flag → 实现 `buildAssignmentsFromBinding()`：从 `activeBinding.groups` 为每个覆盖星区计算所有候选 group 构建 `SectorAssignment[]`
-- [ ] Store 在 `activeBinding` 或 `selectedArchive` 切换时自动调用 `initAutoGroupDraft()`
-- [ ] Live 面板「详情」按钮仅切换模式，不触发计算
-- [ ] 计算模式「返回」→ 回到展示模式（不提交）
+- [x] 实现 `initAutoGroupDraft()` — store 初始化/上下文切换时调用
+- [x] 有变化 flag → 跑分组算法（`groupCleanSlate` / `groupIncremental`）→ 生成 `autoGroupResult`
+- [x] 没有变化 flag → 实现 `buildAssignmentsFromBinding()`：从 `activeBinding.groups` 为每个覆盖星区计算所有候选 group 构建 `SectorAssignment[]`
+- [x] Store 在 `activeBinding` 或 `selectedArchive` 切换时自动调用 `initAutoGroupDraft()`
+- [x] Live 面板「详情」按钮仅切换模式，不触发计算
+- [x] 计算模式「返回」→ 回到展示模式（不提交）

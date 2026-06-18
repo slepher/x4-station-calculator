@@ -482,9 +482,9 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     const archive = selectedArchive.value
     const binding = activeBinding.value
     if (!archive || !binding || archive.meta.guid !== binding.gameGuid) return
-    if (binding.selectedArchiveTime) return
     await loadPlayerStationRecords()
     syncLiveFlowMap()
+    initAutoGroupDraft()
   })
 
   watch(

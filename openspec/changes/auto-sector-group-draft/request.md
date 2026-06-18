@@ -47,26 +47,28 @@ Store 初始化（或 activeBinding/archive 切换）时调用 `initAutoGroupDra
 - **有变化 flag** → 运行分组算法（`groupCleanSlate` / `groupIncremental`）生成 `autoGroupResult`
 - **没有变化 flag** → 从已有 binding 的 groups 为每个覆盖星区计算所有候选目标，构建 assignments（不跑分组算法）
 
-Live 面板和 Map 面板均为纯 view 层，直接读取 store 中已生成的数据。「详情」按钮仅切换显示模式，不执行计算。
+Live 面板和 Map 面板直接读取 store 中已生成的数据。「详情」按钮仅切换显示模式，不执行计算；计算模式内用户显式点击「计算」时，可更新共享 draft。
 
 `handleConfirm()` 记录 `appliedAutoGroupArchiveTime`，不覆盖 `autoGroupResult`。
 
 **不搬的（留在 presenter 本地）：**
 
 - `tradeStationCandidates` — computed，每次切换 tab 从 archive + groups 重算
-- `editSnapshot`、`calcBaselinePillState` — 与当前面板 UI 绑定
+- `editSnapshot` — 与当前面板 UI 绑定
 - `bridgeRetainEnabled` 等保留开关 — 局部 UI 状态
 - `hasGlobalUnresolved`、`hasUncertainAssignments` 等 — computed，本地重算
 
+`calcBaselinePillState` 随共享 draft 初始化写入 `liveStore`，用于 live/map 两个面板展示同一份初始覆盖和连接基线。
+
 ### 4. Presenter 改造
 
-Presenter 退化为纯 view 连接层：只从 `liveStore` 读取 refs 暴露给组件，不包含双路径决策或数据生成逻辑。Handler 函数 delegates 到 store 或 `saveBindingStore`。
+Presenter 作为 view 连接与交互编排层：共享 draft 状态必须从 `liveStore` 读取 refs 暴露给组件；初始化双路径数据生成由 `liveStore.initAutoGroupDraft()` 负责。与当前面板交互强绑定的 handler / computed 可继续留在 presenter，但不得维护第二份共享 draft，也不得在颜色编辑时直接写 `draftBinding`。
 
 ```ts
 export function useAutoSectorGroupPresenter() {
   const liveStore = useLiveProductionStore()
   const { autoGroupResult, calculationMode, ... } = storeToRefs(liveStore)
-  // computed / handler 不变但 delegate 到 store
+  // computed / handler 使用 liveStore 的共享 draft 作为唯一数据源
 }
 ```
 
@@ -91,7 +93,7 @@ const sectorGroupColorMap = computed(() => {
 
 ### 6. 生命周期
 
-Store 在初始化及 activeBinding/archive 切换时调用 `initAutoGroupDraft()` 生成数据。Live 和 Map 面板不负责触发计算。
+Store 在初始化及 activeBinding/archive 切换时调用 `initAutoGroupDraft()` 生成数据。Live 和 Map 面板不因挂载、面板切换或详情模式切换触发计算。
 
 ### 7. Live 面板模式切换
 
@@ -133,7 +135,7 @@ In Scope：
 - `liveStore` 新增状态：`autoGroupResult`、`calculationMode`、`prefJumpRange`、`bridgeSearchJumpRange`、`prefThreshold`、`needsAutoGroupRecalc`、`initAutoGroupDraft()`、`buildAssignmentsFromBinding()`
 - `SaveBindingPlan` 新增并持久化 `appliedAutoGroupArchiveTime`
 - Store 初始化时根据变化 flag 自动生成 `autoGroupResult`（双路径）
-- Presenter 退化为纯 view 连接层
+- Presenter 使用 `liveStore` 共享 draft 作为唯一数据源，并保留面板交互编排
 - `MapWorkbenchView` 从 liveStore 读取渲染地图
 - `handleColorChange` 移除 `updateGroup` 调用
 - live 面板和 map 面板共享编辑状态

@@ -24,6 +24,7 @@ const emit = defineEmits<{
   (e: 'fit-sectors', sectorMacros: string[]): void
   (e: 'back'): void
   (e: 'map'): void
+  (e: 'confirmed'): void
 }>()
 
 const { t } = useI18n()
@@ -78,6 +79,9 @@ const canSwitchToTradeStation = () => true
 
 function onCalculate() { runCalculationFromEditInput(); switchToFirstUnresolvedTab() }
 function onQuickCalc() { handleQuickCalculate(); switchToFirstUnresolvedTab() }
+function onConfirm() {
+  if (handleConfirm()) emit('confirmed')
+}
 
 function switchToFirstUnresolvedTab() {
   if (hasUncertainAssignments.value || hasPendingBridgeDecision.value) activeTab.value = 'allocation'
@@ -120,7 +124,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
           @calculate="onCalculate"
           @quick-calculate="onQuickCalc"
           @reset="handleResetAssignments"
-          @confirm="handleConfirm"
+          @confirm="onConfirm"
           @back="emit('back')"
           @map="emit('map')"
         />
@@ -196,7 +200,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
           @calculate="onCalculate"
           @quick-calculate="onQuickCalc"
           @reset="handleResetAssignments"
-          @confirm="handleConfirm"
+          @confirm="onConfirm"
           @back="emit('back')"
           @map="emit('map')"
         />
@@ -264,7 +268,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
         <div class="confirm-popup-text">{{ t('sector.confirm_unresolved_hint') }}</div>
         <div class="confirm-popup-actions">
           <button class="bar-btn reset-btn" @click="showConfirmPopup = false">{{ t('sector.cancel') }}</button>
-          <button class="bar-btn confirm-btn" @click="handleConfirm()">{{ t('sector.confirm') }}</button>
+          <button class="bar-btn confirm-btn" @click="onConfirm">{{ t('sector.confirm') }}</button>
         </div>
       </div>
     </div>
