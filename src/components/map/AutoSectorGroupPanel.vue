@@ -158,7 +158,6 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
               @toggle-retain-trade-station="handleToggleTradeStationRetain"
               @color-change="handleColorChange" @focus-sector="emit('focus-sector', $event)"
               @reorder="handleReorderGroups"/>
-            />
           </div>
           <div class="column column-allocation">
             <SectorAllocationList :assignments="autoGroupResult?.assignments ?? []" :bridge-plans="autoGroupResult?.bridgePlans ?? []"
@@ -240,7 +239,6 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
               @toggle-retain-trade-station="handleToggleTradeStationRetain"
               @color-change="handleColorChange" @focus-sector="emit('focus-sector', $event)"
               @reorder="handleReorderGroups"/>
-            />
           </div>
           <div v-show="activeTab === 'allocation'">
             <SectorAllocationList :assignments="autoGroupResult?.assignments ?? []" :bridge-plans="autoGroupResult?.bridgePlans ?? []"
