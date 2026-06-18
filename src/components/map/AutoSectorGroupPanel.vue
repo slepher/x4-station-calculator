@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, provide } from 'vue'
+import { ref, watch, provide, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAutoSectorGroupPresenter } from '@/components/empire/presenters/useAutoSectorGroupPresenter'
 import { useActiveViewStore } from '@/store/useActiveViewStore'
@@ -56,10 +56,12 @@ const {
   hasAutoResult, stationCounts, canDisableNode,
   bridgeRetainIndeterminate, coverageRetainIndeterminate,
   tradeStationRetainIndeterminate,
-  handleColorChange, sectorGroupColorMap, triggerAutoGroup, handleReorderGroups,
+  handleColorChange, sectorGroupColorMap, handleReorderGroups,
 } = presenter
 
 provide('sectorGroupColorMap', sectorGroupColorMap)
+
+const isConfirmed = computed(() => hasAutoResult.value && !hasChanges.value)
 
 const liveStore = useLiveProductionStore()
 
@@ -67,9 +69,6 @@ watch(() => props.gameGuid, async (guid) => {
   if (guid) {
     activeViewStore.activeBinding = guid
     await liveStore.activateBinding(guid)
-    if (!autoGroupResult.value) {
-      triggerAutoGroup()
-    }
   }
 }, { immediate: true })
 
@@ -181,6 +180,18 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
         </div>
       </template>
       <template v-else>
+        <template v-if="isConfirmed">
+          <SectorGroupList :groups="autoGroupResult?.groups ?? []" :assignments="autoGroupResult?.assignments ?? []"
+            :maps="gameDataMaps" :sector-graph="sectorGraphInfo.sectorGraph" :sector-cluster-map="sectorGraphInfo.sectorClusterMap"
+            :player-sector-macros="autoGroupResult?.playerSectorMacros ?? []"
+            :editable="false" :diff-enabled="false"
+            view="map" :draggable="false" :trade-station-caps="tradeStationCaps"
+            :show-select-group-button="true"
+            @focus-sector="emit('focus-sector', $event)"
+            @select-group="emit('select-group', $event)"
+          />
+        </template>
+        <template v-else>
         <AutoSectorBar
           :mode="calculationMode === 'edit' ? 'edit' : 'result'"
           view="map"
@@ -263,6 +274,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
           </div>
       </template>
     </template>
+  </template>
     <div v-if="showConfirmPopup" class="confirm-popup-backdrop" @click.self="showConfirmPopup = false">
       <div class="confirm-popup">
         <div class="confirm-popup-text">{{ t('sector.confirm_unresolved_hint') }}</div>

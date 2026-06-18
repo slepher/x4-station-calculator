@@ -594,7 +594,6 @@ function handleSelectBridgePlan(planId: string) {
 }
 
 function handleResetAssignments() {
-  if (calculationMode.value === 'edit') return
   if (!calculationBaseline.value) return
   autoGroupResult.value = cloneAutoGroupResult(calculationBaseline.value)
 }
