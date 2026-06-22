@@ -10,7 +10,7 @@ export interface ActiveViewState {
   activeEmpireStation: string | null
   activeBinding: string | null
   activeBindingStation: string | null
-  activeBindingWorkbench: 'overview' | 'station' | 'transit' | 'terraforming' | 'tech-tree' | 'research' | 'blueprint-recipe'
+  activeBindingWorkbench: 'overview' | 'station' | 'transit' | 'terraforming' | 'tech-tree' | 'research' | 'blueprint-recipe' | 'auto-sector-group'
   activeEmpireWorkbench: 'overview' | 'station' | 'terraforming' | 'research' | 'blueprint-recipe'
   activeTerraformingClusterId: string | null
   activeView: StationActiveView
@@ -113,7 +113,7 @@ export const useActiveViewStore = defineStore('activeView', () => {
     get: () => state.value.activeBindingStation,
     set: (val: string | null) => {
       state.value.activeBindingStation = val
-      const FIXED_MODES = ['terraforming', 'tech-tree', 'research', 'blueprint-recipe']
+      const FIXED_MODES = ['terraforming', 'tech-tree', 'research', 'blueprint-recipe', 'auto-sector-group']
       if (val && !FIXED_MODES.includes(state.value.activeBindingWorkbench)) {
         state.value.activeBindingWorkbench = 'station'
       } else if (state.value.activeBindingWorkbench === 'station') {

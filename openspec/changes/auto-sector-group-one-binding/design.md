@@ -138,6 +138,24 @@ Handler 规则：
 - `needsAutoGroupRecalc=true` 时显示红点和 tooltip。
 - `autoGroupResult=null` 时禁用。
 
+### Live sidebar 入口
+
+Live sidebar 在固定菜单和动态星区/站点列表之间的分隔线区域新增“星区编辑详情”入口。该入口是持久化 workbench 菜单项，而不是临时按钮：
+
+- `ActiveViewState.activeBindingWorkbench` 新增星区编辑详情专用值，例如 `auto-sector-group`。
+- 点击入口设置 `activeBindingWorkbench='auto-sector-group'`，由 `useActiveViewStore` 现有 `x4_station_active_view` 持久化。
+- `useLiveProductionStore.workbenchMode` 将该值解析为星区编辑详情模式，并渲染 `AutoSectorGroupPanel layout="columns"`。
+- 该模式进入详情/计算视图，但计算语义仍等同展示模式 [详情]。
+- 不运行分组算法。
+- 不调用 `initAutoGroupDraft()`。
+- 不修改 binding 或 shared draft。
+- `autoGroupResult=null` 时置灰禁用。
+- `needsAutoGroupRecalc=true` 时显示红点提示。
+- `activeBindingStation` 变化时，星区编辑详情必须加入固定模式保护列表，避免选择站点或星区后被自动改写为 `station` / `overview`。
+- AutoSectorBar [返回] 或用户点击其他 sidebar 菜单时，应显式切回对应 workbench 值。
+
+图标使用与 `blueprint.svg`、`tlt_research.svg` 一致的 128pt 单色 SVG 风格：粗圆环外框，内部用星区节点、连接线和编辑笔表达“星区分组编辑”。该入口只在 Live/save-binding sidebar 显示；Map binding 面板继续通过自己的 binding-sector 流程进入自动分组面板。
+
 ### AutoSectorBar
 
 | 按钮/控件 | edit 模式 | result 模式 |

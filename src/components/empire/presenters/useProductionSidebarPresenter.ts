@@ -13,6 +13,9 @@ export interface SidebarPresenterProps {
   showTechTree: boolean
   showResearch: boolean
   showBlueprintRecipe: boolean
+  showAutoSectorGroup: boolean
+  autoSectorGroupDisabled: ComputedRef<boolean>
+  autoSectorGroupNeedsRecalc: ComputedRef<boolean>
   canCreateStation: boolean
   terraformingClusters: ComputedRef<{ id: string; nameId: string }[]>
   activeTerraformingClusterId: ComputedRef<string | null>
@@ -27,6 +30,7 @@ export interface SidebarPresenterEmits {
   selectTechTree: () => void
   selectResearch: () => void
   selectBlueprintRecipe: () => void
+  selectAutoSectorGroup: () => void
   selectTransit: (sectorId: string) => void
   selectTerraformingCluster: (clusterId: string) => void
   selectStation: (stationId: string) => void
@@ -45,7 +49,7 @@ export interface UseProductionSidebarPresenterReturn {
 
 export interface SidebarPresenterStore {
   session: {
-    workbenchMode: 'overview' | 'station' | 'transit' | 'terraforming' | 'tech-tree' | 'research' | 'blueprint-recipe'
+    workbenchMode: 'overview' | 'station' | 'transit' | 'terraforming' | 'tech-tree' | 'research' | 'blueprint-recipe' | 'auto-sector-group'
     activeStationId: string | null
     activeTransitSectorId: string | null
   }
@@ -78,6 +82,7 @@ export interface SidebarPresenterStore {
   selectTechTree?(): void
   selectResearch?(): void
   selectBlueprintRecipe?(): void
+  selectAutoSectorGroup?(): void
   selectTransitSector?(sectorId: string | null): void
   createStation(name?: string): unknown
   renameStation(stationId: string, name: string): void
@@ -86,6 +91,8 @@ export interface SidebarPresenterStore {
   setExpandedSector?(sectorId: string | null): void
   jumpToMapBinding?(tabId: string, tabType: 'station' | 'transit'): void
   canDeleteStation?(stationId: string): boolean
+  autoGroupResult?: unknown | null
+  needsAutoGroupRecalc?: boolean
 }
 
 function getFallbackTagForStationType(type?: StationType): string | undefined {
@@ -169,6 +176,7 @@ export function useProductionSidebarPresenter(store: SidebarPresenterStore): Use
   const showTechTree = false
   const showResearch = true
   const showBlueprintRecipe = true
+  const showAutoSectorGroup = store.capabilities.hasSectors
 
   const props: SidebarPresenterProps = {
     tabs,
@@ -177,6 +185,7 @@ export function useProductionSidebarPresenter(store: SidebarPresenterStore): Use
       if (store.session.workbenchMode === 'tech-tree') return 'tech-tree'
       if (store.session.workbenchMode === 'research') return 'research'
       if (store.session.workbenchMode === 'blueprint-recipe') return 'blueprint-recipe'
+      if (store.session.workbenchMode === 'auto-sector-group') return 'auto-sector-group'
       if (store.session.workbenchMode === 'transit' && store.session.activeTransitSectorId) {
         return `transit:${store.session.activeTransitSectorId}`
       }
@@ -189,6 +198,9 @@ export function useProductionSidebarPresenter(store: SidebarPresenterStore): Use
     showTechTree,
     showResearch,
     showBlueprintRecipe,
+    showAutoSectorGroup,
+    autoSectorGroupDisabled: computed(() => store.autoGroupResult == null),
+    autoSectorGroupNeedsRecalc: computed(() => store.needsAutoGroupRecalc === true),
     canCreateStation: !store.capabilities.uniqueStation,
     canOpenContextMenu: !store.capabilities.uniqueStation || (store.capabilities.uniqueStation && !store.archiveStation),
     contextMenuMode: store.capabilities.uniqueStation ? 'delete-only' : 'full',
@@ -203,6 +215,7 @@ export function useProductionSidebarPresenter(store: SidebarPresenterStore): Use
     selectTechTree: () => (store.selectTechTree || (() => {}))(),
     selectResearch: () => (store.selectResearch || (() => {}))(),
     selectBlueprintRecipe: () => (store.selectBlueprintRecipe || (() => {}))(),
+    selectAutoSectorGroup: () => (store.selectAutoSectorGroup || (() => {}))(),
     selectTerraformingCluster: () => {},
     selectTransit: (sectorId: string) => (store.selectTransitSector || (() => {}))(sectorId),
     selectStation: (stationId: string) => store.selectStation(stationId),

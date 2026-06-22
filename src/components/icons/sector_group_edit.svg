@@ -1,0 +1,20 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN"
+ "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+ width="128.000000pt" height="128.000000pt" viewBox="0 0 128.000000 128.000000"
+ preserveAspectRatio="xMidYMid meet">
+<g transform="translate(0.000000,128.000000) scale(0.100000,-0.100000)"
+ fill="#ffffff" stroke="none">
+<circle cx="640" cy="640" r="440" fill="none" stroke="#ffffff" stroke-width="100"/>
+<path d="M430 760 L595 660 L790 785" fill="none" stroke="#ffffff" stroke-width="56" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M595 660 L770 520" fill="none" stroke="#ffffff" stroke-width="56" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="430" cy="760" r="70"/>
+<circle cx="595" cy="660" r="78"/>
+<circle cx="790" cy="785" r="70"/>
+<circle cx="770" cy="520" r="70"/>
+<path d="M455 455 L700 210 L820 330 L575 575 Z"/>
+<path d="M730 180 L880 250 L800 330 Z"/>
+<path d="M610 610 L675 675 L925 425 L860 360 Z"/>
+</g>
+</svg>

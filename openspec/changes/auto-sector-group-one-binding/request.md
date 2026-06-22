@@ -43,6 +43,18 @@ Trade station 在 Live 计算模式中作为第三列展示和 confirm gate 的�
 - [详情禁用]：当 `autoGroupResult` 为空时禁用。
 - [地图]：跳转到当前 active binding 的 Map binding 面板；不得修改 draft。
 
+### Live sidebar 详情入口
+
+- Live 页面 sidebar SHALL 在固定菜单和星区/站点列表之间的分隔线区域提供星区编辑详情入口。
+- 该入口 SHALL 作为持久化 workbench 菜单选择，而不是仅作为临时按钮状态。
+- 点击该入口 SHALL 将 `activeBindingWorkbench` 设置为星区编辑详情专用值，并通过现有 active view storage 持久化当前菜单选择。
+- 该入口与展示模式 [详情] 使用同一计算语义：进入详情/计算视图时不得运行分组算法，不得调用 `initAutoGroupDraft()`。
+- 当 `autoGroupResult=null` 时，该入口 SHALL 置灰禁用。
+- 当 `needsAutoGroupRecalc=true` 时，该入口 SHALL 显示红点提示。
+- 入口图标 SHALL 使用与蓝图配方、研究入口一致的单色 SVG 风格，优先表达“星区节点/连接 + 编辑”语义。
+- 该入口只属于 Live/save-binding sidebar，不影响 Map binding 面板和 empire production sidebar。
+- Station/sector 选择变化不得把该 workbench 选择自动覆盖为 `station` 或 `overview`；只有用户显式选择其他 sidebar 菜单或返回展示模式时才切换。
+
 ### 计算模式顶部栏按钮
 
 - [返回]：从计算模式回到展示模式；不提交、不计算、不重置 draft。
@@ -84,6 +96,7 @@ Trade station 在 Live 计算模式中作为第三列展示和 confirm gate 的�
 - `buildAssignmentsFromBinding()` 的无变化路径。
 - Presenter 与 shared draft 的职责边界。
 - Live 展示/计算双模式。
+- Live sidebar 星区编辑详情入口及其持久化菜单选择、禁用、红点和图标语义。
 - Live 中 assignment/trade station confirm gate 的展示关系。
 
 ### Out of Scope

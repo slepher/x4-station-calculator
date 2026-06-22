@@ -188,7 +188,9 @@
     "hub_tab": "枢纽",
     "allocation_tab": "分配方案",
     "trade_station_tab": "交易站",
-    "edit_overlay_hint": "编辑输入中，分配面板暂不可操作"
+    "edit_overlay_hint": "编辑输入中，分配面板暂不可操作",
+    "sidebar_label": "星区编辑",
+    "sidebar_disabled": "暂无星区编辑详情"
   },
   "sectorManagement": {
     "title": "星区管理",

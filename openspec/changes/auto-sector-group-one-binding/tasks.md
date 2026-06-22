@@ -43,12 +43,22 @@
 - [ ] 展示模式渲染 `[存档 3fr] | [星区 4fr] | [资源 5fr]`
 - [ ] 展示模式星区列显示桥接跳数、覆盖跳数和 Hub 阈值
 - [ ] 详情按钮只切换到计算模式，不触发计算
+- [x] Live sidebar 分隔线区域新增星区编辑详情入口
+- [x] `ActiveViewState.activeBindingWorkbench` 增加星区编辑详情专用值
+- [x] Sidebar 详情入口设置并持久化星区编辑详情 workbench 选择
+- [x] `workbenchMode` 支持星区编辑详情模式并渲染 `AutoSectorGroupPanel layout="columns"`
+- [x] 将星区编辑详情加入 `activeBindingStation` 的固定模式保护列表，避免被 station/overview fallback 覆盖
+- [x] Sidebar 详情入口复用详情按钮计算语义：不触发计算、不初始化 draft、不修改 shared draft
+- [x] Sidebar 详情入口在 `autoGroupResult=null` 时置灰禁用
+- [x] Sidebar 详情入口在 `needsAutoGroupRecalc=true` 时显示红点提示
+- [x] 新增与蓝图配方、研究风格一致的星区编辑 SVG 图标
 - [ ] 计算模式渲染 `AutoSectorGroupPanel layout="columns"`
 - [ ] 确认成功后返回展示模式
 
 ## 6. 按钮与 tab 行为
 
 - [ ] 展示模式 [详情] 只进入计算模式，不触发计算
+- [x] Sidebar [星区编辑详情] 持久化当前菜单选择，只进入详情模式，不触发计算
 - [ ] 展示模式 [地图] 进入 Map binding，不修改 draft
 - [ ] 计算模式 [返回] 返回展示模式，不提交、不计算、不重置
 - [ ] [计算] / [快速计算] 更新 shared draft 和 `calculationBaseline`

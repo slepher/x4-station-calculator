@@ -29,6 +29,7 @@ import TechTreePlaceholder from '@/components/empire/TechTreePlaceholder.vue'
 import ResearchWorkbench from '@/components/empire/ResearchWorkbench.vue'
 import BlueprintRecipeWorkbench from '@/components/empire/BlueprintRecipeWorkbench.vue'
 import SectorOverviewPanel from '@/components/empire/sector-overview/SectorOverviewPanel.vue'
+import AutoSectorGroupPanel from '@/components/map/AutoSectorGroupPanel.vue'
 
 const liveStore = useLiveProductionStore()
 const terraformingStore = useTerraformingStore()
@@ -135,6 +136,19 @@ const showArchiveModuleList = computed(() => {
   return planningPresenter.props.visualMode.value === 'live' && planningPresenter.props.hasArchive.value
 })
 
+function closeAutoSectorGroupPanel() {
+  activeViewStore.activeBindingWorkbench = 'overview'
+}
+
+function openAutoSectorGroupMap() {
+  const guid = activeViewStore.activeBinding
+  if (!guid) return
+  activeViewStore.isSavePanelOpen = true
+  activeViewStore.mapBindingGameGuid = guid
+  activeViewStore.mapSavePanelLayer = 'binding-sector'
+  activeViewStore.setActiveView('maps')
+}
+
 </script>
 
 <template>
@@ -148,6 +162,9 @@ const showArchiveModuleList = computed(() => {
       :show-tech-tree="sidebarPresenter.props.showTechTree"
       :show-research="sidebarPresenter.props.showResearch"
       :show-blueprint-recipe="sidebarPresenter.props.showBlueprintRecipe"
+      :show-auto-sector-group="sidebarPresenter.props.showAutoSectorGroup"
+      :auto-sector-group-disabled="sidebarPresenter.props.autoSectorGroupDisabled.value"
+      :auto-sector-group-needs-recalc="sidebarPresenter.props.autoSectorGroupNeedsRecalc.value"
       :terraforming-clusters="terraformingStore.sidebarClusters"
       :active-terraforming-cluster-id="toolbarPresenter.props.workbenchMode.value === 'terraforming' ? (terraformingStore.activePlan?.selectedClusterId ?? null) : null"
       :can-create-station="sidebarPresenter.props.canCreateStation"
@@ -159,6 +176,7 @@ const showArchiveModuleList = computed(() => {
       @select-tech-tree="sidebarPresenter.emits.selectTechTree"
       @select-research="sidebarPresenter.emits.selectResearch"
       @select-blueprint-recipe="sidebarPresenter.emits.selectBlueprintRecipe"
+      @select-auto-sector-group="sidebarPresenter.emits.selectAutoSectorGroup"
       @select-terraforming-cluster="(clusterId: string) => {
         activeViewStore.activeBindingWorkbench = 'terraforming'
         terraformingStore.selectCluster(clusterId)
@@ -258,6 +276,14 @@ const showArchiveModuleList = computed(() => {
   <ResearchWorkbench v-else-if="toolbarPresenter.props.workbenchMode.value === 'research'" />
 
   <BlueprintRecipeWorkbench v-else-if="toolbarPresenter.props.workbenchMode.value === 'blueprint-recipe'" :playerData="playerBindingData" />
+
+  <AutoSectorGroupPanel
+    v-else-if="toolbarPresenter.props.workbenchMode.value === 'auto-sector-group'"
+    layout="columns"
+    @back="closeAutoSectorGroupPanel"
+    @map="openAutoSectorGroupMap"
+    @confirmed="closeAutoSectorGroupPanel"
+  />
 
   <template v-else-if="toolbarPresenter.props.workbenchMode.value === 'overview' || toolbarPresenter.props.workbenchMode.value === 'transit'">
     <div v-if="toolbarPresenter.props.workbenchMode.value === 'transit'" class="main-layout">

@@ -717,11 +717,25 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     }
   })
 
-  const workbenchMode = computed<'station' | 'transit' | 'overview' | 'terraforming' | 'tech-tree' | 'research' | 'blueprint-recipe'>(() => {
+  const isAutoSectorGroupMode = computed({
+    get: () => activeViewStore.activeBindingWorkbench === 'auto-sector-group',
+    set: (val: boolean) => {
+      if (val) {
+        activeViewStore.activeBindingWorkbench = 'auto-sector-group'
+      } else {
+        if (activeViewStore.activeBindingWorkbench === 'auto-sector-group') {
+          activeViewStore.activeBindingWorkbench = 'overview'
+        }
+      }
+    }
+  })
+
+  const workbenchMode = computed<'station' | 'transit' | 'overview' | 'terraforming' | 'tech-tree' | 'research' | 'blueprint-recipe' | 'auto-sector-group'>(() => {
     if (isTerraformingMode.value) return 'terraforming'
     if (isTechTreeMode.value) return 'tech-tree'
     if (isResearchMode.value) return 'research'
     if (isBlueprintRecipeMode.value) return 'blueprint-recipe'
+    if (isAutoSectorGroupMode.value) return 'auto-sector-group'
     return activeTransitSectorId.value ? 'transit' : (activeStationId.value ? 'station' : 'overview')
   })
 
@@ -1679,6 +1693,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     isTechTreeMode.value = false
     isResearchMode.value = false
     isBlueprintRecipeMode.value = false
+    isAutoSectorGroupMode.value = false
     activeStationId.value = stationId
   }
 
@@ -1687,6 +1702,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     isTechTreeMode.value = false
     isResearchMode.value = false
     isBlueprintRecipeMode.value = false
+    isAutoSectorGroupMode.value = false
     if (!sectorId) {
       activeStationId.value = null
       return
@@ -1714,6 +1730,11 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
 
   function selectBlueprintRecipe() {
     isBlueprintRecipeMode.value = true
+    activeStationId.value = null
+  }
+
+  function selectAutoSectorGroup() {
+    isAutoSectorGroupMode.value = true
     activeStationId.value = null
   }
 
@@ -2336,6 +2357,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     selectTechTree,
     selectResearch,
     selectBlueprintRecipe,
+    selectAutoSectorGroup,
     terraformingHqStationCode,
     terraformingHqStationName,
     terraformingHqArchiveStation,

@@ -138,6 +138,18 @@ Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触�
 - **当** 详情按钮渲染
 - **那么** SHALL 置灰禁用
 
+#### Scenario: Sidebar detail entry shows change hint via red dot
+
+- **前提** `needsAutoGroupRecalc` 为 true
+- **当** Live sidebar 星区编辑详情入口渲染
+- **那么** SHALL 显示红点 + tooltip 提示用户重新计算
+
+#### Scenario: Sidebar detail entry disabled without result
+
+- **前提** `autoGroupResult` 为 null
+- **当** Live sidebar 星区编辑详情入口渲染
+- **那么** SHALL 置灰禁用
+
 ### Requirement: Live panel dual mode
 
 系统 SHALL 在 live 面板提供展示模式和计算模式，通过 `liveMode` 切换。展示模式与详情模式切换本身不触发计算，只读取 store 中已有数据；计算模式内用户显式点击「计算」时，系统 MAY 更新共享 draft。
@@ -164,6 +176,37 @@ Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触�
 - **前提** 展示模式
 - **当** 点击「详情」
 - **那么** SHALL 仅设置 `liveMode = 'calculate'`（不触发计算，store 数据已由 `initAutoGroupDraft()` 生成）
+
+#### Scenario: Sidebar detail entry switches to calculate mode
+
+- **前提** Live 处于展示模式
+- **当** 用户点击 sidebar 分隔线区域的星区编辑详情入口
+- **那么** SHALL 设置 `activeBindingWorkbench` 为星区编辑详情专用值
+- **并且** SHALL 通过 active view storage 持久化该 sidebar 菜单选择
+- **并且** SHALL 显示计算/详情视图
+- **并且** SHALL NOT 调用分组算法
+- **并且** SHALL NOT 调用 `initAutoGroupDraft()`
+
+#### Scenario: Sidebar detail entry persists across reload
+
+- **前提** 用户已点击 sidebar 星区编辑详情入口
+- **当** 页面刷新并从 `x4_station_active_view` 恢复 active view state
+- **那么** 系统 SHALL 恢复到星区编辑详情 workbench
+- **并且** SHALL 显示 `AutoSectorGroupPanel layout="columns"`
+- **并且** SHALL NOT 因恢复菜单选择运行分组算法或 `initAutoGroupDraft()`
+
+#### Scenario: Sidebar detail entry is protected from station selection fallback
+
+- **前提** `activeBindingWorkbench` 为星区编辑详情专用值
+- **当** `activeBindingStation` 或 active transit sector 发生变化
+- **那么** 系统 SHALL NOT 将 `activeBindingWorkbench` 自动改写为 `station` 或 `overview`
+
+#### Scenario: Sidebar detail icon follows fixed menu style
+
+- **前提** Live sidebar 渲染星区编辑详情入口
+- **当** 系统显示入口图标
+- **那么** SHALL 使用与蓝图配方和研究入口一致的单色 SVG 图标风格
+- **并且** 图标 SHALL 表达星区节点、连接和编辑语义
 
 #### Scenario: Submit returns to display mode
 
@@ -247,6 +290,14 @@ Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触�
 - **前提** Live 处于展示模式
 - **当** 用户点击「详情」
 - **那么** 系统 SHALL 只设置 `liveMode = 'calculate'`
+- **并且** SHALL NOT 调用分组算法
+- **并且** SHALL NOT 调用 `initAutoGroupDraft()`
+
+#### Scenario: Sidebar detail entry
+
+- **前提** Live 处于展示模式
+- **当** 用户点击 sidebar 星区编辑详情入口
+- **那么** 系统 SHALL 设置并持久化星区编辑详情 workbench 选择
 - **并且** SHALL NOT 调用分组算法
 - **并且** SHALL NOT 调用 `initAutoGroupDraft()`
 

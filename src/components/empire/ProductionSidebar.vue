@@ -10,6 +10,7 @@ import factoryIconUrl from '@/components/icons/factory.svg'
 import researchIconUrl from '@/components/icons/tlt_research.svg'
 import terraformingIconUrl from '@/components/icons/tlt_terraforming.svg'
 import blueprintIconUrl from '@/components/icons/blueprint.svg'
+import sectorGroupEditIconUrl from '@/components/icons/sector_group_edit.svg'
 
 const props = defineProps<{
   tabs: ProductionTabItem[]
@@ -20,6 +21,9 @@ const props = defineProps<{
   showResearch: boolean
   showTechTree: boolean
   showBlueprintRecipe: boolean
+  showAutoSectorGroup?: boolean
+  autoSectorGroupDisabled?: boolean
+  autoSectorGroupNeedsRecalc?: boolean
   terraformingClusters: { id: string; name: string; nameId: string; temperatureState: number }[]
   activeTerraformingClusterId: string | null
   canCreateStation: boolean
@@ -34,6 +38,7 @@ const emit = defineEmits<{
   selectTechTree: []
   selectResearch: []
   selectBlueprintRecipe: []
+  selectAutoSectorGroup: []
   selectTerraformingCluster: [clusterId: string]
   selectTransit: [sectorId: string]
   selectStation: [stationId: string]
@@ -160,6 +165,12 @@ const fixedItems = computed<ProductionTabItem[]>(() => {
   return result
 })
 
+const autoSectorGroupItem = computed<ProductionTabItem>(() => ({
+  id: 'auto-sector-group',
+  type: 'auto-sector-group',
+  name: t('auto_sector.sidebar_label')
+}))
+
 const dynamicItems = computed<ProductionTabItem[]>(() => {
   const result: ProductionTabItem[] = []
 
@@ -211,6 +222,7 @@ const getTabIcon = (tab: ProductionTabItem): string => {
   if (tab.id === 'tech-tree') return terraformingIconUrl
   if (tab.id === 'research') return researchIconUrl
   if (tab.id === 'blueprint-recipe') return blueprintIconUrl
+  if (tab.id === 'auto-sector-group') return sectorGroupEditIconUrl
   if (tab.type === 'transit') return tradestationIconUrl
   const iconTag = getPoiIconTag(tab)
   if (iconTag) return SAVE_POI_ICON_MAP[iconTag] || factoryIconUrl
@@ -230,6 +242,8 @@ const handleTabClick = (tab: ProductionTabItem) => {
     emit('selectResearch')
   } else if (tab.id === 'blueprint-recipe') {
     emit('selectBlueprintRecipe')
+  } else if (tab.id === 'auto-sector-group') {
+    if (!props.autoSectorGroupDisabled) emit('selectAutoSectorGroup')
   } else if (tab.type === 'transit') {
     emit('selectTransit', tab.sectorId!)
   } else {
@@ -262,6 +276,16 @@ const toggleSectorCollapse = (sectorId: string) => {
 
 const handleFixedClick = (tab: ProductionTabItem) => {
   handleTabClick(tab)
+}
+
+const getFixedTestId = (item: ProductionTabItem): string => {
+  if (item.id === 'overview') return 'sidebar-overview'
+  if (item.id === 'terraforming') return 'sidebar-terraforming'
+  if (item.id === 'blueprint-recipe') return 'sidebar-blueprint-recipe'
+  if (item.id === 'research') return 'sidebar-research'
+  if (item.id === 'tech-tree') return 'sidebar-tech-tree'
+  if (item.id === 'auto-sector-group') return 'sidebar-auto-sector-group'
+  return `sidebar-${item.id}`
 }
 
 const isTabActive = (tabId: string): boolean => {
@@ -362,7 +386,7 @@ onUnmounted(() => {
             :key="item.id"
             class="sidebar-item"
             :class="{ active: isTabActive(item.id) }"
-            :data-testid="item.id === 'overview' ? 'sidebar-overview' : item.id === 'terraforming' ? 'sidebar-terraforming' : item.id === 'blueprint-recipe' ? 'sidebar-blueprint-recipe' : 'sidebar-tech-tree'"
+            :data-testid="getFixedTestId(item)"
             @click="handleFixedClick(item)"
           >
             <div class="sidebar-item-active-bar"></div>
@@ -410,6 +434,27 @@ onUnmounted(() => {
               <span class="sidebar-item-label">{{ item.name }}</span>
             </div>
           </div>
+
+        <div class="sidebar-divider"></div>
+
+        <div v-if="props.showAutoSectorGroup" class="sidebar-section sidebar-auto-sector">
+          <div
+            class="sidebar-item sidebar-auto-sector-item"
+            :class="{ active: isTabActive('auto-sector-group'), disabled: props.autoSectorGroupDisabled }"
+            data-testid="sidebar-auto-sector-group"
+            :title="props.autoSectorGroupDisabled ? t('auto_sector.sidebar_disabled') : t('auto_sector.sidebar_label')"
+            @click="handleFixedClick(autoSectorGroupItem)"
+          >
+            <div class="sidebar-item-active-bar"></div>
+            <span class="sector-click-area flex items-center gap-2 flex-1 min-w-0">
+              <span class="sidebar-icon-wrap">
+                <img class="sidebar-item-icon icon-green" :src="sectorGroupEditIconUrl" alt="" />
+                <span v-if="props.autoSectorGroupNeedsRecalc" class="sidebar-recalc-dot"></span>
+              </span>
+              <span class="sidebar-item-label">{{ t('auto_sector.sidebar_label') }}</span>
+            </span>
+          </div>
+        </div>
 
         <div class="sidebar-divider"></div>
 
@@ -618,6 +663,10 @@ onUnmounted(() => {
   @apply text-sky-400 bg-slate-800;
 }
 
+.sidebar-item.disabled {
+  @apply opacity-45 cursor-not-allowed hover:bg-transparent hover:text-slate-400;
+}
+
 .sidebar-item-active-bar {
   @apply absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 rounded-full bg-transparent transition-colors;
 }
@@ -628,6 +677,18 @@ onUnmounted(() => {
 
 .sidebar-item-icon {
   @apply w-5 h-5 flex-shrink-0;
+}
+
+.sidebar-icon-wrap {
+  @apply relative w-5 h-5 flex-shrink-0;
+}
+
+.sidebar-icon-wrap .sidebar-item-icon {
+  @apply w-5 h-5;
+}
+
+.sidebar-recalc-dot {
+  @apply absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-red-500 border border-slate-900;
 }
 
 .icon-green {
