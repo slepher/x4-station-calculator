@@ -93,6 +93,17 @@ type ActiveTab = 'hub' | 'allocation' | 'tradeStation' | 'virtualStation'
 
 Live `layout="columns"` 不显示该 tab。
 
+Map binding 面板使用固定头部、tab 内滚动布局：
+
+```text
+MapSavePanel body
+  AutoSectorBar
+  tab-bar
+  tab-content (only scroll container)
+```
+
+在 binding layer 下，`MapSavePanel` body 不承担纵向滚动和横向 padding；`AutoSectorGroupPanel` 负责头部、tab bar、tab content 的统一横向 padding。滚动条只挂在 `tab-content`，内容左右 padding 保持对称，并保留内容到滚动条的间距。
+
 Virtual Station tab 分两段：
 
 ```text
@@ -107,6 +118,41 @@ Blueprint 空间站
 ```
 
 Blueprint empire selector 复用 binding 的 `blueprintEmpireId`。切换来源只影响可拖拽来源列表，不回写已创建 virtual station。
+
+## Map Binding 面板状态
+
+地图上的“存档”按钮是面板 toggle：
+
+```text
+isSavePanelOpen === true
+  -> close panel only
+
+isSavePanelOpen === false
+  -> open panel and restore previous MapSavePanel layer
+```
+
+关闭面板只隐藏 UI，不重置 `mapSavePanelLayer`、`mapBindingGameGuid` 或 `mapSavePanelSectorGroupId`。再次打开应回到关闭前的 binding tab/sector group 语境。
+
+首次从 list 打开且存在当前 auto group draft 时，可以进入 `binding-sector`。但该初始化只在当前 layer 仍为 `list` 时发生；不得覆盖用户关闭前保留的 layer。
+
+## Draft Overlay 激活条件
+
+Map overlay 只有在当前确实处于 binding draft 编辑态时才能读取 draft：
+
+```text
+isSavePanelOpen
+  && mapBindingStage === 'select-sector'
+  && mapBindingGameGuid === activeBinding.gameGuid
+  && autoGroupResult exists
+```
+
+该条件用于：
+
+- 从 `virtualStationDrafts` 渲染虚拟生产空间站。
+- 从 `autoGroupResult.groups` 渲染 virtual trade station draft。
+- 用 draft 中的 player trade station selection 标记 save POI tradestation。
+
+关闭 binding 面板后，地图必须回到 persisted binding 视图，不得继续混用 `autoGroupResult` 中未确认的 draft。这样未提交的 virtual trade station 选择不会残留在地图，也不会影响原 player trade station 图标。
 
 ## Drag 输入
 

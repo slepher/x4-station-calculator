@@ -59,6 +59,7 @@ export interface GroupDraftInfo {
   savedTradeStationCode?: string
   tradeStationRetainEnabled?: boolean
   selectedTradeStation?: { type: 'player' | 'virtual'; stationCode: string } | null
+  virtualTradeStationPosition?: { x: number; y: number; z: number }
   source?: 'auto' | 'manual' | 'bridge'
   color?: string
   baseline?: boolean

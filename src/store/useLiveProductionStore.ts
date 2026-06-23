@@ -29,6 +29,7 @@ import { DEFAULT_HUB_CONFIG } from './logic/autoGroupHub'
 import { DEFAULT_JUMP_RANGE, DEFAULT_BRIDGE_SEARCH_JUMP_RANGE, type AutoGroupResult, type GroupDraftInfo, type SectorAssignment, type AssignmentOption, groupCleanSlate, groupIncremental, getDistance, enrichAutoGroupResult } from './logic/autoGroup'
 import { buildSectorGraphFromMaps } from './logic/saveBindingUtils'
 import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
+import { getSectorZoneBoundingCenter } from '@/components/map/utils/coordinates'
 import { deepClone } from '@/utils/deepClone'
 import {
   createEmpireSourceView,
@@ -113,6 +114,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   const dirtyBindingStationIds = ref<DirtyBindingState>(null)
 
   const autoGroupResult = shallowRef<AutoGroupResult | null>(null)
+  const virtualStationDrafts = ref<BindingStationPlan[]>([])
+  const virtualStationDraftInitializedKey = ref<string | null>(null)
   const calculationMode = ref<'result' | 'edit'>('result')
   const prefJumpRange = ref(DEFAULT_JUMP_RANGE)
   const bridgeSearchJumpRange = ref(DEFAULT_BRIDGE_SEARCH_JUMP_RANGE)
@@ -121,6 +124,197 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     coverageByGroupId: Record<string, string[]>
     connectedGroupIdsByGroupId: Record<string, string[]>
   } | null>(null)
+
+  function getVirtualStationDraftKey(): string | null {
+    const archive = selectedArchive.value
+    const binding = activeBinding.value
+    if (!binding || !archive) return null
+    return `${binding.gameGuid}:${archive.meta?.time ?? 0}`
+  }
+
+  function resolveVirtualStationGroupId(sectorMacro: string | undefined, groups: GroupDraftInfo[]): string | null {
+    if (!sectorMacro) return null
+    const hits = groups.filter((group) =>
+      group.sectorMacro === sectorMacro || group.coverageSectorMacros.includes(sectorMacro)
+    )
+    if (hits.length !== 1) return null
+    return hits[0]!.id
+  }
+
+  function recomputeVirtualStationDraftGroups(groups: GroupDraftInfo[] = autoGroupResult.value?.groups ?? []) {
+    virtualStationDrafts.value = virtualStationDrafts.value.map((draft) => ({
+      ...draft,
+      groupId: resolveVirtualStationGroupId(draft.sectorMacro, groups)
+    }))
+  }
+
+  function initializeVirtualStationDraftsForAutoGroups(groups: GroupDraftInfo[] = autoGroupResult.value?.groups ?? []) {
+    const key = getVirtualStationDraftKey()
+    if (!key) {
+      virtualStationDrafts.value = []
+      virtualStationDraftInitializedKey.value = null
+      return
+    }
+    if (virtualStationDraftInitializedKey.value !== key) {
+      const binding = activeBinding.value
+      virtualStationDrafts.value = (binding?.stationPlans ?? [])
+        .filter((plan) => plan.saveStationCode === undefined)
+        .map((plan) => deepClone(plan))
+      virtualStationDraftInitializedKey.value = key
+    }
+    recomputeVirtualStationDraftGroups(groups)
+  }
+
+  function createVirtualStationDraftFromBlueprint(input: {
+    source: StationPlan
+    sectorMacro: string
+    position: { x: number; y: number; z: number }
+  }): BindingStationPlan | null {
+    const groupId = resolveVirtualStationGroupId(input.sectorMacro, autoGroupResult.value?.groups ?? [])
+    if (!groupId) return null
+    const draft: BindingStationPlan = {
+      id: crypto.randomUUID(),
+      saveStationCode: undefined,
+      groupId,
+      name: input.source.name,
+      type: input.source.type ?? 'industrial',
+      modules: deepClone(input.source.modules ?? []),
+      settings: deepClone(input.source.settings ?? DEFAULT_STATION_SETTINGS),
+      lockedWares: deepClone(input.source.lockedWares ?? []),
+      warePriority: deepClone(input.source.warePriority ?? {}),
+      sectorMacro: input.sectorMacro,
+      position: input.position
+    }
+    virtualStationDrafts.value = [...virtualStationDrafts.value, draft]
+    return draft
+  }
+
+  function createBlankVirtualStationDraft(input: {
+    sectorMacro: string
+    position: { x: number; y: number; z: number }
+  }): BindingStationPlan | null {
+    const groupId = resolveVirtualStationGroupId(input.sectorMacro, autoGroupResult.value?.groups ?? [])
+    if (!groupId) return null
+    const draft: BindingStationPlan = {
+      id: crypto.randomUUID(),
+      saveStationCode: undefined,
+      groupId,
+      name: i18n.global.t('auto_sector.virtual_station_label'),
+      type: 'industrial',
+      modules: [],
+      settings: deepClone(DEFAULT_STATION_SETTINGS),
+      lockedWares: [],
+      warePriority: {},
+      sectorMacro: input.sectorMacro,
+      position: input.position
+    }
+    virtualStationDrafts.value = [...virtualStationDrafts.value, draft]
+    return draft
+  }
+
+  function moveVirtualStationDraft(input: {
+    draftId: string
+    sectorMacro: string
+    position: { x: number; y: number; z: number }
+  }): boolean {
+    const groupId = resolveVirtualStationGroupId(input.sectorMacro, autoGroupResult.value?.groups ?? [])
+    if (!groupId) return false
+    let changed = false
+    virtualStationDrafts.value = virtualStationDrafts.value.map((draft) => {
+      if (draft.id !== input.draftId) return draft
+      changed = true
+      return {
+        ...draft,
+        groupId,
+        sectorMacro: input.sectorMacro,
+        position: input.position
+      }
+    })
+    return changed
+  }
+
+  function deleteVirtualStationDraft(draftId: string): boolean {
+    const before = virtualStationDrafts.value.length
+    virtualStationDrafts.value = virtualStationDrafts.value.filter((draft) => draft.id !== draftId)
+    return virtualStationDrafts.value.length !== before
+  }
+
+  function applyVirtualStationDraftsToBinding() {
+    const binding = activeBinding.value
+    if (!binding) return
+    recomputeVirtualStationDraftGroups()
+    const validDrafts = virtualStationDrafts.value.filter((draft) => draft.groupId && draft.sectorMacro && draft.position)
+    const validDraftIds = new Set(validDrafts.map((draft) => draft.id))
+    for (const existing of [...binding.stationPlans]) {
+      if (existing.saveStationCode !== undefined) continue
+      if (!validDraftIds.has(existing.id)) {
+        saveBindingStore.deleteStationPlan(binding.gameGuid, existing.id)
+      }
+    }
+    for (const draft of validDrafts) {
+      const existing = binding.stationPlans.find((plan) => plan.id === draft.id)
+      if (existing) {
+        saveBindingStore.updateStationPlan(binding.gameGuid, draft.id, {
+          groupId: draft.groupId,
+          name: draft.name,
+          type: draft.type,
+          modules: deepClone(draft.modules),
+          settings: deepClone(draft.settings),
+          lockedWares: deepClone(draft.lockedWares ?? []),
+          warePriority: deepClone(draft.warePriority ?? {}),
+          sectorMacro: draft.sectorMacro,
+          position: draft.position
+        })
+        continue
+      }
+      const created = saveBindingStore.upsertStationPlan({
+        gameGuid: binding.gameGuid,
+        groupId: draft.groupId,
+        name: draft.name,
+        type: draft.type,
+        modules: deepClone(draft.modules),
+        settings: deepClone(draft.settings),
+        lockedWares: deepClone(draft.lockedWares ?? []),
+        warePriority: deepClone(draft.warePriority ?? {}),
+        sectorMacro: draft.sectorMacro,
+        position: draft.position
+      })
+      if (created) created.id = draft.id
+    }
+  }
+
+  function moveVirtualTradeStationDraft(input: {
+    groupId: string
+    sectorMacro: string
+    position: { x: number; y: number; z: number }
+  }): boolean {
+    const result = autoGroupResult.value
+    if (!result) return false
+    const groups = [...result.groups]
+    const idx = groups.findIndex((group) => group.id === input.groupId)
+    if (idx < 0) return false
+    const group = groups[idx]!
+    if (group.selectedTradeStation?.type !== 'virtual') return false
+    if (group.sectorMacro !== input.sectorMacro) return false
+    groups[idx] = {
+      ...group,
+      virtualTradeStationPosition: input.position
+    }
+    autoGroupResult.value = { ...result, groups, assignments: result.assignments }
+    return true
+  }
+
+  function getVirtualTradeStationDefaultPosition(sectorMacro: string): { x: number; y: number; z: number } {
+    const resolved = resolveMapSectorByMacro<X4MapSector>(gameData.maps, sectorMacro)
+    if (!resolved) return { x: 0, y: 0, z: 0 }
+    const center = getSectorZoneBoundingCenter(resolved.sector)
+    return { x: center.x, y: 0, z: center.z }
+  }
+
+  watch(autoGroupResult, (result) => {
+    if (!result) return
+    initializeVirtualStationDraftsForAutoGroups(result.groups)
+  })
 
   const needsAutoGroupRecalc = computed(() => {
     const archive = selectedArchive.value
@@ -2301,6 +2495,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     overviewBuyMultiplier,
     overviewSellMultiplier,
     autoGroupResult,
+    virtualStationDrafts,
+    virtualStationDraftInitializedKey,
     calculationMode,
     prefJumpRange,
     bridgeSearchJumpRange,
@@ -2308,6 +2504,15 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     calcBaselinePillState,
     needsAutoGroupRecalc,
     initAutoGroupDraft,
+    initializeVirtualStationDraftsForAutoGroups,
+    recomputeVirtualStationDraftGroups,
+    createVirtualStationDraftFromBlueprint,
+    createBlankVirtualStationDraft,
+    moveVirtualStationDraft,
+    deleteVirtualStationDraft,
+    applyVirtualStationDraftsToBinding,
+    moveVirtualTradeStationDraft,
+    getVirtualTradeStationDefaultPosition,
     buildAssignmentsFromBinding,
     saveBinding,
     createStation,

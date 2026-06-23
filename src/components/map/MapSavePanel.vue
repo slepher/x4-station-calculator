@@ -28,7 +28,7 @@ const emit = defineEmits<{
   (e: 'focus-sector', sectorId: string): void
   (e: 'fit-sectors', sectorIds: string[]): void
   (e: 'context-change', payload: { stage: BindingStage; gameGuid: string | null; sectorGroupId: string | null }): void
-  (e: 'drag-station-start', payload: { stationId: string; gameGuid: string; sectorGroupId: string; name: string; icon: 'factory' | 'shipyard' | 'tradestation'; coverageSectorMacros: { ref: string; jump: number }[]; isVirtualTradestation?: boolean; blueprintStation?: StationPlan }): void
+  (e: 'drag-station-start', payload: { stationId: string; gameGuid: string; sectorGroupId: string; name: string; icon: 'factory' | 'shipyard' | 'tradestation'; coverageSectorMacros: { ref: string; jump: number }[]; isVirtualTradestation?: boolean; blueprintStation?: StationPlan; virtualStationDraftId?: string; blankVirtualStation?: boolean }): void
   (e: 'drag-station-end'): void
 }>()
 
@@ -195,7 +195,7 @@ function onClose() {
 }
 
 watch(() => props.open, (open, prev) => {
-  if (open && !prev && !isBindingLayer.value) {
+  if (open && !prev && layer.value === 'list') {
     if (liveStore.autoGroupResult) {
       const binding = saveBindingStore.activeBinding
       if (binding) {
@@ -206,9 +206,6 @@ watch(() => props.open, (open, prev) => {
     }
     resetToList()
     return
-  }
-  if (!open) {
-    resetToList()
   }
 })
 
@@ -227,8 +224,8 @@ watch([layer, selectedBindingGameGuid, selectedSectorGroupId, () => props.open],
 
   emit('context-change', {
     stage,
-    gameGuid: props.open ? selectedBindingGameGuid.value : null,
-    sectorGroupId: props.open ? selectedSectorGroupId.value : null
+    gameGuid: selectedBindingGameGuid.value,
+    sectorGroupId: selectedSectorGroupId.value
   })
 }, { immediate: true })
 </script>
@@ -259,7 +256,7 @@ watch([layer, selectedBindingGameGuid, selectedSectorGroupId, () => props.open],
       </button>
     </div>
 
-    <div class="map-save-panel__body scrollbar-thin">
+    <div class="map-save-panel__body scrollbar-thin" :class="{ 'map-save-panel__body--binding': isBindingLayer }">
       <MapSaveArchiveList
         v-if="layer === 'list'"
         @select="onArchiveSelect"
@@ -287,6 +284,8 @@ watch([layer, selectedBindingGameGuid, selectedSectorGroupId, () => props.open],
         @select-group="onSelectBindingGroup"
         @focus-sector="emit('focus-sector', $event)"
         @fit-sectors="emit('fit-sectors', $event)"
+        @drag-station-start="emit('drag-station-start', $event)"
+        @drag-station-end="emit('drag-station-end')"
       />
 
       <MapBindingStation
@@ -329,6 +328,11 @@ watch([layer, selectedBindingGameGuid, selectedSectorGroupId, () => props.open],
   scrollbar-gutter: stable both-edges;
   scrollbar-color: rgba(251, 191, 36, 0.55) rgba(15, 23, 42, 0.25);
   scrollbar-width: thin;
+}
+
+.map-save-panel__body--binding {
+  @apply overflow-hidden px-0;
+  scrollbar-gutter: auto;
 }
 
 .map-save-panel__body::-webkit-scrollbar {

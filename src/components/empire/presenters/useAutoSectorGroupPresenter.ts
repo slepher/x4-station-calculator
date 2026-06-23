@@ -6,23 +6,26 @@ import { useGameDataStore } from '@/store/useGameDataStore'
 import { useActiveViewStore } from '@/store/useActiveViewStore'
 import { useSaveBindingStore } from '@/store/useSaveBindingStore'
 import { useLiveProductionStore } from '@/store/useLiveProductionStore'
+import { useBlueprintProductionStore } from '@/store/useBlueprintProductionStore'
 import { groupCleanSlate, groupIncremental, applyAbsorbToResult, applyStandaloneToResult, applyBridgePlanToDraft, buildAssignmentResult, type AutoGroupResult, type GroupDraftInfo, getDistance } from '@/store/logic/autoGroup'
 import { buildSectorGraphFromMaps, getCoverageSectors, getPlayerStationsInSector } from '@/store/logic/saveBindingUtils'
 import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
+import { getSectorZoneBoundingCenter } from '@/components/map/utils/coordinates'
 import { stabilizeHubColors, stabilizeEditedHubColor, type HubColorContext } from '@/store/logic/hubColor'
 import { selectTradeStationCandidates, determineDefaultTradeStation, type TradeStationCandidate, type TradeStationSelection } from '@/store/logic/tradeStationSelection'
 import { detectStationHub } from '@/store/logic/autoGroupHub'
-import type { BindingSectorGroup, X4MapSector } from '@/types/x4'
+import type { BindingSectorGroup, BindingStationPlan, StationPlan, X4MapSector } from '@/types/x4'
 
 
 export function useAutoSectorGroupPresenter() {
 const saveStore = useSaveStore()
 const gameDataStore = useGameDataStore()
+const blueprintStore = useBlueprintProductionStore()
 const activeViewStore = useActiveViewStore()
 const saveBindingStore = useSaveBindingStore()
 const { activeBinding } = storeToRefs(saveBindingStore)
 const liveStore = useLiveProductionStore()
-const { autoGroupResult, calculationMode, prefJumpRange, bridgeSearchJumpRange, prefThreshold, needsAutoGroupRecalc, calcBaselinePillState } = storeToRefs(liveStore)
+const { autoGroupResult, virtualStationDrafts, calculationMode, prefJumpRange, bridgeSearchJumpRange, prefThreshold, needsAutoGroupRecalc, calcBaselinePillState } = storeToRefs(liveStore)
 const { t, te } = useI18n()
 const nodeEnabled = ref(true)
 const liveMode = ref<'display' | 'calculate'>('display')
@@ -54,6 +57,23 @@ const coverageRetainEnabled = ref(true)
 const tradeStationRetainEnabled = ref(true)
 const showHubAddMenu = ref(false)
 const calculationBaseline = ref<AutoGroupResult | null>(null)
+const virtualStationDragState = ref<{
+  key: string
+  payload: {
+    stationId: string
+    gameGuid: string
+    sectorGroupId: string
+    name: string
+    icon: 'factory' | 'shipyard'
+    coverageSectorMacros: { ref: string; jump: number }[]
+    blueprintStation?: StationPlan
+    virtualStationDraftId?: string
+    blankVirtualStation?: boolean
+  }
+  startX: number
+  startY: number
+} | null>(null)
+const activeVirtualStationDragKey = ref<string | null>(null)
 
 const gameDataMaps = computed(() => gameDataStore.maps)
 
@@ -72,6 +92,17 @@ function getSectorDisplayName(macro: string): string {
     }
   }
   return macro
+}
+
+function formatCoordKm(value: number): string {
+  return `${(value / 1000).toFixed(1)}km`
+}
+
+function getVirtualTradeStationDefaultPosition(sectorMacro: string): { x: number; y: number; z: number } {
+  const resolved = resolveMapSectorByMacro<X4MapSector>(gameDataStore.maps, sectorMacro)
+  if (!resolved) return { x: 0, y: 0, z: 0 }
+  const center = getSectorZoneBoundingCenter(resolved.sector)
+  return { x: center.x, y: 0, z: center.z }
 }
 
 const sectorGraphInfo = computed(() => {
@@ -815,6 +846,154 @@ const selectedTradeStations = computed<Record<string, TradeStationSelection>>(()
   return sel
 })
 
+const blueprintEmpires = computed(() => blueprintStore.savedEmpires?.list ?? [])
+
+const selectedBlueprintEmpireId = computed({
+  get: () => {
+    const binding = activeBinding.value
+    return binding?.blueprintEmpireId ||
+      blueprintStore.activeEmpire?.id ||
+      blueprintEmpires.value[0]?.id ||
+      ''
+  },
+  set: (empireId: string) => {
+    const binding = activeBinding.value
+    if (!binding) return
+    saveBindingStore.setBlueprintEmpire(binding.gameGuid, empireId || undefined)
+  }
+})
+
+const selectedBlueprintEmpire = computed(() => {
+  const id = selectedBlueprintEmpireId.value
+  if (!id) return null
+  if (blueprintStore.activeEmpire?.id === id) return blueprintStore.activeEmpire
+  return blueprintEmpires.value.find((empire) => empire.id === id) || null
+})
+
+const blueprintStationSources = computed(() => selectedBlueprintEmpire.value?.stations ?? [])
+
+const virtualStationGroups = computed(() => {
+  const draftsByGroupId = new Map<string, BindingStationPlan[]>()
+  const ungrouped: BindingStationPlan[] = []
+  for (const draft of virtualStationDrafts.value) {
+    if (draft.groupId) {
+      const bucket = draftsByGroupId.get(draft.groupId) ?? []
+      bucket.push(draft)
+      draftsByGroupId.set(draft.groupId, bucket)
+    } else {
+      ungrouped.push(draft)
+    }
+  }
+  const groups = (autoGroupResult.value?.groups ?? []).map((group) => ({
+    group,
+    stations: [...(draftsByGroupId.get(group.id) ?? [])].sort((a, b) => {
+      const nameA = getSectorDisplayName(a.sectorMacro ?? '')
+      const nameB = getSectorDisplayName(b.sectorMacro ?? '')
+      return nameA.localeCompare(nameB)
+    })
+  }))
+  return {
+    groups,
+    ungrouped: [...ungrouped].sort((a, b) => {
+      const nameA = getSectorDisplayName(a.sectorMacro ?? '')
+      const nameB = getSectorDisplayName(b.sectorMacro ?? '')
+      return nameA.localeCompare(nameB)
+    })
+  }
+})
+
+function getGroupCoverageEntries(groupId: string): { ref: string; jump: number }[] {
+  const group = autoGroupResult.value?.groups.find((item) => item.id === groupId)
+  if (!group) return []
+  return [
+    ...(group.sectorMacro ? [{ ref: group.sectorMacro, jump: 0 }] : []),
+    ...group.coverageSectorMacros.map((ref) => ({ ref, jump: 0 }))
+  ]
+}
+
+function getAllGroupCoverageEntries(): { ref: string; jump: number }[] {
+  const refs = new Set<string>()
+  for (const group of autoGroupResult.value?.groups ?? []) {
+    if (group.sectorMacro) refs.add(group.sectorMacro)
+    for (const ref of group.coverageSectorMacros) refs.add(ref)
+  }
+  return [...refs].map((ref) => ({ ref, jump: 0 }))
+}
+
+function getFirstVirtualStationGroupId(): string {
+  return autoGroupResult.value?.groups.find((group) => group.sectorMacro)?.id ?? ''
+}
+
+function buildVirtualStationDragPayload(input: {
+  key: string
+  name: string
+  icon: 'factory' | 'shipyard'
+  blueprintStation?: StationPlan
+  virtualStationDraftId?: string
+  blankVirtualStation?: boolean
+  groupId?: string | null
+}) {
+  const binding = activeBinding.value
+  const groupId = input.groupId || getFirstVirtualStationGroupId()
+  if (!binding || !groupId) return null
+  return {
+    stationId: input.virtualStationDraftId || input.blueprintStation?.id || input.key,
+    gameGuid: binding.gameGuid,
+    sectorGroupId: groupId,
+    name: input.name,
+    icon: input.icon,
+    coverageSectorMacros: input.blankVirtualStation || input.blueprintStation || input.virtualStationDraftId
+      ? getAllGroupCoverageEntries()
+      : getGroupCoverageEntries(groupId),
+    blueprintStation: input.blueprintStation,
+    virtualStationDraftId: input.virtualStationDraftId,
+    blankVirtualStation: input.blankVirtualStation
+  }
+}
+
+function startVirtualStationDrag(event: MouseEvent, input: {
+  key: string
+  name: string
+  icon: 'factory' | 'shipyard'
+  blueprintStation?: StationPlan
+  virtualStationDraftId?: string
+  blankVirtualStation?: boolean
+  groupId?: string | null
+}) {
+  if (event.button !== 0) return null
+  const payload = buildVirtualStationDragPayload(input)
+  if (!payload) return null
+  event.preventDefault()
+  virtualStationDragState.value = {
+    key: input.key,
+    payload,
+    startX: event.clientX,
+    startY: event.clientY
+  }
+  return payload
+}
+
+function updateVirtualStationDrag(event: MouseEvent) {
+  const state = virtualStationDragState.value
+  if (!state || activeVirtualStationDragKey.value) return null
+  const dx = event.clientX - state.startX
+  const dy = event.clientY - state.startY
+  if (Math.hypot(dx, dy) < 4) return null
+  activeVirtualStationDragKey.value = state.key
+  return state.payload
+}
+
+function finishVirtualStationDrag() {
+  const wasDragging = activeVirtualStationDragKey.value !== null
+  virtualStationDragState.value = null
+  activeVirtualStationDragKey.value = null
+  return wasDragging
+}
+
+function handleDeleteVirtualStationDraft(draftId: string) {
+  liveStore.deleteVirtualStationDraft(draftId)
+}
+
 const hasUnresolvedTradeStations = computed(() => {
   if (!autoGroupResult.value) return false
   const groupsWithCandidates = Object.keys(tradeStationCandidates.value)
@@ -823,10 +1002,34 @@ const hasUnresolvedTradeStations = computed(() => {
 })
 
 const hasChanges = ref(false)
-watch([autoGroupResult, activeBinding], () => {
+
+function hasVirtualStationDraftChanges(): boolean {
+  const binding = activeBinding.value
+  if (!binding) return virtualStationDrafts.value.length > 0
+  const bindingDrafts = binding.stationPlans.filter((plan) => plan.saveStationCode === undefined)
+  if (bindingDrafts.length !== virtualStationDrafts.value.length) return true
+  const bindingById = new Map(bindingDrafts.map((plan) => [plan.id, plan]))
+  for (const draft of virtualStationDrafts.value) {
+    const existing = bindingById.get(draft.id)
+    if (!existing) return true
+    if (existing.groupId !== draft.groupId) return true
+    if (existing.name !== draft.name) return true
+    if (existing.type !== draft.type) return true
+    if (existing.sectorMacro !== draft.sectorMacro) return true
+    if (JSON.stringify(existing.position) !== JSON.stringify(draft.position)) return true
+    if (JSON.stringify(existing.modules) !== JSON.stringify(draft.modules)) return true
+    if (JSON.stringify(existing.settings) !== JSON.stringify(draft.settings)) return true
+    if (JSON.stringify(existing.lockedWares ?? []) !== JSON.stringify(draft.lockedWares ?? [])) return true
+    if (JSON.stringify(existing.warePriority ?? {}) !== JSON.stringify(draft.warePriority ?? {})) return true
+  }
+  return false
+}
+
+watch([autoGroupResult, activeBinding, virtualStationDrafts], () => {
   const result = autoGroupResult.value
   const binding = activeBinding.value
   if (!result || !binding) { hasChanges.value = result !== null; return }
+  if (hasVirtualStationDraftChanges()) { hasChanges.value = true; return }
   if (result.groups.length !== binding.groups.length) { hasChanges.value = true; return }
   const bindingById = new Map(binding.groups.map((g) => [g.id, g]))
   for (const g of result.groups) {
@@ -898,7 +1101,11 @@ function handleSelectTradeStation(groupId: string, selection: TradeStationSelect
   const groups = [...result.groups]
   const idx = groups.findIndex((g) => g.id === groupId)
   if (idx < 0) return
-  groups[idx] = { ...groups[idx]!, selectedTradeStation: selection }
+  const group = groups[idx]!
+  const virtualTradeStationPosition = selection.type === 'virtual' && group.sectorMacro
+    ? group.virtualTradeStationPosition ?? getVirtualTradeStationDefaultPosition(group.sectorMacro)
+    : group.virtualTradeStationPosition
+  groups[idx] = { ...group, selectedTradeStation: selection, virtualTradeStationPosition }
   autoGroupResult.value = { ...result, groups, assignments: result.assignments }
 }
 
@@ -985,7 +1192,14 @@ function doConfirm() {
       )
       if (!bindingGroup) continue
       if (sel.type === 'virtual') {
-        saveBindingStore.unbindTradeStation(guid, bindingGroup.id)
+        const draftPosition = (group as GroupDraftInfo & { virtualTradeStationPosition?: { x: number; y: number; z: number } }).virtualTradeStationPosition
+        saveBindingStore.upsertTradeStation({
+          gameGuid: guid,
+          groupId: bindingGroup.id,
+          name: group.name,
+          sectorMacro: group.sectorMacro,
+          position: draftPosition ?? bindingGroup.tradeStation?.position
+        })
       } else {
         const archive = saveStore.selectedArchive
         const station = archive?.sectors?.[group.sectorMacro!]?.player_stations?.[sel.stationCode]
@@ -1000,6 +1214,7 @@ function doConfirm() {
       }
     }
   }
+  liveStore.applyVirtualStationDraftsToBinding()
   const binding = saveBindingStore.activeBinding
   if (binding) {
     const archiveTime = saveStore.selectedArchive?.meta?.time ?? 0
@@ -1207,6 +1422,16 @@ return {
   tradeStationRetainEnabled,
   tradeStationCandidates,
   selectedTradeStations,
+  blueprintEmpires,
+  selectedBlueprintEmpireId,
+  blueprintStationSources,
+  virtualStationGroups,
+  activeVirtualStationDragKey,
+  formatCoordKm,
+  startVirtualStationDrag,
+  updateVirtualStationDrag,
+  finishVirtualStationDrag,
+  handleDeleteVirtualStationDraft,
   hasUnresolvedTradeStations,
   showConfirmPopup,
   hasChanges,

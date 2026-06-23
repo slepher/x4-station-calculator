@@ -38,6 +38,10 @@ function formatCap(cap: number): string {
   }
   return Math.round(cap).toLocaleString()
 }
+
+function formatCoordKm(value: number): string {
+  return `${(value / 1000).toFixed(1)}km`
+}
 </script>
 
 <template>
@@ -75,7 +79,12 @@ function formatCap(cap: number): string {
         <span class="option-radio" :class="{ 'radio-checked': isSelected('virtual') }">
           {{ isSelected('virtual') ? '●' : '○' }}
         </span>
-        <span class="candidate-name">{{ t('sector.virtual_trade_station') }}</span>
+        <span class="candidate-info">
+          <span class="candidate-name">{{ t('sector.virtual_trade_station') }}</span>
+          <span v-if="group.virtualTradeStationPosition" class="candidate-meta">
+            x: {{ formatCoordKm(group.virtualTradeStationPosition.x) }} / z: {{ formatCoordKm(group.virtualTradeStationPosition.z) }}
+          </span>
+        </span>
       </li>
     </ul>
   </div>
