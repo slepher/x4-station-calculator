@@ -232,6 +232,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
           :unresolved-trade-station-count="unresolvedTradeStationGroups.length"
           :show-confirm="true"
           :confirm-disabled="hasUnresolvedTradeStations || !hasChanges"
+          :show-back="false"
           @update:pref-jump-range="handleUpdatePrefJumpRange"
           @update:bridge-search-jump-range="handleUpdateBridgeSearchJumpRange"
           @update:pref-threshold="prefThreshold = $event"

@@ -14,12 +14,14 @@ const props = withDefaults(defineProps<{
   unresolvedTradeStationCount?: number
   showConfirm?: boolean
   confirmDisabled?: boolean
+  showBack?: boolean
 }>(), {
   view: 'live',
   unresolvedAllocationCount: 0,
   unresolvedTradeStationCount: 0,
   showConfirm: true,
   confirmDisabled: false,
+  showBack: true,
   needsRecalc: false,
   editDisabled: true
 })
@@ -86,7 +88,7 @@ const hasUnresolved = computed(() => (props.unresolvedAllocationCount ?? 0) + (p
           </div>
         </div>
         <div class="bar-right">
-          <button class="bar-btn back-btn" @click="emit('back')">{{ t('sector.back') }}</button>
+          <button v-if="showBack" class="bar-btn back-btn" @click="emit('back')">{{ t('sector.back') }}</button>
           <button class="bar-btn map-btn" @click="emit('map')">{{ t('sector.map') }}</button>
           <template v-if="mode === 'edit'">
             <button class="bar-btn reset-btn" @click="emit('reset')">{{ t('sector.reset') }}</button>

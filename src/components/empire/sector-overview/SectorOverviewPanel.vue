@@ -6,7 +6,6 @@ import { useActiveViewStore } from '@/store/useActiveViewStore'
 import SaveUploadPanel from '@/components/save/SaveUploadPanel.vue'
 import SaveList from '@/components/save/SaveList.vue'
 import EmpireWareFlowsDashboard from '@/components/empire/EmpireWareFlowsDashboard.vue'
-import SectorOverviewBar from './SectorOverviewBar.vue'
 import SectorGroupList from './SectorGroupList.vue'
 import AutoSectorGroupPanel from '@/components/map/AutoSectorGroupPanel.vue'
 
@@ -16,15 +15,11 @@ const activeViewStore = useActiveViewStore()
 const presenter = useAutoSectorGroupPresenter()
 const {
   t,
-  prefJumpRange,
-  bridgeSearchJumpRange,
-  prefThreshold,
   autoGroupResult,
   gameDataMaps,
   sectorGraphInfo,
   triggerAutoGroup,
   handleUploadComplete,
-  needsAutoGroupRecalc,
   handleColorChange,
   tradeStationCaps,
   empireDerivedProductionFlows,
@@ -33,8 +28,6 @@ const {
 } = presenter
 
 const liveMode = ref<'display' | 'calculate'>('display')
-
-const canEdit = computed(() => autoGroupResult.value !== null)
 
 const displayGroups = computed(() => {
   if (autoGroupResult.value) return autoGroupResult.value.groups
@@ -55,10 +48,6 @@ const displayGroups = computed(() => {
     color: g.color
   }))
 })
-
-function onDetail() {
-  liveMode.value = 'calculate'
-}
 
 function onMap() {
   const guid = activeViewStore.activeBinding
@@ -87,15 +76,6 @@ defineExpose({ triggerAutoGroup })
       </div>
 
       <div class="col-span-12 lg:col-span-4">
-        <SectorOverviewBar
-          :pref-jump-range="prefJumpRange"
-          :bridge-search-jump-range="bridgeSearchJumpRange"
-          :pref-threshold="prefThreshold"
-          :needs-recalc="needsAutoGroupRecalc"
-          :edit-disabled="!canEdit"
-          @detail="onDetail"
-          @map="onMap"
-        />
         <SectorGroupList
           :groups="displayGroups"
           :assignments="autoGroupResult?.assignments ?? []"

@@ -166,7 +166,7 @@ function buildStoreGroups(groups: BindingSectorGroup[], playerSectorMacros: stri
   return { groups: storeGroups, assignments: [], bridgePlans: [], playerSectorMacros }
 }
 
-function runAutoGroup() {
+function runAutoGroup(options: { force?: boolean } = {}) {
   const archive = saveStore.selectedArchive
   const guid = activeViewStore.activeBinding
   if (!archive || !archive.isValid || !guid) {
@@ -179,7 +179,7 @@ function runAutoGroup() {
   const archiveTime = archive.meta?.time ?? 0
 
   // Skip if archive time unchanged and we already have a result
-  if (binding?.appliedAutoGroupArchiveTime === archiveTime && liveStore.autoGroupResult) {
+  if (!options.force && binding?.appliedAutoGroupArchiveTime === archiveTime && liveStore.autoGroupResult) {
     return
   }
 
@@ -1243,12 +1243,7 @@ function triggerAutoGroup() {
     if (binding.bridgeSearchJumpRange !== undefined) bridgeSearchJumpRange.value = binding.bridgeSearchJumpRange
     if (binding.prefThreshold !== undefined) prefThreshold.value = binding.prefThreshold
   }
-  if (binding && binding.groups.length > 0) {
-    setAutoGroupResult(buildStoreGroups(binding.groups, []))
-  } else {
-    setAutoGroupResult(null)
-  }
-  calculationMode.value = 'result'
+  runAutoGroup({ force: true })
 }
 
 function handleUploadComplete() {
