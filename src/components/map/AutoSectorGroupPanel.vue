@@ -128,8 +128,8 @@ function getStationIcon(station: { modules: SavedModule[] } | null | undefined):
   const aggregatedModules = buildAggregatedModulesFromStationPlan(station, gameDataStore.modulesMap)
   const classification = classifyPlayerStationPoi({ modules: aggregatedModules })
   const iconTag = getPoiIconTag({ tag: classification.tag, factoryGroup: classification.factoryGroup })
-  const url = SAVE_POI_ICON_MAP[iconTag] || factoryIconUrl
-  const isShipyard = ['shipyard', 'wharf', 'equipmentdock'].includes(iconTag)
+  const url = iconTag ? SAVE_POI_ICON_MAP[iconTag] || factoryIconUrl : factoryIconUrl
+  const isShipyard = iconTag ? ['shipyard', 'wharf', 'equipmentdock'].includes(iconTag) : false
   return { url, tag: isShipyard ? 'shipyard' : 'factory' }
 }
 
@@ -225,7 +225,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
 </script>
 
 <template>
-  <div class="auto-sector-group-map-panel">
+  <div class="auto-sector-group-map-panel" :class="`auto-sector-group-map-panel--${layout}`">
     <div v-if="!hasAutoResult" class="map-panel-empty">{{ t('sector.no_groups') }}</div>
     <template v-else>
       <template v-if="layout === 'columns'">
@@ -562,7 +562,8 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
 </template>
 
 <style scoped>
-.auto-sector-group-map-panel { @apply flex h-full min-h-0 flex-col overflow-hidden; --confirm-bar-gap: 4px; }
+.auto-sector-group-map-panel { --confirm-bar-gap: 4px; }
+.auto-sector-group-map-panel--tabs { @apply flex h-full min-h-0 flex-col overflow-hidden; }
 .map-panel-empty { @apply text-sm text-slate-500 text-center py-6; }
 .map-tab-header { @apply shrink-0 px-3; }
 .tab-bar { @apply mx-3 flex shrink-0 border-b border-slate-700/50 mb-3; }
