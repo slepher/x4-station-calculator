@@ -322,19 +322,6 @@ function onAnchorPillClick(macro: string) {
           :title="editable ? t('sector.hub_color') : ''"
           @click="onColorChipClick"
         />
-        <button
-          v-if="showSelectGroupButton"
-          class="station-bind-icon-btn"
-          :title="t('map.binding_view_detail')"
-          @click="emit('select-group', group.id)"
-        >
-          <svg viewBox="0 0 24 24" class="station-bind-svg" aria-hidden="true">
-            <path d="M5 6.5C5 5.67 5.67 5 6.5 5H17.5C18.33 5 19 5.67 19 6.5V17.5C19 18.33 18.33 19 17.5 19H6.5C5.67 19 5 18.33 5 17.5V6.5Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M8 9H16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            <path d="M8 12H16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            <path d="M8 15H13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-        </button>
       </div>
       <div class="group-actions">
         <label v-if="props.editable" class="retain-chk" :title="t('sector.bridge_retain')">
