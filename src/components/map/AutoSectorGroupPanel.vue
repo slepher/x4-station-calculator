@@ -245,54 +245,56 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
           @map="emit('map')"
         />
         </div>
-        <div class="columns-layout">
-          <div class="column column-hub">
-            <SectorGroupStatBar
-              :mode="calculationMode === 'edit' ? 'edit' : 'result'"
-              view="live"
-              :bridge-retain-enabled="bridgeRetainEnabled"
-              :coverage-retain-enabled="coverageRetainEnabled"
-              :trade-station-retain-enabled="tradeStationRetainEnabled"
-              :bridge-retain-indeterminate="bridgeRetainIndeterminate"
-              :coverage-retain-indeterminate="coverageRetainIndeterminate"
-              :trade-station-retain-indeterminate="tradeStationRetainIndeterminate"
-              :show-add-hub="showHubAddMenu"
-              :edit-disabled="!autoGroupResult"
-              @update:bridge-retain-enabled="handleMasterBridgeRetain"
-              @update:coverage-retain-enabled="handleMasterCoverageRetain"
-              @update:trade-station-retain-enabled="handleMasterTradeStationRetain"
-              @edit="handleEnterEdit"
-              @exit="handleExitEdit"
-              @add-hub="handleAddHubClick"
-            />
-            <HubAddMenu mode="overlay" :open="showHubAddMenu" :player-sector-macros="autoGroupResult?.playerSectorMacros ?? []" :occupied-sector-macros="[...getExistingAnchorSectors()]"
-              @close="showHubAddMenu = false" @add-hub="(m: string) => { handleAddHubDraft(m); showHubAddMenu = false }" @focus-sector="emit('focus-sector', $event)"
-            />
-            <SectorGroupList :groups="autoGroupResult?.groups ?? []" :assignments="autoGroupResult?.assignments ?? []"
-              :maps="gameDataMaps" :sector-graph="sectorGraphInfo.sectorGraph" :sector-cluster-map="sectorGraphInfo.sectorClusterMap"
-              :player-sector-macros="autoGroupResult?.playerSectorMacros ?? []"
-              :editable="calculationMode === 'edit'"               :diff-enabled="true"
-              :baseline-coverage-by-group-id="calcBaselinePillState?.coverageByGroupId"
-              :baseline-connected-group-ids-by-group-id="calcBaselinePillState?.connectedGroupIdsByGroupId"
-              :draggable="canDragGroups" view="live" :trade-station-caps="tradeStationCaps"
-              @cycle-recalc-state="handleCycleRecalcState" @update-jump-range="handleUpdateJumpRange"
-              @toggle-coverage-input="handleToggleCoverageInput" @toggle-connected-input="handleToggleConnectedInput"
-              @add-candidate-coverage="handleAddCandidateCoverage" @delete-group="handleDeleteGroup"
-              @toggle-retain-coverage="handleToggleRetainCoverage" @toggle-retain-connection="handleToggleRetainConnection"
-              @toggle-retain-trade-station="handleToggleTradeStationRetain"
-              @color-change="handleColorChange" @focus-sector="emit('focus-sector', $event)"
-              @reorder="handleReorderGroups"/>
-          </div>
-          <div class="column column-allocation">
-            <SectorAllocationList :assignments="autoGroupResult?.assignments ?? []" :bridge-plans="autoGroupResult?.bridgePlans ?? []"
-              :groups="autoGroupResult?.groups ?? []" :maps="gameDataMaps" :station-counts="stationCounts"
-              @select-option="handleSelectOption" @select-bridge-plan="handleSelectBridgePlan" @select-bridge-center="handleSelectBridgeCenter" @focus-sector="emit('focus-sector', $event)"
-            />
-          </div>
-          <div class="column column-tradestation">
-            <SectorTradeStationList :groups="autoGroupResult?.groups ?? []" :candidates="tradeStationCandidates" :selected="selectedTradeStations"
-              @select="handleSelectTradeStation" @focus-sector="emit('focus-sector', $event)"
-            />
+        <div class="columns-scroll-area">
+          <div class="columns-layout">
+            <div class="column column-hub">
+              <SectorGroupStatBar
+                :mode="calculationMode === 'edit' ? 'edit' : 'result'"
+                view="live"
+                :bridge-retain-enabled="bridgeRetainEnabled"
+                :coverage-retain-enabled="coverageRetainEnabled"
+                :trade-station-retain-enabled="tradeStationRetainEnabled"
+                :bridge-retain-indeterminate="bridgeRetainIndeterminate"
+                :coverage-retain-indeterminate="coverageRetainIndeterminate"
+                :trade-station-retain-indeterminate="tradeStationRetainIndeterminate"
+                :show-add-hub="showHubAddMenu"
+                :edit-disabled="!autoGroupResult"
+                @update:bridge-retain-enabled="handleMasterBridgeRetain"
+                @update:coverage-retain-enabled="handleMasterCoverageRetain"
+                @update:trade-station-retain-enabled="handleMasterTradeStationRetain"
+                @edit="handleEnterEdit"
+                @exit="handleExitEdit"
+                @add-hub="handleAddHubClick"
+              />
+              <HubAddMenu mode="overlay" :open="showHubAddMenu" :player-sector-macros="autoGroupResult?.playerSectorMacros ?? []" :occupied-sector-macros="[...getExistingAnchorSectors()]"
+                @close="showHubAddMenu = false" @add-hub="(m: string) => { handleAddHubDraft(m); showHubAddMenu = false }" @focus-sector="emit('focus-sector', $event)"
+              />
+              <SectorGroupList :groups="autoGroupResult?.groups ?? []" :assignments="autoGroupResult?.assignments ?? []"
+                :maps="gameDataMaps" :sector-graph="sectorGraphInfo.sectorGraph" :sector-cluster-map="sectorGraphInfo.sectorClusterMap"
+                :player-sector-macros="autoGroupResult?.playerSectorMacros ?? []"
+                :editable="calculationMode === 'edit'"               :diff-enabled="true"
+                :baseline-coverage-by-group-id="calcBaselinePillState?.coverageByGroupId"
+                :baseline-connected-group-ids-by-group-id="calcBaselinePillState?.connectedGroupIdsByGroupId"
+                :draggable="canDragGroups" view="live" :trade-station-caps="tradeStationCaps"
+                @cycle-recalc-state="handleCycleRecalcState" @update-jump-range="handleUpdateJumpRange"
+                @toggle-coverage-input="handleToggleCoverageInput" @toggle-connected-input="handleToggleConnectedInput"
+                @add-candidate-coverage="handleAddCandidateCoverage" @delete-group="handleDeleteGroup"
+                @toggle-retain-coverage="handleToggleRetainCoverage" @toggle-retain-connection="handleToggleRetainConnection"
+                @toggle-retain-trade-station="handleToggleTradeStationRetain"
+                @color-change="handleColorChange" @focus-sector="emit('focus-sector', $event)"
+                @reorder="handleReorderGroups"/>
+            </div>
+            <div class="column column-allocation">
+              <SectorAllocationList :assignments="autoGroupResult?.assignments ?? []" :bridge-plans="autoGroupResult?.bridgePlans ?? []"
+                :groups="autoGroupResult?.groups ?? []" :maps="gameDataMaps" :station-counts="stationCounts"
+                @select-option="handleSelectOption" @select-bridge-plan="handleSelectBridgePlan" @select-bridge-center="handleSelectBridgeCenter" @focus-sector="emit('focus-sector', $event)"
+              />
+            </div>
+            <div class="column column-tradestation">
+              <SectorTradeStationList :groups="autoGroupResult?.groups ?? []" :candidates="tradeStationCandidates" :selected="selectedTradeStations"
+                @select="handleSelectTradeStation" @focus-sector="emit('focus-sector', $event)"
+              />
+            </div>
           </div>
         </div>
       </template>
@@ -628,6 +630,15 @@ button.virtual-group-title { @apply hover:text-sky-300; }
 .virtual-delete { @apply text-slate-500 hover:text-red-300 text-sm px-1; }
 .virtual-empty { @apply text-xs text-slate-500 py-1; }
 .virtual-warning { @apply text-[11px] text-amber-300/90 leading-snug pt-1; }
+.columns-scroll-area {
+  @apply min-h-0 flex-1 overflow-y-auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.55) transparent;
+}
+.columns-scroll-area::-webkit-scrollbar { width: 6px; }
+.columns-scroll-area::-webkit-scrollbar-track { @apply rounded-full bg-slate-900/35; }
+.columns-scroll-area::-webkit-scrollbar-thumb { @apply rounded-full bg-slate-500/60; }
+.columns-scroll-area::-webkit-scrollbar-thumb:hover { @apply bg-slate-400/70; }
 .columns-layout { @apply grid grid-cols-12 gap-4 px-4 pb-4 pt-2; }
 .column-hub, .column-allocation, .column-tradestation { @apply overflow-hidden; }
 .column-hub { @apply col-span-5; }
