@@ -199,7 +199,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       id: crypto.randomUUID(),
       saveStationCode: undefined,
       groupId,
-      name: i18n.global.t('auto_sector.virtual_station_label'),
+      name: i18n.global.t('auto_sector.blank_virtual_station'),
       type: 'industrial',
       modules: [],
       settings: deepClone(DEFAULT_STATION_SETTINGS),

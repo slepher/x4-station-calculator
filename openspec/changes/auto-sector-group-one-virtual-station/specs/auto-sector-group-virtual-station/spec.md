@@ -89,7 +89,7 @@
 #### Scenario: Blank station drag creates empty industrial plan
 - **前提** 用户拖拽空白空间站到有效地图 sector
 - **当** 系统创建 virtual station draft
-- **那么** draft SHALL 使用本地化“虚拟空间站”作为名称
+- **那么** draft SHALL 使用本地化“新空间站”作为名称
 - **并且** `type` SHALL 为 `industrial`
 - **并且** `modules` SHALL 为空数组
 - **并且** `settings` SHALL 使用 `DEFAULT_STATION_SETTINGS`
@@ -146,7 +146,7 @@
 #### Scenario: Virtual station row content
 - **前提** 某个 virtual station draft 归属于 group G
 - **当** 系统渲染该 item
-- **那么** item SHALL 显示固定文案“虚拟空间站”
+- **那么** item SHALL 显示该 draft 的 `name` 属性
 - **并且** SHALL 显示所属 sector 的本地化名称
 - **并且** SHALL 显示坐标
 - **并且** SHALL 显示 `×` 删除按钮

@@ -4,15 +4,18 @@ import { useI18n } from 'vue-i18n'
 import { useAutoSectorGroupPresenter } from '@/components/empire/presenters/useAutoSectorGroupPresenter'
 import { useActiveViewStore } from '@/store/useActiveViewStore'
 import { useLiveProductionStore } from '@/store/useLiveProductionStore'
+import { useGameDataStore } from '@/store/useGameDataStore'
+import { buildAggregatedModulesFromStationPlan, classifyPlayerStationPoi } from '@/store/logic/stationPoiSemantics'
 import AutoSectorBar from '@/components/empire/sector-overview/AutoSectorBar.vue'
 import SectorGroupStatBar from '@/components/empire/sector-overview/SectorGroupStatBar.vue'
 import SectorGroupList from '@/components/empire/sector-overview/SectorGroupList.vue'
 import SectorAllocationList from '@/components/empire/sector-overview/SectorAllocationList.vue'
 import HubAddMenu from './HubAddMenu.vue'
 import SectorTradeStationList from '@/components/empire/sector-overview/SectorTradeStationList.vue'
-import type { StationPlan } from '@/types/x4'
+import type { StationPlan, SavedModule } from '@/types/x4'
+import { getPoiIconTag } from '@/store/logic/stationPoiSemantics'
+import { SAVE_POI_ICON_MAP } from '@/components/map/utils/style'
 import factoryIconUrl from '@/components/icons/factory.svg'
-import shipyardIconUrl from '@/components/icons/shipyard.svg'
 
 const props = withDefaults(defineProps<{
   gameGuid?: string
@@ -73,6 +76,7 @@ provide('sectorGroupColorMap', sectorGroupColorMap)
 const isConfirmed = computed(() => hasAutoResult.value && !hasChanges.value)
 
 const liveStore = useLiveProductionStore()
+const gameDataStore = useGameDataStore()
 
 watch(() => props.gameGuid, async (guid) => {
   if (guid) {
@@ -119,8 +123,14 @@ const selectedBlueprintEmpireName = computed(() => {
   return empire?.name || t('map.binding_select_blueprint_empire')
 })
 
-function getStationIcon(station: StationPlan | null | undefined): string {
-  return station?.type === 'shipyard' ? shipyardIconUrl : factoryIconUrl
+function getStationIcon(station: { modules: SavedModule[] } | null | undefined): { url: string; tag: 'factory' | 'shipyard' } {
+  if (!station) return { url: factoryIconUrl, tag: 'factory' }
+  const aggregatedModules = buildAggregatedModulesFromStationPlan(station, gameDataStore.modulesMap)
+  const classification = classifyPlayerStationPoi({ modules: aggregatedModules })
+  const iconTag = getPoiIconTag({ tag: classification.tag, factoryGroup: classification.factoryGroup })
+  const url = SAVE_POI_ICON_MAP[iconTag] || factoryIconUrl
+  const isShipyard = ['shipyard', 'wharf', 'equipmentdock'].includes(iconTag)
+  return { url, tag: isShipyard ? 'shipyard' : 'factory' }
 }
 
 function updateBlueprintEmpireMenuPosition() {
@@ -413,7 +423,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
                     blankVirtualStation: true
                   })"
                 >
-                  <img class="entry-icon" :src="factoryIconUrl" alt="" />
+                  <img class="entry-icon" :src="SAVE_POI_ICON_MAP.constructionsite || factoryIconUrl" alt="" />
                   <div class="station-info">
                     <div class="station-name">{{ t('auto_sector.blank_virtual_station') }}</div>
                     <div class="station-type">{{ t('auto_sector.empty_modules') }}</div>
@@ -433,11 +443,11 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
                   @mousedown="onVirtualStationMouseDown($event, {
                     key: station.id,
                     name: station.name,
-                    icon: station.type === 'shipyard' ? 'shipyard' : 'factory',
+                    icon: getStationIcon(station).tag,
                     blueprintStation: station
                   })"
                 >
-                  <img class="entry-icon" :src="getStationIcon(station)" alt="" />
+                  <img class="entry-icon" :src="getStationIcon(station).url" alt="" />
                   <div class="station-info">
                     <div class="station-name">{{ station.name }}</div>
                     <div class="station-type">{{ station.modules.length }} {{ t('auto_sector.modules') }}</div>
@@ -463,13 +473,13 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
                   @mousedown="onVirtualStationMouseDown($event, {
                     key: station.id,
                     name: station.name,
-                    icon: station.type === 'shipyard' ? 'shipyard' : 'factory',
+                    icon: getStationIcon(station).tag,
                     virtualStationDraftId: station.id,
                     groupId: station.groupId
                   })"
                 >
                   <div class="virtual-row-main">
-                    <span class="virtual-name">{{ t('auto_sector.virtual_station_label') }}</span>
+                    <span class="virtual-name">{{ station.name }}</span>
                     <span class="virtual-sub">
                       {{ station.sectorMacro ? presenter.getSectorDisplayName(station.sectorMacro) : t('auto_sector.ungrouped_virtual_stations') }}
                       <template v-if="station.position">
@@ -490,13 +500,13 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
                   @mousedown="onVirtualStationMouseDown($event, {
                     key: station.id,
                     name: station.name,
-                    icon: station.type === 'shipyard' ? 'shipyard' : 'factory',
+                    icon: getStationIcon(station).tag,
                     virtualStationDraftId: station.id,
                     groupId: station.groupId
                   })"
                 >
                   <div class="virtual-row-main">
-                    <span class="virtual-name">{{ t('auto_sector.virtual_station_label') }}</span>
+                    <span class="virtual-name">{{ station.name }}</span>
                     <span class="virtual-sub">
                       {{ station.sectorMacro ? presenter.getSectorDisplayName(station.sectorMacro) : t('auto_sector.ungrouped_virtual_stations') }}
                       <template v-if="station.position">
