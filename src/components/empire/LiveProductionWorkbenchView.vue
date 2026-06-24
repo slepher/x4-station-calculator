@@ -13,6 +13,7 @@ import { useProductionPlanningPresenter } from '@/components/empire/presenters/u
 import { useProductionWareflowPresenter } from '@/components/empire/presenters/useProductionWareflowPresenter'
 import { useProductionDashboardPresenter } from '@/components/empire/presenters/useProductionDashboardPresenter'
 import { useTerraformingPresenter } from '@/components/empire/presenters/useTerraformingPresenter'
+import { useTransitTransportPresenter } from '@/components/empire/presenters/useTransitTransportPresenter'
 import StationPlanningPanelWrapper from '@/components/empire/StationPlanningPanelWrapper.vue'
 import StationDashboard from '@/components/empire/StationDashboard.vue'
 import ProductionSidebar from '@/components/empire/ProductionSidebar.vue'
@@ -23,6 +24,7 @@ import TerraformingWorkbench from '@/components/empire/TerraformingWorkbench.vue
 import StationWareFlowsDashboard from '@/components/empire/StationWareFlowsDashboard.vue'
 import TransitHubBuildPanel from '@/components/empire/transit-hub/TransitHubBuildPanel.vue'
 import TransitHubCenterDashboard from '@/components/empire/transit-hub/TransitHubCenterDashboard.vue'
+import TransitTransportPanel from '@/components/empire/transit-hub/TransitTransportPanel.vue'
 import ArchiveModuleList from '@/components/empire/ArchiveModuleList.vue'
 import ImportPlanModal from '@/components/empire/ImportPlanModal.vue'
 import TechTreePlaceholder from '@/components/empire/TechTreePlaceholder.vue'
@@ -72,6 +74,9 @@ watch(() => toolbarPresenter.props.workbenchMode.value, (mode) => {
 const planningPresenter = useProductionPlanningPresenter(liveStore)
 const wareflowPresenter = useProductionWareflowPresenter(liveStore)
 const dashboardPresenter = useProductionDashboardPresenter(liveStore)
+const transitTransportPresenter = useTransitTransportPresenter(liveStore, {
+  modulesMap: gameDataStore.modulesMap
+})
 const terraformingPresenter = useTerraformingPresenter({
   terraformingData: computed(() => terraformingStore.terraformingData),
   terraformingIsLiveMode: computed(() => terraformingStore.isLiveMode),
@@ -317,17 +322,7 @@ function openAutoSectorGroupMap() {
       </div>
 
       <div class="col-span-12 lg:col-span-4">
-        <StationDashboard
-          :display-modules="[...dashboardPresenter.props.activeModules.value, ...dashboardPresenter.props.activeBuildingModules.value]"
-          :hide-workers-view="true"
-          :settings="dashboardPresenter.props.settings.value"
-          :current-efficiency="1"
-          :actual-workforce="0"
-          :build-price-multiplier="dashboardPresenter.props.buildPriceMultiplier.value"
-          @update-transport-ship-capacity="dashboardPresenter.emits.updateTransportShipCapacity"
-          @update-build-price-multiplier="dashboardPresenter.emits.updateBuildPriceMultiplier"
-          @update-use-hq="dashboardPresenter.emits.updateUseHQ"
-        />
+        <TransitTransportPanel :panel="transitTransportPresenter.props.panel.value" />
       </div>
     </div>
 

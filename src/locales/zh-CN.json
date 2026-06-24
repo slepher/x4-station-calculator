@@ -847,6 +847,43 @@
     "fav_add": "添加到收藏",
     "fav_remove": "取消收藏"
   },
+  "transit_transport": {
+    "title": "运输路线",
+    "sector_group": "星区组",
+    "station": "空间站",
+    "problems": "问题组",
+    "empty": "暂无运输目标",
+    "no_sector_groups": "暂无连接的星区组",
+    "no_stations": "暂无本组空间站",
+    "no_problems": "暂无运输问题",
+    "station_count": "座空间站",
+    "gates_value": "{count} 星门",
+    "terminal": "末端点",
+    "superhighway": "超级高速",
+    "station_coord": "坐标",
+    "terminal_distance": "末端距离",
+    "station_to_station": "空间站到空间站",
+    "total_normal_distance": "普通总距离",
+    "production_lines": "产线",
+    "route_action": {
+      "depart_to_gate": "离港至出口星门",
+      "in_sector_transfer": "星区内转场",
+      "jump_to": "星门跃迁至 {sector}",
+      "superhighway_to": "超级高速至 {sector}",
+      "arrive_to_station": "入口星门至目标空间站"
+    },
+    "segment": {
+      "station-to-gate": "空间站到星门",
+      "gate-to-gate": "星门到星门",
+      "gate-transit": "星门通行",
+      "superhighway": "超级高速",
+      "gate-to-station": "星门到空间站"
+    },
+    "target_type": {
+      "sector-group": "星区组",
+      "station": "空间站"
+    }
+  },
   "wareflow": {
     "resource_overview": "资源产出",
     "resource_view": "资源视图",

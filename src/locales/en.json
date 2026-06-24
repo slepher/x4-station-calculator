@@ -846,6 +846,43 @@
     "fav_add": "Add to Favorites",
     "fav_remove": "Remove from Favorites"
   },
+  "transit_transport": {
+    "title": "Transport Routes",
+    "sector_group": "Sector Group",
+    "station": "Station",
+    "problems": "Problems",
+    "empty": "No transport targets",
+    "no_sector_groups": "No linked sector groups",
+    "no_stations": "No local stations",
+    "no_problems": "No transport problems",
+    "station_count": "stations",
+    "gates_value": "{count} gates",
+    "terminal": "Terminal",
+    "superhighway": "Superhighway",
+    "station_coord": "Coord",
+    "terminal_distance": "Terminal distance",
+    "station_to_station": "Station to station",
+    "total_normal_distance": "Normal total",
+    "production_lines": "Production lines",
+    "route_action": {
+      "depart_to_gate": "Depart to outbound gate",
+      "in_sector_transfer": "In-sector transfer",
+      "jump_to": "Gate jump to {sector}",
+      "superhighway_to": "Superhighway to {sector}",
+      "arrive_to_station": "Inbound gate to target station"
+    },
+    "segment": {
+      "station-to-gate": "Station to gate",
+      "gate-to-gate": "Gate to gate",
+      "gate-transit": "Gate transit",
+      "superhighway": "Superhighway",
+      "gate-to-station": "Gate to station"
+    },
+    "target_type": {
+      "sector-group": "Sector Group",
+      "station": "Station"
+    }
+  },
   "wareflow": {
     "resource_overview": "Resource Production",
     "resource_view": "Resource View",

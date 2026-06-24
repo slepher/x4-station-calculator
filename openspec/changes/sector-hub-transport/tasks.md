@@ -1,0 +1,45 @@
+# sector-hub-transport Tasks
+
+## Implementation
+
+- [x] 1. 创建 transit route 纯逻辑模块
+  - [x] 1.1 从 map clusters/sectors 构建 sector edge 图
+  - [x] 1.2 支持 gate edge：星门数 +1，距离不计
+  - [x] 1.3 支持 superhighway edge：星门数不加，端点直线距离只作为明细距离
+  - [x] 1.4 生成不重复 sector 的候选路径
+  - [x] 1.5 按星门数、普通距离选择最优路径
+  - [x] 1.6 输出路径段、terminal、普通距离、superhighway 距离与问题节点
+
+- [x] 2. 创建 transit transport presenter
+  - [x] 2.1 从 active binding 解析当前 transit group 与 hub station
+  - [x] 2.2 从 `connectedGroupIds` 组装 `Sector Group` route rows
+  - [x] 2.3 从当前 group anchor sector 与 coverage sectors 组装 `Station` sector groups
+  - [x] 2.4 计算 station production 产线数量并排序
+  - [x] 2.5 统一收集无法完整计算的目标到问题组
+  - [x] 2.6 保持 presenter 输出为 Vue 直接渲染结构
+
+- [x] 3. 创建运输栏 Vue 组件
+  - [x] 3.1 渲染 `Sector Group` 分类摘要与展开明细
+  - [x] 3.2 渲染 `Station` 分类的 sector 层与 station 列表层
+  - [x] 3.3 渲染 `问题组`
+  - [x] 3.4 使用 km 与 0.1 精度显示距离和坐标
+  - [x] 3.5 处理空态
+
+- [x] 4. 接入 live transit 页面
+  - [x] 4.1 在 live transit 页面使用 presenter
+  - [x] 4.2 将右侧 `StationDashboard` 替换为运输栏组件
+  - [x] 4.3 保留左侧 transit hub build/module 列表
+
+- [x] 5. i18n 文案
+  - [x] 5.1 更新 `src/locales/en.json`
+  - [x] 5.2 更新 `src/locales/zh-CN.json`
+
+- [x] 6. Build validation
+  - [x] 6.1 运行 `npm run build`
+  - [x] 6.2 若出现编译错误，修复后重新运行 `npm run build`
+
+## Notes
+
+- 本任务清单不包含测试代码编写与测试执行；测试工作由 `/x4:test` 或相关测试 workflow 处理。
+- 不修改 Rust parser。
+- 不使用 `sector.highways.spline` 计算跨 sector superhighway。
