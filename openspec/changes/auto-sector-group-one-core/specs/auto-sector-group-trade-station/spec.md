@@ -179,6 +179,7 @@
 - **当**：点击确认
 - **那么**：`BindingSectorGroup.tradeStation.saveStationCode = undefined`
 - **并且**：`position` 设为星区中央位置
+- **并且**：`sectorMacro` 等于该 group 的 hub `sectorMacro`
 - **并且**：系统 SHALL NOT 将 `__virtual__` 写入持久化结构
 
 #### Scenario: 从已有玩家站改选虚拟站
@@ -187,6 +188,23 @@
 - **当**：用户改选虚拟交易站并点击确认
 - **那么**：该 group 的 `tradeStation.saveStationCode` 被清除为 `undefined`
 - **并且**：`position` 更新为锚点星区中央位置
+
+#### Scenario: 虚拟交易站使用地图 draft 位置
+
+- **前提**：用户选择虚拟交易站
+- **并且**：用户在 Map binding 中拖动该虚拟交易站 overlay 到 hub sector 内的新位置
+- **当**：点击确认
+- **那么**：`BindingSectorGroup.tradeStation.position` SHALL 使用该 draft 位置
+- **并且**：`BindingSectorGroup.tradeStation.sectorMacro` SHALL 仍等于该 group 的 hub `sectorMacro`
+
+#### Scenario: 虚拟交易站拖动不改变领域归属
+
+- **前提**：用户在 Map binding 中拖动 virtual trade station overlay
+- **当**：系统更新 draft
+- **那么**：系统 SHALL 只更新该 group trade station draft 的 position
+- **并且**：SHALL NOT 修改 group `sectorMacro`
+- **并且**：SHALL NOT 修改 group coverage
+- **并且**：SHALL NOT 修改任何 station plan
 
 #### Scenario: 旧自动写入逻辑不得覆盖用户选择
 

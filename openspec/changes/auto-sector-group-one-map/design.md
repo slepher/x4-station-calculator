@@ -10,15 +10,14 @@ Map binding-sector 渲染 `AutoSectorGroupPanel layout="tabs"`。
 
 视图：
 
-- 顶部：三视图共用 `AutoSectorBar`，承载返回、地图、参数、计算、重置、提交和全局 gate。
+- 顶部：各 tab 共用 `AutoSectorBar`，承载返回、地图、参数、计算、重置、提交和全局 gate。
 - Hub：group 管理、参数、编辑、drag sort。
 - Allocation：assignment cards。
 - Trade Station：trade station cards。
+- Virtual Station：Map-only，展示 blueprint 来源和 virtual station drafts。
 - 添加 hub：Map 和 Live 共用 `HubAddMenu`。Map 使用默认/侧栏入口并提供定位地图能力；Live 使用 `HubAddMenu mode="overlay"` fixed overlay。
 
-编辑态限制：
-
-- Hub 编辑态下 Allocation 和 Trade Station disabled。
+- Virtual Station 不受 Hub edit/result 限制；Map binding 界面打开后，virtual station draft 的创建、移动、删除都可继续进行。
 - 计算完成后可根据 unresolved 状态切换到第一个待处理 tab。
 
 确认态：
@@ -26,6 +25,60 @@ Map binding-sector 渲染 `AutoSectorGroupPanel layout="tabs"`。
 - 隐藏 draft tabs。
 - 每个 group 显示进入 station binding 的按钮。
 - 确认 auto group 不自动进入 station binding。
+
+## Virtual Station tab
+
+Virtual Station tab 只存在于 `AutoSectorGroupPanel layout="tabs"` 的 Map context。`layout="columns"` 的 Live context 不渲染该 tab。
+
+Tab 内容分两段：
+
+```text
+Blueprint 空间站
+  - Blueprint empire selector
+  - 空白空间站
+  - blueprint station list
+
+虚拟空间站
+  - 按当前 groups 分组
+  - 未分组/提交时移除区域
+```
+
+Blueprint empire selector 复用 binding 的 `blueprintEmpireId`。切换来源只影响可拖拽来源列表；已创建 virtual station 是一次性复制结果，不随 blueprint empire 后续变化同步。
+
+Blueprint station drag payload：
+
+```ts
+{
+  kind: 'blueprintStation'
+  source: StationPlan
+}
+```
+
+drop 到有效 sector 时创建 virtual station draft，复制：
+
+- `name`
+- `type`
+- `modules`
+- `settings`
+- `lockedWares`
+- `warePriority`
+
+不得复制 source station 的 `id`、`sectorId` 或持续同步引用。
+
+空白空间站 drop 后创建 `type='industrial'`、`modules=[]`、默认 settings、空 `lockedWares`、空 `warePriority` 的 draft。
+
+已存在 virtual station drag payload：
+
+```ts
+{
+  kind: 'virtualStationDraft'
+  draftId: string
+}
+```
+
+drop 后只更新该 draft 的 `sectorMacro`、`position` 和 `groupId`，不得走 blueprint source 新建路径。
+
+Virtual station 列表按当前 groups 顺序分组。每个 item 显示 station 名称、sector 名、坐标和删除按钮；不显示 group 名。未分组区域显示说明：这些 virtual stations 当前不属于任何 sector group，提交时会被移除。
 
 ## 事件流
 
@@ -101,3 +154,28 @@ Group card 标题显示 16×16 色块：
 3. resource pie。
 
 每个 sector 至多映射一个 hub color；coverage 互斥由核心分组保证。
+
+## Virtual station overlay
+
+Map binding draft overlay 的激活条件必须确保当前确实处于 binding draft 编辑态，且 active binding 与 `autoGroupResult` 属于同一 gameGuid。激活后：
+
+- virtual station overlay 从 `liveStore.virtualStationDrafts` 渲染。
+- virtual station overlay 在 Map binding 打开后即可拖动，不要求 Virtual Station tab 激活。
+- virtual trade station overlay 从 group trade station draft 渲染。
+- virtual trade station overlay 在 Map binding 打开后即可拖动，不要求 Trade Station tab 激活。
+
+Drop 校验：
+
+```text
+virtual station:
+  target sector 命中唯一 group anchor/coverage -> 接受
+  无命中或多命中 -> 拒绝
+
+virtual trade station:
+  target sector === group.sectorMacro -> 接受
+  其他 sector -> 拒绝
+```
+
+virtual station 拖动更新 station draft 的 `sectorMacro`、`position`、`groupId`。virtual trade station 拖动只更新 group draft 的 trade station position，不修改 `TradeStationBinding.sectorMacro`、group `sectorMacro`、coverage 或 station plan。
+
+两类 overlay 沿用现有图标、颜色和样式，不新增额外视觉设计。

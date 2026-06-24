@@ -1,0 +1,11 @@
+{
+  "$target": "save.json",
+  "$merge": {
+    "meta": {
+      "guid": "X9Y8Z7W6-V5U4-3210-TSRQ-PONMLKJIHGFE",
+      "time": 999999999,
+      "filename": "context_switch_save",
+      "source": "fixture-patch"
+    }
+  }
+}

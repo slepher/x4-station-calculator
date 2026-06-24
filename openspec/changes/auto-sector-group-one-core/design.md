@@ -158,4 +158,16 @@ Trade station 选择与 group 生命周期同步：
 4. 写入 coverage、connections、jumpRange。
 5. 重建 station plan group assignment。
 6. 显式写入 trade station。
-7. 不让旧自动站点绑定逻辑覆盖用户选择。
+7. 按最终 groups 重算无 `saveStationCode` virtual station plans 的归属。
+8. 仍未分组的 virtual station plans 不写回 binding；若 binding 中存在对应旧 plan，则删除。
+9. 带 `saveStationCode` 的 save station plans 不参与 virtual station 同步。
+10. 不让旧自动站点绑定逻辑覆盖用户选择。
+
+## Virtual trade station 不变量
+
+Virtual trade station 属于 `BindingSectorGroup.tradeStation`，不是 `BindingStationPlan`。
+
+- UI/计算层可以用 `__virtual__` 表达候选项，但持久化时不得写入 `saveStationCode`。
+- `tradeStation.sectorMacro` 始终等于所属 group 的 `sectorMacro`。
+- 地图拖动 virtual trade station 只能改变 position。
+- 拖动不得修改 group `sectorMacro`、coverage、station plan 或 trade station `sectorMacro`。

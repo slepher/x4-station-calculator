@@ -6,8 +6,8 @@
 - [ ] `MapSavePanel` 的 `binding-sector` 层不再渲染 `MapBindingSectorGroup`
 - [ ] Map 面板读取 live store 共享 draft
 - [ ] Map 面板挂载和 tab 切换不调用分组算法或 `initAutoGroupDraft()`
-- [ ] 实现 Hub / Allocation / Trade Station 三视图
-- [ ] Hub 编辑态禁用 Allocation 和 Trade Station
+- [ ] 实现 Hub / Allocation / Trade Station / Virtual Station 四个 Map tab
+- [ ] Virtual Station tab 不受 Hub edit/result 状态限制
 - [ ] 确认态隐藏 draft tabs 并显示进入 station binding 的按钮
 
 ## 2. Map 事件
@@ -59,6 +59,45 @@
 - [ ] 无 color 不绘制内部六边形
 - [ ] 保持 faction owner、hub color、resource pie 的渲染层级
 
-## 7. 构建验证
+## 7. Virtual Station tab
+
+- [ ] Map `AutoSectorGroupPanel layout="tabs"` 增加 Virtual Station tab
+- [ ] Live `AutoSectorGroupPanel layout="columns"` 不显示 Virtual Station tab
+- [ ] Virtual Station tab 渲染 blueprint empire selector，并复用 binding `blueprintEmpireId`
+- [ ] 渲染 blueprint station 来源列表
+- [ ] 渲染空白空间站来源项
+- [ ] Virtual station 列表按当前 groups 顺序分组
+- [ ] Virtual station item 显示 station 名称、sector 名、坐标和删除按钮
+- [ ] Virtual station item 不显示 group 名
+- [ ] 未分组区域显示提交时移除说明
+- [ ] 为 Virtual Station tab 和相关文案补充中英本地化
+
+## 8. Virtual station drag 与 overlay
+
+- [ ] Blueprint station 拖拽创建 virtual station draft
+- [ ] 从 blueprint station 复制 `name/type/modules/settings/lockedWares/warePriority`
+- [ ] 不复制 source station 的 `id`、`sectorId` 或持续同步引用
+- [ ] 空白空间站拖拽创建默认 industrial 空 module draft
+- [ ] 已存在 virtual station 拖拽时携带 draft id
+- [ ] 已存在 virtual station 拖拽只更新当前 draft，不创建重复 plan
+- [ ] drop 到无 group 覆盖 sector 时拒绝并保持原位置
+- [ ] 异常多 group 命中时拒绝，不做 fallback 决胜
+- [ ] 删除按钮只删除 store draft，不直接写 binding
+- [ ] Map binding overlay 从 virtual station draft 渲染
+- [ ] Map binding 打开后即可拖动 virtual station overlay，不要求 Virtual Station tab 激活
+- [ ] virtual station overlay 视觉沿用现状
+
+## 9. Virtual trade station map drag
+
+- [ ] virtual trade station overlay 从 group trade station draft 渲染
+- [ ] Map binding 打开后即可拖动 virtual trade station，不要求 Trade Station tab 激活
+- [ ] virtual trade station drop 必须限制在 group hub sector
+- [ ] 拖动只更新 group draft trade station position
+- [ ] 拖动不得修改 `TradeStationBinding.sectorMacro`
+- [ ] 拖动不得修改 group `sectorMacro`、coverage 或 station plan
+- [ ] Trade Station tab 中 virtual 选项显示当前坐标
+- [ ] virtual trade station overlay 视觉沿用现状
+
+## 10. 构建验证
 
 - [ ] 实现完成后运行 `npm run build`

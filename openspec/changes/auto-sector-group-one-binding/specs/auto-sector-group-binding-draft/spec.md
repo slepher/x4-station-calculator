@@ -21,6 +21,8 @@
   - `bridgeSearchJumpRange: Ref<number>`
   - `prefThreshold: Ref<number>`
   - `needsAutoGroupRecalc: Computed<boolean>`
+  - `virtualStationDrafts: Ref<BindingStationPlan[]>`
+  - `virtualStationDraftInitializedKey: Ref<string | null>`
   - `initAutoGroupDraft()` — 双路径数据生成
   - `buildAssignmentsFromBinding()` — 从 binding 构建 assignments
 
@@ -36,6 +38,13 @@
 - **前提** live 面板和 map 面板同时激活
 - **当** 任一面板修改 `autoGroupResult`
 - **那么** 另一面板 SHALL 立即看到更新
+
+#### Scenario: Virtual station draft belongs to shared state
+
+- **前提** Map binding 面板创建、移动或删除 virtual station draft
+- **当** Live 或 Map 读取当前 active binding/archive 的 shared draft
+- **那么** 系统 SHALL 通过同一 `useLiveProductionStore.virtualStationDrafts` 暴露这些修改
+- **并且** SHALL NOT 为 Map 单独维护另一份 virtual station draft
 
 #### Scenario: Single draft resets on context switch
 
@@ -85,6 +94,37 @@
 - **当** Map 面板挂载并间接触发 `initAutoGroupDraft()`
 - **那么** 系统 SHALL 直接返回
 - **并且** `autoGroupResult` SHALL 保留用户编辑内容
+
+#### Scenario: Virtual station draft initializes after groups are generated
+
+- **前提** 系统生成 `autoGroupResult.groups`
+- **并且** 当前 binding 中存在无 `saveStationCode` 的 `BindingStationPlan`
+- **当** 当前 binding/archive context 尚未初始化 virtual station draft
+- **那么** 系统 SHALL 从 binding 读取这些 station plans
+- **并且** SHALL clone 到 `virtualStationDrafts`
+- **并且** SHALL 记录当前 virtual station draft 初始化 key
+
+#### Scenario: Same context does not overwrite virtual station draft
+
+- **前提** 用户已在当前 binding/archive context 编辑 `virtualStationDrafts`
+- **当** 组件挂载、打开 Virtual Station tab、或 Live/Map 面板切换再次触发共享 draft 读取
+- **那么** 系统 SHALL 保留当前 `virtualStationDrafts`
+- **并且** SHALL NOT 从 binding 重新初始化并覆盖用户编辑
+
+#### Scenario: Recalculate preserves virtual station draft
+
+- **前提** 用户已编辑 `virtualStationDrafts`
+- **当** 用户点击 [计算] 或 [快速计算] 重新生成 `autoGroupResult.groups`
+- **那么** 系统 SHALL 保留当前 virtual station draft 内容
+- **并且** SHALL 基于最新 groups 重新计算每个 draft 的 group 归属
+- **并且** 无当前 group 归属的 draft SHALL 保留为未分组状态
+
+#### Scenario: Save station plans are excluded from virtual station draft
+
+- **前提** 当前 binding 中同时存在带 `saveStationCode` 和不带 `saveStationCode` 的 `BindingStationPlan`
+- **当** 系统初始化 virtual station draft
+- **那么** 系统 SHALL 只读取不带 `saveStationCode` 的 station plans
+- **并且** SHALL NOT 将带 `saveStationCode` 的 save station plans 纳入 Virtual Station tab 草案
 
 #### Scenario: Applied time recorded on confirm
 
@@ -167,7 +207,7 @@ Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触�
 - **前提** `liveMode` 为 `'calculate'`
 - **当** SectorOverviewPanel 渲染
 - **那么** SHALL 显示 `[星区 5fr] | [分配 4fr] | [交易站 3fr]` 布局，三列复用 AutoSectorGroupPanel 现有结构
-- **并且** AutoSectorGroupPanel 顶部 SHALL 显示三视图共用的 `AutoSectorBar`
+- **并且** AutoSectorGroupPanel 顶部 SHALL 显示共用的 `AutoSectorBar`
 - **并且** Allocation 区域 SHALL 显示 `SectorAllocationList`
 - **并且** Trade Station 区域 SHALL 显示 `SectorTradeStationList`
 
@@ -239,7 +279,7 @@ Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触�
 - **前提** 用户在共用 `AutoSectorBar` 点击 [重置]
 - **当** 系统执行重置
 - **那么** SHALL 从 `calculationBaseline` 克隆恢复整份 shared draft
-- **并且** SHALL 同时恢复 group、assignment、bridge decision、trade station、hub color 和 retain 字段到最近计算基线
+- **并且** SHALL 同时恢复 group、assignment、bridge decision、trade station、hub color、retain 字段和 virtual station drafts 到最近计算基线
 - **并且** SHALL NOT 切换 active binding/archive 或重新运行分组算法
 
 #### Scenario: Trade station card list follows groups
@@ -324,6 +364,7 @@ Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触�
 - **前提** `calculationBaseline` 非 null
 - **当** 用户点击「重置」
 - **那么** 系统 SHALL 从 `calculationBaseline` clone 恢复 `autoGroupResult`
+- **并且** SHALL 从 `calculationBaseline` clone 恢复 `virtualStationDrafts`
 - **并且** SHALL NOT 切换 active binding
 - **并且** SHALL NOT 切换 selected archive
 
@@ -349,6 +390,36 @@ Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触�
 - **当** 所有 gate 通过
 - **那么** 系统 SHALL 写入 binding
 - **并且** `handleConfirm()` SHALL 返回 true
+
+### Requirement: Virtual Station Draft Apply
+
+系统 MUST 在 auto group 提交成功路径中同步 virtual station drafts，且该同步只影响无 `saveStationCode` 的 station plans。
+
+#### Scenario: Apply order
+
+- **前提** 用户提交 auto group shared draft
+- **并且** 当前存在 virtual station drafts
+- **当** 系统执行确认写入
+- **那么** 系统 SHALL 先应用 auto groups、coverage、connections、colors 和 trade station
+- **并且** SHALL 再按最终 groups 重算 virtual station draft 归属
+- **并且** SHALL 最后同步 virtual station drafts 到 binding station plans
+
+#### Scenario: Apply creates updates and deletes virtual station plans
+
+- **前提** 当前 store 中存在 virtual station drafts
+- **当** 系统同步 virtual station drafts 到 binding
+- **那么** draft 中存在且 binding 中不存在的 virtual station SHALL 被创建
+- **并且** draft 中存在且 binding 中存在的 virtual station SHALL 被更新
+- **并且** binding 中存在但 draft 中不存在的同 scope virtual station SHALL 被删除
+- **并且** 仍未分组的 drafts SHALL NOT 写回 binding
+- **并且** 若 binding 中存在对应旧 virtual station plan，系统 SHALL 删除它
+- **并且** 所有写回的 station plans SHALL 保持 `saveStationCode=undefined`
+
+#### Scenario: Apply does not modify save station plans
+
+- **前提** binding 中存在带 `saveStationCode` 的 station plans
+- **当** 系统同步 virtual station drafts
+- **那么** 这些 save station plans SHALL 保持不变
 
 ### Requirement: Snapshot And Baseline Timing
 

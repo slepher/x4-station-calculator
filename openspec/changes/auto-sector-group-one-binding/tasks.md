@@ -6,6 +6,8 @@
 - [ ] 在 `useLiveProductionStore` 中维护 `calculationMode`
 - [ ] 在 `useLiveProductionStore` 中维护 `prefJumpRange`、`bridgeSearchJumpRange`、`prefThreshold`
 - [ ] 在 `useLiveProductionStore` 中维护 `calcBaselinePillState`
+- [ ] 在 `useLiveProductionStore` 中维护 `virtualStationDrafts`
+- [ ] 在 `useLiveProductionStore` 中维护 virtual station draft context 初始化 key
 - [ ] 实现 `needsAutoGroupRecalc`
 
 ## 2. 初始化路径
@@ -16,6 +18,11 @@
 - [ ] active binding 切换时重新初始化唯一 draft
 - [ ] selected archive 切换且 guid 匹配时重新初始化唯一 draft
 - [ ] 无有效 binding/archive 时清空 draft
+- [ ] 生成 `autoGroupResult.groups` 后初始化 virtual station draft
+- [ ] 从当前 binding 中无 `saveStationCode` 的 station plans 初始化 virtual station draft
+- [ ] 同一 context 下组件挂载、tab 切换、Live/Map 切换不得覆盖 virtual station draft
+- [ ] [计算] / [快速计算] 后保留 virtual station draft 并重算 group 归属
+- [ ] 支持未分组 virtual station draft 状态
 
 ## 3. SaveBindingPlan 持久化
 
@@ -31,10 +38,14 @@
 - [ ] 删除 presenter 内跨面板共享 draft 本地 ref
 - [ ] Handler 统一读写 live store 共享 draft
 - [ ] 明确并实现 `calculationBaseline` 作为 [重置] 数据源
+- [ ] `calculationBaseline` 覆盖 autoGroupResult 与 virtual station drafts
 - [ ] 明确并实现 `calcBaselinePillState` 作为 pill UI diff 基线
 - [ ] 移除旧的 edit restore snapshot 语义；[退出] 只退出编辑态
 - [ ] `handleColorChange` 不直接写持久化 binding
 - [ ] `handleConfirm` 成功后写入 `appliedAutoGroupArchiveTime`
+- [ ] `handleConfirm` 成功时先应用 auto groups，再同步 virtual station drafts
+- [ ] virtual station apply 只同步无 `saveStationCode` 的 station plans
+- [ ] virtual station apply 不修改带 `saveStationCode` 的 save station plans
 - [ ] `handleConfirm` 返回成功/失败，供 Live 切换模式
 
 ## 5. Live 双模式
@@ -63,6 +74,7 @@
 - [ ] 计算模式 [返回] 返回展示模式，不提交、不计算、不重置
 - [ ] [计算] / [快速计算] 更新 shared draft 和 `calculationBaseline`
 - [ ] [重置] 从 `calculationBaseline` 恢复 shared draft
+- [ ] [重置] 同时恢复 virtual station drafts
 - [ ] [提交] 按 edit、无 result、trade station、uncertain assignment gate 返回成功/失败
 - [ ] [编辑] 进入 edit 模式，不创建恢复 snapshot
 - [ ] [退出] 返回 result 模式，不恢复 draft

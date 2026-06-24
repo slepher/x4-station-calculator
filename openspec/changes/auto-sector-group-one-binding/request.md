@@ -11,16 +11,21 @@ Trade station 在 Live 计算模式中作为第三列展示和 confirm gate 的�
 - `useLiveProductionStore` 持有当前 active binding/archive 的唯一共享 draft。
 - 系统 SHALL NOT 为多个 binding 同时维护并行 draft cache。
 - `autoGroupResult`、`calculationMode`、`prefJumpRange`、`bridgeSearchJumpRange`、`prefThreshold`、`calcBaselinePillState` 归属于 live store。
+- Virtual station drafts 归属于同一份 live store shared draft，用于保存 Map-only 虚拟生产空间站草案。
 - `needsAutoGroupRecalc` 只由 `SaveBindingPlan.appliedAutoGroupArchiveTime` 与当前 selected archive time 判断。
 - `initAutoGroupDraft()` 是共享 draft 初始化入口。
 - 有变化时执行 `groupCleanSlate()` 或 `groupIncremental()`。
 - 无变化时调用 `buildAssignmentsFromBinding()`，从已保存 groups 构建 assignments，不重新决定 group 结构。
 - active binding 或 selected archive 切换时重新初始化唯一 draft。
 - Live/Map 面板挂载、面板切换、详情模式切换不得触发自动计算。
+- 生成 `autoGroupResult.groups` 时同步初始化 virtual station draft；初始化来源是当前 binding 中无 `saveStationCode` 的 `BindingStationPlan`。
+- 同一 active binding/archive context 内，组件挂载、切换 Virtual Station tab、Live/Map 来回切换不得覆盖 virtual station draft。
+- [计算] / [快速计算] 重新生成 groups 时，必须保留当前 virtual station draft 内容，并按最新 groups 重算归属；仍无归属的 draft 保留为未分组状态。
 - 用户在计算模式内显式点击“计算”时，可以由 presenter 编排输入并更新共享 draft。
 - `useAutoSectorGroupPresenter` 是 UI 连接与交互编排层，必须以 live store 的 `autoGroupResult` 作为唯一共享 draft 数据源。
 - `handleColorChange` 不得直接调用 `saveBindingStore.updateGroup()` 写持久化 binding；颜色写入由确认流程处理。
 - `handleConfirm()` 成功后记录 `appliedAutoGroupArchiveTime`。
+- `handleConfirm()` 成功流程 SHALL 先应用 auto groups，再应用 virtual station drafts；virtual station apply 只同步无 `saveStationCode` 的 station plans。
 - Live 展示模式为 `[存档 3fr] | [星区 4fr] | [资源 5fr]`。
 - Live 计算模式为 `[星区 5fr] | [分配 4fr] | [交易站 3fr]`。
 - 详情按钮只切换到计算模式，不运行算法。
@@ -30,6 +35,7 @@ Trade station 在 Live 计算模式中作为第三列展示和 confirm gate 的�
 
 - `calculationBaseline` 是“重置快照”，用于 [重置] 恢复到最近一次初始化或显式 [计算] 形成的计算结果。
 - `calculationBaseline` SHALL 在 `setAutoGroupResult(result)` 时更新；显式 [计算] 会通过该路径刷新 baseline。
+- `calculationBaseline` SHALL 覆盖 autoGroupResult 与 virtual station drafts，确保 [重置] 不产生 group 与 virtual station draft 的半旧半新状态。
 - 确认成功后，系统 SHOULD 将 `calculationBaseline` 更新为确认后的 draft，避免之后 [重置] 回到确认前状态。
 - `calcBaselinePillState` 是“UI diff 基线”，用于 coverage/connected pill 的粗边框、虚线 removed 等基线展示。
 - `calcBaselinePillState` SHALL 在 active binding/archive 初始化时写入；显式 [计算] 不应覆盖它。
@@ -62,6 +68,7 @@ Trade station 在 Live 计算模式中作为第三列展示和 confirm gate 的�
 - [计算]：使用当前编辑输入运行核心算法，更新 `autoGroupResult` 和 `calculationBaseline`，结束后进入 result 模式，并切到首个未解决 tab。
 - [快速计算]：与 [计算] 一样运行 `runCalculationFromEditInput()`，用于 result/toolbar 场景的快速重算入口。
 - [重置]：从 `calculationBaseline` 克隆恢复整份 `autoGroupResult`，包括 group、assignment、bridge decision、trade station、hub color 和 retain 字段；不切换 active binding/archive，不运行算法。
+- [重置] 同时恢复 virtual station drafts 到 `calculationBaseline` 中记录的状态。
 - [提交]：调用 `handleConfirm()`；当 trade station 未解决、处于 edit 模式、无 result、或需要二次确认时不提交。
 - [提交二次确认]：当仍有 uncertain assignment 但无 trade station 未解决时，第一次点击打开 popup；popup 中再次确认才允许提交。
 
@@ -116,6 +123,8 @@ Trade station 在 Live 计算模式中作为第三列展示和 confirm gate 的�
 - `calculationBaseline` 与 `calcBaselinePillState` 的更新时间点明确，且互不替代。
 - 确认成功记录 applied archive time，并在 Live 回到展示模式。
 - `normalizeState()` 保留新增 SaveBindingPlan 字段。
+- Virtual station draft 与 shared draft 生命周期一致，计算保留、重置恢复、提交应用的边界明确。
+- 提交时仅同步无 `saveStationCode` 的 virtual station plans，带 `saveStationCode` 的 save station plans 不被修改。
 
 ## 未决项
 

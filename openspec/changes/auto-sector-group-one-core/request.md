@@ -68,6 +68,9 @@
 - 用户选择 assignment 后不得改变 card 身份和顺序。
 - 确认时按 UUID 优先、`sectorMacro` 兜底匹配已有 group，避免重复 standalone group。
 - 确认时重建 `sector -> groupId`，并按最终 coverage 重分配 station plans。
+- 确认时必须先写入最终 groups/coverage/connections/trade station，再按最终 group 结果处理 virtual station drafts。
+- 无 `saveStationCode` 的 virtual station plans 按最终 group 归属同步；仍未分组的 virtual station 不写回 binding。
+- 带 `saveStationCode` 的 save station plans 不得被 virtual station 同步流程修改。
 
 ### Trade station
 
@@ -80,6 +83,7 @@
 - Trade station retain 开启且存在 saved code 时，重算默认值优先使用 saved code。
 - `__virtual__` 只存在于 UI/计算层，持久化时不得写入 `saveStationCode`。
 - 用户选择不得被旧的 `hubStationCode` 或 fallback best station 逻辑覆盖。
+- Virtual trade station 的 `sectorMacro` 是 group hub `sectorMacro` 的派生结果；拖动只能改变 position，不得改变 trade station `sectorMacro`、group `sectorMacro`、coverage 或 station plan。
 
 ## 边界
 
@@ -91,6 +95,7 @@
 - Sector group card 的编辑态/非编辑态展示、操作按钮和 baseline/current diff 标记。
 - Trade station 候选、默认、retain、reset、confirm gate 与持久化。
 - `BindingSectorGroup.tradeStation` 相关核心数据写入。
+- Confirm 后 station plan group assignment 与 virtual station 同步的不变量。
 
 ### Out of Scope
 
@@ -106,6 +111,7 @@
 - 编辑态输入可以实时修改 shared draft，但不会直接污染最终 binding；只有确认动作写入持久化。
 - 确认前 bridge、assignment、trade station 未决项均被 gate。
 - 确认后 groups、coverage、connections、station plan group assignment、trade station 均写入一致。
+- 确认后 virtual station plans 只同步无 `saveStationCode` 的草案；save station plans 保持不变。
 - 不引入已移除的 `recalcState`、per-group `exclude`、旧三 tab pill UI 或 bridge marker 持久化字段。
 
 ## 未决项

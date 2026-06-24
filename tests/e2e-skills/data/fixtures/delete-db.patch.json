@@ -1,0 +1,11 @@
+{
+  "$target": "db.json",
+  "$delete": [
+    "vsn"
+  ],
+  "$merge": {
+    "x4_logic_flow_plans": {
+      "activeId": "fixture-patch-after-delete"
+    }
+  }
+}

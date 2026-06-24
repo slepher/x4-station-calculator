@@ -53,6 +53,9 @@
 - [ ] 用户选择 option 后不改变 card 身份和排序
 - [ ] Confirm 按 UUID 优先、`sectorMacro` 兜底匹配 groups
 - [ ] Confirm 后按最终 coverage 重分配 station plans
+- [ ] Confirm 后按最终 groups 同步无 `saveStationCode` 的 virtual station plans
+- [ ] Confirm 时仍未分组的 virtual station plans 不写回 binding
+- [ ] Confirm 不通过 virtual station 同步流程修改带 `saveStationCode` 的 save station plans
 
 ## 6. Trade station
 
@@ -63,6 +66,9 @@
 - [ ] 实现 `tradeStationRetainEnabled` 与 `savedTradeStationCode`
 - [ ] Confirm gate 覆盖 bridge、assignment、trade station 三类未决项
 - [ ] Confirm 显式写入玩家站或虚拟站 trade station
+- [ ] 虚拟交易站持久化时 `sectorMacro` 固定为 group hub sector
+- [ ] 虚拟交易站 position 可来自 map draft 拖动结果
+- [ ] 虚拟交易站拖动不得修改 group `sectorMacro`、coverage 或 station plan
 - [ ] 防止旧 `hubStationCode` / fallback best station 逻辑覆盖用户选择
 
 ## 7. 构建验证

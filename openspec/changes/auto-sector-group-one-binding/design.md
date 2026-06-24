@@ -29,6 +29,8 @@ bridgeSearchJumpRange: Ref<number>
 prefThreshold: Ref<number>
 calcBaselinePillState: Ref<CalcBaselinePillState | null>
 needsAutoGroupRecalc: Computed<boolean>
+virtualStationDrafts: Ref<BindingStationPlan[]>
+virtualStationDraftInitializedKey: Ref<string | null>
 ```
 
 Presenter 仍可持有 UI 辅助状态，但共享草案不得离开 live store。当前设计保留以下 presenter-local 状态：
@@ -64,6 +66,22 @@ appliedAutoGroupArchiveTime === undefined
 
 初始化只由 store 生命周期和 active context 切换触发。组件挂载和 tab 切换不得调用初始化。
 
+### Virtual station draft 初始化
+
+Virtual station draft 使用与 `autoGroupResult` 相同的 active binding/archive context key，例如：
+
+```text
+gameGuid:archiveTime
+```
+
+当 `autoGroupResult.groups` 生成后，store 同步处理 virtual station draft：
+
+1. 当前 context 尚未初始化 virtual station draft 时，从 `activeBinding.stationPlans` 中读取 `saveStationCode === undefined` 的 plans，并 clone 到 `virtualStationDrafts`。
+2. 当前 context 已初始化时，保留现有 `virtualStationDrafts`，不得因组件挂载、Map/Live 切换或打开 Virtual Station tab 覆盖用户编辑。
+3. 每次 groups 变化后，按当前 groups 的 anchor/coverage 重算 virtual station 的 `groupId`；无命中时保留 draft 并标记为未分组。
+
+[计算] / [快速计算] 会重新生成 `autoGroupResult.groups`，但不会清空 `virtualStationDrafts`。重算完成后只更新归属结果。
+
 ## Snapshot 与基线
 
 ### calculationBaseline
@@ -72,7 +90,7 @@ appliedAutoGroupArchiveTime === undefined
 
 更新时间点：
 
-1. `setAutoGroupResult(result)` 时克隆 `result` 写入。
+1. `setAutoGroupResult(result)` 时克隆 `result` 与当前 `virtualStationDrafts` 写入。
 2. Store 初始化或 active context 切换生成 result 后，经 `setAutoGroupResult()` 写入。
 3. 用户显式 [计算] / [快速计算] 生成 result 后，经 `setAutoGroupResult()` 写入。
 4. 确认成功后 SHOULD 更新为确认后的 result，避免 [重置] 回退到确认前。
@@ -80,7 +98,7 @@ appliedAutoGroupArchiveTime === undefined
 使用点：
 
 - [重置] 调用 `handleResetAssignments()`。
-- `handleResetAssignments()` 从 `calculationBaseline` clone 恢复 `autoGroupResult`。
+- `handleResetAssignments()` 从 `calculationBaseline` clone 恢复 `autoGroupResult` 与 `virtualStationDrafts`。
 - 该恢复不改变 active binding、selected archive 或 liveMode。
 
 ### calcBaselinePillState
@@ -120,6 +138,7 @@ const refs = storeToRefs(liveStore)
 Handler 规则：
 
 - 读写 `liveStore.autoGroupResult`。
+- 读写 `liveStore.virtualStationDrafts`，但 UI 展示结构由 presenter 组装。
 - 计算按钮可以运行纯算法并更新共享 draft。
 - 颜色修改只改共享 draft，不直接写 binding。
 - 确认按钮执行最终持久化，并返回成功/失败状态给 panel。
@@ -195,12 +214,20 @@ Live sidebar 在固定菜单和动态星区/站点列表之间的分隔线区域
 确认成功后：
 
 1. 写入 groups、coverage、connections、colors、trade station。
-2. 写入 `appliedAutoGroupArchiveTime`。
-3. 保存 binding。
-4. 同步 live flow。
-5. 将 result groups 标记为 baseline。
-6. 更新 `calcBaselinePillState`。
-7. emit `confirmed`，Live 返回展示模式。
+2. 按最终 groups 重算 `virtualStationDrafts` 归属。
+3. 同步无 `saveStationCode` 的 virtual station plans：
+   - draft 中存在且 binding 中不存在：创建。
+   - draft 中存在且 binding 中存在：更新。
+   - binding 中存在但 draft 中不存在：删除。
+   - 仍未分组的 draft：不写回；若 binding 中存在对应旧 plan，则删除。
+4. 带 `saveStationCode` 的 station plans 不参与 virtual station 同步。
+5. 写入 `appliedAutoGroupArchiveTime`。
+6. 保存 binding。
+7. 同步 live flow。
+8. 将 result groups 标记为 baseline。
+9. 更新 `calcBaselinePillState`。
+10. 更新 `calculationBaseline` 为确认后的 autoGroupResult 与 virtual station drafts。
+11. emit `confirmed`，Live 返回展示模式。
 
 ### Tab 自动切换
 

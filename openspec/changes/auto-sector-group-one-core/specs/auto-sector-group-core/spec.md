@@ -199,6 +199,24 @@
 - **那么** bridge draft group SHALL 作为普通 `BindingSectorGroup` 保存
 - **并且** 系统 SHALL NOT 新增 bridge marker 持久化字段
 
+#### Scenario: Confirm applies virtual station drafts after groups
+- **前提** 用户确认包含 auto groups 和 virtual station drafts 的草案
+- **当** 系统写入 save binding
+- **那么** 系统 SHALL 先写入最终 groups、coverage、connections 和 trade station
+- **并且** SHALL 再按最终 groups 重算无 `saveStationCode` virtual station plans 的 group 归属
+- **并且** SHALL 同步这些 virtual station plans 到 binding
+
+#### Scenario: Ungrouped virtual station plans are not persisted
+- **前提** 确认时某个无 `saveStationCode` virtual station draft 仍未归属于任何最终 group
+- **当** 系统同步 station plans
+- **那么** 该 draft SHALL NOT 写回 binding
+- **并且** 若 binding 中存在对应旧 virtual station plan，系统 SHALL 删除它
+
+#### Scenario: Save station plans are not modified by virtual station sync
+- **前提** binding 中存在带 `saveStationCode` 的 station plans
+- **当** 系统同步 virtual station drafts
+- **那么** 这些 save station plans SHALL 保持不变
+
 ### Requirement: Edit Input State
 
 系统 MUST 将 Col 2 编辑态作为“下一次计算输入编辑”，而不是最终归属编辑。

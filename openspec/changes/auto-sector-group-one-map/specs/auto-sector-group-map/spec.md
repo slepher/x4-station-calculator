@@ -2,13 +2,13 @@
 
 ## Purpose
 
-定义自动星区划分系统接入 Map 界面的行为规范：系统 SHALL 在 Map 的 Save Panel binding-sector 层中提供与 Live Production 一致的自动分组能力，支持 Hub / 分配方案 / Trade Station 视图切换、双上下文样式适配、pill 聚焦地图、拖拽排序，并复用 `useLiveProductionStore` 中的唯一共享 draft。
+定义自动星区划分系统接入 Map 界面的行为规范：系统 SHALL 在 Map 的 Save Panel binding-sector 层中提供与 Live Production 一致的自动分组能力，支持 Hub / 分配方案 / Trade Station / Virtual Station 视图切换、双上下文样式适配、pill 聚焦地图、拖拽排序，并复用 `useLiveProductionStore` 中的唯一共享 draft。
 
 ## ADDED Requirements
 
 ### Requirement: Map Context View Switching
 
-系统 MUST 在 map 上下文中用 Hub / 分配方案 / Trade Station 视图分离群组管理、星区分配和交易站选择界面，并且三个视图 MUST 读写同一份 `autoGroupResult`。
+系统 MUST 在 map 上下文中用 Hub / 分配方案 / Trade Station / Virtual Station 视图分离群组管理、星区分配、交易站选择和虚拟生产空间站编辑界面，并且这些视图 MUST 读写同一份 shared draft。
 
 #### Scenario: Hub tab displays group management
 - **前提** map binding wrapper 渲染在 map 上下文中
@@ -42,16 +42,30 @@
 - **当** 系统渲染任意 hub group card
 - **那么** 每个 card SHALL 展示候选站 radio、score、containerCap 和虚拟交易站选项
 
-#### Scenario: Map edit mode blocks allocation and trade station views
-- **前提** Hub tab 处于编辑输入态
-- **当** 系统渲染 map binding wrapper
-- **那么** 分配方案和 Trade Station 视图 SHALL disabled
-- **并且** 用户 SHALL NOT 能切换到 `SectorAllocationList` 或 `SectorTradeStationList`
+#### Scenario: Virtual Station tab displays virtual station editor
+- **前提** map binding wrapper 渲染在 map 上下文中
+- **并且** 自动分组尚未确认完成
+- **当** 用户切换到 Virtual Station tab
+- **那么** 系统 SHALL 显示 blueprint station 来源列表
+- **并且** SHALL 显示空白空间站来源项
+- **并且** SHALL 显示按当前 groups 分组的 virtual station draft 列表
+- **并且** SHALL 不重新计算 autoGroupResult
+
+#### Scenario: Live does not display virtual station tab
+- **前提** Live 计算模式渲染 `AutoSectorGroupPanel layout="columns"`
+- **当** 系统显示三列布局
+- **那么** 系统 SHALL NOT 显示 Virtual Station tab
+
+#### Scenario: Virtual Station tab remains available in map states
+- **前提** 用户位于 Map binding 界面
+- **当** Hub 处于 edit 或 result 模式，或用户切换 Allocation / Trade Station / Virtual Station tab
+- **那么** 系统 SHALL 允许 virtual station draft 继续被地图拖拽创建、移动或删除
+- **并且** virtual station 编辑 SHALL NOT 依赖 Virtual Station tab 当前激活
 
 #### Scenario: Map confirmed state hides draft tabs
 - **前提** 自动分组已确认完成
 - **当** 系统渲染 map binding wrapper
-- **那么** 系统 SHALL NOT 显示 Hub / 分配方案 / Trade Station tab
+- **那么** 系统 SHALL NOT 显示 Hub / 分配方案 / Trade Station / Virtual Station tab
 - **并且** 系统 SHALL NOT 显示 `SectorAllocationList` 或 `SectorTradeStationList`
 - **并且** 系统 SHALL 在每个 group 上显示进入 station binding 的按钮
 
@@ -69,7 +83,7 @@
 #### Scenario: Live context uses three-column layout
 - **前提** `SectorOverviewPanel` 渲染 live overview
 - **当** 系统渲染三列布局
-- **那么** 面板顶部 SHALL 显示三视图共用的 `AutoSectorBar`
+- **那么** 面板顶部 SHALL 显示共用的 `AutoSectorBar`
 - **并且** Col 1 SHALL 显示 `SectorGroupList(view='live')`
 - **并且** Col 2 SHALL 显示 `SectorAllocationList(view='live')`
 - **并且** Col 3 SHALL 显示 `SectorTradeStationList(view='live')` 或完成态内容
@@ -183,6 +197,165 @@
 - **当** `autoGroupResult` 已由 store 初始化
 - **那么** Map 面板 SHALL NOT 自行调用分组算法或 `initAutoGroupDraft()`
 
+### Requirement: Map-only Virtual Station Editing
+
+系统 MUST 在 Map 自动分组面板中提供 Virtual Station tab，用于创建、移动、删除无 `saveStationCode` 的 virtual station drafts。
+
+#### Scenario: Blueprint empire selector is shared
+- **前提** 用户打开 Virtual Station tab
+- **当** 系统显示 blueprint 来源
+- **那么** 系统 SHALL 显示 blueprint empire 选择器
+- **并且** 该选择 SHALL 复用当前 binding 的 `blueprintEmpireId`
+- **并且** 已创建的 virtual station SHALL NOT 随 blueprint empire 后续切换同步变化
+
+#### Scenario: Blueprint station list supports dragging
+- **前提** 已选择 blueprint empire
+- **当** 系统显示 blueprint station 列表
+- **那么** 系统 SHALL 显示该 blueprint empire 中可作为 station plan 来源的空间站
+- **并且** 列表样式和拖拽交互 SHALL 参照原 Step 3 blueprint station 列表
+
+#### Scenario: Blank station source exists
+- **前提** 用户打开 Virtual Station tab
+- **当** 系统显示 blueprint station 列表
+- **那么** 系统 SHALL 额外显示一个空白空间站来源项
+- **并且** 该来源项表示 `modules=[]` 的 virtual station 模板
+
+#### Scenario: Blueprint drag copies station plan fields
+- **前提** 用户从 blueprint station 列表拖拽某个 station 到有效地图 sector
+- **当** 系统创建 virtual station draft
+- **那么** 系统 SHALL 复制 source station 的 `name`
+- **并且** SHALL 复制 `type`
+- **并且** SHALL deep clone `modules`
+- **并且** SHALL deep clone `settings`
+- **并且** SHALL deep clone `lockedWares`
+- **并且** SHALL deep clone `warePriority`
+- **并且** SHALL NOT 复制 source station 的 `id`、`sectorId` 或持续同步引用
+- **并且** 新 draft 的 `saveStationCode` SHALL 为 `undefined`
+
+#### Scenario: Blank station drag creates empty industrial plan
+- **前提** 用户拖拽空白空间站到有效地图 sector
+- **当** 系统创建 virtual station draft
+- **那么** draft SHALL 使用本地化“虚拟空间站”作为名称
+- **并且** `type` SHALL 为 `industrial`
+- **并且** `modules` SHALL 为空数组
+- **并且** `settings` SHALL 使用 `DEFAULT_STATION_SETTINGS`
+- **并且** `lockedWares` SHALL 为空数组
+- **并且** `warePriority` SHALL 为空对象
+- **并且** `saveStationCode` SHALL 为 `undefined`
+
+#### Scenario: Drag to covered sector creates draft
+- **前提** 用户拖拽 blueprint station 或空白空间站
+- **并且** 目标 sector 属于某个当前 draft group 的 anchor 或 coverage
+- **当** 用户释放拖拽
+- **那么** 系统 SHALL 创建 virtual station draft
+- **并且** SHALL 设置 `sectorMacro` 为目标 sector
+- **并且** SHALL 设置 `position` 为地图落点
+- **并且** SHALL 设置 `groupId` 为覆盖该 sector 的 group id
+
+#### Scenario: Drag to uncovered sector is rejected
+- **前提** 用户拖拽 blueprint station、空白空间站或已有 virtual station
+- **并且** 目标 sector 不属于任何当前 draft group 的 anchor 或 coverage
+- **当** 用户释放拖拽
+- **那么** 系统 SHALL 拒绝该落点
+- **并且** SHALL 保持原 draft 不变
+
+#### Scenario: Active coverage is unique
+- **前提** 用户拖拽 virtual station 到目标 sector
+- **当** 系统查找目标 sector 的 group 归属
+- **那么** 系统 SHALL 期望命中唯一 group
+- **并且** 若代码发现命中多个 group，系统 SHALL 拒绝落点
+- **并且** SHALL NOT 自动选择第一个、最近或任意 fallback group
+
+#### Scenario: Existing virtual station can be dragged again
+- **前提** virtual station draft 已存在
+- **当** 用户从列表或地图 overlay 再次拖拽该 virtual station 到有效 sector
+- **那么** 系统 SHALL 使用该 draft 自身 id 更新现有 draft
+- **并且** SHALL 更新 `sectorMacro`
+- **并且** SHALL 更新 `position`
+- **并且** SHALL 更新 `groupId`
+- **并且** SHALL NOT 创建重复 virtual station draft
+
+#### Scenario: Virtual station list is grouped by current groups
+- **前提** Virtual Station tab 渲染
+- **当** 当前存在 virtual station drafts
+- **那么** 系统 SHALL 按当前 `autoGroupResult.groups` 顺序分组显示
+- **并且** 每组内 SHALL 按 sector 显示名再按创建顺序排序
+
+#### Scenario: Virtual station row content
+- **前提** 某个 virtual station draft 归属于 group G
+- **当** 系统渲染该 item
+- **那么** item SHALL 显示该 draft 的 `name` 属性
+- **并且** SHALL 显示所属 sector 的本地化名称
+- **并且** SHALL 显示坐标
+- **并且** SHALL 显示 `×` 删除按钮
+- **并且** SHALL NOT 显示所属 sector group 名
+
+#### Scenario: Delete removes draft only
+- **前提** 用户点击 virtual station item 的 `×`
+- **当** 系统处理删除
+- **那么** 系统 SHALL 从 store draft 中移除该 virtual station
+- **并且** SHALL NOT 立即修改 binding
+
+#### Scenario: Coverage edit moves station to ungrouped list
+- **前提** 某个 virtual station draft 原本归属于 group G
+- **当** 用户编辑 group/coverage 后，该 station 的 `sectorMacro` 不再属于任何 group
+- **那么** 系统 SHALL 保留该 virtual station draft
+- **并且** SHALL 将其显示在未分组区域
+- **并且** SHALL NOT 立即删除该 draft
+
+#### Scenario: Ungrouped station can recover
+- **前提** 某个 virtual station draft 显示在未分组区域
+- **当** 用户将其拖拽到有效 group sector，或编辑 coverage 使其 sector 重新被某个 group 覆盖
+- **那么** 系统 SHALL 将该 virtual station 恢复显示到对应 group 列表
+
+#### Scenario: Ungrouped warning text
+- **前提** 未分组区域中存在 virtual station draft
+- **当** 系统渲染该区域
+- **那么** 系统 SHALL 在列表下方显示说明
+- **并且** 说明 SHALL 表达这些 virtual stations 当前不属于任何 sector group，提交时会被移除
+
+### Requirement: Virtual Station And Trade Station Map Overlays
+
+系统 MUST 在 Map binding draft 编辑态从 shared draft 渲染 virtual station 和 virtual trade station overlay，并通过地图拖拽更新 draft。
+
+#### Scenario: Virtual station overlay renders from draft
+- **前提** 用户打开 Map binding 界面
+- **并且** `liveStore.virtualStationDrafts` 中存在 virtual station draft
+- **当** 地图渲染 binding draft overlay
+- **那么** 系统 SHALL 从 virtual station draft 渲染虚拟生产空间站 overlay
+
+#### Scenario: Virtual station draggable in map binding
+- **前提** 用户打开 Map binding 界面
+- **并且** 存在 virtual station overlay
+- **当** 用户拖动该 overlay 到有效 group sector
+- **那么** 系统 SHALL 更新该 virtual station draft 的 `sectorMacro`、`position` 和 `groupId`
+- **并且** 该能力 SHALL NOT 要求 Virtual Station tab 当前激活
+
+#### Scenario: Virtual trade station draggable in map binding
+- **前提** 用户打开 Map binding 界面
+- **并且** 某个 group 的 trade station 选择为 virtual
+- **当** 用户在地图上拖动该 virtual trade station overlay
+- **那么** 系统 SHALL 更新该 group draft 的 trade station position
+- **并且** SHALL NOT 直接写 binding
+- **并且** 该能力 SHALL NOT 要求 Trade Station tab 当前激活
+
+#### Scenario: Virtual trade station drop outside hub sector is rejected
+- **前提** 用户拖动 virtual trade station
+- **当** 用户释放到非 hub sector
+- **那么** 系统 SHALL 拒绝该落点
+- **并且** SHALL 保持原 position 不变
+
+#### Scenario: Trade Station tab shows coordinates for virtual selection
+- **前提** 用户在 Trade Station tab 中将某个 group 的 trade station 选项切换为 virtual
+- **当** 系统渲染该 group 的 trade station card
+- **那么** 系统 SHALL 显示当前 virtual trade station 坐标
+
+#### Scenario: Existing overlay visuals are reused
+- **前提** 系统渲染 virtual station 或 virtual trade station overlay
+- **当** 地图显示这些 overlay
+- **那么** 系统 SHALL 沿用现有 overlay 图标、颜色和样式
+- **并且** SHALL NOT 为本 change 新增额外视觉区分设计
+
 ### Requirement: Presenter Extraction from SectorOverviewPanel
 
 系统 MUST 将自动分组面板的 UI 组装和交互编排收敛到 `useAutoSectorGroupPresenter.ts`，使其遵守 `store → presenter → vue` 三层架构。
@@ -251,6 +424,7 @@
 - **那么** Hub tab SHALL 显示"枢纽"
 - **并且** 分配方案 tab SHALL 显示"分配方案"
 - **并且** Trade Station tab SHALL 显示"交易站"
+- **并且** Virtual Station tab SHALL 显示"虚拟空间站"
 
 #### Scenario: English tab labels
 - **前提** 当前语言为 en
@@ -258,3 +432,4 @@
 - **那么** Hub tab SHALL 显示"Hub"
 - **并且** 分配方案 tab SHALL 显示"Allocation"
 - **并且** Trade Station tab SHALL 显示"Trade Station"
+- **并且** Virtual Station tab SHALL 显示"Virtual Station"

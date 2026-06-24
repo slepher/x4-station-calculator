@@ -90,8 +90,6 @@ const blueprintEmpireMenuOpen = ref(false)
 const blueprintEmpireMenuRef = ref<HTMLElement | null>(null)
 const blueprintEmpireMenuTriggerEl = ref<HTMLElement | null>(null)
 const blueprintEmpireMenuStyle = ref<Record<string, string>>({})
-const canSwitchToAllocation = () => true
-const canSwitchToTradeStation = () => true
 
 function onCalculate() { runCalculationFromEditInput(); switchToFirstUnresolvedTab() }
 function onQuickCalc() { handleQuickCalculate(); switchToFirstUnresolvedTab() }
@@ -337,10 +335,8 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
         <div class="tab-bar">
             <button type="button" class="tab-btn" :class="{ active: activeTab === 'hub' }" @click="activeTab = 'hub'">{{ t('auto_sector.hub_tab') }}</button>
             <button type="button" class="tab-btn" :class="{ active: activeTab === 'allocation' }"
-              :disabled="!canSwitchToAllocation()" :title="canSwitchToAllocation() ? '' : t('auto_sector.edit_overlay_hint')"
               @click="activeTab = 'allocation'">{{ t('auto_sector.allocation_tab') }}</button>
             <button type="button" class="tab-btn" :class="{ active: activeTab === 'tradeStation' }"
-              :disabled="!canSwitchToTradeStation()" :title="canSwitchToTradeStation() ? '' : t('auto_sector.edit_overlay_hint')"
               @click="activeTab = 'tradeStation'">{{ t('auto_sector.trade_station_tab') }}</button>
             <button type="button" class="tab-btn" :class="{ active: activeTab === 'virtualStation' }"
               @click="activeTab = 'virtualStation'">{{ t('auto_sector.virtual_station_tab') }}</button>

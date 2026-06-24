@@ -1,0 +1,17 @@
+{
+  "$target": "db.json",
+  "$merge": {
+    "x4_logic_flow_plans": {
+      "activeId": "fixture-patch-flow"
+    }
+  },
+  "$append": {
+    "x4_empire_data.list": [
+      {
+        "id": "empire-fixture-patch-alpha",
+        "name": "Fixture Patch Alpha",
+        "stations": []
+      }
+    ]
+  }
+}

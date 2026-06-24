@@ -1,0 +1,8 @@
+{
+  "$target": "db.json",
+  "$append": {
+    "x4_empire_data.activeId": [
+      "not-array"
+    ]
+  }
+}
