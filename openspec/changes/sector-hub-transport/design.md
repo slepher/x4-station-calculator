@@ -35,7 +35,7 @@ live transit hub 页面当前右侧使用 `StationDashboard` 展示建设成本�
 
 - store：继续提供 active binding、active transit group、station state、flow cache、game map data，不新增面向 UI 的拼装结构。
 - presenter：新增 transit transport presenter，负责从 store 输入组装分类、路径摘要、路径明细、问题组和格式化前数据。
-- vue：新增运输栏组件，只接收 presenter 输出并处理展开/折叠状态。
+- vue：新增运输栏组件，只接收 presenter 输出并处理展开/折叠状态、动作式路线描述、0 值隐藏和空问题组隐藏。
 
 建议新增纯逻辑 route builder，供 presenter 调用。route builder 不依赖 Vue/Pinia，用于单独验证路径选择和距离分段。
 
@@ -91,6 +91,8 @@ route builder 从 map data 建立 sector edge 图：
 
 同一对 sector 按唯一连接处理，不实现多 edge 竞争。
 
+route builder 输出的 gate/superhighway endpoint label SHALL 只使用面向用户的 sector 显示名，不拼接 gate id 或 superhighway link id。
+
 ## 路径候选与选择
 
 算法应生成不重复 sector 的 simple path 候选。最终最优路径排序为：
@@ -125,14 +127,15 @@ route builder 从 map data 建立 sector edge 图：
 
 ### Sector Group
 
-折叠摘要显示普通总距离、星门数、target sector、target station。
+折叠摘要显示普通总距离、星门数和目标说明。目标说明优先表达 linked hub station；当 target station 与 target sector 同名时只显示一次，避免重复文本；二者不同名时显示 `station · sector`。
 
-展开后显示完整路径段：
+展开后显示动作式路线明细：
 
-- 普通空间段端点与距离
-- gate transit
-- superhighway 段与距离
-- 末端点到 linked hub station 的距离
+- 按 sector 分块，sector 名称只作为块标题出现。
+- 普通空间段显示为 `离港至出口星门`、`星区内转场` 或 `入口星门至目标空间站`，并显示距离。
+- gate transit 显示为 `星门跃迁至 <sector>`，不显示 `0.0 km`。
+- superhighway 显示为 `超级高速至 <sector>`，显示 superhighway 距离。
+- 不显示 gate/superhighway 内部 ID。
 
 排序为星门数少、普通总距离短、group order。
 
@@ -143,13 +146,20 @@ route builder 从 map data 建立 sector edge 图：
 1. sector 行：显示到目标 sector 末端点的普通总距离、星门数、sector。
 2. station 行：显示 station name、code、坐标、末端点到 station 距离、普通总距离加末端点到 station 距离。
 
-sector 行展开显示到末端点的路径明细，末端不是 station。
+sector 行展开显示到末端点的动作式路径明细，末端不是 station。若目标 station 与当前 hub 在同一 sector，sector 行不提供展开路径，station 行直接显示 `空间站到空间站` 距离。
+
+sector 行摘要隐藏无信息量的 0 值：普通距离为 0 时不显示距离字段，星门数为 0 时不显示星门数字段。
 
 station 排序按 production 产线数量从高到低。production 产线数量优先使用 station 正向产出 production flows distinct ware count；无法取得时使用生产模块输出 ware distinct count。
 
+Station 分类目标来源同时覆盖两类 station：
+
+- save station records：当前 group anchor/coverage sector 中的真实存档空间站，排除所有 group 的 transit hub station。
+- binding station plans：没有 save record 的规划/虚拟 station，按 `groupId` 与 `sectorMacro` 纳入当前 group。
+
 ### 问题组
 
-任何无法完整计算路径或距离的目标进入问题组。问题组只需要列出目标类型、目标名称、所属 sector 和问题节点列表。
+任何无法完整计算路径或距离的目标进入问题组。问题组只需要列出目标类型、目标名称、所属 sector 和问题节点列表。若没有问题，整个问题组区块不渲染。
 
 ## 数据缺失策略
 
@@ -165,8 +175,9 @@ station 排序按 production 产线数量从高到低。production 产线数量�
 
 需要新增运输栏相关文案，至少包含：
 
-- 分类标题：Sector Group、Station、问题组。
+- 分类标题：Sector Group/星区组、Station/空间站、问题组。
 - 距离字段：普通距离、星门数、superhighway、路径明细、station 坐标、station code。
+- 动作式路线字段：离港至出口星门、星区内转场、星门跃迁至、超级高速至、入口星门至目标空间站、空间站到空间站。
 - 问题组字段。
 
 ## 验证

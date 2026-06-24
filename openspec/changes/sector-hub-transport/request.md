@@ -25,6 +25,7 @@
 - 当前 hub 自身 SHALL NOT 作为目标显示。
 - linked group 的 transit hub station SHALL 只显示在 `Sector Group` 分类，不混入 `Station` 分类。
 - 无法得到完整路径或完整距离数据的目标 SHALL 统一进入 `问题组`。
+- `问题组` 为空时 SHALL 不显示该分类区块。
 
 ### 路径与连接语义
 
@@ -65,6 +66,8 @@
   1. 星门数少
   2. 普通总距离短
   3. group order
+- `Sector Group` 折叠摘要 SHALL 避免重复显示相同的 target sector 与 target station；当二者同名时只显示一次目标名称，二者不同时可显示 `station · sector`。
+- `Sector Group` 展开明细 SHALL 使用动作式路线说明，不直接显示 gate/superhighway 内部 ID。
 
 ### Station 分类显示
 
@@ -81,7 +84,9 @@
   - 到目标 sector 末端点的普通总距离，不包含 superhighway 距离
   - 星门数
   - sector
+- sector 层摘要中普通距离为 `0` 时 SHALL 隐藏距离字段；星门数为 `0` 时 SHALL 隐藏星门数字段。
 - sector 层展开明细 SHALL 显示到末端点的路径明细；末端不是 station。
+- 当前 hub 与目标 station 同 sector 时，sector 层 SHALL 不显示展开路径；station 行直接显示空间站到空间站距离。
 - station 列表 SHALL 显示：
   - station name
   - station code
@@ -97,7 +102,14 @@
 - 距离单位 SHALL 为 km。
 - 每段距离、总距离、坐标 SHALL 使用 `0.1 km` 精度。
 - 极短距离 MAY 显示为 `<0.1 km`。
-- 分段行默认 SHALL 显示节点名、段类型与距离。
+- 展开明细 SHALL 结合路线与明细，按 sector 分块显示动作行：
+  - `离港至出口星门` / `Depart to outbound gate`
+  - `星区内转场` / `In-sector transfer`
+  - `星门跃迁至 <sector>` / `Gate jump to <sector>`
+  - `超级高速至 <sector>` / `Superhighway to <sector>`
+  - `入口星门至目标空间站` / `Inbound gate to target station`
+- gate transit SHALL 不显示 `0.0 km` 距离。
+- gate/superhighway endpoint 内部 ID SHALL NOT 出现在 UI。
 - station 目标行 SHALL 显示 station 坐标。
 - gate/highway endpoint 坐标不需要常驻显示。
 
@@ -137,11 +149,13 @@
 
 - 进入 live transit hub 页面时，右侧不再显示建设成本 `StationDashboard`，而显示运输栏。
 - `Sector Group` 分类能列出 linked sector group 的 transit hub station，并显示普通总距离、星门数、sector、station。
-- 展开 `Sector Group` 项时，能看到逐段端点和距离；superhighway 段显示距离但不计入摘要普通总距离。
+- 展开 `Sector Group` 项时，能看到按 sector 分块的动作式路线明细；superhighway 段显示距离但不计入摘要普通总距离。
 - `Station` 分类按 sector 分组；sector 行显示到目标 sector gate 或 superhighway exit 的普通距离、星门数、sector。
-- 展开 station sector 行时，能看到到末端点的路径明细。
+- 展开 station sector 行时，能看到到末端点的动作式路径明细；同 sector station 不显示展开路径。
 - station 行显示 station name、code、坐标、末端点到 station 距离、普通总距离。
 - station 行按 production 产线数量从高到低排序。
+- 空问题组不显示；0 km 与 0 星门摘要字段不显示。
+- gate/superhighway 内部 ID 不出现在 UI。
 - 路径选择遵循星门数优先、普通距离其次，且普通距离不包含 superhighway。
 - 缺失或无法计算的目标统一进入问题组。
 - `npm run build` 通过。
