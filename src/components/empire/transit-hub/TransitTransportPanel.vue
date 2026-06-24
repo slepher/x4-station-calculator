@@ -268,7 +268,7 @@ function routeBlocks(segments: TransitRouteSegment[]): RouteBlock[] {
 }
 
 .panel-content {
-  @apply p-3 flex flex-col gap-4 max-h-[calc(100vh-12rem)] overflow-y-auto;
+  @apply p-3 flex flex-col gap-4;
 }
 
 .transport-section {
