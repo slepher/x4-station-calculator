@@ -64,6 +64,13 @@ function hasGates(value: number): boolean {
   return value > 0
 }
 
+function sectorGroupTargetText(row: { targetSectorName: string; targetStationName: string }): string {
+  if (row.targetStationName && row.targetStationName !== row.targetSectorName) {
+    return `${row.targetStationName} · ${row.targetSectorName}`
+  }
+  return row.targetSectorName || row.targetStationName
+}
+
 function routeBlocks(segments: TransitRouteSegment[]): RouteBlock[] {
   const blocks: RouteBlock[] = []
 
@@ -146,8 +153,7 @@ function routeBlocks(segments: TransitRouteSegment[]): RouteBlock[] {
         >
           <button class="route-summary" type="button" @click="toggleSectorGroup(row.id)">
             <span class="route-title">{{ row.groupName }}</span>
-            <span class="route-meta">{{ row.targetSectorName }}</span>
-            <span class="route-meta">{{ row.targetStationName }}</span>
+            <span class="route-meta route-target">{{ sectorGroupTargetText(row) }}</span>
             <span class="route-stat">{{ formatKm(row.summary.normalDistanceKm) }}</span>
             <span class="route-stat">{{ t('transit_transport.gates_value', { count: row.summary.gateCount }) }}</span>
           </button>
@@ -293,6 +299,10 @@ function routeBlocks(segments: TransitRouteSegment[]): RouteBlock[] {
 
 .route-meta {
   @apply text-slate-400 truncate;
+}
+
+.route-target {
+  @apply col-span-2;
 }
 
 .route-stat {
