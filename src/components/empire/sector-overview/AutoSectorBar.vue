@@ -12,6 +12,7 @@ const props = withDefaults(defineProps<{
   canDisableNode: boolean
   unresolvedAllocationCount?: number
   unresolvedTradeStationCount?: number
+  unresolvedTitle?: string
   showConfirm?: boolean
   confirmDisabled?: boolean
   showBack?: boolean
@@ -19,6 +20,7 @@ const props = withDefaults(defineProps<{
   view: 'live',
   unresolvedAllocationCount: 0,
   unresolvedTradeStationCount: 0,
+  unresolvedTitle: '',
   showConfirm: true,
   confirmDisabled: false,
   showBack: true,
@@ -89,22 +91,14 @@ const hasUnresolved = computed(() => (props.unresolvedAllocationCount ?? 0) + (p
         </div>
         <div class="bar-right">
           <button v-if="showBack" class="bar-btn back-btn" @click="emit('back')">{{ t('sector.back') }}</button>
+          <span v-if="hasUnresolved" class="bar-unresolved" v-tippy="{ content: unresolvedTitle, allowHTML: true, placement: 'top', theme: 'material' }">
+            {{ t('sector.unresolved') }}<template v-if="unresolvedAllocationCount">&nbsp;◈{{ unresolvedAllocationCount }}</template><template v-if="unresolvedTradeStationCount">&nbsp;◉{{ unresolvedTradeStationCount }}</template>
+          </span>
           <button class="bar-btn map-btn" @click="emit('map')">{{ t('sector.map') }}</button>
-          <template v-if="mode === 'edit'">
-            <button class="bar-btn reset-btn" @click="emit('reset')">{{ t('sector.reset') }}</button>
-            <button v-if="showConfirm" class="bar-btn confirm-btn" :disabled="confirmDisabled" @click="emit('confirm')">{{ t('sector.confirm') }}</button>
-            <button class="bar-btn calc-btn" @click="emit('calculate')">{{ t('sector.calculate') }}</button>
-          </template>
-          <template v-else>
-            <span v-if="hasUnresolved" class="bar-unresolved">
-              {{ t('sector.unresolved') }}: {{ unresolvedAllocationCount }}{{ unresolvedTradeStationCount ? '+' + unresolvedTradeStationCount : '' }}
-            </span>
-            <button class="bar-btn reset-btn" @click="emit('reset')">{{ t('sector.reset') }}</button>
-            <button v-if="showConfirm" class="bar-btn confirm-btn" :disabled="confirmDisabled" @click="emit('confirm')">{{ t('sector.confirm') }}</button>
-            <button class="bar-btn calc-btn" @click="emit('quick-calculate')">
-              {{ t('sector.calculate') }}
-            </button>
-          </template>
+          <button class="bar-btn reset-btn" @click="emit('reset')">{{ t('sector.reset') }}</button>
+          <button v-if="showConfirm" class="bar-btn confirm-btn" :disabled="confirmDisabled" @click="emit('confirm')">{{ t('sector.confirm') }}</button>
+          <button v-if="mode === 'edit'" class="bar-btn calc-btn" @click="emit('calculate')">{{ t('sector.calculate') }}</button>
+          <button v-else class="bar-btn calc-btn" @click="emit('quick-calculate')">{{ t('sector.calculate') }}</button>
         </div>
       </div>
     </template>
@@ -139,19 +133,15 @@ const hasUnresolved = computed(() => (props.unresolvedAllocationCount ?? 0) + (p
       </div>
       <div class="bar-row bar-row--map !justify-end">
         <div class="bar-right">
-          <template v-if="mode === 'edit'">
-            <button class="bar-btn reset-btn" @click="emit('reset')">{{ t('sector.reset') }}</button>
-            <button v-if="showConfirm" class="bar-btn confirm-btn" :disabled="confirmDisabled" @click="emit('confirm')">{{ t('sector.confirm') }}</button>
-            <button class="bar-btn calc-btn" @click="emit('calculate')">{{ t('sector.calculate') }}</button>
-          </template>
-          <template v-else>
-            <span v-if="hasUnresolved" class="bar-unresolved">{{ unresolvedAllocationCount }}{{ unresolvedTradeStationCount ? '+' + unresolvedTradeStationCount : '' }}</span>
-            <button class="bar-btn reset-btn" @click="emit('reset')">{{ t('sector.reset') }}</button>
-            <button class="bar-btn confirm-btn" :disabled="confirmDisabled" @click="emit('confirm')">{{ t('sector.confirm') }}</button>
-            <button class="bar-btn calc-btn" @click="emit('quick-calculate')">
-              {{ t('sector.calculate') }}
-            </button>
-          </template>
+          <span v-if="hasUnresolved" class="bar-unresolved" v-tippy="{ content: unresolvedTitle, allowHTML: true, placement: 'top', theme: 'material' }">
+            {{ t('sector.unresolved') }}<template v-if="unresolvedAllocationCount">&nbsp;◈{{ unresolvedAllocationCount }}</template><template v-if="unresolvedTradeStationCount">&nbsp;◉{{ unresolvedTradeStationCount }}</template>
+          </span>
+          <button class="bar-btn reset-btn" @click="emit('reset')">{{ t('sector.reset') }}</button>
+          <button v-if="showConfirm" class="bar-btn confirm-btn" :disabled="confirmDisabled" @click="emit('confirm')">{{ t('sector.confirm') }}</button>
+          <button v-if="mode === 'edit'" class="bar-btn calc-btn" @click="emit('calculate')">{{ t('sector.calculate') }}</button>
+          <button v-else class="bar-btn calc-btn" @click="emit('quick-calculate')">
+            {{ t('sector.calculate') }}
+          </button>
         </div>
       </div>
     </template>
@@ -237,6 +227,7 @@ const hasUnresolved = computed(() => (props.unresolvedAllocationCount ?? 0) + (p
 
 .bar-unresolved {
   @apply text-xs text-amber-400;
+  cursor: help;
 }
 
 .bar-right {
