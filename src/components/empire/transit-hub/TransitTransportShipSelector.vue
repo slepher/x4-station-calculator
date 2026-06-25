@@ -29,13 +29,19 @@ function formatDistance(value: number): string {
 
 function metricChips(profile: TransportShipTravelProfile) {
   return [
-    { key: 'speed', label: t('transit_transport.ship_selector.speed'), value: formatSpeed(profile.baseSpeedMps) },
-    { key: 'travel', label: t('transit_transport.ship_selector.travel_speed'), value: formatSpeed(profile.travelSpeedMps) },
-    { key: 'charge', label: t('transit_transport.ship_selector.charge'), value: formatSeconds(profile.chargeSec) },
-    { key: 'attack', label: t('transit_transport.ship_selector.attack'), value: formatSeconds(profile.attackSec) },
-    { key: 'attack_distance', label: t('transit_transport.ship_selector.attack_distance'), value: formatDistance(profile.attackDistanceKm) },
-    { key: 'release', label: t('transit_transport.ship_selector.release'), value: formatSeconds(profile.releaseSec) },
-    { key: 'decel_distance', label: t('transit_transport.ship_selector.decel_distance'), value: formatDistance(profile.decelDistanceKm) }
+    [
+      { key: 'speed', label: t('transit_transport.ship_selector.speed'), value: formatSpeed(profile.baseSpeedMps) },
+      { key: 'travel', label: t('transit_transport.ship_selector.travel_speed'), value: formatSpeed(profile.travelSpeedMps) },
+      { key: 'charge', label: t('transit_transport.ship_selector.charge'), value: formatSeconds(profile.chargeSec) }
+    ],
+    [
+      { key: 'attack', label: t('transit_transport.ship_selector.attack'), value: formatSeconds(profile.attackSec) },
+      { key: 'attack_distance', label: t('transit_transport.ship_selector.attack_distance'), value: formatDistance(profile.attackDistanceKm) }
+    ],
+    [
+      { key: 'release', label: t('transit_transport.ship_selector.release'), value: formatSeconds(profile.releaseSec) },
+      { key: 'decel_distance', label: t('transit_transport.ship_selector.decel_distance'), value: formatDistance(profile.decelDistanceKm) }
+    ]
   ]
 }
 
@@ -89,12 +95,18 @@ function shipTypeLabel(type: string): string {
               </ul>
               <span class="blueprint-chips">
                 <span
-                  v-for="chip in metricChips(blueprint.profile)"
-                  :key="chip.key"
-                  class="metric-chip"
+                  v-for="(row, rowIdx) in metricChips(blueprint.profile)"
+                  :key="rowIdx"
+                  class="blueprint-chip-row"
                 >
-                  <span>{{ chip.label }}</span>
-                  <strong>{{ chip.value }}</strong>
+                  <span
+                    v-for="chip in row"
+                    :key="chip.key"
+                    class="metric-chip"
+                  >
+                    <span>{{ chip.label }}</span>
+                    <strong>{{ chip.value }}</strong>
+                  </span>
                 </span>
               </span>
             </button>
@@ -159,6 +171,10 @@ function shipTypeLabel(type: string): string {
 }
 
 .blueprint-chips {
+  @apply flex flex-col gap-1;
+}
+
+.blueprint-chip-row {
   @apply flex flex-wrap gap-1;
 }
 

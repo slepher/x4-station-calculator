@@ -42,13 +42,13 @@
 
 - 使用真实 route segment 距离，不使用 QSNA 固定 `1000km` 标准航程。
 - route builder 保持现状，仍允许 superhighway 作为路径段出现。
-- 本次不做 highway 路径规划，不为 highway 计算耗时，也不把 superhighway 时间计入总耗时。
-- `gate-transit` 不计耗时。
-- 每个普通空间 segment 独立计算一次耗时，每段都重新计入完整 `travel.charge`。
-- 不加入额外 gate、align、靠站、过门固定惩罚。
-- 普通空间段采用 QSNA-style `charge + attack + cruise + release` 模型。
+- **普通空间段** 采用 QSNA-style `charge + attack + cruise + release` 模型，使用引擎参数。
+- **highway 段**（sector 内蓝色环道）使用固定速度 **12,000 m/s**，不涉及引擎加速减速。
+- `gate-transit` 与 `superhighway` 不计耗时。
 - 短距离达不到最高巡航速度时，使用峰值速度模型，不使用线性 attack 截断。
 - `travel.charge`、`travel.attack`、`travel.release` 聚合时取有效引擎中的最大值；推力与巡航推力按数量累加。
+- **S/M 船可用 highway，L/XL 不可用**。未选船时默认非 highway 方案。
+- 当 highway 方案总耗时 < 非 highway 方案总耗时，选择 highway 方案。
 
 ### 吞吐量口径
 
@@ -100,7 +100,6 @@ throughputM3PerHour = containerCapacityM3 / oneWayTimeSec * 3600
 
 ### Out of Scope
 
-- 不实现 highway/superhighway 路径规划。
 - 不计算 superhighway 耗时。
 - 不引入 AI、驾驶员星级、IS/OOS、align、gate 固定等待、靠站时间等模拟。
 - 不修改 Rust parser。
@@ -115,7 +114,7 @@ throughputM3PerHour = containerCapacityM3 / oneWayTimeSec * 3600
 - 不可用蓝图不出现在候选中；当前选择变不可用时自动清空。
 - 未选择运输船时，右侧运输路线保持原有距离/星门展示，不显示新增指标。
 - 选择运输船后，Sector Group、Station sector、Station row 按已确认规则显示耗时与单程吞吐量。
-- 路径明细只为普通空间段显示耗时；gate transit 与 superhighway 不显示耗时。
+- 路径明细只为普通空间段与 highway 段显示耗时；gate transit 与 superhighway 不显示耗时。
 - 单程吞吐量固定使用 container cargo，显示为整数 `m3/h`。
 - 代码实现完成后 `npm run build` 通过。
 

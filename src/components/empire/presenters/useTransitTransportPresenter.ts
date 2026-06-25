@@ -1,5 +1,5 @@
 import { computed, type ComputedRef } from 'vue'
-import type { BindingSectorGroup, BindingStationPlan, SaveBindingPlan, SavedModule, ShipBlueprint, TradeStationBinding, X4Equipment, X4Map, X4Module, X4Ship } from '@/types/x4'
+import type { BindingSectorGroup, BindingStationPlan, SaveBindingPlan, SavedModule, ShipBlueprint, TradeStationBinding, X4Equipment, X4Map, X4MapSector, X4Module, X4Ship } from '@/types/x4'
 import type { PlayerStationEntry, PlayerStationRecord } from '@/types/saveArchive'
 import type { StationDerivedMap } from '@/store/state/StationDerivedMap'
 import { buildTransitRoute, type TransitRouteResult, type TransitRouteSegment, type TransitRouteSummary, type TransitRouteTerminal } from '@/store/logic/transitRouteBuilder'
@@ -7,6 +7,8 @@ import {
   buildStationTravelEstimate,
   buildTransportShipCandidateState,
   buildTransportTravelEstimate,
+  canUseHighway,
+  expandHighwayAlternatives,
   estimateRouteSegmentsTravel,
   estimateSegmentTravelTimeSec,
   sumSegmentTravelTime,
@@ -16,6 +18,7 @@ import {
   type TransportShipTravelProfile,
   type TransportTravelEstimate
 } from '@/store/logic/transitTransportShip'
+import { generateHighwayAlternative } from '@/store/logic/transitRouteHighway'
 import { isSectorMacroInBindingScope } from '@/store/logic/saveBindingSectorScope'
 import i18n from '@/i18n'
 
@@ -62,6 +65,7 @@ export type TransportStationSectorGroup = {
 
 export type TransportRouteSegmentView = TransitRouteSegment & {
   travel?: TransportSegmentTravelEstimate
+  highwayAlternative?: Array<TransitRouteSegment & { travel?: TransportSegmentTravelEstimate }>
 }
 
 export type TransportShipSelectorState = {
@@ -227,6 +231,8 @@ function buildSectorGroupRows(input: {
       continue
     }
 
+    const segmentsWithHighway = injectHighwayAlternatives(route.segments, route.sectors, input.maps.sectors, input.travelProfile)
+
     rows.push({
       id: linkedGroup.id,
       order: linkedGroup.order,
@@ -234,9 +240,9 @@ function buildSectorGroupRows(input: {
       targetSectorName: sectorName(input.maps, linkedHub.sectorMacro),
       targetStationName: linkedHub.name,
       summary: route.summary,
-      segments: attachSegmentTravel(route.segments, input.travelProfile),
+      segments: attachSegmentTravel(segmentsWithHighway, input.travelProfile),
       terminal: route.terminal,
-      travel: routeTravel(route.segments, input.travelProfile)
+      travel: routeTravel(segmentsWithHighway, input.travelProfile)
     })
   }
 
@@ -281,8 +287,10 @@ function buildStationSectorGroups(input: {
       continue
     }
 
+    const segmentsWithHighway = injectHighwayAlternatives(sectorRoute.segments, sectorRoute.sectors, input.maps.sectors, input.travelProfile)
+
     const stationRows = stations
-      .map((station) => buildStationRow(station, sectorRoute, input))
+      .map((station) => buildStationRow(station, sectorRoute, segmentsWithHighway, input))
       .filter((row): row is TransportStationRouteRow => !!row)
       .sort((a, b) => b.productionLineCount - a.productionLineCount || a.stationName.localeCompare(b.stationName))
 
@@ -291,10 +299,10 @@ function buildStationSectorGroups(input: {
         id: sectorMacro,
         sectorName: sectorName(input.maps, sectorMacro),
         summary: sectorRoute.summary,
-        segments: attachSegmentTravel(sectorRoute.segments, input.travelProfile),
+        segments: attachSegmentTravel(segmentsWithHighway, input.travelProfile),
         terminal: sectorRoute.terminal,
         stations: stationRows,
-        travel: routeTravel(sectorRoute.segments, input.travelProfile),
+        travel: routeTravel(segmentsWithHighway, input.travelProfile),
         hideSectorHeader: input.routeSource.sectorMacro === sectorMacro
       })
     }
@@ -310,6 +318,7 @@ function buildStationSectorGroups(input: {
 function buildStationRow(
   station: StationTransportTarget,
   sectorRoute: TransitRouteResult,
+  highwaySegments: TransitRouteSegment[],
   input: {
     maps: X4Map
     flowMap?: StationDerivedMap | null
@@ -327,7 +336,7 @@ function buildStationRow(
     ? estimateSegmentTravelTimeSec(terminalDistanceKm, input.travelProfile)
     : 0
   const sectorTimeSec = input.travelProfile
-    ? routeTravelTime(sectorRoute.segments, input.travelProfile)
+    ? routeTravelTime(highwaySegments, input.travelProfile)
     : 0
   return {
     id: station.id,
@@ -347,12 +356,65 @@ function attachSegmentTravel(
   segments: TransitRouteSegment[],
   profile: TransportShipTravelProfile | null
 ): TransportRouteSegmentView[] {
-  if (!profile) return segments
-  const travels = estimateRouteSegmentsTravel(segments, profile)
-  return segments.map((segment, index) => ({
-    ...segment,
-    travel: travels[index]
-  }))
+  return segments.map((segment) => {
+    const travels = profile ? estimateRouteSegmentsTravel([segment], profile) : [undefined]
+    const highwayTravels = segment.highwayAlternative && profile
+      ? estimateRouteSegmentsTravel(segment.highwayAlternative, profile)
+      : undefined
+    return {
+      ...segment,
+      travel: travels[0],
+      highwayAlternative: highwayTravels
+        ? segment.highwayAlternative?.map((altSeg, i) => ({ ...altSeg, travel: highwayTravels[i] }))
+        : segment.highwayAlternative
+    } as TransportRouteSegmentView
+  })
+}
+
+function injectHighwayAlternatives(
+  segments: TransitRouteSegment[],
+  sectorPath: string[],
+  sectors: Record<string, X4MapSector>,
+  profile: TransportShipTravelProfile | null
+): TransitRouteSegment[] {
+  if (!profile || !canUseHighway(profile)) return segments
+
+  let sectorIndex = 0
+  return segments.map((segment) => {
+    if (segment.kind === 'gate-transit' || segment.kind === 'superhighway') {
+      sectorIndex += 1
+      return segment
+    }
+    if (!segment.countsInSummaryDistance) return segment
+    if (segment.distanceKm <= 0) return segment
+
+    const currentSectorMacro = sectorPath[sectorIndex]
+    if (!currentSectorMacro) return segment
+    const highwaySector = sectors[currentSectorMacro]
+    if (!highwaySector) return segment
+
+    const fromPos = segment.fromPosition
+    const toPos = segment.toPosition
+    if (!fromPos || !toPos) return segment
+
+    const alternative = generateHighwayAlternative(
+      { x: fromPos.x, z: fromPos.z },
+      { x: toPos.x, z: toPos.z },
+      segment.fromLabel,
+      segment.toLabel,
+      highwaySector
+    )
+
+    if (!alternative) return segment
+
+    const altSegments = [
+      ...alternative.approachSegments,
+      alternative.highwaySegment,
+      ...alternative.exitSegments
+    ]
+
+    return { ...segment, highwayAlternative: altSegments }
+  })
 }
 
 function routeTravel(segments: TransitRouteSegment[], profile: TransportShipTravelProfile | null): TransportTravelEstimate | undefined {
@@ -361,7 +423,8 @@ function routeTravel(segments: TransitRouteSegment[], profile: TransportShipTrav
 }
 
 function routeTravelTime(segments: TransitRouteSegment[], profile: TransportShipTravelProfile): number {
-  return sumSegmentTravelTime(estimateRouteSegmentsTravel(segments, profile))
+  const expanded = expandHighwayAlternatives(segments)
+  return sumSegmentTravelTime(estimateRouteSegmentsTravel(expanded, profile))
 }
 
 function buildStationRoute(

@@ -56,11 +56,13 @@ type TransitPathSegment = {
     | 'gate-to-gate'
     | 'gate-transit'
     | 'superhighway'
+    | 'highway'
     | 'gate-to-station'
   fromLabel: string
   toLabel: string
   distanceKm: number
   countsInSummaryDistance: boolean
+  highwayAlternative?: TransitPathSegment[]
 }
 
 type RouteTerminal = {
@@ -123,6 +125,69 @@ route builder 输出的 gate/superhighway endpoint label SHALL 只使用面向�
 
 当最后一跳是 superhighway，目标 sector 的末端点是 superhighway exit；当最后一跳是 gate，末端点是目标 sector gate。
 
+## Highway 路径替代
+
+### 分层职责
+
+Highway 是 sector 内交通，不改变 sector 级路径。route builder 照常输出 sector path，highway 替代方案在 **segment 展开阶段** 生成。
+
+### 数据来源
+
+- `sector.highways`：每个 highway 包含 `entry`、`exit`、`spline`（点位 `x,z` + 切线柄 `sx,sy`）
+- Spline 插值方法：**线性折线插值**（逐点连成折线，用折线距离近似弧长）
+
+### 替代方案生成
+
+对每个 sector 内的普通空间段（hub→gate、gate→gate、gate→station 全覆盖）：
+
+```text
+方案A (无highway): origin ──引擎直飞──→ destination
+
+方案B (有highway):
+  origin ──引擎──→ P_entry ──highway(12km/s)──→ P_exit ──引擎──→ destination
+              approach       highway段               exit
+```
+
+- **P_entry**：origin 在全 sector 所有 highway spline 上的最近投影点
+- **P_exit**：destination 在全 sector 所有 highway spline 上的最近投影点
+- P_entry 和 P_exit 取自同一条 highway，且方向吻合（spline 上 P_entry 参数 < P_exit 参数）
+- 遍历所有方向适合的 highway，每条生成一个候选
+
+### 距离过滤
+
+```text
+if (方案A.distance < 方案B.approachDistance + 方案B.exitDistance):
+    → 剔除方案B
+else:
+    → 方案B 保留
+```
+
+其中 approach/exit 距离为 origin→P_entry 和 P_exit→destination 的直线距离。
+
+### Gate 紧贴 Highway 捷径
+
+实测 48 对 gate-highway 距离 < 1km。**阈值 1km**，当 origin 或 destination 到对应 P_entry/P_exit 的距离 < 1km 时：
+
+- 该 approach/exit 段从路径展示中移除
+- 不渲染该段、不显示距离
+- （耗时层面由 ship 变更处理）
+
+### 输出结构
+
+segment 展开结果携带 highway 替代：
+
+```ts
+type TransitPathSegment = {
+  kind: ... | 'highway'
+  // ...
+  highwayAlternative?: TransitPathSegment[]  // 有 highway 时的替代段列表
+}
+```
+
+### 未选船时的默认行为
+
+view 层未选船时直接使用非 highway 方案。
+
 ## UI 设计
 
 ### Sector Group
@@ -178,7 +243,20 @@ Station 分类目标来源同时覆盖两类 station：
 - 分类标题：Sector Group/星区组、Station/空间站、问题组。
 - 距离字段：普通距离、星门数、superhighway、路径明细、station 坐标、station code。
 - 动作式路线字段：离港至出口星门、星区内转场、星门跃迁至、超级高速至、入口星门至目标空间站、空间站到空间站。
+- Highway 相关：高速通道、上高速通道、下高速通道。
 - 问题组字段。
+
+### Highway 段类型
+
+```ts
+kind: 'highway' | 'highway-approach' | 'highway-exit'
+```
+
+- `highway` — sector 内蓝色环道，距离为 spline 弧长，`countsInSummaryDistance: false`
+- `highway-approach` — 起点到 highway spline 最近点，普通空间飞行
+- `highway-exit` — highway spline 最近点到终点，普通空间飞行
+
+这三个段组合为 highway 替代方案，嵌入 `TransitRouteSegment.highwayAlternative`。
 
 ## 验证
 

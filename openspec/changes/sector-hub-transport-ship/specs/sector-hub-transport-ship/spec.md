@@ -116,6 +116,45 @@ live transit hub 页面 SHALL 在建筑区下方提供运输船蓝图选择区�
 - **那么** 该段耗时 SHALL 为 0
 - **并且** 该段 SHALL 不计入 `charge`
 
+### Requirement: Highway segment SHALL use fixed speed timing
+
+Highway 段 SHALL 使用固定速度 12,000 m/s 计算耗时，不依赖引擎参数。
+
+#### Scenario: Highway segment time uses fixed speed
+
+- **前提** 路线包含 highway 段
+- **并且** highway 段有 spline 弧长距离
+- **当** 系统计算 highway 段耗时
+- **那么** highway 段耗时 SHALL 等于 `highwayDistanceKm / 12`
+- **并且** highway 段 SHALL NOT 使用引擎 charge/attack/release 参数
+
+#### Scenario: S/M ships may use highway
+
+- **前提** 选中的运输船 class 为 `ship_s` 或 `ship_m`
+- **并且** sector 内存在可用 highway 候选
+- **当** 系统比较 highway 与非 highway 方案
+- **那么** highway 方案 SHALL 被纳入时间比较
+
+#### Scenario: L/XL ships SHALL NOT use highway
+
+- **前提** 选中的运输船 class 为 `ship_l` 或 `ship_xl`
+- **当** 系统计算路线耗时
+- **那么** highway 方案 SHALL NOT 被使用
+- **并且** 总耗时 SHALL 仅使用非 highway 方案
+
+#### Scenario: Gate adjacent highway skips approach time
+
+- **前提** gate 到 highway entry/exit 距离 < 1km
+- **当** 系统计算 highway 方案的 approach/exit 段耗时
+- **那么** 该段耗时 SHALL 为 0
+- **并且** 该段 SHALL 从路径展示中移除
+
+#### Scenario: No ship selected defaults to non-highway
+
+- **前提** 用户未选择运输船蓝图
+- **当** 系统展示运输路线
+- **那么** 路径 SHALL 使用非 highway 方案
+
 ### Requirement: Transport route rows SHALL show selected-ship estimates
 
 选择运输船后，右侧运输路线 SHALL 在现有距离展示基础上增加耗时与单程吞吐量。

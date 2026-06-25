@@ -862,7 +862,7 @@
     "station_coord": "Coord",
     "terminal_distance": "Terminal distance",
     "station_to_station": "Station to station",
-    "total_normal_distance": "Normal total",
+    "total_normal_distance": "Total",
     "travel_time_value": "Time {time}",
     "local_travel_time_value": "Local {time}",
     "total_travel_time_value": "Total {time}",
@@ -897,7 +897,10 @@
       "gate-to-gate": "Gate to gate",
       "gate-transit": "Gate transit",
       "superhighway": "Superhighway",
-      "gate-to-station": "Gate to station"
+      "gate-to-station": "Gate to station",
+      "highway": "Highway",
+      "highway-approach": "Highway approach",
+      "highway-exit": "Highway exit"
     },
     "target_type": {
       "sector-group": "Sector Group",

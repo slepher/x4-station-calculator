@@ -82,56 +82,96 @@ function routeBlocks(segments: TransportRouteSegmentView[]): RouteBlock[] {
     return block
   }
 
-  segments.forEach((segment, index) => {
-    if (segment.kind === 'station-to-gate') {
-      ensureBlock(segment.toLabel).items.push({
-        key: `${index}:depart`,
-        label: t('transit_transport.route_action.depart_to_gate'),
-        distanceText: formatKm(segment.distanceKm),
-        timeText: segment.travel?.formattedTime ?? null
-      })
-      return
-    }
+  function emitBlockItems(segList: TransportRouteSegmentView[], startIndex: number) {
+    segList.forEach((segment, i) => {
+      const index = startIndex + i
+      const effectiveSegments = segment.highwayAlternative ?? [segment]
 
-    if (segment.kind === 'gate-transit') {
-      ensureBlock(segment.fromLabel).items.push({
-        key: `${index}:jump`,
-        label: t('transit_transport.route_action.jump_to', { sector: segment.toLabel }),
-        distanceText: null,
-        timeText: null
-      })
-      return
-    }
+      for (const es of effectiveSegments) {
+        const segKind = 'kind' in es ? es.kind : ''
+        if (segKind === 'station-to-gate') {
+          ensureBlock(('toLabel' in es ? es.toLabel : '') || '').items.push({
+            key: `${index}:depart`,
+            label: t('transit_transport.route_action.depart_to_gate'),
+            distanceText: formatKm(('distanceKm' in es ? es.distanceKm : 0) || 0),
+            timeText: ('travel' in es && es.travel) ? es.travel.formattedTime : null
+          })
+          continue
+        }
 
-    if (segment.kind === 'gate-to-gate') {
-      ensureBlock(segment.fromLabel).items.push({
-        key: `${index}:transfer`,
-        label: t('transit_transport.route_action.in_sector_transfer'),
-        distanceText: formatKm(segment.distanceKm),
-        timeText: segment.travel?.formattedTime ?? null
-      })
-      return
-    }
+        if (segKind === 'gate-transit') {
+          ensureBlock(('fromLabel' in es ? es.fromLabel : '') || '').items.push({
+            key: `${index}:jump`,
+            label: t('transit_transport.route_action.jump_to', { sector: ('toLabel' in es ? es.toLabel : '') || '' }),
+            distanceText: null,
+            timeText: null
+          })
+          continue
+        }
 
-    if (segment.kind === 'superhighway') {
-      ensureBlock(segment.fromLabel).items.push({
-        key: `${index}:superhighway`,
-        label: t('transit_transport.route_action.superhighway_to', { sector: segment.toLabel }),
-        distanceText: formatKm(segment.distanceKm),
-        timeText: null
-      })
-      return
-    }
+        if (segKind === 'gate-to-gate') {
+          ensureBlock(('fromLabel' in es ? es.fromLabel : '') || '').items.push({
+            key: `${index}:transfer`,
+            label: t('transit_transport.route_action.in_sector_transfer'),
+            distanceText: formatKm(('distanceKm' in es ? es.distanceKm : 0) || 0),
+            timeText: ('travel' in es && es.travel) ? es.travel.formattedTime : null
+          })
+          continue
+        }
 
-    if (segment.kind === 'gate-to-station') {
-      ensureBlock(segment.fromLabel).items.push({
-        key: `${index}:arrive`,
-        label: t('transit_transport.route_action.arrive_to_station'),
-        distanceText: formatKm(segment.distanceKm),
-        timeText: segment.travel?.formattedTime ?? null
-      })
-    }
-  })
+        if (segKind === 'superhighway') {
+          ensureBlock(('fromLabel' in es ? es.fromLabel : '') || '').items.push({
+            key: `${index}:superhighway`,
+            label: t('transit_transport.route_action.superhighway_to', { sector: ('toLabel' in es ? es.toLabel : '') || '' }),
+            distanceText: formatKm(('distanceKm' in es ? es.distanceKm : 0) || 0),
+            timeText: null
+          })
+          continue
+        }
+
+        if (segKind === 'highway-approach') {
+          ensureBlock(('fromLabel' in es ? es.fromLabel : '') || '').items.push({
+            key: `${index}:hw-approach`,
+            label: t('transit_transport.segment.highway-approach'),
+            distanceText: formatKm(('distanceKm' in es ? es.distanceKm : 0) || 0),
+            timeText: ('travel' in es && es.travel) ? es.travel.formattedTime : null
+          })
+          continue
+        }
+
+        if (segKind === 'highway') {
+          ensureBlock(('fromLabel' in es ? es.fromLabel : '') || '').items.push({
+            key: `${index}:highway`,
+            label: t('transit_transport.segment.highway'),
+            distanceText: formatKm(('distanceKm' in es ? es.distanceKm : 0) || 0),
+            timeText: ('travel' in es && es.travel) ? es.travel.formattedTime : null
+          })
+          continue
+        }
+
+        if (segKind === 'highway-exit') {
+          ensureBlock(('fromLabel' in es ? es.fromLabel : '') || '').items.push({
+            key: `${index}:hw-exit`,
+            label: t('transit_transport.segment.highway-exit'),
+            distanceText: formatKm(('distanceKm' in es ? es.distanceKm : 0) || 0),
+            timeText: ('travel' in es && es.travel) ? es.travel.formattedTime : null
+          })
+          continue
+        }
+
+        if (segKind === 'gate-to-station') {
+          ensureBlock(('fromLabel' in es ? es.fromLabel : '') || '').items.push({
+            key: `${index}:arrive`,
+            label: t('transit_transport.route_action.arrive_to_station'),
+            distanceText: formatKm(('distanceKm' in es ? es.distanceKm : 0) || 0),
+            timeText: ('travel' in es && es.travel) ? es.travel.formattedTime : null
+          })
+        }
+      }
+    })
+  }
+
+  emitBlockItems(segments, 0)
 
   return blocks
 }
@@ -200,7 +240,6 @@ function routeBlocks(segments: TransportRouteSegmentView[]): RouteBlock[] {
           class="sector-block"
         >
           <button
-            v-if="!group.hideSectorHeader"
             class="route-summary"
             type="button"
             :class="{ 'not-expandable': !hasRouteDetails(group.segments) }"
@@ -212,7 +251,7 @@ function routeBlocks(segments: TransportRouteSegmentView[]): RouteBlock[] {
             <span v-if="group.travel" class="route-stat">{{ t('transit_transport.travel_time_value', { time: group.travel.formattedTime }) }}</span>
             <span class="route-meta">{{ group.stations.length }} {{ t('transit_transport.station_count') }}</span>
           </button>
-          <div v-if="!group.hideSectorHeader && hasRouteDetails(group.segments) && expandedStationSectors.has(group.id)" class="route-details">
+          <div v-if="hasRouteDetails(group.segments) && expandedStationSectors.has(group.id)" class="route-details">
             <div
               v-for="block in routeBlocks(group.segments)"
               :key="`${group.id}:${block.sectorName}`"
@@ -242,7 +281,7 @@ function routeBlocks(segments: TransportRouteSegmentView[]): RouteBlock[] {
               </div>
               <div class="station-metrics">
                 <span>{{ t('transit_transport.station_coord') }}: {{ formatCoord(station.coordinateKm.x) }}, {{ formatCoord(station.coordinateKm.y) }}, {{ formatCoord(station.coordinateKm.z) }} km</span>
-                <span>{{ t(hasRouteDetails(group.segments) ? 'transit_transport.terminal_distance' : 'transit_transport.station_to_station') }}: {{ formatKm(station.terminalDistanceKm) }}</span>
+                <span v-if="!group.hideSectorHeader">{{ t(hasRouteDetails(group.segments) ? 'transit_transport.terminal_distance' : 'transit_transport.station_to_station') }}: {{ formatKm(station.terminalDistanceKm) }}</span>
                 <span>{{ t('transit_transport.total_normal_distance') }}: {{ formatKm(station.totalNormalDistanceKm) }}</span>
                 <span v-if="station.travel && group.hideSectorHeader">{{ t('transit_transport.travel_time_value', { time: station.travel.formattedTotalTime }) }}</span>
                 <span v-if="station.travel && !group.hideSectorHeader">{{ t('transit_transport.local_travel_time_value', { time: station.travel.formattedLocalTime }) }}</span>
@@ -364,7 +403,7 @@ function routeBlocks(segments: TransportRouteSegmentView[]): RouteBlock[] {
 }
 
 .station-list {
-  @apply flex flex-col divide-y divide-slate-800;
+  @apply flex flex-col divide-y divide-slate-800 border-t border-slate-800;
 }
 
 .station-row {

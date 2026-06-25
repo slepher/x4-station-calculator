@@ -101,7 +101,9 @@ d_decel_km = ((V_travel + V_base) / 2) * t_release / 1000
 
 ## Segment Time Formula
 
-只对普通空间段计算耗时。`gate-transit` 与 `superhighway` 不增加耗时。
+只对普通空间段和 `highway` 段计算耗时。`gate-transit` 与 `superhighway` 不增加耗时。
+
+### 普通空间段耗时
 
 长距离段：
 
@@ -131,6 +133,60 @@ timeSec =
 ```
 
 `D_km <= 0` 时返回 0，不加 `charge`。
+
+### Highway 段耗时
+
+Highway 段使用 **固定速度 12,000 m/s**，非引擎相关：
+
+```text
+highwayTimeSec = highwayDistanceKm / 12
+```
+
+Highway 段不涉及 charge/attack/release 引擎参数。
+
+### Highway approach 段耗时
+
+上高速无需减速。飞船直接以巡航速度进入高速，速度瞬间切换为 12,000 m/s。使用 `skipRelease` 模式：
+
+```text
+approachTimeSec = estimateSegmentTravelTimeSec(D_km, profile, { skipRelease: true })
+```
+
+- 长距离：`charge + attack + cruise`（无 release）
+- 短距离：`charge + attack`（仅加速到可达速度，无 decel 段）
+
+### Highway exit 段耗时
+
+下高速后飞船断崖式降速至 V_base，需重新蓄能加速。无额外固定时间惩罚，使用标准普通空间段耗时：
+
+```text
+exitTimeSec = estimateSegmentTravelTimeSec(D_km, profile)
+```
+
+即完整的 `charge + attack + cruise + release` 模型。
+
+### Gate 紧贴 Highway 的捷径
+
+当 origin 或 destination 到 highway P_entry/P_exit 距离 < 1km（gate 紧贴）时：
+- 该 approach/exit 段从路径展示中移除，不渲染
+
+### 船型限制
+
+- **S/M 船**（`ship.class === 'ship_s' || ship.class === 'ship_m'`）：highway 可用
+- **L/XL 船**（`ship.class === 'ship_l' || ship.class === 'ship_xl'`）：highway 不可用，仅非 highway 方案
+- 未选船时，view 层默认使用非 highway 方案
+
+### 方案选择（S/M 船）
+
+```text
+if (方案B highway 方案有效 且 方案B.totalTime < 方案A.totalTime):
+    → 选择方案B（有 highway）
+else:
+    → 选择方案A（无 highway）
+```
+
+方案A 的耗时 = 所有普通空间段的 engine travel time 之和。
+方案B 的耗时 = approach/exit 的 engine travel time + highway 段固定时间。
 
 ## Row Travel Estimates
 

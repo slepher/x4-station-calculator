@@ -164,6 +164,37 @@ live transit hub 页面 SHALL 将右侧建设成本 `StationDashboard` 替换为
 - **那么** station rows SHALL 按 production 产线数量从高到低排序
 - **并且** production 产线数量 SHOULD 使用正向产出 production flows 的 distinct ware 数量
 
+### Requirement: Highway SHALL provide route alternative within sectors
+
+当 sector 内存在 highway 数据时，系统 SHALL 为 sector 内普通空间段生成 highway 路径替代。
+
+#### Scenario: Highway alternative generated for in-sector segment
+
+- **前提** sector 内有 `sector.highways` 数据
+- **并且** 该 sector 内存在普通空间段（hub→gate、gate→gate 或 gate→station）
+- **当** segment 展开阶段计算路径
+- **那么** 系统 SHALL 为符合条件的 highway 生成替代 segment 方案
+- **并且** highway 替代 SHALL NOT 参与 route builder 的 sector 级图搜索
+
+#### Scenario: Highway direction check
+
+- **前提** 某 highway 的 P_entry spline 参数 >= P_exit spline 参数
+- **当** 系统检查 highway 候选
+- **那么** 该 highway SHALL 被剔除（方向不吻合）
+
+#### Scenario: Highway filtered by ramp distance
+
+- **前提** 直达距离 < highway approach + exit 距离
+- **当** 系统评估 highway 候选
+- **那么** 该 highway 候选 SHALL 被剔除
+
+#### Scenario: Gate adjacent highway removes approach segment
+
+- **前提** gate 到 highway entry/exit 距离 < 1km
+- **当** 系统生成 highway 替代路径
+- **那么** 该 approach/exit 段 SHALL 从路径展示中移除
+- **并且** 移除的段 SHALL NOT 渲染距离
+
 ### Requirement: Transport distances SHALL use km display precision
 
 运输栏距离与坐标 SHALL 使用 km 单位和稳定精度。

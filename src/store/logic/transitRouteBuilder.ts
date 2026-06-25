@@ -11,6 +11,9 @@ export type TransitRouteSegmentKind =
   | 'gate-to-gate'
   | 'gate-transit'
   | 'superhighway'
+  | 'highway'
+  | 'highway-approach'
+  | 'highway-exit'
   | 'gate-to-station'
 
 export type TransitRouteSegment = {
@@ -19,6 +22,9 @@ export type TransitRouteSegment = {
   toLabel: string
   distanceKm: number
   countsInSummaryDistance: boolean
+  fromPosition?: { x: number; y: number; z: number }
+  toPosition?: { x: number; y: number; z: number }
+  highwayAlternative?: TransitRouteSegment[]
 }
 
 export type TransitRouteTerminal = {
@@ -181,7 +187,9 @@ function appendNormalSegment(
       fromLabel: state.current.label,
       toLabel: to.label,
       distanceKm: distance,
-      countsInSummaryDistance: true
+      countsInSummaryDistance: true,
+      fromPosition: state.current.position,
+      toPosition: to.position
     }
   }
 }

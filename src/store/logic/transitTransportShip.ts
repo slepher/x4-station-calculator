@@ -12,6 +12,7 @@ export type TransportShipTravelProfile = {
   blueprintName: string
   shipId: string
   shipName: string
+  shipClass: string
   containerCapacityM3: number
   baseSpeedMps: number
   travelSpeedMps: number
@@ -178,11 +179,17 @@ export function buildTransportShipTravelProfile(input: {
       attackSec = Math.max(attackSec, attack)
       releaseSec = Math.max(releaseSec, release)
 
-      engines.push({
-        equipmentId: group.equipment_id,
-        count: group.count,
-        name: input.translateEquipment ? input.translateEquipment(equipment) : equipment.name || equipment.id
-      })
+      const name = input.translateEquipment ? input.translateEquipment(equipment) : equipment.name || equipment.id
+      const existing = engines.find((e) => e.equipmentId === group.equipment_id)
+      if (existing) {
+        existing.count += group.count
+      } else {
+        engines.push({
+          equipmentId: group.equipment_id,
+          count: group.count,
+          name
+        })
+      }
     }
   }
 
@@ -201,6 +208,7 @@ export function buildTransportShipTravelProfile(input: {
     blueprintName: input.blueprint.name,
     shipId: input.ship.id,
     shipName: input.resolveShipName ? input.resolveShipName(input.ship) : input.ship.name || input.ship.id,
+    shipClass: input.ship.class,
     containerCapacityM3,
     baseSpeedMps,
     travelSpeedMps,
@@ -213,17 +221,29 @@ export function buildTransportShipTravelProfile(input: {
   }
 }
 
-export function estimateSegmentTravelTimeSec(distanceKm: number, profile: TransportShipTravelProfile): number {
+export function estimateSegmentTravelTimeSec(distanceKm: number, profile: TransportShipTravelProfile, opts?: { skipRelease?: boolean }): number {
   if (distanceKm <= 0) return 0
   const speedDelta = profile.travelSpeedMps - profile.baseSpeedMps
   if (speedDelta <= 0 || profile.attackSec <= 0 || profile.releaseSec <= 0) return 0
 
   const attackAndDecelKm = profile.attackDistanceKm + profile.decelDistanceKm
   if (distanceKm > attackAndDecelKm) {
-    return profile.chargeSec
-      + profile.attackSec
-      + ((distanceKm - attackAndDecelKm) / (profile.travelSpeedMps / 1000))
-      + profile.releaseSec
+    const cruiseSec = (distanceKm - attackAndDecelKm) / (profile.travelSpeedMps / 1000)
+    const releaseSec = opts?.skipRelease ? 0 : profile.releaseSec
+    return profile.chargeSec + profile.attackSec + cruiseSec + releaseSec
+  }
+
+  if (opts?.skipRelease) {
+    const distanceM = distanceKm * 1000
+    const accelerationUp = speedDelta / profile.attackSec
+    if (accelerationUp <= 0) return 0
+    const attackDistM = profile.attackDistanceKm * 1000
+    if (distanceM <= attackDistM) {
+      const peakSpeedMps = Math.sqrt(profile.baseSpeedMps ** 2 + 2 * accelerationUp * distanceM)
+      return profile.chargeSec + (peakSpeedMps - profile.baseSpeedMps) / accelerationUp
+    }
+    const cruiseM = distanceM - attackDistM
+    return profile.chargeSec + profile.attackSec + (cruiseM / profile.travelSpeedMps)
   }
 
   const distanceM = distanceKm * 1000
@@ -239,11 +259,50 @@ export function estimateSegmentTravelTimeSec(distanceKm: number, profile: Transp
   return profile.chargeSec + attackTimeSec + releaseTimeSec
 }
 
+const HIGHWAY_SPEED_MPS = 12000
+
+export function canUseHighway(profile: TransportShipTravelProfile): boolean {
+  return profile.shipClass === 'ship_s' || profile.shipClass === 'ship_m'
+}
+
+export function estimateHighwaySegmentTimeSec(distanceKm: number): number {
+  if (distanceKm <= 0) return 0
+  return distanceKm / (HIGHWAY_SPEED_MPS / 1000)
+}
+
+export function estimateHighwayExitOverheadSec(profile: TransportShipTravelProfile): number {
+  return profile.chargeSec + profile.attackSec
+}
+
 export function estimateRouteSegmentsTravel(
   segments: TransitRouteSegment[],
   profile: TransportShipTravelProfile
 ): Array<TransportSegmentTravelEstimate | undefined> {
   return segments.map((segment) => {
+    if (segment.kind === 'highway') {
+      const timeSec = estimateHighwaySegmentTimeSec(segment.distanceKm)
+      if (timeSec <= 0) return undefined
+      return {
+        timeSec,
+        formattedTime: formatTransportTime(timeSec)
+      }
+    }
+    if (segment.kind === 'highway-exit') {
+      const timeSec = estimateSegmentTravelTimeSec(segment.distanceKm, profile)
+      if (timeSec <= 0) return undefined
+      return {
+        timeSec,
+        formattedTime: formatTransportTime(timeSec)
+      }
+    }
+    if (segment.kind === 'highway-approach') {
+      const timeSec = estimateSegmentTravelTimeSec(segment.distanceKm, profile, { skipRelease: true })
+      if (timeSec <= 0) return undefined
+      return {
+        timeSec,
+        formattedTime: formatTransportTime(timeSec)
+      }
+    }
     if (!segment.countsInSummaryDistance) return undefined
     const timeSec = estimateSegmentTravelTimeSec(segment.distanceKm, profile)
     if (timeSec <= 0) return undefined
@@ -256,6 +315,12 @@ export function estimateRouteSegmentsTravel(
 
 export function sumSegmentTravelTime(travels: Array<TransportSegmentTravelEstimate | undefined>): number {
   return travels.reduce((sum, travel) => sum + (travel?.timeSec ?? 0), 0)
+}
+
+export function expandHighwayAlternatives(segments: TransitRouteSegment[]): TransitRouteSegment[] {
+  return segments.flatMap((segment) =>
+    segment.highwayAlternative ?? [segment]
+  )
 }
 
 export function buildTransportTravelEstimate(

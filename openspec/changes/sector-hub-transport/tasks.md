@@ -10,6 +10,14 @@
   - [x] 1.5 按星门数、普通距离选择最优路径
   - [x] 1.6 输出路径段、terminal、普通距离、superhighway 距离与问题节点
 
+- [x] 2. Highway 路径替代实现
+  - [x] 2.1 创建 highway spline 线性插值模块（弧长计算、最近点投影）
+  - [x] 2.2 在 segment 展开阶段，对 sector 内普通空间段生成 highway 替代
+  - [x] 2.3 对每条 highway 检查方向适合性（P_entry param < P_exit param）
+  - [x] 2.4 实现距离过滤规则（直达 < approach + exit → 剔除）
+  - [x] 2.5 实现 gate 紧贴 highway 捷径（<1km 阈值，移除 approach/exit 段）
+  - [x] 2.6 输出 highway 替代段，保持 `highwayAlternative` 结构
+
 - [x] 2. 创建 transit transport presenter
   - [x] 2.1 从 active binding 解析当前 transit group 与 hub station
   - [x] 2.2 从 `connectedGroupIds` 组装 `Sector Group` route rows
@@ -33,13 +41,19 @@
 - [x] 5. i18n 文案
   - [x] 5.1 更新 `src/locales/en.json`
   - [x] 5.2 更新 `src/locales/zh-CN.json`
+  - [x] 5.3 highway 段 i18n（highway 段标签、与高速同行的动作文案）
 
 - [x] 6. Build validation
   - [x] 6.1 运行 `npm run build`
   - [x] 6.2 若出现编译错误，修复后重新运行 `npm run build`
 
+- [x] 7. Build validation (highway)
+  - [ ] 7.1 运行 `npm run build`
+  - [ ] 7.2 若出现编译错误，修复后重新运行 `npm run build`
+
 ## Notes
 
 - 本任务清单不包含测试代码编写与测试执行；测试工作由 `/x4:test` 或相关测试 workflow 处理。
 - 不修改 Rust parser。
-- 不使用 `sector.highways.spline` 计算跨 sector superhighway。
+- `sector.highways`（蓝色环道）与 `cluster.sector_links`（superhighway 绿色六角门）是两种独立机制。
+- Highway 替代仅在 segment 展开阶段生效，不参与 route builder 的 sector 级图搜索。

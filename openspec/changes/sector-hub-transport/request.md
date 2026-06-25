@@ -49,6 +49,17 @@
   - superhighway 距离 SHALL NOT 计入摘要普通总距离，也 SHALL NOT 作为路径排序第二关键字
 - 不使用 `sector.highways.spline` 计算跨 sector superhighway；`sector.highways` 属于 sector 内 highway，不是本次 superhighway 距离来源。
 
+### Highway 路径替代
+
+- 当 sector 内存在 highway 时，SHALL 为 sector 内普通空间段生成 highway 替代方案。
+- 替代方案 SHALL 仅在 segment 展开阶段生成，不参与 route builder 的 sector 级图搜索。
+- Spline 插值 SHALL 使用线性折线插值。
+- 最近点投影 SHALL 在全 spline 上搜索（非仅限 entry/exit 端点）。
+- 每条 highway 有方向，SHALL 只取 P_entry spline 参数 < P_exit spline 参数 的候选。
+- 使用距离过滤：若直达距离 < approach + exit 距离，SHALL 剔除该 highway 候选。
+- gate 到 highway entry/exit 距离 < 1km 时，SHALL 视为 gate 紧贴 highway，该 approach/exit 段从路径展示中移除。
+- 无船选择时，view 层默认使用非 highway 方案。
+
 ### Sector Group 分类显示
 
 - 折叠摘要 SHALL 显示：
