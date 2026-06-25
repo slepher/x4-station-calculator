@@ -1062,16 +1062,19 @@ const tradeStationCaps = computed<Record<string, number>>(() => {
   return caps
 })
 
-const unresolvedTradeStationGroups = computed<string[]>(() => {
-  if (!hasUnresolvedTradeStations.value) return []
-  return ['sector.trade_station_unresolved']
+const unresolvedTradeStationCount = computed(() => {
+  if (!hasUnresolvedTradeStations.value) return 0
+  if (!autoGroupResult.value) return 0
+  const groupsWithCandidates = Object.keys(tradeStationCandidates.value)
+  return groupsWithCandidates.filter((id) => !selectedTradeStations.value[id]).length
 })
 
-const unresolvedAllocationGroups = computed<string[]>(() => {
-  if (hasUncertainAssignments.value || hasPendingBridgeDecision.value) {
-    return ['sector.allocation_unresolved']
-  }
-  return []
+const unresolvedAllocationCount = computed(() => {
+  let count = 0
+  if (!autoGroupResult.value) return count
+  if (hasPendingBridgeDecision.value) count++
+  const uncertainCount = (autoGroupResult.value?.assignments ?? []).filter((a) => a.uncertain).length
+  return count + uncertainCount
 })
 
 const hasGlobalUnresolved = computed(() =>
@@ -1429,8 +1432,8 @@ return {
   hasUnresolvedTradeStations,
   showConfirmPopup,
   hasChanges,
-  unresolvedTradeStationGroups,
-  unresolvedAllocationGroups,
+  unresolvedTradeStationCount,
+  unresolvedAllocationCount,
   handleSelectTradeStation,
   handleResetTradeStations,
   handleMasterTradeStationRetain,

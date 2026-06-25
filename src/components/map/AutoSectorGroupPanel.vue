@@ -46,7 +46,6 @@ const {
   calculationMode, calcBaselinePillState,
   gameDataMaps, sectorGraphInfo,
   tradeStationCandidates, selectedTradeStations, tradeStationCaps,
-  unresolvedAllocationGroups, unresolvedTradeStationGroups,
   blueprintEmpires, selectedBlueprintEmpireId, blueprintStationSources,
   virtualStationGroups, activeVirtualStationDragKey,
   formatCoordKm, startVirtualStationDrag, updateVirtualStationDrag, finishVirtualStationDrag,
@@ -74,6 +73,30 @@ const {
 provide('sectorGroupColorMap', sectorGroupColorMap)
 
 const isConfirmed = computed(() => hasAutoResult.value && !hasChanges.value)
+
+const unresolvedTooltip = computed(() => {
+  const result = autoGroupResult.value
+  let allocCount = 0
+  let tsCount = 0
+  if (!result) return { html: '', allocCount: 0, tsCount: 0 }
+  const allocNames: string[] = []
+  if (hasPendingBridgeDecision.value) { allocCount++; allocNames.push(t('sector.connected')) }
+  for (const a of result.assignments ?? []) {
+    if (a.uncertain) { allocCount++; allocNames.push(a.sectorMacro) }
+  }
+  const tsNames = result.groups
+    .filter((g) => !g.selectedTradeStation)
+    .map((g) => g.name || g.id)
+  tsCount = tsNames.length
+  let html = ''
+  if (allocNames.length > 0) {
+    html += `<div>${t('sector.allocation_unresolved')}</div><ul>${allocNames.map((n) => `<li>${n}</li>`).join('')}</ul>`
+  }
+  if (tsNames.length > 0) {
+    html += `<div>${t('sector.trade_station_unresolved')}</div><ul>${tsNames.map((n) => `<li>${n}</li>`).join('')}</ul>`
+  }
+  return { html, allocCount, tsCount }
+})
 
 const liveStore = useLiveProductionStore()
 const gameDataStore = useGameDataStore()
@@ -236,15 +259,16 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
           :pref-threshold="prefThreshold"
           :node-enabled="nodeEnabled"
           :can-disable-node="canDisableNode"
-          :unresolved-allocation-count="unresolvedAllocationGroups.length"
-          :unresolved-trade-station-count="unresolvedTradeStationGroups.length"
-          :show-confirm="true"
-          :confirm-disabled="hasUnresolvedTradeStations || !hasChanges"
-          :show-back="false"
-          @update:pref-jump-range="handleUpdatePrefJumpRange"
-          @update:bridge-search-jump-range="handleUpdateBridgeSearchJumpRange"
-          @update:pref-threshold="prefThreshold = $event"
-          @update:node-enabled="nodeEnabled = $event"
+          :unresolved-allocation-count="unresolvedTooltip.allocCount"
+            :unresolved-trade-station-count="unresolvedTooltip.tsCount"
+            :unresolved-title="unresolvedTooltip.html"
+            :show-confirm="true"
+            :confirm-disabled="hasUnresolvedTradeStations || !hasChanges"
+            :show-back="false"
+            @update:pref-jump-range="handleUpdatePrefJumpRange"
+            @update:bridge-search-jump-range="handleUpdateBridgeSearchJumpRange"
+            @update:pref-threshold="prefThreshold = $event"
+            @update:node-enabled="nodeEnabled = $event"
           @calculate="onCalculate"
           @quick-calculate="onQuickCalc"
           @reset="handleResetAssignments"
@@ -316,8 +340,9 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
             :pref-threshold="prefThreshold"
             :node-enabled="nodeEnabled"
             :can-disable-node="canDisableNode"
-            :unresolved-allocation-count="unresolvedAllocationGroups.length"
-            :unresolved-trade-station-count="unresolvedTradeStationGroups.length"
+            :unresolved-allocation-count="unresolvedTooltip.allocCount"
+            :unresolved-trade-station-count="unresolvedTooltip.tsCount"
+            :unresolved-title="unresolvedTooltip.html"
             :show-confirm="calculationMode === 'result'"
             :confirm-disabled="hasUnresolvedTradeStations || !hasChanges"
             @update:pref-jump-range="handleUpdatePrefJumpRange"
