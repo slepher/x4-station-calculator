@@ -179,7 +179,7 @@ Live sidebar 在固定菜单和动态星区/站点列表之间的分隔线区域
 
 | 按钮/控件 | edit 模式 | result 模式 |
 | --- | --- | --- |
-| 返回 | emit `back`，Live 返回展示模式 | 同 edit |
+| 返回 | emit `back` | 同 edit |
 | 地图 | emit `map`，进入 Map binding | 同 edit |
 | 桥接跳数 | 更新 `bridgeSearchJumpRange`，不得小于覆盖跳数 | 可作为下一次计算参数 |
 | 覆盖跳数 | 更新 `prefJumpRange`，必要时抬高桥接跳数 | 可作为下一次计算参数 |
@@ -188,14 +188,14 @@ Live sidebar 在固定菜单和动态星区/站点列表之间的分隔线区域
 | 计算 | 运行 `runCalculationFromEditInput()`，更新 result 和 `calculationBaseline` | 同 edit |
 | 快速计算 | 运行同一计算路径 | 同 edit |
 | 重置 | 从 `calculationBaseline` 恢复 | 同 edit |
-| 提交 | edit 模式返回 false，不提交 | 通过 gate 后提交 |
+| 提交 | 直接提交，不依赖当前模式 | 通过 gate 后提交 |
 
 ### SectorGroupStatBar
 
 | 按钮/控件 | 行为 |
 | --- | --- |
-| 编辑 | `calculationMode='edit'` |
-| 退出 | `calculationMode='result'`，不恢复 draft |
+| 编辑 | 切换到编辑视图（`calculationMode='edit'`），不改变数据 |
+| 退出 | 切换到结果视图（`calculationMode='result'`），不改变数据 |
 | 添加枢纽 | 切换 `showHubAddMenu` |
 | 桥接保留 | 同步所有 group 的 `connectionRetainEnabled` |
 | 覆盖保留 | 同步所有 group 的 `coverageRetainEnabled` |
@@ -227,7 +227,7 @@ Live sidebar 在固定菜单和动态星区/站点列表之间的分隔线区域
 8. 将 result groups 标记为 baseline。
 9. 更新 `calcBaselinePillState`。
 10. 更新 `calculationBaseline` 为确认后的 autoGroupResult 与 virtual station drafts。
-11. emit `confirmed`，Live 返回展示模式。
+11. 确认成功后确认按钮置灰，不跳转。
 
 ### Tab 自动切换
 
@@ -276,7 +276,7 @@ prefThreshold?: number
 
 布局：`[星区 5fr] | [分配 4fr] | [交易站 3fr]`
 
-使用 `AutoSectorGroupPanel layout="columns"`。确认成功后 emit `confirmed`，Live 切回展示模式。
+使用 `AutoSectorGroupPanel layout="columns"`。确认成功后确认按钮置灰，不跳转。
 
 ## Map 共享关系
 

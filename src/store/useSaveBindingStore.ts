@@ -685,6 +685,9 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
         targetId = existingBySector.get(draft.sectorMacro)
       }
       if (targetId) {
+        // Clear old connections before re-syncing from draft
+        const bindingGroup = draftBinding.value!.groups.find((g) => g.id === targetId)!
+        bindingGroup.connectedGroupIds = []
         updateGroup(gameGuid, targetId, {
           jumpRange: draft.jumpRange,
           color: draft.color
