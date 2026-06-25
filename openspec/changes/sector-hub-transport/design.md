@@ -48,6 +48,10 @@ type TransitDistanceSummary = {
   gateCount: number
   normalDistanceKm: number
   superhighwayDistanceKm: number
+  highwayDistanceKm: number
+  engineDistanceKm: number
+  highwayGateCount: number
+  engineGateCount: number
 }
 
 type TransitPathSegment = {
@@ -73,7 +77,7 @@ type RouteTerminal = {
 }
 ```
 
-`normalDistanceKm` 不包含 superhighway 距离。`superhighwayDistanceKm` 用于明细或补充展示，不参与摘要普通距离，也不参与路径排序第二关键字。
+`normalDistanceKm` 不包含 superhighway 距离。`superhighwayDistanceKm` 用于明细或补充展示，不参与摘要普通距离，也不参与路径排序第二关键字。非 highway 候选中 `engineDistanceKm = normalDistanceKm`、`engineGateCount = gateCount`；highway/ring 候选中 `engineDistanceKm = normalDistanceKm - highwayDistanceKm`、`engineGateCount = gateCount - highwayGateCount`，用于 S/M 船选择时表达需要引擎飞行的部分。
 
 ## 路径图构建
 
@@ -97,10 +101,13 @@ route builder 输出的 gate/superhighway endpoint label SHALL 只使用面向�
 
 ## 路径候选与选择
 
-算法应生成不重复 sector 的 simple path 候选。最终最优路径排序为：
+算法应生成不重复 sector 的 simple path 候选，不再默认固定保留 3 条。多数地图组合只有唯一通路；多候选用于处理星门、超级高速与高速环路组合产生的真实分支。
 
-1. `gateCount` 升序
-2. `normalDistanceKm` 升序
+未选择运输船时，最终路径排序为：
+
+1. `normalDistanceKm` 升序
+2. `gateCount` 升序
+3. 枚举顺序
 
 `normalDistanceKm` 只包含 station/gate/endpoints 之间的普通空间段，不包含 superhighway 段距离。
 
@@ -108,8 +115,14 @@ route builder 输出的 gate/superhighway endpoint label SHALL 只使用面向�
 
 - 以当前 hub 所在 sector 为起点。
 - 枚举 simple paths 到目标 sector。
-- 保留当前最优与少量候选，避免全图爆炸。
-- 若发现路径 gateCount 已超过当前最佳，可剪枝。
+- 搜索仍受全局 queue/iteration 上限约束，避免全图爆炸。
+- 不再使用单一 `gateCount` 最优路径剪枝；否则会错误丢弃普通距离更短但星门数更多的候选。
+
+候选池进入最终选择前采用 Pareto 过滤：
+
+- 未选择运输船或 L/XL 船：只比较 `gateCount` 与 `normalDistanceKm`，两项都劣于另一条路线的候选被丢弃。
+- S/M 船：比较 `gateCount`、`normalDistanceKm`、`engineDistanceKm`、`engineGateCount`，四项都劣于另一条路线的候选被丢弃。
+- 若多条候选都各有至少一项优势，则全部保留给后续最终选择。
 
 ## 分段生成
 
@@ -187,6 +200,18 @@ type TransitPathSegment = {
 ### 未选船时的默认行为
 
 view 层未选船时直接使用非 highway 方案。
+
+## 地图高速环路星门高亮
+
+`maps.highwayRings` 是 maps.json 载入后的派生成员，记录由 sector 内 highway 段与普通跨 cluster gate 连接共同形成的高速环路。地图界面只高亮环路中的普通 gate 连接部分，不高亮 highway spline 本身。
+
+渲染规则：
+
+- `useMapSvgLinks` 将 `maps.highwayRings[*].gateMatches` 转换为 `sectorId:gateId` 集合。
+- 生成跨 cluster gate line 时，只有 line 两端 gate 都命中该集合，才标记为 `isHighwayRingGate`。
+- 仍使用现有跨 cluster gate 去重逻辑，因此同一条 gate 连接只画一次。
+- `MapLinkLayer` 对 `isHighwayRingGate` 使用高亮黄色，并把线宽乘以 1.5。
+- 若只有一端 gate 命中环路集合，该连接不是完整环路 gate 段，继续使用普通样式。
 
 ## UI 设计
 

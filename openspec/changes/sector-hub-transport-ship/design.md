@@ -38,7 +38,9 @@ ship-build saved blueprints
   -> selected blueprint id in useLiveProductionStore
 
 transit route builder output
-  -> route segments
+  -> route candidates with gate/normal/engine/highway metrics
+  -> ship-class candidate pool
+  -> selected route segments
   -> selected travel profile
   -> segment travel estimates
   -> row-level travel summaries
@@ -102,6 +104,23 @@ d_decel_km = ((V_travel + V_base) / 2) * t_release / 1000
 ## Segment Time Formula
 
 只对普通空间段和 `highway` 段计算耗时。`gate-transit` 与 `superhighway` 不增加耗时。
+
+## Route Candidate Selection With Ship
+
+`sector-hub-transport` 的 route builder 输出 simple path 候选及候选摘要。选择运输船后，presenter 先按船型构造候选池，再对池内每条候选独立展开 highway 替代并计算真实总耗时，然后按以下顺序选择最终展示路径：
+
+1. `travelTimeSec` 升序
+2. `normalDistanceKm` 升序
+3. 枚举顺序
+
+候选池规则：
+
+- 未选船时不使用 highway，仍按 `normalDistanceKm asc -> gateCount asc -> 枚举顺序` 取最终路线。
+- L/XL 船不可使用 highway/ring 优势，候选池只比较 `gateCount` 与 `normalDistanceKm`；若某候选两项均劣于另一候选，则丢弃。
+- S/M 船可使用 highway/ring 优势，候选池比较 `gateCount`、`normalDistanceKm`、`engineDistanceKm`、`engineGateCount`；若某候选四项均劣于另一候选，则丢弃。
+- `engineDistanceKm` 与 `engineGateCount` 表示去除 highway 行进部分后仍需普通引擎处理的路程与星门数。非 highway 候选中它们分别等于 `normalDistanceKm` 与 `gateCount`。
+
+不同候选即使经过同一个 sector，也必须使用该候选具体 segment 的 `fromPosition` 与 `toPosition` 独立计算 highway 替代；不得按 sector 复用 highway 方案。
 
 ### 普通空间段耗时
 
@@ -178,12 +197,7 @@ exitTimeSec = estimateSegmentTravelTimeSec(D_km, profile)
 
 ### 方案选择（S/M 船）
 
-```text
-if (方案B highway 方案有效 且 方案B.totalTime < 方案A.totalTime):
-    → 选择方案B（有 highway）
-else:
-    → 选择方案A（无 highway）
-```
+S/M 船不是只比较单条路线内的“方案A vs 方案B”，而是在候选池内对每条候选使用自身 segment 端点生成 highway 替代，再按总耗时选择最终路线。
 
 方案A 的耗时 = 所有普通空间段的 engine travel time 之和。
 方案B 的耗时 = approach/exit 的 engine travel time + highway 段固定时间。
@@ -266,4 +280,3 @@ Station:
 - 本模型是宏观估算，不模拟 pilot、AI、IS/OOS、align、靠站、真实过门等待。
 - superhighway 仍可出现在现有路径里，但本变更不计算其耗时。
 - 选择状态不持久化，刷新后会丢失，这是已确认行为。
-

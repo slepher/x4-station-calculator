@@ -52,15 +52,11 @@
   - 点击切换 fav，非当前蓝图立即持久化
   - flex 布局替代 absolute 定位
 
-## T7: 模态框 - 收藏标记
+## T7: 旧载入弹窗清理
 
-- [x] 在 `LoadShipBlueprintModal.vue` 的蓝图卡片行中新增收藏星形标记
-  - ~~仅用户蓝图显示~~（所有蓝图显示）
-  - ~~已收藏显示实心星形，不可点击~~（可点击切换）
-
-- [x] 修订：
-  - 预设项不显示星形图标
-  - 添加 `@click` 处理：切换 fav，非当前蓝图立即持久化
+- [x] 删除 `src/components/ship-build/LoadShipBlueprintModal.vue`
+- [x] 移除 `StationToolbar.vue` 中不可达的 `LoadShipBlueprintModal` import/ref/template 挂载
+- [x] 确认 `ship-build` 视图的全局 toolbar load 按钮隐藏，蓝图载入统一由 `ShipBuildPanelFit.vue` header 菜单承载
 
 ## T8: i18n - 新增文案
 
@@ -78,5 +74,5 @@
 - [x] `saveBlueprint`/`saveAsBlueprint` 首次保存设置 `createdAt`
 - [x] `loadBlueprint` preset 路径保留 `favorite` 和 `createdAt`
 - [x] 排序改为 `createdAt` 降序 + 名称字母序
-- [x] 暴露 `saveBlueprintsToStorage()` 供菜单/模态框 fav 切换使用
+- [x] 暴露 `saveBlueprintsToStorage()` 供菜单 fav 切换使用
 - [x] 删除按钮改为常显示

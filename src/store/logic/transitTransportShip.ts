@@ -1,5 +1,5 @@
 import type { ShipBlueprint, X4Equipment, X4Ship } from '@/types/x4'
-import type { TransitRouteSegment } from '@/store/logic/transitRouteBuilder'
+import type { TransitRouteResult, TransitRouteSegment } from '@/store/logic/transitRouteBuilder'
 
 export type TransportShipEngineInfo = {
   equipmentId: string
@@ -64,6 +64,12 @@ export type StationTravelEstimate = {
   formattedTotalTime: string
   throughputM3PerHour?: number
   formattedThroughput?: string
+}
+
+export type SelectedTransitRouteTravel = {
+  route: TransitRouteResult
+  segments: TransitRouteSegment[]
+  travelTimeSec: number
 }
 
 export function buildTransportShipCandidateState(input: {
@@ -317,10 +323,96 @@ export function sumSegmentTravelTime(travels: Array<TransportSegmentTravelEstima
   return travels.reduce((sum, travel) => sum + (travel?.timeSec ?? 0), 0)
 }
 
-export function expandHighwayAlternatives(segments: TransitRouteSegment[]): TransitRouteSegment[] {
-  return segments.flatMap((segment) =>
-    segment.highwayAlternative ?? [segment]
+export function routeSegmentsTravelTime(segments: TransitRouteSegment[], profile: TransportShipTravelProfile): number {
+  return sumSegmentTravelTime(estimateRouteSegmentsTravel(segments, profile))
+}
+
+export function expandHighwayAlternatives(
+  segments: TransitRouteSegment[],
+  profile?: TransportShipTravelProfile | null
+): TransitRouteSegment[] {
+  if (!profile) return segments
+  if (!canUseHighway(profile)) return segments
+  return segments.flatMap((segment) => {
+    if (!segment.highwayAlternative || segment.highwayAlternative.length === 0) return [segment]
+    const directTime = routeSegmentsTravelTime([segment], profile)
+    const highwayTime = routeSegmentsTravelTime(segment.highwayAlternative, profile)
+    if (highwayTime <= 0) return [segment]
+    return highwayTime < directTime ? segment.highwayAlternative : [segment]
+  })
+}
+
+function routeDominates(
+  left: TransitRouteResult,
+  right: TransitRouteResult,
+  metrics: Array<keyof TransitRouteResult['summary']>
+): boolean {
+  let hasStrictAdvantage = false
+  for (const metric of metrics) {
+    const leftValue = left.summary[metric]
+    const rightValue = right.summary[metric]
+    if (leftValue > rightValue) return false
+    if (leftValue < rightValue) hasStrictAdvantage = true
+  }
+  return hasStrictAdvantage
+}
+
+function filterNonDominatedRouteCandidates(
+  candidates: TransitRouteResult[],
+  metrics: Array<keyof TransitRouteResult['summary']>
+): TransitRouteResult[] {
+  return candidates.filter((candidate) =>
+    !candidates.some((other) => other !== candidate && routeDominates(other, candidate, metrics))
   )
+}
+
+export function filterTransitRouteCandidatesForProfile(
+  candidates: TransitRouteResult[],
+  profile?: TransportShipTravelProfile | null
+): TransitRouteResult[] {
+  if (candidates.length <= 1) return candidates
+  if (!profile || !canUseHighway(profile)) {
+    return filterNonDominatedRouteCandidates(candidates, ['gateCount', 'normalDistanceKm'])
+  }
+  return filterNonDominatedRouteCandidates(candidates, [
+    'gateCount',
+    'normalDistanceKm',
+    'engineDistanceKm',
+    'engineGateCount'
+  ])
+}
+
+export function selectTransitRouteByTravelTime(
+  candidates: TransitRouteResult[],
+  profile: TransportShipTravelProfile,
+  expandSegments: (route: TransitRouteResult) => TransitRouteSegment[] = (route) => route.segments
+): SelectedTransitRouteTravel {
+  const candidatePool = filterTransitRouteCandidatesForProfile(candidates, profile)
+  const ranked = candidatePool.map((route, index) => {
+    const segments = expandHighwayAlternatives(expandSegments(route), profile)
+    return {
+      route,
+      segments,
+      travelTimeSec: routeSegmentsTravelTime(segments, profile),
+      order: route.candidateOrder ?? index
+    }
+  })
+
+  ranked.sort((a, b) =>
+    a.travelTimeSec - b.travelTimeSec ||
+    a.route.summary.normalDistanceKm - b.route.summary.normalDistanceKm ||
+    a.order - b.order
+  )
+
+  const selected = ranked[0]
+  if (!selected) {
+    throw new Error('selectTransitRouteByTravelTime requires at least one candidate')
+  }
+  return {
+    route: selected.route,
+    segments: selected.segments,
+    travelTimeSec: selected.travelTimeSec
+  }
 }
 
 export function buildTransportTravelEstimate(

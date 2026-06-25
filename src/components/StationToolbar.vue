@@ -9,7 +9,6 @@ import LoadBlueprintPlanModal from './empire/LoadBlueprintPlanModal.vue'
 import LoadLivePlanModal from './empire/LoadLivePlanModal.vue'
 import LoadFlowPlanModal from './logic-flow/LoadFlowPlanModal.vue'
 import SmartSaveDialog from './common/SmartSaveDialog.vue'
-import LoadShipBlueprintModal from './ship-build/LoadShipBlueprintModal.vue'
 import StorageImportWizard from './StorageImportWizard.vue'
 import StorageExportWizard from './StorageExportWizard.vue'
 import TopViewSwitch from './common/TopViewSwitch.vue'
@@ -32,7 +31,6 @@ const toolbarWorkflow = useToolbarWorkflowController({ t, translateShip })
 const showLoadBlueprintModal = ref(false)
 const showLoadLiveModal = ref(false)
 const showLoadFlowModal = ref(false)
-const showLoadShipBlueprintModal = ref(false)
 const showImportWizard = ref(false)
 const showVersionSettingsModal = ref(false)
 const showDlcSettingsModal = ref(false)
@@ -126,11 +124,6 @@ const handleSaveAs = () => {
 }
 
 const handleLoad = () => {
-  if (isShipBuildView.value) {
-    if (!shipBuildStore.selectedShipId) return
-    showLoadShipBlueprintModal.value = true
-    return
-  }
   if (isFlowView.value) {
     showLoadFlowModal.value = true
     return
@@ -274,7 +267,6 @@ const handleExport = () => {
     <LoadBlueprintPlanModal :isOpen="showLoadBlueprintModal" @close="showLoadBlueprintModal = false" />
     <LoadLivePlanModal :isOpen="showLoadLiveModal" @close="showLoadLiveModal = false" />
     <LoadFlowPlanModal :isOpen="showLoadFlowModal" @close="showLoadFlowModal = false" />
-    <LoadShipBlueprintModal :isOpen="showLoadShipBlueprintModal" @close="showLoadShipBlueprintModal = false" />
     <StorageImportWizard :isOpen="showImportWizard" @close="showImportWizard = false" />
     <StorageExportWizard :isOpen="showExportWizard" @close="showExportWizard = false" />
     <VersionSettingsModal :visible="showVersionSettingsModal" @close="showVersionSettingsModal = false" />

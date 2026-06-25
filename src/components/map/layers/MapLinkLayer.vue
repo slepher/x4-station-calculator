@@ -104,9 +104,9 @@ defineProps<{
       :y1="line.left.y.toFixed(1)"
       :x2="line.right.x.toFixed(1)"
       :y2="line.right.y.toFixed(1)"
-      stroke="#e5e7eb"
-      :stroke-width="getMapCrossLinkStrokeWidth(stargateVisualScale).toFixed(2)"
-      stroke-opacity="0.85"
+      :stroke="line.isHighwayRingGate ? '#facc15' : '#e5e7eb'"
+      :stroke-width="(getMapCrossLinkStrokeWidth(stargateVisualScale) * (line.isHighwayRingGate ? 1.5 : 1)).toFixed(2)"
+      :stroke-opacity="line.isHighwayRingGate ? '1' : '0.85'"
     />
   </g>
 </template>

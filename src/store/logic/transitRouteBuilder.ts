@@ -38,6 +38,10 @@ export type TransitRouteSummary = {
   gateCount: number
   normalDistanceKm: number
   superhighwayDistanceKm: number
+  highwayDistanceKm: number
+  engineDistanceKm: number
+  highwayGateCount: number
+  engineGateCount: number
 }
 
 export type TransitRouteResult = {
@@ -46,6 +50,7 @@ export type TransitRouteResult = {
   segments: TransitRouteSegment[]
   terminal: TransitRouteTerminal
   problems: string[]
+  candidateOrder?: number
 }
 
 export type TransitRouteTarget =
@@ -101,9 +106,37 @@ function toPosition(position: { x?: number; y?: number; z?: number } | undefined
   return { x: position.x, y: position.y ?? 0, z: position.z }
 }
 
-function compareRoute(a: Pick<SearchState, 'gateCount' | 'normalDistanceKm'>, b: Pick<SearchState, 'gateCount' | 'normalDistanceKm'>): number {
-  if (a.gateCount !== b.gateCount) return a.gateCount - b.gateCount
-  return a.normalDistanceKm - b.normalDistanceKm
+function compareRouteDistanceFirst(
+  a: { summary?: TransitRouteSummary; gateCount?: number; normalDistanceKm?: number; candidateOrder?: number },
+  b: { summary?: TransitRouteSummary; gateCount?: number; normalDistanceKm?: number; candidateOrder?: number }
+): number {
+  const aDistance = a.summary?.normalDistanceKm ?? a.normalDistanceKm ?? 0
+  const bDistance = b.summary?.normalDistanceKm ?? b.normalDistanceKm ?? 0
+  if (aDistance !== bDistance) return aDistance - bDistance
+  const aGateCount = a.summary?.gateCount ?? a.gateCount ?? 0
+  const bGateCount = b.summary?.gateCount ?? b.gateCount ?? 0
+  if (aGateCount !== bGateCount) return aGateCount - bGateCount
+  return (a.candidateOrder ?? 0) - (b.candidateOrder ?? 0)
+}
+
+function buildTransitRouteSummary(input: {
+  gateCount: number
+  normalDistanceKm: number
+  superhighwayDistanceKm: number
+  highwayDistanceKm?: number
+  highwayGateCount?: number
+}): TransitRouteSummary {
+  const highwayDistanceKm = input.highwayDistanceKm ?? 0
+  const highwayGateCount = input.highwayGateCount ?? 0
+  return {
+    gateCount: input.gateCount,
+    normalDistanceKm: input.normalDistanceKm,
+    superhighwayDistanceKm: input.superhighwayDistanceKm,
+    highwayDistanceKm,
+    engineDistanceKm: Math.max(0, input.normalDistanceKm - highwayDistanceKm),
+    highwayGateCount,
+    engineGateCount: Math.max(0, input.gateCount - highwayGateCount)
+  }
 }
 
 function addEdge(graph: Map<string, Edge[]>, edge: Edge) {
@@ -198,9 +231,11 @@ function finishRoute(state: SearchState, target: TransitRouteTarget): TransitRou
   if (target.kind === 'sector') {
     return {
       summary: {
-        gateCount: state.gateCount,
-        normalDistanceKm: state.normalDistanceKm,
-        superhighwayDistanceKm: state.superhighwayDistanceKm
+        ...buildTransitRouteSummary({
+          gateCount: state.gateCount,
+          normalDistanceKm: state.normalDistanceKm,
+          superhighwayDistanceKm: state.superhighwayDistanceKm
+        })
       },
       sectors: state.sectors,
       segments: state.segments,
@@ -225,9 +260,11 @@ function finishRoute(state: SearchState, target: TransitRouteTarget): TransitRou
 
   return {
     summary: {
-      gateCount: state.gateCount,
-      normalDistanceKm: normalDistance,
-      superhighwayDistanceKm: state.superhighwayDistanceKm
+      ...buildTransitRouteSummary({
+        gateCount: state.gateCount,
+        normalDistanceKm: normalDistance,
+        superhighwayDistanceKm: state.superhighwayDistanceKm
+      })
     },
     sectors: state.sectors,
     segments,
@@ -241,17 +278,41 @@ function finishRoute(state: SearchState, target: TransitRouteTarget): TransitRou
   }
 }
 
-export function buildTransitRoute(input: TransitRouteInput): TransitRouteResult {
+function problemRoute(input: TransitRouteInput, problems: string[]): TransitRouteResult {
+  return {
+    summary: buildTransitRouteSummary({ gateCount: 0, normalDistanceKm: 0, superhighwayDistanceKm: 0 }),
+    sectors: [],
+    segments: [],
+    terminal: { kind: 'origin', label: input.from.label, sectorMacro: input.from.sectorMacro, position: input.from.position },
+    problems
+  }
+}
+
+function finalizeRoute(result: TransitRouteResult): TransitRouteResult {
+  const lastSegment = result.segments[result.segments.length - 1]
+  if (result.terminal.kind === 'gate' && lastSegment?.kind === 'superhighway') {
+    return {
+      ...result,
+      terminal: { ...result.terminal, kind: 'superhighway-exit' }
+    }
+  }
+  return result
+}
+
+export function buildTransitRouteCandidates(
+  input: TransitRouteInput,
+  options?: { maxCandidates?: number }
+): TransitRouteResult[] {
   const resolveSectorLabel = input.resolveSectorLabel ?? ((sector: X4MapSector) => sector.name || sector.id)
   const graphData = buildTransitEdgeGraph(input.clusters, input.sectors, resolveSectorLabel)
   const sourceSector = input.sectors[input.from.sectorMacro]
   const targetSector = input.sectors[input.target.sectorMacro]
 
   if (!sourceSector) {
-    return { summary: { gateCount: 0, normalDistanceKm: 0, superhighwayDistanceKm: 0 }, sectors: [], segments: [], terminal: { kind: 'origin', label: input.from.label, sectorMacro: input.from.sectorMacro, position: input.from.position }, problems: [`sector:${input.from.sectorMacro}`] }
+    return [problemRoute(input, [`sector:${input.from.sectorMacro}`])]
   }
   if (!targetSector) {
-    return { summary: { gateCount: 0, normalDistanceKm: 0, superhighwayDistanceKm: 0 }, sectors: [], segments: [], terminal: { kind: 'origin', label: input.from.label, sectorMacro: input.from.sectorMacro, position: input.from.position }, problems: [`sector:${input.target.sectorMacro}`] }
+    return [problemRoute(input, [`sector:${input.target.sectorMacro}`])]
   }
 
   const initial: SearchState = {
@@ -269,16 +330,17 @@ export function buildTransitRoute(input: TransitRouteInput): TransitRouteResult 
   }
 
   const queue: SearchState[] = [initial]
-  let best: SearchState | null = null
+  const candidates: TransitRouteResult[] = []
   let iterations = 0
+  let candidateOrder = 0
 
   while (queue.length > 0 && iterations < MAX_QUEUE_STATES) {
     iterations += 1
-    queue.sort(compareRoute)
+    queue.sort(compareRouteDistanceFirst)
     const state = queue.shift()!
-    if (best && compareRoute(state, best) > 0) continue
     if (state.sectorMacro === input.target.sectorMacro) {
-      if (!best || compareRoute(state, best) < 0) best = state
+      candidates.push(finalizeRoute({ ...finishRoute(state, input.target), candidateOrder }))
+      candidateOrder += 1
       continue
     }
 
@@ -322,20 +384,15 @@ export function buildTransitRoute(input: TransitRouteInput): TransitRouteResult 
     }
   }
 
-  if (!best) {
-    return {
-      summary: { gateCount: 0, normalDistanceKm: 0, superhighwayDistanceKm: 0 },
-      sectors: [],
-      segments: [],
-      terminal: { kind: 'origin', label: input.from.label, sectorMacro: input.from.sectorMacro, position: input.from.position },
-      problems: graphData.problems.length > 0 ? graphData.problems : [`route:${input.from.sectorMacro}->${input.target.sectorMacro}`]
-    }
+  if (candidates.length === 0) {
+    return [problemRoute(input, graphData.problems.length > 0 ? graphData.problems : [`route:${input.from.sectorMacro}->${input.target.sectorMacro}`])]
   }
 
-  const result = finishRoute(best, input.target)
-  const lastSegment = result.segments[result.segments.length - 1]
-  if (input.target.kind === 'sector' && lastSegment?.kind === 'superhighway') {
-    result.terminal.kind = 'superhighway-exit'
-  }
-  return result
+  const sorted = candidates.sort(compareRouteDistanceFirst)
+  if (options?.maxCandidates === undefined) return sorted
+  return sorted.slice(0, Math.max(1, options.maxCandidates))
+}
+
+export function buildTransitRoute(input: TransitRouteInput): TransitRouteResult {
+  return buildTransitRouteCandidates(input)[0]!
 }

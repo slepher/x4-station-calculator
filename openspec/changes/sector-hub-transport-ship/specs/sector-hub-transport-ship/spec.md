@@ -86,6 +86,19 @@ live transit hub 页面 SHALL 在建筑区下方提供运输船蓝图选择区�
 
 系统 SHALL 使用真实 route segment 距离计算普通空间段耗时，并跳过 gate transit 与 superhighway 耗时。
 
+#### Scenario: Selected ship route candidate uses fastest travel time
+
+- **前提** 当前 hub 到目标存在多条 route 候选
+- **并且** 用户选择了可用运输船蓝图
+- **当** 系统组装最终展示路线
+- **那么** 系统 SHALL 先按选中运输船 class 构造候选池
+- **并且** L/XL 船 SHALL 只保留在 `gateCount` 与 `normalDistanceKm` 中至少一项不劣于其它候选的路线
+- **并且** S/M 船 SHALL 以 `gateCount`、`normalDistanceKm`、`engineDistanceKm`、`engineGateCount` 构造候选池
+- **并且** 系统 SHALL 对候选池内路线分别计算真实耗时
+- **并且** 系统 SHALL 选择总耗时最短的候选
+- **并且** 当总耗时相同时 SHALL 选择普通距离最短的候选
+- **并且** 当仍无法区分时 SHALL 选择枚举顺序最靠前的候选
+
 #### Scenario: Estimate long normal segment
 
 - **前提** 路径段是普通空间段
@@ -210,4 +223,3 @@ Highway 段 SHALL 使用固定速度 12,000 m/s 计算耗时，不依赖引擎�
 - **前提** 路线总耗时为 0
 - **当** 系统计算单程吞吐量
 - **那么** 系统 SHALL 不显示有效吞吐量数值
-

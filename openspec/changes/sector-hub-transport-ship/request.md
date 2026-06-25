@@ -48,7 +48,9 @@
 - 短距离达不到最高巡航速度时，使用峰值速度模型，不使用线性 attack 截断。
 - `travel.charge`、`travel.attack`、`travel.release` 聚合时取有效引擎中的最大值；推力与巡航推力按数量累加。
 - **S/M 船可用 highway，L/XL 不可用**。未选船时默认非 highway 方案。
-- 当 highway 方案总耗时 < 非 highway 方案总耗时，选择 highway 方案。
+- route builder 不再默认固定截断为 3 条路径候选；选择运输船后先按船型构造候选池，再按真实总耗时最短选择，其次按普通距离最短选择，仍相同时取原始枚举顺序最靠前的候选。
+- L/XL 船候选池只使用 `gateCount` 与 `normalDistanceKm` 判断优势；S/M 船候选池使用 `gateCount`、`normalDistanceKm`、`engineDistanceKm`、`engineGateCount` 判断优势。
+- 不同路径候选即使经过同一 sector，也必须按该候选的具体 segment 端点独立计算 highway 替代方案。
 
 ### 吞吐量口径
 
@@ -114,6 +116,7 @@ throughputM3PerHour = containerCapacityM3 / oneWayTimeSec * 3600
 - 不可用蓝图不出现在候选中；当前选择变不可用时自动清空。
 - 未选择运输船时，右侧运输路线保持原有距离/星门展示，不显示新增指标。
 - 选择运输船后，Sector Group、Station sector、Station row 按已确认规则显示耗时与单程吞吐量。
+- 选择运输船后，多条路径候选按真实耗时选择最终展示路径；未选择运输船时仍按普通距离选择。
 - 路径明细只为普通空间段与 highway 段显示耗时；gate transit 与 superhighway 不显示耗时。
 - 单程吞吐量固定使用 container cargo，显示为整数 `m3/h`。
 - 代码实现完成后 `npm run build` 通过。

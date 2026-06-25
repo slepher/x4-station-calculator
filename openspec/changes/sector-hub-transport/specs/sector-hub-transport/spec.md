@@ -44,22 +44,37 @@ live transit hub 页面 SHALL 将右侧建设成本 `StationDashboard` 替换为
 - **那么** 该目标 SHALL 进入 `问题组`
 - **并且** `问题组` SHALL 显示目标类型、目标名称、所属 sector 与问题节点列表
 
-### Requirement: Route selection SHALL optimize gate count then normal distance
+### Requirement: Route selection SHALL keep route candidates and select by distance without ship
 
-路径算法 SHALL 允许内部生成候选路径，并最终选择星门数最少、普通距离最短的 simple path。
+路径算法 SHALL 允许内部生成 simple path 候选，不默认固定截断为 3 条，并在未选择运输船时选择普通距离最短的路径。
 
-#### Scenario: Candidate route uses gate count first
+#### Scenario: Candidate route keeps enumerated paths
 
 - **前提** 当前 hub 到目标存在多条不重复 sector 的候选路径
-- **当** 候选路径星门数不同
-- **那么** 系统 SHALL 选择星门数最少的路径
+- **当** route builder 枚举候选路径
+- **那么** 系统 SHALL 返回搜索上限内枚举到的候选路径
+- **并且** 系统 SHALL 为每条候选输出普通距离、星门数、superhighway 距离与 engine/highway 摘要指标
 
-#### Scenario: Candidate route uses normal distance second
+#### Scenario: Candidate route uses normal distance first without selected ship
 
-- **前提** 当前 hub 到目标存在多条星门数相同的候选路径
+- **前提** 当前 hub 到目标存在多条候选路径
+- **并且** 用户未选择运输船蓝图
 - **当** 候选路径普通距离不同
 - **那么** 系统 SHALL 选择普通距离最短的路径
 - **并且** 普通距离 SHALL NOT 包含 superhighway 距离
+
+#### Scenario: Candidate route uses gate count second without selected ship
+
+- **前提** 当前 hub 到目标存在多条普通距离相同的候选路径
+- **并且** 用户未选择运输船蓝图
+- **当** 候选路径星门数不同
+- **那么** 系统 SHALL 选择星门数最少的路径
+
+#### Scenario: Candidate route tie keeps enumeration order
+
+- **前提** 当前 hub 到目标存在多条普通距离与星门数均相同的候选路径
+- **当** 系统选择最终路径
+- **那么** 系统 SHALL 选择枚举顺序最靠前的候选
 
 #### Scenario: Route does not repeat sectors
 
@@ -175,6 +190,8 @@ live transit hub 页面 SHALL 将右侧建设成本 `StationDashboard` 替换为
 - **当** segment 展开阶段计算路径
 - **那么** 系统 SHALL 为符合条件的 highway 生成替代 segment 方案
 - **并且** highway 替代 SHALL NOT 参与 route builder 的 sector 级图搜索
+- **并且** 每条路径候选 SHALL 使用自身 segment 的 `fromPosition` 与 `toPosition` 独立计算 highway 替代
+- **并且** 不同候选即使经过同一 sector，也 SHALL NOT 复用按 sector 缓存的 highway 方案
 
 #### Scenario: Highway direction check
 
@@ -195,6 +212,26 @@ live transit hub 页面 SHALL 将右侧建设成本 `StationDashboard` 替换为
 - **那么** 该 approach/exit 段 SHALL 从路径展示中移除
 - **并且** 移除的段 SHALL NOT 渲染距离
 
+### Requirement: Map SHALL highlight gate links that are part of highway rings
+
+地图界面 SHALL 对高速环路中属于普通星门连接的部分使用高亮样式。
+
+#### Scenario: Highway ring gate link is highlighted once
+
+- **前提** `maps.highwayRings` 中某条跨 cluster 普通星门连接的两个端点 gate 都属于高速环路 gate
+- **当** 地图界面渲染跨 cluster gate line
+- **那么** 系统 SHALL 将该 gate line 视为高速环路的一部分
+- **并且** 系统 SHALL 只绘制一次该 gate line
+- **并且** 该 gate line SHALL 使用高亮黄色
+- **并且** 该 gate line SHALL 使用普通 gate line 的 1.5 倍线宽
+
+#### Scenario: One-sided highway ring gate is not highlighted
+
+- **前提** 某条跨 cluster 普通星门连接只有一个端点 gate 属于 `maps.highwayRings`
+- **当** 地图界面渲染跨 cluster gate line
+- **那么** 系统 SHALL NOT 将该 gate line 视为高速环路的一部分
+- **并且** 该 gate line SHALL 保持普通 gate line 样式
+
 ### Requirement: Transport distances SHALL use km display precision
 
 运输栏距离与坐标 SHALL 使用 km 单位和稳定精度。
@@ -212,4 +249,3 @@ live transit hub 页面 SHALL 将右侧建设成本 `StationDashboard` 替换为
 - **当** 系统展示 station row
 - **那么** station 坐标 SHALL 转换为 km 显示
 - **并且** 精度 SHALL 为 0.1 km
-

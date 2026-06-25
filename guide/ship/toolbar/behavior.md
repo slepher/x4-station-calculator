@@ -13,5 +13,5 @@
   - `action`: 点击工具栏“另存为”按钮。
   - `expected`: 打开保存流程对话并要求输入新名称。
 - `guide.ship.load`
-  - `action`: 点击工具栏“载入”按钮。
-  - `expected`: 在已选择船只时打开蓝图载入弹窗（LoadShipBlueprintModal）；未选船只时按钮不可用。
+  - `action`: 在 `ship-build` 视图查看工具栏。
+  - `expected`: 全局工具栏“载入”按钮不显示；蓝图载入通过配装面板 header 的蓝图菜单完成。

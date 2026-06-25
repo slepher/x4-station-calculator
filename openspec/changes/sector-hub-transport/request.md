@@ -32,10 +32,14 @@
 - 路径 SHALL 基于 sector graph 生成候选路径。
 - 路径 SHALL NOT 重复经过同一 sector。
 - 任意两个 sector 之间的连接按唯一连接处理，不设计 gate/superhighway 并存竞争。
-- 算法内部 MAY 生成多个候选路径。
-- 最终最优路径 SHALL 按以下顺序选择：
-  1. 星门数最少
-  2. 普通距离最短
+- 算法内部 SHALL 生成不重复 sector 的 simple path 候选，不再默认固定截断为 3 条。
+- 每条候选 SHALL 携带 `gateCount`、`normalDistanceKm`、`superhighwayDistanceKm`、`highwayDistanceKm`、`engineDistanceKm`、`highwayGateCount`、`engineGateCount` 摘要指标。
+- 非 highway 候选 SHALL 满足 `engineDistanceKm = normalDistanceKm` 且 `engineGateCount = gateCount`。
+- highway/ring 候选 SHALL 使用 `engineDistanceKm = normalDistanceKm - highwayDistanceKm` 且 `engineGateCount = gateCount - highwayGateCount` 表示需要引擎飞行的部分。
+- 未选择运输船时，最终最优路径 SHALL 按以下顺序选择：
+  1. 普通距离最短
+  2. 星门数最少
+  3. 原始枚举顺序
 - 这里的普通距离 SHALL NOT 包含 superhighway 距离。
 - gate 跨 sector 为瞬时通行：
   - 星门数 `+1`
@@ -59,6 +63,14 @@
 - 使用距离过滤：若直达距离 < approach + exit 距离，SHALL 剔除该 highway 候选。
 - gate 到 highway entry/exit 距离 < 1km 时，SHALL 视为 gate 紧贴 highway，该 approach/exit 段从路径展示中移除。
 - 无船选择时，view 层默认使用非 highway 方案。
+
+### 地图高速环路星门显示
+
+- 地图界面 SHALL 高亮属于高速环路组成部分的普通跨 cluster gate 连接。
+- 判定时 SHALL 要求该 gate 连接两端 gate 都属于 `maps.highwayRings` 的 gateMatches；只有一端命中时不高亮。
+- 高亮 gate 连接 SHALL 去重后只绘制一次。
+- 高亮样式 SHALL 使用黄色，并使用普通 gate 连接线宽的 1.5 倍。
+- 该显示只影响地图视觉，不改变运输路线计算。
 
 ### Sector Group 分类显示
 
@@ -141,6 +153,7 @@
 - transit 页面右侧运输栏 UI。
 - route builder 与 path candidate 选择逻辑。
 - gate、superhighway、station 到端点的距离分段。
+- 地图上高速环路普通 gate 连接的高亮显示。
 - Sector Group、Station、问题组分类与排序。
 - presenter 层数据组装。
 - 必要的 i18n 文案。
@@ -167,7 +180,8 @@
 - station 行按 production 产线数量从高到低排序。
 - 空问题组不显示；0 km 与 0 星门摘要字段不显示。
 - gate/superhighway 内部 ID 不出现在 UI。
-- 路径选择遵循星门数优先、普通距离其次，且普通距离不包含 superhighway。
+- 路径选择在未选择运输船时遵循普通距离优先、星门数其次，且普通距离不包含 superhighway。
+- 地图中属于高速环路的普通 gate 连接以黄色 1.5 倍线宽显示，且每条连接只绘制一次。
 - 缺失或无法计算的目标统一进入问题组。
 - `npm run build` 通过。
 

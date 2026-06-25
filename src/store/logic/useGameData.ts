@@ -23,7 +23,8 @@ import type {
   X4ShipSlot,
   X4Res,
   X4ResearchData,
-  BlueprintsData
+  BlueprintsData,
+  X4MapHighwayRing
 } from '../../types/x4'
 import type { TerraformingData } from './terraformingTaskResolver'
 
@@ -92,6 +93,8 @@ type JsonLoader = () => Promise<unknown>
 type GameDataLoaderMap = Record<string, JsonLoader>
 
 const gameDataLoaders = import.meta.glob('/src/assets/x4_game_data/*/data/*.json')
+const HIGHWAY_RING_CONNECT_THRESHOLD_M = 1000.1
+const HIGHWAY_RING_GATE_THRESHOLD_M = 1000
 
 export function buildGameDataLoaderKey(folderName: string, file: string): string {
   return `/src/assets/x4_game_data/${folderName}/data/${file}`
@@ -152,6 +155,8 @@ export async function loadGameDataFiles(
     loadJsonFromBundle<BlueprintsData>(folderName, 'blueprints.json', loaders),
   ])
 
+  maps.highwayRings = buildMapHighwayRings(maps)
+
   return {
     wares, modules, moduleGroups, consumption,
     ships, shipRaces, shipTypes,
@@ -160,6 +165,139 @@ export async function loadGameDataFiles(
     maps, mapResources, regionyields, res, factions,
     defaultMaxes, shipSlots, languages, dlcs, terraforming, research, blueprints
   }
+}
+
+type HighwayRingPoint = { x: number; z: number }
+type HighwayRingEdge = {
+  id: string
+  entry: HighwayRingPoint
+  exit: HighwayRingPoint
+  lengthM: number
+}
+type HighwayRingGate = {
+  id: string
+  targetClusterId?: string
+  pos: HighwayRingPoint
+}
+
+function mapPoint(raw: { x?: number; z?: number } | undefined): HighwayRingPoint | null {
+  if (!raw || !Number.isFinite(raw.x) || !Number.isFinite(raw.z)) return null
+  return { x: raw.x!, z: raw.z! }
+}
+
+function mapDistanceM(a: HighwayRingPoint, b: HighwayRingPoint): number {
+  const dx = a.x - b.x
+  const dz = a.z - b.z
+  return Math.sqrt(dx * dx + dz * dz)
+}
+
+function mapPathLengthM(points: HighwayRingPoint[]): number {
+  let total = 0
+  for (let i = 1; i < points.length; i += 1) {
+    total += mapDistanceM(points[i - 1]!, points[i]!)
+  }
+  return total
+}
+
+function highwayRingCycleKey(ids: string[]): string {
+  const rotations = ids.map((_, i) => [...ids.slice(i), ...ids.slice(0, i)].join('>'))
+  return rotations.sort()[0]!
+}
+
+function findHighwayRingCycles(edges: HighwayRingEdge[]): Array<{ edges: HighwayRingEdge[]; joins: number[] }> {
+  const cycles: Array<{ edges: HighwayRingEdge[]; joins: number[] }> = []
+  const seen = new Set<string>()
+  const maxDepth = Math.min(edges.length, 8)
+
+  function dfs(start: HighwayRingEdge, current: HighwayRingEdge, path: HighwayRingEdge[], joins: number[]) {
+    if (path.length > maxDepth) return
+    for (const next of edges) {
+      if (path.some((edge) => edge.id === next.id)) continue
+      const joinDistance = mapDistanceM(current.exit, next.entry)
+      if (joinDistance > HIGHWAY_RING_CONNECT_THRESHOLD_M) continue
+      const nextJoins = [...joins, joinDistance]
+      const closingDistance = mapDistanceM(next.exit, start.entry)
+      if (closingDistance <= HIGHWAY_RING_CONNECT_THRESHOLD_M) {
+        const cycle = [...path, next]
+        const key = highwayRingCycleKey(cycle.map((edge) => edge.id))
+        if (!seen.has(key)) {
+          seen.add(key)
+          cycles.push({ edges: cycle, joins: [...nextJoins, closingDistance] })
+        }
+      }
+      dfs(start, next, [...path, next], nextJoins)
+    }
+  }
+
+  for (const edge of edges) {
+    dfs(edge, edge, [edge], [])
+  }
+  return cycles
+}
+
+export function buildMapHighwayRings(maps: X4Map): X4MapHighwayRing[] {
+  const results: X4MapHighwayRing[] = []
+
+  for (const sector of Object.values(maps.sectors ?? {})) {
+    const edges = Object.entries(sector.highways ?? {})
+      .map(([id, highway]): HighwayRingEdge | null => {
+        const entry = mapPoint(highway.entry)
+        const exit = mapPoint(highway.exit)
+        const spline = (highway.spline ?? []).map(mapPoint).filter((point): point is HighwayRingPoint => !!point)
+        if (!entry || !exit || spline.length < 2) return null
+        return { id, entry, exit, lengthM: mapPathLengthM(spline) }
+      })
+      .filter((edge): edge is HighwayRingEdge => !!edge)
+
+    if (edges.length < 2) continue
+    const cycles = findHighwayRingCycles(edges)
+    if (cycles.length === 0) continue
+
+    const gates: HighwayRingGate[] = Object.entries(sector.cluster_gates ?? {})
+      .map(([id, gate]): HighwayRingGate | null => {
+        const pos = mapPoint(gate.raw_local_pos)
+        if (!pos) return null
+        return { id, targetClusterId: gate.target_cluster_id, pos }
+      })
+      .filter((gate): gate is HighwayRingGate => !!gate)
+
+    for (const cycle of cycles) {
+      const ports = cycle.edges.flatMap((edge) => [
+        { highwayId: edge.id, portKind: 'entry' as const, pos: edge.entry },
+        { highwayId: edge.id, portKind: 'exit' as const, pos: edge.exit }
+      ])
+      const gateMatches: X4MapHighwayRing['gateMatches'] = []
+      for (const gate of gates) {
+        let best: X4MapHighwayRing['gateMatches'][number] | null = null
+        for (const port of ports) {
+          const distanceM = mapDistanceM(gate.pos, port.pos)
+          if (!best || distanceM < best.distanceM) {
+            best = {
+              gateId: gate.id,
+              targetClusterId: gate.targetClusterId,
+              highwayId: port.highwayId,
+              portKind: port.portKind,
+              distanceM
+            }
+          }
+        }
+        if (best && best.distanceM <= HIGHWAY_RING_GATE_THRESHOLD_M) {
+          gateMatches.push({ ...best, distanceM: Math.round(best.distanceM) })
+        }
+      }
+      if (gateMatches.length === 0) continue
+
+      results.push({
+        sectorId: sector.id,
+        highwayIds: cycle.edges.map((edge) => edge.id),
+        lengthKm: Number((cycle.edges.reduce((sum, edge) => sum + edge.lengthM, 0) / 1000).toFixed(1)),
+        maxJoinDistanceM: Math.round(Math.max(...cycle.joins)),
+        gateMatches
+      })
+    }
+  }
+
+  return results.sort((a, b) => a.sectorId.localeCompare(b.sectorId) || a.lengthKm - b.lengthKm)
 }
 
 export function getShipBuildRawData(data: GameDataFiles): ShipBuildRawData {

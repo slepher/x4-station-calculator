@@ -2,7 +2,7 @@ import { computed, type ComputedRef } from 'vue'
 import type { BindingSectorGroup, BindingStationPlan, SaveBindingPlan, SavedModule, ShipBlueprint, TradeStationBinding, X4Equipment, X4Map, X4MapSector, X4Module, X4Ship } from '@/types/x4'
 import type { PlayerStationEntry, PlayerStationRecord } from '@/types/saveArchive'
 import type { StationDerivedMap } from '@/store/state/StationDerivedMap'
-import { buildTransitRoute, type TransitRouteResult, type TransitRouteSegment, type TransitRouteSummary, type TransitRouteTerminal } from '@/store/logic/transitRouteBuilder'
+import { buildTransitRouteCandidates, type TransitRouteResult, type TransitRouteSegment, type TransitRouteSummary, type TransitRouteTerminal, type TransitRouteTarget } from '@/store/logic/transitRouteBuilder'
 import {
   buildStationTravelEstimate,
   buildTransportShipCandidateState,
@@ -11,6 +11,7 @@ import {
   expandHighwayAlternatives,
   estimateRouteSegmentsTravel,
   estimateSegmentTravelTimeSec,
+  selectTransitRouteByTravelTime,
   sumSegmentTravelTime,
   type StationTravelEstimate,
   type TransportSegmentTravelEstimate,
@@ -115,6 +116,11 @@ type StationTransportTarget = {
   sectorMacro: string
   position?: { x: number; y: number; z: number }
   modules: SavedModule[]
+}
+
+type SelectedTransportRoute = {
+  route: TransitRouteResult
+  segments: TransitRouteSegment[]
 }
 
 export function useTransitTransportPresenter(
@@ -225,13 +231,17 @@ function buildSectorGroupRows(input: {
       continue
     }
 
-    const route = buildStationRoute(input.maps, input.routeSource, linkedHub.sectorMacro, linkedPosition, linkedHub.name || linkedGroup.name)
+    const selectedRoute = buildSelectedRoute(input.maps, input.routeSource, {
+      kind: 'station',
+      sectorMacro: linkedHub.sectorMacro,
+      position: linkedPosition,
+      label: linkedHub.name || linkedGroup.name
+    }, input.travelProfile)
+    const route = selectedRoute.route
     if (route.problems.length > 0) {
       input.problems.push(problemRow('sector-group', groupId, linkedGroup.name, sectorName(input.maps, linkedHub.sectorMacro), route.problems))
       continue
     }
-
-    const segmentsWithHighway = injectHighwayAlternatives(route.segments, route.sectors, input.maps.sectors, input.travelProfile)
 
     rows.push({
       id: linkedGroup.id,
@@ -240,9 +250,9 @@ function buildSectorGroupRows(input: {
       targetSectorName: sectorName(input.maps, linkedHub.sectorMacro),
       targetStationName: linkedHub.name,
       summary: route.summary,
-      segments: attachSegmentTravel(segmentsWithHighway, input.travelProfile),
+      segments: attachSegmentTravel(selectedRoute.segments, input.travelProfile),
       terminal: route.terminal,
-      travel: routeTravel(segmentsWithHighway, input.travelProfile)
+      travel: routeTravel(selectedRoute.segments, input.travelProfile)
     })
   }
 
@@ -275,22 +285,15 @@ function buildStationSectorGroups(input: {
 
   const groups: TransportStationSectorGroup[] = []
   for (const [sectorMacro, stations] of bySector) {
-    const sectorRoute = buildTransitRoute({
-      clusters: input.maps.clusters,
-      sectors: input.maps.sectors,
-      resolveSectorLabel,
-      from: input.routeSource,
-      target: { kind: 'sector', sectorMacro }
-    })
+    const selectedSectorRoute = buildSelectedRoute(input.maps, input.routeSource, { kind: 'sector', sectorMacro }, input.travelProfile)
+    const sectorRoute = selectedSectorRoute.route
     if (sectorRoute.problems.length > 0) {
       input.problems.push(problemRow('station', sectorMacro, sectorName(input.maps, sectorMacro), sectorName(input.maps, sectorMacro), sectorRoute.problems))
       continue
     }
 
-    const segmentsWithHighway = injectHighwayAlternatives(sectorRoute.segments, sectorRoute.sectors, input.maps.sectors, input.travelProfile)
-
     const stationRows = stations
-      .map((station) => buildStationRow(station, sectorRoute, segmentsWithHighway, input))
+      .map((station) => buildStationRow(station, sectorRoute, selectedSectorRoute.segments, input))
       .filter((row): row is TransportStationRouteRow => !!row)
       .sort((a, b) => b.productionLineCount - a.productionLineCount || a.stationName.localeCompare(b.stationName))
 
@@ -299,10 +302,10 @@ function buildStationSectorGroups(input: {
         id: sectorMacro,
         sectorName: sectorName(input.maps, sectorMacro),
         summary: sectorRoute.summary,
-        segments: attachSegmentTravel(segmentsWithHighway, input.travelProfile),
+        segments: attachSegmentTravel(selectedSectorRoute.segments, input.travelProfile),
         terminal: sectorRoute.terminal,
         stations: stationRows,
-        travel: routeTravel(segmentsWithHighway, input.travelProfile),
+        travel: routeTravel(selectedSectorRoute.segments, input.travelProfile),
         hideSectorHeader: input.routeSource.sectorMacro === sectorMacro
       })
     }
@@ -412,6 +415,9 @@ function injectHighwayAlternatives(
       alternative.highwaySegment,
       ...alternative.exitSegments
     ]
+    const directTime = routeTravelTime([segment], profile)
+    const highwayTime = routeTravelTime(altSegments, profile)
+    if (highwayTime <= 0 || highwayTime >= directTime) return segment
 
     return { ...segment, highwayAlternative: altSegments }
   })
@@ -423,29 +429,34 @@ function routeTravel(segments: TransitRouteSegment[], profile: TransportShipTrav
 }
 
 function routeTravelTime(segments: TransitRouteSegment[], profile: TransportShipTravelProfile): number {
-  const expanded = expandHighwayAlternatives(segments)
+  const expanded = expandHighwayAlternatives(segments, profile)
   return sumSegmentTravelTime(estimateRouteSegmentsTravel(expanded, profile))
 }
 
-function buildStationRoute(
+function buildSelectedRoute(
   maps: X4Map,
   routeSource: { sectorMacro: string; position: { x: number; y: number; z: number }; label: string },
-  targetSectorMacro: string,
-  targetPosition: { x: number; y: number; z: number },
-  targetLabel: string
-): TransitRouteResult {
-  return buildTransitRoute({
+  target: TransitRouteTarget,
+  profile: TransportShipTravelProfile | null
+): SelectedTransportRoute {
+  const candidates = buildTransitRouteCandidates({
     clusters: maps.clusters,
     sectors: maps.sectors,
     resolveSectorLabel,
     from: routeSource,
-    target: {
-      kind: 'station',
-      sectorMacro: targetSectorMacro,
-      position: targetPosition,
-      label: targetLabel
-    }
+    target
   })
+  const first = candidates[0]!
+  if (first.problems.length > 0 || !profile) {
+    return { route: first, segments: first.segments }
+  }
+  const validCandidates = candidates.filter((candidate) => candidate.problems.length === 0)
+  const selected = selectTransitRouteByTravelTime(
+    validCandidates,
+    profile,
+    (candidate) => injectHighwayAlternatives(candidate.segments, candidate.sectors, maps.sectors, profile)
+  )
+  return { route: selected.route, segments: selected.segments }
 }
 
 function buildStationTargets(input: {

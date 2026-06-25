@@ -2,7 +2,7 @@
 
 ## 目标
 
-为飞船配装界面新增蓝图收藏功能。用户可通过主界面的收藏按钮收藏/取消收藏当前蓝图，收藏状态在菜单和模态框中以星形图标展示，收藏的蓝图在列表中优先排列，状态持久化到 localStorage。
+为飞船配装界面新增蓝图收藏功能。用户可通过主界面的收藏按钮收藏/取消收藏当前蓝图，收藏状态在配装面板菜单中以星形图标展示，收藏状态持久化到 localStorage。
 
 ## 已确认方案（审核重点）
 
@@ -53,15 +53,13 @@
 **排序**：
 - 按 `createdAt` 降序排列（最近创建的在前），相同时按名称字母序
 
-### 5. 模态框中的收藏标记
+### 5. 旧载入弹窗清理
 
-**位置**：`LoadShipBlueprintModal.vue` 蓝图卡片行
+**位置**：`LoadShipBlueprintModal.vue`
 
 **行为**：
-- 星形图标仅用户蓝图显示
-- 星形图标可点击切换 fav
-- 点击当前蓝图 → 仅内存标记，不持久化
-- 点击非当前蓝图 → toggle 后立即 `saveBlueprintsToStorage()` 持久化
+- 旧 toolbar 载入弹窗已不可达，SHALL 删除组件和挂载链。
+- `ship-build` 视图的蓝图载入 SHALL 统一通过 `ShipBuildPanelFit.vue` header 蓝图菜单完成。
 
 ### 6. localStorage 持久化
 
@@ -69,7 +67,7 @@
 
 **逻辑**：
 - `toggleFavoriteBlueprint(id)` 更新内存中的 `ShipBlueprint.favorite`，不自动持久化
-- 由调用方决定是否持久化：当前蓝图推迟到 `saveBlueprint()` 时统一持久化；列表/模态框中的非当前蓝图切换后立即调用 `saveBlueprintsToStorage()`
+- 由调用方决定是否持久化：当前蓝图推迟到 `saveBlueprint()` 时统一持久化；菜单中的非当前蓝图切换后立即调用 `saveBlueprintsToStorage()`
 
 ### 7. i18n 文案
 
@@ -89,7 +87,7 @@
 - 版本升级 `3` → `4` → `5` 与迁移逻辑
 - 主界面收藏按钮（切换当前蓝图收藏状态，不立即持久化）
 - 下拉菜单中的收藏星形标记（仅用户蓝图，可点击）
-- 模态框中的收藏星形标记（仅用户蓝图，可点击）
+- 删除不可达的旧蓝图载入弹窗 `LoadShipBlueprintModal.vue`
 - Store 层 `toggleFavoriteBlueprint` 方法（移除 auto-save）
 - 蓝图列表按 `createdAt` 降序 + 名称字母序排列
 - 切换到预设时保留已有蓝图的 `favorite` 标记
@@ -118,9 +116,9 @@
    - 点击非当前蓝图立即持久化
    - 点击文本区域载入蓝图，hover 高亮限定文本区域
 
-4. **模态框展示**：
-   - 用户蓝图显示可点击星形图标
-   - 内置预设不显示星形图标
+4. **旧弹窗清理**：
+   - `LoadShipBlueprintModal.vue` 不再存在
+   - 源码中不存在 `LoadShipBlueprintModal` / `showLoadShipBlueprintModal` 引用
 
 5. **迁移兼容**：
    - 加载 version=3 旧数据，补 `favorite: false`

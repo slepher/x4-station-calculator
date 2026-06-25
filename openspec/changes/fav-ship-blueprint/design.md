@@ -8,11 +8,11 @@
 
 ### D1: 收藏按钮交互边界
 
-**决定**：主界面、菜单和模态框中的星星均可点击切换 fav。
+**决定**：主界面和配装面板菜单中的星星均可点击切换 fav。
 
 **持久化策略**：
 - 当前蓝图：切换仅更新内存标记，随 `saveBlueprint()` 统一持久化
-- 菜单/模态框中非当前蓝图：切换后立即 `saveBlueprintsToStorage()` 持久化
+- 菜单中非当前蓝图：切换后立即 `saveBlueprintsToStorage()` 持久化
 
 ### D2: 排序策略
 
@@ -37,7 +37,7 @@
 
 ### D5: 预设蓝图 fav 策略
 
-**决定**：内置预设蓝图不显示 fav 星标（菜单和模态框中），主界面 fav 按钮始终显示。
+**决定**：内置预设蓝图不在配装面板菜单中显示 fav 星标，主界面 fav 按钮始终显示。
 
 **理由**：
 - 预设是模板，不可收藏
@@ -47,7 +47,7 @@
 
 ```
 用户点击收藏按钮
-  → ShipBuildPanelFit.vue / LoadShipBlueprintModal.vue
+  → ShipBuildPanelFit.vue
   → 判断是否当前蓝图
     → 当前蓝图：仅 toggle favorite 内存标记
     → 非当前蓝图：toggle favorite + saveBlueprintsToStorage()
@@ -63,4 +63,4 @@
 | `src/store/logic/stateMigrations.ts` | 修改 | 迁移逻辑补充 `favorite: false` 和 `createdAt = lastUpdated` |
 | `src/store/useShipBuildStore.ts` | 修改 | 新增 `toggleFavoriteBlueprint`、`saveBlueprintsToStorage`；`saveBlueprint`/`saveAsBlueprint` 设 `createdAt`；`loadBlueprint` 保留 `favorite`+`createdAt` |
 | `src/components/ship-build/ShipBuildPanelFit.vue` | 修改 | 收藏按钮始终显示；菜单星标可点击，预设不显示；排序按 `createdAt`；flex 布局 |
-| `src/components/ship-build/LoadShipBlueprintModal.vue` | 修改 | 收藏标记可点击，预设不显示 |
+| `src/components/ship-build/LoadShipBlueprintModal.vue` | 删除 | 旧 toolbar 载入弹窗已不可达，载入蓝图统一使用配装面板 header 菜单 |

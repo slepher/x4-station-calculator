@@ -5,11 +5,12 @@ import { getMapGateRadius } from '@/components/map/utils/mapIconConfig'
 import type { Cluster, Sector, Vec2 } from '@/components/map/types'
 import type { MapSvgLayoutState } from './useMapSvgLayout'
 import type { SectorData } from '@/types/saveArchive'
+import type { X4MapHighwayRing } from '@/types/x4'
 
 export type MapSectorLinkLine = { id: string; start: Vec2; end: Vec2 }
 export type MapHighwaySegment = { id: string; type: 'path' | 'line'; d?: string; start?: Vec2; end?: Vec2 }
-export type MapGateCircle = { id: string; point: Vec2; r: number; color: string; clusterId: string; targetClusterId?: string }
-export type MapCrossClusterGateLine = { id: string; left: Vec2; right: Vec2 }
+export type MapGateCircle = { id: string; point: Vec2; r: number; color: string; clusterId: string; sectorId: string; gateId: string; targetClusterId?: string }
+export type MapCrossClusterGateLine = { id: string; left: Vec2; right: Vec2; isHighwayRingGate: boolean }
 
 const GATE_ICON_RADIUS_SCALE = 3
 const GATE_LINE_MARGIN = 0.6
@@ -18,11 +19,22 @@ export function useMapSvgLinks(args: {
   clusters: ComputedRef<Record<string, Cluster>>
   sectors: ComputedRef<Record<string, Sector>>
   saveSectors?: Ref<Record<string, SectorData> | undefined>
+  highwayRings?: ComputedRef<X4MapHighwayRing[] | undefined>
   regionIds: ComputedRef<string[]>
   layoutState: ComputedRef<MapSvgLayoutState>
   resolveOwnerColor: (node: { owner_color?: string }, sectorId?: string, clusterId?: string) => string
   stargateVisualScale: number
 }) {
+  const highwayRingGateKeys = computed(() => {
+    const keys = new Set<string>()
+    for (const ring of args.highwayRings?.value ?? []) {
+      for (const match of ring.gateMatches) {
+        keys.add(`${ring.sectorId}:${match.gateId}`)
+      }
+    }
+    return keys
+  })
+
   const getSavedSectorLinkEndpointRatio = (
     savedSector: SectorData | undefined,
     linkId: string,
@@ -206,6 +218,8 @@ export function useMapSvgLinks(args: {
             }),
             color: sectorColor,
             clusterId,
+            sectorId: sector.id,
+            gateId,
             targetClusterId: gate.target_cluster_id
           })
         })
@@ -216,10 +230,12 @@ export function useMapSvgLinks(args: {
 
   const crossClusterGateLines = computed<MapCrossClusterGateLine[]>(() => {
     const rows: MapCrossClusterGateLine[] = []
-    const gateIndex: Record<string, { clusterId: string; targetClusterId?: string; point: Vec2; r: number }> = {}
+    const gateIndex: Record<string, { clusterId: string; sectorId: string; gateId: string; targetClusterId?: string; point: Vec2; r: number }> = {}
     gateCircles.value.forEach((gate) => {
       gateIndex[gate.id] = {
         clusterId: gate.clusterId,
+        sectorId: gate.sectorId,
+        gateId: gate.gateId,
         targetClusterId: gate.targetClusterId,
         point: gate.point,
         r: gate.r
@@ -245,6 +261,9 @@ export function useMapSvgLinks(args: {
       const uy = dy / length
       const leftInset = gate.r * GATE_ICON_RADIUS_SCALE + GATE_LINE_MARGIN
       const rightInset = reverseGate.r * GATE_ICON_RADIUS_SCALE + GATE_LINE_MARGIN
+      const ringKeys = highwayRingGateKeys.value
+      const isHighwayRingGate = ringKeys.has(`${gate.sectorId}:${gate.gateId}`) &&
+        ringKeys.has(`${reverseGate.sectorId}:${reverseGate.gateId}`)
       rows.push({
         id: `${gateId}<->${reverseId}`,
         left: {
@@ -254,7 +273,8 @@ export function useMapSvgLinks(args: {
         right: {
           x: reverseGate.point.x - ux * rightInset,
           y: reverseGate.point.y - uy * rightInset
-        }
+        },
+        isHighwayRingGate
       })
       used.add(gateId)
       used.add(reverseId)

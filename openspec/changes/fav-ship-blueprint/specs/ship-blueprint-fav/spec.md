@@ -1,13 +1,13 @@
 # Ship Blueprint Favorite Specification
 
 ## Purpose
-为飞船配装蓝图新增收藏功能，支持收藏/取消收藏、收藏状态持久化、菜单与模态框中展示收藏标记，以及收藏蓝图在列表中优先排列。
+为飞船配装蓝图新增收藏功能，支持收藏/取消收藏、收藏状态持久化、配装面板菜单展示收藏标记，以及收藏蓝图在列表中优先排列。
 
 ## ADDED Requirements
 
 ### Requirement: Favorite Toggle on Main Interface
 
-**主界面收藏按钮**位于"载入飞船配装"按钮左侧，用于切换当前用户蓝图的收藏状态。
+系统 SHALL 在主界面提供收藏按钮，位于"载入飞船配装"按钮左侧，用于切换当前用户蓝图的收藏状态。
 
 #### Scenario: Show Favorite Button for All Blueprints
 - **前提**：用户已选择飞船。
@@ -26,7 +26,7 @@
 
 ### Requirement: Favorite Indicator in Dropdown Menu
 
-**下拉菜单**中每个用户蓝图行在名称和删除按钮之间显示星形收藏标记。
+系统 SHALL 在下拉菜单的每个用户蓝图行中，在名称和删除按钮之间显示星形收藏标记。
 
 #### Scenario: Show Star for User Blueprints Only
 - **前提**：下拉菜单打开。
@@ -43,7 +43,7 @@
 
 ### Requirement: Blueprint List Sorting
 
-**用户配装组**按创建时间降序排列，相同时按名称字母序。
+系统 SHALL 将用户配装组按创建时间降序排列，相同时按名称字母序排列。
 
 #### Scenario: Blueprints Sorted by CreatedAt
 - **前提**：用户配装组包含多个蓝图。
@@ -51,26 +51,9 @@
 - **那么**：蓝图 SHALL 按 `createdAt` 降序排列（最新创建的在前）。
 - **并且**：创建时间相同时 SHALL 按名称字母序排列。
 
-### Requirement: Favorite Indicator in Modal
-
-**模态框**（`LoadShipBlueprintModal.vue`）中每个用户蓝图卡片显示收藏标记。
-
-#### Scenario: Show Star in Modal for User Blueprints
-- **前提**：模态框打开。
-- **当**：渲染蓝图卡片。
-- **那么**：用户蓝图卡片 SHALL 显示可点击星形图标。
-- **并且**：内置预设 CARDS SHALL NOT 显示星形图标。
-- **并且**：已收藏显示实心星形，未收藏显示空心星形。
-
-#### Scenario: Star in Modal is Clickable
-- **前提**：模态框中蓝图卡片显示星形图标。
-- **当**：用户点击星形图标。
-- **那么**：蓝图 favorite 状态 SHALL 切换。
-- **并且**：非当前蓝图 SHALL 立即调用 `saveBlueprintsToStorage()` 持久化。
-
 ### Requirement: Favorite State Persistence
 
-**收藏状态**持久化到 `x4_ship_blueprints` localStorage key。
+系统 SHALL 将收藏状态持久化到 `x4_ship_blueprints` localStorage key。
 
 #### Scenario: Favorite State Persists Across Sessions
 - **前提**：用户收藏了一个蓝图。

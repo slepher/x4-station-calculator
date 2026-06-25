@@ -25,7 +25,7 @@
   - [x] 4.1 实现 highway 段固定速度（12,000 m/s）耗时公式
   - [x] 4.2 S/M 船允许 highway，L/XL 禁用 highway
   - [x] 4.3 未选船时默认非 highway 方案
-  - [x] 4.4 实现方案B（含 highway）vs 方案A 的时间比较选择
+  - [x] 4.4 实现按船型构造候选池后再按真实耗时选择最终路线
   - [x] 4.5 gate 紧贴 highway（<1km）的 approach/exit 段移除
   - [x] 4.6 highway-approach 使用 skipRelease 模式（上高速无减速）
   - [x] 4.7 highway-exit 使用标准 charge+attack+cruise+release 模型
@@ -38,6 +38,8 @@
   - [x] 5.5 为 Station sector group 增加 `travel` 与 `hideSectorHeader`
   - [x] 5.6 为 Station row 增加 local/total/throughput `travel`
   - [x] 5.7 对接 highway 替代方案，输出 highway travel 估算
+  - [x] 5.8 选择运输船后按 L/XL 与 S/M 不同候选指标筛选，再按候选 route 的真实耗时选择最终展示路径
+  - [x] 5.9 每条候选使用自身 segment 端点独立计算 highway 替代
 
 - [x] 6. 实现左侧运输船选择 UI
   - [x] 6.1 在 transit hub 建筑区下方接入选择组件或区域
@@ -64,8 +66,8 @@
   - [x] 9.2 若出现编译错误，修复后重新运行 `npm run build`
 
 - [ ] 10. Build validation (highway)
-  - [ ] 10.1 运行 `npm run build`
-  - [ ] 10.2 若出现编译错误，修复后重新运行 `npm run build`
+  - [x] 10.1 运行 `npm run build`
+  - [x] 10.2 若出现编译错误，修复后重新运行 `npm run build`
 
 ## Notes
 

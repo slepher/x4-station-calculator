@@ -1036,9 +1036,26 @@ export interface X4MapCluster {
   }>
 }
 
+export interface X4MapHighwayRingGateMatch {
+  gateId: string
+  targetClusterId?: string
+  highwayId: string
+  portKind: 'entry' | 'exit'
+  distanceM: number
+}
+
+export interface X4MapHighwayRing {
+  sectorId: string
+  highwayIds: string[]
+  lengthKm: number
+  maxJoinDistanceM: number
+  gateMatches: X4MapHighwayRingGateMatch[]
+}
+
 export interface X4Map {
   clusters: Record<string, X4MapCluster>
   sectors: Record<string, X4MapSector>
+  highwayRings?: X4MapHighwayRing[]
 }
 
 export interface X4MapSectorResourceEntry {

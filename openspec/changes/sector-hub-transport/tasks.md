@@ -7,8 +7,9 @@
   - [x] 1.2 支持 gate edge：星门数 +1，距离不计
   - [x] 1.3 支持 superhighway edge：星门数不加，端点直线距离只作为明细距离
   - [x] 1.4 生成不重复 sector 的候选路径
-  - [x] 1.5 按星门数、普通距离选择最优路径
-  - [x] 1.6 输出路径段、terminal、普通距离、superhighway 距离与问题节点
+  - [x] 1.5 返回搜索上限内的候选路径，不默认固定截断为 3 条
+  - [x] 1.6 未选船时按普通距离、星门数、枚举顺序选择最优路径
+  - [x] 1.7 输出路径段、terminal、普通距离、superhighway 距离、engine/highway 摘要指标与问题节点
 
 - [x] 2. Highway 路径替代实现
   - [x] 2.1 创建 highway spline 线性插值模块（弧长计算、最近点投影）
@@ -48,8 +49,14 @@
   - [x] 6.2 若出现编译错误，修复后重新运行 `npm run build`
 
 - [x] 7. Build validation (highway)
-  - [ ] 7.1 运行 `npm run build`
-  - [ ] 7.2 若出现编译错误，修复后重新运行 `npm run build`
+  - [x] 7.1 运行 `npm run build`
+  - [x] 7.2 若出现编译错误，修复后重新运行 `npm run build`
+
+- [x] 8. 地图高速环路星门高亮
+  - [x] 8.1 将 `maps.highwayRings` 接入地图 link 生成层
+  - [x] 8.2 仅当跨 cluster gate line 两端 gate 都属于环路时标记高亮
+  - [x] 8.3 高亮 gate line 去重后只绘制一次
+  - [x] 8.4 使用黄色与普通 gate line 1.5 倍线宽渲染
 
 ## Notes
 

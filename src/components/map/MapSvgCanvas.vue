@@ -279,6 +279,7 @@ const {
   clusters,
   sectors,
   saveSectors: saveSectorsRef,
+  highwayRings: computed(() => gameData.maps.highwayRings),
   regionIds,
   layoutState,
   resolveOwnerColor,
