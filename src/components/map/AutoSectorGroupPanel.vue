@@ -94,7 +94,7 @@ const blueprintEmpireMenuStyle = ref<Record<string, string>>({})
 function onCalculate() { runCalculationFromEditInput(); switchToFirstUnresolvedTab() }
 function onQuickCalc() { handleQuickCalculate(); switchToFirstUnresolvedTab() }
 function onConfirm() {
-  if (handleConfirm()) emit('confirmed')
+  handleConfirm()
 }
 
 function switchToFirstUnresolvedTab() {

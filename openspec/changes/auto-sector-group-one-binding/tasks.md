@@ -64,7 +64,7 @@
 - [x] Sidebar 详情入口在 `needsAutoGroupRecalc=true` 时显示红点提示
 - [x] 新增与蓝图配方、研究风格一致的星区编辑 SVG 图标
 - [ ] 计算模式渲染 `AutoSectorGroupPanel layout="columns"`
-- [ ] 确认成功后返回展示模式
+- [x] 确认成功后确认按钮置灰，不跳转
 
 ## 6. 按钮与 tab 行为
 

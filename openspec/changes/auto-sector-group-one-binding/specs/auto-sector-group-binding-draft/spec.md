@@ -248,11 +248,12 @@ Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触�
 - **那么** SHALL 使用与蓝图配方和研究入口一致的单色 SVG 图标风格
 - **并且** 图标 SHALL 表达星区节点、连接和编辑语义
 
-#### Scenario: Submit returns to display mode
+#### Scenario: Submit disables confirm button
 
 - **前提** 计算模式
 - **当** 点击「提交」
-- **那么** SHALL 调用 `handleConfirm` 后回到展示模式
+- **那么** SHALL 调用 `handleConfirm` 后将确认按钮置灰
+- **并且** 不跳转到展示模式
 
 ### Requirement: Live Calculation Trade Station View
 

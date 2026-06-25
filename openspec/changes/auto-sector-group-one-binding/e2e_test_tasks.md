@@ -25,9 +25,9 @@
   - [✓] 1.3.6 当 `autoGroupResult=null` 时 sidebar 入口置灰禁用
   - [✓] 1.3.7 当 `needsAutoGroupRecalc=true` 时 sidebar 入口显示红点提示
 
-- [✓] 1.4 确认成功后返回展示模式：覆盖确认成功后 Live 回到展示模式并保留确认后的 baseline
+- [✓] 1.4 确认成功后确认按钮置灰：覆盖确认成功后确认按钮置灰，不跳转，保留确认后的 baseline
   - [✓] 1.4.1 在计算模式完成所有 assignment 和 trade station 后点击确认
-  - [✓] 1.4.2 确认成功后 Live 回到展示模式（三列布局恢复）
+  - [✓] 1.4.2 确认后确认按钮置灰（hasChanges=false）
   - [✓] 1.4.3 确认后 `calculationBaseline` 更新为确认后的 result
   - [✓] 1.4.4 确认后 `calcBaselinePillState` 更新为确认后的 groups
 

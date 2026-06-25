@@ -29,7 +29,7 @@ Trade station 在 Live 计算模式中作为第三列展示和 confirm gate 的�
 - Live 展示模式为 `[存档 3fr] | [星区 4fr] | [资源 5fr]`。
 - Live 计算模式为 `[星区 5fr] | [分配 4fr] | [交易站 3fr]`。
 - 详情按钮只切换到计算模式，不运行算法。
-- 确认成功后 Live 返回展示模式。
+- 确认成功后确认按钮置灰，不跳转到展示模式。
 
 ### Snapshot 与基线口径
 
@@ -40,7 +40,7 @@ Trade station 在 Live 计算模式中作为第三列展示和 confirm gate 的�
 - `calcBaselinePillState` 是“UI diff 基线”，用于 coverage/connected pill 的粗边框、虚线 removed 等基线展示。
 - `calcBaselinePillState` SHALL 在 active binding/archive 初始化时写入；显式 [计算] 不应覆盖它。
 - 确认成功后，`calcBaselinePillState` SHALL 更新为确认后的 groups。
-- 本 change 不再保留旧的“进入编辑态 editSnapshot + 取消恢复 draft”语义；编辑态直接修改当前 shared draft，[退出] 只退出编辑模式。
+- edit/result 仅为视图切换，不改变共享 draft 数据。
 
 ### Live 展示模式按钮
 
@@ -69,7 +69,7 @@ Trade station 在 Live 计算模式中作为第三列展示和 confirm gate 的�
 - [快速计算]：与 [计算] 一样运行 `runCalculationFromEditInput()`，用于 result/toolbar 场景的快速重算入口。
 - [重置]：从 `calculationBaseline` 克隆恢复整份 `autoGroupResult`，包括 group、assignment、bridge decision、trade station、hub color 和 retain 字段；不切换 active binding/archive，不运行算法。
 - [重置] 同时恢复 virtual station drafts 到 `calculationBaseline` 中记录的状态。
-- [提交]：调用 `handleConfirm()`；当 trade station 未解决、处于 edit 模式、无 result、或需要二次确认时不提交。
+- [提交]：调用 `handleConfirm()`；当 trade station 未解决、无 result、或需要二次确认时不提交。
 - [提交二次确认]：当仍有 uncertain assignment 但无 trade station 未解决时，第一次点击打开 popup；popup 中再次确认才允许提交。
 
 ### Hub 列控制按钮
@@ -121,7 +121,7 @@ Trade station 在 Live 计算模式中作为第三列展示和 confirm gate 的�
 - 展示模式和详情模式切换不触发计算。
 - 每个按钮的状态变化、提交 gate 和 tab 自动切换符合上文定义。
 - `calculationBaseline` 与 `calcBaselinePillState` 的更新时间点明确，且互不替代。
-- 确认成功记录 applied archive time，并在 Live 回到展示模式。
+- 确认成功记录 applied archive time，确认按钮置灰。
 - `normalizeState()` 保留新增 SaveBindingPlan 字段。
 - Virtual station draft 与 shared draft 生命周期一致，计算保留、重置恢复、提交应用的边界明确。
 - 提交时仅同步无 `saveStationCode` 的 virtual station plans，带 `saveStationCode` 的 save station plans 不被修改。
