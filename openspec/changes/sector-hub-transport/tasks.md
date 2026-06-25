@@ -10,6 +10,7 @@
   - [x] 1.5 返回搜索上限内的候选路径，不默认固定截断为 3 条
   - [x] 1.6 未选船时按普通距离、星门数、枚举顺序选择最优路径
   - [x] 1.7 输出路径段、terminal、普通距离、superhighway 距离、engine/highway 摘要指标与问题节点
+  - [x] 1.8 丢弃总 gate jump 数超过 5 的候选路径
 
 - [x] 2. Highway 路径替代实现
   - [x] 2.1 创建 highway spline 线性插值模块（弧长计算、最近点投影）
@@ -57,6 +58,12 @@
   - [x] 8.2 仅当跨 cluster gate line 两端 gate 都属于环路时标记高亮
   - [x] 8.3 高亮 gate line 去重后只绘制一次
   - [x] 8.4 使用黄色与普通 gate line 1.5 倍线宽渲染
+
+- [x] 9. 环形高速路径候选
+  - [x] 9.1 从 `maps.highwayRings` 派生 `maps.highwayRingChains`
+  - [x] 9.2 修正 chain hop 的 forward/backward 定向 highway 匹配
+  - [x] 9.3 route builder 消费 `highwayRingChains` 并生成 ring candidates
+  - [x] 9.4 将 ring candidates 与普通 BFS candidates 合并进入后续候选选择
 
 ## Notes
 

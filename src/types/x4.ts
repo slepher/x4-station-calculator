@@ -1052,10 +1052,30 @@ export interface X4MapHighwayRing {
   gateMatches: X4MapHighwayRingGateMatch[]
 }
 
+export interface X4MapHighwayRingChainHop {
+  sectorId: string
+  // Gate in this sector connecting to the previous sector in chain order (cycle index i-1).
+  prevGateId: string
+  // Gate in this sector connecting to the next sector in chain order (cycle index i+1).
+  nextGateId: string
+  // Traversing forward (chain order increasing): enter through prev gate, ride this highway, exit at next gate.
+  forwardHighwayId: string
+  forwardHighwayLengthKm: number
+  // Traversing backward (chain order decreasing): enter through next gate, ride this highway, exit at prev gate.
+  backwardHighwayId: string
+  backwardHighwayLengthKm: number
+}
+
+export interface X4MapHighwayRingChain {
+  hops: X4MapHighwayRingChainHop[]
+  totalLengthKm: number
+}
+
 export interface X4Map {
   clusters: Record<string, X4MapCluster>
   sectors: Record<string, X4MapSector>
   highwayRings?: X4MapHighwayRing[]
+  highwayRingChains?: X4MapHighwayRingChain[]
 }
 
 export interface X4MapSectorResourceEntry {

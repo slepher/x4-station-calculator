@@ -82,6 +82,13 @@ live transit hub 页面 SHALL 将右侧建设成本 `StationDashboard` 替换为
 - **当** 某条候选会重复经过同一 sector
 - **那么** 该候选 SHALL 被排除
 
+#### Scenario: Route beyond five gate jumps is discarded
+
+- **前提** 当前 hub 到目标的唯一 simple path 需要超过 5 次 gate jump
+- **当** route builder 枚举候选路径
+- **那么** 系统 SHALL 不返回该路径作为有效候选
+- **并且** 目标 SHALL 进入 route problem 状态
+
 ### Requirement: Route segments SHALL distinguish gates, superhighways, and normal distance
 
 路径明细 SHALL 区分普通空间段、gate transit 与 superhighway 段。
@@ -211,6 +218,20 @@ live transit hub 页面 SHALL 将右侧建设成本 `StationDashboard` 替换为
 - **当** 系统生成 highway 替代路径
 - **那么** 该 approach/exit 段 SHALL 从路径展示中移除
 - **并且** 移除的段 SHALL NOT 渲染距离
+
+### Requirement: Highway ring chain SHALL provide route candidates
+
+route builder SHALL consume `maps.highwayRingChains` and merge highway ring candidates with ordinary BFS route candidates.
+
+#### Scenario: Highway ring candidate is merged into route candidates
+
+- **前提** `maps.highwayRingChains` 存在跨 sector 环形高速 chain
+- **并且** 当前 hub 到目标可以通过该 chain 形成路线
+- **当** route builder 枚举候选路径
+- **那么** 系统 SHALL 返回至少一条包含 `highway` segment 的 ring candidate
+- **并且** 该候选 SHALL 设置 `highwayDistanceKm > 0`
+- **并且** 该候选 SHALL 设置 `highwayGateCount > 0`
+- **并且** 该候选 SHALL 满足 `engineDistanceKm < normalDistanceKm`
 
 ### Requirement: Map SHALL highlight gate links that are part of highway rings
 

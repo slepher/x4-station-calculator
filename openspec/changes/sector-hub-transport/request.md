@@ -33,6 +33,7 @@
 - 路径 SHALL NOT 重复经过同一 sector。
 - 任意两个 sector 之间的连接按唯一连接处理，不设计 gate/superhighway 并存竞争。
 - 算法内部 SHALL 生成不重复 sector 的 simple path 候选，不再默认固定截断为 3 条。
+- 算法内部 SHALL 丢弃总 gate jump 数超过 5 的路径候选。
 - 每条候选 SHALL 携带 `gateCount`、`normalDistanceKm`、`superhighwayDistanceKm`、`highwayDistanceKm`、`engineDistanceKm`、`highwayGateCount`、`engineGateCount` 摘要指标。
 - 非 highway 候选 SHALL 满足 `engineDistanceKm = normalDistanceKm` 且 `engineGateCount = gateCount`。
 - highway/ring 候选 SHALL 使用 `engineDistanceKm = normalDistanceKm - highwayDistanceKm` 且 `engineGateCount = gateCount - highwayGateCount` 表示需要引擎飞行的部分。
@@ -63,6 +64,13 @@
 - 使用距离过滤：若直达距离 < approach + exit 距离，SHALL 剔除该 highway 候选。
 - gate 到 highway entry/exit 距离 < 1km 时，SHALL 视为 gate 紧贴 highway，该 approach/exit 段从路径展示中移除。
 - 无船选择时，view 层默认使用非 highway 方案。
+
+### 环形高速路径候选
+
+- `maps.highwayRingChains` SHALL 在 maps.json 载入后由 `maps.highwayRings` 派生生成。
+- route builder SHALL 将环形高速 chain 候选与普通 BFS simple path 候选合并，而不是替换普通候选。
+- 环形高速候选 SHALL 包含：起点到上环 sector 的普通路径、环上 highway 段、环上跨 sector gate transit、下环 sector 到目标的普通路径。
+- 环形高速候选 SHALL 将环上 highway 长度计入 `highwayDistanceKm`，将环上跨 sector gate 数计入 `highwayGateCount`。
 
 ### 地图高速环路星门显示
 

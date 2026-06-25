@@ -2,7 +2,7 @@ import { computed, type ComputedRef } from 'vue'
 import type { BindingSectorGroup, BindingStationPlan, SaveBindingPlan, SavedModule, ShipBlueprint, TradeStationBinding, X4Equipment, X4Map, X4MapSector, X4Module, X4Ship } from '@/types/x4'
 import type { PlayerStationEntry, PlayerStationRecord } from '@/types/saveArchive'
 import type { StationDerivedMap } from '@/store/state/StationDerivedMap'
-import { buildTransitRouteCandidates, type TransitRouteResult, type TransitRouteSegment, type TransitRouteSummary, type TransitRouteTerminal, type TransitRouteTarget } from '@/store/logic/transitRouteBuilder'
+import { buildTransitRouteCandidates, type TransitRouteBuildOptions, type TransitRouteResult, type TransitRouteSegment, type TransitRouteSummary, type TransitRouteTerminal, type TransitRouteTarget } from '@/store/logic/transitRouteBuilder'
 import {
   buildStationTravelEstimate,
   buildTransportShipCandidateState,
@@ -152,6 +152,7 @@ export function useTransitTransportPresenter(
       selectedBlueprintValid: shipCandidateState.selectedBlueprintValid,
       hasCandidates: shipCandidateState.hasCandidates
     }
+    const routeSearchCache: NonNullable<TransitRouteBuildOptions['multiTargetRouteCache']> = new Map()
 
     if (!binding || !activeGroup || !hubStation || !hubPosition || !hubStation.sectorMacro) {
       return {
@@ -182,7 +183,8 @@ export function useTransitTransportPresenter(
       maps,
       playerStationRecords: store.playerStationRecords,
       problems,
-      travelProfile: shipCandidateState.selectedProfile
+      travelProfile: shipCandidateState.selectedProfile,
+      routeSearchCache
     })
 
     const stationSectorGroups = buildStationSectorGroups({
@@ -195,7 +197,8 @@ export function useTransitTransportPresenter(
       flowMap: store.mode === 'live' ? store.liveFlowMap : store.planningDerivedMap,
       modulesMap: deps.modulesMap,
       problems,
-      travelProfile: shipCandidateState.selectedProfile
+      travelProfile: shipCandidateState.selectedProfile,
+      routeSearchCache
     })
 
     return {
@@ -218,6 +221,7 @@ function buildSectorGroupRows(input: {
   playerStationRecords: PlayerStationRecord[]
   problems: TransportProblemRow[]
   travelProfile: TransportShipTravelProfile | null
+  routeSearchCache: NonNullable<TransitRouteBuildOptions['multiTargetRouteCache']>
 }): TransportSectorGroupRouteRow[] {
   const rows: Array<TransportSectorGroupRouteRow & { order: number }> = []
   const connectedIds = input.activeGroup.connectedGroupIds ?? []
@@ -236,7 +240,7 @@ function buildSectorGroupRows(input: {
       sectorMacro: linkedHub.sectorMacro,
       position: linkedPosition,
       label: linkedHub.name || linkedGroup.name
-    }, input.travelProfile)
+    }, input.travelProfile, input.routeSearchCache)
     const route = selectedRoute.route
     if (route.problems.length > 0) {
       input.problems.push(problemRow('sector-group', groupId, linkedGroup.name, sectorName(input.maps, linkedHub.sectorMacro), route.problems))
@@ -276,6 +280,7 @@ function buildStationSectorGroups(input: {
   modulesMap: Record<string, X4Module>
   problems: TransportProblemRow[]
   travelProfile: TransportShipTravelProfile | null
+  routeSearchCache: NonNullable<TransitRouteBuildOptions['multiTargetRouteCache']>
 }): TransportStationSectorGroup[] {
   const stationTargets = buildStationTargets(input)
   const bySector = new Map<string, StationTransportTarget[]>()
@@ -285,7 +290,7 @@ function buildStationSectorGroups(input: {
 
   const groups: TransportStationSectorGroup[] = []
   for (const [sectorMacro, stations] of bySector) {
-    const selectedSectorRoute = buildSelectedRoute(input.maps, input.routeSource, { kind: 'sector', sectorMacro }, input.travelProfile)
+    const selectedSectorRoute = buildSelectedRoute(input.maps, input.routeSource, { kind: 'sector', sectorMacro }, input.travelProfile, input.routeSearchCache)
     const sectorRoute = selectedSectorRoute.route
     if (sectorRoute.problems.length > 0) {
       input.problems.push(problemRow('station', sectorMacro, sectorName(input.maps, sectorMacro), sectorName(input.maps, sectorMacro), sectorRoute.problems))
@@ -415,9 +420,6 @@ function injectHighwayAlternatives(
       alternative.highwaySegment,
       ...alternative.exitSegments
     ]
-    const directTime = routeTravelTime([segment], profile)
-    const highwayTime = routeTravelTime(altSegments, profile)
-    if (highwayTime <= 0 || highwayTime >= directTime) return segment
 
     return { ...segment, highwayAlternative: altSegments }
   })
@@ -437,14 +439,20 @@ function buildSelectedRoute(
   maps: X4Map,
   routeSource: { sectorMacro: string; position: { x: number; y: number; z: number }; label: string },
   target: TransitRouteTarget,
-  profile: TransportShipTravelProfile | null
+  profile: TransportShipTravelProfile | null,
+  routeSearchCache: NonNullable<TransitRouteBuildOptions['multiTargetRouteCache']>
 ): SelectedTransportRoute {
+  const canUseRing = !!profile && canUseHighway(profile)
   const candidates = buildTransitRouteCandidates({
     clusters: maps.clusters,
     sectors: maps.sectors,
+    highwayRingChains: canUseRing ? maps.highwayRingChains : undefined,
     resolveSectorLabel,
     from: routeSource,
     target
+  }, {
+    includeHighwayRingCandidates: canUseRing,
+    multiTargetRouteCache: routeSearchCache
   })
   const first = candidates[0]!
   if (first.problems.length > 0 || !profile) {

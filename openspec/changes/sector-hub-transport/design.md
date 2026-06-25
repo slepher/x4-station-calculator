@@ -116,6 +116,7 @@ route builder 输出的 gate/superhighway endpoint label SHALL 只使用面向�
 - 以当前 hub 所在 sector 为起点。
 - 枚举 simple paths 到目标 sector。
 - 搜索仍受全局 queue/iteration 上限约束，避免全图爆炸。
+- `gateCount > 5` 的路径不再扩展，也不进入最终候选；ring candidate 合成后总 gateCount 超过 5 也丢弃。
 - 不再使用单一 `gateCount` 最优路径剪枝；否则会错误丢弃普通距离更短但星门数更多的候选。
 
 候选池进入最终选择前采用 Pareto 过滤：
@@ -200,6 +201,24 @@ type TransitPathSegment = {
 ### 未选船时的默认行为
 
 view 层未选船时直接使用非 highway 方案。
+
+## 环形高速路径候选
+
+`maps.highwayRingChains` 是 maps.json 载入后的派生成员，表示跨 sector 的高速环路顺序、每个 sector 的前后 gate、以及 forward/backward 两个方向使用的 highway。
+
+route builder 在普通 BFS simple path 候选之外额外生成 ring candidates：
+
+- 先构造起点到 ring sector 的普通 BFS 段。
+- 在 ring chain 上按 forward/backward 方向生成 `highway` 段，并在相邻 ring sectors 间插入 `gate-transit` 段。
+- 再构造下环 gate 到目标 sector/station 的普通 BFS 段。
+- ring candidate 与 BFS candidates 合并后统一进入候选排序和 ship 侧 Pareto/travel-time 选择。
+
+ring candidate 的摘要中：
+
+- `highwayDistanceKm` 为环上 highway 段长度总和。
+- `highwayGateCount` 为环上跨 sector gate transit 数。
+- `normalDistanceKm = engineDistanceKm + highwayDistanceKm`。
+- `engineDistanceKm` 与 `engineGateCount` 用于 S/M 船的候选池比较；L/XL 船不会从 highway/ring 优势中获益。
 
 ## 地图高速环路星门高亮
 

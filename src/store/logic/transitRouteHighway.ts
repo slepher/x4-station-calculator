@@ -72,9 +72,18 @@ export type SectorHighwayData = {
   splines: Array<{ spline: SplineSegment }>
 }
 
+const sectorHighwayCache = new Map<string, SectorHighwayData>()
+
 export function extractSectorHighways(sector: X4MapSector): SectorHighwayData {
+  const cached = sectorHighwayCache.get(sector.id)
+  if (cached) return cached
+
   const splines: Array<{ spline: SplineSegment }> = []
-  if (!sector.highways) return { splines }
+  if (!sector.highways) {
+    const empty = { splines }
+    sectorHighwayCache.set(sector.id, empty)
+    return empty
+  }
 
   for (const [_key, hw] of Object.entries(sector.highways)) {
     const rawSpline = hw.spline
@@ -89,7 +98,9 @@ export function extractSectorHighways(sector: X4MapSector): SectorHighwayData {
     if (spline) splines.push({ spline })
   }
 
-  return { splines }
+  const result = { splines }
+  sectorHighwayCache.set(sector.id, result)
+  return result
 }
 
 export type HighwayAlternative = {

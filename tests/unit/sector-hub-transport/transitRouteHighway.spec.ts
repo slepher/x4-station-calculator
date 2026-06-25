@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import { buildTransitRoute, buildTransitRouteCandidates } from '@/store/logic/transitRouteBuilder'
 import { generateHighwayAlternative } from '@/store/logic/transitRouteHighway'
+import { buildMapHighwayRingChains, buildMapHighwayRings } from '@/store/logic/useGameData'
 import type { X4MapCluster, X4MapSector } from '@/types/x4'
+import mapsData from '@/assets/x4_game_data/8.0-Diplomacy/data/maps.json'
+import type { X4Map } from '@/types/x4'
 
 function sector(id: string, clusterId = 'cluster_a', patch: Partial<X4MapSector> = {}): X4MapSector {
   return {
@@ -307,5 +310,86 @@ describe('sector-hub-transport route and highway construction', () => {
       .filter((value): value is number => typeof value === 'number')
 
     expect(new Set(throughXSegments)).toEqual(new Set([1_000, 30_000]))
+  })
+
+  it('adds highway ring route candidates with engine-only summary metrics', () => {
+    const maps = JSON.parse(JSON.stringify(mapsData)) as X4Map
+    maps.highwayRings = buildMapHighwayRings(maps)
+    maps.highwayRingChains = buildMapHighwayRingChains(maps)
+
+    const candidates = buildTransitRouteCandidates({
+      clusters: maps.clusters,
+      sectors: maps.sectors,
+      highwayRingChains: maps.highwayRingChains,
+      from: {
+        sectorMacro: 'cluster_18_sector001_macro',
+        label: 'Hub',
+        position: { x: 0, y: 0, z: 0 }
+      },
+      target: { kind: 'sector', sectorMacro: 'cluster_14_sector001_macro' }
+    })
+
+    const ringCandidate = candidates.find((candidate) =>
+      candidate.summary.highwayDistanceKm > 0 &&
+      candidate.summary.highwayGateCount > 0
+    )
+
+    expect(ringCandidate).toBeTruthy()
+    expect(ringCandidate!.summary.engineDistanceKm).toBeLessThan(ringCandidate!.summary.normalDistanceKm)
+    expect(ringCandidate!.segments.some((segment) => segment.kind === 'highway')).toBe(true)
+  })
+
+  it('does not explode highway ring route candidates by combining every ring entry and exit', () => {
+    const maps = JSON.parse(JSON.stringify(mapsData)) as X4Map
+    maps.highwayRings = buildMapHighwayRings(maps)
+    maps.highwayRingChains = buildMapHighwayRingChains(maps)
+
+    const candidates = buildTransitRouteCandidates({
+      clusters: maps.clusters,
+      sectors: maps.sectors,
+      highwayRingChains: maps.highwayRingChains,
+      from: {
+        sectorMacro: 'cluster_18_sector001_macro',
+        label: 'Hub',
+        position: { x: 0, y: 0, z: 0 }
+      },
+      target: { kind: 'sector', sectorMacro: 'cluster_14_sector001_macro' }
+    })
+
+    const ringCandidates = candidates.filter((candidate) => candidate.summary.highwayDistanceKm > 0)
+    expect(ringCandidates.length).toBeGreaterThan(0)
+    expect(ringCandidates.length).toBeLessThanOrEqual(2)
+  })
+
+  it('does not return route candidates beyond five gate jumps', () => {
+    const sectors: Record<string, X4MapSector> = {}
+    const clusters: Record<string, X4MapCluster> = {}
+    for (let i = 0; i <= 6; i += 1) {
+      const sectorId = `s${i}`
+      const clusterId = `c${i}`
+      clusters[clusterId] = cluster(clusterId, [sectorId])
+      sectors[sectorId] = sector(sectorId, clusterId, {
+        cluster_gates: {}
+      })
+    }
+    for (let i = 0; i < 6; i += 1) {
+      sectors[`s${i}`]!.cluster_gates![`g_${i}_${i + 1}`] = {
+        target_cluster_id: `c${i + 1}`,
+        raw_local_pos: { x: 1_000, y: 0, z: 0 }
+      }
+      sectors[`s${i + 1}`]!.cluster_gates![`g_${i + 1}_${i}`] = {
+        target_cluster_id: `c${i}`,
+        raw_local_pos: { x: 0, y: 0, z: 0 }
+      }
+    }
+
+    const candidates = buildTransitRouteCandidates({
+      clusters,
+      sectors,
+      from: { sectorMacro: 's0', label: 'Hub', position: { x: 0, y: 0, z: 0 } },
+      target: { kind: 'sector', sectorMacro: 's6' }
+    })
+
+    expect(candidates[0]!.problems).toEqual(['route:s0->s6'])
   })
 })

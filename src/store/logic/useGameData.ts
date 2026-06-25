@@ -24,7 +24,9 @@ import type {
   X4Res,
   X4ResearchData,
   BlueprintsData,
-  X4MapHighwayRing
+  X4MapHighwayRing,
+  X4MapHighwayRingChain,
+  X4MapHighwayRingChainHop
 } from '../../types/x4'
 import type { TerraformingData } from './terraformingTaskResolver'
 
@@ -156,6 +158,7 @@ export async function loadGameDataFiles(
   ])
 
   maps.highwayRings = buildMapHighwayRings(maps)
+  maps.highwayRingChains = buildMapHighwayRingChains(maps)
 
   return {
     wares, modules, moduleGroups, consumption,
@@ -298,6 +301,187 @@ export function buildMapHighwayRings(maps: X4Map): X4MapHighwayRing[] {
   }
 
   return results.sort((a, b) => a.sectorId.localeCompare(b.sectorId) || a.lengthKm - b.lengthKm)
+}
+
+type HighwayLink = {
+  highwayId: string
+  entry: HighwayRingPoint
+  exit: HighwayRingPoint
+  lengthM: number
+}
+
+function buildSectorHighwayLinkMap(maps: X4Map): Map<string, HighwayLink[]> {
+  const bySector = new Map<string, HighwayLink[]>()
+  for (const sector of Object.values(maps.sectors ?? {})) {
+    const links: HighwayLink[] = []
+    for (const [id, highway] of Object.entries(sector.highways ?? {})) {
+      const entry = mapPoint(highway.entry)
+      const exit = mapPoint(highway.exit)
+      const spline = (highway.spline ?? []).map(mapPoint).filter((p): p is HighwayRingPoint => !!p)
+      if (!entry || !exit || spline.length < 2) continue
+      links.push({ highwayId: id, entry, exit, lengthM: mapPathLengthM(spline) })
+    }
+    if (links.length > 0) bySector.set(sector.id, links)
+  }
+  return bySector
+}
+
+type SectorBridge = {
+  sectorId: string
+  gateId: string
+  targetClusterId: string
+}
+
+function ringNeighborBridges(sectorId: string, ringSectorIds: Set<string>, maps: X4Map): SectorBridge[] {
+  const sector = maps.sectors[sectorId]
+  if (!sector) return []
+  const bridges: SectorBridge[] = []
+  for (const [gateId, gate] of Object.entries(sector.cluster_gates ?? {})) {
+    const targetClusterId = gate.target_cluster_id
+    if (!targetClusterId) continue
+    for (const [candidateId, candidate] of Object.entries(maps.sectors)) {
+      if (candidate.cluster_id !== targetClusterId) continue
+      if (!ringSectorIds.has(candidateId)) continue
+      bridges.push({ sectorId: candidateId, gateId, targetClusterId })
+      break
+    }
+  }
+  return bridges
+}
+
+function walkRingCycle(
+  startSectorId: string,
+  ringSectorIds: Set<string>,
+  maps: X4Map
+): string[] | null {
+  const order: string[] = [startSectorId]
+  const visited = new Set<string>([startSectorId])
+  let prev: string | null = null
+  let current = startSectorId
+  const maxIters = ringSectorIds.size + 2
+  let iters = 0
+  while (iters < maxIters) {
+    iters += 1
+    const bridges = ringNeighborBridges(current, ringSectorIds, maps)
+      .filter((bridge) => bridge.sectorId !== prev)
+    if (bridges.length === 0) break
+    const next = bridges[0]!.sectorId
+    if (next === startSectorId) break
+    if (visited.has(next)) break
+    order.push(next)
+    visited.add(next)
+    prev = current
+    current = next
+  }
+  if (order.length < 2) return null
+  return order
+}
+
+function followRingChainFrom(
+  startSectorId: string,
+  ringSectorIds: Set<string>,
+  ringBySector: Map<string, X4MapHighwayRing>,
+  linkMap: Map<string, HighwayLink[]>,
+  maps: X4Map
+): X4MapHighwayRingChain | null {
+  const order = walkRingCycle(startSectorId, ringSectorIds, maps)
+  if (!order || order.length < 2) return null
+  const hops: X4MapHighwayRingChainHop[] = []
+  const N = order.length
+  for (let i = 0; i < N; i += 1) {
+    const sectorId = order[i]!
+    const prevId = order[(i - 1 + N) % N]!
+    const nextId = order[(i + 1) % N]!
+    const hop = buildHopForSectorWithMaps(sectorId, prevId, nextId, ringBySector, linkMap, maps)
+    if (!hop) return null
+    hops.push(hop)
+  }
+  const total = hops.reduce((sum, hop) => sum + hop.forwardHighwayLengthKm, 0)
+  return { hops, totalLengthKm: Number(total.toFixed(1)) }
+}
+
+function buildHopForSectorWithMaps(
+  sectorId: string,
+  prevSectorId: string,
+  nextSectorId: string,
+  ringBySector: Map<string, X4MapHighwayRing>,
+  linkMap: Map<string, HighwayLink[]>,
+  maps: X4Map
+): X4MapHighwayRingChainHop | null {
+  const sector = ringBySector.get(sectorId)
+  if (!sector) return null
+  const prevSector = maps.sectors[prevSectorId]
+  const nextSector = maps.sectors[nextSectorId]
+  if (!prevSector || !nextSector) return null
+  const prevClusterId = prevSector.cluster_id
+  const nextClusterId = nextSector.cluster_id
+  const prevMatch = sector.gateMatches.find((m) => m.targetClusterId === prevClusterId)
+  const nextMatch = sector.gateMatches.find((m) => m.targetClusterId === nextClusterId)
+  if (!prevMatch || !nextMatch) return null
+  if (prevMatch.gateId === nextMatch.gateId) return null
+  const links = linkMap.get(sectorId) ?? []
+  const forwardLink = findDirectedHighwayLink(sectorId, prevMatch.gateId, nextMatch.gateId, links, maps)
+  const backwardLink = findDirectedHighwayLink(sectorId, nextMatch.gateId, prevMatch.gateId, links, maps)
+  if (!forwardLink || !backwardLink) return null
+  return {
+    sectorId,
+    prevGateId: prevMatch.gateId,
+    nextGateId: nextMatch.gateId,
+    forwardHighwayId: forwardLink.highwayId,
+    forwardHighwayLengthKm: Number((forwardLink.lengthM / 1000).toFixed(1)),
+    backwardHighwayId: backwardLink.highwayId,
+    backwardHighwayLengthKm: Number((backwardLink.lengthM / 1000).toFixed(1))
+  }
+}
+
+function findDirectedHighwayLink(
+  sectorId: string,
+  fromGateId: string,
+  toGateId: string,
+  links: HighwayLink[],
+  maps: X4Map
+): HighwayLink | null {
+  const sector = maps.sectors[sectorId]
+  const fromGate = mapPoint(sector?.cluster_gates?.[fromGateId]?.raw_local_pos)
+  const toGate = mapPoint(sector?.cluster_gates?.[toGateId]?.raw_local_pos)
+  if (!fromGate || !toGate) return null
+
+  let best: { link: HighwayLink; entryDistanceM: number; exitDistanceM: number; totalDistanceM: number } | null = null
+  for (const link of links) {
+    const entryDistanceM = mapDistanceM(fromGate, link.entry)
+    const exitDistanceM = mapDistanceM(toGate, link.exit)
+    const totalDistanceM = entryDistanceM + exitDistanceM
+    if (!best || totalDistanceM < best.totalDistanceM) {
+      best = { link, entryDistanceM, exitDistanceM, totalDistanceM }
+    }
+  }
+  if (!best) return null
+  if (best.entryDistanceM > HIGHWAY_RING_GATE_THRESHOLD_M || best.exitDistanceM > HIGHWAY_RING_GATE_THRESHOLD_M) return null
+  return best.link
+}
+
+export function buildMapHighwayRingChains(maps: X4Map): X4MapHighwayRingChain[] {
+  const rings = maps.highwayRings ?? []
+  if (rings.length === 0) return []
+  const ringBySector = new Map<string, X4MapHighwayRing>()
+  const ringSectorIds = new Set<string>()
+  for (const ring of rings) {
+    ringBySector.set(ring.sectorId, ring)
+    ringSectorIds.add(ring.sectorId)
+  }
+  const linkMap = buildSectorHighwayLinkMap(maps)
+
+  const visitedChains = new Set<string>()
+  const chains: X4MapHighwayRingChain[] = []
+  for (const startSectorId of ringSectorIds) {
+    const chain = followRingChainFrom(startSectorId, ringSectorIds, ringBySector, linkMap, maps)
+    if (!chain || chain.hops.length < 2) continue
+    const key = chain.hops.map((hop) => hop.sectorId).sort().join('>')
+    if (visitedChains.has(key)) continue
+    visitedChains.add(key)
+    chains.push(chain)
+  }
+  return chains
 }
 
 export function getShipBuildRawData(data: GameDataFiles): ShipBuildRawData {

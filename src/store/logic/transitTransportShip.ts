@@ -389,7 +389,8 @@ export function selectTransitRouteByTravelTime(
 ): SelectedTransitRouteTravel {
   const candidatePool = filterTransitRouteCandidatesForProfile(candidates, profile)
   const ranked = candidatePool.map((route, index) => {
-    const segments = expandHighwayAlternatives(expandSegments(route), profile)
+    const injected = expandSegments(route)
+    const segments = expandHighwayAlternatives(injected, profile)
     return {
       route,
       segments,
