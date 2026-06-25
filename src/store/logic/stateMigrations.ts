@@ -365,7 +365,8 @@ function normalizeShipBlueprintShape(input: SavedShipBlueprintsState & { list?: 
       storage,
       hull,
       materialMethod: typeof blueprint.materialMethod === 'string' ? blueprint.materialMethod : 'default',
-      lastUpdated: Number(blueprint.lastUpdated) || Date.now() + index
+      lastUpdated: Number(blueprint.lastUpdated) || Date.now() + index,
+      favorite: typeof blueprint.favorite === 'boolean' ? blueprint.favorite : false
     }
   }).filter((blueprint) => {
     if (blueprint.shipId) return true

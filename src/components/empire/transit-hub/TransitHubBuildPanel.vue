@@ -41,8 +41,8 @@ const modulesWithInfo = computed<Array<{ module: SavedModule; info: X4Module }>>
         </div>
       </div>
     </div>
-    <div class="build-list">
-      <div v-if="modules.length === 0" class="placeholder">
+    <div v-if="modules.length === 0" class="build-list">
+      <div class="placeholder">
         {{ $t('sectorManagement.supply_build_placeholder') }}
       </div>
     </div>

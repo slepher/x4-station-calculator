@@ -140,20 +140,51 @@ describe('vsn2one', () => {
     // 1.1.1 在 `migrateShipBlueprintStateToCurrent` 输入 `version=0` 且包含一个缺失 `shipId` 的条目
     const migrated = migrateShipBlueprintStateToCurrent(raw)
 
-    // 1.1.2 读取迁移结果的 `list` 与 `activeId`
+    // 1.1.2 读取迁移结果的 `ships` 与 `activeBlueprintId`
     const next = migrated.state
 
-    // 1.1.3 断言迁移结果过滤无效条目且 `version=1` #期望: [1]
-    expect(next.list.length).toBe(1)
-    expect(next.activeId).toBe('legacy-active')
-    expect(next.version).toBe(1)
+    // 1.1.3 断言迁移结果过滤无效条目且 `version` 更新到当前版本
+    expect(next.ships).toHaveLength(1)
+    expect(next.ships[0].blueprints).toHaveLength(1)
+    expect(next.activeBlueprintId).toBe('legacy-active')
+    expect(next.version).toBe(CURRENT_SHIP_BLUEPRINT_VERSION)
   })
 
-  it('1.2 import/export ship 模组复用统一 migration 路径', () => {
+  it('1.1.1 blueprint migration 保留 favorite 字段', () => {
+    const raw = {
+      version: CURRENT_SHIP_BLUEPRINT_VERSION,
+      activeShipId: 'ship_a',
+      activeBlueprintId: 'bp-fav',
+      ships: [
+        {
+          shipId: 'ship_a',
+          blueprints: [
+            {
+              id: 'bp-fav',
+              name: 'Favorite Blueprint',
+              shipId: 'ship_a',
+              connections: [],
+              materialMethod: 'default',
+              lastUpdated: 1,
+              favorite: true
+            }
+          ]
+        }
+      ]
+    }
+
+    const migrated = migrateShipBlueprintStateToCurrent(raw)
+    const blueprint = migrated.state.ships[0]?.blueprints[0]
+
+    expect(blueprint?.favorite).toBe(true)
+    expect(migrated.state.activeBlueprintId).toBe('bp-fav')
+  })
+
+  it('1.2 import/export ship 模组复用统一 migration 路径', async () => {
     const { empireStore, logicFlowStore, shipBuildStore, gameDataStore } = createStoreStubs()
 
     // 1.2.1 在 import 流程输入 `x4_ship_blueprints.version=0` 并执行 overwrite
-    const importResult = applyImportPayload({
+    const importResult = await applyImportPayload({
       mode: 'overwrite',
       selectedModules: {
         x4_empire_data: false,
@@ -202,10 +233,10 @@ describe('vsn2one', () => {
       gameDataStore as any
     )
 
-    // 1.2.3 断言导入落盘 version 与导出 payload version 都等于 `1` #期望: [1]
+    // 1.2.3 断言导入落盘 version 与导出 payload version 都等于当前版本
     expect(importResult.applied).toEqual(['x4_ship_blueprints'])
     const saved = JSON.parse(localStorage.getItem('x4_ship_blueprints') || '{}') as SavedShipBlueprintsState
-    expect(saved.version).toBe(1)
-    expect(exported.data.x4_ship_blueprints!.version).toBe(1)
+    expect(saved.version).toBe(CURRENT_SHIP_BLUEPRINT_VERSION)
+    expect(exported.data.x4_ship_blueprints!.version).toBe(CURRENT_SHIP_BLUEPRINT_VERSION)
   })
 })

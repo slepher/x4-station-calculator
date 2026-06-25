@@ -106,6 +106,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   const overviewBuyMultiplier = ref(0.5)
   const overviewSellMultiplier = ref(0.5)
   const playerStationRecords = ref<PlayerStationRecord[]>([])
+  const selectedTransitTransportBlueprintId = ref<string | null>(null)
 
   const productionSource = computed<'save-binding'>(() => 'save-binding')
 
@@ -2386,6 +2387,9 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     return Object.fromEntries(entries)
   })
   const updateTitle = (value: string) => { activeBindingName.value = value }
+  const setSelectedTransitTransportBlueprintId = (blueprintId: string | null) => {
+    selectedTransitTransportBlueprintId.value = blueprintId
+  }
   const updateBindingGroupName = (groupId: string, name: string) => {
     const group = activeBinding.value?.groups.find(g => g.id === groupId)
     if (group && activeBinding.value) {
@@ -2537,6 +2541,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     archiveStation,
     bindingStation,
     playerStationRecords,
+    selectedTransitTransportBlueprintId,
+    setSelectedTransitTransportBlueprintId,
     planningDerivedMap,
     liveFlowMap,
 

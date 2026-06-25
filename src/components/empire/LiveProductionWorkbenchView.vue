@@ -5,6 +5,7 @@ import { useSaveStore } from '@/store/useSaveStore'
 import { useTerraformingStore } from '@/store/useTerraformingStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useActiveViewStore } from '@/store/useActiveViewStore'
+import { useShipBuildStore } from '@/store/useShipBuildStore'
 import { storeToRefs } from 'pinia'
 import type { PlayerBindingData } from '@/components/empire/presenters/useBlueprintRecipePresenter'
 import { useProductionSidebarPresenter } from '@/components/empire/presenters/useProductionSidebarPresenter'
@@ -14,6 +15,7 @@ import { useProductionWareflowPresenter } from '@/components/empire/presenters/u
 import { useProductionDashboardPresenter } from '@/components/empire/presenters/useProductionDashboardPresenter'
 import { useTerraformingPresenter } from '@/components/empire/presenters/useTerraformingPresenter'
 import { useTransitTransportPresenter } from '@/components/empire/presenters/useTransitTransportPresenter'
+import { useX4I18n } from '@/utils/UseX4I18n'
 import StationPlanningPanelWrapper from '@/components/empire/StationPlanningPanelWrapper.vue'
 import StationDashboard from '@/components/empire/StationDashboard.vue'
 import ProductionSidebar from '@/components/empire/ProductionSidebar.vue'
@@ -25,6 +27,7 @@ import StationWareFlowsDashboard from '@/components/empire/StationWareFlowsDashb
 import TransitHubBuildPanel from '@/components/empire/transit-hub/TransitHubBuildPanel.vue'
 import TransitHubCenterDashboard from '@/components/empire/transit-hub/TransitHubCenterDashboard.vue'
 import TransitTransportPanel from '@/components/empire/transit-hub/TransitTransportPanel.vue'
+import TransitTransportShipSelector from '@/components/empire/transit-hub/TransitTransportShipSelector.vue'
 import ArchiveModuleList from '@/components/empire/ArchiveModuleList.vue'
 import ImportPlanModal from '@/components/empire/ImportPlanModal.vue'
 import TechTreePlaceholder from '@/components/empire/TechTreePlaceholder.vue'
@@ -38,6 +41,7 @@ const terraformingStore = useTerraformingStore()
 const activeViewStore = useActiveViewStore()
 const gameDataStore = useGameDataStore()
 const saveStore = useSaveStore()
+const shipBuildStore = useShipBuildStore()
 
 const gameDataMaps = computed(() => gameDataStore.maps)
 
@@ -74,8 +78,17 @@ watch(() => toolbarPresenter.props.workbenchMode.value, (mode) => {
 const planningPresenter = useProductionPlanningPresenter(liveStore)
 const wareflowPresenter = useProductionWareflowPresenter(liveStore)
 const dashboardPresenter = useProductionDashboardPresenter(liveStore)
+const { translateShip, translateEquipment } = useX4I18n()
+
 const transitTransportPresenter = useTransitTransportPresenter(liveStore, {
-  modulesMap: gameDataStore.modulesMap
+  modulesMap: gameDataStore.modulesMap,
+  shipBlueprints: computed(() => shipBuildStore.savedBlueprints.ships.flatMap((bucket) => bucket.blueprints)),
+  findShip: (shipId) => shipBuildStore.findShip(shipId),
+  findEquipment: (equipmentId) => shipBuildStore.findEquipment(equipmentId),
+  includeShip: (ship) => shipBuildStore.isShipDlcUsable(ship),
+  includeEquipment: (equipment) => shipBuildStore.isEquipmentDlcUsable(equipment),
+  translateShip: (ship) => translateShip(ship),
+  translateEquipment: (equipment) => translateEquipment(equipment)
 })
 const terraformingPresenter = useTerraformingPresenter({
   terraformingData: computed(() => terraformingStore.terraformingData),
@@ -152,6 +165,18 @@ function openAutoSectorGroupMap() {
   activeViewStore.mapBindingGameGuid = guid
   activeViewStore.mapSavePanelLayer = 'binding-sector'
   activeViewStore.setActiveView('maps')
+}
+
+watch(
+  () => transitTransportPresenter.props.panel.value.shipSelector.selectedBlueprintValid,
+  (valid) => {
+    if (!valid) liveStore.setSelectedTransitTransportBlueprintId(null)
+  },
+  { immediate: true }
+)
+
+function openShipBuildForTransportSelection() {
+  activeViewStore.setActiveView('ship-build')
 }
 
 </script>
@@ -301,6 +326,11 @@ function openAutoSectorGroupMap() {
         <TransitHubBuildPanel
           v-else
           :modules="planningPresenter.props.autoInfrastructureModules.value"
+        />
+        <TransitTransportShipSelector
+          :selector="transitTransportPresenter.props.panel.value.shipSelector"
+          @select="liveStore.setSelectedTransitTransportBlueprintId"
+          @go-ship-build="openShipBuildForTransportSelection"
         />
       </div>
 

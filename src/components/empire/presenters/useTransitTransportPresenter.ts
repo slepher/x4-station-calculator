@@ -1,8 +1,21 @@
 import { computed, type ComputedRef } from 'vue'
-import type { BindingSectorGroup, BindingStationPlan, SaveBindingPlan, SavedModule, TradeStationBinding, X4Map, X4Module } from '@/types/x4'
+import type { BindingSectorGroup, BindingStationPlan, SaveBindingPlan, SavedModule, ShipBlueprint, TradeStationBinding, X4Equipment, X4Map, X4Module, X4Ship } from '@/types/x4'
 import type { PlayerStationEntry, PlayerStationRecord } from '@/types/saveArchive'
 import type { StationDerivedMap } from '@/store/state/StationDerivedMap'
 import { buildTransitRoute, type TransitRouteResult, type TransitRouteSegment, type TransitRouteSummary, type TransitRouteTerminal } from '@/store/logic/transitRouteBuilder'
+import {
+  buildStationTravelEstimate,
+  buildTransportShipCandidateState,
+  buildTransportTravelEstimate,
+  estimateRouteSegmentsTravel,
+  estimateSegmentTravelTimeSec,
+  sumSegmentTravelTime,
+  type StationTravelEstimate,
+  type TransportSegmentTravelEstimate,
+  type TransportShipCandidateGroup,
+  type TransportShipTravelProfile,
+  type TransportTravelEstimate
+} from '@/store/logic/transitTransportShip'
 import { isSectorMacroInBindingScope } from '@/store/logic/saveBindingSectorScope'
 import i18n from '@/i18n'
 
@@ -20,8 +33,9 @@ export type TransportSectorGroupRouteRow = {
   targetSectorName: string
   targetStationName: string
   summary: TransitRouteSummary
-  segments: TransitRouteSegment[]
+  segments: TransportRouteSegmentView[]
   terminal: TransitRouteTerminal
+  travel?: TransportTravelEstimate
 }
 
 export type TransportStationRouteRow = {
@@ -32,21 +46,37 @@ export type TransportStationRouteRow = {
   terminalDistanceKm: number
   totalNormalDistanceKm: number
   productionLineCount: number
+  travel?: StationTravelEstimate
 }
 
 export type TransportStationSectorGroup = {
   id: string
   sectorName: string
   summary: TransitRouteSummary
-  segments: TransitRouteSegment[]
+  segments: TransportRouteSegmentView[]
   terminal: TransitRouteTerminal
   stations: TransportStationRouteRow[]
+  travel?: TransportTravelEstimate
+  hideSectorHeader?: boolean
+}
+
+export type TransportRouteSegmentView = TransitRouteSegment & {
+  travel?: TransportSegmentTravelEstimate
+}
+
+export type TransportShipSelectorState = {
+  groups: TransportShipCandidateGroup[]
+  selectedBlueprintId: string | null
+  selectedProfile: TransportShipTravelProfile | null
+  selectedBlueprintValid: boolean
+  hasCandidates: boolean
 }
 
 export type TransitTransportPanelState = {
   sectorGroupRows: TransportSectorGroupRouteRow[]
   stationSectorGroups: TransportStationSectorGroup[]
   problems: TransportProblemRow[]
+  shipSelector: TransportShipSelectorState
   empty: boolean
 }
 
@@ -59,10 +89,18 @@ export interface TransitTransportPresenterStore {
   planningDerivedMap?: StationDerivedMap | null
   liveFlowMap?: StationDerivedMap | null
   gameDataMaps: X4Map
+  selectedTransitTransportBlueprintId?: string | null
 }
 
 export type TransitTransportPresenterDeps = {
   modulesMap: Record<string, X4Module>
+  shipBlueprints: ComputedRef<ShipBlueprint[]>
+  findShip: (shipId: string) => X4Ship | null
+  findEquipment: (equipmentId: string) => X4Equipment | null
+  includeShip: (ship: X4Ship) => boolean
+  includeEquipment: (equipment: X4Equipment) => boolean
+  translateShip: (ship: X4Ship) => string
+  translateEquipment: (equipment: X4Equipment) => string
 }
 
 type StationTransportTarget = {
@@ -87,11 +125,29 @@ export function useTransitTransportPresenter(
     const hubPosition = resolveStationPosition(hubStation, store.playerStationRecords)
     const maps = store.gameDataMaps
     const problems: TransportProblemRow[] = []
+    const shipCandidateState = buildTransportShipCandidateState({
+      blueprints: deps.shipBlueprints.value,
+      findShip: deps.findShip,
+      findEquipment: deps.findEquipment,
+      selectedBlueprintId: store.selectedTransitTransportBlueprintId ?? null,
+      includeShip: deps.includeShip,
+      includeEquipment: deps.includeEquipment,
+      resolveShipName: deps.translateShip,
+      translateEquipment: deps.translateEquipment
+    })
+    const shipSelector: TransportShipSelectorState = {
+      groups: shipCandidateState.groups,
+      selectedBlueprintId: shipCandidateState.selectedProfile?.blueprintId ?? null,
+      selectedProfile: shipCandidateState.selectedProfile,
+      selectedBlueprintValid: shipCandidateState.selectedBlueprintValid,
+      hasCandidates: shipCandidateState.hasCandidates
+    }
 
     if (!binding || !activeGroup || !hubStation || !hubPosition || !hubStation.sectorMacro) {
       return {
         sectorGroupRows: [],
         stationSectorGroups: [],
+        shipSelector,
         problems: [{
           id: 'active-hub',
           targetType: 'sector-group',
@@ -115,7 +171,8 @@ export function useTransitTransportPresenter(
       routeSource,
       maps,
       playerStationRecords: store.playerStationRecords,
-      problems
+      problems,
+      travelProfile: shipCandidateState.selectedProfile
     })
 
     const stationSectorGroups = buildStationSectorGroups({
@@ -127,13 +184,15 @@ export function useTransitTransportPresenter(
       playerStationRecords: store.playerStationRecords,
       flowMap: store.mode === 'live' ? store.liveFlowMap : store.planningDerivedMap,
       modulesMap: deps.modulesMap,
-      problems
+      problems,
+      travelProfile: shipCandidateState.selectedProfile
     })
 
     return {
       sectorGroupRows,
       stationSectorGroups,
       problems,
+      shipSelector,
       empty: sectorGroupRows.length === 0 && stationSectorGroups.length === 0 && problems.length === 0
     }
   })
@@ -148,6 +207,7 @@ function buildSectorGroupRows(input: {
   maps: X4Map
   playerStationRecords: PlayerStationRecord[]
   problems: TransportProblemRow[]
+  travelProfile: TransportShipTravelProfile | null
 }): TransportSectorGroupRouteRow[] {
   const rows: Array<TransportSectorGroupRouteRow & { order: number }> = []
   const connectedIds = input.activeGroup.connectedGroupIds ?? []
@@ -174,8 +234,9 @@ function buildSectorGroupRows(input: {
       targetSectorName: sectorName(input.maps, linkedHub.sectorMacro),
       targetStationName: linkedHub.name,
       summary: route.summary,
-      segments: route.segments,
-      terminal: route.terminal
+      segments: attachSegmentTravel(route.segments, input.travelProfile),
+      terminal: route.terminal,
+      travel: routeTravel(route.segments, input.travelProfile)
     })
   }
 
@@ -198,6 +259,7 @@ function buildStationSectorGroups(input: {
   flowMap?: StationDerivedMap | null
   modulesMap: Record<string, X4Module>
   problems: TransportProblemRow[]
+  travelProfile: TransportShipTravelProfile | null
 }): TransportStationSectorGroup[] {
   const stationTargets = buildStationTargets(input)
   const bySector = new Map<string, StationTransportTarget[]>()
@@ -229,9 +291,11 @@ function buildStationSectorGroups(input: {
         id: sectorMacro,
         sectorName: sectorName(input.maps, sectorMacro),
         summary: sectorRoute.summary,
-        segments: sectorRoute.segments,
+        segments: attachSegmentTravel(sectorRoute.segments, input.travelProfile),
         terminal: sectorRoute.terminal,
-        stations: stationRows
+        stations: stationRows,
+        travel: routeTravel(sectorRoute.segments, input.travelProfile),
+        hideSectorHeader: input.routeSource.sectorMacro === sectorMacro
       })
     }
   }
@@ -251,6 +315,7 @@ function buildStationRow(
     flowMap?: StationDerivedMap | null
     modulesMap: Record<string, X4Module>
     problems: TransportProblemRow[]
+    travelProfile: TransportShipTravelProfile | null
   }
 ): TransportStationRouteRow | null {
   if (!station.position) {
@@ -258,6 +323,12 @@ function buildStationRow(
     return null
   }
   const terminalDistanceKm = kmDistance(sectorRoute.terminal.position, station.position)
+  const localTimeSec = input.travelProfile
+    ? estimateSegmentTravelTimeSec(terminalDistanceKm, input.travelProfile)
+    : 0
+  const sectorTimeSec = input.travelProfile
+    ? routeTravelTime(sectorRoute.segments, input.travelProfile)
+    : 0
   return {
     id: station.id,
     stationName: station.name,
@@ -265,8 +336,32 @@ function buildStationRow(
     coordinateKm: { x: station.position.x / 1000, y: station.position.y / 1000, z: station.position.z / 1000 },
     terminalDistanceKm,
     totalNormalDistanceKm: sectorRoute.summary.normalDistanceKm + terminalDistanceKm,
-    productionLineCount: productionLineCount(station, input.flowMap, input.modulesMap)
+    productionLineCount: productionLineCount(station, input.flowMap, input.modulesMap),
+    travel: input.travelProfile
+      ? buildStationTravelEstimate({ localTimeSec, sectorTimeSec, profile: input.travelProfile })
+      : undefined
   }
+}
+
+function attachSegmentTravel(
+  segments: TransitRouteSegment[],
+  profile: TransportShipTravelProfile | null
+): TransportRouteSegmentView[] {
+  if (!profile) return segments
+  const travels = estimateRouteSegmentsTravel(segments, profile)
+  return segments.map((segment, index) => ({
+    ...segment,
+    travel: travels[index]
+  }))
+}
+
+function routeTravel(segments: TransitRouteSegment[], profile: TransportShipTravelProfile | null): TransportTravelEstimate | undefined {
+  if (!profile) return undefined
+  return buildTransportTravelEstimate(routeTravelTime(segments, profile), profile)
+}
+
+function routeTravelTime(segments: TransitRouteSegment[], profile: TransportShipTravelProfile): number {
+  return sumSegmentTravelTime(estimateRouteSegmentsTravel(segments, profile))
 }
 
 function buildStationRoute(
