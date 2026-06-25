@@ -844,6 +844,7 @@ export interface ShipBlueprint {
   storage?: ShipBlueprintStorage
   materialMethod: string
   lastUpdated: number
+  createdAt: number
   favorite?: boolean
 }
 

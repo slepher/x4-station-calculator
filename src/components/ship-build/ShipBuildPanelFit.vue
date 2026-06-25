@@ -63,7 +63,7 @@ const emit = defineEmits<{
 const shipBuildStore = useShipBuildStore()
 const gameData = useGameDataStore()
 const { selectedShip, blueprint, mockTagPatch, isDirty, activeBlueprintStatusLabel, isBuiltInPresetUnchanged } = storeToRefs(shipBuildStore)
-const { applyConnectionAssignment, setConnectionAssignmentCount, enterShipSelector, toggleFavoriteBlueprint, isBuiltInBlueprintId } = shipBuildStore
+const { applyConnectionAssignment, setConnectionAssignmentCount, enterShipSelector, toggleFavoriteBlueprint } = shipBuildStore
 
 // 本地 connectionKeyMap：从 connectionRows 构建
 const localConnectionKeyMap = computed(() => {
@@ -283,19 +283,21 @@ const shouldShowBlueprintDirtyDot = computed(() => {
 
 const currentBlueprintId = computed(() => blueprint.value?.id || '')
 
-const isCurrentBlueprintFavoritable = computed(() => {
-  const id = currentBlueprintId.value
-  if (!id) return false
-  return !isBuiltInBlueprintId(id)
-})
-
 const currentBlueprintFavorited = computed(() => {
   return blueprint.value?.favorite ?? false
 })
 
 const toggleFavoriteCurrent = () => {
   const id = currentBlueprintId.value
-  if (id) toggleFavoriteBlueprint(id)
+  if (!id) return
+  toggleFavoriteBlueprint(id)
+}
+
+const toggleFavoriteItem = (itemId: string) => {
+  toggleFavoriteBlueprint(itemId)
+  if (itemId !== currentBlueprintId.value) {
+    shipBuildStore.saveBlueprintsToStorage()
+  }
 }
 
 const loadableBlueprintItems = computed(() => {
@@ -304,6 +306,8 @@ const loadableBlueprintItems = computed(() => {
     id: bp.id,
     label: bp.name,
     favorite: bp.favorite ?? false,
+    lastUpdated: bp.lastUpdated ?? 0,
+    createdAt: bp.createdAt ?? 0,
     isBuiltIn: shipBuildStore.isBuiltInBlueprintId(bp.id),
     isCurrentSaved: shipBuildStore.savedBlueprints.activeBlueprintId === bp.id
   }))
@@ -313,8 +317,10 @@ const groupedLoadableBlueprintItems = computed(() => {
   const builtInItems = loadableBlueprintItems.value.filter((item) => item.isBuiltIn)
   const userItems = loadableBlueprintItems.value.filter((item) => !item.isBuiltIn)
   userItems.sort((a, b) => {
-    if (a.favorite !== b.favorite) return a.favorite ? -1 : 1
-    return 0
+    const ca = a.createdAt ?? 0
+    const cb = b.createdAt ?? 0
+    if (cb !== ca) return cb - ca
+    return (a.label ?? '').localeCompare(b.label ?? '')
   })
   return [
     { key: 'preset', title: t('shipBuild.blueprint_group_preset'), items: builtInItems },
@@ -986,7 +992,6 @@ watch(slotTargets, () => {
         </button>
         <div class="ship-blueprint-picker" ref="blueprintMenuRef">
           <button
-            v-if="isCurrentBlueprintFavoritable"
             class="ship-blueprint-fav-btn"
             :class="{ 'is-favorited': currentBlueprintFavorited }"
             :title="currentBlueprintFavorited ? t('shipBuild.fav_remove') : t('shipBuild.fav_add')"
@@ -1028,30 +1033,32 @@ watch(slotTargets, () => {
               class="ship-blueprint-menu-group"
             >
               <div class="ship-blueprint-menu-group-title">{{ group.title }}</div>
-              <div
+              <div class="ship-blueprint-menu-row"
                 v-for="item in group.items"
                 :key="item.id"
-                class="ship-blueprint-menu-row group"
                 :class="[
-                  item.isBuiltIn ? 'ship-blueprint-menu-item-built-in' : '',
-                  item.isCurrentSaved ? 'ship-blueprint-menu-item-current' : ''
-                ]"
-              >
-                <button
-                  class="ship-blueprint-menu-item"
-                  @click="handleBlueprintSelect(item.id)"
-                >
+                  item.isCurrentSaved ? 'ship-blueprint-menu-row-current' : ''
+                ]">
+                <div class="ship-blueprint-menu-item-text"
+                  :class="[
+                    item.isBuiltIn ? 'ship-blueprint-menu-item-built-in' : ''
+                  ]"
+                  @click="handleBlueprintSelect(item.id)">
                   <span>{{ item.label }}</span>
-                </button>
-                <span
-                  v-if="!item.isBuiltIn && item.favorite"
-                  class="ship-blueprint-menu-fav-star absolute right-8 top-1/2 -translate-y-1/2"
-                  :title="t('shipBuild.fav_remove')"
+                </div>
+                <button
+                  v-if="!item.isBuiltIn"
+                  class="ship-blueprint-menu-fav-star"
+                  :title="item.favorite ? t('shipBuild.fav_remove') : t('shipBuild.fav_add')"
+                  @click.stop="toggleFavoriteItem(item.id)"
                 >
-                  <svg class="h-3.5 w-3.5 text-yellow-400" viewBox="0 0 24 24" fill="currentColor">
+                  <svg v-if="item.favorite" class="h-3.5 w-3.5 text-yellow-400" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                   </svg>
-                </span>
+                  <svg v-else class="h-3.5 w-3.5 text-slate-500 hover:text-yellow-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                  </svg>
+                </button>
                 <button
                   v-if="!item.isBuiltIn"
                   class="ship-blueprint-delete-btn"
@@ -1267,7 +1274,7 @@ watch(slotTargets, () => {
 }
 
 .ship-blueprint-menu-row {
-  @apply relative;
+  @apply flex items-center gap-1 rounded px-1;
 }
 
 .ship-blueprint-menu-group + .ship-blueprint-menu-group {
@@ -1278,24 +1285,24 @@ watch(slotTargets, () => {
   @apply px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-emerald-300/80;
 }
 
-.ship-blueprint-menu-item {
-  @apply block h-8 w-full text-left px-2.5 pr-9 py-1.5 rounded text-xs text-slate-200 hover:bg-emerald-500/15 transition-colors whitespace-nowrap;
+.ship-blueprint-menu-item-text {
+  @apply flex-1 min-w-0 h-8 px-2.5 py-1.5 rounded text-xs text-slate-200 hover:bg-emerald-500/15 transition-colors cursor-pointer truncate;
 }
 
 .ship-blueprint-menu-item-built-in {
   @apply text-emerald-200;
 }
 
-.ship-blueprint-menu-item-current .ship-blueprint-menu-item {
-  @apply text-emerald-100 bg-emerald-500/15 border border-emerald-400/50;
+.ship-blueprint-menu-row-current {
+  @apply bg-emerald-500/15 border border-emerald-400/50;
+}
+
+.ship-blueprint-menu-fav-star {
+  @apply shrink-0 h-8 w-7 flex items-center justify-center rounded text-slate-400 hover:text-yellow-400 hover:bg-yellow-500/10 transition-colors;
 }
 
 .ship-blueprint-delete-btn {
-  @apply absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 flex items-center justify-center rounded text-red-300 hover:text-red-200 hover:bg-red-500/20 opacity-0 pointer-events-none transition-opacity;
-}
-
-.ship-blueprint-menu-row:hover .ship-blueprint-delete-btn {
-  @apply opacity-100 pointer-events-auto;
+  @apply shrink-0 h-8 w-7 flex items-center justify-center rounded text-red-300 hover:text-red-200 hover:bg-red-500/20 transition-colors;
 }
 
 .ship-blueprint-menu::-webkit-scrollbar {

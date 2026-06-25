@@ -366,6 +366,7 @@ function normalizeShipBlueprintShape(input: SavedShipBlueprintsState & { list?: 
       hull,
       materialMethod: typeof blueprint.materialMethod === 'string' ? blueprint.materialMethod : 'default',
       lastUpdated: Number(blueprint.lastUpdated) || Date.now() + index,
+      createdAt: Number(blueprint.createdAt) || 0,
       favorite: typeof blueprint.favorite === 'boolean' ? blueprint.favorite : false
     }
   }).filter((blueprint) => {
@@ -468,6 +469,9 @@ export function migrateShipBlueprintStateToCurrent(
       bucket.blueprints.forEach(bp => {
         if (bp.favorite === undefined) {
           bp.favorite = false
+        }
+        if (!bp.createdAt) {
+          bp.createdAt = bp.lastUpdated
         }
       })
     })

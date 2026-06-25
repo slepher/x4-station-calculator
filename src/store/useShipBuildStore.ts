@@ -323,7 +323,8 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     connections: [],
     storage: JSON.parse(JSON.stringify(EMPTY_SHIP_STORAGE)),
     materialMethod: 'default',
-    lastUpdated: Date.now()
+    lastUpdated: Date.now(),
+    createdAt: Date.now()
   })
 
   const parseMk = (mk: string | null | undefined) => {
@@ -516,7 +517,8 @@ export const useShipBuildStore = defineStore('ship-build', () => {
       connections: [],
       storage: JSON.parse(JSON.stringify(EMPTY_SHIP_STORAGE)),
       materialMethod: 'default',
-      lastUpdated: Date.now()
+      lastUpdated: Date.now(),
+      createdAt: 0
     }
 
     if (preset === 'empty') {
@@ -756,13 +758,14 @@ export const useShipBuildStore = defineStore('ship-build', () => {
         shipId: shipId || '',
         connections: [],
         materialMethod: 'default',
-        lastUpdated: Date.now()
+        lastUpdated: Date.now(),
+        createdAt: Date.now()
       }
     }
-    let connection = blueprint.value.connections.find(c => c.slot_type === slotType)
+    let connection = blueprint.value!.connections.find(c => c.slot_type === slotType)
     if (!connection) {
       connection = { slot_type: slotType, group: [] }
-      blueprint.value.connections.push(connection)
+      blueprint.value!.connections.push(connection)
     }
     return connection
   }
@@ -964,11 +967,12 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     blueprint.value.lastUpdated = Date.now()
 
     if (idx !== -1) {
+      const existing = bucket.blueprints[idx]!
+      blueprint.value.createdAt = existing.createdAt
       bucket.blueprints[idx] = JSON.parse(JSON.stringify(blueprint.value))
     } else {
-      // No active blueprint, create new one
       blueprint.value.id = crypto.randomUUID()
-      // name 保持为空，UI 会显示默认名称
+      blueprint.value.createdAt = Date.now()
       bucket.blueprints.push(JSON.parse(JSON.stringify(blueprint.value)))
     }
 
@@ -989,7 +993,8 @@ export const useShipBuildStore = defineStore('ship-build', () => {
       connections: blueprint.value ? JSON.parse(JSON.stringify(blueprint.value.connections)) : [],
       storage: blueprint.value?.storage ? JSON.parse(JSON.stringify(blueprint.value.storage)) : undefined,
       materialMethod: blueprint.value?.materialMethod || 'default',
-      lastUpdated: Date.now()
+      lastUpdated: Date.now(),
+      createdAt: Date.now()
     }
 
     const bucket = getOrCreateBucketByShipId(shipId)
@@ -1032,13 +1037,17 @@ export const useShipBuildStore = defineStore('ship-build', () => {
         const currentName = blueprint.value.name
         const currentMaterialMethod = blueprint.value.materialMethod
         const currentLastUpdated = blueprint.value.lastUpdated
+        const currentCreatedAt = blueprint.value.createdAt
+        const currentFavorite = blueprint.value.favorite
         blueprint.value = {
           ...JSON.parse(JSON.stringify(bp)),
           id: currentId,
           name: currentName,
           shipId: builtIn.shipId,
           materialMethod: currentMaterialMethod,
-          lastUpdated: currentLastUpdated
+          lastUpdated: currentLastUpdated,
+          createdAt: currentCreatedAt,
+          favorite: currentFavorite
         }
         loadedBuiltInPreset.value = null
         loadedBuiltInConnectionsSnapshot.value = null
@@ -1135,14 +1144,12 @@ export const useShipBuildStore = defineStore('ship-build', () => {
   }
 
   const toggleFavoriteBlueprint = (id: string) => {
-    if (isBuiltInBlueprintId(id)) return
     const bp = findBlueprintById(id)
     if (!bp) return
     bp.favorite = !bp.favorite
     if (blueprint.value?.id === id) {
       blueprint.value.favorite = bp.favorite
     }
-    saveBlueprintsToStorage()
   }
 
   // Sync selectedByConnection with computed
@@ -1285,7 +1292,8 @@ export const useShipBuildStore = defineStore('ship-build', () => {
         shipId: shipId || '',
         connections: [],
         materialMethod: 'default',
-        lastUpdated: Date.now()
+        lastUpdated: Date.now(),
+        createdAt: Date.now()
       }
     }
     return JSON.parse(JSON.stringify(source)) as ShipBlueprint
@@ -1750,6 +1758,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     loadBlueprint,
     deleteBlueprint,
     toggleFavoriteBlueprint,
+    saveBlueprintsToStorage,
     getBlueprintsForShip,
     getLoadableBlueprintsForShip,
     isBuiltInBlueprintId,
