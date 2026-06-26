@@ -59,13 +59,14 @@
 - 上货时间与卸货时间分别按同一公式计算：
 
 ```text
-cargoTransferTimeSec = containerCapacityM3 / (min(cargoDroneCount, 10) * (4000 / 60))
+cargoTransferTimeSec = containerCapacityM3 / (10 * (4000 / 60))
 ```
 
 公式中 `4000` 为每架货运无人机单趟搬运量（m³/trip），`60` 为单趟耗时（s/trip），均来自游戏内实测经验数据。`4000 / 60` 即每架无人机的搬运速率（m³/s）。
 
-- `cargoDroneCount` 只统计蓝图 storage 中用途为 `trade` 的货运无人机；同一条船最多同时使用 10 架货运无人机参与装卸。
-- 若蓝图没有货运无人机，则不增加上货/卸货时间。
+- 装卸由运输船与空间站货运无人机共同参与；同一条船的装卸并发上限按 10 架货运无人机估算。
+- `cargoDroneCount` 只统计蓝图 storage 中用途为 `trade` 的船载货运无人机，用于 UI 提示；若运输船自身货运无人机不足，空间站补足到装卸并发上限。
+- 若蓝图没有船载货运无人机，仍按空间站补足后的 10 架并发估算上货/卸货时间。
 - 单程吞吐量公式：
 
 ```text

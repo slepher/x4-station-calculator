@@ -102,7 +102,7 @@ d_attack_km = ((V_base + V_travel) / 2) * t_attack / 1000
 d_decel_km = ((V_travel + V_base) / 2) * t_release / 1000
 ```
 
-`cargoDroneCount` 从蓝图 `storage.drones` 中统计 `purposePrimary === 'trade'` 的货运无人机数量，并按单船最多 10 架并行装卸封顶。
+`cargoDroneCount` 从蓝图 `storage.drones` 中统计 `purposePrimary === 'trade'` 的船载货运无人机数量，仅用于候选 UI 展示和提示；装卸时间按运输船与空间站共同参与、空间站补足不足无人机的口径计算。
 
 ## Segment Time Formula
 
@@ -240,18 +240,19 @@ type StationTravelEstimate = {
 装卸时间：
 
 ```text
-cargoTransferTimeSec = containerCapacityM3 / (min(cargoDroneCount, 10) * (4000 / 60))
+cargoTransferTimeSec = containerCapacityM3 / (10 * (4000 / 60))
 ```
 
 其中：
 - `4000` — 每架货运无人机单趟搬运量（m³/trip），来自游戏内实测经验数据
 - `60` — 每架货运无人机单趟搬运耗时（s/trip），来自游戏内实测经验数据
 - `4000 / 60` — 每架无人机的搬运速率（m³/s）
+- `10` — 单条船装卸时最多同时参与的货运无人机数量；运输船自身不足时由空间站补足
 
 - 上货和卸货各计算一次。
 - `timeSec` / `totalTimeSec` 包含飞行、上货、卸货。
 - `flightTimeSec` 仅保存 route segment 飞行耗时。
-- `cargoDroneCount <= 0` 时装卸时间为 0，不显示装卸明细行。
+- `cargoDroneCount <= 0` 时仍按空间站补足后的 10 架并发估算装卸时间；UI 可提示依赖空间站无人机。
 
 Sector Group:
 
