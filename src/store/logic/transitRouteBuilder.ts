@@ -4,7 +4,12 @@ export type TransitRoutePoint = {
   sectorMacro: string
   label: string
   position: { x: number; y: number; z: number }
+  endpoint?: TransitRouteEndpointRef
 }
+
+export type TransitRouteEndpointRef =
+  | { kind: 'cluster-gate'; sectorMacro: string; gateId: string }
+  | { kind: 'superhighway'; sectorMacro: string; linkId: string; zoneId: string }
 
 export type TransitRouteSegmentKind =
   | 'station-to-gate'
@@ -24,6 +29,9 @@ export type TransitRouteSegment = {
   countsInSummaryDistance: boolean
   fromPosition?: { x: number; y: number; z: number }
   toPosition?: { x: number; y: number; z: number }
+  fromEndpoint?: TransitRouteEndpointRef
+  toEndpoint?: TransitRouteEndpointRef
+  highwayId?: string
   highwayAlternative?: TransitRouteSegment[]
 }
 
@@ -197,8 +205,18 @@ function buildTransitEdgeGraph(
           problems.push(`gate:${sector.id}:${gateId}`)
           continue
         }
-        const from: TransitRoutePoint = { sectorMacro: sector.id, label: resolveSectorLabel(sector), position: fromPosition }
-        const to: TransitRoutePoint = { sectorMacro: targetSector.id, label: resolveSectorLabel(targetSector), position: toPositionValue }
+        const from: TransitRoutePoint = {
+          sectorMacro: sector.id,
+          label: resolveSectorLabel(sector),
+          position: fromPosition,
+          endpoint: { kind: 'cluster-gate', sectorMacro: sector.id, gateId }
+        }
+        const to: TransitRoutePoint = {
+          sectorMacro: targetSector.id,
+          label: resolveSectorLabel(targetSector),
+          position: toPositionValue,
+          endpoint: { kind: 'cluster-gate', sectorMacro: targetSector.id, gateId: targetGateEntry[0] }
+        }
         addEdge(graph, { kind: 'gate', fromSector: sector.id, toSector: targetSector.id, from, to })
       }
     }
@@ -209,14 +227,27 @@ function buildTransitEdgeGraph(
       const sectorA = sectors[link.sector_a_id]
       const sectorB = sectors[link.sector_b_id]
       if (!sectorA || !sectorB || link.render?.lane_count === 1) continue
-      const fromPosition = toPosition(sectorA.zones?.[link.from_zone_id ?? '']?.raw_sector_pos)
-      const toPositionValue = toPosition(sectorB.zones?.[link.to_zone_id ?? '']?.raw_sector_pos)
+      const fromZoneId = link.from_zone_id
+      const toZoneId = link.to_zone_id
+      if (!fromZoneId || !toZoneId) continue
+      const fromPosition = toPosition(sectorA.zones?.[fromZoneId]?.raw_sector_pos)
+      const toPositionValue = toPosition(sectorB.zones?.[toZoneId]?.raw_sector_pos)
       if (!fromPosition || !toPositionValue) {
         problems.push(`superhighway:${link.id}`)
         continue
       }
-      const pointA: TransitRoutePoint = { sectorMacro: sectorA.id, label: resolveSectorLabel(sectorA), position: fromPosition }
-      const pointB: TransitRoutePoint = { sectorMacro: sectorB.id, label: resolveSectorLabel(sectorB), position: toPositionValue }
+      const pointA: TransitRoutePoint = {
+        sectorMacro: sectorA.id,
+        label: resolveSectorLabel(sectorA),
+        position: fromPosition,
+        endpoint: { kind: 'superhighway', sectorMacro: sectorA.id, linkId: link.id, zoneId: fromZoneId }
+      }
+      const pointB: TransitRoutePoint = {
+        sectorMacro: sectorB.id,
+        label: resolveSectorLabel(sectorB),
+        position: toPositionValue,
+        endpoint: { kind: 'superhighway', sectorMacro: sectorB.id, linkId: link.id, zoneId: toZoneId }
+      }
       addEdge(graph, { kind: 'superhighway', fromSector: sectorA.id, toSector: sectorB.id, from: pointA, to: pointB })
       addEdge(graph, { kind: 'superhighway', fromSector: sectorB.id, toSector: sectorA.id, from: pointB, to: pointA })
     }
@@ -241,7 +272,9 @@ function appendNormalSegment(
       distanceKm: distance,
       countsInSummaryDistance: true,
       fromPosition: state.current.position,
-      toPosition: to.position
+      toPosition: to.position,
+      fromEndpoint: state.current.endpoint,
+      toEndpoint: to.endpoint
     }
   }
 }
@@ -262,7 +295,9 @@ function buildNormalSegment(
       distanceKm: distance,
       countsInSummaryDistance: true,
       fromPosition: from.position,
-      toPosition: to.position
+      toPosition: to.position,
+      fromEndpoint: from.endpoint,
+      toEndpoint: to.endpoint
     }
   }
 }
@@ -349,7 +384,12 @@ function routePointForGate(
   const gate = sector?.cluster_gates?.[gateId]
   const position = toPosition(gate?.raw_local_pos)
   if (!sector || !position) return null
-  return { sectorMacro: sectorId, label: resolveSectorLabel(sector), position }
+  return {
+    sectorMacro: sectorId,
+    label: resolveSectorLabel(sector),
+    position,
+    endpoint: { kind: 'cluster-gate', sectorMacro: sectorId, gateId }
+  }
 }
 
 function ringHopIndices(startIndex: number, endIndex: number, length: number, direction: 'forward' | 'backward'): number[] {
@@ -418,7 +458,10 @@ function buildHighwayRingSegments(input: {
       distanceKm: highwayDistance,
       countsInSummaryDistance: false,
       fromPosition: entryPoint.position,
-      toPosition: exitPoint.position
+      toPosition: exitPoint.position,
+      fromEndpoint: entryPoint.endpoint,
+      toEndpoint: exitPoint.endpoint,
+      highwayId: input.direction === 'forward' ? hop.forwardHighwayId : hop.backwardHighwayId
     })
 
     if (i < indices.length - 1) {
@@ -428,7 +471,11 @@ function buildHighwayRingSegments(input: {
         fromLabel: exitPoint.label,
         toLabel: input.resolveSectorLabel(input.sectors[nextHop.sectorId]!),
         distanceKm: 0,
-        countsInSummaryDistance: false
+        countsInSummaryDistance: false,
+        fromPosition: exitPoint.position,
+        toPosition: routePointForGate(input.sectors, nextHop.sectorId, hopEntryGateId(nextHop, input.direction), input.resolveSectorLabel)?.position,
+        fromEndpoint: exitPoint.endpoint,
+        toEndpoint: routePointForGate(input.sectors, nextHop.sectorId, hopEntryGateId(nextHop, input.direction), input.resolveSectorLabel)?.endpoint
       })
     }
   }
@@ -514,7 +561,11 @@ function buildRoutesFromPointToSectorTargets(
           fromLabel: edge.from.label,
           toLabel: edge.to.label,
           distanceKm: 0,
-          countsInSummaryDistance: false
+          countsInSummaryDistance: false,
+          fromPosition: edge.from.position,
+          toPosition: edge.to.position,
+          fromEndpoint: edge.from.endpoint,
+          toEndpoint: edge.to.endpoint
         })
       } else {
         const highwayDistance = distanceKm(edge.from.position, edge.to.position)
@@ -524,7 +575,11 @@ function buildRoutesFromPointToSectorTargets(
           fromLabel: edge.from.label,
           toLabel: edge.to.label,
           distanceKm: highwayDistance,
-          countsInSummaryDistance: false
+          countsInSummaryDistance: false,
+          fromPosition: edge.from.position,
+          toPosition: edge.to.position,
+          fromEndpoint: edge.from.endpoint,
+          toEndpoint: edge.to.endpoint
         })
       }
 
@@ -835,7 +890,11 @@ export function buildTransitRouteCandidates(
           fromLabel: edge.from.label,
           toLabel: edge.to.label,
           distanceKm: 0,
-          countsInSummaryDistance: false
+          countsInSummaryDistance: false,
+          fromPosition: edge.from.position,
+          toPosition: edge.to.position,
+          fromEndpoint: edge.from.endpoint,
+          toEndpoint: edge.to.endpoint
         })
       } else {
         const highwayDistance = distanceKm(edge.from.position, edge.to.position)
@@ -845,7 +904,11 @@ export function buildTransitRouteCandidates(
           fromLabel: edge.from.label,
           toLabel: edge.to.label,
           distanceKm: highwayDistance,
-          countsInSummaryDistance: false
+          countsInSummaryDistance: false,
+          fromPosition: edge.from.position,
+          toPosition: edge.to.position,
+          fromEndpoint: edge.from.endpoint,
+          toEndpoint: edge.to.endpoint
         })
       }
 

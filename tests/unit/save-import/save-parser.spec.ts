@@ -574,6 +574,7 @@ describe('save parser rust worker enrichment', () => {
     } as any)
 
     expect(archive.sectors.sec.scale_per_radius).toBeCloseTo((Math.sqrt(3) / 2 * 0.8) / 350, 12)
+    expect(archive.sectors.sec.center).toEqual({ x: 0, y: 0, z: 0 })
     expect(archive.sectors.sec.npc_stations?.NPC?.position.tx).toBeCloseTo((Math.sqrt(3) / 2 * 0.8), 12)
     expect(archive.sectors.sec.clusterGates).toHaveLength(1)
     expect(archive.sectors.sec.clusterGates?.[0]).toMatchObject({

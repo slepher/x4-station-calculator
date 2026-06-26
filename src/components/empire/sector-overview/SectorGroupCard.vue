@@ -384,20 +384,22 @@ function onAnchorPillClick(macro: string) {
           <span
             class="pill pill--anchor"
             :class="{ 'cursor-pointer': view === 'map' }"
-            @click="onAnchorPillClick(group.sectorMacro || '')"
           >
             <span class="pill-dot" :class="playerSectorMacros.includes(group.sectorMacro || '') ? 'pill-dot--filled' : 'pill-dot--empty'"/>
-            {{ getSectorName(group.sectorMacro || '') }}
+            <span class="pill-label" @click.stop="onAnchorPillClick(group.sectorMacro || '')">
+              {{ getSectorName(group.sectorMacro || '') }}
+            </span>
           </span>
           <span
             v-if="group.selectedTradeStation"
             class="pill pill--trade-station"
             :class="{ 'cursor-pointer hover:text-sky-300': view === 'map' }"
-            @click="view === 'map' && group.sectorMacro && emit('focus-sector', group.sectorMacro)"
           >
             <span class="pill-dot pill-dot--small" :class="group.selectedTradeStation.type === 'virtual' ? 'pill-dot--empty' : 'pill-dot--filled'"/>
-            <template v-if="group.selectedTradeStation.type === 'virtual'">{{ t('sector.virtual_trade_station') }}</template>
-            <template v-else>{{ group.selectedTradeStation.stationCode }}<span v-if="tradeStationCap !== null">&nbsp;{{ formatCapM(tradeStationCap) }}</span></template>
+            <span class="pill-label" @click.stop="view === 'map' && group.sectorMacro && emit('focus-sector', group.sectorMacro)">
+              <template v-if="group.selectedTradeStation.type === 'virtual'">{{ t('sector.virtual_trade_station') }}</template>
+              <template v-else>{{ group.selectedTradeStation.stationCode }}<span v-if="tradeStationCap !== null">&nbsp;{{ formatCapM(tradeStationCap) }}</span></template>
+            </span>
           </span>
           <div class="jump-control">
             <template v-if="!canEditJumpRange(group)">
@@ -432,10 +434,11 @@ function onAnchorPillClick(macro: string) {
                 'pill--removed': props.diffEnabled && entry.removed,
                 'cursor-pointer': view === 'map'
               }"
-              @click="onPillClick(entry)"
             >
               <span class="pill-dot" :class="entry.hasPlayerStation ? 'pill-dot--filled' : 'pill-dot--empty'"/>
-              {{ entry.type === 'connected' && entry.connectedGroupName ? entry.connectedGroupName : getSectorName(entry.macro) }}
+              <span class="pill-label" @click.stop="onPillClick(entry)">
+                {{ entry.type === 'connected' && entry.connectedGroupName ? entry.connectedGroupName : getSectorName(entry.macro) }}
+              </span>
               <button
                 v-if="entry.action && props.editable"
                 type="button"
@@ -445,7 +448,7 @@ function onAnchorPillClick(macro: string) {
                   'pill-action--add': entry.action === 'add',
                   'pill-action--transfer': entry.action === 'transfer'
                 }"
-                @click.stop="onPillAction(entry, group.id); view === 'map' && onPillClick(entry)"
+                @click.stop="onPillAction(entry, group.id)"
               >
                 {{ entry.action === 'remove' ? 'x' : entry.action === 'transfer' ? '→' : '+' }}
               </button>
@@ -630,6 +633,10 @@ function onAnchorPillClick(macro: string) {
 
 .pill-action--transfer {
   @apply text-amber-400;
+}
+
+.pill-label {
+  @apply cursor-pointer;
 }
 
 .pill-dot {

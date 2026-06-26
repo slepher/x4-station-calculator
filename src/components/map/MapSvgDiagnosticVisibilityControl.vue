@@ -6,6 +6,7 @@ const props = defineProps<{
     sectorLabels: boolean
     sectorLinks: boolean
     sectorGroupColors: boolean
+    sectorRoutes: boolean
     sectorFactionFill: boolean
   }
   expanded: boolean
@@ -18,6 +19,7 @@ const emit = defineEmits<{
       sectorLabels: boolean
       sectorLinks: boolean
       sectorGroupColors: boolean
+      sectorRoutes: boolean
       sectorFactionFill: boolean
     }
   ): void
@@ -93,6 +95,17 @@ function onToggle<K extends keyof typeof props.visibility>(key: K, checked: bool
               @change="onToggle('sectorGroupColors', ($event.target as HTMLInputElement).checked)"
             />
             <span class="label-text">{{ t('map.debug_visibility_sector_group_colors') }}</span>
+          </label>
+        </div>
+
+        <div class="checkbox-item">
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              :checked="visibility.sectorRoutes"
+              @change="onToggle('sectorRoutes', ($event.target as HTMLInputElement).checked)"
+            />
+            <span class="label-text">{{ t('map.debug_visibility_sector_routes') }}</span>
           </label>
         </div>
 

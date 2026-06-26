@@ -1,0 +1,235 @@
+# auto-sector-group-one-map-route Design
+
+## 背景
+
+`sector-hub-transport` 已经实现 transit hub 到 linked hub station 的 route candidate 算法，并在 transit transport presenter 中用于 `Sector Group` 路径展示。`auto-sector-group-one-map` 已经定义地图 binding-sector 使用 shared draft、非 binding 场景使用 persisted binding 的数据切换规则。
+
+本变更把 hub link route candidates 前移到 `useLiveProductionStore` 预计算，并把同一份结果提供给：
+
+- 地图 hub link route overlay。
+- transit hub 运输栏中的 `Sector Group` link 路径。
+
+## 已知代码入口
+
+- `src/store/useLiveProductionStore.ts`：维护 active binding、shared draft `autoGroupResult`、virtual station draft、active transit context。本变更的 route cache 应放在这里。
+- `src/store/logic/transitRouteBuilder.ts`：已有 route candidate 算法，输出 `TransitRouteResult`、segments、summary、terminal 与 problems。
+- `src/components/empire/presenters/useTransitTransportPresenter.ts`：当前 `Sector Group` link 路径在 presenter 中计算。本变更应让它读取 store 预计算结果。
+- `src/components/map/MapWorkbenchView.vue`：地图页面状态与 `sectorGroupColorMap` 数据源切换入口。
+- `src/components/map/MapSvgCanvas.vue`：地图 SVG canvas，适合接收 hub link route overlay props。
+- `src/components/map/layers/MapLinkLayer.vue`：现有 gate、superhighway、highway、cross-cluster gate line 渲染层，可新增或旁路一个 route layer。
+- `src/composables/useMapSvgLinks.ts`：现有 gate/superhighway/highway 点位转换逻辑，可参考 endpoint 到 screen coordinate 的转换。
+
+## 架构
+
+继续遵守 `store -> presenter -> vue`：
+
+- store：
+  - 保存全局单份 hub link route cache。
+  - 基于当前 binding/draft 中出现过的 link、map data 与 station positions 预计算缺失的 route candidates。
+  - binding/draft 当前 link 集合只用于过滤全局 cache 的显示视图，不拥有独立 route 数据。
+  - 输出领域语义结构，不输出面向组件排版的 view model。
+- presenter：
+  - transit transport presenter 读取 store 中的预计算 hub link route。
+  - 对 `Sector Group` row 做 UI 所需排序、travel estimate、文案前数据拼装。
+  - `Station` 分类路径暂不迁移，继续沿用现有计算。
+- vue/map：
+  - 地图只接收已经计算好的 route overlay 数据。
+  - 地图负责 screen coordinate 转换与 SVG 绘制，不负责 route builder 调用。
+  - 图层开关只决定 overlay 是否渲染，不改变 store route cache。
+
+## 数据模型
+
+建议新增 store 侧 route cache 结构：
+
+```ts
+type HubLinkRouteEndpoint = {
+  groupId: string
+  sectorMacro: string
+  stationLabel: string
+  position: { x: number; y: number; z: number }
+}
+
+type HubLinkRouteEntry = {
+  id: string
+  fromGroupId: string
+  toGroupId: string
+  from: HubLinkRouteEndpoint
+  to: HubLinkRouteEndpoint
+  colorGroupId: string
+  color?: string
+  candidates: TransitRouteResult[]
+  problems: string[]
+}
+
+type HubLinkRouteCache = {
+  entries: HubLinkRouteEntry[]
+  binding: HubLinkRouteEntry[]
+  draft: HubLinkRouteEntry[]
+}
+```
+
+`id` 使用稳定路径 key，不使用 `binding` / `draft` scope，也不只使用 group id。路径 key 由两端实际 endpoint 生成：
+
+```text
+<minEndpointToken>:<maxEndpointToken>
+endpointToken = <sectorMacro>@<roundedX>,<roundedY>,<roundedZ>
+```
+
+这样可以避免 A->B 与 B-A 在地图上重复绘制，也保证相同路径端点在 binding 与 draft 中引用同一份路径数据。sector hub 切换导致 sector 或 position 变化时，会自然生成新的路径 key；旧 key 对应的路径继续保留在全局 cache，但只要当前 link 集合不再引用它，就不会显示。
+
+## route 生成
+
+store 生成 link route 时：
+
+1. 遍历 groups。
+2. 对每个 group 的 `connectedGroupIds` 找到 linked group。
+4. 解析两端 hub station：
+   - persisted binding 使用 `BindingSectorGroup.tradeStation`。
+   - draft 使用 draft group 的 trade station 信息；若 virtual trade station position 存在，应作为 draft 端点位置来源。
+5. 根据两端 hub station 的 `sectorMacro + position` 生成稳定无向路径 key。
+6. 通过稳定路径 key 去重。
+7. 如果全局 cache 中已经存在该路径 key，则不重复计算。
+8. 如果全局 cache 中不存在该路径 key，则调用 `buildTransitRouteCandidates`。
+9. 过滤掉 `problems.length > 0` 的候选后写入 `candidates`。
+10. 若端点缺失或全部候选不完整，写入 `problems`，但地图 overlay 不绘制该 entry。
+
+route algorithm 的口径不在本变更中修改：simple path、gate jump 上限、gate/superhighway/highway/ring 候选与 `sector-hub-transport` 保持一致。
+
+## 全局 route cache 生命周期
+
+全局 cache 的生命周期独立于 link 当前是否存在：
+
+- active binding 初始化或切换时，系统扫描 persisted binding links；缺失的路径 key 才计算并插入 cache。
+- binding-sector shared draft 初始化或变化时，系统扫描 draft links；缺失的路径 key 才计算并插入 cache。
+- 删除 link 时，只影响当前 link 集合过滤结果，不删除全局 cache entry。
+- 重新添加 link 时，若全局 cache 已有对应路径 key 的 entry，则直接复用。
+- sector hub 切换时，若两端 sector/position 变化，则生成新的路径 key；旧路径不删除。
+- group 顺序变化本身不应改变 route；若仅顺序变化，不需要重算 route。
+
+显示层从全局 cache 派生两个过滤视图：
+
+- `binding`：当前 persisted binding link key 集合对应的 entries。
+- `draft`：当前 binding-sector shared draft link key 集合对应的 entries。
+
+## 染色规则
+
+每条 hub link 的颜色由两端 hub station 所在 sector 决定：
+
+```text
+colorEndpointSector = min(from.sectorMacro, to.sectorMacro)
+colorGroup = endpoint sector 所属的 group
+color = colorGroup.color
+```
+
+若 colorGroup 无颜色，使用地图 route layer 的 fallback stroke。fallback 只影响该 link 的显示，不影响其它 link。
+
+同一 link 的所有 candidates 使用同一颜色。候选不使用透明度降级，也不通过样式表达最优/次优。
+
+## Route lane 偏移
+
+地图 route overlay 需要对重叠线路做稳定 lane 偏移，解决两类覆盖：
+
+- 不同 hub link 的路线经过同一基础线路时互相覆盖。
+- hub link route 压在地图原生 gate、superhighway、highway 连接线上。
+
+偏移只属于 map presenter / render view model，不改变 store 中的 route candidates，也不改变 `sector-hub-transport` 路径算法。
+
+### lane 分配
+
+基础线路用渲染层可识别的 `baseLinkKey` 分组，例如：
+
+- `gate:`：跨 sector gate transit，以两端 gate / sector 的无向 key 分组。
+- `superhighway:`：superhighway segment，以 link id / zone id / 两端 sector 的无向 key 分组。
+- `sector-internal:`：同一 sector 内部 A-B 通道，以两端位置几何 key 分组；普通 gate-to-gate、station-to-gate、gate-to-station、非环形 highway 相关内部段都归入该类。
+- `ring-highway:`：仅当 route segment 的 `highwayId` 命中 `highwayRingChains` 的 forward/backward highway id 时使用，表示该 A-B 通道存在原生环形高速直连。
+
+lane 分配规则：
+
+- 渲染层先按 `laneGroupKey` 分组；普通 `sector-internal` 与同几何端点的 `ring-highway` SHALL 归入同一个 lane group。
+- 同一 lane group 下，不同 hub link 分配不同 lane。
+- 同一 hub link 的多条 candidate 经过同一 lane group 时共用同一 lane。
+- 同一 hub link 在同一 A-B 通道同时存在普通内部段与环形高速段时，渲染层 SHALL 只保留一条可视 route，并优先保留 `ring-highway` 语义。
+- lane side 与 lane order 应稳定，避免重新渲染时左右跳动。
+- `gate:`、`superhighway:`、`ring-highway:` 属于原生 map link 通道，中心线保留给原生连接；即使只有一条 route 经过，也应偏到一侧。
+- 普通 `sector-internal:` 不属于原生 map link 通道；只有一条 route 时可走中心线，多条不同 hub link 共用该通道时按“中心线 + 两侧 lane”展开。
+- 如果某个 `sector-internal` lane group 中存在 `ring-highway`，整个 group 视为原生环形高速通道，中心线空出，普通内部 route 也不得占用中心线。
+
+### gate / endpoint 收束
+
+经过 gate、superhighway endpoint 或 highway endpoint 的 route SHOULD 在端点收束到真实连接点。主体线路保持 lane 偏移，靠近端点时通过短 taper 从 lane 收束到 endpoint，再从 endpoint 展开到下一段 lane。
+
+因此连续路径不强制跨端点保持完全相同的偏移量。端点是拓扑锚点，允许“汇合再分叉”；segment 主体应尽量保持稳定 lane，避免无意义的 2px / 3px 逐段跳变。
+
+### 星区内部与环形高速
+
+用户确认后的简化方案是：地图 route overlay 不再绘制普通 highway spline，也不区分“过高速/不过高速”的同端点重复方案。对于每个 sector 内部的 A-B route segment：
+
+- 渲染几何统一使用 A 点到 B 点的直连 polyline。
+- 非环形 highway、station-to-gate、gate-to-station、gate-to-gate 等同 sector 段都归入 `sector-internal`。
+- 若 `highwayId` 属于 `highwayRingChains` 中的 ring highway hop，则该段标记为 `ring-highway`，但输出几何仍是 A-B 直线。
+- `ring-highway` 的作用只在 lane 语义上：表示该 A-B 通道中线已有原生环形高速，需要空出中心 lane。
+- 环形高速规则只适用于环形高速星区中的环形高速路段，不包括这些星区中的其它非环形高速。
+
+这样可避免第二次接触 II 闪点（Flashpoint）这类场景中同一对 gate 同时画出“直连内部段”和“环形高速段”两条 route，导致某一颜色覆盖另一颜色。
+
+## 地图 overlay
+
+地图需要新增 hub link route overlay 输入，来源规则：
+
+```text
+if current map page is binding-sector:
+  routeEntries = liveStore.hubLinkRoutes.draft // filtered global cache
+  forceVisible = true
+else:
+  routeEntries = liveStore.hubLinkRoutes.binding // filtered global cache
+  forceVisible = false
+```
+
+可见性规则：
+
+```text
+visible = forceVisible || mapLayerVisibility.sectorRoutes
+```
+
+渲染时只绘制 `entry.candidates` 非空的 routes。每个 candidate 的 `segments` 转为 SVG line/path，并在 map route view model 中补充 lane 偏移：
+
+- 普通空间段：使用 segment `fromPosition` 与 `toPosition`，结合 segment 所在 sector 转屏幕坐标后画线。
+- gate transit：可使用现有 cross-cluster gate endpoint 逻辑画跨 cluster gate 线，或在候选 segment 有端点位置时按两端点画线。
+- superhighway：按端点位置生成 route segment，并按原生 map link 通道避让中心线。
+- highway / gate-to-gate / station-to-gate / gate-to-station 等 sector 内部段：统一按 A-B 端点直连生成 route segment；只有环形高速命中 `highwayRingChains` 时保留 `ring-highway` lane 语义。
+
+为避免地图层引入业务组装，segment 到 screen coordinate 的转换应是 map composable 或 layer 的纯渲染转换，不调用 store 或 route builder。
+
+## 图层开关
+
+地图图层控制增加 `sectorRoutes` 开关：
+
+- 文案：`Sector Routes` / `星区路径`。
+- 非 binding-sector 页面受该开关控制。
+- binding-sector 页面无视该开关，强制显示 draft routes。
+- 该开关不影响现有 gate、superhighway、highway ring gate 高亮、sector group color overlay、resource overlay。
+
+## transit hub 运输栏接入
+
+`useTransitTransportPresenter` 的 `Sector Group` rows 应改为从 store 读取 link route cache：
+
+- 根据当前 active transit group id 与 linked group id 找 route entry。
+- 默认仍按当前 ship selection 决定面板展示使用的 route：
+  - 无 ship 时使用 candidate order 中 `sector-hub-transport` 已选出的默认候选。
+  - 有 ship 时可沿用现有 travel time 选择逻辑，在预计算 candidates 上选择。
+- 问题组继续展示端点缺失或 route entry problems。
+
+`Station` 分类暂不迁移，避免把本次地图 link overlay 范围扩大到所有 station routes。
+
+## i18n
+
+需要新增或复用地图图层控制文案：
+
+- `Sector Routes`
+- `星区路径`
+
+如果地图 route overlay 增加 tooltip 或 legend，再补充对应中英文文案；本变更不要求新增候选路径 legend。
+
+## 验证
+
+实现阶段需要运行 `npm run build`。测试代码与测试执行不属于 `/x4:apply` 阶段，由测试 workflow 另行处理。

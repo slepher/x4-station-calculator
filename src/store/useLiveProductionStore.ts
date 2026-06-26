@@ -48,6 +48,12 @@ import { createProductionModuleActions } from './actions/productionModuleActions
 import { createProductionWareRuleActions } from './actions/productionWareRuleActions'
 import { createProductionSettingActions, doesStationSettingsAffectFlowMap } from './actions/productionSettingActions'
 import { maxSavedModules } from './logic/planningRecommendedModules'
+import {
+  buildBindingHubLinkRouteEntries,
+  buildDraftHubLinkRouteEntries,
+  type HubLinkRouteEntry,
+  type HubLinkRouteCache
+} from './logic/hubLinkRoutes'
 
 function mergeSavedModules(modules: SavedModule[]): SavedModule[] {
   const counts = new Map<string, number>()
@@ -125,6 +131,11 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     coverageByGroupId: Record<string, string[]>
     connectedGroupIdsByGroupId: Record<string, string[]>
   } | null>(null)
+
+  function resolveTransitRouteSectorLabel(sector: { id: string; name?: string; nameId?: string }): string {
+    if (sector.nameId && i18n.global.te(sector.nameId)) return i18n.global.t(sector.nameId)
+    return sector.name || sector.id
+  }
 
   function getVirtualStationDraftKey(): string | null {
     const archive = selectedArchive.value
@@ -312,6 +323,35 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     return { x: center.x, y: 0, z: center.z }
   }
 
+  const hubLinkRouteEntryCache = shallowRef(new Map<string, HubLinkRouteEntry>())
+
+  const bindingHubLinkRouteEntries = computed(() => buildBindingHubLinkRouteEntries({
+    binding: activeBinding.value,
+    maps: gameData.maps,
+    playerStationRecords: playerStationRecords.value,
+    cache: hubLinkRouteEntryCache.value,
+    resolveSectorLabel: resolveTransitRouteSectorLabel
+  }))
+
+  const draftHubLinkRouteEntries = computed(() => buildDraftHubLinkRouteEntries({
+    groups: autoGroupResult.value?.groups,
+    maps: gameData.maps,
+    playerStationRecords: playerStationRecords.value,
+    cache: hubLinkRouteEntryCache.value,
+    resolveSectorLabel: resolveTransitRouteSectorLabel,
+    getVirtualTradeStationDefaultPosition
+  }))
+
+  const hubLinkRoutes = computed<HubLinkRouteCache>(() => {
+    const binding = bindingHubLinkRouteEntries.value
+    const draft = draftHubLinkRouteEntries.value
+    return {
+      entries: Array.from(hubLinkRouteEntryCache.value.values()),
+      binding,
+      draft
+    }
+  })
+
   watch(autoGroupResult, (result) => {
     if (!result) return
     initializeVirtualStationDraftsForAutoGroups(result.groups)
@@ -350,6 +390,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
             ? { type: 'player' as const, stationCode: g.tradeStation.saveStationCode }
             : { type: 'virtual' as const, stationCode: '__virtual__' })
         : { type: 'virtual' as const, stationCode: '__virtual__' },
+      virtualTradeStationPosition: g.tradeStation?.saveStationCode ? undefined : g.tradeStation?.position,
       color: g.color,
       baseline: true
     }))
@@ -2499,6 +2540,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     overviewBuyMultiplier,
     overviewSellMultiplier,
     autoGroupResult,
+    hubLinkRoutes,
     virtualStationDrafts,
     virtualStationDraftInitializedKey,
     calculationMode,

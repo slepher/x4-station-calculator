@@ -150,7 +150,7 @@ const sortedAssignments = computed(() => {
                 class="bridge-sector-option"
                 :class="{ 'bridge-sector-option--selected': unit.selectedSectorMacro === candidate.sectorMacro }"
                 :disabled="disabled"
-                @click.stop="!disabled && emit('select-bridge-center', plan.id, unit.unitId, candidate.sectorMacro); view === 'map' && emit('focus-sector', candidate.sectorMacro)"
+                @click.stop="!disabled && emit('select-bridge-center', plan.id, unit.unitId, candidate.sectorMacro)"
               >
                 <span>{{ unit.selectedSectorMacro === candidate.sectorMacro ? '●' : '○' }}</span>
                 <span>{{ getSectorDisplayName(candidate.sectorMacro) }}</span>

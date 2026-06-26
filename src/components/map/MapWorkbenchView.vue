@@ -163,7 +163,7 @@ const saveBindingStore = useSaveBindingStore()
 const liveStore = useLiveProductionStore()
 const activeViewStore = useActiveViewStore()
 
-const { isResourcePanelOpen, isSavePanelOpen, isBindingPanelOpen, mapBindingGameGuid: bindingContextGameGuid, mapBindingStage: bindingContextStage } = storeToRefs(activeViewStore)
+const { isResourcePanelOpen, isSavePanelOpen, isBindingPanelOpen, mapBindingGameGuid: bindingContextGameGuid, mapBindingStage: bindingContextStage, mapSavePanelLayer } = storeToRefs(activeViewStore)
 const activeSavePoiCategory = ref<SavePoiCategory | null>(null)
 const focusedSavePoiKey = ref<string | null>(null)
 const savePoiTooltipItem = ref<SavePoiOverlayItem | null>(null)
@@ -171,6 +171,7 @@ const mapDiagnosticVisibility = ref({
   sectorLabels: true,
   sectorLinks: true,
   sectorGroupColors: true,
+  sectorRoutes: true,
   sectorFactionFill: true
 })
 const activeControlPanel = ref<'diagnostic' | 'poi' | null>(null)
@@ -209,6 +210,20 @@ const sectorGroupColorMap = computed<Record<string, string>>(() => {
   if (!binding) return {}
   return buildColorMap(binding.groups)
 })
+const isBindingSectorRouteActive = computed(() => {
+  if (!isSavePanelOpen.value) return false
+  if (mapSavePanelLayer.value !== 'binding-sector') return false
+  const binding = saveBindingStore.activeBinding
+  if (!binding) return false
+  return bindingContextGameGuid.value === binding.gameGuid
+})
+const hubLinkRouteEntries = computed(() => {
+  return isBindingSectorRouteActive.value
+    ? liveStore.hubLinkRoutes.draft
+    : liveStore.hubLinkRoutes.binding
+})
+const showSectorRoutes = computed(() => isBindingSectorRouteActive.value || mapDiagnosticVisibility.value.sectorRoutes)
+
 const settledSavePoiViewportContentBounds = ref<{
   left: number
   top: number
@@ -1708,6 +1723,7 @@ const onMapDiagnosticVisibilityChange = (visibility: {
   sectorLabels: boolean
   sectorLinks: boolean
   sectorGroupColors: boolean
+  sectorRoutes: boolean
   sectorFactionFill: boolean
 }) => {
   mapDiagnosticVisibility.value = visibility
@@ -2161,8 +2177,10 @@ onBeforeUnmount(() => {
               :show-sector-links="mapDiagnosticVisibility.sectorLinks"
               :show-resource-badges="true"
               :show-sector-group-colors="mapDiagnosticVisibility.sectorGroupColors || bindingContextStage === 'select-sector' || bindingContextStage === 'select-station'"
+              :show-sector-routes="showSectorRoutes"
               :show-faction-fill="mapDiagnosticVisibility.sectorFactionFill && bindingContextStage !== 'select-sector' && bindingContextStage !== 'select-station'"
               :sector-group-color-map="sectorGroupColorMap"
+              :hub-link-route-entries="hubLinkRouteEntries"
               @content-size="onCanvasSize"
               @sector-layout="onSectorLayout"
               @layout-state="onLayoutState"

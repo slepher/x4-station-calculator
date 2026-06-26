@@ -55,6 +55,12 @@ export interface SaveSectorStaticPosition {
   ty?: number
 }
 
+export interface SaveSectorCenter {
+  x: number
+  y: number
+  z: number
+}
+
 export interface SaveSectorClusterGateEntry {
   id: string
   target_cluster_id?: string
@@ -330,6 +336,7 @@ export interface SectorData {
   name: string
   is_known: boolean
   owner?: string
+  center?: SaveSectorCenter
   scale_per_radius?: number
   clusterGates?: SaveSectorClusterGateEntry[]
   superhighwayGates?: SaveSectorSuperhighwayGateEntry[]

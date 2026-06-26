@@ -61,6 +61,7 @@ function createEmptySectorData(name: string): SectorData {
     name,
     is_known: false,
     owner: undefined,
+    center: undefined,
     scale_per_radius: undefined,
     clusterGates: [],
     superhighwayGates: [],
@@ -262,6 +263,12 @@ function normalizeSectorData(
   const normalized = createEmptySectorData(sector.name || sectorId)
   normalized.is_known = Boolean(sector.is_known)
   normalized.owner = sector.owner
+  normalized.center = sector.center
+    && typeof sector.center.x === 'number'
+    && typeof sector.center.y === 'number'
+    && typeof sector.center.z === 'number'
+    ? sector.center
+    : undefined
   normalized.scale_per_radius = typeof sector.scale_per_radius === 'number' ? sector.scale_per_radius : undefined
   normalized.clusterGates = Array.isArray(sector.clusterGates) ? sector.clusterGates : []
   normalized.superhighwayGates = Array.isArray(sector.superhighwayGates) ? sector.superhighwayGates : []

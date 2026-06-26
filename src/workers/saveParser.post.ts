@@ -67,7 +67,7 @@ interface SectorStaticHighwayLookup {
 }
 
 export const CURRENT_PARSER_VERSION = 'v9' as const
-export const CURRENT_POST_PROCESSOR_VERSION = 'v12' as const
+export const CURRENT_POST_PROCESSOR_VERSION = 'v13' as const
 const SECTOR_CENTER_GRID = 64000
 const DEFAULT_HEX_INNER_RATIO = Math.sqrt(3) / 2
 const DEFAULT_EXTENT_RATIO = 0.8
@@ -869,6 +869,7 @@ function stripEmptySectorCollections(sector: SectorData): SectorData {
     name: sector.name,
     is_known: sector.is_known,
     owner: sector.owner,
+    center: sector.center,
     scale_per_radius: sector.scale_per_radius
   }
   
@@ -953,6 +954,7 @@ export function postProcessRustSaveArchive(
       
       let enrichedSector: SectorData = {
         ...processedSector,
+        center: sectorCenterLookup[sectorMacro.toLowerCase()],
         scale_per_radius: sectorScaleLookup[sectorMacro.toLowerCase()] || undefined,
         clusterGates: sectorStaticClusterGateLookup[sectorMacro.toLowerCase()] || [],
         superhighwayGates: sectorStaticSuperhighwayGateLookup[sectorMacro.toLowerCase()] || [],

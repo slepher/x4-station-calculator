@@ -897,9 +897,10 @@ onBeforeUnmount(() => {
           <span
             class="sector-pill"
             :class="{ 'sector-pill--anchor': sector.isAnchor }"
-            @click="emit('focus-sector', sector.sectorMacro)"
           >
-            {{ sector.sectorName }}
+            <span class="sector-pill-label" @click.stop="emit('focus-sector', sector.sectorMacro)">
+              {{ sector.sectorName }}
+            </span>
           </span>
           <span v-if="!sector.isAnchor" class="sector-distance">{{ sector.distance }}j</span>
         </div>
@@ -1213,11 +1214,15 @@ onBeforeUnmount(() => {
 }
 
 .sector-pill {
-  @apply inline-flex items-center rounded-full border border-amber-300/25 bg-amber-200/10 px-2.5 py-1 text-sm text-amber-100 cursor-pointer transition-colors hover:bg-amber-200/20 hover:text-amber-50;
+  @apply inline-flex items-center rounded-full border border-amber-300/25 bg-amber-200/10 px-2.5 py-1 text-sm text-amber-100;
 }
 
 .sector-pill--anchor {
   @apply border-amber-400/40 bg-amber-300/15 text-amber-50 font-medium;
+}
+
+.sector-pill-label {
+  @apply cursor-pointer rounded-sm transition-colors hover:text-amber-50;
 }
 
 .sector-distance {

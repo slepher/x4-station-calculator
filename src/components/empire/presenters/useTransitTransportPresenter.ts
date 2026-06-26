@@ -4,6 +4,7 @@ import type { PlayerStationEntry, PlayerStationRecord } from '@/types/saveArchiv
 import type { WareProductionFlow } from '@/types/production-flow'
 import type { StationDerivedMap } from '@/store/state/StationDerivedMap'
 import { buildTransitRouteCandidates, type TransitRouteBuildOptions, type TransitRouteResult, type TransitRouteSegment, type TransitRouteSummary, type TransitRouteTerminal, type TransitRouteTarget } from '@/store/logic/transitRouteBuilder'
+import { findHubLinkRouteEntry, type HubLinkRouteCache } from '@/store/logic/hubLinkRoutes'
 import {
   buildStationProductsFromFlows,
   buildStationTravelEstimate,
@@ -103,6 +104,7 @@ export interface TransitTransportPresenterStore {
   liveFlowMap?: StationDerivedMap | null
   gameDataMaps: X4Map
   selectedTransitTransportBlueprintId?: string | null
+  hubLinkRoutes?: HubLinkRouteCache
 }
 
 export type TransitTransportPresenterDeps = {
@@ -194,6 +196,7 @@ export function useTransitTransportPresenter(
       routeSource,
       maps,
       playerStationRecords: store.playerStationRecords,
+      hubLinkRoutes: store.hubLinkRoutes,
       problems,
       travelProfile: shipCandidateState.selectedProfile,
       routeSearchCache
@@ -233,6 +236,7 @@ function buildSectorGroupRows(input: {
   routeSource: { sectorMacro: string; position: { x: number; y: number; z: number }; label: string }
   maps: X4Map
   playerStationRecords: PlayerStationRecord[]
+  hubLinkRoutes?: HubLinkRouteCache
   problems: TransportProblemRow[]
   travelProfile: TransportShipTravelProfile | null
   routeSearchCache: NonNullable<TransitRouteBuildOptions['multiTargetRouteCache']>
@@ -249,12 +253,10 @@ function buildSectorGroupRows(input: {
       continue
     }
 
-    const selectedRoute = buildSelectedRoute(input.maps, input.routeSource, {
-      kind: 'station',
-      sectorMacro: linkedHub.sectorMacro,
-      position: linkedPosition,
-      label: linkedHub.name || linkedGroup.name
-    }, input.travelProfile, input.routeSearchCache)
+    const routeEntry = findHubLinkRouteEntry(input.hubLinkRoutes?.binding ?? [], input.activeGroup.id, linkedGroup.id)
+    const selectedRoute = routeEntry?.candidates.length
+      ? selectRouteFromCandidates(routeEntry.candidates, input.maps, input.travelProfile)
+      : buildMissingSelectedRoute(input.routeSource, routeEntry?.problems.length ? routeEntry.problems : ['missing-precomputed-hub-link-route'])
     const route = selectedRoute.route
     const summary = buildTransitRouteSummaryForSegments(route.summary, selectedRoute.segments)
     if (route.problems.length > 0) {
@@ -546,6 +548,50 @@ function buildSelectedRoute(
     (candidate) => injectHighwayAlternatives(candidate.segments, candidate.sectors, maps.sectors, profile)
   )
   return { route: selected.route, segments: selected.segments }
+}
+
+function selectRouteFromCandidates(
+  candidates: TransitRouteResult[],
+  maps: X4Map,
+  profile: TransportShipTravelProfile | null
+): SelectedTransportRoute {
+  const first = candidates[0]!
+  if (!profile) return { route: first, segments: first.segments }
+  const selected = selectTransitRouteByTravelTime(
+    candidates,
+    profile,
+    (candidate) => injectHighwayAlternatives(candidate.segments, candidate.sectors, maps.sectors, profile)
+  )
+  return { route: selected.route, segments: selected.segments }
+}
+
+function buildMissingSelectedRoute(
+  routeSource: { sectorMacro: string; position: { x: number; y: number; z: number }; label: string },
+  problems: string[]
+): SelectedTransportRoute {
+  return {
+    route: {
+      summary: {
+        gateCount: 0,
+        normalDistanceKm: 0,
+        superhighwayDistanceKm: 0,
+        highwayDistanceKm: 0,
+        engineDistanceKm: 0,
+        highwayGateCount: 0,
+        engineGateCount: 0
+      },
+      sectors: [],
+      segments: [],
+      terminal: {
+        kind: 'origin',
+        label: routeSource.label,
+        sectorMacro: routeSource.sectorMacro,
+        position: routeSource.position
+      },
+      problems
+    },
+    segments: []
+  }
 }
 
 function buildStationTargets(input: {

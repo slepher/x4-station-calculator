@@ -22,13 +22,16 @@ import type {
 } from '@/components/map/types'
 import { useMapSvgLayout } from '@/composables/useMapSvgLayout'
 import { useMapSvgLinks } from '@/composables/useMapSvgLinks'
+import { useMapHubLinkRoutes } from '@/composables/useMapHubLinkRoutes'
 import { useMapSvgOverlays } from '@/composables/useMapSvgOverlays'
 import { useMapSvgSectors } from '@/composables/useMapSvgSectors'
 import MapLinkLayer from '@/components/map/layers/MapLinkLayer.vue'
+import MapHubLinkRouteLayer from '@/components/map/layers/MapHubLinkRouteLayer.vue'
 import MapOverlayLayer from '@/components/map/layers/MapOverlayLayer.vue'
 import MapSectorLabelLayer from '@/components/map/layers/MapSectorLabelLayer.vue'
 import MapSectorLayer from '@/components/map/layers/MapSectorLayer.vue'
 import MapSectorGroupColorLayer from '@/components/map/layers/MapSectorGroupColorLayer.vue'
+import type { HubLinkRouteEntry } from '@/store/logic/hubLinkRoutes'
 type SectorHoverPayload = {
   sectorId: string
   clusterId: string
@@ -102,8 +105,10 @@ const props = withDefaults(defineProps<{
   showSectorLinks?: boolean
   showResourceBadges?: boolean
   showSectorGroupColors?: boolean
+  showSectorRoutes?: boolean
   showFactionFill?: boolean
   sectorGroupColorMap?: Record<string, string>
+  hubLinkRouteEntries?: HubLinkRouteEntry[]
 }>(), {
   searchHighlightedSectorIds: () => [],
   resourceHighlightedSectorIds: () => [],
@@ -137,7 +142,9 @@ const props = withDefaults(defineProps<{
   showSectorLinks: true,
   showResourceBadges: true,
   showSectorGroupColors: true,
-  showFactionFill: true
+  showSectorRoutes: true,
+  showFactionFill: true,
+  hubLinkRouteEntries: () => []
 })
 
 const emit = defineEmits<{
@@ -284,6 +291,15 @@ const {
   layoutState,
   resolveOwnerColor,
   stargateVisualScale: STARGATE_VISUAL_SCALE
+})
+
+const { routeLines: hubLinkRouteLines } = useMapHubLinkRoutes({
+  clusters,
+  sectors,
+  saveSectors: saveSectorsRef,
+  highwayRingChains: computed(() => gameData.maps.highwayRingChains),
+  layoutState,
+  routeEntries: toRef(props, 'hubLinkRouteEntries')
 })
 
 const {
@@ -449,6 +465,11 @@ watchEffect(() => {
       :show-resource-badges="showResourceBadges"
       @sector-hover="emitSectorHover"
       @sector-leave="emitSectorLeave"
+    />
+
+    <MapHubLinkRouteLayer
+      :visible="showSectorRoutes"
+      :route-lines="hubLinkRouteLines"
     />
 
     <MapOverlayLayer
