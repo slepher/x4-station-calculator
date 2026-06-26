@@ -81,9 +81,7 @@ function hasGates(value: number): boolean {
 }
 
 function sectorGroupTargetText(row: { groupName: string; targetSectorName: string; targetStationName: string }): string {
-  const target = row.targetStationName && row.targetStationName !== row.targetSectorName
-    ? `${row.targetStationName} · ${row.targetSectorName}`
-    : row.targetSectorName || row.targetStationName
+  const target = row.targetSectorName || row.targetStationName
   if (target.trim() === row.groupName.trim()) {
     return ''
   }
