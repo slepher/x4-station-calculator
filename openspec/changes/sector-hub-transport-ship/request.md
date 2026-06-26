@@ -67,11 +67,21 @@ throughputM3PerHour = containerCapacityM3 / oneWayTimeSec * 3600
 ### 右侧运输路线展示
 
 - 选择运输船后，Sector Group row 以 metric chip 显示总耗时与单程吞吐量。
+- 选择运输船后，Sector Group row 的总路程必须跟随最终展示路线变更；若最终路线使用 highway / highway-approach / highway-exit 替代原普通空间段，则总路程按最终 segment 汇总，不继续显示旧 route summary。
+- Sector Group row、Station sector row、Station row 使用一致的两列指标布局：左列为总路程/耗时，右列为星门数或数量/单程吞吐量；耗时与单程吞吐量不显示“耗时”“单程”等描述性前缀；缺失的耗时/吞吐量不预留空行。
+- Sector Group row 的副标题如果与 row 标题相同，则隐藏副标题。
 - Sector Group 展开明细中，每个普通空间路径段显示该段耗时；`gate-transit` 与 `superhighway` 不显示耗时。
 - Station 分类中：
-  - 若 station 与当前 hub 同星区，sector header 依旧不显示，只显示 station row 的耗时与单程吞吐量。
-  - 若 station 与当前 hub 不同星区，sector row 显示到目标 sector terminal 的耗时，sector 展开明细像 Sector Group 一样显示每段普通空间耗时。
-  - 跨星区 station row 显示星区内耗时、总耗时、单程吞吐量。
+  - Station row 的展示格式对齐 Sector Group row，直接显示总路程、总耗时、单程吞吐量的值，不显示“总路程/耗时/单程吞吐”等描述性文字。
+  - Station row 副信息只显示 station code；若 code 为空或与 station 名称相同，则不显示副信息；副信息不显示星区名，避免与分组标题重复。
+  - Station row 使用产物摘要替代产线数显示；产物摘要单独占一行，不参与距离/耗时/吞吐指标网格；产物来自 `StationDerivedMap` cache 的 `productionFlows` 与 `warePriorityLevels`，只显示 `netRate > 0` 且有效 priority > 0 的 ware。
+  - Station 产物不区分主次，排序为 priority 降序、tier 降序、名称升序；摘要最多显示前两个产物，超出显示 `+N`；无产物时摘要显示“无产物”。
+  - Station row 展开内容除了本地最后一段路线，还显示完整产物列表；无产物时不显示产物标题和产物列表。
+  - Station row 的总路程与总耗时按“到目标 sector terminal 的最终路线 + sector 内最后一段最终路线”汇总；最后一段如果使用 highway 替代，也必须纳入总路程与耗时。
+  - Station row 可展开；展开内容只显示 sector 内最后一段路程，不展示跨星区完整 route。
+  - Station 最后一段如果没有 highway 替代，则展开显示一段 terminal/origin 到 station 的本地路程。
+  - Station 最后一段如果使用 highway 替代，则展开显示 highway-approach / highway / highway-exit 组成的本地路径明细；连续 highway 段按 highway 起点星区归组，`highway-exit` 不因 `fromLabel` 是 station code 而另起 station 标题。
+  - Station sector header 不因本次调整改变展开内容；跨星区 sector row 仍只展示到目标 sector terminal 的路线。
 - 耗时显示格式：
   - 小于 60 分钟：`Xm Ys`
   - 大于等于 60 分钟：`Xh Ym`

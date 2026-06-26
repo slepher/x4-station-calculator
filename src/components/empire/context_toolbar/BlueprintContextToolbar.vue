@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { StationType, StationSettings } from '@/types/x4'
 import X4NumberInput from '@/components/common/X4NumberInput.vue'
@@ -42,10 +42,38 @@ const { t } = useI18n()
 
 const isOverview = computed(() => props.workbenchMode === 'overview')
 
-const stationName = computed({
-  get: () => props.station?.name || '',
-  set: (name: string) => { if (props.station) emit('updateStationName', name) }
+const stationNameDraft = ref(props.station?.name || '')
+const isEditingStationName = ref(false)
+const stationNameBeforeEdit = ref(props.station?.name || '')
+
+watch(() => props.station?.name, (value) => {
+  if (!isEditingStationName.value) {
+    stationNameDraft.value = value || ''
+  }
 })
+
+const handleStationNameFocus = () => {
+  isEditingStationName.value = true
+  stationNameBeforeEdit.value = props.station?.name || ''
+  stationNameDraft.value = props.station?.name || ''
+}
+
+const handleStationNameInput = (event: Event) => {
+  stationNameDraft.value = (event.target as HTMLInputElement).value
+}
+
+const handleStationNameBlur = () => {
+  const trimmed = stationNameDraft.value.trim()
+  if (!trimmed) {
+    stationNameDraft.value = stationNameBeforeEdit.value
+    isEditingStationName.value = false
+    return
+  }
+  isEditingStationName.value = false
+  if (props.station && trimmed !== props.station.name) {
+    emit('updateStationName', trimmed)
+  }
+}
 
 const stationType = computed({
   get: () => props.station?.type || 'industrial',
@@ -134,7 +162,14 @@ const handleOpenImport = () => {
       <div class="toolbar-section">
         <div class="input-group">
           <label class="group-label">{{ t('toolbar.station_name') }}</label>
-          <input v-model="stationName" class="ghost-input w-32" :placeholder="t('toolbar.station_name_placeholder')" />
+          <input
+            :value="stationNameDraft"
+            class="ghost-input w-32"
+            :placeholder="t('toolbar.station_name_placeholder')"
+            @focus="handleStationNameFocus"
+            @input="handleStationNameInput"
+            @blur="handleStationNameBlur"
+          />
         </div>
 
         <div class="input-group ml-6">

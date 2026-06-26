@@ -10,6 +10,7 @@ const props = defineProps<{
 const { t } = useI18n()
 const expandedSectorGroups = ref<Set<string>>(new Set())
 const expandedStationSectors = ref<Set<string>>(new Set())
+const expandedStations = ref<Set<string>>(new Set())
 
 const hasSectorGroups = computed(() => props.panel.sectorGroupRows.length > 0)
 const hasStationGroups = computed(() => props.panel.stationSectorGroups.length > 0)
@@ -25,12 +26,18 @@ type RouteBlock = {
   }>
 }
 
+type EffectiveRouteSegment = TransportRouteSegmentView | NonNullable<TransportRouteSegmentView['highwayAlternative']>[number]
+
 function toggleSectorGroup(id: string) {
   expandedSectorGroups.value = toggledSet(expandedSectorGroups.value, id)
 }
 
 function toggleStationSector(id: string) {
   expandedStationSectors.value = toggledSet(expandedStationSectors.value, id)
+}
+
+function toggleStation(id: string) {
+  expandedStations.value = toggledSet(expandedStations.value, id)
 }
 
 function toggledSet(source: Set<string>, id: string): Set<string> {
@@ -48,12 +55,16 @@ function formatKm(value: number): string {
   return `${value.toFixed(1)} km`
 }
 
-function formatCoord(value: number): string {
-  return `${value.toFixed(1)}`
-}
-
 function hasRouteDetails(segments: unknown[]): boolean {
   return segments.length > 0
+}
+
+function hasStationDetails(station: { segments: unknown[] }): boolean {
+  return station.segments.length > 0
+}
+
+function hasStationProducts(station: { products: { items: unknown[] } }): boolean {
+  return station.products.items.length > 0
 }
 
 function hasDistance(value: number): boolean {
@@ -64,11 +75,21 @@ function hasGates(value: number): boolean {
   return value > 0
 }
 
-function sectorGroupTargetText(row: { targetSectorName: string; targetStationName: string }): string {
-  if (row.targetStationName && row.targetStationName !== row.targetSectorName) {
-    return `${row.targetStationName} · ${row.targetSectorName}`
+function sectorGroupTargetText(row: { groupName: string; targetSectorName: string; targetStationName: string }): string {
+  const target = row.targetStationName && row.targetStationName !== row.targetSectorName
+    ? `${row.targetStationName} · ${row.targetSectorName}`
+    : row.targetSectorName || row.targetStationName
+  if (target.trim() === row.groupName.trim()) {
+    return ''
   }
-  return row.targetSectorName || row.targetStationName
+  return target
+}
+
+function stationTargetText(station: { stationName: string; stationCode: string }): string {
+  const code = station.stationCode.trim()
+  if (!code) return ''
+  if (code === station.stationName.trim()) return ''
+  return code
 }
 
 function routeBlocks(segments: TransportRouteSegmentView[]): RouteBlock[] {
@@ -82,7 +103,21 @@ function routeBlocks(segments: TransportRouteSegmentView[]): RouteBlock[] {
     return block
   }
 
+  function segmentFromLabel(segment: EffectiveRouteSegment): string {
+    if ('fromLabel' in segment) return segment.fromLabel
+    return ''
+  }
+
+  function highwayBlockLabel(segment: TransportRouteSegmentView, effectiveSegment: EffectiveRouteSegment): string {
+    if (segment.highwayAlternative && segment.highwayAlternative.length > 0) {
+      return segment.highwayAlternative[0]!.fromLabel
+    }
+    return segmentFromLabel(effectiveSegment)
+  }
+
   function emitBlockItems(segList: TransportRouteSegmentView[], startIndex: number) {
+    let activeHighwayBlockLabel: string | null = null
+
     segList.forEach((segment, i) => {
       const index = startIndex + i
       const effectiveSegments = segment.highwayAlternative ?? [segment]
@@ -90,6 +125,7 @@ function routeBlocks(segments: TransportRouteSegmentView[]): RouteBlock[] {
       for (const es of effectiveSegments) {
         const segKind = 'kind' in es ? es.kind : ''
         if (segKind === 'station-to-gate') {
+          activeHighwayBlockLabel = null
           ensureBlock(('toLabel' in es ? es.toLabel : '') || '').items.push({
             key: `${index}:depart`,
             label: t('transit_transport.route_action.depart_to_gate'),
@@ -100,6 +136,7 @@ function routeBlocks(segments: TransportRouteSegmentView[]): RouteBlock[] {
         }
 
         if (segKind === 'gate-transit') {
+          activeHighwayBlockLabel = null
           ensureBlock(('fromLabel' in es ? es.fromLabel : '') || '').items.push({
             key: `${index}:jump`,
             label: t('transit_transport.route_action.jump_to', { sector: ('toLabel' in es ? es.toLabel : '') || '' }),
@@ -110,6 +147,7 @@ function routeBlocks(segments: TransportRouteSegmentView[]): RouteBlock[] {
         }
 
         if (segKind === 'gate-to-gate') {
+          activeHighwayBlockLabel = null
           ensureBlock(('fromLabel' in es ? es.fromLabel : '') || '').items.push({
             key: `${index}:transfer`,
             label: t('transit_transport.route_action.in_sector_transfer'),
@@ -120,6 +158,7 @@ function routeBlocks(segments: TransportRouteSegmentView[]): RouteBlock[] {
         }
 
         if (segKind === 'superhighway') {
+          activeHighwayBlockLabel = null
           ensureBlock(('fromLabel' in es ? es.fromLabel : '') || '').items.push({
             key: `${index}:superhighway`,
             label: t('transit_transport.route_action.superhighway_to', { sector: ('toLabel' in es ? es.toLabel : '') || '' }),
@@ -130,7 +169,9 @@ function routeBlocks(segments: TransportRouteSegmentView[]): RouteBlock[] {
         }
 
         if (segKind === 'highway-approach') {
-          ensureBlock(('fromLabel' in es ? es.fromLabel : '') || '').items.push({
+          const blockLabel = highwayBlockLabel(segment, es)
+          activeHighwayBlockLabel = blockLabel
+          ensureBlock(blockLabel).items.push({
             key: `${index}:hw-approach`,
             label: t('transit_transport.segment.highway-approach'),
             distanceText: formatKm(('distanceKm' in es ? es.distanceKm : 0) || 0),
@@ -140,7 +181,9 @@ function routeBlocks(segments: TransportRouteSegmentView[]): RouteBlock[] {
         }
 
         if (segKind === 'highway') {
-          ensureBlock(('fromLabel' in es ? es.fromLabel : '') || '').items.push({
+          const blockLabel = activeHighwayBlockLabel ?? highwayBlockLabel(segment, es)
+          activeHighwayBlockLabel = blockLabel
+          ensureBlock(blockLabel).items.push({
             key: `${index}:highway`,
             label: t('transit_transport.segment.highway'),
             distanceText: formatKm(('distanceKm' in es ? es.distanceKm : 0) || 0),
@@ -150,7 +193,9 @@ function routeBlocks(segments: TransportRouteSegmentView[]): RouteBlock[] {
         }
 
         if (segKind === 'highway-exit') {
-          ensureBlock(('fromLabel' in es ? es.fromLabel : '') || '').items.push({
+          const blockLabel = activeHighwayBlockLabel ?? highwayBlockLabel(segment, es)
+          activeHighwayBlockLabel = null
+          ensureBlock(blockLabel).items.push({
             key: `${index}:hw-exit`,
             label: t('transit_transport.segment.highway-exit'),
             distanceText: formatKm(('distanceKm' in es ? es.distanceKm : 0) || 0),
@@ -160,6 +205,7 @@ function routeBlocks(segments: TransportRouteSegmentView[]): RouteBlock[] {
         }
 
         if (segKind === 'gate-to-station') {
+          activeHighwayBlockLabel = null
           ensureBlock(('fromLabel' in es ? es.fromLabel : '') || '').items.push({
             key: `${index}:arrive`,
             label: t('transit_transport.route_action.arrive_to_station'),
@@ -198,11 +244,14 @@ function routeBlocks(segments: TransportRouteSegmentView[]): RouteBlock[] {
         >
           <button class="route-summary" type="button" @click="toggleSectorGroup(row.id)">
             <span class="route-title">{{ row.groupName }}</span>
-            <span class="route-meta route-target">{{ sectorGroupTargetText(row) }}</span>
-            <span class="route-stat">{{ formatKm(row.summary.normalDistanceKm) }}</span>
-            <span class="route-stat">{{ t('transit_transport.gates_value', { count: row.summary.gateCount }) }}</span>
-            <span v-if="row.travel" class="route-stat">{{ t('transit_transport.travel_time_value', { time: row.travel.formattedTime }) }}</span>
-            <span v-if="row.travel?.formattedThroughput" class="route-stat">{{ t('transit_transport.throughput_value', { value: row.travel.formattedThroughput }) }}</span>
+            <span v-if="sectorGroupTargetText(row)" class="route-subtitle">{{ sectorGroupTargetText(row) }}</span>
+            <span class="route-metrics">
+              <span class="route-stat">{{ formatKm(row.summary.normalDistanceKm) }}</span>
+              <span v-if="row.travel" class="route-stat">{{ row.travel.formattedTime }}</span>
+              <span v-else class="route-stat">{{ t('transit_transport.gates_value', { count: row.summary.gateCount }) }}</span>
+              <span v-if="row.travel?.formattedThroughput" class="route-stat">{{ row.travel.formattedThroughput }}</span>
+              <span v-if="row.travel" class="route-stat">{{ t('transit_transport.gates_value', { count: row.summary.gateCount }) }}</span>
+            </span>
           </button>
           <div v-if="expandedSectorGroups.has(row.id)" class="route-details">
             <div class="terminal-line">
@@ -242,14 +291,18 @@ function routeBlocks(segments: TransportRouteSegmentView[]): RouteBlock[] {
           <button
             class="route-summary"
             type="button"
-            :class="{ 'not-expandable': !hasRouteDetails(group.segments) }"
+            :class="{ 'not-expandable': !hasRouteDetails(group.segments), 'compact-summary': !hasDistance(group.summary.normalDistanceKm) && !group.travel }"
             @click="hasRouteDetails(group.segments) && toggleStationSector(group.id)"
           >
             <span class="route-title">{{ group.sectorName }}</span>
-            <span v-if="hasDistance(group.summary.normalDistanceKm)" class="route-stat">{{ formatKm(group.summary.normalDistanceKm) }}</span>
-            <span v-if="hasGates(group.summary.gateCount)" class="route-stat">{{ t('transit_transport.gates_value', { count: group.summary.gateCount }) }}</span>
-            <span v-if="group.travel" class="route-stat">{{ t('transit_transport.travel_time_value', { time: group.travel.formattedTime }) }}</span>
-            <span class="route-meta">{{ group.stations.length }} {{ t('transit_transport.station_count') }}</span>
+            <span class="route-metrics">
+              <span v-if="hasDistance(group.summary.normalDistanceKm)" class="route-stat">{{ formatKm(group.summary.normalDistanceKm) }}</span>
+              <span v-else class="route-stat route-stat-empty"></span>
+              <span v-if="group.travel" class="route-stat">{{ group.travel.formattedTime }}</span>
+              <span v-else class="route-stat">{{ hasGates(group.summary.gateCount) ? t('transit_transport.gates_value', { count: group.summary.gateCount }) : `${group.stations.length} ${t('transit_transport.station_count')}` }}</span>
+              <span v-if="group.travel && hasGates(group.summary.gateCount)" class="route-stat">{{ t('transit_transport.gates_value', { count: group.summary.gateCount }) }}</span>
+              <span v-if="group.travel || hasGates(group.summary.gateCount)" class="route-stat">{{ group.stations.length }} {{ t('transit_transport.station_count') }}</span>
+            </span>
           </button>
           <div v-if="hasRouteDetails(group.segments) && expandedStationSectors.has(group.id)" class="route-details">
             <div
@@ -275,19 +328,49 @@ function routeBlocks(segments: TransportRouteSegmentView[]): RouteBlock[] {
               :key="station.id"
               class="station-row"
             >
-              <div class="station-main">
-                <strong>{{ station.stationName }}</strong>
-                <span>{{ station.stationCode }}</span>
-              </div>
-              <div class="station-metrics">
-                <span>{{ t('transit_transport.station_coord') }}: {{ formatCoord(station.coordinateKm.x) }}, {{ formatCoord(station.coordinateKm.y) }}, {{ formatCoord(station.coordinateKm.z) }} km</span>
-                <span v-if="!group.hideSectorHeader">{{ t(hasRouteDetails(group.segments) ? 'transit_transport.terminal_distance' : 'transit_transport.station_to_station') }}: {{ formatKm(station.terminalDistanceKm) }}</span>
-                <span>{{ t('transit_transport.total_normal_distance') }}: {{ formatKm(station.totalNormalDistanceKm) }}</span>
-                <span v-if="station.travel && group.hideSectorHeader">{{ t('transit_transport.travel_time_value', { time: station.travel.formattedTotalTime }) }}</span>
-                <span v-if="station.travel && !group.hideSectorHeader">{{ t('transit_transport.local_travel_time_value', { time: station.travel.formattedLocalTime }) }}</span>
-                <span v-if="station.travel && !group.hideSectorHeader">{{ t('transit_transport.total_travel_time_value', { time: station.travel.formattedTotalTime }) }}</span>
-                <span v-if="station.travel?.formattedThroughput">{{ t('transit_transport.throughput_value', { value: station.travel.formattedThroughput }) }}</span>
-                <span>{{ t('transit_transport.production_lines') }}: {{ station.productionLineCount }}</span>
+              <button
+                class="route-summary station-summary"
+                type="button"
+                :class="{ 'not-expandable': !hasStationDetails(station) }"
+                @click="hasStationDetails(station) && toggleStation(station.id)"
+              >
+                <span class="route-title">{{ station.stationName }}</span>
+                <span v-if="stationTargetText(station)" class="route-subtitle">{{ stationTargetText(station) }}</span>
+                <span class="station-product-summary">{{ station.products.label }}</span>
+                <span class="route-metrics">
+                  <span class="route-stat">{{ formatKm(station.summary.normalDistanceKm) }}</span>
+                  <span v-if="station.travel" class="route-stat">{{ station.travel.formattedTotalTime }}</span>
+                  <span v-if="station.travel?.formattedThroughput" class="route-stat">{{ station.travel.formattedThroughput }}</span>
+                </span>
+              </button>
+              <div v-if="hasStationDetails(station) && expandedStations.has(station.id)" class="route-details">
+                <div
+                  v-for="block in routeBlocks(station.segments)"
+                  :key="`${station.id}:${block.sectorName}`"
+                  class="route-block"
+                >
+                  <div class="route-sector">{{ block.sectorName }}</div>
+                  <div
+                    v-for="item in block.items"
+                    :key="item.key"
+                    class="route-action-row"
+                  >
+                    <span class="route-action-label">{{ item.label }}</span>
+                    <span class="route-action-distance">{{ item.distanceText || '' }}</span>
+                    <span class="route-action-time">{{ item.timeText || '' }}</span>
+                  </div>
+                </div>
+                <div v-if="hasStationProducts(station)" class="station-products-detail">
+                  <div class="route-sector">{{ t('transit_transport.products') }}</div>
+                  <ul class="station-products-list">
+                    <li
+                      v-for="product in station.products.items"
+                      :key="product.wareId"
+                    >
+                      {{ product.name }}
+                    </li>
+                  </ul>
+                </div>
               </div>
             </div>
           </div>
@@ -340,7 +423,7 @@ function routeBlocks(segments: TransportRouteSegmentView[]): RouteBlock[] {
 }
 
 .route-summary {
-  @apply w-full grid grid-cols-2 gap-2 items-center px-3 py-2 text-left text-xs text-slate-300 hover:bg-slate-800/50;
+  @apply w-full flex flex-col gap-2 px-3 py-2 text-left text-xs text-slate-300 hover:bg-slate-800/50;
 }
 
 .route-summary.not-expandable {
@@ -348,19 +431,49 @@ function routeBlocks(segments: TransportRouteSegmentView[]): RouteBlock[] {
 }
 
 .route-title {
-  @apply col-span-2 text-sm font-semibold text-slate-100;
+  @apply text-sm font-semibold text-slate-100;
 }
 
+.route-subtitle,
 .route-meta {
   @apply text-slate-400 truncate;
 }
 
-.route-target {
-  @apply col-span-2;
+.route-subtitle {
+  @apply -mt-1;
+}
+
+.route-metrics {
+  @apply grid grid-cols-[minmax(0,1fr)_minmax(9rem,1fr)] gap-x-6 gap-y-1;
+}
+
+.compact-summary {
+  @apply grid grid-cols-[minmax(0,1fr)_minmax(9rem,1fr)] gap-x-6 items-center;
+  row-gap: 0;
+}
+
+.compact-summary .route-title {
+  @apply col-start-1 leading-5;
+}
+
+.compact-summary .route-metrics {
+  @apply col-start-2 flex items-center justify-start p-0;
+}
+
+.compact-summary .route-stat {
+  @apply flex items-center leading-5;
+}
+
+.compact-summary .route-stat-empty {
+  @apply hidden;
 }
 
 .route-stat {
-  @apply text-sky-200 font-medium;
+  @apply text-sky-200 font-medium min-h-5;
+}
+
+.route-stat-empty {
+  @apply invisible;
 }
 
 .route-details {
@@ -407,7 +520,23 @@ function routeBlocks(segments: TransportRouteSegmentView[]): RouteBlock[] {
 }
 
 .station-row {
-  @apply px-3 py-2 flex flex-col gap-2;
+  @apply flex flex-col;
+}
+
+.station-summary {
+  @apply px-3 py-2;
+}
+
+.station-product-summary {
+  @apply text-xs text-slate-400 truncate;
+}
+
+.station-products-detail {
+  @apply flex flex-col gap-1 py-1;
+}
+
+.station-products-list {
+  @apply list-disc pl-7 text-xs text-slate-400 space-y-1;
 }
 
 .station-main {
@@ -416,10 +545,6 @@ function routeBlocks(segments: TransportRouteSegmentView[]): RouteBlock[] {
 
 .station-main span {
   @apply text-xs text-slate-500 truncate;
-}
-
-.station-metrics {
-  @apply grid gap-1 text-xs text-slate-400;
 }
 
 .problem-row {

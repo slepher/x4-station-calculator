@@ -82,7 +82,10 @@ const unresolvedTooltip = computed(() => {
   const allocNames: string[] = []
   if (hasPendingBridgeDecision.value) { allocCount++; allocNames.push(t('sector.connected')) }
   for (const a of result.assignments ?? []) {
-    if (a.uncertain) { allocCount++; allocNames.push(a.sectorMacro) }
+    if (a.selectedOptionIndex === null && (a.status === 'uncertain_tie' || a.status === 'uncertain_extend')) {
+      allocCount++
+      allocNames.push(a.sectorMacro)
+    }
   }
   const tsNames = result.groups
     .filter((g) => !g.selectedTradeStation)

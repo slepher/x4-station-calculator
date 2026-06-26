@@ -7,7 +7,7 @@ import { useActiveViewStore } from '@/store/useActiveViewStore'
 import { useSaveBindingStore } from '@/store/useSaveBindingStore'
 import { useLiveProductionStore } from '@/store/useLiveProductionStore'
 import { useBlueprintProductionStore } from '@/store/useBlueprintProductionStore'
-import { groupCleanSlate, groupIncremental, applyAbsorbToResult, applyStandaloneToResult, applyBridgePlanToDraft, buildAssignmentResult, type AutoGroupResult, type GroupDraftInfo, getDistance } from '@/store/logic/autoGroup'
+import { groupCleanSlate, groupIncremental, applyAbsorbToResult, applyStandaloneToResult, applyBridgePlanToDraft, buildAssignmentResult, type AutoGroupResult, type GroupDraftInfo, type SectorAssignment, getDistance } from '@/store/logic/autoGroup'
 import { buildSectorGraphFromMaps, getCoverageSectors, getPlayerStationsInSector } from '@/store/logic/saveBindingUtils'
 import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
 import { getSectorZoneBoundingCenter } from '@/components/map/utils/coordinates'
@@ -1073,7 +1073,7 @@ const unresolvedAllocationCount = computed(() => {
   let count = 0
   if (!autoGroupResult.value) return count
   if (hasPendingBridgeDecision.value) count++
-  const uncertainCount = (autoGroupResult.value?.assignments ?? []).filter((a) => a.uncertain).length
+  const uncertainCount = (autoGroupResult.value?.assignments ?? []).filter(isUnresolvedAssignment).length
   return count + uncertainCount
 })
 
@@ -1290,10 +1290,13 @@ onMounted(async () => {
 const hasUncertainAssignments = computed(() => {
   if (!autoGroupResult.value) return false
   if (hasPendingBridgeDecision.value) return true
-  return autoGroupResult.value.assignments.some(
-    (a) => a.selectedOptionIndex === null && (a.status === 'uncertain_tie' || a.status === 'uncertain_extend')
-  )
+  return autoGroupResult.value.assignments.some(isUnresolvedAssignment)
 })
+
+function isUnresolvedAssignment(assignment: SectorAssignment): boolean {
+  return assignment.selectedOptionIndex === null &&
+    (assignment.status === 'uncertain_tie' || assignment.status === 'uncertain_extend')
+}
 
 const hasPendingBridgeDecision = computed(() => {
   return hasPendingBridgeDecisionInResult(autoGroupResult.value)

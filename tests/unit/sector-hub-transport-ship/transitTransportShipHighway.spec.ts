@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import {
   buildStationTravelEstimate,
+  buildStationProductsFromFlows,
+  buildStationRouteSummaryForLocalSegments,
   buildTransportTravelEstimate,
+  buildTransitRouteSummaryForSegments,
   canUseHighway,
   estimateHighwaySegmentTimeSec,
   estimateRouteSegmentsTravel,
@@ -12,6 +15,7 @@ import {
   type TransportShipTravelProfile
 } from '@/store/logic/transitTransportShip'
 import type { TransitRouteResult, TransitRouteSegment } from '@/store/logic/transitRouteBuilder'
+import type { WareProductionFlow } from '@/types/production-flow'
 
 function profile(patch: Partial<TransportShipTravelProfile> = {}): TransportShipTravelProfile {
   return {
@@ -66,6 +70,20 @@ function route(
     terminal: { kind: 'gate', label: 'B', sectorMacro: 'b', position: { x: 0, y: 0, z: 0 } },
     problems: [],
     candidateOrder
+  }
+}
+
+function flow(wareId: string, netRate: number, tier: number): WareProductionFlow {
+  return {
+    wareId,
+    orderIndex: 0,
+    tier,
+    transportType: 'container',
+    unitVolume: 1,
+    production: Math.max(0, netRate),
+    consumption: 0,
+    netRate,
+    contributions: []
   }
 }
 
@@ -195,5 +213,89 @@ describe('sector-hub-transport-ship highway travel timing', () => {
       .toBe(normalGateWinner)
     expect(selectTransitRouteByTravelTime([normalGateWinner, highwayEngineWinner, dominated], mediumShip).route)
       .toBe(highwayEngineWinner)
+  })
+
+  it('rebuilds route summary distance from the selected highway route segments', () => {
+    const sourceRoute = route(100, 100, 0)
+    const selectedSegments: TransitRouteSegment[] = [
+      { kind: 'highway-approach', fromLabel: 'A', toLabel: 'A', distanceKm: 4, countsInSummaryDistance: true },
+      { kind: 'highway', fromLabel: 'A', toLabel: 'B', distanceKm: 80, countsInSummaryDistance: false },
+      { kind: 'highway-exit', fromLabel: 'B', toLabel: 'B', distanceKm: 6, countsInSummaryDistance: true }
+    ]
+
+    const summary = buildTransitRouteSummaryForSegments(sourceRoute.summary, selectedSegments)
+
+    expect(summary.normalDistanceKm).toBe(90)
+    expect(summary.engineDistanceKm).toBe(10)
+    expect(summary.highwayDistanceKm).toBe(80)
+    expect(summary.gateCount).toBe(sourceRoute.summary.gateCount)
+  })
+
+  it('adds station local highway segments to the sector route summary', () => {
+    const sectorSummary = buildTransitRouteSummaryForSegments(route(100, 100, 0).summary, [
+      { kind: 'highway-approach', fromLabel: 'A', toLabel: 'A', distanceKm: 4, countsInSummaryDistance: true },
+      { kind: 'highway', fromLabel: 'A', toLabel: 'B', distanceKm: 80, countsInSummaryDistance: false },
+      { kind: 'highway-exit', fromLabel: 'B', toLabel: 'B', distanceKm: 6, countsInSummaryDistance: true }
+    ])
+    const localSegments: TransitRouteSegment[] = [
+      { kind: 'highway-approach', fromLabel: 'B', toLabel: 'B', distanceKm: 2, countsInSummaryDistance: true },
+      { kind: 'highway', fromLabel: 'B', toLabel: 'Station', distanceKm: 30, countsInSummaryDistance: false },
+      { kind: 'highway-exit', fromLabel: 'Station', toLabel: 'Station', distanceKm: 3, countsInSummaryDistance: true }
+    ]
+
+    const summary = buildStationRouteSummaryForLocalSegments(sectorSummary, localSegments)
+
+    expect(summary.normalDistanceKm).toBe(125)
+    expect(summary.engineDistanceKm).toBe(15)
+    expect(summary.highwayDistanceKm).toBe(110)
+    expect(summary.gateCount).toBe(sectorSummary.gateCount)
+  })
+
+  it('builds station products from positive priority production flows', () => {
+    const products = buildStationProductsFromFlows({
+      flows: [
+        flow('low_priority_high_tier', 10, 3),
+        flow('high_priority_low_tier', 20, 1),
+        flow('high_priority_high_tier', 5, 3),
+        flow('disabled', 100, 4),
+        flow('negative', -1, 5),
+        flow('high_priority_low_tier', 3, 1)
+      ],
+      priorityLevels: {
+        low_priority_high_tier: 1,
+        high_priority_low_tier: 2,
+        high_priority_high_tier: 2,
+        disabled: 0,
+        negative: 2
+      },
+      waresMap: {
+        low_priority_high_tier: { tier: 3 } as any,
+        high_priority_low_tier: { tier: 1 } as any,
+        high_priority_high_tier: { tier: 3 } as any
+      },
+      resolveWareName: (wareId) => ({
+        low_priority_high_tier: 'C',
+        high_priority_low_tier: 'B',
+        high_priority_high_tier: 'A'
+      })[wareId] ?? wareId,
+      emptyLabel: 'No products'
+    })
+
+    expect(products.count).toBe(3)
+    expect(products.label).toBe('A, B +1')
+    expect(products.items.map((item) => item.wareId)).toEqual([
+      'high_priority_high_tier',
+      'high_priority_low_tier',
+      'low_priority_high_tier'
+    ])
+    expect(products.items[1]?.netRate).toBe(23)
+
+    expect(buildStationProductsFromFlows({
+      flows: [flow('disabled', 100, 4)],
+      priorityLevels: { disabled: 0 },
+      waresMap: {},
+      resolveWareName: (wareId) => wareId,
+      emptyLabel: 'No products'
+    }).label).toBe('No products')
   })
 })

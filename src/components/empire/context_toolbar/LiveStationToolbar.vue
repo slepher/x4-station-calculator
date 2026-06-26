@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useX4I18n } from '@/utils/UseX4I18n'
@@ -41,10 +41,38 @@ const emit = defineEmits<{
 
 const showSectorPopover = ref(false)
 
-const nameValue = computed({
-  get: () => props.stationName || '',
-  set: (val: string) => emit('updateStationName', val)
+const nameDraft = ref(props.stationName || '')
+const isEditingName = ref(false)
+const nameBeforeEdit = ref(props.stationName || '')
+
+watch(() => props.stationName, (value) => {
+  if (!isEditingName.value) {
+    nameDraft.value = value || ''
+  }
 })
+
+const handleNameFocus = () => {
+  isEditingName.value = true
+  nameBeforeEdit.value = props.stationName || ''
+  nameDraft.value = props.stationName || ''
+}
+
+const handleNameInput = (event: Event) => {
+  nameDraft.value = (event.target as HTMLInputElement).value
+}
+
+const handleNameBlur = () => {
+  const trimmed = nameDraft.value.trim()
+  if (!trimmed) {
+    nameDraft.value = nameBeforeEdit.value
+    isEditingName.value = false
+    return
+  }
+  isEditingName.value = false
+  if (trimmed !== (props.stationName || '')) {
+    emit('updateStationName', trimmed)
+  }
+}
 
 const workforce = computed({
   get: () => props.settings?.considerWorkforceForAutoFill ?? true,
@@ -138,7 +166,14 @@ const scopeClass = computed(() => {
       <div class="toolbar-section">
         <div class="input-group">
           <label class="group-label">{{ t('toolbar.station_name') }}</label>
-          <input v-model="nameValue" class="ghost-input w-32" :placeholder="t('toolbar.station_name_placeholder')" />
+          <input
+            :value="nameDraft"
+            class="ghost-input w-32"
+            :placeholder="t('toolbar.station_name_placeholder')"
+            @focus="handleNameFocus"
+            @input="handleNameInput"
+            @blur="handleNameBlur"
+          />
         </div>
 
         <div class="input-group ml-4">

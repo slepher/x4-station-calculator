@@ -1,18 +1,22 @@
 import { computed, type ComputedRef } from 'vue'
-import type { BindingSectorGroup, BindingStationPlan, SaveBindingPlan, SavedModule, ShipBlueprint, TradeStationBinding, X4Equipment, X4Map, X4MapSector, X4Module, X4Ship } from '@/types/x4'
+import type { BindingSectorGroup, BindingStationPlan, SaveBindingPlan, SavedModule, ShipBlueprint, TradeStationBinding, X4Equipment, X4Map, X4MapSector, X4Module, X4Ship, X4Ware } from '@/types/x4'
 import type { PlayerStationEntry, PlayerStationRecord } from '@/types/saveArchive'
+import type { WareProductionFlow } from '@/types/production-flow'
 import type { StationDerivedMap } from '@/store/state/StationDerivedMap'
 import { buildTransitRouteCandidates, type TransitRouteBuildOptions, type TransitRouteResult, type TransitRouteSegment, type TransitRouteSummary, type TransitRouteTerminal, type TransitRouteTarget } from '@/store/logic/transitRouteBuilder'
 import {
+  buildStationProductsFromFlows,
   buildStationTravelEstimate,
+  buildStationRouteSummaryForLocalSegments,
+  buildTransitRouteSummaryForSegments,
   buildTransportShipCandidateState,
   buildTransportTravelEstimate,
   canUseHighway,
   expandHighwayAlternatives,
   estimateRouteSegmentsTravel,
-  estimateSegmentTravelTimeSec,
   selectTransitRouteByTravelTime,
   sumSegmentTravelTime,
+  type StationProductsSummary,
   type StationTravelEstimate,
   type TransportSegmentTravelEstimate,
   type TransportShipCandidateGroup,
@@ -46,9 +50,13 @@ export type TransportStationRouteRow = {
   id: string
   stationName: string
   stationCode: string
+  sectorName: string
   coordinateKm: { x: number; y: number; z: number }
   terminalDistanceKm: number
   totalNormalDistanceKm: number
+  summary: TransitRouteSummary
+  segments: TransportRouteSegmentView[]
+  products: StationProductsSummary
   productionLineCount: number
   travel?: StationTravelEstimate
 }
@@ -99,12 +107,14 @@ export interface TransitTransportPresenterStore {
 
 export type TransitTransportPresenterDeps = {
   modulesMap: Record<string, X4Module>
+  waresMap: Record<string, X4Ware>
   shipBlueprints: ComputedRef<ShipBlueprint[]>
   findShip: (shipId: string) => X4Ship | null
   findEquipment: (equipmentId: string) => X4Equipment | null
   includeShip: (ship: X4Ship) => boolean
   includeEquipment: (equipment: X4Equipment) => boolean
   translateShip: (ship: X4Ship) => string
+  translateWare: (ware: X4Ware) => string
   translateEquipment: (equipment: X4Equipment) => string
 }
 
@@ -196,6 +206,8 @@ export function useTransitTransportPresenter(
       playerStationRecords: store.playerStationRecords,
       flowMap: store.mode === 'live' ? store.liveFlowMap : store.planningDerivedMap,
       modulesMap: deps.modulesMap,
+      waresMap: deps.waresMap,
+      translateWare: deps.translateWare,
       problems,
       travelProfile: shipCandidateState.selectedProfile,
       routeSearchCache
@@ -242,6 +254,7 @@ function buildSectorGroupRows(input: {
       label: linkedHub.name || linkedGroup.name
     }, input.travelProfile, input.routeSearchCache)
     const route = selectedRoute.route
+    const summary = buildTransitRouteSummaryForSegments(route.summary, selectedRoute.segments)
     if (route.problems.length > 0) {
       input.problems.push(problemRow('sector-group', groupId, linkedGroup.name, sectorName(input.maps, linkedHub.sectorMacro), route.problems))
       continue
@@ -253,7 +266,7 @@ function buildSectorGroupRows(input: {
       groupName: linkedGroup.name,
       targetSectorName: sectorName(input.maps, linkedHub.sectorMacro),
       targetStationName: linkedHub.name,
-      summary: route.summary,
+      summary,
       segments: attachSegmentTravel(selectedRoute.segments, input.travelProfile),
       terminal: route.terminal,
       travel: routeTravel(selectedRoute.segments, input.travelProfile)
@@ -278,6 +291,8 @@ function buildStationSectorGroups(input: {
   playerStationRecords: PlayerStationRecord[]
   flowMap?: StationDerivedMap | null
   modulesMap: Record<string, X4Module>
+  waresMap: Record<string, X4Ware>
+  translateWare: (ware: X4Ware) => string
   problems: TransportProblemRow[]
   travelProfile: TransportShipTravelProfile | null
   routeSearchCache: NonNullable<TransitRouteBuildOptions['multiTargetRouteCache']>
@@ -292,13 +307,14 @@ function buildStationSectorGroups(input: {
   for (const [sectorMacro, stations] of bySector) {
     const selectedSectorRoute = buildSelectedRoute(input.maps, input.routeSource, { kind: 'sector', sectorMacro }, input.travelProfile, input.routeSearchCache)
     const sectorRoute = selectedSectorRoute.route
+    const summary = buildTransitRouteSummaryForSegments(sectorRoute.summary, selectedSectorRoute.segments)
     if (sectorRoute.problems.length > 0) {
       input.problems.push(problemRow('station', sectorMacro, sectorName(input.maps, sectorMacro), sectorName(input.maps, sectorMacro), sectorRoute.problems))
       continue
     }
 
     const stationRows = stations
-      .map((station) => buildStationRow(station, sectorRoute, selectedSectorRoute.segments, input))
+      .map((station) => buildStationRow(station, sectorRoute, summary, selectedSectorRoute.segments, input))
       .filter((row): row is TransportStationRouteRow => !!row)
       .sort((a, b) => b.productionLineCount - a.productionLineCount || a.stationName.localeCompare(b.stationName))
 
@@ -306,7 +322,7 @@ function buildStationSectorGroups(input: {
       groups.push({
         id: sectorMacro,
         sectorName: sectorName(input.maps, sectorMacro),
-        summary: sectorRoute.summary,
+        summary,
         segments: attachSegmentTravel(selectedSectorRoute.segments, input.travelProfile),
         terminal: sectorRoute.terminal,
         stations: stationRows,
@@ -326,11 +342,14 @@ function buildStationSectorGroups(input: {
 function buildStationRow(
   station: StationTransportTarget,
   sectorRoute: TransitRouteResult,
+  sectorSummary: TransitRouteSummary,
   highwaySegments: TransitRouteSegment[],
   input: {
     maps: X4Map
     flowMap?: StationDerivedMap | null
     modulesMap: Record<string, X4Module>
+    waresMap: Record<string, X4Ware>
+    translateWare: (ware: X4Ware) => string
     problems: TransportProblemRow[]
     travelProfile: TransportShipTravelProfile | null
   }
@@ -340,8 +359,10 @@ function buildStationRow(
     return null
   }
   const terminalDistanceKm = kmDistance(sectorRoute.terminal.position, station.position)
+  const localSegments = buildStationLocalSegments(station, sectorRoute, terminalDistanceKm, input.maps, input.travelProfile)
+  const summary = buildStationRouteSummaryForLocalSegments(sectorSummary, localSegments)
   const localTimeSec = input.travelProfile
-    ? estimateSegmentTravelTimeSec(terminalDistanceKm, input.travelProfile)
+    ? routeTravelTime(localSegments, input.travelProfile)
     : 0
   const sectorTimeSec = input.travelProfile
     ? routeTravelTime(highwaySegments, input.travelProfile)
@@ -350,14 +371,72 @@ function buildStationRow(
     id: station.id,
     stationName: station.name,
     stationCode: station.code,
+    sectorName: sectorName(input.maps, station.sectorMacro),
     coordinateKm: { x: station.position.x / 1000, y: station.position.y / 1000, z: station.position.z / 1000 },
     terminalDistanceKm,
-    totalNormalDistanceKm: sectorRoute.summary.normalDistanceKm + terminalDistanceKm,
+    totalNormalDistanceKm: summary.normalDistanceKm,
+    summary,
+    segments: attachSegmentTravel(localSegments, input.travelProfile),
+    products: buildStationProducts(station, input.flowMap, input.waresMap, input.translateWare),
     productionLineCount: productionLineCount(station, input.flowMap, input.modulesMap),
     travel: input.travelProfile
       ? buildStationTravelEstimate({ localTimeSec, sectorTimeSec, profile: input.travelProfile })
       : undefined
   }
+}
+
+function buildStationLocalSegments(
+  station: StationTransportTarget,
+  sectorRoute: TransitRouteResult,
+  terminalDistanceKm: number,
+  maps: X4Map,
+  profile: TransportShipTravelProfile | null
+): TransitRouteSegment[] {
+  if (!station.position || terminalDistanceKm <= 0) return []
+
+  const stationSectorName = sectorName(maps, station.sectorMacro)
+  const directSegment: TransitRouteSegment = {
+    kind: 'gate-to-station',
+    fromLabel: stationSectorName,
+    toLabel: station.name,
+    distanceKm: terminalDistanceKm,
+    countsInSummaryDistance: true,
+    fromPosition: sectorRoute.terminal.position,
+    toPosition: station.position
+  }
+  const injected = injectHighwayAlternatives([directSegment], [station.sectorMacro], maps.sectors, profile)
+  return profile ? expandHighwayAlternatives(injected, profile) : injected
+}
+
+function buildStationProducts(
+  station: StationTransportTarget,
+  flowMap: StationDerivedMap | null | undefined,
+  waresMap: Record<string, X4Ware>,
+  translateWare: (ware: X4Ware) => string
+): StationProductsSummary {
+  const flows: WareProductionFlow[] = []
+  const priorityLevels: Record<string, number> = {}
+
+  for (const flowId of station.flowIds) {
+    const cache = flowMap?.getCache(flowId)
+    if (!cache) continue
+    flows.push(...cache.productionFlows)
+    for (const [wareId, priority] of Object.entries(cache.warePriorityLevels)) {
+      priorityLevels[wareId] = Math.max(priorityLevels[wareId] ?? 0, priority)
+    }
+  }
+
+  return buildStationProductsFromFlows({
+    flows,
+    priorityLevels,
+    waresMap,
+    resolveWareName: (wareId) => {
+      const ware = waresMap[wareId]
+      if (!ware) return wareId
+      return translateWare(ware)
+    },
+    emptyLabel: i18n.global.t('transit_transport.no_products')
+  })
 }
 
 function attachSegmentTravel(

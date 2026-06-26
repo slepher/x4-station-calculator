@@ -1,5 +1,6 @@
-import type { ShipBlueprint, X4Equipment, X4Ship } from '@/types/x4'
-import type { TransitRouteResult, TransitRouteSegment } from '@/store/logic/transitRouteBuilder'
+import type { ShipBlueprint, X4Equipment, X4Ship, X4Ware } from '@/types/x4'
+import type { WareProductionFlow } from '@/types/production-flow'
+import type { TransitRouteResult, TransitRouteSegment, TransitRouteSummary } from '@/store/logic/transitRouteBuilder'
 
 export type TransportShipEngineInfo = {
   equipmentId: string
@@ -64,6 +65,20 @@ export type StationTravelEstimate = {
   formattedTotalTime: string
   throughputM3PerHour?: number
   formattedThroughput?: string
+}
+
+export type StationProductItem = {
+  wareId: string
+  name: string
+  priority: number
+  tier: number
+  netRate: number
+}
+
+export type StationProductsSummary = {
+  label: string
+  count: number
+  items: StationProductItem[]
 }
 
 export type SelectedTransitRouteTravel = {
@@ -413,6 +428,110 @@ export function selectTransitRouteByTravelTime(
     route: selected.route,
     segments: selected.segments,
     travelTimeSec: selected.travelTimeSec
+  }
+}
+
+export function buildTransitRouteSummaryForSegments(
+  baseSummary: TransitRouteSummary,
+  segments: TransitRouteSegment[]
+): TransitRouteSummary {
+  let engineDistanceKm = 0
+  let highwayDistanceKm = 0
+  let superhighwayDistanceKm = 0
+
+  for (const segment of segments) {
+    if (segment.kind === 'superhighway') {
+      superhighwayDistanceKm += segment.distanceKm
+      continue
+    }
+    if (segment.kind === 'highway') {
+      highwayDistanceKm += segment.distanceKm
+      continue
+    }
+    if (segment.countsInSummaryDistance) {
+      engineDistanceKm += segment.distanceKm
+    }
+  }
+
+  return {
+    ...baseSummary,
+    normalDistanceKm: engineDistanceKm + highwayDistanceKm,
+    superhighwayDistanceKm,
+    highwayDistanceKm,
+    engineDistanceKm
+  }
+}
+
+export function buildStationRouteSummaryForLocalSegments(
+  sectorSummary: TransitRouteSummary,
+  localSegments: TransitRouteSegment[]
+): TransitRouteSummary {
+  const localSummary = buildTransitRouteSummaryForSegments({
+    gateCount: 0,
+    normalDistanceKm: 0,
+    superhighwayDistanceKm: 0,
+    highwayDistanceKm: 0,
+    engineDistanceKm: 0,
+    highwayGateCount: 0,
+    engineGateCount: 0
+  }, localSegments)
+
+  return {
+    ...sectorSummary,
+    normalDistanceKm: sectorSummary.normalDistanceKm + localSummary.normalDistanceKm,
+    superhighwayDistanceKm: sectorSummary.superhighwayDistanceKm + localSummary.superhighwayDistanceKm,
+    highwayDistanceKm: sectorSummary.highwayDistanceKm + localSummary.highwayDistanceKm,
+    engineDistanceKm: sectorSummary.engineDistanceKm + localSummary.engineDistanceKm
+  }
+}
+
+export function buildStationProductsFromFlows(input: {
+  flows: WareProductionFlow[]
+  priorityLevels: Record<string, number>
+  waresMap: Record<string, X4Ware>
+  resolveWareName: (wareId: string) => string
+  emptyLabel: string
+}): StationProductsSummary {
+  const byWare = new Map<string, StationProductItem>()
+
+  for (const flow of input.flows) {
+    const priority = input.priorityLevels[flow.wareId] ?? 0
+    if (flow.netRate <= 0 || priority <= 0) continue
+
+    const ware = input.waresMap[flow.wareId]
+    const tier = ware ? ware.tier : flow.tier
+    const existing = byWare.get(flow.wareId)
+    if (existing) {
+      existing.netRate += flow.netRate
+      existing.priority = Math.max(existing.priority, priority)
+      existing.tier = Math.max(existing.tier, tier)
+      continue
+    }
+
+    byWare.set(flow.wareId, {
+      wareId: flow.wareId,
+      name: input.resolveWareName(flow.wareId),
+      priority,
+      tier,
+      netRate: flow.netRate
+    })
+  }
+
+  const items = [...byWare.values()].sort((a, b) =>
+    b.priority - a.priority ||
+    b.tier - a.tier ||
+    a.name.localeCompare(b.name)
+  )
+  if (items.length === 0) {
+    return { label: input.emptyLabel, count: 0, items }
+  }
+
+  const visible = items.slice(0, 2).map((item) => item.name).join(', ')
+  const hiddenCount = items.length - 2
+  return {
+    label: hiddenCount > 0 ? `${visible} +${hiddenCount}` : visible,
+    count: items.length,
+    items
   }
 }
 

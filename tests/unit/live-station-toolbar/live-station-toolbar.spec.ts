@@ -7,6 +7,13 @@ import { mount } from '@vue/test-utils'
 import LiveStationToolbar from '@/components/empire/context_toolbar/LiveStationToolbar.vue'
 
 vi.mock('vue-i18n', () => ({
+  createI18n: () => ({
+    global: {
+      locale: { value: 'zh-CN' },
+      t: (key: string) => key,
+      te: () => false
+    }
+  }),
   useI18n: () => ({
     locale: { value: 'zh-CN' },
     t: (key: string) => key,
@@ -85,5 +92,38 @@ describe('1 单元测试', () => {
     })
     await wrapper2.find('.mode-toggle-chip').trigger('click')
     expect(wrapper2.emitted('toggleMode')).toBeFalsy()
+  })
+
+  it('1.3 Unit: station name waits until blur to reset empty draft', async () => {
+    const wrapper = mount(LiveStationToolbar, {
+      props: { ...defaultProps }
+    })
+    const input = wrapper.find<HTMLInputElement>('.ghost-input.w-32')
+
+    await input.trigger('focus')
+    await input.setValue('')
+
+    expect(wrapper.emitted('updateStationName')).toBeFalsy()
+    expect(input.element.value).toBe('')
+
+    await input.trigger('blur')
+
+    expect(wrapper.emitted('updateStationName')).toBeFalsy()
+    expect(input.element.value).toBe(defaultProps.stationName)
+  })
+
+  it('1.4 Unit: station name commits non-empty draft on blur', async () => {
+    const wrapper = mount(LiveStationToolbar, {
+      props: { ...defaultProps }
+    })
+    const input = wrapper.find<HTMLInputElement>('.ghost-input.w-32')
+
+    await input.trigger('focus')
+    await input.setValue('新站点')
+    expect(wrapper.emitted('updateStationName')).toBeFalsy()
+
+    await input.trigger('blur')
+
+    expect(wrapper.emitted('updateStationName')).toEqual([['新站点']])
   })
 })

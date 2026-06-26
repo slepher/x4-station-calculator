@@ -231,7 +231,8 @@ type StationTravelEstimate = {
 
 Sector Group:
 
-- row `travel.timeSec` 为所有普通空间段耗时之和。
+- row `summary.normalDistanceKm` 从最终展示 segments 重新汇总；当选中路线把普通空间段替换为 highway-approach / highway / highway-exit 时，总路程使用替换后的 segments，不沿用原 route summary。
+- row `travel.timeSec` 为最终展示 segments 的耗时之和。
 - row `travel.throughputM3PerHour` 使用 row 总耗时。
 - segment 仅普通空间段带 `travel`。
 
@@ -239,8 +240,12 @@ Station:
 
 - sector group `travel.timeSec` 为到目标 sector terminal 的耗时。
 - 同星区 station group 输出 `hideSectorHeader: true`。
-- station row `travel.localTimeSec` 为 terminal/origin 到 station 的普通空间耗时。
+- station row 输出自身 `summary` 与 `segments`，Vue 直接用它渲染可展开的本地路径。
+- station row `summary.normalDistanceKm` 为 sector group 最终总路程 + 本地最后一段最终总路程。
+- station row `segments` 只包含 terminal/origin 到 station 的本地最后一段，不包含跨星区 sector route。
+- station row `travel.localTimeSec` 为 terminal/origin 到 station 的本地最后一段耗时；如果本地最后一段使用 highway 替代，则按 highway-approach / highway / highway-exit 之和计算。
 - station row `travel.totalTimeSec` 为 sector 耗时加 local 耗时；同星区时 local 等于 total。
+- station row `travel.throughputM3PerHour` 使用 station 总耗时。
 
 ## Formatting
 
@@ -264,9 +269,18 @@ Station:
 右侧运输路线：
 
 - 摘要层新增耗时和单程吞吐量 metric chip。
+- Sector Group row、Station sector row、Station row 使用统一摘要结构：标题、可选副标题、两列指标网格。左列为总路程/耗时，右列为星门数或数量/单程吞吐量。
+- Sector Group row 的副标题由目标 station/sector 组成；当副标题与标题相同时隐藏，且不保留副标题空白。
+- 未选择运输船时，耗时与单程吞吐量不渲染，也不预留空行；station row 只显示总路程与产线数。
 - 明细层每个普通空间段显示耗时列。
 - `gate-transit` 和 `superhighway` 不显示耗时。
 - 未选择运输船时不渲染新增耗时/吞吐量 UI。
+- Station row 的摘要排版对齐 Sector Group row：直接显示总路程、总耗时、单程吞吐量的值，不显示“总路程/耗时/单程吞吐”等 label。
+- Station row 的副信息只显示非重复 station code；不显示星区名，且当 code 为空或与 station 名称相同时隐藏副信息。
+- Station row 使用产物摘要替代产线数，产物摘要单独占一行，不参与距离/耗时/吞吐指标网格。产物从 `StationDerivedMap.getCache(stationId)` 的 `productionFlows` 与 `warePriorityLevels` 读取，过滤 `flow.netRate > 0 && priority > 0`，不再用静态 module outputs 推断。
+- Station 产物排序为 priority 降序、tier 降序、名称升序。摘要最多显示前两个产物，超出显示 `+N`；无产物时摘要显示“无产物”。展开内容只在有产物时用 li 显示完整产物列表，无产物时不渲染产物标题和列表。
+- Station row 可展开；展开内容只渲染本地最后一段 `segments`。若最后一段未使用 highway，展示 terminal/origin 到 station 一段；若最后一段使用 highway，展示 highway-approach / highway / highway-exit 路径。连续 highway 段按 highway 起点星区归组，避免 `highway-exit` 使用 station code 单独开标题。
+- Sector Group 展开内容不因 Station row 调整而改变。
 
 ## 引擎配装 Stat
 

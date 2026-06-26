@@ -78,16 +78,18 @@ watch(() => toolbarPresenter.props.workbenchMode.value, (mode) => {
 const planningPresenter = useProductionPlanningPresenter(liveStore)
 const wareflowPresenter = useProductionWareflowPresenter(liveStore)
 const dashboardPresenter = useProductionDashboardPresenter(liveStore)
-const { translateShip, translateEquipment } = useX4I18n()
+const { translateShip, translateWare, translateEquipment } = useX4I18n()
 
 const transitTransportPresenter = useTransitTransportPresenter(liveStore, {
   modulesMap: gameDataStore.modulesMap,
+  waresMap: gameDataStore.waresMap,
   shipBlueprints: computed(() => shipBuildStore.savedBlueprints.ships.flatMap((bucket) => bucket.blueprints)),
   findShip: (shipId) => shipBuildStore.findShip(shipId),
   findEquipment: (equipmentId) => shipBuildStore.findEquipment(equipmentId),
   includeShip: (ship) => shipBuildStore.isShipDlcUsable(ship),
   includeEquipment: (equipment) => shipBuildStore.isEquipmentDlcUsable(equipment),
   translateShip: (ship) => translateShip(ship),
+  translateWare: (ware) => translateWare(ware),
   translateEquipment: (equipment) => translateEquipment(equipment)
 })
 const terraformingPresenter = useTerraformingPresenter({
