@@ -882,12 +882,16 @@
       "attack_distance": "Accel dist",
       "release": "Release",
       "decel_distance": "Decel dist",
-      "ship_type": {
-        "freighter": "Freighter",
-        "transporter": "Transporter"
-      }
+    "ship_type": {
+      "freighter": "Freighter",
+      "transporter": "Transporter"
     },
-    "route_action": {
+    "cargo_drone_count": "Cargo Drones ×{count}",
+    "no_cargo_drone": "No cargo drone, relying on station drones"
+  },
+  "route_action": {
+      "load_cargo": "Cargo loading",
+      "unload_cargo": "Cargo unloading",
       "depart_to_gate": "Depart to outbound gate",
       "in_sector_transfer": "In-sector transfer",
       "jump_to": "Gate jump to {sector}",

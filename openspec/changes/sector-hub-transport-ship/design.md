@@ -80,6 +80,7 @@ type TransportShipTravelProfile = {
   releaseSec: number
   attackDistanceKm: number
   decelDistanceKm: number
+  cargoDroneCount: number
   engines: Array<{ equipmentId: string; count: number; name: string }>
 }
 ```
@@ -100,6 +101,8 @@ t_release = max(engine.travel.release)
 d_attack_km = ((V_base + V_travel) / 2) * t_attack / 1000
 d_decel_km = ((V_travel + V_base) / 2) * t_release / 1000
 ```
+
+`cargoDroneCount` 从蓝图 `storage.drones` 中统计 `purposePrimary === 'trade'` 的货运无人机数量，并按单船最多 10 架并行装卸封顶。
 
 ## Segment Time Formula
 
@@ -209,6 +212,9 @@ S/M 船不是只比较单条路线内的“方案A vs 方案B”，而是在候�
 ```ts
 type TransportTravelEstimate = {
   timeSec: number
+  flightTimeSec: number
+  loadingTimeSec: number
+  unloadingTimeSec: number
   formattedTime: string
   throughputM3PerHour?: number
   formattedThroughput?: string
@@ -222,6 +228,8 @@ type TransportSegmentTravel = {
 type StationTravelEstimate = {
   localTimeSec: number
   totalTimeSec: number
+  loadingTimeSec: number
+  unloadingTimeSec: number
   formattedLocalTime: string
   formattedTotalTime: string
   throughputM3PerHour?: number
@@ -229,10 +237,26 @@ type StationTravelEstimate = {
 }
 ```
 
+装卸时间：
+
+```text
+cargoTransferTimeSec = containerCapacityM3 / (min(cargoDroneCount, 10) * (4000 / 60))
+```
+
+其中：
+- `4000` — 每架货运无人机单趟搬运量（m³/trip），来自游戏内实测经验数据
+- `60` — 每架货运无人机单趟搬运耗时（s/trip），来自游戏内实测经验数据
+- `4000 / 60` — 每架无人机的搬运速率（m³/s）
+
+- 上货和卸货各计算一次。
+- `timeSec` / `totalTimeSec` 包含飞行、上货、卸货。
+- `flightTimeSec` 仅保存 route segment 飞行耗时。
+- `cargoDroneCount <= 0` 时装卸时间为 0，不显示装卸明细行。
+
 Sector Group:
 
 - row `summary.normalDistanceKm` 从最终展示 segments 重新汇总；当选中路线把普通空间段替换为 highway-approach / highway / highway-exit 时，总路程使用替换后的 segments，不沿用原 route summary。
-- row `travel.timeSec` 为最终展示 segments 的耗时之和。
+- row `travel.timeSec` 为最终展示 segments 的耗时之和加上上货/卸货时间。
 - row `travel.throughputM3PerHour` 使用 row 总耗时。
 - segment 仅普通空间段带 `travel`。
 
@@ -244,7 +268,7 @@ Station:
 - station row `summary.normalDistanceKm` 为 sector group 最终总路程 + 本地最后一段最终总路程。
 - station row `segments` 只包含 terminal/origin 到 station 的本地最后一段，不包含跨星区 sector route。
 - station row `travel.localTimeSec` 为 terminal/origin 到 station 的本地最后一段耗时；如果本地最后一段使用 highway 替代，则按 highway-approach / highway / highway-exit 之和计算。
-- station row `travel.totalTimeSec` 为 sector 耗时加 local 耗时；同星区时 local 等于 total。
+- station row `travel.totalTimeSec` 为 sector 耗时加 local 耗时，再加上上货/卸货时间；同星区时 local 等于飞行段 local。
 - station row `travel.throughputM3PerHour` 使用 station 总耗时。
 
 ## Formatting
@@ -273,6 +297,7 @@ Station:
 - Sector Group row 的副标题由目标 station/sector 组成；当副标题与标题相同时隐藏，且不保留副标题空白。
 - 未选择运输船时，耗时与单程吞吐量不渲染，也不预留空行；station row 只显示总路程与产线数。
 - 明细层每个普通空间段显示耗时列。
+- 明细层在 `station-to-gate` 前插入“上货时间”行，在 `gate-to-station` 后插入“卸货时间”行；station 本地最后一段使用 highway 时，允许在最后一个 `highway-exit` 后插入“卸货时间”行。装卸行不显示距离。
 - `gate-transit` 和 `superhighway` 不显示耗时。
 - 未选择运输船时不渲染新增耗时/吞吐量 UI。
 - Station row 的摘要排版对齐 Sector Group row：直接显示总路程、总耗时、单程吞吐量的值，不显示“总路程/耗时/单程吞吐”等 label。

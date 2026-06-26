@@ -55,6 +55,17 @@
 ### 吞吐量口径
 
 - 固定使用 `container` cargo capacity。
+- 选择运输船后，单程总耗时包含飞行耗时、上货时间和卸货时间。
+- 上货时间与卸货时间分别按同一公式计算：
+
+```text
+cargoTransferTimeSec = containerCapacityM3 / (min(cargoDroneCount, 10) * (4000 / 60))
+```
+
+公式中 `4000` 为每架货运无人机单趟搬运量（m³/trip），`60` 为单趟耗时（s/trip），均来自游戏内实测经验数据。`4000 / 60` 即每架无人机的搬运速率（m³/s）。
+
+- `cargoDroneCount` 只统计蓝图 storage 中用途为 `trade` 的货运无人机；同一条船最多同时使用 10 架货运无人机参与装卸。
+- 若蓝图没有货运无人机，则不增加上货/卸货时间。
 - 单程吞吐量公式：
 
 ```text
@@ -71,6 +82,7 @@ throughputM3PerHour = containerCapacityM3 / oneWayTimeSec * 3600
 - Sector Group row、Station sector row、Station row 使用一致的两列指标布局：左列为总路程/耗时，右列为星门数或数量/单程吞吐量；耗时与单程吞吐量不显示“耗时”“单程”等描述性前缀；缺失的耗时/吞吐量不预留空行。
 - Sector Group row 的副标题如果与 row 标题相同，则隐藏副标题。
 - Sector Group 展开明细中，每个普通空间路径段显示该段耗时；`gate-transit` 与 `superhighway` 不显示耗时。
+- 展开明细中，上货时间作为独立行显示在“离港至出口星门”之前；卸货时间作为独立行显示在“入口星门至目标空间站”之后。装卸行不显示距离，只显示耗时。
 - Station 分类中：
   - Station row 的展示格式对齐 Sector Group row，直接显示总路程、总耗时、单程吞吐量的值，不显示“总路程/耗时/单程吞吐”等描述性文字。
   - Station row 副信息只显示 station code；若 code 为空或与 station 名称相同，则不显示副信息；副信息不显示星区名，避免与分组标题重复。

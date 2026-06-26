@@ -86,6 +86,7 @@ const transitTransportPresenter = useTransitTransportPresenter(liveStore, {
   shipBlueprints: computed(() => shipBuildStore.savedBlueprints.ships.flatMap((bucket) => bucket.blueprints)),
   findShip: (shipId) => shipBuildStore.findShip(shipId),
   findEquipment: (equipmentId) => shipBuildStore.findEquipment(equipmentId),
+  findDrone: (droneId) => shipBuildStore.dronesMap.get(droneId) ?? null,
   includeShip: (ship) => shipBuildStore.isShipDlcUsable(ship),
   includeEquipment: (equipment) => shipBuildStore.isEquipmentDlcUsable(equipment),
   translateShip: (ship) => translateShip(ship),

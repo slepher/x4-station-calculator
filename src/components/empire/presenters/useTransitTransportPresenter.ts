@@ -1,5 +1,5 @@
 import { computed, type ComputedRef } from 'vue'
-import type { BindingSectorGroup, BindingStationPlan, SaveBindingPlan, SavedModule, ShipBlueprint, TradeStationBinding, X4Equipment, X4Map, X4MapSector, X4Module, X4Ship, X4Ware } from '@/types/x4'
+import type { BindingSectorGroup, BindingStationPlan, SaveBindingPlan, SavedModule, ShipBlueprint, TradeStationBinding, X4Drone, X4Equipment, X4Map, X4MapSector, X4Module, X4Ship, X4Ware } from '@/types/x4'
 import type { PlayerStationEntry, PlayerStationRecord } from '@/types/saveArchive'
 import type { WareProductionFlow } from '@/types/production-flow'
 import type { StationDerivedMap } from '@/store/state/StationDerivedMap'
@@ -111,6 +111,7 @@ export type TransitTransportPresenterDeps = {
   shipBlueprints: ComputedRef<ShipBlueprint[]>
   findShip: (shipId: string) => X4Ship | null
   findEquipment: (equipmentId: string) => X4Equipment | null
+  findDrone: (droneId: string) => X4Drone | null
   includeShip: (ship: X4Ship) => boolean
   includeEquipment: (equipment: X4Equipment) => boolean
   translateShip: (ship: X4Ship) => string
@@ -149,6 +150,7 @@ export function useTransitTransportPresenter(
       blueprints: deps.shipBlueprints.value,
       findShip: deps.findShip,
       findEquipment: deps.findEquipment,
+      findDrone: deps.findDrone,
       selectedBlueprintId: store.selectedTransitTransportBlueprintId ?? null,
       includeShip: deps.includeShip,
       includeEquipment: deps.includeEquipment,

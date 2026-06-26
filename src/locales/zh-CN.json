@@ -883,12 +883,16 @@
       "attack_distance": "加速距",
       "release": "减速",
       "decel_distance": "减速距",
-      "ship_type": {
-        "freighter": "货船",
-        "transporter": "运输船"
-      }
+    "ship_type": {
+      "freighter": "货船",
+      "transporter": "运输船"
     },
-    "route_action": {
+    "cargo_drone_count": "货运无人机 ×{count}",
+    "no_cargo_drone": "没有货运无人机，依赖空间站无人机"
+  },
+  "route_action": {
+    "load_cargo": "货物装载",
+    "unload_cargo": "货物卸载",
       "depart_to_gate": "离港至出口星门",
       "in_sector_transfer": "星区内转场",
       "jump_to": "星门跃迁至 {sector}",

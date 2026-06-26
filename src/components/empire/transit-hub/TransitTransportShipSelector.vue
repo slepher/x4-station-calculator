@@ -28,7 +28,7 @@ function formatDistance(value: number): string {
 }
 
 function metricChips(profile: TransportShipTravelProfile) {
-  return [
+  const chips = [
     [
       { key: 'speed', label: t('transit_transport.ship_selector.speed'), value: formatSpeed(profile.baseSpeedMps) },
       { key: 'travel', label: t('transit_transport.ship_selector.travel_speed'), value: formatSpeed(profile.travelSpeedMps) },
@@ -43,6 +43,18 @@ function metricChips(profile: TransportShipTravelProfile) {
       { key: 'decel_distance', label: t('transit_transport.ship_selector.decel_distance'), value: formatDistance(profile.decelDistanceKm) }
     ]
   ]
+
+  if (profile.shipClass === 'ship_l' || profile.shipClass === 'ship_xl') {
+    chips.push([
+      { key: 'cargo_drone_count', label: t('transit_transport.ship_selector.cargo_drone_count', { count: profile.cargoDroneCount }), value: '' }
+    ])
+  }
+
+  return chips
+}
+
+function isLargeShip(profile: TransportShipTravelProfile): boolean {
+  return profile.shipClass === 'ship_l' || profile.shipClass === 'ship_xl'
 }
 
 function shipTypeLabel(type: string): string {
@@ -94,6 +106,12 @@ function shipTypeLabel(type: string): string {
                 </li>
               </ul>
               <span class="blueprint-chips">
+                <div
+                  v-if="isLargeShip(blueprint.profile) && blueprint.profile.cargoDroneCount === 0"
+                  class="no-cargo-drone-warning"
+                >
+                  {{ t('transit_transport.ship_selector.no_cargo_drone') }}
+                </div>
                 <span
                   v-for="(row, rowIdx) in metricChips(blueprint.profile)"
                   :key="rowIdx"
@@ -105,7 +123,7 @@ function shipTypeLabel(type: string): string {
                     class="metric-chip"
                   >
                     <span>{{ chip.label }}</span>
-                    <strong>{{ chip.value }}</strong>
+                    <strong v-if="chip.value">{{ chip.value }}</strong>
                   </span>
                 </span>
               </span>
@@ -184,5 +202,9 @@ function shipTypeLabel(type: string): string {
 
 .metric-chip strong {
   @apply font-semibold text-slate-100;
+}
+
+.no-cargo-drone-warning {
+  @apply rounded border border-yellow-500/40 bg-yellow-500/10 px-2 py-1 text-[11px] leading-tight text-yellow-300;
 }
 </style>

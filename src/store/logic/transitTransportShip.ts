@@ -1,4 +1,4 @@
-import type { ShipBlueprint, X4Equipment, X4Ship, X4Ware } from '@/types/x4'
+import type { ShipBlueprint, X4Drone, X4Equipment, X4Ship, X4Ware } from '@/types/x4'
 import type { WareProductionFlow } from '@/types/production-flow'
 import type { TransitRouteResult, TransitRouteSegment, TransitRouteSummary } from '@/store/logic/transitRouteBuilder'
 
@@ -22,6 +22,7 @@ export type TransportShipTravelProfile = {
   releaseSec: number
   attackDistanceKm: number
   decelDistanceKm: number
+  cargoDroneCount: number
   engines: TransportShipEngineInfo[]
 }
 
@@ -48,6 +49,9 @@ export type TransportShipCandidateState = {
 
 export type TransportTravelEstimate = {
   timeSec: number
+  flightTimeSec: number
+  loadingTimeSec: number
+  unloadingTimeSec: number
   formattedTime: string
   throughputM3PerHour?: number
   formattedThroughput?: string
@@ -61,6 +65,8 @@ export type TransportSegmentTravelEstimate = {
 export type StationTravelEstimate = {
   localTimeSec: number
   totalTimeSec: number
+  loadingTimeSec: number
+  unloadingTimeSec: number
   formattedLocalTime: string
   formattedTotalTime: string
   throughputM3PerHour?: number
@@ -91,6 +97,7 @@ export function buildTransportShipCandidateState(input: {
   blueprints: ShipBlueprint[]
   findShip: (shipId: string) => X4Ship | null
   findEquipment: (equipmentId: string) => X4Equipment | null
+  findDrone?: (droneId: string) => X4Drone | null
   selectedBlueprintId: string | null
   includeShip?: (ship: X4Ship) => boolean
   includeEquipment?: (equipment: X4Equipment) => boolean
@@ -112,6 +119,7 @@ export function buildTransportShipCandidateState(input: {
       blueprint,
       ship,
       findEquipment: input.findEquipment,
+      findDrone: input.findDrone,
       includeEquipment: input.includeEquipment,
       resolveShipName: input.resolveShipName,
       translateEquipment: input.translateEquipment
@@ -164,6 +172,7 @@ export function buildTransportShipTravelProfile(input: {
   blueprint: ShipBlueprint
   ship: X4Ship
   findEquipment: (equipmentId: string) => X4Equipment | null
+  findDrone?: (droneId: string) => X4Drone | null
   includeEquipment?: (equipment: X4Equipment) => boolean
   resolveShipName?: (ship: X4Ship) => string
   translateEquipment?: (equipment: X4Equipment) => string
@@ -223,6 +232,7 @@ export function buildTransportShipTravelProfile(input: {
 
   const attackDistanceKm = ((baseSpeedMps + travelSpeedMps) / 2) * attackSec / 1000
   const decelDistanceKm = ((travelSpeedMps + baseSpeedMps) / 2) * releaseSec / 1000
+  const cargoDroneCount = countCargoDrones(input.blueprint, input.findDrone)
 
   return {
     blueprintId: input.blueprint.id,
@@ -238,8 +248,20 @@ export function buildTransportShipTravelProfile(input: {
     releaseSec,
     attackDistanceKm,
     decelDistanceKm,
+    cargoDroneCount,
     engines
   }
+}
+
+function countCargoDrones(blueprint: ShipBlueprint, findDrone?: (droneId: string) => X4Drone | null): number {
+  let count = 0
+  for (const item of blueprint.storage?.drones ?? []) {
+    const drone = findDrone ? findDrone(item.id) : null
+    if (drone && drone.purposePrimary !== 'trade') continue
+    if (!drone && !item.id.toLowerCase().includes('trade')) continue
+    count += Math.max(0, item.count)
+  }
+  return Math.min(10, count)
 }
 
 export function estimateSegmentTravelTimeSec(distanceKm: number, profile: TransportShipTravelProfile, opts?: { skipRelease?: boolean }): number {
@@ -539,14 +561,29 @@ export function buildTransportTravelEstimate(
   timeSec: number,
   profile: TransportShipTravelProfile
 ): TransportTravelEstimate | undefined {
-  if (timeSec <= 0) return undefined
-  const throughput = profile.containerCapacityM3 / timeSec * 3600
+  const loadingTimeSec = estimateCargoTransferTimeSec(profile)
+  const unloadingTimeSec = estimateCargoTransferTimeSec(profile)
+  const totalTimeSec = timeSec + loadingTimeSec + unloadingTimeSec
+  if (totalTimeSec <= 0) return undefined
+  const throughput = profile.containerCapacityM3 / totalTimeSec * 3600
   return {
-    timeSec,
-    formattedTime: formatTransportTime(timeSec),
+    timeSec: totalTimeSec,
+    flightTimeSec: timeSec,
+    loadingTimeSec,
+    unloadingTimeSec,
+    formattedTime: formatTransportTime(totalTimeSec),
     throughputM3PerHour: throughput,
     formattedThroughput: formatThroughput(throughput)
   }
+}
+
+const MAX_PARALLEL_DRONES = 10
+const DRONE_TRANSFER_M3_PER_TRIP = 4000
+const DRONE_TRANSFER_SEC_PER_TRIP = 60
+
+export function estimateCargoTransferTimeSec(profile: TransportShipTravelProfile): number {
+  if (profile.containerCapacityM3 <= 0) return 0
+  return profile.containerCapacityM3 / (MAX_PARALLEL_DRONES * (DRONE_TRANSFER_M3_PER_TRIP / DRONE_TRANSFER_SEC_PER_TRIP))
 }
 
 export function buildStationTravelEstimate(input: {
@@ -554,12 +591,16 @@ export function buildStationTravelEstimate(input: {
   sectorTimeSec: number
   profile: TransportShipTravelProfile
 }): StationTravelEstimate | undefined {
-  const totalTimeSec = input.localTimeSec + input.sectorTimeSec
+  const loadingTimeSec = estimateCargoTransferTimeSec(input.profile)
+  const unloadingTimeSec = estimateCargoTransferTimeSec(input.profile)
+  const totalTimeSec = input.localTimeSec + input.sectorTimeSec + loadingTimeSec + unloadingTimeSec
   if (totalTimeSec <= 0) return undefined
   const throughput = input.profile.containerCapacityM3 / totalTimeSec * 3600
   return {
     localTimeSec: input.localTimeSec,
     totalTimeSec,
+    loadingTimeSec,
+    unloadingTimeSec,
     formattedLocalTime: formatTransportTime(input.localTimeSec),
     formattedTotalTime: formatTransportTime(totalTimeSec),
     throughputM3PerHour: throughput,

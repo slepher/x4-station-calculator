@@ -28,6 +28,11 @@ type RouteBlock = {
 
 type EffectiveRouteSegment = TransportRouteSegmentView | NonNullable<TransportRouteSegmentView['highwayAlternative']>[number]
 
+type RouteOperationTimes = {
+  loadingTimeSec?: number
+  unloadingTimeSec?: number
+}
+
 function toggleSectorGroup(id: string) {
   expandedSectorGroups.value = toggledSet(expandedSectorGroups.value, id)
 }
@@ -92,7 +97,11 @@ function stationTargetText(station: { stationName: string; stationCode: string }
   return code
 }
 
-function routeBlocks(segments: TransportRouteSegmentView[]): RouteBlock[] {
+function routeBlocks(
+  segments: TransportRouteSegmentView[],
+  operations?: RouteOperationTimes,
+  opts?: { unloadAfterFinalHighwayExit?: boolean }
+): RouteBlock[] {
   const blocks: RouteBlock[] = []
 
   function ensureBlock(sectorName: string): RouteBlock {
@@ -115,6 +124,16 @@ function routeBlocks(segments: TransportRouteSegmentView[]): RouteBlock[] {
     return segmentFromLabel(effectiveSegment)
   }
 
+  function pushOperationItem(block: RouteBlock, key: string, labelKey: string, timeSec: number | undefined) {
+    if (!timeSec || timeSec <= 0) return
+    block.items.push({
+      key,
+      label: t(labelKey),
+      distanceText: null,
+      timeText: formatTransportDuration(timeSec)
+    })
+  }
+
   function emitBlockItems(segList: TransportRouteSegmentView[], startIndex: number) {
     let activeHighwayBlockLabel: string | null = null
 
@@ -126,7 +145,9 @@ function routeBlocks(segments: TransportRouteSegmentView[]): RouteBlock[] {
         const segKind = 'kind' in es ? es.kind : ''
         if (segKind === 'station-to-gate') {
           activeHighwayBlockLabel = null
-          ensureBlock(('toLabel' in es ? es.toLabel : '') || '').items.push({
+          const block = ensureBlock(('toLabel' in es ? es.toLabel : '') || '')
+          pushOperationItem(block, `${index}:load-cargo`, 'transit_transport.route_action.load_cargo', operations?.loadingTimeSec)
+          block.items.push({
             key: `${index}:depart`,
             label: t('transit_transport.route_action.depart_to_gate'),
             distanceText: formatKm(('distanceKm' in es ? es.distanceKm : 0) || 0),
@@ -195,23 +216,29 @@ function routeBlocks(segments: TransportRouteSegmentView[]): RouteBlock[] {
         if (segKind === 'highway-exit') {
           const blockLabel = activeHighwayBlockLabel ?? highwayBlockLabel(segment, es)
           activeHighwayBlockLabel = null
-          ensureBlock(blockLabel).items.push({
+          const block = ensureBlock(blockLabel)
+          block.items.push({
             key: `${index}:hw-exit`,
             label: t('transit_transport.segment.highway-exit'),
             distanceText: formatKm(('distanceKm' in es ? es.distanceKm : 0) || 0),
             timeText: ('travel' in es && es.travel) ? es.travel.formattedTime : null
           })
+          if (opts?.unloadAfterFinalHighwayExit && i === segList.length - 1) {
+            pushOperationItem(block, `${index}:unload-cargo`, 'transit_transport.route_action.unload_cargo', operations?.unloadingTimeSec)
+          }
           continue
         }
 
         if (segKind === 'gate-to-station') {
           activeHighwayBlockLabel = null
-          ensureBlock(('fromLabel' in es ? es.fromLabel : '') || '').items.push({
+          const block = ensureBlock(('fromLabel' in es ? es.fromLabel : '') || '')
+          block.items.push({
             key: `${index}:arrive`,
             label: t('transit_transport.route_action.arrive_to_station'),
             distanceText: formatKm(('distanceKm' in es ? es.distanceKm : 0) || 0),
             timeText: ('travel' in es && es.travel) ? es.travel.formattedTime : null
           })
+          pushOperationItem(block, `${index}:unload-cargo`, 'transit_transport.route_action.unload_cargo', operations?.unloadingTimeSec)
         }
       }
     })
@@ -220,6 +247,18 @@ function routeBlocks(segments: TransportRouteSegmentView[]): RouteBlock[] {
   emitBlockItems(segments, 0)
 
   return blocks
+}
+
+function formatTransportDuration(timeSec: number): string {
+  const rounded = Math.max(0, Math.round(timeSec))
+  if (rounded < 3600) {
+    const minutes = Math.floor(rounded / 60)
+    const seconds = rounded % 60
+    return `${minutes}m ${seconds}s`
+  }
+  const hours = Math.floor(rounded / 3600)
+  const minutes = Math.floor((rounded % 3600) / 60)
+  return `${hours}h ${minutes}m`
 }
 </script>
 
@@ -258,7 +297,7 @@ function routeBlocks(segments: TransportRouteSegmentView[]): RouteBlock[] {
               {{ t('transit_transport.terminal') }}: {{ row.terminal.label }}
             </div>
             <div
-              v-for="block in routeBlocks(row.segments)"
+              v-for="block in routeBlocks(row.segments, row.travel)"
               :key="`${row.id}:${block.sectorName}`"
               class="route-block"
             >
@@ -291,11 +330,14 @@ function routeBlocks(segments: TransportRouteSegmentView[]): RouteBlock[] {
           <button
             class="route-summary"
             type="button"
-            :class="{ 'not-expandable': !hasRouteDetails(group.segments), 'compact-summary': !hasDistance(group.summary.normalDistanceKm) && !group.travel }"
+            :class="{ 'not-expandable': !hasRouteDetails(group.segments), 'compact-summary': !hasDistance(group.summary.normalDistanceKm) && !group.travel || group.hideSectorHeader }"
             @click="hasRouteDetails(group.segments) && toggleStationSector(group.id)"
           >
             <span class="route-title">{{ group.sectorName }}</span>
-            <span class="route-metrics">
+            <span v-if="group.hideSectorHeader" class="route-metrics">
+              <span class="route-stat">{{ group.stations.length }} {{ t('transit_transport.station_count') }}</span>
+            </span>
+            <span v-else class="route-metrics">
               <span v-if="hasDistance(group.summary.normalDistanceKm)" class="route-stat">{{ formatKm(group.summary.normalDistanceKm) }}</span>
               <span v-else class="route-stat route-stat-empty"></span>
               <span v-if="group.travel" class="route-stat">{{ group.travel.formattedTime }}</span>
@@ -306,7 +348,7 @@ function routeBlocks(segments: TransportRouteSegmentView[]): RouteBlock[] {
           </button>
           <div v-if="hasRouteDetails(group.segments) && expandedStationSectors.has(group.id)" class="route-details">
             <div
-              v-for="block in routeBlocks(group.segments)"
+              v-for="block in routeBlocks(group.segments, group.travel)"
               :key="`${group.id}:${block.sectorName}`"
               class="route-block"
             >
@@ -345,7 +387,7 @@ function routeBlocks(segments: TransportRouteSegmentView[]): RouteBlock[] {
               </button>
               <div v-if="hasStationDetails(station) && expandedStations.has(station.id)" class="route-details">
                 <div
-                  v-for="block in routeBlocks(station.segments)"
+                  v-for="block in routeBlocks(station.segments, station.travel, { unloadAfterFinalHighwayExit: true })"
                   :key="`${station.id}:${block.sectorName}`"
                   class="route-block"
                 >

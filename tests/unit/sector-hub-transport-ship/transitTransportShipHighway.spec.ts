@@ -6,6 +6,7 @@ import {
   buildTransportTravelEstimate,
   buildTransitRouteSummaryForSegments,
   canUseHighway,
+  estimateCargoTransferTimeSec,
   estimateHighwaySegmentTimeSec,
   estimateRouteSegmentsTravel,
   estimateSegmentTravelTimeSec,
@@ -32,6 +33,7 @@ function profile(patch: Partial<TransportShipTravelProfile> = {}): TransportShip
     releaseSec: 2,
     attackDistanceKm: 10.5,
     decelDistanceKm: 2.1,
+    cargoDroneCount: 0,
     engines: [],
     ...patch
   }
@@ -155,9 +157,28 @@ describe('sector-hub-transport-ship highway travel timing', () => {
     expect(expandHighwayAlternatives([direct])).toEqual([direct])
 
     const ship = profile({ containerCapacityM3: 3600 })
-    expect(buildTransportTravelEstimate(3600, ship)?.throughputM3PerHour).toBe(3600)
+    const cargoTime = 3600 / (10 * (4000 / 60))
+    expect(buildTransportTravelEstimate(3600, ship)?.throughputM3PerHour).toBeCloseTo(3600 / (3600 + cargoTime * 2) * 3600, 10)
     expect(buildStationTravelEstimate({ localTimeSec: 100, sectorTimeSec: 200, profile: ship })?.timeSec).toBeUndefined()
-    expect(buildStationTravelEstimate({ localTimeSec: 100, sectorTimeSec: 200, profile: ship })?.totalTimeSec).toBe(300)
+    expect(buildStationTravelEstimate({ localTimeSec: 100, sectorTimeSec: 200, profile: ship })?.totalTimeSec).toBeCloseTo(300 + cargoTime * 2, 10)
+  })
+
+  it('adds cargo loading and unloading time to route and station throughput estimates', () => {
+    const ship = profile({ containerCapacityM3: 3000, cargoDroneCount: 12 })
+
+    expect(estimateCargoTransferTimeSec(ship)).toBeCloseTo(4.5, 10)
+
+    const routeTravel = buildTransportTravelEstimate(100, ship)
+    expect(routeTravel?.loadingTimeSec).toBeCloseTo(4.5, 10)
+    expect(routeTravel?.unloadingTimeSec).toBeCloseTo(4.5, 10)
+    expect(routeTravel?.timeSec).toBeCloseTo(109, 10)
+    expect(routeTravel?.formattedTime).toBe('1m 49s')
+
+    const stationTravel = buildStationTravelEstimate({ localTimeSec: 100, sectorTimeSec: 200, profile: ship })
+    expect(stationTravel?.loadingTimeSec).toBeCloseTo(4.5, 10)
+    expect(stationTravel?.unloadingTimeSec).toBeCloseTo(4.5, 10)
+    expect(stationTravel?.totalTimeSec).toBeCloseTo(309, 10)
+    expect(stationTravel?.formattedTotalTime).toBe('5m 9s')
   })
 
   it('selects route candidates by ship travel time before normal distance', () => {

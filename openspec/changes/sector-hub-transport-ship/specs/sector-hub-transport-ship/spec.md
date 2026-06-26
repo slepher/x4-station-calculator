@@ -207,7 +207,7 @@ Highway 段 SHALL 使用固定速度 12,000 m/s 计算耗时，不依赖引擎�
 
 ### Requirement: Throughput SHALL use one-way container cargo per hour
 
-单程吞吐量 SHALL 固定使用 container cargo 和单程总耗时计算。
+单程吞吐量 SHALL 固定使用 container cargo 和包含装卸时间的单程总耗时计算。
 
 #### Scenario: Calculate one-way throughput
 
@@ -217,6 +217,16 @@ Highway 段 SHALL 使用固定速度 12,000 m/s 计算耗时，不依赖引擎�
 - **那么** 单程吞吐量 SHALL 等于 `containerCapacityM3 / oneWayTimeSec * 3600`
 - **并且** 单位 SHALL 为 `m3/h`
 - **并且** 显示值 SHALL 为整数
+
+#### Scenario: Include loading and unloading time
+
+- **前提** 运输船蓝图包含用途为 `trade` 的货运无人机
+- **当** 系统计算单程总耗时
+- **那么** 上货时间 SHALL 等于 `containerCapacityM3 / (min(cargoDroneCount, 10) * (4000 / 60))`，其中 `4000` 为每架货运无人机单趟搬运量（m³/trip），`60` 为单趟耗时（s/trip），均来自游戏内实测经验数据
+- **并且** 卸货时间 SHALL 使用同一公式
+- **并且** 单程总耗时 SHALL 包含飞行耗时、上货时间和卸货时间
+- **并且** 路线明细 SHALL 在“离港至出口星门”之前显示上货时间
+- **并且** 路线明细 SHALL 在“入口星门至目标空间站”之后显示卸货时间
 
 #### Scenario: Do not calculate throughput for zero time
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { buildTransportShipCandidateState } from '@/store/logic/transitTransportShip'
-import type { ShipBlueprint, X4Equipment, X4Ship } from '@/types/x4'
+import type { ShipBlueprint, X4Drone, X4Equipment, X4Ship } from '@/types/x4'
 
 function ship(id: string, type: X4Ship['type'], patch: Partial<X4Ship> = {}): X4Ship {
   return {
@@ -72,6 +72,25 @@ function blueprint(id: string, shipId: string, favorite = true): ShipBlueprint {
   }
 }
 
+function drone(id: string, purposePrimary: string): X4Drone {
+  return {
+    id,
+    macro: id,
+    nameId: id,
+    name: id,
+    dlc_tag: '',
+    class: 'ship_xs',
+    mk: '1',
+    race: 'argon',
+    purposePrimary,
+    droneTags: [],
+    noplayerblueprint: false,
+    cargo: [],
+    tags: [],
+    cost: {}
+  }
+}
+
 describe('sector-hub-transport-ship candidate and profile calculation', () => {
   it('uses only favorite freighter/transporter blueprints with valid travel engines', () => {
     const ships = new Map([
@@ -116,5 +135,34 @@ describe('sector-hub-transport-ship candidate and profile calculation', () => {
     expect(state.hasCandidates).toBe(false)
     expect(state.selectedProfile).toBeNull()
     expect(state.selectedBlueprintValid).toBe(false)
+  })
+
+  it('counts transport drones from blueprint storage and caps active cargo drones at 10', () => {
+    const freighter = ship('freighter', 'freighter')
+    const equipments = new Map([['engine_a', engine('engine_a')]])
+    const drones = new Map([
+      ['drone_trade', drone('drone_trade', 'trade')],
+      ['drone_mine', drone('drone_mine', 'mine')]
+    ])
+    const bp = blueprint('bp-freighter', 'freighter')
+    bp.storage = {
+      deployables: [],
+      countermeasure: null,
+      drones: [
+        { id: 'drone_trade', name: 'Cargo Drone', count: 12 },
+        { id: 'drone_mine', name: 'Mining Drone', count: 4 }
+      ],
+      missiles: []
+    }
+
+    const state = buildTransportShipCandidateState({
+      blueprints: [bp],
+      selectedBlueprintId: 'bp-freighter',
+      findShip: () => freighter,
+      findEquipment: (id) => equipments.get(id) ?? null,
+      findDrone: (id) => drones.get(id) ?? null
+    })
+
+    expect(state.selectedProfile?.cargoDroneCount).toBe(10)
   })
 })

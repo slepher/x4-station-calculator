@@ -10,6 +10,9 @@ vi.mock('vue-i18n', () => ({
   useI18n: () => ({
     t: (key: string, params?: Record<string, unknown>) => {
       if (key === 'transit_transport.products') return '产物'
+      if (key === 'transit_transport.route_action.load_cargo') return '上货时间'
+      if (key === 'transit_transport.route_action.unload_cargo') return '卸货时间'
+      if (key === 'transit_transport.route_action.depart_to_gate') return '离港至出口星门'
       if (key === 'transit_transport.route_action.arrive_to_station') return '抵达空间站'
       if (key === 'transit_transport.station_count') return '座空间站'
       if (key === 'transit_transport.gates_value') return `${params?.count} 星门`
@@ -197,5 +200,64 @@ describe('TransitTransportPanel station products', () => {
 
     expect(sectorTitles).toEqual(['真视'])
     expect(wrapper.find('.route-details').text()).toContain('transit_transport.segment.highway-exit')
+  })
+
+  it('renders cargo loading before departure and unloading after arrival details', async () => {
+    const wrapper = mount(TransitTransportPanel, {
+      props: {
+        panel: panel([], [
+          {
+            kind: 'station-to-gate',
+            fromLabel: '起点空间站',
+            toLabel: '真视',
+            distanceKm: 10,
+            countsInSummaryDistance: true
+          },
+          {
+            kind: 'gate-to-station',
+            fromLabel: '真视',
+            toLabel: '目标空间站',
+            distanceKm: 20,
+            countsInSummaryDistance: true
+          }
+        ])
+      }
+    })
+
+    await wrapper.setProps({
+      panel: {
+        ...wrapper.props('panel'),
+        stationSectorGroups: [
+          {
+            ...wrapper.props('panel').stationSectorGroups[0],
+            stations: [
+              {
+                ...wrapper.props('panel').stationSectorGroups[0]!.stations[0]!,
+                travel: {
+                  localTimeSec: 50,
+                  totalTimeSec: 90,
+                  loadingTimeSec: 20,
+                  unloadingTimeSec: 20,
+                  formattedLocalTime: '0m 50s',
+                  formattedTotalTime: '1m 30s'
+                }
+              }
+            ]
+          }
+        ]
+      }
+    })
+    await wrapper.find('.station-summary').trigger('click')
+
+    const labels = wrapper
+      .findAll('.route-details .route-action-label')
+      .map((node) => node.text())
+
+    expect(labels).toEqual([
+      '上货时间',
+      '离港至出口星门',
+      '抵达空间站',
+      '卸货时间'
+    ])
   })
 })
