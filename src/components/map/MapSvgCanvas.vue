@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, toRef, watch, watchEffect } from 'vue'
+import { computed, toRef, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import type { SavePoiOverlayItem, SectorData } from '@/types/saveArchive'
@@ -277,15 +277,6 @@ const sectorFilter = (sectorId: string) => {
   if (state === 'resource') return `url(#${RESOURCE_HIGHLIGHT_FILTER_ID})`
   return undefined
 }
-
-watch(() => ({
-  showSectorGroupColors: props.showSectorGroupColors,
-  showSectorRoutes: props.showSectorRoutes,
-  sectorGroupColorCount: Object.keys(props.sectorGroupColorMap ?? {}).length,
-  hubLinkRouteEntryCount: props.hubLinkRouteEntries.length
-}), (state) => {
-  console.info('[MapSvgCanvas] binding overlay props', state)
-}, { immediate: true })
 
 const {
   sectorLinkLines,

@@ -260,27 +260,6 @@ const showSectorGroupColors = computed(() =>
   (mapDiagnosticVisibility.value.sectorGroupColors || bindingContextStage.value === 'select-sector' || bindingContextStage.value === 'select-station')
 )
 
-watch(() => ({
-  mapArchiveTarget: effectiveMapArchiveTarget.value,
-  explicitMapArchiveTarget: mapArchiveTarget.value,
-  selectedArchiveGuid: saveStore.selectedArchive?.meta.guid ?? null,
-  selectedArchiveTime: saveStore.selectedArchive?.meta.time ?? null,
-  activeBindingGuid: saveBindingStore.activeBinding?.gameGuid ?? null,
-  activeBindingArchiveTime: activeBindingArchiveTime.value,
-  bindingContextGameGuid: bindingContextGameGuid.value,
-  bindingContextStage: bindingContextStage.value,
-  isSavePanelOpen: isSavePanelOpen.value,
-  mapSavePanelLayer: mapSavePanelLayer.value,
-  showBindingOverlay: showBindingOverlayForDisplayedArchive.value,
-  showSectorGroupColors: showSectorGroupColors.value,
-  showSectorRoutes: showSectorRoutes.value,
-  sectorGroupColorCount: Object.keys(sectorGroupColorMap.value).length,
-  hubLinkRouteCount: hubLinkRouteEntries.value.length,
-  routeSource: isBindingSectorRouteActive.value ? 'draft' : 'binding'
-}), (state) => {
-  console.info('[MapWorkbenchView] binding overlay visibility', state)
-}, { immediate: true })
-
 const settledSavePoiViewportContentBounds = ref<{
   left: number
   top: number
