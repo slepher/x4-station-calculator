@@ -16,13 +16,27 @@ export type MapHubLinkRouteLine = {
   end?: Vec2
   d?: string
   color: string
+  colors: {
+    from: string
+    to: string
+  }
+  trackPaths: {
+    from: string
+    to: string
+  }
 }
 
 type RawMapHubLinkRouteLine = RouteLaneOffsetInput & {
   color: string
+  colors: {
+    from: string
+    to: string
+  }
 }
 
 const FALLBACK_ROUTE_COLOR = '#f8fafc'
+const ROUTE_TRACK_STROKE_WIDTH_PX = 1.45
+const TRACK_SOLID_HALF_OFFSET_PX = ROUTE_TRACK_STROKE_WIDTH_PX / 2
 
 export function useMapHubLinkRoutes(args: {
   clusters: ComputedRef<Record<string, Cluster>>
@@ -41,6 +55,10 @@ export function useMapHubLinkRoutes(args: {
         continue
       }
       const color = entry.color || FALLBACK_ROUTE_COLOR
+      const colors = {
+        from: entry.endpointColors?.from || color || FALLBACK_ROUTE_COLOR,
+        to: entry.endpointColors?.to || color || FALLBACK_ROUTE_COLOR
+      }
       entry.candidates.forEach((candidate, candidateIndex) => {
         const visualSegments = buildRouteSectorVisualSegments({
           idPrefix: `${entry.id}:${candidateIndex}`,
@@ -58,7 +76,8 @@ export function useMapHubLinkRoutes(args: {
               baseLinkKey,
               points: [start, end],
               curved: false,
-              color
+              color,
+              colors
             })
           }
         })
@@ -71,11 +90,42 @@ export function useMapHubLinkRoutes(args: {
       id: line.id,
       type: 'path',
       d: polylinePath(line.points),
-      color: line.color
+      color: line.color,
+      colors: line.colors,
+      trackPaths: buildTrackPaths(line.points)
     }))
   })
 
   return { routeLines }
+}
+
+function buildTrackPaths(points: Vec2[]): MapHubLinkRouteLine['trackPaths'] {
+  return {
+    from: polylinePath(offsetPolyline(points, -TRACK_SOLID_HALF_OFFSET_PX)),
+    to: polylinePath(offsetPolyline(points, TRACK_SOLID_HALF_OFFSET_PX))
+  }
+}
+
+function offsetPolyline(points: Vec2[], laneOffset: number): Vec2[] {
+  if (points.length < 2) return points
+  if (laneOffset === 0) return points
+  return points.map((point, index) => {
+    const normal = pointNormal(points, index)
+    return {
+      x: point.x + normal.x * laneOffset,
+      y: point.y + normal.y * laneOffset
+    }
+  })
+}
+
+function pointNormal(points: Vec2[], index: number): Vec2 {
+  const previous = points[Math.max(0, index - 1)]!
+  const next = points[Math.min(points.length - 1, index + 1)]!
+  const dx = next.x - previous.x
+  const dy = next.y - previous.y
+  const length = Math.hypot(dx, dy)
+  if (length === 0) return { x: 0, y: -1 }
+  return { x: -dy / length, y: dx / length }
 }
 
 function segmentBaseLinkKey(

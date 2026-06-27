@@ -123,6 +123,16 @@ function onConfirm() {
   handleConfirm()
 }
 
+watch([calculationMode, hasChanges, hasUnresolvedTradeStations], () => {
+  console.log('[DEBUG-map-binding-confirm-7c9e]', {
+    layout: props.layout,
+    calculationMode: calculationMode.value,
+    hasChanges: hasChanges.value,
+    hasUnresolvedTradeStations: hasUnresolvedTradeStations.value,
+    showConfirmProp: true
+  })
+}, { immediate: true })
+
 function switchToFirstUnresolvedTab() {
   if (hasUncertainAssignments.value || hasPendingBridgeDecision.value) activeTab.value = 'allocation'
   else if (hasUnresolvedTradeStations.value) activeTab.value = 'tradeStation'
@@ -346,7 +356,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
             :unresolved-allocation-count="unresolvedTooltip.allocCount"
             :unresolved-trade-station-count="unresolvedTooltip.tsCount"
             :unresolved-title="unresolvedTooltip.html"
-            :show-confirm="calculationMode === 'result'"
+            :show-confirm="true"
             :confirm-disabled="hasUnresolvedTradeStations || !hasChanges"
             @update:pref-jump-range="handleUpdatePrefJumpRange"
             @update:bridge-search-jump-range="handleUpdateBridgeSearchJumpRange"

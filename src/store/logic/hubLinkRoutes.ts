@@ -21,6 +21,10 @@ export type HubLinkRouteEntry = {
   to: HubLinkRouteEndpoint
   colorGroupId: string
   color?: string
+  endpointColors?: {
+    from?: string
+    to?: string
+  }
   candidates: TransitRouteResult[]
   problems: string[]
 }
@@ -63,6 +67,10 @@ export function buildHubLinkRouteEntries(input: {
       const from = resolveHubEndpoint(group, input)
       const to = resolveHubEndpoint(linkedGroup, input)
       const colorGroup = colorGroupForEndpoints(group, linkedGroup, from, to)
+      const endpointColors = {
+        from: group.color,
+        to: linkedGroup.color
+      }
 
       if (!from || !to) {
         const linkKey = missingHubLinkRouteKey(input.scope, group.id, linkedGroup.id)
@@ -77,6 +85,7 @@ export function buildHubLinkRouteEntries(input: {
           to: to ?? missingEndpoint(linkedGroup),
           colorGroupId: colorGroup.id,
           color: colorGroup.color,
+          endpointColors,
           candidates: [],
           problems: ['missing-hub-route-endpoint']
         })
@@ -107,7 +116,8 @@ export function buildHubLinkRouteEntries(input: {
         fromGroupId: group.id,
         toGroupId: linkedGroup.id,
         colorGroupId: colorGroup.id,
-        color: colorGroup.color
+        color: colorGroup.color,
+        endpointColors
       })
     }
   }

@@ -67,8 +67,14 @@
   - [x] 9.8 星区内部聚合 A-B route 统一按端点直连渲染，不再复用普通 highway spline 或绘制中途 gate/highway 折线
   - [x] 9.9 命中 `highwayRingChains` 的环形高速通道保留中线，普通 sector-internal 与 ring-highway 同几何通道归入同一 lane group
   - [x] 9.10 同一 link 在同一 sector 内相同进入点/离开点的多条 candidate 只保留一条可视 route；不同 link 保留多条并分 lane
-  - [x] 9.11 移除临时 route endpoint debug 日志
-  - [x] 9.12 运行变更相关单元测试与 build validation
+- [x] 9.11 移除临时 route endpoint debug 日志
+- [x] 9.12 运行变更相关单元测试与 build validation
+
+- [x] 10. 将 hub link route 从单色线改为双端颜色双轨线
+  - [x] 10.1 文档替换 `sectorMacro` 字母序单色规则，明确无向 link 同时表达两端 group color
+  - [x] 10.2 为 map route view model 增加端点颜色 pair
+  - [x] 10.3 route layer 使用“半透明 A / 实色 A / 实色 B / 半透明 B”的紧密双轨复合描边
+  - [x] 10.4 增加单元测试覆盖端点颜色 pair 传递
 
 ## Notes
 

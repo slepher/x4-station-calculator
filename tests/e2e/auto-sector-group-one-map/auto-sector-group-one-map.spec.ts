@@ -535,7 +535,48 @@ test.describe('3 Hub Color 与 Overlay', () => {
     expect(afterColors.length).toBe(beforeColors.length)
   })
 
-  test('3.3 地图颜色来源', async ({ page }) => {
+  test('3.3 map binding edit mode keeps confirm visible', async ({ page }) => {
+    await navigateToMapBinding(page)
+    await enterEditMode(page)
+
+    const confirmBtn = page.getByRole('button', { name: /确定|Confirm/ })
+    await expect(confirmBtn).toBeVisible({ timeout: 3000 })
+  })
+
+  test('3.4 calculate preserves edited group color by anchor sector', async ({ page }) => {
+    await navigateToMapBinding(page)
+    await enterEditMode(page)
+
+    const edited = await page.evaluate(() => {
+      const liveStore = (window as any).liveStore
+      const result = liveStore?.autoGroupResult
+      const group = result?.groups?.find((item: any) => item.sectorMacro)
+      if (!liveStore || !result || !group) return null
+      const color = '#123456'
+      liveStore.autoGroupResult = {
+        ...result,
+        groups: result.groups.map((item: any) =>
+          item.id === group.id ? { ...item, color } : item
+        )
+      }
+      return { sectorMacro: group.sectorMacro, color }
+    })
+    expect(edited).toBeTruthy()
+
+    await page.getByRole('button', { name: /计算|Calculate/ }).first().click()
+    await page.waitForTimeout(500)
+
+    const afterColor = await page.evaluate((expected) => {
+      const groups = (window as any).liveStore?.autoGroupResult?.groups ?? []
+      return groups.find((group: any) => group.sectorMacro === expected.sectorMacro)?.color ?? null
+    }, edited)
+    expect(afterColor).toBe(edited!.color)
+
+    const svgContent = await page.getByTestId('map-svg-canvas').innerHTML()
+    expect(svgContent).toContain('#123456')
+  })
+
+  test('3.5 地图颜色来源', async ({ page }) => {
     // 3.3.1 Navigate to map binding-sector and check map canvas
     await navigateToMapBinding(page)
     const mapCanvas = page.locator('[data-testid="map-svg-canvas"]')
@@ -555,7 +596,7 @@ test.describe('3 Hub Color 与 Overlay', () => {
     await expect(page.locator('[data-testid="map-svg-canvas"]')).toBeVisible({ timeout: 3000 })
   })
 
-  test('3.4 overlay 层级', async ({ page }) => {
+  test('3.6 overlay 层级', async ({ page }) => {
     // 3.4.1 Navigate and check map rendering
     await navigateToMapBinding(page)
     const mapCanvas = page.locator('[data-testid="map-svg-canvas"]')

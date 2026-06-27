@@ -116,29 +116,39 @@ transit hub 运输栏中 `Sector Group` link route SHALL 读取 live production 
 - **并且** 系统 SHALL NOT 只绘制最终最优路径
 - **并且** 单个 candidate 在每个 sector 内部 SHALL 先聚合为进入点到离开点的一条 visual segment
 
-### Requirement: Hub link routes SHALL use deterministic macro-based color
+### Requirement: Hub link routes SHALL render both endpoint group colors as a tight dual-track line
 
-每条 hub link route 的颜色 SHALL 由 link 两端 hub station 所在 sector 的 `sectorMacro` 排序决定。
+每条 hub link route SHALL 同时表达 link 两端 group 的 `color`。hub link 表达两个区域对象之间的无向连接，不是 source/target 流量，因此两端颜色 SHALL 平等显示。
 
-#### Scenario: Route color uses lexicographically earlier endpoint macro
+#### Scenario: Route color uses both endpoint group colors
 
-- **前提** hub link 两端 hub station 分别位于 sector A 与 sector B
-- **当** 系统决定该 link route 的颜色
-- **那么** 系统 SHALL 按字符串字母序比较两端 `sectorMacro`
-- **并且** 系统 SHALL 使用排序靠前 `sectorMacro` 所属 group 的 `color`
+- **前提** hub link 两端 group 分别具有颜色 A 与颜色 B
+- **当** 地图绘制该 link route
+- **那么** route SHALL 同时使用颜色 A 与颜色 B
+- **并且** SHALL NOT 只选择其中一端颜色
+- **并且** SHALL NOT 生成 A 与 B 的混合中间色
 
-#### Scenario: All candidates for the same link share color
+#### Scenario: Dual-track route keeps solid tracks tightly connected
+
+- **前提** hub link route 使用颜色 A 与颜色 B
+- **当** 地图绘制该 route 的双轨 stroke
+- **那么** 系统 SHALL 只绘制两条实色轨道
+- **并且** 系统 SHALL NOT 绘制半透明 route 底层或外侧半透明边
+- **并且** 视觉横截面 SHALL 呈现为 `实色 A | 实色 B`
+- **并且** 两条实色轨道 SHALL 紧密连接，不保留可见空隙
+
+#### Scenario: All candidates for the same link share endpoint color pair
 
 - **前提** 某条 hub link 有多条有效 route candidates
 - **当** 系统绘制这些候选
-- **那么** 这些候选 SHALL 使用相同颜色
+- **那么** 这些候选 SHALL 使用相同的两端 group color pair
 - **并且** 系统 SHALL NOT 通过透明度降级表达候选优先级
 
-#### Scenario: Missing group color uses fallback style
+#### Scenario: Missing endpoint group color uses fallback style
 
-- **前提** 排序靠前 `sectorMacro` 所属 group 没有 `color`
+- **前提** link 任一端 group 没有 `color`
 - **当** 地图绘制该 link route
-- **那么** 系统 SHALL 使用稳定 fallback 样式绘制
+- **那么** 系统 SHALL 为缺失颜色的一端使用稳定 fallback 样式绘制
 - **并且** SHALL NOT 阻断其它 link route 绘制
 
 ### Requirement: Map hub link route overlay SHALL offset overlapping route lanes

@@ -264,16 +264,13 @@ function buildRecalculateBaseGroups(): { baseGroups: BindingSectorGroup[]; exclu
       order: index,
       sectorMacro: group.sectorMacro,
       jumpRange: group.jumpRange,
+      color: group.color,
       connectedGroupIds: group.connectedGroupIds.filter((connId) => {
         const other = pinnedGroups.find((g) => g.id === connId)
         if (!other) return false
         return group.connectionRetainEnabled || other.connectionRetainEnabled
       }),
       coverageSectorMacros: (group.coverageRetainEnabled ? group.coverageSectorMacros : [])
-        .filter((ref) => {
-          if (!group.excludedDefaultAssignmentSectorMacros.includes(ref)) return true
-          return !autoGroupResult.value!.playerSectorMacros.includes(ref)
-        })
         .map((ref) => ({ ref, jump: 0 }))
     }))
   return { baseGroups, excludedSectorMacros: [] }
@@ -287,14 +284,15 @@ function runCalculationFromEditInput() {
 
   // Capture user-edited state from current edit draft (by anchor sector)
   const currentDraft = autoGroupResult.value
-  const excludedCoverageByAnchor: Record<string, string[]> = {}
-  if (currentDraft) {
-    for (const group of currentDraft.groups) {
-      if (group.sectorMacro && group.excludedDefaultAssignmentSectorMacros.length > 0) {
-        excludedCoverageByAnchor[group.sectorMacro] = [...group.excludedDefaultAssignmentSectorMacros]
-      }
-    }
-  }
+  console.log('[DEBUG-map-binding-calc-7c9e]', {
+    phase: 'before',
+    calculationMode: calculationMode.value,
+    draftGroupColors: currentDraft?.groups.map((group) => ({
+      id: group.id,
+      sectorMacro: group.sectorMacro,
+      color: group.color
+    })) ?? []
+  })
 
   let result: AutoGroupResult
   if (!recalculateInput || recalculateInput.baseGroups.length === 0) {
@@ -329,14 +327,6 @@ function runCalculationFromEditInput() {
     }
   }
 
-  // Re-apply excluded defaults to groups with matching anchors
-  const restoredGroups = result.groups.map((group) => {
-    if (!group.sectorMacro) return group
-    const covExcluded = excludedCoverageByAnchor[group.sectorMacro] ?? []
-    if (covExcluded.length === 0) return group
-    return { ...group, excludedDefaultAssignmentSectorMacros: covExcluded }
-  })
-
   // Preserve trade station retain info from previous groups (matched by ID)
   const prevTradeStationByGroupId: Record<string, { savedTradeStationCode?: string; tradeStationRetainEnabled?: boolean }> = {}
   if (currentDraft) {
@@ -348,7 +338,7 @@ function runCalculationFromEditInput() {
     }
   }
   const groupsWithPrevTrade = applyRetainStateFromDraft(
-    restoredGroups.map((g) => ({
+    result.groups.map((g) => ({
       ...g,
       ...prevTradeStationByGroupId[g.id]
     })),
@@ -356,6 +346,14 @@ function runCalculationFromEditInput() {
   )
 
   stabilizeHubColors(groupsWithPrevTrade, buildHubColorContext())
+  console.log('[DEBUG-map-binding-calc-7c9e]', {
+    phase: 'after-stabilize',
+    resultGroupColors: groupsWithPrevTrade.map((group) => ({
+      id: group.id,
+      sectorMacro: group.sectorMacro,
+      color: group.color
+    }))
+  })
   setAutoGroupResult({ ...result, groups: groupsWithPrevTrade })
   calculationMode.value = 'result'
 }

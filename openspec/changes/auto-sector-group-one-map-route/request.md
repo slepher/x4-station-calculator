@@ -49,11 +49,14 @@
 
 ### 路线染色
 
-- 每条 hub link route 的颜色 SHALL 基于 link 两端 hub station 所在 sector 的 `sectorMacro`。
-- 系统 SHALL 对两端 `sectorMacro` 字符串按字母序排序。
-- 路线颜色 SHALL 使用排序靠前的 `sectorMacro` 所属 group 的 `color`。
-- 若排序靠前端所属 group 没有 `color`，该路线 SHALL 使用稳定 fallback 样式，不得阻断其它路线绘制。
-- 同一条 hub link 的所有候选 SHALL 使用同一颜色。
+- 每条 hub link route 的颜色 SHALL 同时表达 link 两端 group 的 `color`。
+- hub link SHALL 被视为两个区域对象之间的无向关系，而不是 source/target 流量；两端颜色 SHALL 平等显示。
+- 路线 SHALL 使用紧密贴合的双色实线双轨，而不是单色线或混合中间色。
+- 旧单色视觉为“更宽半透明原色底层 + 较窄实色原色上层”，新双色视觉 SHALL 取消半透明底层。
+- 新双色视觉 SHALL 只绘制两条紧密贴合的实色轨道，横截面呈现为 `实色 A | 实色 B`。
+- 两条实色轨道 SHALL 紧密连接，不应保留可见空隙。
+- 若任一端 group 没有 `color`，该端 SHALL 使用稳定 fallback 样式，不得阻断其它路线绘制。
+- 同一条 hub link 的所有候选 SHALL 使用同一对端点颜色。
 - 候选路线 SHALL 不使用透明度降级表达优先级；所有候选都是可考虑选择。
 - 多条候选重叠时 SHALL 通过稳定 lane 偏移做视觉消歧，不通过透明度暗示优先级。
 - 同一 hub link 的多条候选经过同一基础线路时 SHALL 共用同一 lane，不因 candidate 不同而拆成多条并行线。
@@ -110,8 +113,8 @@
 - 每条候选路径在每个星区内只绘制进入点到离开点的聚合直线，不显示星区内部中途绕行。
 - 同一 hub link 在同一星区内相同进入/离开点的多条候选合并为一条；不同 hub link 保留各自可视段。
 - 带 `problems` 的不完整候选不绘制在地图 route overlay 中。
-- 每条路线颜色按两端 hub station 所在 sector 的 `sectorMacro` 字母序靠前端所属 group color 选择。
-- 同一条 hub link 的所有候选使用同一颜色，不通过透明度降级表达优先级。
+- 每条路线使用两端 group color 的紧密双轨复合线，不生成混合中间色。
+- 同一条 hub link 的所有候选使用同一对端点颜色，不通过透明度降级表达优先级。
 - 不同 hub link route 在同一基础线路上不会完全覆盖；同一 hub link 的多条候选在同一基础线路上可共用 lane。
 - route 与原生 gate / superhighway / highway 连接不会完全重合；经过 gate 或 highway endpoint 时允许收束到端点。
 - 星区内部 A-B 路线以端点直连方式显示；存在环形高速直连的 A-B 通道中线保持空出，紫色/橙色等不同 link 不会有任一路线占用中线。

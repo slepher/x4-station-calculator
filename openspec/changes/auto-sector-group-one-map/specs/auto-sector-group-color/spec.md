@@ -12,18 +12,27 @@
 
 #### Scenario: Existing automatic color preserved when valid
 - **前提** 某 hub 已有 `color` 值
-- **并且** 该颜色与自身定位星区、覆盖星区 faction 色 ΔE 均 > 5
-- **并且** 该颜色与 5 跳以内已固定 hub 颜色 ΔE > 5
+- **并且** 该颜色与自身定位星区、覆盖星区 faction 色均不满足冲突判定
+- **并且** 该颜色与 5 跳以内已固定 hub 颜色均不满足冲突判定
 - **当** 用户点击 [计算]
 - **那么** 系统 SHALL 保留该 `color`
 - **并且** SHALL 将该颜色作为后续 hub 的固定避色输入
 
 #### Scenario: Existing automatic color reassigned when conflicting
 - **前提** 某 hub 已有 `color` 值
-- **并且** 该颜色与自身定位星区、覆盖星区 faction 色 ΔE ≤ 5
-- **或** 该颜色与 5 跳以内已固定 hub 颜色 ΔE ≤ 5
+- **并且** 该颜色与自身定位星区、覆盖星区 faction 色满足冲突判定
+- **或** 该颜色与 5 跳以内已固定 hub 颜色满足冲突判定
 - **当** 用户点击 [计算]
 - **那么** 系统 SHALL 重新为该 hub 分配颜色
+
+#### Scenario: Color conflict threshold
+- **前提** 系统比较两个可解析颜色
+- **当** 两个颜色的 CIE2000 ΔE < 10
+- **那么** 系统 SHALL 判定为颜色冲突
+- **当** 两个颜色都具备足够 chroma 可比较 hue，并且 OKLCH hue 距离 < 10°
+- **那么** 系统 SHALL 判定为颜色冲突
+- **当** ΔE ≥ 10，并且 hue 不参与比较或 OKLCH hue 距离 ≥ 10°
+- **那么** 系统 SHALL NOT 判定为颜色冲突
 
 #### Scenario: User preset color can be recomputed
 - **前提** 用户通过色卡为某 hub 选择过预设颜色
@@ -63,14 +72,14 @@
 #### Scenario: New coverage faction does not conflict
 - **前提** 某 hub 已有自动颜色
 - **当** 用户在 [计算] 后到提交前调整该 hub 覆盖星区，并因覆盖计算新增覆盖星区
-- **并且** 新增覆盖星区 faction 色与该 hub 颜色 ΔE > 5
+- **并且** 新增覆盖星区 faction 色与该 hub 颜色不满足冲突判定
 - **那么** 该新增覆盖星区 SHALL NOT 单独触发该 hub 重分配
 - **并且** 系统 SHALL NOT 改变其他 hub 的颜色
 
 #### Scenario: New coverage faction conflicts
 - **前提** 某 hub 已有自动颜色
 - **当** 用户在 [计算] 后到提交前调整该 hub 覆盖星区，并因覆盖计算新增覆盖星区
-- **并且** 新增覆盖星区 faction 色与该 hub 颜色 ΔE ≤ 5
+- **并且** 新增覆盖星区 faction 色与该 hub 颜色满足冲突判定
 - **那么** 系统 SHALL 仅对该 hub 即时重新分配颜色
 - **并且** 系统 SHALL NOT 改变其他 hub 的颜色
 

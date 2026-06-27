@@ -113,17 +113,29 @@ route algorithm 的口径不在本变更中修改：simple path、gate jump 上�
 
 ## 染色规则
 
-每条 hub link 的颜色由两端 hub station 所在 sector 决定：
+每条 hub link 的颜色由两端 group 决定，而不是从两端中选择一个代表色。hub link 表达的是两个区域对象之间的无向连接，不是 source/target 流量，因此两端颜色在视觉上平等。
+
+旧单色视觉是两层叠加：
 
 ```text
-colorEndpointSector = min(from.sectorMacro, to.sectorMacro)
-colorGroup = endpoint sector 所属的 group
-color = colorGroup.color
+底层：更宽的半透明原色 stroke
+上层：较窄的实色原色 stroke
+横截面：半透明 A | 实色 A | 半透明 A
 ```
 
-若 colorGroup 无颜色，使用地图 route layer 的 fallback stroke。fallback 只影响该 link 的显示，不影响其它 link。
+新视觉取消半透明底层，只保留两条紧密贴合的实色轨道，降低双色 route 本身的视觉复杂度：
 
-同一 link 的所有 candidates 使用同一颜色。候选不使用透明度降级，也不通过样式表达最优/次优。
+```text
+左轨：实色 A stroke
+右轨：实色 B stroke
+横截面：实色 A | 实色 B
+```
+
+两条实色轨道不留可见空隙，不混合为中间色，也不使用渐变暗示方向。实现上 map route view model 应保留两端 endpoint colors；route layer 在 lane 偏移后的中心线上生成两条平行轨道，并让两条实色轨的中心距等于实色 stroke 宽度，从而贴边相接但不互相覆盖。
+
+若任一端 group 无颜色，该端使用地图 route layer 的 fallback stroke。fallback 只影响该端轨道显示，不影响其它 link。
+
+同一 link 的所有 candidates 使用同一对端点颜色。候选不使用透明度降级，也不通过样式表达最优/次优。
 
 ## Route lane 偏移
 

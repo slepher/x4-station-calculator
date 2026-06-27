@@ -72,7 +72,7 @@
 
 - Hub color 是地图显示辅助，不是不可变用户决策。
 - 自动分配应尽量保持已有有效颜色稳定。
-- 与自身 anchor/coverage faction 色冲突，或与 5 跳内 hub 色冲突时，可以重分配。
+- 与自身 anchor/coverage faction 色冲突，或与 5 跳内 hub 色冲突时，可以重分配；冲突按 CIE2000 ΔE < 10，或可比较 hue 时 OKLCH hue 距离 < 10° 判定。
 - 5 跳外 hub 允许复用颜色。
 - 用户色卡选择是 preset，不是永久锁定；后续 compute 可在冲突时调整。
 - Transparent 表示清空颜色，不得持久化为 `0x00000000`。
