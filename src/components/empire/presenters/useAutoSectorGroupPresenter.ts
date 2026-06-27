@@ -284,15 +284,6 @@ function runCalculationFromEditInput() {
 
   // Capture user-edited state from current edit draft (by anchor sector)
   const currentDraft = autoGroupResult.value
-  console.log('[DEBUG-map-binding-calc-7c9e]', {
-    phase: 'before',
-    calculationMode: calculationMode.value,
-    draftGroupColors: currentDraft?.groups.map((group) => ({
-      id: group.id,
-      sectorMacro: group.sectorMacro,
-      color: group.color
-    })) ?? []
-  })
 
   let result: AutoGroupResult
   if (!recalculateInput || recalculateInput.baseGroups.length === 0) {
@@ -346,14 +337,6 @@ function runCalculationFromEditInput() {
   )
 
   stabilizeHubColors(groupsWithPrevTrade, buildHubColorContext())
-  console.log('[DEBUG-map-binding-calc-7c9e]', {
-    phase: 'after-stabilize',
-    resultGroupColors: groupsWithPrevTrade.map((group) => ({
-      id: group.id,
-      sectorMacro: group.sectorMacro,
-      color: group.color
-    }))
-  })
   setAutoGroupResult({ ...result, groups: groupsWithPrevTrade })
   calculationMode.value = 'result'
 }

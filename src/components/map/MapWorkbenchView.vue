@@ -233,33 +233,11 @@ const sectorGroupColorMap = computed<Record<string, string>>(() => {
     (bindingContextStage.value === 'select-sector' || bindingContextStage.value === 'select-station')
   if (isBinding && liveStore.autoGroupResult) {
     const draftMap = buildColorMap(liveStore.autoGroupResult.groups)
-    console.log('[DEBUG-map-binding-color-7c9e]', {
-      source: 'draft',
-      mapSavePanelLayer: mapSavePanelLayer.value,
-      bindingContextStage: bindingContextStage.value,
-      draftGroupColors: liveStore.autoGroupResult.groups.map((group) => ({
-        id: group.id,
-        sectorMacro: group.sectorMacro,
-        color: group.color
-      })),
-      hasTestColor: Object.values(draftMap).includes('#123456')
-    })
     return draftMap
   }
   const binding = saveBindingStore.activeBinding
   if (!binding) return {}
   const bindingMap = buildColorMap(binding.groups)
-  console.log('[DEBUG-map-binding-color-7c9e]', {
-    source: 'binding',
-    mapSavePanelLayer: mapSavePanelLayer.value,
-    bindingContextStage: bindingContextStage.value,
-    bindingGroupColors: binding.groups.map((group) => ({
-      id: group.id,
-      sectorMacro: group.sectorMacro,
-      color: group.color
-    })),
-    hasTestColor: Object.values(bindingMap).includes('#123456')
-  })
   return bindingMap
 })
 const isBindingSectorRouteActive = computed(() => {
