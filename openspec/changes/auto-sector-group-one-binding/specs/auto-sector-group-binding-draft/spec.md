@@ -322,6 +322,14 @@ Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触�
 - **那么** 参数栏 SHALL 显示 `tradeStationRetainEnabled` 主开关
 - **并且** edit 模式 group card SHALL 显示对应 group 的 `tradeStationRetainEnabled` 开关
 
+#### Scenario: Retain masters are derived and mixed defaults off
+
+- **前提** 共享自动分组面板渲染
+- **当** 用户查看桥接保留、覆盖保留或交易站保留主开关
+- **那么** 主开关 SHALL 由当前各 group 的对应 retain 字段聚合得出
+- **并且** 当部分 group 为 true、部分 group 为 false 时，主开关 SHALL 显示 indeterminate
+- **并且** 当当前 retain 状态为 mixed 且用户新增 hub 时，新 hub SHALL 默认取 false
+
 ### Requirement: Binding Button Semantics
 
 系统 SHALL 明确定义 Live/Map 共享自动分组面板中的按钮语义，避免按钮隐式触发计算、提交或恢复。

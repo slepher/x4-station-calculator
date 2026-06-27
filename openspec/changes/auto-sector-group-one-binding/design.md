@@ -37,9 +37,10 @@ Presenter 仍可持有 UI 辅助状态，但共享草案不得离开 live store�
 
 - `calculationBaseline`: 最近一次初始化或显式计算后的重置快照。
 - `nodeEnabled`: 下一次计算是否允许生成新 pure hub。
-- `bridgeRetainEnabled` / `coverageRetainEnabled` / `tradeStationRetainEnabled`: 顶部主保留开关。
 - `showHubAddMenu`: 添加 hub 菜单显示状态。
 - `activeTab`: AutoSectorGroupPanel 内的 `hub | allocation | tradeStation` 当前页。
+
+`bridgeRetainEnabled` / `coverageRetainEnabled` / `tradeStationRetainEnabled` 为派生态，不是独立真值；它们由当前 `autoGroupResult.groups` 聚合得出。mixed 状态时，新增 hub 默认取 `false`。
 
 `needsAutoGroupRecalc`：
 
@@ -197,9 +198,9 @@ Live sidebar 在固定菜单和动态星区/站点列表之间的分隔线区域
 | 编辑 | 切换到编辑视图（`calculationMode='edit'`），不改变数据 |
 | 退出 | 切换到结果视图（`calculationMode='result'`），不改变数据 |
 | 添加枢纽 | 切换 `showHubAddMenu` |
-| 桥接保留 | 同步所有 group 的 `connectionRetainEnabled` |
-| 覆盖保留 | 同步所有 group 的 `coverageRetainEnabled` |
-| 交易站保留 | 同步所有 group 的 `tradeStationRetainEnabled` |
+| 桥接保留 | 同步所有 group 的 `connectionRetainEnabled`；主开关由 groups 聚合得出 |
+| 覆盖保留 | 同步所有 group 的 `coverageRetainEnabled`；主开关由 groups 聚合得出 |
+| 交易站保留 | 同步所有 group 的 `tradeStationRetainEnabled`；主开关由 groups 聚合得出 |
 
 ### Confirm
 

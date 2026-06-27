@@ -147,7 +147,7 @@ describe('sector-hub-transport route and highway construction', () => {
     expect(rampLongerThanDirect).toBeNull()
   })
 
-  it('returns all route candidates sorted by normal distance then gate count', () => {
+  it('returns final route candidates sorted by normal distance then gate count', () => {
     const sectors = {
       a: sector('a', 'ca', {
         cluster_gates: {
@@ -205,8 +205,60 @@ describe('sector-hub-transport route and highway construction', () => {
       target: { kind: 'sector', sectorMacro: 'd' }
     })
 
-    expect(candidates).toHaveLength(4)
-    expect(candidates.map((route) => route.summary.normalDistanceKm)).toEqual([11, 21, 31, 41])
+    expect(candidates).toHaveLength(1)
+    expect(candidates.map((route) => route.summary.normalDistanceKm)).toEqual([11])
+  })
+
+  it('filters route candidates dominated across final selection metrics', () => {
+    const sectors = {
+      a: sector('a', 'ca', {
+        cluster_gates: {
+          g_ab: { target_cluster_id: 'cb', raw_local_pos: { x: 10_000, y: 0, z: 0 } },
+          g_ac: { target_cluster_id: 'cc', raw_local_pos: { x: 20_000, y: 0, z: 0 } }
+        }
+      }),
+      b: sector('b', 'cb', {
+        cluster_gates: {
+          g_ba: { target_cluster_id: 'ca', raw_local_pos: { x: 0, y: 0, z: 0 } },
+          g_bd: { target_cluster_id: 'cd', raw_local_pos: { x: 1_000, y: 0, z: 0 } }
+        }
+      }),
+      c: sector('c', 'cc', {
+        cluster_gates: {
+          g_ca: { target_cluster_id: 'ca', raw_local_pos: { x: 0, y: 0, z: 0 } },
+          g_ce: { target_cluster_id: 'ce', raw_local_pos: { x: 10_000, y: 0, z: 0 } }
+        }
+      }),
+      e: sector('e', 'ce', {
+        cluster_gates: {
+          g_ec: { target_cluster_id: 'cc', raw_local_pos: { x: 0, y: 0, z: 0 } },
+          g_ed: { target_cluster_id: 'cd', raw_local_pos: { x: 10_000, y: 0, z: 0 } }
+        }
+      }),
+      d: sector('d', 'cd', {
+        cluster_gates: {
+          g_db: { target_cluster_id: 'cb', raw_local_pos: { x: 0, y: 0, z: 0 } },
+          g_de: { target_cluster_id: 'ce', raw_local_pos: { x: 0, y: 0, z: 0 } }
+        }
+      })
+    }
+
+    const candidates = buildTransitRouteCandidates({
+      clusters: {
+        ca: cluster('ca', ['a']),
+        cb: cluster('cb', ['b']),
+        cc: cluster('cc', ['c']),
+        cd: cluster('cd', ['d']),
+        ce: cluster('ce', ['e'])
+      },
+      sectors,
+      from: { sectorMacro: 'a', label: 'Hub', position: { x: 0, y: 0, z: 0 } },
+      target: { kind: 'sector', sectorMacro: 'd' }
+    })
+
+    expect(candidates.map((route) => route.sectors)).toEqual([
+      ['a', 'b', 'd']
+    ])
   })
 
   it('selects normal distance before gate count when no ship is selected', () => {
@@ -266,13 +318,13 @@ describe('sector-hub-transport route and highway construction', () => {
       a: sector('a', 'ca', {
         cluster_gates: {
           g_ax: { target_cluster_id: 'cx', raw_local_pos: { x: 10_000, y: 0, z: 0 } },
-          g_ay: { target_cluster_id: 'cy', raw_local_pos: { x: 20_000, y: 0, z: 0 } }
+          g_ay: { target_cluster_id: 'cy', raw_local_pos: { x: 1_000, y: 0, z: 0 } }
         }
       }),
       y: sector('y', 'cy', {
         cluster_gates: {
           g_ya: { target_cluster_id: 'ca', raw_local_pos: { x: 0, y: 0, z: 0 } },
-          g_yx: { target_cluster_id: 'cx', raw_local_pos: { x: 30_000, y: 0, z: 0 } }
+          g_yx: { target_cluster_id: 'cx', raw_local_pos: { x: 1_000, y: 0, z: 0 } }
         }
       }),
       x: sector('x', 'cx', {

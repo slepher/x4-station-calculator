@@ -52,9 +52,6 @@ function buildHubColorContext(): HubColorContext {
     maxHop: 5
   }
 }
-const bridgeRetainEnabled = ref(true)
-const coverageRetainEnabled = ref(true)
-const tradeStationRetainEnabled = ref(true)
 const showHubAddMenu = ref(false)
 const calculationBaseline = ref<AutoGroupResult | null>(null)
 const virtualStationDragState = ref<{
@@ -115,6 +112,47 @@ const sectorGraphInfo = computed(() => {
 
 function cloneAutoGroupResult(result: AutoGroupResult): AutoGroupResult {
   return JSON.parse(JSON.stringify(result))
+}
+
+type RetainKey = 'connectionRetainEnabled' | 'coverageRetainEnabled' | 'tradeStationRetainEnabled'
+
+function getRetainSummary(groups: GroupDraftInfo[], key: RetainKey): { checked: boolean; indeterminate: boolean; defaultValue: boolean } {
+  if (groups.length === 0) {
+    return { checked: false, indeterminate: false, defaultValue: false }
+  }
+  const allOn = groups.every((group) => Boolean(group[key]))
+  const allOff = groups.every((group) => !group[key])
+  return {
+    checked: allOn,
+    indeterminate: !allOn && !allOff,
+    defaultValue: allOn
+  }
+}
+
+function applyRetainStateFromDraft(
+  groups: GroupDraftInfo[],
+  currentDraftGroups: GroupDraftInfo[] = []
+): GroupDraftInfo[] {
+  const currentById = new Map(currentDraftGroups.map((group) => [group.id, group]))
+  const currentBySectorMacro = new Map(
+    currentDraftGroups
+      .filter((group) => !!group.sectorMacro)
+      .map((group) => [group.sectorMacro!, group])
+  )
+  const defaultConnectionRetain = getRetainSummary(currentDraftGroups, 'connectionRetainEnabled').defaultValue
+  const defaultCoverageRetain = getRetainSummary(currentDraftGroups, 'coverageRetainEnabled').defaultValue
+  const defaultTradeStationRetain = getRetainSummary(currentDraftGroups, 'tradeStationRetainEnabled').defaultValue
+
+  return groups.map((group) => {
+    const source = currentById.get(group.id) ?? (group.sectorMacro ? currentBySectorMacro.get(group.sectorMacro) : undefined)
+    return {
+      ...group,
+      connectionRetainEnabled: source?.connectionRetainEnabled ?? defaultConnectionRetain,
+      coverageRetainEnabled: source?.coverageRetainEnabled ?? defaultCoverageRetain,
+      tradeStationRetainEnabled: source?.tradeStationRetainEnabled ?? defaultTradeStationRetain,
+      savedTradeStationCode: source?.savedTradeStationCode ?? group.savedTradeStationCode
+    }
+  })
 }
 
 function hasPendingBridgeDecisionInResult(result: AutoGroupResult | null): boolean {
@@ -309,10 +347,13 @@ function runCalculationFromEditInput() {
       }
     }
   }
-  const groupsWithPrevTrade = restoredGroups.map((g) => ({
-    ...g,
-    ...prevTradeStationByGroupId[g.id]
-  }))
+  const groupsWithPrevTrade = applyRetainStateFromDraft(
+    restoredGroups.map((g) => ({
+      ...g,
+      ...prevTradeStationByGroupId[g.id]
+    })),
+    currentDraft?.groups ?? []
+  )
 
   stabilizeHubColors(groupsWithPrevTrade, buildHubColorContext())
   setAutoGroupResult({ ...result, groups: groupsWithPrevTrade })
@@ -683,9 +724,9 @@ function handleAddHubDraft(sectorMacro: string) {
     excludedDefaultAssignmentSectorMacros: [],
     isNew: true,
     isPinned: true,
-    coverageRetainEnabled: true,
-    connectionRetainEnabled: true,
-    tradeStationRetainEnabled: true,
+    coverageRetainEnabled: getRetainSummary(groups, 'coverageRetainEnabled').defaultValue,
+    connectionRetainEnabled: getRetainSummary(groups, 'connectionRetainEnabled').defaultValue,
+    tradeStationRetainEnabled: getRetainSummary(groups, 'tradeStationRetainEnabled').defaultValue,
     source: 'manual',
     savedTradeStationCode
   }
@@ -738,7 +779,6 @@ function handleToggleRetainConnection(groupId: string) {
 }
 
 function handleMasterBridgeRetain(enabled: boolean) {
-  bridgeRetainEnabled.value = enabled
   if (!autoGroupResult.value) return
   const result = autoGroupResult.value
   const groups = result.groups.map((g) => ({ ...g, connectionRetainEnabled: enabled }))
@@ -746,7 +786,6 @@ function handleMasterBridgeRetain(enabled: boolean) {
 }
 
 function handleMasterCoverageRetain(enabled: boolean) {
-  coverageRetainEnabled.value = enabled
   if (!autoGroupResult.value) return
   const result = autoGroupResult.value
   const groups = result.groups.map((g) => ({ ...g, coverageRetainEnabled: enabled }))
@@ -758,9 +797,6 @@ function canReorderGroups(): boolean {
 }
 
 function setResultModeDefaults() {
-  handleMasterBridgeRetain(false)
-  handleMasterCoverageRetain(true)
-  handleMasterTradeStationRetain(false)
   const guid = activeViewStore.activeBinding
   const binding = guid ? saveBindingStore.getBindingByGameGuid(guid) : null
   nodeEnabled.value = !(binding && binding.groups.length > 0)
@@ -1133,7 +1169,6 @@ function handleResetTradeStations() {
 }
 
 function handleMasterTradeStationRetain(enabled: boolean) {
-  tradeStationRetainEnabled.value = enabled
   if (!autoGroupResult.value) return
   const result = autoGroupResult.value
   const groups = result.groups.map((g) => ({ ...g, tradeStationRetainEnabled: enabled }))
@@ -1331,32 +1366,17 @@ watch(autoGroupResult, (result) => {
 
 watch(activeBinding, () => { baselineInitialized = false })
 
-const bridgeRetainIndeterminate = computed(() => {
-  if (!autoGroupResult.value) return false
-  const groups = autoGroupResult.value.groups
-  if (groups.length === 0) return false
-  const allOn = groups.every((g) => g.connectionRetainEnabled)
-  const allOff = groups.every((g) => !g.connectionRetainEnabled)
-  return !allOn && !allOff
-})
+const bridgeRetainState = computed(() => getRetainSummary(autoGroupResult.value?.groups ?? [], 'connectionRetainEnabled'))
+const coverageRetainState = computed(() => getRetainSummary(autoGroupResult.value?.groups ?? [], 'coverageRetainEnabled'))
+const tradeStationRetainState = computed(() => getRetainSummary(autoGroupResult.value?.groups ?? [], 'tradeStationRetainEnabled'))
 
-const coverageRetainIndeterminate = computed(() => {
-  if (!autoGroupResult.value) return false
-  const groups = autoGroupResult.value.groups
-  if (groups.length === 0) return false
-  const allOn = groups.every((g) => g.coverageRetainEnabled)
-  const allOff = groups.every((g) => !g.coverageRetainEnabled)
-  return !allOn && !allOff
-})
+const bridgeRetainEnabled = computed(() => bridgeRetainState.value.checked)
+const coverageRetainEnabled = computed(() => coverageRetainState.value.checked)
+const tradeStationRetainEnabled = computed(() => tradeStationRetainState.value.checked)
 
-const tradeStationRetainIndeterminate = computed(() => {
-  if (!autoGroupResult.value) return false
-  const groups = autoGroupResult.value.groups
-  if (groups.length === 0) return false
-  const allOn = groups.every((g) => !!g.tradeStationRetainEnabled)
-  const allOff = groups.every((g) => !g.tradeStationRetainEnabled)
-  return !allOn && !allOff
-})
+const bridgeRetainIndeterminate = computed(() => bridgeRetainState.value.indeterminate)
+const coverageRetainIndeterminate = computed(() => coverageRetainState.value.indeterminate)
+const tradeStationRetainIndeterminate = computed(() => tradeStationRetainState.value.indeterminate)
 
 return {
   t,

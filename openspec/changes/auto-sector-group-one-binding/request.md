@@ -77,9 +77,9 @@ Trade station 在 Live 计算模式中作为第三列展示和 confirm gate 的�
 - [编辑]：设置 `calculationMode='edit'`；不复制 edit snapshot。
 - [退出]：设置 `calculationMode='result'`；不恢复 draft。
 - [添加枢纽]：切换 hub add menu；Live 使用 overlay，Map 使用侧栏/弹出式入口。
-- [桥接保留]：主开关同步所有 group 的 `connectionRetainEnabled`。
-- [覆盖保留]：主开关同步所有 group 的 `coverageRetainEnabled`。
-- [交易站保留]：主开关同步所有 group 的 `tradeStationRetainEnabled`。
+- [桥接保留]：主开关同步所有 group 的 `connectionRetainEnabled`；主开关由各 group 状态聚合得出，mixed 时新 hub 默认 off。
+- [覆盖保留]：主开关同步所有 group 的 `coverageRetainEnabled`；主开关由各 group 状态聚合得出，mixed 时新 hub 默认 off。
+- [交易站保留]：主开关同步所有 group 的 `tradeStationRetainEnabled`；主开关由各 group 状态聚合得出，mixed 时新 hub 默认 off。
 - [节点]：控制下一次计算是否允许生成新的 pure hub；clean slate 且无 baseline/pinned input 时不可关闭。
 - [桥接跳数]：更新 `bridgeSearchJumpRange`，且不得小于覆盖跳数。
 - [覆盖跳数]：更新 `prefJumpRange`；若桥接跳数低于覆盖跳数，需要同步抬高桥接跳数。

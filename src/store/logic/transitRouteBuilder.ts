@@ -146,6 +146,29 @@ function compareRouteGateFirst(
   return (a.normalDistanceKm ?? 0) - (b.normalDistanceKm ?? 0)
 }
 
+function routeDominates(left: TransitRouteResult, right: TransitRouteResult): boolean {
+  const metrics: Array<keyof TransitRouteSummary> = [
+    'gateCount',
+    'normalDistanceKm',
+    'engineDistanceKm',
+    'engineGateCount'
+  ]
+  let hasStrictAdvantage = false
+  for (const metric of metrics) {
+    const leftValue = left.summary[metric]
+    const rightValue = right.summary[metric]
+    if (leftValue > rightValue) return false
+    if (leftValue < rightValue) hasStrictAdvantage = true
+  }
+  return hasStrictAdvantage
+}
+
+function filterNonDominatedRouteCandidates(candidates: TransitRouteResult[]): TransitRouteResult[] {
+  return candidates.filter((candidate) =>
+    !candidates.some((other) => other !== candidate && routeDominates(other, candidate))
+  )
+}
+
 function buildTransitRouteSummary(input: {
   gateCount: number
   normalDistanceKm: number
@@ -935,8 +958,9 @@ export function buildTransitRouteCandidates(
   const sorted = [...ordinarySorted, ...ringCandidates]
     .map((candidate, index) => ({ ...candidate, candidateOrder: candidate.candidateOrder ?? index }))
     .sort(compareRouteDistanceFirst)
-  if (options?.maxCandidates === undefined) return sorted
-  return sorted.slice(0, Math.max(1, options.maxCandidates))
+  const finalCandidates = filterNonDominatedRouteCandidates(sorted)
+  if (options?.maxCandidates === undefined) return finalCandidates
+  return finalCandidates.slice(0, Math.max(1, options.maxCandidates))
 }
 
 export function buildTransitRoute(input: TransitRouteInput): TransitRouteResult {
