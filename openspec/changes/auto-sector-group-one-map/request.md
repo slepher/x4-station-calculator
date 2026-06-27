@@ -53,6 +53,9 @@
 - 用户点击默认地图时，Map 显示目标 SHALL 明确变为 `default-map`；用户点击某个存档时，Map 显示目标 SHALL 变为该 archive。
 - 星区组染色与 hub 连线只由 Map 当前显示目标与 active binding 的 `gameGuid` 是否一致决定，不由 save panel 当前 layer 决定。
 - Save panel 关闭再打开 SHALL 回到关闭前 layer；只有显式跳转入口才覆盖 layer/stage。
+- 地图背景填充按单个星区决策，优先级 SHALL 为：星区组染色 > 势力背景色 > 默认地图背景。
+- 当星区组染色关闭且势力背景色打开时，星区 SHALL 显示势力背景色，不得因为存在 `sectorGroupColorMap` 而退回默认地图背景。
+- 当星区组染色和势力背景色同时打开时，属于星区组且存在组色的星区 SHALL 只显示星区组染色；不属于星区组或没有组色的星区 MAY 显示势力背景色。
 
 ### UI 与排序
 
@@ -114,6 +117,7 @@
 - 透明色不会作为颜色值持久化。
 - 默认地图目标下不显示星区组染色和 hub 连线；显示具体 archive 且 archive guid 等于 active binding guid 时才显示。
 - 关闭并重新打开 save panel 保持关闭前 layer/stage；点击明确入口时按入口指定界面跳转。
+- 地图背景填充优先级为星区组染色 > 势力背景色 > 默认地图背景；关闭星区组染色但打开势力背景色时，星区显示势力背景色。
 
 ## 未决项
 

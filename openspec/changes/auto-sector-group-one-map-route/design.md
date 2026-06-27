@@ -141,7 +141,7 @@ color = colorGroup.color
 - `gate:`：跨 sector gate transit，以两端 gate / sector 的无向 key 分组。
 - `superhighway:`：superhighway segment，以 link id / zone id / 两端 sector 的无向 key 分组。
 - `sector-internal:`：同一 sector 内部 A-B 通道，以两端位置几何 key 分组；普通 gate-to-gate、station-to-gate、gate-to-station、非环形 highway 相关内部段都归入该类。
-- `ring-highway:`：仅当 route segment 的 `highwayId` 命中 `highwayRingChains` 的 forward/backward highway id 时使用，表示该 A-B 通道存在原生环形高速直连。
+- `ring-highway:`：仅当聚合后的 A-B visual segment 两端 gate 与 `highwayRingChains` 的 prev/next gate pair 重合时使用。它表示最终绘制通道与原生环形高速 gate-to-gate 通道重合。
 
 lane 分配规则：
 
@@ -182,9 +182,10 @@ lane 分配规则：
 
 - 渲染几何统一使用 A 点到 B 点的直连 polyline。
 - 非环形 highway、station-to-gate、gate-to-station、gate-to-gate 等同 sector 段都只影响聚合段的起点/终点，不单独绘制。
-- 若聚合段包含的任一原始 segment 的 `highwayId` 属于 `highwayRingChains` 中的 ring highway hop，则该聚合段使用 `ring-highway` lane 语义，但输出几何仍是 A-B 直线。
-- `ring-highway` 的作用只在 lane 语义上：表示该 A-B 通道中线已有原生环形高速，需要空出中心 lane。
-- 环形高速规则只适用于环形高速星区中的环形高速路段，不包括这些星区中的其它非环形高速。
+- 若聚合段最终进入/离开的两个 gate 与 `highwayRingChains` 中某个 hop 的 prev/next gate pair 重合，则该聚合段使用 `ring-highway` lane 语义；不要求该 candidate 实际走 ring highway，也不要求原始 segment 携带 `highwayId`。
+- 若聚合段最终 gate pair 不匹配 `highwayRingChains`，即使其中某个原始 segment 携带 ring highway 的 `highwayId`，也 SHALL NOT 使用 `ring-highway` lane 语义。
+- `ring-highway` 的作用只在 lane 语义上：表示该最终 A-B gate-to-gate 通道中线已有原生环形高速，需要空出中心 lane。
+- 环形高速规则只适用于命中 `highwayRingChains` gate pair 的最终 A-B 通道，不包括这些星区中的其它非环形高速。
 
 这样可避免第二次接触 II 闪点（Flashpoint）或 Hatikvah's Choice I 这类场景中，把 candidate 在星区内部的中途 gate / ring highway 绕行画成额外折线，导致视觉上看起来路线拐向了不属于该 candidate 星区序列表达的目标。
 
@@ -220,7 +221,7 @@ visible = forceVisible || mapLayerVisibility.sectorRoutes
 
 地图图层控制增加 `sectorRoutes` 开关：
 
-- 文案：`Sector Routes` / `星区路径`。
+- 文案：`Sector Group Links` / `星区组连接`。
 - 非 binding-sector 页面受该开关控制。
 - binding-sector 页面无视该开关，强制显示 draft routes。
 - 该开关不影响现有 gate、superhighway、highway ring gate 高亮、sector group color overlay、resource overlay。
@@ -241,8 +242,8 @@ visible = forceVisible || mapLayerVisibility.sectorRoutes
 
 需要新增或复用地图图层控制文案：
 
-- `Sector Routes`
-- `星区路径`
+- `Sector Group Links`
+- `星区组连接`
 
 如果地图 route overlay 增加 tooltip 或 legend，再补充对应中英文文案；本变更不要求新增候选路径 legend。
 

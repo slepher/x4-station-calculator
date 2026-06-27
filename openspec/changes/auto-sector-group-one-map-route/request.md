@@ -42,10 +42,10 @@
 
 - 地图 SHALL 新增 hub link route overlay。
 - binding-sector 页面 SHALL 显示当前 draft link 集合对应的全局 route 数据。
-- binding-sector 页面 SHALL 无视星区路径图层开关，始终显示 draft link routes。
+- binding-sector 页面 SHALL 无视星区组连接图层开关，始终显示 draft link routes。
 - 非 binding-sector 地图页面 SHALL 显示当前 persisted binding link 集合对应的全局 route 数据。
-- 非 binding-sector 地图页面 SHALL 受“星区路径 / Sector Routes”图层开关控制。
-- “星区路径 / Sector Routes”开关只控制 hub link route overlay，不影响现有 gate、superhighway、highway ring gate 高亮、sector group color overlay 或资源 overlay。
+- 非 binding-sector 地图页面 SHALL 受“星区组连接 / Sector Group Links”图层开关控制。
+- “星区组连接 / Sector Group Links”开关只控制 hub link route overlay，不影响现有 gate、superhighway、highway ring gate 高亮、sector group color overlay 或资源 overlay。
 
 ### 路线染色
 
@@ -66,13 +66,13 @@
 - 起点星区的内部段 SHALL 是 hub station 到离开点；中间星区 SHALL 是进入点到离开点；终点星区 SHALL 是进入点到 hub station。
 - 同一 hub link 的多条 candidate 在同一星区内具有相同进入点与离开点时，地图 overlay SHALL 合并为一条可视段；不同 hub link 即使入口/出口相同也 SHALL 保留多条并通过 lane 分开。
 - 星区内部 A-B 聚合段 SHALL 统一按两端点直连渲染，不复用普通 highway spline，也不展示“过高速/不过高速”的重复候选差异。
-- 若同一星区内部 A-B 聚合通道存在环形高速直连，route overlay SHALL 把该通道视为原生环形高速通道：中线留给原生环形高速，所有经过该 A-B 通道的 route lane 都应避让中线。
-- 环形高速避让只适用于 `highwayRingChains` 中的环形高速路段；同一星区内其它非环形高速不触发中线预留。
+- 若同一星区内部 A-B 聚合通道的最终 gate-to-gate 端点与 `highwayRingChains` 的环形高速 gate-to-gate 通道重合，route overlay SHALL 把该通道视为原生环形高速通道：中线留给原生环形高速，所有经过该 A-B 通道的 route lane 都应避让中线。
+- 环形高速避让只由最终聚合 A-B gate pair 是否命中 `highwayRingChains` 决定；route candidate 即使包含 ring highway segment 或 `highwayId`，只要最终 gate pair 不重合也不触发中线预留。同一星区内其它非环形高速不触发中线预留。
 - 同一 hub link 在同一 A-B 通道同时存在普通直连候选与环形高速候选时，地图 overlay SHALL 去重为一条可视 route，并优先采用环形高速通道的 lane 语义。
 
 ### 图层控制
 
-- 地图图层控制 SHALL 增加“星区路径 / Sector Routes”开关。
+- 地图图层控制 SHALL 增加“星区组连接 / Sector Group Links”开关。
 - 开关默认状态 SHOULD 与现有地图图层控制策略保持一致。
 - 非 binding-sector 页面关闭该开关时 SHALL 隐藏 persisted binding hub link route。
 - binding-sector 页面打开时 SHALL 强制显示 draft hub link route，不受开关状态影响。
@@ -85,7 +85,7 @@
 - binding/draft link 集合对全局 route cache 的显示过滤规则。
 - transit hub `Sector Group` link 路径读取预计算结果。
 - 地图 hub link route overlay。
-- 地图图层控制增加“星区路径 / Sector Routes”开关。
+- 地图图层控制增加“星区组连接 / Sector Group Links”开关。
 - 必要的 i18n 文案。
 - build validation。
 
@@ -101,11 +101,11 @@
 ## 验收标准（DoD）
 
 - 地图在 binding-sector 页面显示当前 draft link 集合对应的 hub link route candidates。
-- 地图在 binding-sector 页面无视“星区路径 / Sector Routes”开关，始终显示 draft link routes。
+- 地图在 binding-sector 页面无视“星区组连接 / Sector Group Links”开关，始终显示 draft link routes。
 - 地图在非 binding-sector 页面显示当前 persisted binding link 集合对应的 hub link route candidates。
 - 删除 link 不删除全局 route cache 中已计算的路径数据。
 - 重新添加 link 时，如果全局 route cache 已存在该 link route，则复用既有候选；不存在时才新计算。
-- 非 binding-sector 页面关闭“星区路径 / Sector Routes”开关后，hub link route overlay 被隐藏。
+- 非 binding-sector 页面关闭“星区组连接 / Sector Group Links”开关后，hub link route overlay 被隐藏。
 - 每条 hub link 绘制全部有效候选路径，而不是只绘制最优路径。
 - 每条候选路径在每个星区内只绘制进入点到离开点的聚合直线，不显示星区内部中途绕行。
 - 同一 hub link 在同一星区内相同进入/离开点的多条候选合并为一条；不同 hub link 保留各自可视段。
@@ -117,7 +117,7 @@
 - 星区内部 A-B 路线以端点直连方式显示；存在环形高速直连的 A-B 通道中线保持空出，紫色/橙色等不同 link 不会有任一路线占用中线。
 - 同一 link 在同一 A-B 通道不会因为“过环形高速”和“直连”两个候选而重复绘制两条路线。
 - transit hub `Sector Group` link 路径读取 live production store 的预计算结果。
-- 现有 gate、superhighway、highway ring gate 高亮、sector group color overlay 不受星区路径开关影响。
+- 现有 gate、superhighway、highway ring gate 高亮、sector group color overlay 不受星区组连接开关影响。
 - `npm run build` 通过。
 
 ## 未决项

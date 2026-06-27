@@ -525,7 +525,7 @@
     "debug_visibility_sector_labels": "星区文本",
     "debug_visibility_sector_links": "星区连线",
     "debug_visibility_sector_group_colors": "星区组染色",
-    "debug_visibility_sector_routes": "星区路径",
+    "debug_visibility_sector_routes": "星区组连接",
     "debug_visibility_sector_faction_fill": "势力背景色",
     "debug_visibility_resource_badges": "资源标签"
   },

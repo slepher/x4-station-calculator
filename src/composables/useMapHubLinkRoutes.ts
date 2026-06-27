@@ -20,9 +20,31 @@ export type MapHubLinkRouteLine = {
 
 type RawMapHubLinkRouteLine = RouteLaneOffsetInput & {
   color: string
+  debugRouteRenderMeta?: DebugRouteRenderMeta
 }
 
 const FALLBACK_ROUTE_COLOR = '#f8fafc'
+const DEBUG_ROUTE_RENDER_SECTORS = new Set([
+  'cluster_401_sector001_macro',
+  'cluster_32_sector001_macro'
+])
+const ROUTE_RENDER_STROKE_WIDTH = 1.45
+const ROUTE_RENDER_VECTOR_EFFECT = 'none'
+
+type DebugRouteRenderMeta = {
+  entryId: string
+  candidateIndex: number
+  segmentId: string
+  segmentKind: RouteSectorVisualSegment['kind']
+  entryEndpointSectors: string[]
+  routeSectors: string[]
+  fromSectorId?: string
+  toSectorId?: string
+  fromEndpoint?: TransitRouteEndpointRef
+  toEndpoint?: TransitRouteEndpointRef
+  sourceSegmentIndexes: number[]
+  highwayIds: string[]
+}
 
 export function useMapHubLinkRoutes(args: {
   clusters: ComputedRef<Record<string, Cluster>>
@@ -51,13 +73,30 @@ export function useMapHubLinkRoutes(args: {
           const start = pointToScreen(args.clusters.value, args.sectors.value, args.saveSectors?.value, centers, clusterRadius, segment.fromSectorId, segment.fromPosition, segment.fromEndpoint)
           const end = pointToScreen(args.clusters.value, args.sectors.value, args.saveSectors?.value, centers, clusterRadius, segment.toSectorId, segment.toPosition, segment.toEndpoint)
           if (start && end) {
+            const baseLinkKey = segmentBaseLinkKey(segment, [start, end], args.highwayRingChains?.value)
             rows.push({
               id: segment.id,
               linkId: entry.id,
-              baseLinkKey: segmentBaseLinkKey(segment, [start, end], args.highwayRingChains?.value),
+              baseLinkKey,
               points: [start, end],
               curved: false,
-              color
+              color,
+              debugRouteRenderMeta: shouldDebugRouteRender(entry, candidate.sectors, segment)
+                ? {
+                    entryId: entry.id,
+                    candidateIndex,
+                    segmentId: segment.id,
+                    segmentKind: segment.kind,
+                    entryEndpointSectors: [entry.from.sectorMacro, entry.to.sectorMacro],
+                    routeSectors: candidate.sectors,
+                    fromSectorId: segment.fromSectorId,
+                    toSectorId: segment.toSectorId,
+                    fromEndpoint: segment.fromEndpoint,
+                    toEndpoint: segment.toEndpoint,
+                    sourceSegmentIndexes: segment.sourceSegmentIndexes,
+                    highwayIds: segment.highwayIds
+                  }
+                : undefined
             })
           }
         })
@@ -65,6 +104,7 @@ export function useMapHubLinkRoutes(args: {
     }
 
     const offsetRows = applyRouteLaneOffsets(rows)
+    logDebugRouteRenderRows(rows, offsetRows)
 
     return offsetRows.map((line) => ({
       id: line.id,
@@ -75,6 +115,48 @@ export function useMapHubLinkRoutes(args: {
   })
 
   return { routeLines }
+}
+
+function shouldDebugRouteRender(
+  entry: HubLinkRouteEntry,
+  routeSectors: string[],
+  segment: RouteSectorVisualSegment
+): boolean {
+  if (DEBUG_ROUTE_RENDER_SECTORS.has(entry.from.sectorMacro)) return true
+  if (DEBUG_ROUTE_RENDER_SECTORS.has(entry.to.sectorMacro)) return true
+  if (routeSectors.some((sectorId) => DEBUG_ROUTE_RENDER_SECTORS.has(sectorId))) return true
+  if (segment.fromSectorId && DEBUG_ROUTE_RENDER_SECTORS.has(segment.fromSectorId)) return true
+  return Boolean(segment.toSectorId && DEBUG_ROUTE_RENDER_SECTORS.has(segment.toSectorId))
+}
+
+function logDebugRouteRenderRows(
+  rows: RawMapHubLinkRouteLine[],
+  offsetRows: Array<RawMapHubLinkRouteLine & { laneOffset: number }>
+): void {
+  const rawById = new Map(rows.map((row) => [row.id, row]))
+  offsetRows.forEach((row) => {
+    if (!row.debugRouteRenderMeta) return
+    const raw = rawById.get(row.id)
+    console.log('[DEBUG-route-render]', {
+      ...row.debugRouteRenderMeta,
+      linkId: row.linkId,
+      baseLinkKey: row.baseLinkKey,
+      laneOffset: row.laneOffset,
+      color: row.color,
+      strokeWidth: ROUTE_RENDER_STROKE_WIDTH,
+      vectorEffect: ROUTE_RENDER_VECTOR_EFFECT,
+      rawPoints: raw ? formatDebugPoints(raw.points) : [],
+      offsetPoints: formatDebugPoints(row.points),
+      pathD: polylinePath(row.points)
+    })
+  })
+}
+
+function formatDebugPoints(points: Vec2[]): Array<{ x: number; y: number }> {
+  return points.map((point) => ({
+    x: Number(point.x.toFixed(3)),
+    y: Number(point.y.toFixed(3))
+  }))
 }
 
 function segmentBaseLinkKey(
@@ -103,15 +185,37 @@ function ringHighwayBaseLinkKey(
 ): string | null {
   if (segment.kind !== 'sector-internal' || !segment.fromSectorId || !highwayRingChains) return null
   for (const chain of highwayRingChains) {
-    const hop = chain.hops.find((item) =>
-      item.sectorId === segment.fromSectorId &&
-      (segment.highwayIds.includes(item.forwardHighwayId) || segment.highwayIds.includes(item.backwardHighwayId))
-    )
+    const hop = chain.hops.find((item) => {
+      if (item.sectorId !== segment.fromSectorId) return false
+      return segmentMatchesRingGatePair(segment, item.prevGateId, item.nextGateId)
+    })
     if (!hop) continue
     const pair = [hop.forwardHighwayId, hop.backwardHighwayId].sort((a, b) => a.localeCompare(b)).join('|')
     return `ring-highway:${segment.fromSectorId}:${pair}`
   }
   return null
+}
+
+function segmentMatchesRingGatePair(
+  segment: RouteSectorVisualSegment,
+  prevGateId: string,
+  nextGateId: string
+): boolean {
+  const fromGateId = sameSectorClusterGateId(segment.fromEndpoint, segment.fromSectorId)
+  const toGateId = sameSectorClusterGateId(segment.toEndpoint, segment.toSectorId)
+  if (!fromGateId || !toGateId) return false
+  if (fromGateId === prevGateId && toGateId === nextGateId) return true
+  return fromGateId === nextGateId && toGateId === prevGateId
+}
+
+function sameSectorClusterGateId(
+  endpoint: TransitRouteEndpointRef | undefined,
+  sectorId: string | undefined
+): string | null {
+  if (endpoint?.kind !== 'cluster-gate') return null
+  if (!sectorId) return null
+  if (endpoint.sectorMacro !== sectorId) return null
+  return endpoint.gateId
 }
 
 function geometryPairFromSegmentEndpoints(

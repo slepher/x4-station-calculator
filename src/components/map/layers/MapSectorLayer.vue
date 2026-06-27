@@ -23,8 +23,6 @@ defineProps<{
   shouldRenderResourceOverlay: (sectorId: string) => boolean
   buildPieSliceGeometries: (sectorId: string, cx: number, cy: number, radius: number) => Array<{ ware: string; color: string; path: string }>
   buildResourceGroupBadgeGeometries: (sectorId: string, cx: number, cy: number, radius: number) => Array<{ key: string; label: string; x: number; y: number; width: number; height: number }>
-  sectorFillColor: (sectorId: string, defaultColor: string) => string
-  sectorFillOpacity: (sectorId: string) => number
   sectorStrokeColor: (sectorId: string, defaultColor: string) => string
   sectorStrokeWidth: (sectorId: string, defaultValue: number) => number
   sectorStrokeOpacity: (sectorId: string, defaultValue: number) => number
@@ -75,8 +73,7 @@ const emit = defineEmits<{
         </g>
         <polygon
           :points="hexPoints(cluster.sectors[0]?.sx || cluster.cx, cluster.sectors[0]?.sy || cluster.cy, cluster.sectors[0]?.radius || cluster.singleRadius || 0)"
-          :fill="sectorFillColor(cluster.sectors[0]?.id || '', cluster.sectors[0]?.color || cluster.color)"
-          :fill-opacity="sectorFillOpacity(cluster.sectors[0]?.id || '')"
+          fill="none"
           :stroke="sectorStrokeColor(cluster.sectors[0]?.id || '', cluster.sectors[0]?.color || cluster.color)"
           :stroke-width="sectorStrokeWidth(cluster.sectors[0]?.id || '', 2.8)"
           :stroke-opacity="sectorStrokeOpacity(cluster.sectors[0]?.id || '', 0.95)"
@@ -164,8 +161,7 @@ const emit = defineEmits<{
             </g>
             <polygon
               :points="hexPoints(sector.sx, sector.sy, sector.radius)"
-              :fill="sectorFillColor(sector.id, sector.color)"
-              :fill-opacity="sectorFillOpacity(sector.id)"
+              fill="none"
               :stroke="sectorStrokeColor(sector.id, sector.color)"
               :stroke-width="sectorStrokeWidth(sector.id, 2.2)"
               :stroke-opacity="sectorStrokeOpacity(sector.id, 0.9)"

@@ -183,9 +183,21 @@ Save panel 生命周期：
 
 渲染层级：
 
-1. faction owner 色。
-2. hub 内部六边形。
-3. resource pie。
+1. 地图背景。
+2. faction owner 区域染色与 sector group 区域染色。
+3. 高速路、星门、superhighway、跨星区连接和普通星区连线等地图结构。
+4. sector 六边形边框、resource pie 和资源 badge。
+5. hub route、空间站、POI、拖拽 overlay、文字与交互高亮。
+
+faction owner 区域染色与 sector group 区域染色只作为 sector 内部背景，不得遮蔽高速路、空间站、星门或其他地图实体。Sector 六边形边框必须绘制在染色上方，保证边界清晰。
+
+单个 sector 的背景填充优先级：
+
+1. 若 `showSectorGroupColors` 开启且 `sectorGroupColorMap[sectorId]` 存在，sector group color 负责该 sector 的背景填充，faction owner fill 不参与该 sector。
+2. 若不满足上一步且 `showFactionFill` 开启，使用 faction owner fill。
+3. 若两者都不适用，显示默认地图背景。
+
+因此关闭星区组染色时，即使 `sectorGroupColorMap` 中仍有该 sector 的颜色数据，也不得隐藏 faction owner fill；只有星区组染色实际可见时，才 suppress 对应 sector 的 faction owner fill。
 
 每个 sector 至多映射一个 hub color；coverage 互斥由核心分组保证。
 

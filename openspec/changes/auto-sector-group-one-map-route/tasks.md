@@ -40,8 +40,8 @@
   - [x] 5.6 同一 link 的所有候选使用同一颜色且不做透明度降级
   - [x] 5.7 缺 group color 时使用稳定 fallback 样式
 
-- [x] 6. 增加星区路径图层开关
-  - [x] 6.1 地图图层控制新增 `Sector Routes` / `星区路径`
+- [x] 6. 增加星区组连接图层开关
+  - [x] 6.1 地图图层控制新增 `Sector Group Links` / `星区组连接`
   - [x] 6.2 非 binding-sector 页面按开关显示或隐藏 hub link route overlay
   - [x] 6.3 binding-sector 页面无视开关并强制显示 draft routes
   - [x] 6.4 确认开关不影响 gate、superhighway、highway ring gate、sector group color 与 resource overlay

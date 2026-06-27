@@ -61,6 +61,10 @@
 - [ ] 星区组染色和 hub 连线仅在 archive target guid 等于 active binding guid 时显示
 - [ ] 默认地图 target 隐藏星区组染色和 hub 连线
 - [ ] Save panel 关闭再打开恢复关闭前 layer/stage；显式导航入口可覆盖恢复状态
+- [ ] faction owner 区域染色和 sector group 区域染色位于底层，不遮蔽高速路、星门、空间站、POI 或路线
+- [ ] sector 六边形边框绘制在区域染色上方
+- [ ] 单个 sector 背景填充优先级为 sector group color > faction owner fill > 默认地图背景
+- [ ] 星区组染色关闭且势力背景色打开时，不因 `sectorGroupColorMap` 存在而隐藏势力背景色
 - [ ] 有 color 的 coverage sector 绘制内部六边形
 - [ ] 无 color 不绘制内部六边形
 - [ ] 保持 faction owner、hub color、resource pie 的渲染层级

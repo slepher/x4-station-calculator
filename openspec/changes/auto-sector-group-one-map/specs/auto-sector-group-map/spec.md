@@ -235,6 +235,29 @@
 - **那么** Map archive target SHALL 指向 G 下最新有效 archive
 - **并且** save panel SHALL 进入 category layer 并显示该 archive 的二级分类菜单
 
+#### Scenario: Region fills stay below map structures
+- **前提** 地图同时显示 faction owner 区域染色或 sector group 区域染色
+- **当** 系统渲染 sector 六边形、高速路、星门、superhighway、空间站、POI 和路线
+- **那么** faction owner 区域染色和 sector group 区域染色 SHALL 位于底层背景
+- **并且** sector 六边形边框 SHALL 绘制在这些染色上方
+- **并且** 高速路、星门、superhighway、空间站、POI 和路线 SHALL 绘制在这些染色上方，不得被染色遮蔽
+
+#### Scenario: Sector group fill has priority over faction fill per sector
+- **前提** 势力背景色开关打开
+- **并且** 星区组染色开关打开
+- **并且** 某个 sector 属于星区组且存在 sector group color
+- **当** 系统渲染该 sector 背景
+- **那么** 该 sector SHALL 只显示 sector group color
+- **并且** faction owner fill SHALL NOT 叠加、透出或覆盖该 sector group color
+
+#### Scenario: Faction fill remains visible when sector group fill is disabled
+- **前提** 势力背景色开关打开
+- **并且** 星区组染色开关关闭
+- **并且** `sectorGroupColorMap` 中仍存在某个 sector 的颜色数据
+- **当** 系统渲染该 sector 背景
+- **那么** 该 sector SHALL 显示 faction owner fill
+- **并且** 系统 SHALL NOT 因存在 `sectorGroupColorMap[sectorId]` 而隐藏 faction owner fill 或退回默认地图背景
+
 #### Scenario: Panel reopen restores last layer
 - **前提** 用户在 save panel 的任意 layer 关闭面板
 - **当** 用户再次打开 save panel 且未通过显式导航入口指定目标 layer

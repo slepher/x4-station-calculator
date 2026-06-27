@@ -29,6 +29,7 @@ import MapLinkLayer from '@/components/map/layers/MapLinkLayer.vue'
 import MapHubLinkRouteLayer from '@/components/map/layers/MapHubLinkRouteLayer.vue'
 import MapOverlayLayer from '@/components/map/layers/MapOverlayLayer.vue'
 import MapSectorLabelLayer from '@/components/map/layers/MapSectorLabelLayer.vue'
+import MapSectorFillLayer from '@/components/map/layers/MapSectorFillLayer.vue'
 import MapSectorLayer from '@/components/map/layers/MapSectorLayer.vue'
 import MapSectorGroupColorLayer from '@/components/map/layers/MapSectorGroupColorLayer.vue'
 import type { HubLinkRouteEntry } from '@/store/logic/hubLinkRoutes'
@@ -263,8 +264,8 @@ const {
 const sectorGroupColorMapComputed = computed(() => props.sectorGroupColorMap ?? {})
 
 const wrappedSectorFillOpacity = (sectorId: string) => {
-  // Sectors with group color always hide faction fill (prevents color interference)
-  if (sectorGroupColorMapComputed.value[sectorId]) return 0
+  // Active group coloring owns the fill for grouped sectors; otherwise faction fill can show.
+  if (props.showSectorGroupColors && sectorGroupColorMapComputed.value[sectorId]) return 0
   if (!props.showFactionFill) return 0
   return sectorFillOpacity(sectorId)
 }
@@ -440,13 +441,11 @@ watchEffect(() => {
       </clipPath>
     </defs>
 
-    <MapLinkLayer
-      :visible="showSectorLinks"
-      :sector-link-lines="sectorLinkLines"
-      :highway-segments="highwaySegments"
-      :gate-circles="gateCircles"
-      :cross-cluster-gate-lines="crossClusterGateLines"
-      :stargate-visual-scale="STARGATE_VISUAL_SCALE"
+    <MapSectorFillLayer
+      :cluster-polygons="clusterPolygons"
+      :hex-points="hexPoints"
+      :sector-fill-color="sectorFillColor"
+      :sector-fill-opacity="wrappedSectorFillOpacity"
     />
 
     <MapSectorGroupColorLayer
@@ -465,8 +464,6 @@ watchEffect(() => {
       :should-render-resource-overlay="shouldRenderResourceOverlay"
       :build-pie-slice-geometries="buildPieSliceGeometries"
       :build-resource-group-badge-geometries="buildResourceGroupBadgeGeometries"
-      :sector-fill-color="sectorFillColor"
-      :sector-fill-opacity="wrappedSectorFillOpacity"
       :sector-stroke-color="sectorStrokeColor"
       :sector-stroke-width="sectorStrokeWidth"
       :sector-stroke-opacity="sectorStrokeOpacity"
@@ -479,6 +476,15 @@ watchEffect(() => {
     <MapHubLinkRouteLayer
       :visible="showSectorRoutes"
       :route-lines="hubLinkRouteLines"
+    />
+
+    <MapLinkLayer
+      :visible="showSectorLinks"
+      :sector-link-lines="sectorLinkLines"
+      :highway-segments="highwaySegments"
+      :gate-circles="gateCircles"
+      :cross-cluster-gate-lines="crossClusterGateLines"
+      :stargate-visual-scale="STARGATE_VISUAL_SCALE"
     />
 
     <MapOverlayLayer
