@@ -160,17 +160,33 @@ lane 分配规则：
 
 因此连续路径不强制跨端点保持完全相同的偏移量。端点是拓扑锚点，允许“汇合再分叉”；segment 主体应尽量保持稳定 lane，避免无意义的 2px / 3px 逐段跳变。
 
+### candidate 星区内聚合
+
+地图 overlay 的候选保留粒度是 candidate 的星区序列，而不是 route builder 的 segment 序列。每条 candidate 先转换成按 sector visit 聚合的 visual segments：
+
+- 起点 sector：hub station -> 离开该 sector 的出口点。
+- 中间 sector：进入点 -> 离开点。
+- 终点 sector：进入点 -> hub station。
+- 若 candidate 在同一 sector 内部经过多个 route builder segments，例如 gate-to-gate、highway、ring highway、station-to-gate、gate-to-station，渲染层只输出该 sector visit 的一条 `sector-internal` 直线。
+- 跨 sector 的 `gate-transit` 与 `superhighway` 仍作为跨 sector visual segment 保留，用于体现 candidate 的星区序列。
+
+去重发生在 visual segment 层：
+
+- 去重 key 使用 `linkId + sectorId + unordered(start,end)`。
+- 同一 hub link 的多条 candidate 在同一 sector 内具有相同进入点与离开点时，只保留一条可视段。
+- 不同 hub link 即使拥有相同 sector、相同进入点与离开点，也保留多条可视段，再进入 lane 分配。
+
 ### 星区内部与环形高速
 
-用户确认后的简化方案是：地图 route overlay 不再绘制普通 highway spline，也不区分“过高速/不过高速”的同端点重复方案。对于每个 sector 内部的 A-B route segment：
+用户确认后的简化方案是：地图 route overlay 不再绘制普通 highway spline，也不区分“过高速/不过高速”的同端点重复方案。对于每个 sector 内部聚合后的 A-B visual segment：
 
 - 渲染几何统一使用 A 点到 B 点的直连 polyline。
-- 非环形 highway、station-to-gate、gate-to-station、gate-to-gate 等同 sector 段都归入 `sector-internal`。
-- 若 `highwayId` 属于 `highwayRingChains` 中的 ring highway hop，则该段标记为 `ring-highway`，但输出几何仍是 A-B 直线。
+- 非环形 highway、station-to-gate、gate-to-station、gate-to-gate 等同 sector 段都只影响聚合段的起点/终点，不单独绘制。
+- 若聚合段包含的任一原始 segment 的 `highwayId` 属于 `highwayRingChains` 中的 ring highway hop，则该聚合段使用 `ring-highway` lane 语义，但输出几何仍是 A-B 直线。
 - `ring-highway` 的作用只在 lane 语义上：表示该 A-B 通道中线已有原生环形高速，需要空出中心 lane。
 - 环形高速规则只适用于环形高速星区中的环形高速路段，不包括这些星区中的其它非环形高速。
 
-这样可避免第二次接触 II 闪点（Flashpoint）这类场景中同一对 gate 同时画出“直连内部段”和“环形高速段”两条 route，导致某一颜色覆盖另一颜色。
+这样可避免第二次接触 II 闪点（Flashpoint）或 Hatikvah's Choice I 这类场景中，把 candidate 在星区内部的中途 gate / ring highway 绕行画成额外折线，导致视觉上看起来路线拐向了不属于该 candidate 星区序列表达的目标。
 
 ## 地图 overlay
 
@@ -191,12 +207,12 @@ else:
 visible = forceVisible || mapLayerVisibility.sectorRoutes
 ```
 
-渲染时只绘制 `entry.candidates` 非空的 routes。每个 candidate 的 `segments` 转为 SVG line/path，并在 map route view model 中补充 lane 偏移：
+渲染时只绘制 `entry.candidates` 非空的 routes。每个 candidate 先按 sector visit 聚合，再把 visual segments 转为 SVG path，并在 map route view model 中补充 lane 偏移：
 
-- 普通空间段：使用 segment `fromPosition` 与 `toPosition`，结合 segment 所在 sector 转屏幕坐标后画线。
-- gate transit：可使用现有 cross-cluster gate endpoint 逻辑画跨 cluster gate 线，或在候选 segment 有端点位置时按两端点画线。
+- sector-internal visual segment：使用聚合后的进入点与离开点，结合 segment 所在 sector 转屏幕坐标后画直线。
+- gate transit：使用两端 gate endpoint 画跨 cluster gate 线。
 - superhighway：按端点位置生成 route segment，并按原生 map link 通道避让中心线。
-- highway / gate-to-gate / station-to-gate / gate-to-station 等 sector 内部段：统一按 A-B 端点直连生成 route segment；只有环形高速命中 `highwayRingChains` 时保留 `ring-highway` lane 语义。
+- highway / gate-to-gate / station-to-gate / gate-to-station 等原始 sector 内部段：不直接生成 SVG route；它们只参与所在 sector visit 的进入点、离开点与 ring-highway lane 语义计算。
 
 为避免地图层引入业务组装，segment 到 screen coordinate 的转换应是 map composable 或 layer 的纯渲染转换，不调用 store 或 route builder。
 

@@ -61,8 +61,12 @@
 - hub link route SHALL 相对地图原生 gate / superhighway / highway 连接做偏移，避免压在原生连接线上。
 - 经过 gate 或 highway endpoint 的 route SHOULD 在端点处收束到真实连接点，再从该点展开到下一段 lane。
 - route lane 的连续偏移 SHOULD 尽量保持稳定；由于端点收束、跨 sector / cluster 坐标转换或不同线路类型拼接导致的局部收束与重新展开是允许的。
-- 星区内部 A-B 路线 SHALL 统一按两端点直连渲染，不复用普通 highway spline，也不展示“过高速/不过高速”的重复候选差异。
-- 若同一星区内部 A-B 通道存在环形高速直连，route overlay SHALL 把该通道视为原生环形高速通道：中线留给原生环形高速，所有经过该 A-B 通道的 route lane 都应避让中线。
+- 地图 overlay SHALL 保留所有有效 candidate 的星区序列差异；不同 candidate 经过不同星区时都应被绘制。
+- 每个 candidate 在单个星区内部 SHALL 聚合为“进入点 -> 离开点”的一条直连段；不绘制该星区内部的中途 gate、highway、ring highway 或其它绕行折线。
+- 起点星区的内部段 SHALL 是 hub station 到离开点；中间星区 SHALL 是进入点到离开点；终点星区 SHALL 是进入点到 hub station。
+- 同一 hub link 的多条 candidate 在同一星区内具有相同进入点与离开点时，地图 overlay SHALL 合并为一条可视段；不同 hub link 即使入口/出口相同也 SHALL 保留多条并通过 lane 分开。
+- 星区内部 A-B 聚合段 SHALL 统一按两端点直连渲染，不复用普通 highway spline，也不展示“过高速/不过高速”的重复候选差异。
+- 若同一星区内部 A-B 聚合通道存在环形高速直连，route overlay SHALL 把该通道视为原生环形高速通道：中线留给原生环形高速，所有经过该 A-B 通道的 route lane 都应避让中线。
 - 环形高速避让只适用于 `highwayRingChains` 中的环形高速路段；同一星区内其它非环形高速不触发中线预留。
 - 同一 hub link 在同一 A-B 通道同时存在普通直连候选与环形高速候选时，地图 overlay SHALL 去重为一条可视 route，并优先采用环形高速通道的 lane 语义。
 
@@ -103,6 +107,8 @@
 - 重新添加 link 时，如果全局 route cache 已存在该 link route，则复用既有候选；不存在时才新计算。
 - 非 binding-sector 页面关闭“星区路径 / Sector Routes”开关后，hub link route overlay 被隐藏。
 - 每条 hub link 绘制全部有效候选路径，而不是只绘制最优路径。
+- 每条候选路径在每个星区内只绘制进入点到离开点的聚合直线，不显示星区内部中途绕行。
+- 同一 hub link 在同一星区内相同进入/离开点的多条候选合并为一条；不同 hub link 保留各自可视段。
 - 带 `problems` 的不完整候选不绘制在地图 route overlay 中。
 - 每条路线颜色按两端 hub station 所在 sector 的 `sectorMacro` 字母序靠前端所属 group color 选择。
 - 同一条 hub link 的所有候选使用同一颜色，不通过透明度降级表达优先级。

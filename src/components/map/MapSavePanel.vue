@@ -5,7 +5,6 @@ import { useI18n } from 'vue-i18n'
 import { useSaveStore } from '@/store/useSaveStore'
 import { useSaveBindingStore } from '@/store/useSaveBindingStore'
 import { useActiveViewStore, type BindingStage } from '@/store/useActiveViewStore'
-import { useLiveProductionStore } from '@/store/useLiveProductionStore'
 import MapSaveBreadcrumb from './MapSaveBreadcrumb.vue'
 import MapSaveArchiveList from './MapSaveArchiveList.vue'
 import MapSaveCategoryMenu from './MapSaveCategoryMenu.vue'
@@ -36,7 +35,6 @@ const { t } = useI18n()
 const saveStore = useSaveStore()
 const saveBindingStore = useSaveBindingStore()
 const activeViewStore = useActiveViewStore()
-const liveStore = useLiveProductionStore()
 
 const { mapSavePanelLayer: layer, mapBindingGameGuid: selectedBindingGameGuid, mapSavePanelSectorGroupId: selectedSectorGroupId } = storeToRefs(activeViewStore)
 const selectedCategory = ref<SavePoiCategory | null>(null)
@@ -103,7 +101,7 @@ function getCategoryLabel(category: SavePoiCategory): string {
 
 function getLatestTime(gameGuid: string): number | null {
   const group = saveStore.archives.get(gameGuid)
-  return group?.saves[0]?.meta.time ?? null
+  return group?.saves.find((archive) => archive.isValid)?.meta.time ?? null
 }
 
 function resetToList() {
@@ -136,11 +134,19 @@ async function onArchiveSelect(payload: { guid: string; time: number } | null) {
 
 async function onArchiveSelectGroup(payload: { guid: string }) {
   await saveStore.selectArchiveGroup(payload.guid)
+  const effectiveTime = getLatestTime(payload.guid)
+  if (effectiveTime !== null) {
+    emit('select-archive', { guid: payload.guid, time: effectiveTime })
+  }
 }
 
 async function onArchiveNavigate(payload: { guid: string; time: number | null }) {
   if (payload.time === null) {
     await saveStore.selectArchiveGroup(payload.guid)
+    const effectiveTime = getLatestTime(payload.guid)
+    if (effectiveTime !== null) {
+      emit('select-archive', { guid: payload.guid, time: effectiveTime })
+    }
   } else {
     await saveStore.selectArchive(payload.guid, payload.time)
     emit('select-archive', { guid: payload.guid, time: payload.time })
@@ -193,21 +199,6 @@ function onClose() {
   emit('active-category-change', null)
   emit('close')
 }
-
-watch(() => props.open, (open, prev) => {
-  if (open && !prev && layer.value === 'list') {
-    if (liveStore.autoGroupResult) {
-      const binding = saveBindingStore.activeBinding
-      if (binding) {
-        selectedBindingGameGuid.value = binding.gameGuid
-        layer.value = 'binding-sector'
-        return
-      }
-    }
-    resetToList()
-    return
-  }
-})
 
 watch(() => props.archive, (archive) => {
   if (!archive && (layer.value === 'category' || layer.value === 'coord')) {

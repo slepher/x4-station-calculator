@@ -55,6 +55,12 @@
 
 - [ ] Binding 模式从 shared draft 构建 `sectorGroupColorMap`
 - [ ] 非 binding 模式从 persisted active binding 构建 `sectorGroupColorMap`
+- [ ] 用单一 Map archive target 表达 `default-map` 或具体 archive，避免用 `selectedArchive=null` 表示默认地图
+- [ ] 进入 Map 且未显式选择目标时，优先推导 active binding 对应 archive
+- [ ] 玩家存档组标题和组级详情入口解析为最新有效 archive target
+- [ ] 星区组染色和 hub 连线仅在 archive target guid 等于 active binding guid 时显示
+- [ ] 默认地图 target 隐藏星区组染色和 hub 连线
+- [ ] Save panel 关闭再打开恢复关闭前 layer/stage；显式导航入口可覆盖恢复状态
 - [ ] 有 color 的 coverage sector 绘制内部六边形
 - [ ] 无 color 不绘制内部六边形
 - [ ] 保持 faction owner、hub color、resource pie 的渲染层级

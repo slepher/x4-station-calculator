@@ -105,6 +105,30 @@ export const buildHighwayPathPoints = (start: Vec2, end: Vec2, middle: Vec2[], e
   return deduped
 }
 
+export const simplifyDensePathPoints = (points: Vec2[], minStep = 4): Vec2[] => {
+  if (points.length <= 2) return points
+  const result: Vec2[] = [points[0]!]
+  let index = 1
+  const lastInternalIndex = points.length - 2
+
+  while (index <= lastInternalIndex) {
+    let runEnd = index
+    while (
+      runEnd < lastInternalIndex &&
+      Math.hypot(points[runEnd + 1]!.x - points[runEnd]!.x, points[runEnd + 1]!.y - points[runEnd]!.y) <= minStep
+    ) {
+      runEnd += 1
+    }
+
+    const representativeIndex = Math.ceil((index + runEnd) / 2)
+    result.push(points[representativeIndex]!)
+    index = runEnd + 1
+  }
+
+  result.push(points[points.length - 1]!)
+  return result
+}
+
 export const clipSegmentToConvexPolygon = (p0: Vec2, p1: Vec2, polygon: Vec2[]): [Vec2, Vec2] | null => {
   const dx = p1.x - p0.x
   const dy = p1.y - p0.y

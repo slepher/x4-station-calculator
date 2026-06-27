@@ -1,5 +1,5 @@
 import { computed, type ComputedRef, type Ref } from 'vue'
-import { buildHighwayPathPoints, catmullRomToBezierPath, clipPolylineToConvexPolygon, hexVertices } from '@/components/map/utils/geometry'
+import { buildHighwayPathPoints, catmullRomToBezierPath, clipPolylineToConvexPolygon, hexVertices, simplifyDensePathPoints } from '@/components/map/utils/geometry'
 import { clusterRatioToScreen, gateClusterRatioFromRaw, getSectorViewportTransform, sectorLocalRatioToScreen, sectorPointToLocalRatio, sectorRatioToClusterRatio } from '@/components/map/utils/coordinates'
 import { getMapGateRadius } from '@/components/map/utils/mapIconConfig'
 import type { Cluster, Sector, Vec2 } from '@/components/map/types'
@@ -14,6 +14,7 @@ export type MapCrossClusterGateLine = { id: string; left: Vec2; right: Vec2; isH
 
 const GATE_ICON_RADIUS_SCALE = 3
 const GATE_LINE_MARGIN = 0.6
+const HIGHWAY_DENSE_POINT_THRESHOLD_PX = 4
 
 export function useMapSvgLinks(args: {
   clusters: ComputedRef<Record<string, Cluster>>
@@ -166,7 +167,10 @@ export function useMapSvgLinks(args: {
             if (screenPoint) middlePoints.push(screenPoint)
           })
 
-          const pathPoints = buildHighwayPathPoints(start, end, middlePoints)
+          const pathPoints = simplifyDensePathPoints(
+            buildHighwayPathPoints(start, end, middlePoints),
+            HIGHWAY_DENSE_POINT_THRESHOLD_PX
+          )
           const visibleChains = clipPolylineToConvexPolygon(pathPoints, sectorHex)
           visibleChains.forEach((chain, index) => {
             if (chain.length >= 3) {

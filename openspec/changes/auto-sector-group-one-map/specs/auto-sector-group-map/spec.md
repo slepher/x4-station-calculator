@@ -197,6 +197,56 @@
 - **当** `autoGroupResult` 已由 store 初始化
 - **那么** Map 面板 SHALL NOT 自行调用分组算法或 `initAutoGroupDraft()`
 
+### Requirement: Map Archive Target Lifecycle
+
+系统 MUST 使用一个明确的 Map archive target 表达地图当前显示目标，并将该目标与 save panel layer 生命周期分离。该 target SHALL 支持 `default-map` 与具体 archive 两种状态；`selectedArchive=null` SHALL NOT 被用作“默认地图”的隐式语义。
+
+#### Scenario: Entering map defaults to active binding archive
+- **前提** 用户进入 Map
+- **并且** 用户尚未显式选择 Map archive target
+- **并且** 当前存在 active binding
+- **并且** 该 binding 对应 guid 下存在可用 archive
+- **当** 系统初始化地图显示目标
+- **那么** Map archive target SHALL 指向该 active binding 对应 archive
+- **并且** 若 archive guid 等于 active binding guid，星区组染色和 hub 连线 SHALL 显示
+
+#### Scenario: Default map is explicit target
+- **前提** 用户在存档列表点击默认地图
+- **当** 系统更新地图显示目标
+- **那么** Map archive target SHALL 为 `default-map`
+- **并且** 系统 SHALL 隐藏星区组染色
+- **并且** 系统 SHALL 隐藏 hub 连线
+
+#### Scenario: Archive target controls binding overlay
+- **前提** 当前 active binding guid 为 A
+- **当** 用户在存档列表选择 guid 为 A 的 archive
+- **那么** Map archive target SHALL 指向该 archive
+- **并且** 系统 SHALL 显示星区组染色和 hub 连线
+- **当** 用户在存档列表选择 guid 为 B 的 archive
+- **那么** Map archive target SHALL 指向 B 的 archive
+- **并且** 系统 SHALL 隐藏 A 的星区组染色和 hub 连线
+
+#### Scenario: Guid-level archive entry resolves to latest valid archive
+- **前提** 存档列表中玩家存档组 G 下存在至少一个有效 archive
+- **当** 用户点击该玩家存档组标题
+- **那么** Map archive target SHALL 指向 G 下最新有效 archive
+- **并且** save panel SHALL 保持在 list layer
+- **当** 用户点击该玩家存档组的组级 POI/详情入口
+- **那么** Map archive target SHALL 指向 G 下最新有效 archive
+- **并且** save panel SHALL 进入 category layer 并显示该 archive 的二级分类菜单
+
+#### Scenario: Panel reopen restores last layer
+- **前提** 用户在 save panel 的任意 layer 关闭面板
+- **当** 用户再次打开 save panel 且未通过显式导航入口指定目标 layer
+- **那么** 系统 SHALL 恢复关闭前的 `mapSavePanelLayer`、`mapBindingStage` 与 binding context
+- **并且** 系统 SHALL NOT 因重新打开面板改变 Map archive target
+
+#### Scenario: Explicit navigation overrides restored layer
+- **前提** save panel 关闭前停留在某个 layer
+- **当** 用户通过明确入口进入 binding-sector、binding-station、category 或 list
+- **那么** 系统 SHALL 按该入口指定的 layer/stage 打开
+- **并且** SHALL NOT 受关闭前 layer 限制
+
 ### Requirement: Map-only Virtual Station Editing
 
 系统 MUST 在 Map 自动分组面板中提供 Virtual Station tab，用于创建、移动、删除无 `saveStationCode` 的 virtual station drafts。

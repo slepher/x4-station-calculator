@@ -3,6 +3,7 @@
  */
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
+import { ref } from 'vue'
 import MapSavePanel from '@/components/map/MapSavePanel.vue'
 
 vi.mock('vue-i18n', () => ({
@@ -45,11 +46,11 @@ vi.mock('@/components/map/MapSaveCoordList.vue', () => ({
   }
 }))
 
-vi.mock('@/components/map/MapBindingSectorGroup.vue', () => ({
+vi.mock('@/components/map/AutoSectorGroupPanel.vue', () => ({
   default: {
-    name: 'MapBindingSectorGroup',
+    name: 'AutoSectorGroupPanel',
     emits: ['select-group'],
-    template: '<div data-testid="binding-sector-group" />'
+    template: '<div data-testid="auto-sector-group-panel" />'
   }
 }))
 
@@ -64,14 +65,21 @@ vi.mock('@/store/useSaveStore', () => ({
   useSaveStore: vi.fn()
 }))
 
-vi.mock('@/store/useEmpireStore', () => ({
-  useEmpireStore: vi.fn()
+vi.mock('@/store/useSaveBindingStore', () => ({
+  useSaveBindingStore: vi.fn()
+}))
+
+vi.mock('@/store/useActiveViewStore', () => ({
+  useActiveViewStore: vi.fn()
 }))
 
 import { useSaveStore } from '@/store/useSaveStore'
-import { useEmpireStore } from '@/store/useEmpireStore'
+import { useSaveBindingStore } from '@/store/useSaveBindingStore'
+import { useActiveViewStore } from '@/store/useActiveViewStore'
 
 let mockedSaveStore: any
+let mockedSaveBindingStore: any
+let mockedActiveViewStore: any
 const testerArchive = {
   meta: {
     guid: 'g-1',
@@ -103,18 +111,23 @@ describe('MapSavePanel open behavior', () => {
       selectArchive: vi.fn(),
       selectArchiveGroup: vi.fn()
     }
-    vi.mocked(useSaveStore).mockReturnValue(mockedSaveStore as any)
-    vi.mocked(useEmpireStore).mockReturnValue({
-      activeEmpire: {
-        sectors: [
+    mockedSaveBindingStore = {
+      activeBinding: {
+        groups: [
           { id: 'sector-1', name: 'Sector 1' }
         ]
       },
-      activeEmpireId: 'empire-1',
-      createBinding: vi.fn(),
-      setSelectedArchiveTime: vi.fn(),
-      getActiveBinding: vi.fn(() => null)
-    } as any)
+      bindings: [],
+      createOrOpenBinding: vi.fn()
+    }
+    mockedActiveViewStore = {
+      mapSavePanelLayer: ref('list'),
+      mapBindingGameGuid: ref(null),
+      mapSavePanelSectorGroupId: ref(null)
+    }
+    vi.mocked(useSaveStore).mockReturnValue(mockedSaveStore as any)
+    vi.mocked(useSaveBindingStore).mockReturnValue(mockedSaveBindingStore as any)
+    vi.mocked(useActiveViewStore).mockReturnValue(mockedActiveViewStore as any)
   })
   it('stays on archive list when opened with an already selected archive', () => {
     const wrapper = mount(MapSavePanel, {
@@ -152,7 +165,7 @@ describe('MapSavePanel open behavior', () => {
     await wrapper.vm.$nextTick()
 
     expect(wrapper.get('[data-testid="save-breadcrumb"]').text()).toContain('Tester 绑定')
-    expect(wrapper.find('[data-testid="binding-sector-group"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="auto-sector-group-panel"]').exists()).toBe(true)
     expect(mockedSaveStore.selectArchiveGroup).toHaveBeenCalledWith('g-1')
     expect(mockedSaveStore.selectArchive).not.toHaveBeenCalled()
   })
@@ -168,8 +181,25 @@ describe('MapSavePanel open behavior', () => {
     await wrapper.getComponent({ name: 'MapSaveArchiveList' }).vm.$emit('select-group', { guid: 'g-1' })
 
     expect(mockedSaveStore.selectArchiveGroup).toHaveBeenCalledWith('g-1')
+    expect(wrapper.emitted('select-archive')?.[0]).toEqual([{ guid: 'g-1', time: 10 }])
     expect(wrapper.find('[data-testid="save-archive-list"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="save-category-menu"]').exists()).toBe(false)
+  })
+
+  it('uses the latest valid archive when opening guid-level archive details', async () => {
+    const wrapper = mount(MapSavePanel, {
+      props: {
+        open: true,
+        archive: testerArchive
+      }
+    })
+
+    await wrapper.getComponent({ name: 'MapSaveArchiveList' }).vm.$emit('navigate', { guid: 'g-1', time: null })
+    await wrapper.vm.$nextTick()
+
+    expect(mockedSaveStore.selectArchiveGroup).toHaveBeenCalledWith('g-1')
+    expect(wrapper.emitted('select-archive')?.[0]).toEqual([{ guid: 'g-1', time: 10 }])
+    expect(wrapper.find('[data-testid="save-category-menu"]').exists()).toBe(true)
   })
 
   it('updates active archive in savePanel when a specific time is selected from the archive list', async () => {
@@ -196,7 +226,7 @@ describe('MapSavePanel open behavior', () => {
 
     await wrapper.getComponent({ name: 'MapSaveArchiveList' }).vm.$emit('bind', { guid: 'g-1', time: null })
     await wrapper.vm.$nextTick()
-    await wrapper.getComponent({ name: 'MapBindingSectorGroup' }).vm.$emit('select-group', 'sector-1')
+    await wrapper.getComponent({ name: 'AutoSectorGroupPanel' }).vm.$emit('select-group', 'sector-1')
     await wrapper.vm.$nextTick()
 
     expect(wrapper.get('[data-testid="save-breadcrumb"]').text()).toContain('Sector 1')

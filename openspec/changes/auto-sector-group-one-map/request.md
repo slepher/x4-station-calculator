@@ -48,6 +48,11 @@
 - Virtual station overlay 从 store draft 渲染，Map binding 界面打开后即可拖动，不要求 Virtual Station tab 激活。
 - Virtual trade station overlay 仍属于 group trade station draft；拖动只更新对应 group draft position，不修改 `sectorMacro`，且 drop 必须限制在 hub sector。
 - Virtual station overlay 与 virtual trade station overlay 沿用现有图标、颜色和样式，不新增额外视觉区分。
+- Map 当前显示目标使用单一状态表达：`default-map` 或具体 save archive，不再用 `selectedArchive=null` 隐式表示默认地图。
+- 进入 Map 时如果用户尚未显式选择显示目标，且存在 active binding，则默认显示该 active binding 对应的 save archive；否则显示默认地图。
+- 用户点击默认地图时，Map 显示目标 SHALL 明确变为 `default-map`；用户点击某个存档时，Map 显示目标 SHALL 变为该 archive。
+- 星区组染色与 hub 连线只由 Map 当前显示目标与 active binding 的 `gameGuid` 是否一致决定，不由 save panel 当前 layer 决定。
+- Save panel 关闭再打开 SHALL 回到关闭前 layer；只有显式跳转入口才覆盖 layer/stage。
 
 ### UI 与排序
 
@@ -107,6 +112,8 @@
 - Drag sort 不改变 group 领域数据，不触发计算。
 - Hub color 在 Map 中稳定显示，binding 模式和非 binding 模式来源正确。
 - 透明色不会作为颜色值持久化。
+- 默认地图目标下不显示星区组染色和 hub 连线；显示具体 archive 且 archive guid 等于 active binding guid 时才显示。
+- 关闭并重新打开 save panel 保持关闭前 layer/stage；点击明确入口时按入口指定界面跳转。
 
 ## 未决项
 

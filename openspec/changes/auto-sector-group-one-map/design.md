@@ -147,6 +147,40 @@ Group card 标题显示 16×16 色块：
 - Binding 模式：`liveStore.autoGroupResult.groups`。
 - 非 binding 模式：`saveBindingStore.activeBinding.groups`。
 
+Map 显示目标使用一个变量表达：
+
+```ts
+type MapArchiveTarget =
+  | { kind: 'default-map' }
+  | { kind: 'archive'; guid: string; time: number }
+```
+
+该变量只描述地图当前显示什么，不承载 save panel layer/stage。`saveStore.selectedArchive` 继续表示已加载的存档详情，不再用 `null` 表示“用户选择默认地图”。
+
+初始化规则：
+
+- 若用户尚未显式选择 `MapArchiveTarget`，且存在 active binding 与可用 archive，则目标推导为该 active binding 对应 archive。
+- 若用户尚未显式选择目标且没有 active binding archive，则目标推导为 `{ kind: 'default-map' }`。
+- 点击“默认地图”显式设置 `{ kind: 'default-map' }`。
+- 点击某个存档显式设置 `{ kind: 'archive', guid, time }`。
+- 点击玩家存档组标题或组级 POI 入口时，guid-level 选择不作为第三种 target；系统必须解析为该 guid 下最新有效 archive，并显式设置 `{ kind: 'archive', guid, time }`。
+
+星区组染色和 hub route overlay 显示规则：
+
+```ts
+showBindingOverlay =
+  mapArchiveTarget.kind === 'archive' &&
+  mapArchiveTarget.guid === activeBinding.gameGuid
+```
+
+因此 save panel 当前 layer 不参与 overlay 显隐。用户在 list、category、coord、binding-sector 或 binding-station 中，只要地图显示目标与 active binding guid 匹配即可显示；选择 default-map 或其他 guid archive 时隐藏。
+
+Save panel 生命周期：
+
+- 关闭再打开只恢复关闭前的 `mapSavePanelLayer`、`mapBindingStage` 和 binding context。
+- 明确导航入口（例如进入 binding-sector、binding-station、category、list）才覆盖 layer/stage。
+- 地图显示目标与 panel layer/stage 分离，避免打开/关闭面板导致染色/连线切换。
+
 渲染层级：
 
 1. faction owner 色。

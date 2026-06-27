@@ -112,8 +112,9 @@ transit hub 运输栏中 `Sector Group` link route SHALL 读取 live production 
 
 - **前提** 某条 hub link 存在多条有效 route candidates
 - **当** 地图渲染 hub link route overlay
-- **那么** 系统 SHALL 绘制该 hub link 的全部有效候选路径
+- **那么** 系统 SHALL 绘制该 hub link 的全部有效候选星区路径
 - **并且** 系统 SHALL NOT 只绘制最终最优路径
+- **并且** 单个 candidate 在每个 sector 内部 SHALL 先聚合为进入点到离开点的一条 visual segment
 
 ### Requirement: Hub link routes SHALL use deterministic macro-based color
 
@@ -158,6 +159,20 @@ transit hub 运输栏中 `Sector Group` link route SHALL 读取 live production 
 - **那么** 两条候选在该基础线路上 SHALL 共用同一 lane
 - **并且** 系统 SHALL NOT 仅因 candidate 不同而把同一 hub link 拆成多条并行 lane
 
+#### Scenario: Same link candidates with the same sector entry and exit collapse
+
+- **前提** 同一 hub link 的多条 candidate 在同一 sector 内具有相同进入点与离开点
+- **当** 地图生成 route overlay rows
+- **那么** 系统 SHALL 只生成一条该 sector 的可视 route row
+- **并且** 原始 candidate 在该 sector 内部经过的中途 gate、highway 或 ring highway 不应生成额外 route row
+
+#### Scenario: Different links with the same sector entry and exit remain visible
+
+- **前提** 两条不同 hub link 在同一 sector 内具有相同进入点与离开点
+- **当** 地图生成 route overlay rows
+- **那么** 系统 SHALL 为两个 hub link 保留各自的可视 route row
+- **并且** lane 分配 SHALL 将两条 route 分开显示
+
 #### Scenario: Route lanes are offset from native map links
 
 - **前提** 某条 hub link route 经过地图已有 gate、superhighway 或 ring-highway 连接
@@ -174,15 +189,15 @@ transit hub 运输栏中 `Sector Group` link route SHALL 读取 live production 
 
 #### Scenario: Sector-internal route segments render as direct endpoint channels
 
-- **前提** 某条 route segment 的起点与终点位于同一 sector
-- **并且** 该 segment 不是 gate transit 或 superhighway transit
+- **前提** 某条 candidate 在某个 sector 内部包含一个或多个 route builder segments
 - **当** 地图渲染 route overlay
-- **那么** 系统 SHALL 使用起点到终点的直连通道绘制该 segment
-- **并且** 系统 SHALL NOT 复用普通 highway spline 绘制该 route segment
+- **那么** 系统 SHALL 使用该 sector visit 的进入点到离开点直连通道绘制一条 visual segment
+- **并且** 系统 SHALL NOT 绘制该 sector 内部的中途折线
+- **并且** 系统 SHALL NOT 复用普通 highway spline 绘制该 route visual segment
 
 #### Scenario: Ring highway channels reserve the center lane
 
-- **前提** 某个同 sector A-B 通道存在命中 `highwayRingChains` 的 ring highway segment
+- **前提** 某个同 sector A-B 聚合通道包含命中 `highwayRingChains` 的 ring highway segment
 - **当** 地图渲染经过该 A-B 通道的 route overlay
 - **那么** 该 A-B 通道 SHALL 视为原生 ring-highway 通道
 - **并且** 系统 SHALL 将中线保留给原生环形高速

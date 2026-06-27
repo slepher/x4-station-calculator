@@ -1,11 +1,12 @@
 import { computed, type ComputedRef, type Ref } from 'vue'
 import { clusterRatioToScreen, sectorPointToLocalRatio, sectorRatioToClusterRatio } from '@/components/map/utils/coordinates'
 import { applyRouteLaneOffsets, type RouteLaneOffsetInput } from '@/components/map/utils/routeLaneOffset'
+import { buildRouteSectorVisualSegments, type RouteSectorVisualSegment } from '@/components/map/utils/routeSectorSegments'
 import type { Cluster, Sector, Vec2 } from '@/components/map/types'
 import type { MapSvgLayoutState } from './useMapSvgLayout'
 import type { HubLinkRouteEntry } from '@/store/logic/hubLinkRoutes'
 import type { SectorData } from '@/types/saveArchive'
-import type { TransitRouteEndpointRef, TransitRouteSegment } from '@/store/logic/transitRouteBuilder'
+import type { TransitRouteEndpointRef } from '@/store/logic/transitRouteBuilder'
 import type { X4MapHighwayRingChain } from '@/types/x4'
 
 export type MapHubLinkRouteLine = {
@@ -41,23 +42,23 @@ export function useMapHubLinkRoutes(args: {
       }
       const color = entry.color || FALLBACK_ROUTE_COLOR
       entry.candidates.forEach((candidate, candidateIndex) => {
-        let sectorIndex = 0
-        candidate.segments.forEach((segment, segmentIndex) => {
-          const sectorIds = segmentSectors(candidate.sectors, sectorIndex, segment)
-          const start = pointToScreen(args.clusters.value, args.sectors.value, args.saveSectors?.value, centers, clusterRadius, sectorIds.fromSectorId, segment.fromPosition, segment.fromEndpoint)
-          const end = pointToScreen(args.clusters.value, args.sectors.value, args.saveSectors?.value, centers, clusterRadius, sectorIds.toSectorId, segment.toPosition, segment.toEndpoint)
+        const visualSegments = buildRouteSectorVisualSegments({
+          idPrefix: `${entry.id}:${candidateIndex}`,
+          routeSectors: candidate.sectors,
+          segments: candidate.segments
+        })
+        visualSegments.forEach((segment) => {
+          const start = pointToScreen(args.clusters.value, args.sectors.value, args.saveSectors?.value, centers, clusterRadius, segment.fromSectorId, segment.fromPosition, segment.fromEndpoint)
+          const end = pointToScreen(args.clusters.value, args.sectors.value, args.saveSectors?.value, centers, clusterRadius, segment.toSectorId, segment.toPosition, segment.toEndpoint)
           if (start && end) {
             rows.push({
-              id: `${entry.id}:${candidateIndex}:${segmentIndex}`,
+              id: segment.id,
               linkId: entry.id,
-              baseLinkKey: segmentBaseLinkKey(segment, sectorIds, [start, end], args.highwayRingChains?.value),
+              baseLinkKey: segmentBaseLinkKey(segment, [start, end], args.highwayRingChains?.value),
               points: [start, end],
               curved: false,
               color
             })
-          }
-          if (segment.kind === 'gate-transit' || segment.kind === 'superhighway') {
-            sectorIndex += 1
           }
         })
       })
@@ -77,14 +78,14 @@ export function useMapHubLinkRoutes(args: {
 }
 
 function segmentBaseLinkKey(
-  segment: TransitRouteSegment,
-  sectorIds: { fromSectorId: string | undefined; toSectorId: string | undefined },
+  segment: RouteSectorVisualSegment,
   points: Vec2[],
   highwayRingChains: X4MapHighwayRingChain[] | undefined
 ): string {
-  const ringHighwayKey = ringHighwayBaseLinkKey(segment, sectorIds, highwayRingChains)
+  const sectorIds = { fromSectorId: segment.fromSectorId, toSectorId: segment.toSectorId }
+  const ringHighwayKey = ringHighwayBaseLinkKey(segment, highwayRingChains)
   if (ringHighwayKey) return ringHighwayKey
-  if (isSectorInternalSegment(segment, sectorIds)) {
+  if (segment.kind === 'sector-internal') {
     return `sector-internal:${sectorIds.fromSectorId}:${geometryPairFromSegmentEndpoints(segment, sectorIds) ?? geometryPairKey(points)}`
   }
   if (segment.kind === 'superhighway') {
@@ -97,33 +98,24 @@ function segmentBaseLinkKey(
 }
 
 function ringHighwayBaseLinkKey(
-  segment: TransitRouteSegment,
-  sectorIds: { fromSectorId: string | undefined; toSectorId: string | undefined },
+  segment: RouteSectorVisualSegment,
   highwayRingChains: X4MapHighwayRingChain[] | undefined
 ): string | null {
-  if (segment.kind !== 'highway' || !segment.highwayId || !sectorIds.fromSectorId || !highwayRingChains) return null
+  if (segment.kind !== 'sector-internal' || !segment.fromSectorId || !highwayRingChains) return null
   for (const chain of highwayRingChains) {
     const hop = chain.hops.find((item) =>
-      item.sectorId === sectorIds.fromSectorId &&
-      (item.forwardHighwayId === segment.highwayId || item.backwardHighwayId === segment.highwayId)
+      item.sectorId === segment.fromSectorId &&
+      (segment.highwayIds.includes(item.forwardHighwayId) || segment.highwayIds.includes(item.backwardHighwayId))
     )
     if (!hop) continue
     const pair = [hop.forwardHighwayId, hop.backwardHighwayId].sort((a, b) => a.localeCompare(b)).join('|')
-    return `ring-highway:${sectorIds.fromSectorId}:${pair}`
+    return `ring-highway:${segment.fromSectorId}:${pair}`
   }
   return null
 }
 
-function isSectorInternalSegment(
-  segment: TransitRouteSegment,
-  sectorIds: { fromSectorId: string | undefined; toSectorId: string | undefined }
-): boolean {
-  if (!sectorIds.fromSectorId || sectorIds.fromSectorId !== sectorIds.toSectorId) return false
-  return segment.kind !== 'gate-transit' && segment.kind !== 'superhighway'
-}
-
 function geometryPairFromSegmentEndpoints(
-  segment: TransitRouteSegment,
+  segment: RouteSectorVisualSegment,
   sectorIds: { fromSectorId: string | undefined; toSectorId: string | undefined }
 ): string | null {
   const from = segment.fromPosition
@@ -178,32 +170,6 @@ function polylinePath(points: Vec2[]): string {
     parts.push(`L ${point.x.toFixed(1)},${point.y.toFixed(1)}`)
   })
   return parts.join(' ')
-}
-
-function segmentSectors(
-  sectors: string[],
-  sectorIndex: number,
-  segment: TransitRouteSegment
-): { fromSectorId: string | undefined; toSectorId: string | undefined } {
-  const current = sectors[sectorIndex]
-  const fromEndpointSectorId = segment.fromEndpoint?.sectorMacro
-  const toEndpointSectorId = segment.toEndpoint?.sectorMacro
-  if (fromEndpointSectorId || toEndpointSectorId) {
-    return {
-      fromSectorId: fromEndpointSectorId ?? current,
-      toSectorId: toEndpointSectorId ?? current
-    }
-  }
-  if (segment.kind === 'gate-transit' || segment.kind === 'superhighway') {
-    return {
-      fromSectorId: current,
-      toSectorId: sectors[sectorIndex + 1] ?? current
-    }
-  }
-  return {
-    fromSectorId: current,
-    toSectorId: current
-  }
 }
 
 function pointToScreen(

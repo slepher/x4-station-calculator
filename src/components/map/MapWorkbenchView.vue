@@ -13,6 +13,11 @@ import MapSavePoiTooltip from './MapSavePoiTooltip.vue'
 import { focusOverlayInViewport } from './focusOverlayInViewport'
 import { getSectorScalePerRadius, getSectorZoneBoundingCenter, sectorLocalRatioToRawPointWithScale, sectorPointToLocalRatioWithScale } from '@/components/map/utils/coordinates'
 import { hexVertices } from '@/components/map/utils/geometry'
+import {
+  inferMapArchiveTarget,
+  shouldShowBindingOverlayForMapTarget,
+  type MapArchiveTarget
+} from '@/components/map/utils/bindingOverlayVisibility'
 import { resolveMapSectorByMacro, resolveSectorMacroById } from '@/components/map/utils/mapSectorMacro'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useMapStore } from '@/store/useMapStore'
@@ -200,7 +205,30 @@ const isBindingDraftOverlayActive = computed(() => {
   return bindingContextGameGuid.value === binding.gameGuid
 })
 
+const mapArchiveTarget = ref<MapArchiveTarget | null>(null)
+
+const activeBindingArchiveTime = computed<number | null>(() => {
+  const binding = saveBindingStore.activeBinding
+  if (!binding) return null
+  if (typeof binding.selectedArchiveTime === 'number') return binding.selectedArchiveTime
+  const group = saveStore.archives.get(binding.gameGuid)
+  return group?.saves.find((archive) => archive.isValid)?.meta.time ?? null
+})
+
+const effectiveMapArchiveTarget = computed<MapArchiveTarget>(() => mapArchiveTarget.value ?? inferMapArchiveTarget({
+  activeBindingGuid: saveBindingStore.activeBinding?.gameGuid,
+  activeBindingArchiveTime: activeBindingArchiveTime.value,
+  selectedArchiveGuid: saveStore.selectedArchive?.meta.guid,
+  selectedArchiveTime: saveStore.selectedArchive?.meta.time
+}))
+
+const showBindingOverlayForDisplayedArchive = computed(() => shouldShowBindingOverlayForMapTarget({
+  target: effectiveMapArchiveTarget.value,
+  bindingGuid: saveBindingStore.activeBinding?.gameGuid
+}))
+
 const sectorGroupColorMap = computed<Record<string, string>>(() => {
+  if (!showBindingOverlayForDisplayedArchive.value) return {}
   const isBinding = isSavePanelOpen.value &&
     (bindingContextStage.value === 'select-sector' || bindingContextStage.value === 'select-station')
   if (isBinding && liveStore.autoGroupResult) {
@@ -218,11 +246,40 @@ const isBindingSectorRouteActive = computed(() => {
   return bindingContextGameGuid.value === binding.gameGuid
 })
 const hubLinkRouteEntries = computed(() => {
+  if (!showBindingOverlayForDisplayedArchive.value) return []
   return isBindingSectorRouteActive.value
     ? liveStore.hubLinkRoutes.draft
     : liveStore.hubLinkRoutes.binding
 })
-const showSectorRoutes = computed(() => isBindingSectorRouteActive.value || mapDiagnosticVisibility.value.sectorRoutes)
+const showSectorRoutes = computed(() =>
+  showBindingOverlayForDisplayedArchive.value &&
+  (isBindingSectorRouteActive.value || mapDiagnosticVisibility.value.sectorRoutes)
+)
+const showSectorGroupColors = computed(() =>
+  showBindingOverlayForDisplayedArchive.value &&
+  (mapDiagnosticVisibility.value.sectorGroupColors || bindingContextStage.value === 'select-sector' || bindingContextStage.value === 'select-station')
+)
+
+watch(() => ({
+  mapArchiveTarget: effectiveMapArchiveTarget.value,
+  explicitMapArchiveTarget: mapArchiveTarget.value,
+  selectedArchiveGuid: saveStore.selectedArchive?.meta.guid ?? null,
+  selectedArchiveTime: saveStore.selectedArchive?.meta.time ?? null,
+  activeBindingGuid: saveBindingStore.activeBinding?.gameGuid ?? null,
+  activeBindingArchiveTime: activeBindingArchiveTime.value,
+  bindingContextGameGuid: bindingContextGameGuid.value,
+  bindingContextStage: bindingContextStage.value,
+  isSavePanelOpen: isSavePanelOpen.value,
+  mapSavePanelLayer: mapSavePanelLayer.value,
+  showBindingOverlay: showBindingOverlayForDisplayedArchive.value,
+  showSectorGroupColors: showSectorGroupColors.value,
+  showSectorRoutes: showSectorRoutes.value,
+  sectorGroupColorCount: Object.keys(sectorGroupColorMap.value).length,
+  hubLinkRouteCount: hubLinkRouteEntries.value.length,
+  routeSource: isBindingSectorRouteActive.value ? 'draft' : 'binding'
+}), (state) => {
+  console.info('[MapWorkbenchView] binding overlay visibility', state)
+}, { immediate: true })
 
 const settledSavePoiViewportContentBounds = ref<{
   left: number
@@ -674,9 +731,14 @@ const bindingOverlays = computed<PlacementOverlayItem[]>(() => {
 })
 
 const activeMapArchive = computed<SaveArchive | null>(() => {
-  const archive = saveStore.selectedArchive
-  if (archive && !archive.isValid) return null
-  return archive
+  const target = effectiveMapArchiveTarget.value
+  if (target.kind === 'default-map') return null
+  const selected = saveStore.selectedArchive
+  if (selected?.isValid && selected.meta.guid === target.guid && selected.meta.time === target.time) {
+    return selected
+  }
+  const group = saveStore.archives.get(target.guid)
+  return group?.saves.find((archive) => archive.isValid && archive.meta.time === target.time) ?? null
 })
 
 const savePoiVisibility = computed<SavePoiVisibility>({
@@ -1706,12 +1768,14 @@ const onBindingDragStationEnd = () => {
 
 const onSaveSelectArchive = async (payload: { guid: string; time: number } | null) => {
   if (!payload) {
+    mapArchiveTarget.value = { kind: 'default-map' }
     saveStore.clearSelection()
     activeSavePoiCategory.value = null
     return
   }
 
   await saveStore.previewArchive(payload.guid, payload.time)
+  mapArchiveTarget.value = { kind: 'archive', guid: payload.guid, time: payload.time }
   activeSavePoiCategory.value = null
 }
 
@@ -2176,7 +2240,7 @@ onBeforeUnmount(() => {
               :show-sector-labels="mapDiagnosticVisibility.sectorLabels"
               :show-sector-links="mapDiagnosticVisibility.sectorLinks"
               :show-resource-badges="true"
-              :show-sector-group-colors="mapDiagnosticVisibility.sectorGroupColors || bindingContextStage === 'select-sector' || bindingContextStage === 'select-station'"
+              :show-sector-group-colors="showSectorGroupColors"
               :show-sector-routes="showSectorRoutes"
               :show-faction-fill="mapDiagnosticVisibility.sectorFactionFill && bindingContextStage !== 'select-sector' && bindingContextStage !== 'select-station'"
               :sector-group-color-map="sectorGroupColorMap"

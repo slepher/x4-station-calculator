@@ -63,11 +63,12 @@
   - [x] 9.4 route 主体相对 gate / superhighway / ring-highway 原生连接偏移
   - [x] 9.5 gate / superhighway / sector-internal endpoint 处收束到真实端点并从端点重新展开
   - [x] 9.6 同一 hub link 的多条 candidate 经过同一基础线路时共用 lane
-  - [x] 9.7 星区内部 A-B route 统一按端点直连渲染，不再复用普通 highway spline
-  - [x] 9.8 命中 `highwayRingChains` 的环形高速通道保留中线，普通 sector-internal 与 ring-highway 同几何通道归入同一 lane group
-  - [x] 9.9 同一 link 在同一 A-B 通道同时存在普通内部段与 ring-highway 段时只保留一条可视 route，并优先保留 ring-highway lane 语义
-  - [x] 9.10 移除临时 route lane debug 日志
-  - [x] 9.11 运行变更相关单元测试与 build validation
+  - [x] 9.7 candidate 在每个 sector visit 内先聚合为进入点到离开点的一条 visual segment
+  - [x] 9.8 星区内部聚合 A-B route 统一按端点直连渲染，不再复用普通 highway spline 或绘制中途 gate/highway 折线
+  - [x] 9.9 命中 `highwayRingChains` 的环形高速通道保留中线，普通 sector-internal 与 ring-highway 同几何通道归入同一 lane group
+  - [x] 9.10 同一 link 在同一 sector 内相同进入点/离开点的多条 candidate 只保留一条可视 route；不同 link 保留多条并分 lane
+  - [x] 9.11 移除临时 route endpoint debug 日志
+  - [x] 9.12 运行变更相关单元测试与 build validation
 
 ## Notes
 
