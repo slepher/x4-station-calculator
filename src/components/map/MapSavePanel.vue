@@ -52,7 +52,7 @@ const bindingPlayerName = computed(() => {
 
 const bindingSectorName = computed(() => {
   if (!selectedSectorGroupId.value) return null
-  return saveBindingStore.activeBinding?.groups.find((item) => item.id === selectedSectorGroupId.value)?.name || null
+  return saveBindingStore.activeBinding?.groups.find((item) => item.sectorMacro === selectedSectorGroupId.value)?.name || null
 })
 const isBindingLayer = computed(() => layer.value === 'binding-sector' || layer.value === 'binding-station')
 

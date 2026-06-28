@@ -1,5 +1,5 @@
 import i18n from '@/i18n';
-import type { X4Module, X4Ware, X4ModuleGroup, X4Ship, X4ShipType, X4EquipmentType, X4Equipment, X4SlotTag, X4Dlc, X4Faction } from '../types/x4';
+import type { X4Module, X4Ware, X4ModuleGroup, X4Ship, X4ShipType, X4EquipmentType, X4Equipment, X4SlotTag, X4Dlc, X4Faction, X4MapSector } from '../types/x4';
 import { useStatusStore } from '../store/useStatusStore';
 import { ref } from 'vue';
 
@@ -12,7 +12,7 @@ export function useX4I18n() {
   const te = i18n.global.te.bind(i18n.global);
   const statusStore = useStatusStore();
 
-  const translate = (id: string, nameId: string, category: 'module' | 'ware' | 'type' | 'ship' | 'ship_type' | 'equipment_type' | 'equipment' | 'slot_tag' | 'dlc' | 'faction'): string => {
+  const translate = (id: string, nameId: string, category: 'module' | 'ware' | 'type' | 'ship' | 'ship_type' | 'equipment_type' | 'equipment' | 'slot_tag' | 'dlc' | 'faction' | 'sector'): string => {
     if (te(nameId)) {
       return t(nameId);
     }
@@ -83,6 +83,10 @@ export function useX4I18n() {
 
     translateFaction: (faction: X4Faction) => {
       return translate(faction.id, faction.nameId || 'MISSING_NAME_ID', 'faction');
+    },
+
+    translateSector: (sector: X4MapSector) => {
+      return translate(sector.id, sector.nameId || 'MISSING_NAME_ID', 'sector');
     },
 
     translate,

@@ -34,12 +34,14 @@ export interface EmpireSourceView {
 const TRANSIT_TAB_PREFIX = 'transit:'
 
 function buildBindingSectorLinks(groups: BindingSectorGroup[]): string[] {
-  const validGroupIds = new Set(groups.map((group) => group.id))
+  const validGroupIds = new Set(groups.map((group) => group.sectorMacro).filter((id): id is string => !!id))
   const links = new Set<string>()
   groups.forEach((group) => {
+    const groupId = group.sectorMacro
+    if (!groupId) return
     ;(group.connectedGroupIds || []).forEach((targetId) => {
       if (!validGroupIds.has(targetId)) return
-      const key = normalizeSectorLinkKey(group.id, targetId)
+      const key = normalizeSectorLinkKey(groupId, targetId)
       if (key) links.add(key)
     })
   })
@@ -73,7 +75,7 @@ export function createEmpireSourceView(deps: EmpireSourceViewDeps): EmpireSource
       const binding = activeBinding.value
       if (!binding) return []
       return binding.groups.map((group, index) => ({
-        id: group.id,
+        id: group.sectorMacro || '',
         name: group.name,
         order: index
       }))

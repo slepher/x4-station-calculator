@@ -143,7 +143,7 @@ export function useTransitTransportPresenter(
   const panel = computed<TransitTransportPanelState>(() => {
     const binding = store.activeBinding
     const activeGroupId = store.activeTransitSectorId
-    const activeGroup = binding?.groups.find((group) => group.id === activeGroupId) ?? null
+    const activeGroup = binding?.groups.find((group) => group.sectorMacro === activeGroupId) ?? null
     const hubStation = activeGroup?.tradeStation ?? null
     const hubPosition = resolveStationPosition(hubStation, store.playerStationRecords)
     const maps = store.gameDataMaps
@@ -245,7 +245,7 @@ function buildSectorGroupRows(input: {
   const connectedIds = input.activeGroup.connectedGroupIds ?? []
 
   for (const groupId of connectedIds) {
-    const linkedGroup = input.binding.groups.find((group) => group.id === groupId)
+    const linkedGroup = input.binding.groups.find((group) => group.sectorMacro === groupId)
     const linkedHub = linkedGroup?.tradeStation ?? null
     const linkedPosition = resolveStationPosition(linkedHub, input.playerStationRecords)
     if (!linkedGroup || !linkedHub || !linkedHub.sectorMacro || !linkedPosition) {
@@ -253,7 +253,7 @@ function buildSectorGroupRows(input: {
       continue
     }
 
-    const routeEntry = findHubLinkRouteEntry(input.hubLinkRoutes?.binding ?? [], input.activeGroup.id, linkedGroup.id)
+    const routeEntry = findHubLinkRouteEntry(input.hubLinkRoutes?.binding ?? [], input.activeGroup.sectorMacro || '', linkedGroup.sectorMacro || '')
     const selectedRoute = routeEntry?.candidates.length
       ? selectRouteFromCandidates(routeEntry.candidates, input.maps, input.travelProfile)
       : buildMissingSelectedRoute(input.routeSource, routeEntry?.problems.length ? routeEntry.problems : ['missing-precomputed-hub-link-route'])
@@ -265,7 +265,7 @@ function buildSectorGroupRows(input: {
     }
 
     rows.push({
-      id: linkedGroup.id,
+      id: linkedGroup.sectorMacro || linkedGroup.name,
       order: linkedGroup.order,
       groupName: linkedGroup.name,
       targetSectorName: sectorName(input.maps, linkedHub.sectorMacro),
@@ -636,7 +636,7 @@ function buildStationTargets(input: {
 
   for (const plan of input.binding.stationPlans) {
     if (emittedIds.has(plan.id)) continue
-    if (plan.groupId !== input.activeGroup.id) continue
+    if (plan.groupId !== input.activeGroup.sectorMacro) continue
     if (tradeStationIds.has(plan.id)) continue
     if (!plan.sectorMacro) continue
     targets.push({

@@ -1304,7 +1304,6 @@ export interface TradeStationBinding {
 }
 
 export interface BindingSectorGroup {
-  id: string
   name: string
   order: number
   sectorMacro?: string

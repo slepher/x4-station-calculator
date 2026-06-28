@@ -81,7 +81,7 @@ function getSaveStationPlan(saveStationCode: string) {
 }
 
 const currentGroupBinding = computed<GroupSaveBinding | null>(() => {
-  const group = activeBindingPlan.value?.groups.find((b) => b.id === props.sectorGroupId)
+  const group = activeBindingPlan.value?.groups.find((b) => b.sectorMacro === props.sectorGroupId)
   if (!group) return null
   const stationBindings: StationSaveBinding[] = (activeBindingPlan.value?.stationPlans || [])
     .filter((plan) => plan.groupId === props.sectorGroupId)
@@ -92,7 +92,7 @@ const currentGroupBinding = computed<GroupSaveBinding | null>(() => {
       position: plan.position
     }))
   return {
-    sectorGroupId: group.id,
+    sectorGroupId: group.sectorMacro || props.sectorGroupId,
     sectorMacro: group.sectorMacro,
     jumpRange: group.jumpRange,
     coverageSectorMacros: group.coverageSectorMacros,

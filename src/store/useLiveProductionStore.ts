@@ -123,6 +123,10 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   const autoGroupResult = shallowRef<AutoGroupResult | null>(null)
   const virtualStationDrafts = ref<BindingStationPlan[]>([])
   const virtualStationDraftInitializedKey = ref<string | null>(null)
+  const calculationBaseline = ref<{
+    autoGroupResult: AutoGroupResult
+    virtualStationDrafts: BindingStationPlan[]
+  } | null>(null)
   const calculationMode = ref<'result' | 'edit'>('result')
   const prefJumpRange = ref(DEFAULT_JUMP_RANGE)
   const bridgeSearchJumpRange = ref(DEFAULT_BRIDGE_SEARCH_JUMP_RANGE)
@@ -175,6 +179,35 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       virtualStationDraftInitializedKey.value = key
     }
     recomputeVirtualStationDraftGroups(groups)
+  }
+
+  function captureCalculationBaseline(result: AutoGroupResult | null = autoGroupResult.value) {
+    if (!result) {
+      calculationBaseline.value = null
+      return
+    }
+    calculationBaseline.value = {
+      autoGroupResult: deepClone(result),
+      virtualStationDrafts: deepClone(virtualStationDrafts.value)
+    }
+  }
+
+  function setAutoGroupResult(result: AutoGroupResult | null) {
+    autoGroupResult.value = result
+    if (!result) {
+      calculationBaseline.value = null
+      virtualStationDrafts.value = []
+      virtualStationDraftInitializedKey.value = null
+      return
+    }
+    initializeVirtualStationDraftsForAutoGroups(result.groups)
+    captureCalculationBaseline(result)
+  }
+
+  function resetAutoGroupResultToBaseline() {
+    if (!calculationBaseline.value) return
+    autoGroupResult.value = deepClone(calculationBaseline.value.autoGroupResult)
+    virtualStationDrafts.value = deepClone(calculationBaseline.value.virtualStationDrafts)
   }
 
   function createVirtualStationDraftFromBlueprint(input: {
@@ -370,7 +403,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     const binding = activeBinding.value
     if (!binding) return null
     const groups: GroupDraftInfo[] = binding.groups.map((g) => ({
-      id: g.id,
+      id: g.sectorMacro || '',
       name: g.name,
       sectorMacro: g.sectorMacro,
       jumpRange: g.jumpRange,
@@ -476,7 +509,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     if (_lastDraftInitKey === draftKey) return
     _lastDraftInitKey = draftKey
     if (!archive || !archive.isValid || !binding) {
-      autoGroupResult.value = null
+      setAutoGroupResult(null)
       return
     }
 
@@ -503,12 +536,12 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     } else {
       const built = buildAssignmentsFromBinding()
       if (!built) {
-        autoGroupResult.value = null
+        setAutoGroupResult(null)
         return
       }
       result = built
     }
-    autoGroupResult.value = enrichAutoGroupResult(result, {
+    const enrichedResult = enrichAutoGroupResult(result, {
       getSectorName: (macro: string) => {
         if (!gameData.maps) return macro
         const resolved = resolveMapSectorByMacro<X4MapSector>(gameData.maps, macro)
@@ -532,12 +565,13 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       containerThreshold: prefThreshold.value,
       prefJumpRange: prefJumpRange.value
     }, sectorGraph, sectorClusterMap)
+    setAutoGroupResult(enrichedResult)
     calcBaselinePillState.value = {
       coverageByGroupId: Object.fromEntries(
-        autoGroupResult.value.groups.map((g) => [g.id, [...g.coverageSectorMacros]])
+        enrichedResult.groups.map((g) => [g.id, [...g.coverageSectorMacros]])
       ),
       connectedGroupIdsByGroupId: Object.fromEntries(
-        autoGroupResult.value.groups.map((g) => [g.id, [...g.connectedGroupIds]])
+        enrichedResult.groups.map((g) => [g.id, [...g.connectedGroupIds]])
       )
     }
     calculationMode.value = 'result'
@@ -1031,7 +1065,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     if (!sectorId) return null
     const binding = activeBinding.value
     if (!binding) return null
-    return binding.groups.find(g => g.id === sectorId) || null
+    return binding.groups.find(g => g.sectorMacro === sectorId) || null
   })
 
   const bindingStation = computed<BindingStationPlan | TradeStationBinding | null>(() => {
@@ -1475,7 +1509,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       if (workbenchMode.value === 'transit') {
         const sectorId = activeTransitSectorId.value
         if (!sectorId) return
-        const group = activeBinding.value?.groups.find(g => g.id === sectorId)
+        const group = activeBinding.value?.groups.find(g => g.sectorMacro === sectorId)
         if (!group?.tradeStation) return
         group.tradeStation.settings = { ...DEFAULT_STATION_SETTINGS, ...value }
         saveBindingStore.updateGroup(activeBinding.value?.gameGuid || '', sectorId, { tradeStation: group.tradeStation })
@@ -2432,9 +2466,9 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     selectedTransitTransportBlueprintId.value = blueprintId
   }
   const updateBindingGroupName = (groupId: string, name: string) => {
-    const group = activeBinding.value?.groups.find(g => g.id === groupId)
+    const group = activeBinding.value?.groups.find(g => g.sectorMacro === groupId)
     if (group && activeBinding.value) {
-      saveBindingStore.updateGroup(activeBinding.value.gameGuid, group.id, { name })
+      saveBindingStore.updateGroup(activeBinding.value.gameGuid, group.sectorMacro || groupId, { name })
     }
   }
   const updateStationNameFromActive = (value: string) => {
@@ -2450,12 +2484,12 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     now: () => Date.now(),
     commitStationMutation: (station) => {
       const sectorId = activeTransitSectorId.value
-      const tradeStationId = activeBinding.value?.groups.find(g => g.id === sectorId)?.tradeStation?.id
+      const tradeStationId = activeBinding.value?.groups.find(g => g.sectorMacro === sectorId)?.tradeStation?.id
       
       if (station.id === tradeStationId) {
         const sectorId = activeTransitSectorId.value
         if (!sectorId) return
-        const group = activeBinding.value?.groups.find(g => g.id === sectorId)
+        const group = activeBinding.value?.groups.find(g => g.sectorMacro === sectorId)
         if (!group?.tradeStation) return
         group.tradeStation.settings = { ...DEFAULT_STATION_SETTINGS, ...station.settings }
         saveBindingStore.updateGroup(activeBinding.value?.gameGuid || '', sectorId, { tradeStation: group.tradeStation })
@@ -2470,7 +2504,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     },
     recompute: (station, _deps) => {
       const sectorId = activeTransitSectorId.value
-      const tradeStationId = activeBinding.value?.groups.find(g => g.id === sectorId)?.tradeStation?.id
+      const tradeStationId = activeBinding.value?.groups.find(g => g.sectorMacro === sectorId)?.tradeStation?.id
       
       if (station.id === tradeStationId) {
         return
@@ -2495,20 +2529,20 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     },
     shouldRecompute: (station, patch) => {
       const sectorId = activeTransitSectorId.value
-      const tradeStationId = activeBinding.value?.groups.find(g => g.id === sectorId)?.tradeStation?.id
+      const tradeStationId = activeBinding.value?.groups.find(g => g.sectorMacro === sectorId)?.tradeStation?.id
       if (station.id === tradeStationId) return true
       return doesStationSettingsAffectFlowMap(patch)
     },
     afterRecompute: (station, deps) => {
       const sectorId = activeTransitSectorId.value
-      const tradeStationId = activeBinding.value?.groups.find(g => g.id === sectorId)?.tradeStation?.id
+      const tradeStationId = activeBinding.value?.groups.find(g => g.sectorMacro === sectorId)?.tradeStation?.id
       
       if (station.id === tradeStationId) return
       syncAfterStationFlowChange(station.id, deps)
     },
     afterCommit: (station, _deps, patch) => {
       const sectorId = activeTransitSectorId.value
-      const tradeStationId = activeBinding.value?.groups.find(g => g.id === sectorId)?.tradeStation?.id
+      const tradeStationId = activeBinding.value?.groups.find(g => g.sectorMacro === sectorId)?.tradeStation?.id
 
       if (station.id === tradeStationId) return
       if (!doesStationSettingsAffectFlowMap(patch)) {
@@ -2540,6 +2574,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     overviewBuyMultiplier,
     overviewSellMultiplier,
     autoGroupResult,
+    calculationBaseline,
     hubLinkRoutes,
     virtualStationDrafts,
     virtualStationDraftInitializedKey,
@@ -2549,6 +2584,9 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     prefThreshold,
     calcBaselinePillState,
     needsAutoGroupRecalc,
+    setAutoGroupResult,
+    captureCalculationBaseline,
+    resetAutoGroupResultToBaseline,
     initAutoGroupDraft,
     initializeVirtualStationDraftsForAutoGroups,
     recomputeVirtualStationDraftGroups,

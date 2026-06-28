@@ -453,7 +453,7 @@ const resolveSectorDisplayNameByMacro = (sectorMacro: string) => {
 }
 
 const resolveEmpireSectorGroupName = (sectorGroupId: string) =>
-  saveBindingStore.activeBinding?.groups.find((sector) => sector.id === sectorGroupId)?.name || sectorGroupId
+  saveBindingStore.activeBinding?.groups.find((sector) => sector.sectorMacro === sectorGroupId)?.name || sectorGroupId
 
 const resolveEmpireSectorGroupColor = (sectorGroupId: string | undefined) =>
   sectorGroupId ? liveStore.autoGroupResult?.groups.find((sector) => sector.id === sectorGroupId)?.color : undefined
@@ -569,7 +569,7 @@ const bindingOverlays = computed<PlacementOverlayItem[]>(() => {
     const resolved = resolveMapSectorByMacro(gameDataStore.maps || { clusters: {}, sectors: {} }, plan.sectorMacro)
     if (!resolved) continue
 
-    const group = plan.groupId ? activePlan.groups.find(g => g.id === plan.groupId) : null
+    const group = plan.groupId ? activePlan.groups.find(g => g.sectorMacro === plan.groupId) : null
     const coverageSectorMacros = draftOverlayActive
       ? [...allDraftCoverageSectorMacros]
       : group
@@ -620,11 +620,11 @@ const bindingOverlays = computed<PlacementOverlayItem[]>(() => {
           lastUpdated: activePlan.updatedAt
         },
         isVirtualTradestation: false,
-        sectorGroupId: group?.id
+        sectorGroupId: group?.sectorMacro
       }),
       binding: group ? {
         gameGuid: activePlan.gameGuid,
-        sectorGroupId: group.id,
+        sectorGroupId: group.sectorMacro || '',
         coverageSectorMacros,
         isVirtualTradestation: false
       } : undefined
@@ -638,8 +638,9 @@ const bindingOverlays = computed<PlacementOverlayItem[]>(() => {
 
   // tradeStation per group (only virtual/unbound ones)
   for (const group of tradeStationGroups) {
-    const bindingGroup = activePlan.groups.find((item) => item.id === group.id)
-    const draftGroup = autoGroupById.get(group.id)
+    const groupKey = group.sectorMacro || ('id' in group ? group.id : '')
+    const bindingGroup = activePlan.groups.find((item) => item.sectorMacro === groupKey)
+    const draftGroup = autoGroupById.get(groupKey)
     const stationPlan = bindingGroup?.tradeStation
     // Skip bound tradestations - they show as save station POIs instead
     if (draftGroup?.selectedTradeStation?.type === 'player') continue
@@ -657,8 +658,8 @@ const bindingOverlays = computed<PlacementOverlayItem[]>(() => {
     ]))
 
     overlays.push({
-      key: `binding:station:${stationPlan?.id || `virtual-trade-${group.id}`}`,
-      id: stationPlan?.id || `virtual-trade-${group.id}`,
+      key: `binding:station:${stationPlan?.id || `virtual-trade-${groupKey}`}`,
+      id: stationPlan?.id || `virtual-trade-${groupKey}`,
       kind: 'station',
       name: stationPlan?.name || group.name,
       icon: 'tradestation',
@@ -680,7 +681,7 @@ const bindingOverlays = computed<PlacementOverlayItem[]>(() => {
         (bindingContextStage.value === 'select-sector' || bindingContextStage.value === 'select-station') &&
         bindingContextGameGuid.value === activePlan.gameGuid,
       savePoiVisual: buildBindingSavePoiVisual({
-        key: `binding:station:${stationPlan?.id || `virtual-trade-${group.id}`}`,
+        key: `binding:station:${stationPlan?.id || `virtual-trade-${groupKey}`}`,
         code: stationPlan?.name || group.name,
         sectorMacro,
         position: {
@@ -688,7 +689,7 @@ const bindingOverlays = computed<PlacementOverlayItem[]>(() => {
           z: position.z
         },
         station: {
-          id: stationPlan?.id || `virtual-trade-${group.id}`,
+          id: stationPlan?.id || `virtual-trade-${groupKey}`,
           name: stationPlan?.name || group.name,
           type: 'transit',
           modules: [],
@@ -696,11 +697,11 @@ const bindingOverlays = computed<PlacementOverlayItem[]>(() => {
           lastUpdated: activePlan.updatedAt
         },
         isVirtualTradestation: true,
-        sectorGroupId: group.id
+        sectorGroupId: groupKey
       }),
       binding: {
         gameGuid: activePlan.gameGuid,
-        sectorGroupId: group.id,
+        sectorGroupId: groupKey,
         coverageSectorMacros,
         isVirtualTradestation: true
       }

@@ -180,7 +180,9 @@ export function buildBindingHubLinkRouteEntries(input: {
   if (!input.binding) return []
   return buildHubLinkRouteEntries({
     scope: 'binding',
-    groups: input.binding.groups,
+    groups: input.binding.groups
+      .filter((group) => !!group.sectorMacro)
+      .map((group) => ({ ...group, id: group.sectorMacro! })),
     maps: input.maps,
     playerStationRecords: input.playerStationRecords,
     cache: input.cache,

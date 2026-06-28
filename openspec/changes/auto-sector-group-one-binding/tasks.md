@@ -31,14 +31,18 @@
 - [ ] 新增 `prefJumpRange`
 - [ ] 新增 `prefThreshold`
 - [ ] 更新 `normalizeState()` 保留新增字段
+- [x] 将 save binding state 版本升至 2
+- [x] 迁移旧 group `id` 引用为定位星区 `sectorMacro`
+- [x] 持久化 `BindingSectorGroup` 移除独立 `id` 字段
+- [x] `connectedGroupIds` 与 `stationPlans.groupId` 改为保存 hub `sectorMacro`
 
 ## 4. Presenter 改造
 
 - [ ] Presenter 通过 `storeToRefs(liveStore)` 读取共享 draft
 - [ ] 删除 presenter 内跨面板共享 draft 本地 ref
 - [ ] Handler 统一读写 live store 共享 draft
-- [ ] 明确并实现 `calculationBaseline` 作为 [重置] 数据源
-- [ ] `calculationBaseline` 覆盖 autoGroupResult 与 virtual station drafts
+- [x] 明确并实现 `calculationBaseline` 作为 [重置] 数据源
+- [x] `calculationBaseline` 覆盖 autoGroupResult 与 virtual station drafts
 - [ ] 明确并实现 `calcBaselinePillState` 作为 pill UI diff 基线
 - [ ] 移除旧的 edit restore snapshot 语义；[退出] 只退出编辑态
 - [ ] `handleColorChange` 不直接写持久化 binding
@@ -47,6 +51,20 @@
 - [ ] virtual station apply 只同步无 `saveStationCode` 的 station plans
 - [ ] virtual station apply 不修改带 `saveStationCode` 的 save station plans
 - [ ] `handleConfirm` 返回成功/失败，供 Live 切换模式
+- [x] 二次确认 popup 使用当前组件可生效的弹窗与主次按钮样式
+- [x] 确认成功后清理 result groups 的 `isNew` 等未保存 transient 高亮标记
+- [x] 确认成功后将 `hasChanges` 与 uncertain assignment 提示解耦，draft 与 binding 一致时按钮置灰
+- [x] 实现 pin / unpin 不刷新 `calculationBaseline`
+- [x] pin / unpin 按钮只出现在 hub/group card，assignment card 不显示该按钮
+- [x] result/edit 模式的 hub/group card 都显示 pin / unpin 按钮
+- [x] 实现 unpin 保留 hub/group card，仅切换 `isPinned=false`
+- [x] 实现 unpin 将 hub 定位星区加入 assignment，默认 standalone
+- [x] 实现 pin 将 hub 定位星区从 assignment 移除
+- [x] 确保 `isPinned=false` group 不作为下一次显式计算的 pinned base input
+- [x] 确保单纯 pin / unpin 不产生可持久化 dirty，`hasChanges` 保持 false
+- [x] 确保 unpin 不调用 `applyStandaloneToResult()`，不抢占其他 coverage
+- [ ] 确保 assignment 显式「独立成组」仍保留既有 standalone coverage / derived candidates 行为
+- [ ] absorb 到其他 group 时按 `sectorMacro` 删除自身 hub，并清理 connections / assignment options / trade station
 
 ## 5. Live 双模式
 
@@ -73,8 +91,8 @@
 - [ ] 展示模式 [地图] 进入 Map binding，不修改 draft
 - [ ] 计算模式 [返回] 返回展示模式，不提交、不计算、不重置
 - [ ] [计算] / [快速计算] 更新 shared draft 和 `calculationBaseline`
-- [ ] [重置] 从 `calculationBaseline` 恢复 shared draft
-- [ ] [重置] 同时恢复 virtual station drafts
+- [x] [重置] 从 `calculationBaseline` 恢复 shared draft
+- [x] [重置] 同时恢复 virtual station drafts
 - [ ] [提交] 按 edit、无 result、trade station、uncertain assignment gate 返回成功/失败
 - [ ] [编辑] 进入 edit 模式，不创建恢复 snapshot
 - [ ] [退出] 返回 result 模式，不恢复 draft

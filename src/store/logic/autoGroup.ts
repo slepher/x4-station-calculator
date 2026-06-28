@@ -772,7 +772,7 @@ export function groupCleanSlate(
       const sectorMacro = hub.sectorMacro
       if (assignedSectors.has(sectorMacro)) continue
 
-      const groupId = `auto_${crypto.randomUUID()}`
+      const groupId = sectorMacro
       const allCoverage = getSectorCoverageMacros(sectorMacro, prefJumpRange, sectorGraph, sectorClusterMap)
       const coverage = allCoverage.filter((m) =>
         playerSectorMacros.includes(m) &&
@@ -1003,7 +1003,7 @@ export function groupIncremental(
   }
 
   const groups: GroupDraftInfo[] = existingGroups.map((group) => ({
-    id: group.id,
+    id: group.sectorMacro || '',
     name: group.name,
     sectorMacro: group.sectorMacro,
     jumpRange: group.jumpRange,
@@ -1050,7 +1050,7 @@ export function groupIncremental(
     let groupCounter = groups.length
     for (const hub of pureHubs) {
       if (assignedSectors.has(hub.sectorMacro)) continue
-      const groupId = `auto_${crypto.randomUUID()}`
+      const groupId = hub.sectorMacro
       const allCoverage = getSectorCoverageMacros(hub.sectorMacro, prefJumpRange, sectorGraph, sectorClusterMap)
       const coverage = allCoverage.filter((m) =>
         playerSectorMacros.includes(m) &&
@@ -1339,6 +1339,97 @@ export function resolveUncertainAssignment(
   }
 }
 
+function buildStandaloneSelectedAssignment(
+  sectorMacro: string,
+  groups: GroupDraftInfo[],
+  sectorGraph: Record<string, string[]>,
+  sectorClusterMap: Record<string, string>
+): SectorAssignment {
+  const candidateGroups = groups.filter((group) => group.sectorMacro !== sectorMacro)
+  const candidates: Array<{ groupId: string; distance: number; jumpRange: number; score?: number }> = []
+  for (const group of candidateGroups) {
+    if (!group.sectorMacro) continue
+    const distance = getDistance(group.sectorMacro, sectorMacro, sectorGraph, sectorClusterMap)
+    if (distance === null) continue
+    candidates.push({
+      groupId: group.id,
+      distance,
+      jumpRange: group.jumpRange,
+      score: group.hubScore
+    })
+  }
+
+  const currentRangeHits = candidates.filter((candidate) => candidate.distance <= candidate.jumpRange)
+  let optionsSource = currentRangeHits
+  if (optionsSource.length === 0 && candidates.length > 0) {
+    const minDistance = Math.min(...candidates.map((candidate) => candidate.distance))
+    if (minDistance <= MAX_UNCERTAIN_JUMP) {
+      optionsSource = candidates.filter((candidate) => candidate.distance === minDistance)
+    }
+  }
+  const sortedOptionsSource = [...optionsSource].sort((a, b) => a.distance - b.distance)
+  const options: AssignmentOption[] = [
+    ...sortedOptionsSource.map((candidate) => ({
+      type: 'absorb' as const,
+      targetGroupId: candidate.groupId,
+      distance: candidate.distance,
+      extendsRange: candidate.distance > candidate.jumpRange,
+      resultingGroupSize: groups.length
+    })),
+    {
+      type: 'standalone',
+      distance: 0,
+      extendsRange: false,
+      resultingGroupSize: 1
+    }
+  ]
+  const standaloneIndex = options.findIndex((option) => option.type === 'standalone')
+  return {
+    sectorMacro,
+    status: 'standalone',
+    displayBucket: 'resolved',
+    options,
+    selectedOptionIndex: standaloneIndex
+  }
+}
+
+export function setGroupPinnedInResult(
+  result: AutoGroupResult,
+  groupId: string,
+  isPinned: boolean,
+  sectorGraph: Record<string, string[]>,
+  sectorClusterMap: Record<string, string>
+): AutoGroupResult {
+  const group = result.groups.find((candidate) => candidate.id === groupId)
+  if (!group?.sectorMacro) return result
+
+  const sectorMacro = group.sectorMacro
+  const groups = result.groups.map((candidate) =>
+    candidate.id === groupId ? { ...candidate, isPinned } : candidate
+  )
+
+  if (isPinned) {
+    return {
+      ...result,
+      groups,
+      assignments: result.assignments.filter((assignment) => assignment.sectorMacro !== sectorMacro)
+    }
+  }
+
+  if (result.assignments.some((assignment) => assignment.sectorMacro === sectorMacro)) {
+    return { ...result, groups }
+  }
+
+  return {
+    ...result,
+    groups,
+    assignments: [
+      ...result.assignments,
+      buildStandaloneSelectedAssignment(sectorMacro, groups, sectorGraph, sectorClusterMap)
+    ]
+  }
+}
+
 export function applyAbsorbToResult(
   result: AutoGroupResult,
   sectorMacro: string,
@@ -1356,30 +1447,22 @@ export function applyAbsorbToResult(
   const opt = assignment.options[optionIndex]!
   if (opt.type !== 'absorb' || !opt.targetGroupId) return result
 
-  const wasStandalone = assignment.selectedOptionIndex !== null
-    && assignment.options[assignment.selectedOptionIndex]?.type === 'standalone'
-
   assignments[idx] = resolveUncertainAssignment(assignment, optionIndex)
 
   let groups = [...result.groups]
 
-  // If switching back from standalone, remove the now-empty standalone group
-  let removedGroupId: string | null = null
-  if (wasStandalone) {
-    const standaloneGroupIdx = groups.findIndex((g) =>
-      g.isNew && g.sectorMacro === sectorMacro
-    )
-    if (standaloneGroupIdx >= 0) {
-      removedGroupId = groups[standaloneGroupIdx]!.id
-      groups.splice(standaloneGroupIdx, 1)
-      // Remove connections to removed group
-      for (let i = 0; i < groups.length; i++) {
-        groups[i] = {
-          ...groups[i]!,
-          connectedGroupIds: groups[i]!.connectedGroupIds.filter((id) => id !== removedGroupId)
-        }
-      }
-    }
+  const removedGroupIds = new Set(
+    groups
+      .filter((g) => g.sectorMacro === sectorMacro && g.id !== opt.targetGroupId)
+      .map((g) => g.id)
+  )
+  if (removedGroupIds.size > 0) {
+    groups = groups
+      .filter((g) => !removedGroupIds.has(g.id))
+      .map((g) => ({
+        ...g,
+        connectedGroupIds: g.connectedGroupIds.filter((id) => !removedGroupIds.has(id))
+      }))
   }
 
   const targetGroupIdx = groups.findIndex((g) => g.id === opt.targetGroupId)
@@ -1412,18 +1495,23 @@ export function applyAbsorbToResult(
 
   groups[targetGroupIdx] = { ...g, jumpRange: newJumpRange, coverageSectorMacros: newCoverage }
 
-  // If standalone group was removed, remove only candidates derived from that standalone group.
-  if (removedGroupId) {
+  if (removedGroupIds.size > 0) {
     for (let i = 0; i < assignments.length; i++) {
       const a = assignments[i]!
       if (a.sectorMacro === sectorMacro) continue
-      const filteredOptions = a.options.filter((o) => o.sourceGroupId !== removedGroupId)
+      const filteredOptions = a.options.filter((o) =>
+        (o.sourceGroupId === undefined || !removedGroupIds.has(o.sourceGroupId)) &&
+        (o.targetGroupId === undefined || !removedGroupIds.has(o.targetGroupId))
+      )
       if (filteredOptions.length === a.options.length) continue
 
       let selectedOptionIndex = a.selectedOptionIndex
       if (selectedOptionIndex !== null) {
         const selectedOption = a.options[selectedOptionIndex]
-        if (selectedOption?.sourceGroupId === removedGroupId) {
+        if (
+          (selectedOption?.sourceGroupId !== undefined && removedGroupIds.has(selectedOption.sourceGroupId)) ||
+          (selectedOption?.targetGroupId !== undefined && removedGroupIds.has(selectedOption.targetGroupId))
+        ) {
           selectedOptionIndex = findBestOptionIndex(filteredOptions)
         } else {
           const remappedIndex = filteredOptions.findIndex((option) => option === selectedOption)
@@ -1480,7 +1568,7 @@ export function applyStandaloneToResult(
 
   // Reuse existing standalone group ID if one already exists for this sector
   const existingGroup = result.groups.find((g) => g.sectorMacro === sectorMacro)
-  const groupId = existingGroup ? existingGroup.id : `auto_${crypto.randomUUID()}`
+  const groupId = existingGroup ? existingGroup.id : sectorMacro
   const allSectors = getCoverageSectors(sectorMacro, prefJumpRange, sectorGraph, sectorClusterMap)
 
   const coverage = allSectors
@@ -1515,6 +1603,7 @@ export function applyStandaloneToResult(
   assignments[idx] = {
     ...assignment,
     selectedOptionIndex: standaloneIdx >= 0 ? standaloneIdx : assignment.options.length,
+    status: 'standalone'
   }
 
   // Remove this sector from other groups' coverage
@@ -1549,7 +1638,11 @@ export function applyStandaloneToResult(
     if (si >= 0) opts.splice(si, 0, newOpt)
     else opts.push(newOpt)
     const bestIdx = findBestOptionIndex(opts)
-    assignments[i] = { ...a, options: opts, selectedOptionIndex: bestIdx }
+    assignments[i] = {
+      ...a,
+      options: opts,
+      selectedOptionIndex: bestIdx
+    }
   }
 
   groups = normalizeGroupJumpRanges(

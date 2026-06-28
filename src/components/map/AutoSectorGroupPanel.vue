@@ -5,6 +5,7 @@ import { useAutoSectorGroupPresenter } from '@/components/empire/presenters/useA
 import { useActiveViewStore } from '@/store/useActiveViewStore'
 import { useLiveProductionStore } from '@/store/useLiveProductionStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
+import { useX4I18n } from '@/utils/UseX4I18n'
 import { buildAggregatedModulesFromStationPlan, classifyPlayerStationPoi } from '@/store/logic/stationPoiSemantics'
 import AutoSectorBar from '@/components/empire/sector-overview/AutoSectorBar.vue'
 import SectorGroupStatBar from '@/components/empire/sector-overview/SectorGroupStatBar.vue'
@@ -15,7 +16,9 @@ import SectorTradeStationList from '@/components/empire/sector-overview/SectorTr
 import type { StationPlan, SavedModule } from '@/types/x4'
 import { getPoiIconTag } from '@/store/logic/stationPoiSemantics'
 import { SAVE_POI_ICON_MAP } from '@/components/map/utils/style'
+import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
 import factoryIconUrl from '@/components/icons/factory.svg'
+import type { X4MapSector } from '@/types/x4'
 
 const props = withDefaults(defineProps<{
   gameGuid?: string
@@ -36,6 +39,7 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+const { translateSector } = useX4I18n()
 const activeViewStore = useActiveViewStore()
 
 const presenter = useAutoSectorGroupPresenter()
@@ -74,6 +78,14 @@ provide('sectorGroupColorMap', sectorGroupColorMap)
 
 const isConfirmed = computed(() => hasAutoResult.value && !hasChanges.value)
 
+function getTooltipSectorName(sectorMacro: string): string {
+  const maps = gameDataMaps.value
+  if (!maps) return sectorMacro
+  const resolved = resolveMapSectorByMacro<X4MapSector>(maps, sectorMacro)
+  if (!resolved) return sectorMacro
+  return translateSector(resolved.sector)
+}
+
 const unresolvedTooltip = computed(() => {
   const result = autoGroupResult.value
   let allocCount = 0
@@ -84,7 +96,7 @@ const unresolvedTooltip = computed(() => {
   for (const a of result.assignments ?? []) {
     if (a.selectedOptionIndex === null && (a.status === 'uncertain_tie' || a.status === 'uncertain_extend')) {
       allocCount++
-      allocNames.push(a.sectorMacro)
+      allocNames.push(getTooltipSectorName(a.sectorMacro))
     }
   }
   const tsNames = result.groups
@@ -577,8 +589,8 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
       <div class="confirm-popup">
         <div class="confirm-popup-text">{{ t('sector.confirm_unresolved_hint') }}</div>
         <div class="confirm-popup-actions">
-          <button class="bar-btn reset-btn" @click="showConfirmPopup = false">{{ t('sector.cancel') }}</button>
-          <button class="bar-btn confirm-btn" @click="onConfirm">{{ t('sector.confirm') }}</button>
+          <button type="button" class="confirm-popup-button confirm-popup-button--secondary" @click="showConfirmPopup = false">{{ t('sector.cancel') }}</button>
+          <button type="button" class="confirm-popup-button confirm-popup-button--primary" @click="onConfirm">{{ t('sector.confirm') }}</button>
         </div>
       </div>
     </div>
@@ -698,5 +710,14 @@ button.virtual-group-title { @apply hover:text-sky-300; }
 }
 .confirm-popup-actions {
   @apply flex justify-end gap-2;
+}
+.confirm-popup-button {
+  @apply rounded border px-3 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40;
+}
+.confirm-popup-button--secondary {
+  @apply border-slate-500/40 bg-slate-700/35 text-slate-200 hover:bg-slate-600/45;
+}
+.confirm-popup-button--primary {
+  @apply border-emerald-500/40 bg-emerald-600/25 text-emerald-300 hover:bg-emerald-600/35;
 }
 </style>

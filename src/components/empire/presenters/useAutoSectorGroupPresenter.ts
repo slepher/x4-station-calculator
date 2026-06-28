@@ -7,7 +7,7 @@ import { useActiveViewStore } from '@/store/useActiveViewStore'
 import { useSaveBindingStore } from '@/store/useSaveBindingStore'
 import { useLiveProductionStore } from '@/store/useLiveProductionStore'
 import { useBlueprintProductionStore } from '@/store/useBlueprintProductionStore'
-import { groupCleanSlate, groupIncremental, applyAbsorbToResult, applyStandaloneToResult, applyBridgePlanToDraft, buildAssignmentResult, type AutoGroupResult, type GroupDraftInfo, type SectorAssignment, getDistance } from '@/store/logic/autoGroup'
+import { groupCleanSlate, groupIncremental, applyAbsorbToResult, applyStandaloneToResult, applyBridgePlanToDraft, buildAssignmentResult, setGroupPinnedInResult, type AutoGroupResult, type GroupDraftInfo, type SectorAssignment, getDistance } from '@/store/logic/autoGroup'
 import { buildSectorGraphFromMaps, getCoverageSectors, getPlayerStationsInSector } from '@/store/logic/saveBindingUtils'
 import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
 import { getSectorZoneBoundingCenter } from '@/components/map/utils/coordinates'
@@ -53,7 +53,6 @@ function buildHubColorContext(): HubColorContext {
   }
 }
 const showHubAddMenu = ref(false)
-const calculationBaseline = ref<AutoGroupResult | null>(null)
 const virtualStationDragState = ref<{
   key: string
   payload: {
@@ -110,10 +109,6 @@ const sectorGraphInfo = computed(() => {
   )
 })
 
-function cloneAutoGroupResult(result: AutoGroupResult): AutoGroupResult {
-  return JSON.parse(JSON.stringify(result))
-}
-
 type RetainKey = 'connectionRetainEnabled' | 'coverageRetainEnabled' | 'tradeStationRetainEnabled'
 
 function getRetainSummary(groups: GroupDraftInfo[], key: RetainKey): { checked: boolean; indeterminate: boolean; defaultValue: boolean } {
@@ -161,8 +156,7 @@ function hasPendingBridgeDecisionInResult(result: AutoGroupResult | null): boole
 }
 
 function setAutoGroupResult(result: AutoGroupResult | null) {
-  autoGroupResult.value = result
-  calculationBaseline.value = result ? cloneAutoGroupResult(result) : null
+  liveStore.setAutoGroupResult(result)
   if (result && !calcBaselinePillState.value) {
     calcBaselinePillState.value = {
       coverageByGroupId: Object.fromEntries(
@@ -174,11 +168,12 @@ function setAutoGroupResult(result: AutoGroupResult | null) {
     }
   }
   applyTradeStationDefaultsToResult()
+  liveStore.captureCalculationBaseline()
 }
 
 function buildStoreGroups(groups: BindingSectorGroup[], playerSectorMacros: string[]): AutoGroupResult {
   const storeGroups: GroupDraftInfo[] = groups.map((g) => ({
-    id: g.id,
+    id: g.sectorMacro || '',
     name: g.sectorMacro ? getSectorDisplayName(g.sectorMacro) : g.name,
     sectorMacro: g.sectorMacro,
     jumpRange: g.jumpRange,
@@ -405,16 +400,13 @@ function handleSelectOption(sectorMacro: string, optionIndex: number) {
 }
 
 function handleCycleRecalcState(groupId: string) {
-  if (calculationMode.value !== 'edit') return
   if (!autoGroupResult.value) return
   const result = autoGroupResult.value
-  const groups = [...result.groups]
-  const idx = groups.findIndex((g) => g.id === groupId)
-  if (idx < 0) return
-  const group = groups[idx]!
+  const group = result.groups.find((g) => g.id === groupId)
+  if (!group) return
   if (group.enteredOtherGroupCoverage) return
-  groups[idx] = { ...group, isPinned: !group.isPinned }
-  autoGroupResult.value = { ...result, groups, assignments: result.assignments }
+  const { sectorGraph, sectorClusterMap } = sectorGraphInfo.value
+  autoGroupResult.value = setGroupPinnedInResult(result, groupId, !group.isPinned, sectorGraph, sectorClusterMap)
 }
 
 function handleUpdateJumpRange(groupId: string, range: number) {
@@ -635,7 +627,7 @@ function handleSelectBridgePlan(planId: string) {
   const result = autoGroupResult.value
   const plan = result.bridgePlans.find((p) => p.id === planId)
   if (!plan) return
-  setAutoGroupResult(applyBridgePlanToDraft(
+  autoGroupResult.value = applyBridgePlanToDraft(
     result,
     plan,
     prefJumpRange.value,
@@ -643,12 +635,11 @@ function handleSelectBridgePlan(planId: string) {
     sectorGraphInfo.value.sectorGraph,
     sectorGraphInfo.value.sectorClusterMap,
     bridgeSearchJumpRange.value
-  ))
+  )
 }
 
 function handleResetAssignments() {
-  if (!calculationBaseline.value) return
-  autoGroupResult.value = cloneAutoGroupResult(calculationBaseline.value)
+  liveStore.resetAutoGroupResultToBaseline()
 }
 
 function handleAddHubClick() {
@@ -695,7 +686,7 @@ function handleAddHubDraft(sectorMacro: string) {
   }
 
   const newGroup: GroupDraftInfo = {
-    id: `auto_${crypto.randomUUID()}`,
+    id: sectorMacro,
     name: getSectorDisplayName(sectorMacro),
     sectorMacro,
     jumpRange: prefJumpRange.value,
@@ -1042,28 +1033,109 @@ function hasVirtualStationDraftChanges(): boolean {
   return false
 }
 
+function logAutoSectorDirty(reason: string, detail: Record<string, unknown> = {}) {
+  console.log('[auto-sector-confirm][hasChanges]', reason, JSON.stringify(detail))
+}
+
 watch([autoGroupResult, activeBinding, virtualStationDrafts], () => {
   const result = autoGroupResult.value
   const binding = activeBinding.value
-  if (!result || !binding) { hasChanges.value = result !== null; return }
-  if (hasVirtualStationDraftChanges()) { hasChanges.value = true; return }
-  if (result.groups.length !== binding.groups.length) { hasChanges.value = true; return }
-  const bindingById = new Map(binding.groups.map((g) => [g.id, g]))
+  if (!result || !binding) {
+    hasChanges.value = result !== null
+    if (hasChanges.value) logAutoSectorDirty('missing-binding', { hasResult: !!result, hasBinding: !!binding })
+    return
+  }
+  if (hasVirtualStationDraftChanges()) {
+    logAutoSectorDirty('virtual-station-drafts-differ', {
+      bindingDrafts: binding.stationPlans.filter((plan) => plan.saveStationCode === undefined).map((plan) => ({
+        id: plan.id,
+        groupId: plan.groupId,
+        sectorMacro: plan.sectorMacro
+      })),
+      draftState: virtualStationDrafts.value.map((draft) => ({
+        id: draft.id,
+        groupId: draft.groupId,
+        sectorMacro: draft.sectorMacro
+      }))
+    })
+    hasChanges.value = true
+    return
+  }
+  if (result.groups.length !== binding.groups.length) {
+    logAutoSectorDirty('group-length-differ', {
+      resultGroupIds: result.groups.map((group) => group.id),
+      bindingGroupIds: binding.groups.map((group) => group.sectorMacro)
+    })
+    hasChanges.value = true
+    return
+  }
+  const bindingById = new Map(
+    binding.groups
+      .filter((g) => g.sectorMacro !== undefined)
+      .map((g) => [g.sectorMacro!, g])
+  )
   for (const g of result.groups) {
     const bg = bindingById.get(g.id)
-    if (!bg) { hasChanges.value = true; return }
-    if (g.jumpRange !== bg.jumpRange) { hasChanges.value = true; return }
-    if (g.color !== bg.color) { hasChanges.value = true; return }
+    if (!bg) {
+      logAutoSectorDirty('binding-group-missing', { groupId: g.id, groupName: g.name })
+      hasChanges.value = true
+      return
+    }
+    if (g.jumpRange !== bg.jumpRange) {
+      logAutoSectorDirty('jump-range-differ', { groupId: g.id, result: g.jumpRange, binding: bg.jumpRange })
+      hasChanges.value = true
+      return
+    }
+    if (g.color !== bg.color) {
+      logAutoSectorDirty('color-differ', { groupId: g.id, result: g.color, binding: bg.color })
+      hasChanges.value = true
+      return
+    }
     const bgCov = bg.coverageSectorMacros.map((c) => c.ref).sort()
     const gCov = [...g.coverageSectorMacros].sort()
-    if (gCov.length !== bgCov.length || gCov.some((m, i) => m !== bgCov[i])) { hasChanges.value = true; return }
+    if (gCov.length !== bgCov.length || gCov.some((m, i) => m !== bgCov[i])) {
+      logAutoSectorDirty('coverage-differ', { groupId: g.id, result: gCov, binding: bgCov })
+      hasChanges.value = true
+      return
+    }
     const bgConns = [...(bg.connectedGroupIds ?? [])].sort()
     const gConns = [...g.connectedGroupIds].sort()
-    if (gConns.length !== bgConns.length || gConns.some((c, i) => c !== bgConns[i])) { hasChanges.value = true; return }
-    const savedTS = bg.tradeStation?.saveStationCode ?? ''
-    const currentTS = g.selectedTradeStation?.stationCode ?? ''
-    if (savedTS !== currentTS) { hasChanges.value = true; return }
+    if (gConns.length !== bgConns.length || gConns.some((c, i) => c !== bgConns[i])) {
+      logAutoSectorDirty('connections-differ', { groupId: g.id, result: gConns, binding: bgConns })
+      hasChanges.value = true
+      return
+    }
+    const currentTradeStation = g.selectedTradeStation
+    if (!currentTradeStation) {
+      if (bg.tradeStation) {
+        logAutoSectorDirty('trade-station-differ', { groupId: g.id, result: null, binding: bg.tradeStation })
+        hasChanges.value = true
+        return
+      }
+    } else if (currentTradeStation.type === 'player') {
+      if (bg.tradeStation?.saveStationCode !== currentTradeStation.stationCode) {
+        logAutoSectorDirty('trade-station-player-differ', {
+          groupId: g.id,
+          result: currentTradeStation,
+          binding: bg.tradeStation
+        })
+        hasChanges.value = true
+        return
+      }
+    } else if (!bg.tradeStation || bg.tradeStation.saveStationCode !== undefined) {
+      logAutoSectorDirty('trade-station-virtual-differ', {
+        groupId: g.id,
+        result: currentTradeStation,
+        binding: bg.tradeStation
+      })
+      hasChanges.value = true
+      return
+    }
   }
+  logAutoSectorDirty('clean', {
+    groupCount: result.groups.length,
+    virtualDraftCount: virtualStationDrafts.value.length
+  })
   hasChanges.value = false
 }, { immediate: true })
 
@@ -1183,6 +1255,15 @@ function handleReorderGroups(nextGroups: GroupDraftInfo[]) {
 
 const showConfirmPopup = ref(false)
 
+function toConfirmedBaselineGroup(group: GroupDraftInfo): GroupDraftInfo {
+  return {
+    ...group,
+    baseline: true,
+    isNew: false,
+    isPinned: true
+  }
+}
+
 function handleConfirm() {
   if (!autoGroupResult.value) return false
   if (hasUnresolvedTradeStations.value) return false
@@ -1205,15 +1286,15 @@ function doConfirm() {
     for (const group of result.groups) {
       const sel = group.selectedTradeStation
       if (!sel) continue
-      const bindingGroup = activeBinding.groups.find((g) =>
-        g.id === group.id || (group.sectorMacro && g.sectorMacro === group.sectorMacro)
+    const bindingGroup = activeBinding.groups.find((g) =>
+        group.sectorMacro && g.sectorMacro === group.sectorMacro
       )
       if (!bindingGroup) continue
       if (sel.type === 'virtual') {
         const draftPosition = (group as GroupDraftInfo & { virtualTradeStationPosition?: { x: number; y: number; z: number } }).virtualTradeStationPosition
         saveBindingStore.upsertTradeStation({
           gameGuid: guid,
-          groupId: bindingGroup.id,
+          groupId: bindingGroup.sectorMacro || group.id,
           name: group.name,
           sectorMacro: group.sectorMacro,
           position: draftPosition ?? bindingGroup.tradeStation?.position
@@ -1223,7 +1304,7 @@ function doConfirm() {
         const station = archive?.sectors?.[group.sectorMacro!]?.player_stations?.[sel.stationCode]
         saveBindingStore.upsertTradeStation({
           gameGuid: guid,
-          groupId: bindingGroup.id,
+          groupId: bindingGroup.sectorMacro || group.id,
           saveStationCode: sel.stationCode,
           name: group.name,
           sectorMacro: group.sectorMacro,
@@ -1242,8 +1323,24 @@ function doConfirm() {
   liveStore.syncAllBindingStationsToStateMap()
   liveStore.syncLiveFlowMap()
   // Update baseline to confirmed state
-  const confirmedGroups = result.groups.map((g) => ({ ...g, baseline: true }))
-  autoGroupResult.value = { ...result, groups: confirmedGroups }
+  const confirmedGroups = result.groups.map(toConfirmedBaselineGroup)
+  console.log('[auto-sector-confirm][doConfirm]', 'after-save', JSON.stringify({
+    resultGroups: confirmedGroups.map((group) => ({
+      id: group.id,
+      name: group.name,
+      isNew: group.isNew,
+      baseline: group.baseline,
+      selectedTradeStation: group.selectedTradeStation
+    })),
+    bindingGroups: saveBindingStore.activeBinding?.groups.map((group) => ({
+      id: group.sectorMacro,
+      name: group.name,
+      tradeStation: group.tradeStation,
+      coverage: group.coverageSectorMacros.map((sector) => sector.ref),
+      connectedGroupIds: group.connectedGroupIds
+    })) ?? []
+  }))
+  liveStore.setAutoGroupResult({ ...result, groups: confirmedGroups })
   liveStore.calcBaselinePillState = {
     coverageByGroupId: Object.fromEntries(
       confirmedGroups.map((g) => [g.id, [...g.coverageSectorMacros]])
@@ -1335,17 +1432,6 @@ const canDisableNode = computed(() => {
   if (!autoGroupResult.value) return false
   return autoGroupResult.value.groups.some((g) => g.isPinned || g.baseline)
 })
-
-let baselineInitialized = false
-watch(autoGroupResult, (result) => {
-  if (baselineInitialized) return
-  if (result && result.groups.length > 0) {
-    calculationBaseline.value = cloneAutoGroupResult(result)
-    baselineInitialized = true
-  }
-})
-
-watch(activeBinding, () => { baselineInitialized = false })
 
 const bridgeRetainState = computed(() => getRetainSummary(autoGroupResult.value?.groups ?? [], 'connectionRetainEnabled'))
 const coverageRetainState = computed(() => getRetainSummary(autoGroupResult.value?.groups ?? [], 'coverageRetainEnabled'))

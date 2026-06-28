@@ -141,7 +141,7 @@ export function deriveBindingStationsFromRecords(
     const record = getStationRecordByCode(stationRecords, code)
     if (!record) return
     const plan = stationPlansByCode.get(code)
-    const groupId = plan?.groupId || findGroupBySectorMacro(groups, record.sectorMacro)?.id || null
+    const groupId = plan?.groupId || findGroupBySectorMacro(groups, record.sectorMacro)?.sectorMacro || null
     const station = toDerivedSaveStation(record.data as PlayerStationEntry, plan, record.sectorMacro, sectorsMap)
     station.sectorId = groupId
     result.push({

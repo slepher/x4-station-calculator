@@ -79,7 +79,7 @@ export function buildTransitHubsFromBinding(groups: BindingSectorGroup[]): Trans
   return groups
     .filter((g) => g.tradeStation)
     .map((g) => ({
-      groupId: g.id,
+      groupId: g.sectorMacro || '',
       groupName: g.name,
       tradeStation: g.tradeStation
     }))

@@ -33,7 +33,7 @@ const displayGroups = computed(() => {
   if (autoGroupResult.value) return autoGroupResult.value.groups
   const binding = saveBindingStore.activeBinding
   return (binding?.groups ?? []).map((g) => ({
-    id: g.id,
+    id: g.sectorMacro || '',
     name: g.name,
     sectorMacro: g.sectorMacro,
     jumpRange: g.jumpRange,

@@ -28,14 +28,14 @@ prefJumpRange: Ref<number>
 bridgeSearchJumpRange: Ref<number>
 prefThreshold: Ref<number>
 calcBaselinePillState: Ref<CalcBaselinePillState | null>
+calculationBaseline: Ref<CalculationBaseline | null>
 needsAutoGroupRecalc: Computed<boolean>
 virtualStationDrafts: Ref<BindingStationPlan[]>
 virtualStationDraftInitializedKey: Ref<string | null>
 ```
 
-Presenter 仍可持有 UI 辅助状态，但共享草案不得离开 live store。当前设计保留以下 presenter-local 状态：
+Presenter 仍可持有 UI 辅助状态，但共享草案和重置快照不得离开 live store。当前设计保留以下 presenter-local 状态：
 
-- `calculationBaseline`: 最近一次初始化或显式计算后的重置快照。
 - `nodeEnabled`: 下一次计算是否允许生成新 pure hub。
 - `showHubAddMenu`: 添加 hub 菜单显示状态。
 - `activeTab`: AutoSectorGroupPanel 内的 `hub | allocation | tradeStation` 当前页。
@@ -91,7 +91,7 @@ gameGuid:archiveTime
 
 更新时间点：
 
-1. `setAutoGroupResult(result)` 时克隆 `result` 与当前 `virtualStationDrafts` 写入。
+1. live store `setAutoGroupResult(result)` 时克隆 `result` 与当前 `virtualStationDrafts` 写入。
 2. Store 初始化或 active context 切换生成 result 后，经 `setAutoGroupResult()` 写入。
 3. 用户显式 [计算] / [快速计算] 生成 result 后，经 `setAutoGroupResult()` 写入。
 4. 确认成功后 SHOULD 更新为确认后的 result，避免 [重置] 回退到确认前。
@@ -99,7 +99,7 @@ gameGuid:archiveTime
 使用点：
 
 - [重置] 调用 `handleResetAssignments()`。
-- `handleResetAssignments()` 从 `calculationBaseline` clone 恢复 `autoGroupResult` 与 `virtualStationDrafts`。
+- `handleResetAssignments()` 通过 live store 从 `calculationBaseline` clone 恢复 `autoGroupResult` 与 `virtualStationDrafts`。
 - 该恢复不改变 active binding、selected archive 或 liveMode。
 
 ### calcBaselinePillState
@@ -117,6 +117,20 @@ gameGuid:archiveTime
 - `SectorGroupList` 的 `baselineCoverageByGroupId`。
 - `SectorGroupList` 的 `baselineConnectedGroupIdsByGroupId`。
 - 用于粗边框、removed pill 等“与初始/已确认基线比较”的展示。
+
+### SaveBinding Version 2 Group Identity
+
+`BindingSectorGroup` 不再持久化独立 `id` 字段。group 身份由定位星区 `sectorMacro` 决定。
+
+迁移规则：
+
+1. 读取旧版 state 时，建立旧 `group.id -> group.sectorMacro` 映射。
+2. 每个 group 输出时删除 `id` 字段，仅保留 `sectorMacro`。
+3. `connectedGroupIds` 中的旧 group id 替换为对应 `sectorMacro`。
+4. `stationPlans.groupId` 中的旧 group id 替换为对应 `sectorMacro`。
+5. 无 `sectorMacro` 的旧 group 不能形成定位星区组，迁移时不作为有效 group 输出。
+
+运行时 `GroupDraftInfo.id` 仍作为 UI/算法引用字段存在，但其值 SHALL 等于 group 的 `sectorMacro`，不得再使用随机 auto uuid。
 
 ### 不再使用 edit restore snapshot
 
@@ -191,6 +205,31 @@ Live sidebar 在固定菜单和动态星区/站点列表之间的分隔线区域
 | 重置 | 从 `calculationBaseline` 恢复 | 同 edit |
 | 提交 | 直接提交，不依赖当前模式 | 通过 gate 后提交 |
 
+### Pin / Unpin Draft Transform
+
+pin / unpin 是 shared draft 的即时变换，不是持久化提交动作，也不是 baseline 捕获动作。
+
+设计约束：
+
+1. `autoGroupResult.groups` 保留当前 hub/group card；unpin 不从当前 hub 列表删除 group。
+2. unpin 只将 group `isPinned=false`；pin 只将 group `isPinned=true`。
+3. unpin 为该 group 的 `sectorMacro` 新增/恢复 assignment，并默认选中 standalone option；pin 移除该 `sectorMacro` 对应 assignment。
+4. unpin 生成 assignment options 时复用标准 assignment 展示规则：当前范围内命中的 absorb 候选全部显示；无当前范围命中时只显示最小扩展候选；超过 `MAX_UNCERTAIN_JUMP` 的 absorb 候选不显示。
+5. pin / unpin 不修改 group 顺序、coverage、connections、trade station、virtual station draft 或其他 assignment 选择。
+6. `isPinned=false` 只影响下一次显式 [计算] 的 base input：`buildRecalculateBaseGroups()` SHALL 只读取 `isPinned=true` 的 groups。
+7. 用户在 assignment 中显式点击“独立成组”时，才调用既有 `applyStandaloneToResult()`，并保留它自动计算 coverage 与 derived candidates 的行为。
+8. pin / unpin 入口只属于 hub/group card；assignment card 不显示 pin / unpin 按钮。
+9. result/edit 模式的 hub/group card 都显示 pin / unpin 按钮；result 模式不得隐藏该按钮。
+10. pin / unpin 可以在 result/edit 模式触发，但都只写 live store 的 shared draft，不直接写 `saveBindingStore`。
+11. 单纯 pin / unpin 不改变可持久化字段时，dirty comparison 应将其视为 `hasChanges=false`。
+12. absorb 一个 sector 到其他 group 时，如果该 sector 同时存在自身 hub group，则删除所有同 `sectorMacro` 的自身 hub group，清理其他 group 的 `connectedGroupIds` 和 assignment options 中指向被删除 group 的引用。
+
+实现边界：
+
+- store/logic 层提供纯 result transform，负责保持 `groups`、`assignments`、connections 与 options 的一致性。
+- presenter 只负责响应 UI action、取得 `sectorGraphInfo` 并写回 live store shared draft。
+- Vue 组件只从 hub/group card 发出 pin / unpin action，不直接拼装 assignment 或修改 store。
+
 ### SectorGroupStatBar
 
 | 按钮/控件 | 行为 |
@@ -212,6 +251,12 @@ Live sidebar 在固定菜单和动态星区/站点列表之间的分隔线区域
 - uncertain assignment 未解决且 popup 未打开：打开二次确认 popup，返回 `false`。
 - 二次确认后或无 uncertain assignment：执行 `doConfirm()`，返回 `true`。
 
+二次确认 popup：
+
+- 使用 `AutoSectorGroupPanel` 本地样式或共享按钮样式定义主次按钮，不依赖其他 SFC 的 scoped class。
+- [取消] 关闭 popup 并保持 `showConfirmPopup=false`。
+- [确定] 关闭 popup 后继续 `doConfirm()`。
+
 确认成功后：
 
 1. 写入 groups、coverage、connections、colors、trade station。
@@ -225,10 +270,13 @@ Live sidebar 在固定菜单和动态星区/站点列表之间的分隔线区域
 5. 写入 `appliedAutoGroupArchiveTime`。
 6. 保存 binding。
 7. 同步 live flow。
-8. 将 result groups 标记为 baseline。
+8. 将 result groups 规范化为保存后的 baseline UI 状态：`baseline=true`，清理 `isNew`、新增高亮和跨覆盖临时提示，保留用户确认后的顺序和字段。
 9. 更新 `calcBaselinePillState`。
 10. 更新 `calculationBaseline` 为确认后的 autoGroupResult 与 virtual station drafts。
-11. 确认成功后确认按钮置灰，不跳转。
+11. 重新计算 dirty 状态；若 draft 与 binding 一致，`hasChanges=false`。
+12. 确认成功后确认按钮置灰，不跳转。
+
+`hasChanges` 只表示 shared draft 相对已保存 binding 是否有未保存修改。uncertain assignment、未分配提示和二次确认 gate 不得在确认成功后单独让 `hasChanges=true`。
 
 ### Tab 自动切换
 

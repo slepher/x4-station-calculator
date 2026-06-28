@@ -337,7 +337,7 @@ function onAnchorPillClick(macro: string) {
           <span class="retain-label">{{ t('sector.trade_station_short') }}</span>
         </label>
         <button
-          v-if="props.editable && !group.enteredOtherGroupCoverage"
+          v-if="!group.enteredOtherGroupCoverage"
           class="action-btn state-btn"
           :class="group.isPinned ? 'state-btn--pinned' : 'state-btn--unpinned'"
           :title="getPinnedTitle(group)"

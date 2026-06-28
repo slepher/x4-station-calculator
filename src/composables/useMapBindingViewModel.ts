@@ -217,7 +217,7 @@ export function useMapBindingViewModel(): MapBindingViewModel {
     return sectors.map((group) => {
       const rawBinding = bindingKey
         ? {
-            sectorGroupId: group.id,
+            sectorGroupId: group.sectorMacro || '',
             sectorMacro: group.sectorMacro,
             jumpRange: group.jumpRange,
             coverageSectorMacros: group.coverageSectorMacros,

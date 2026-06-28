@@ -414,6 +414,74 @@ test.describe('3 计算、重置与确认', () => {
     const workbench = await page.evaluate(() => (window as any).activeViewStore?.activeBindingWorkbench)
     expect(workbench).toBe('auto-sector-group')
   })
+
+  test('3.6 二次确认保存后进入已保存 UI 状态', async ({ page }) => {
+    page.on('console', (msg) => {
+      const text = msg.text()
+      if (text.includes('[auto-sector-confirm]')) console.log(text)
+    })
+
+    await enterAutoSectorGroup(page)
+
+    await page.evaluate(() => {
+      const w = window as any
+      const result = w.liveStore?.autoGroupResult
+      if (!result?.groups?.length) throw new Error('autoGroupResult is required')
+      const groups = result.groups.map((group: any, index: number) => ({
+        ...group,
+        isNew: index === 0 ? true : group.isNew,
+        color: index === 0 ? '#22c55e' : group.color,
+        selectedTradeStation: group.selectedTradeStation ?? { type: 'virtual', stationCode: '__virtual__' }
+      }))
+      const first = groups[0]
+      const sectorMacro = first.coverageSectorMacros.find((macro: string) => macro !== first.sectorMacro) ?? first.sectorMacro
+      w.liveStore.autoGroupResult = {
+        ...result,
+        groups,
+        assignments: [{
+          sectorMacro,
+          status: 'uncertain_tie',
+          displayBucket: 'unresolved',
+          selectedOptionIndex: null,
+          options: [{
+            type: 'absorb',
+            targetGroupId: first.id,
+            distance: 1,
+            extendsRange: false,
+            resultingGroupSize: first.coverageSectorMacros.length
+          }]
+        }]
+      }
+    })
+    await page.waitForTimeout(300)
+
+    const topConfirm = page.locator('.auto-sector-bar .confirm-btn').first()
+    await expect(topConfirm).toBeEnabled()
+    await expect(page.locator('.group-item--new').first()).toBeVisible()
+
+    await topConfirm.click()
+    const popup = page.locator('.confirm-popup')
+    await expect(popup).toBeVisible()
+    await expect(popup.locator('.confirm-popup-button--secondary')).toBeVisible()
+    await expect(popup.locator('.confirm-popup-button--primary')).toBeVisible()
+
+    await popup.locator('.confirm-popup-button--primary').click()
+    await expect(popup).toHaveCount(0)
+    await expect(topConfirm).toBeDisabled()
+    await expect(page.locator('.group-item--new')).toHaveCount(0)
+
+    const postConfirmState = await page.evaluate(() => {
+      const w = window as any
+      return {
+        workbench: w.activeViewStore?.activeBindingWorkbench,
+        hasTransientNew: w.liveStore?.autoGroupResult?.groups?.some((group: any) => group.isNew) ?? true,
+        hasPillBaseline: !!w.liveStore?.calcBaselinePillState
+      }
+    })
+    expect(postConfirmState.workbench).toBe('auto-sector-group')
+    expect(postConfirmState.hasTransientNew).toBe(false)
+    expect(postConfirmState.hasPillBaseline).toBe(true)
+  })
 })
 
 // ================================================================
@@ -620,7 +688,7 @@ test.describe('5 回归风险', () => {
       const binding = (window as any).saveBindingStore?.activeBinding
       if (!result || !binding) return false
       if (result.groups.length !== binding.groups.length) return false
-      const bindingById = new Map(binding.groups.map((g: any) => [g.id, g]))
+      const bindingById = new Map(binding.groups.map((g: any) => [g.sectorMacro, g]))
       for (const g of result.groups) {
         const bg = bindingById.get(g.id)
         if (!bg) return false
@@ -637,7 +705,7 @@ test.describe('5 回归风险', () => {
       const result = (window as any).liveStore?.autoGroupResult
       const binding = (window as any).saveBindingStore?.activeBinding
       if (!result || !binding) return false
-      const bindingById = new Map(binding.groups.map((g: any) => [g.id, g]))
+      const bindingById = new Map(binding.groups.map((g: any) => [g.sectorMacro, g]))
       for (const g of result.groups) {
         const bg = bindingById.get(g.id)
         if (!bg) return false
@@ -648,5 +716,11 @@ test.describe('5 回归风险', () => {
       return true
     })
     expect(connectionsMatch).toBe(true)
+
+    const noPersistedGroupIds = await page.evaluate(() => {
+      const binding = (window as any).saveBindingStore?.activeBinding
+      return !!binding && binding.groups.every((g: any) => !Object.prototype.hasOwnProperty.call(g, 'id'))
+    })
+    expect(noPersistedGroupIds).toBe(true)
   })
 })

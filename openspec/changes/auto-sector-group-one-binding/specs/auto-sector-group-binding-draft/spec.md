@@ -20,6 +20,7 @@
   - `prefJumpRange: Ref<number>`
   - `bridgeSearchJumpRange: Ref<number>`
   - `prefThreshold: Ref<number>`
+  - `calculationBaseline: Ref<CalculationBaseline | null>`
   - `needsAutoGroupRecalc: Computed<boolean>`
   - `virtualStationDrafts: Ref<BindingStationPlan[]>`
   - `virtualStationDraftInitializedKey: Ref<string | null>`
@@ -437,9 +438,18 @@ Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触�
 #### Scenario: Calculation baseline timing
 
 - **前提** 系统通过初始化或显式计算得到新的 `AutoGroupResult`
-- **当** 系统调用 `setAutoGroupResult(result)`
+- **当** 系统调用 live store `setAutoGroupResult(result)`
 - **那么** SHALL clone `result` 写入 `calculationBaseline`
 - **并且** [重置] SHALL 使用该 baseline 恢复 shared draft
+
+#### Scenario: Pin and unpin do not capture baseline
+
+- **前提** 当前 shared draft 已存在 `calculationBaseline`
+- **当** 用户对 hub 执行 pin 或 unpin
+- **那么** 系统 SHALL 修改当前 shared draft
+- **并且** SHALL NOT 更新 `calculationBaseline`
+- **当** 用户随后点击「重置」
+- **那么** 系统 SHALL 恢复到 pin / unpin 之前最近一次 baseline 对应的 shared draft
 
 #### Scenario: Pill baseline timing
 
@@ -450,9 +460,128 @@ Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触�
 - **当** 用户确认成功
 - **那么** 系统 SHALL 使用确认后的 groups 更新 `calcBaselinePillState`
 
+#### Scenario: Post-confirm saved UI state
+
+- **前提** 当前 result 中仍存在 uncertain assignment
+- **并且** trade station gate 已通过
+- **当** 用户点击「确定」并在二次确认 popup 中再次点击「确定」
+- **那么** 系统 SHALL 保存当前 draft
+- **并且** `hasChanges` SHALL 变为 false
+- **并且** 顶部「确定」按钮 SHALL 置灰/禁用
+- **并且** 当前页面 SHALL 继续停留在星区编辑页面
+- **并且** result groups SHALL 清理 `isNew` 等仅表示未保存新增的 transient 高亮标记
+- **并且** `calcBaselinePillState` SHALL 更新为确认后的 groups，coverage/connected pill SHALL NOT 继续显示相对确认前的差异高亮
+- **并且** uncertain assignment 提示 MAY 继续显示，但 SHALL NOT 被解释为未保存改动
+
+#### Scenario: Styled secondary confirm dialog
+
+- **前提** 当前 result 中仍存在 uncertain assignment
+- **并且** trade station gate 已通过
+- **当** 用户第一次点击「确定」
+- **那么** 系统 SHALL 展示二次确认 popup
+- **并且** popup SHALL 使用应用内弹窗面板、遮罩、主按钮和次按钮样式
+- **并且** popup SHALL NOT 使用无修饰纯文本按钮
+- **当** 用户点击 popup「取消」
+- **那么** 系统 SHALL 只关闭 popup，不修改 draft、binding 或 baseline
+
+### Requirement: Pin Unpin Group Card State
+
+系统 SHALL 将 pin / unpin 作为 hub/group card 上的 shared draft 状态变换处理。unpin 后 card SHALL 保留在当前 hub 列表中；`isPinned=false` 只影响下一次显式计算是否作为 pinned base input。
+
+#### Scenario: Unpin keeps hub card and toggles pinned state
+
+- **前提** 当前 `autoGroupResult.groups` 中存在 hub group `G`
+- **并且** `G.sectorMacro=S`
+- **当** 用户对 `G` 执行 unpin
+- **那么** `autoGroupResult.groups` SHALL 继续包含 `G`
+- **并且** `G.isPinned` SHALL 变为 `false`
+- **并且** `autoGroupResult.assignments` SHALL 包含 `sectorMacro=S` 的 assignment
+- **并且** 该 assignment SHALL 默认选中 standalone option
+- **并且** 该 assignment 的 absorb options SHALL 复用标准 assignment 展示规则，当前范围内命中的 absorb 候选 SHALL 全部显示
+- **并且** 无当前范围命中时 SHALL 只显示最小扩展候选
+- **并且** 超过最大不确定扩展跳数的 absorb option SHALL NOT 显示
+- **并且** 系统 SHALL NOT 调用 standalone coverage 计算
+- **并且** 系统 SHALL NOT 修改 group 顺序、coverage、connections、trade station、virtual station draft 或其他 assignment 选择
+
+#### Scenario: Pin removes hub assignment
+
+- **前提** 当前 `autoGroupResult.groups` 中存在 hub group `G`
+- **并且** `G.sectorMacro=S`
+- **并且** `G.isPinned=false`
+- **并且** `autoGroupResult.assignments` 中存在 `sectorMacro=S` 的 assignment
+- **当** 用户对 `G` 执行 pin
+- **那么** `autoGroupResult.groups` SHALL 继续包含 `G`
+- **并且** `G.isPinned` SHALL 变为 `true`
+- **并且** `autoGroupResult.assignments` SHALL NOT 包含 `sectorMacro=S` 的 assignment
+- **并且** 系统 SHALL NOT 修改 group 顺序、coverage、connections、trade station、virtual station draft 或其他 assignment 选择
+
+#### Scenario: Pinned base input excludes unpinned groups
+
+- **前提** 当前 `autoGroupResult.groups` 中存在 `isPinned=false` 的 group `G`
+- **当** 用户点击显式「计算」或「快速计算」
+- **那么** `buildRecalculateBaseGroups()` SHALL NOT 将 `G` 输出到 pinned base groups
+- **并且** 下一次计算 SHALL NOT 把 `G` 作为固定 hub 输入
+
+#### Scenario: Pin unpin button is a group card action
+
+- **前提** 当前页面处于 result 模式或 edit 模式
+- **当** 系统渲染 hub/group card
+- **那么** card SHALL 显示 pin / unpin 按钮
+- **并且** result 模式 SHALL NOT 隐藏该按钮
+- **并且** assignment card SHALL NOT 显示 pin / unpin 按钮
+
+#### Scenario: Pure pin unpin is not dirty
+
+- **前提** 当前 draft 与已保存 binding 在可持久化字段上一致
+- **当** 用户只执行 pin 或 unpin，且未进一步选择 absorb 或显式 standalone
+- **那么** `hasChanges` SHALL 保持 false
+- **并且** 顶部「确定」按钮 SHALL 保持置灰/禁用
+
+#### Scenario: Explicit standalone keeps existing standalone behavior
+
+- **前提** sector `S` 出现在 assignment 列表中
+- **当** 用户显式选择「独立成组」
+- **那么** 系统 SHALL 使用既有 standalone 逻辑创建 `S` 的 hub group
+- **并且** SHALL 按 `prefJumpRange` 计算 coverage 并排除已占用 sector
+- **并且** SHALL 允许向邻近 assignment 追加 derived absorb candidates
+- **并且** 若新候选是更优选择，邻近 sector MAY 被该 standalone hub 吸收到 coverage
+
+#### Scenario: Absorb removes own hub by sector macro
+
+- **前提** sector `S` 出现在 assignment 列表中
+- **并且** 当前 result 中存在一个或多个 `sectorMacro=S` 的 hub group
+- **当** 用户选择将 `S` absorb 到目标 group `T`
+- **那么** 系统 SHALL 删除所有 `sectorMacro=S` 的自身 hub group
+- **并且** SHALL 清理其他 group 中指向被删除 group 的 `connectedGroupIds`
+- **并且** SHALL 清理 assignment options 中指向被删除 group 的引用
+- **并且** SHALL 将 `S` 加入目标 group `T` 的 coverage
+- **并且** 被删除自身 hub 的 trade station SHALL 被丢弃，不转移到 `T`
+
 #### Scenario: No edit restore snapshot
 
 - **前提** 用户进入 edit 模式并修改 draft
 - **当** 用户点击「退出」
 - **那么** 系统 SHALL 保留当前 shared draft
 - **并且** SHALL NOT 恢复进入 edit 前的 coverage、connection、assignment、trade station 或 color
+
+### Requirement: Save Binding Group Identity Migration
+
+Save binding state SHALL use version 2 for sector group identity based on hub `sectorMacro`.
+
+#### Scenario: Migrate legacy group ids to sector macros
+
+- **前提** localStorage 中存在 version 1 save binding state
+- **并且** groups 中存在旧 `id` 字段
+- **当** 系统 normalize save binding state
+- **那么** 输出 state version SHALL 为 2
+- **并且** 每个有效 group SHALL NOT 包含持久化 `id` 字段
+- **并且** group identity SHALL be represented by `sectorMacro`
+- **并且** `connectedGroupIds` 中旧 group id SHALL 被替换为对应 group 的 `sectorMacro`
+- **并且** `stationPlans.groupId` 中旧 group id SHALL 被替换为对应 group 的 `sectorMacro`
+
+#### Scenario: Runtime draft ids use sector macro
+
+- **前提** 系统从 binding 或自动分组结果生成 `GroupDraftInfo`
+- **当** group 存在定位星区 `sectorMacro`
+- **那么** runtime `GroupDraftInfo.id` SHALL 等于该 `sectorMacro`
+- **并且** 系统 SHALL NOT 为该 group 生成随机 auto uuid 作为身份

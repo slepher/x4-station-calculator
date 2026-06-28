@@ -22,7 +22,7 @@ import type {
   X4MapSector
 } from '@/types/x4'
 
-const CURRENT_SAVE_BINDING_VERSION = 1
+const CURRENT_SAVE_BINDING_VERSION = 2
 
 function deepClone<T>(value: T): T {
   return JSON.parse(JSON.stringify(value))
@@ -51,15 +51,71 @@ function createDefaultBinding(gameGuid: string): SaveBindingPlan {
   }
 }
 
-function createDefaultGroup(name: string, order: number): BindingSectorGroup {
+function getGroupKey(group: Pick<BindingSectorGroup, 'sectorMacro'>): string {
+  return group.sectorMacro || ''
+}
+
+function createDefaultGroup(name: string, order: number, sectorMacro?: string): BindingSectorGroup {
   return {
-    id: crypto.randomUUID(),
     name: name || `Sector ${order + 1}`,
     order,
+    sectorMacro,
     jumpRange: 3,
     coverageSectorMacros: [],
     connectedGroupIds: []
   }
+}
+
+function normalizeGroupRefsToSectorMacros(
+  rawGroups: Array<Partial<BindingSectorGroup> & { id?: string }>,
+  rawStationPlans: unknown[]
+): { groups: BindingSectorGroup[]; stationPlans: BindingStationPlan[] } {
+  const oldIdToSectorMacro = new Map<string, string>()
+  for (const group of rawGroups) {
+    if (typeof group.id === 'string' && typeof group.sectorMacro === 'string' && group.sectorMacro.length > 0) {
+      oldIdToSectorMacro.set(group.id, group.sectorMacro)
+    }
+  }
+
+  const groups = rawGroups
+    .filter((group) => typeof group.sectorMacro === 'string' && group.sectorMacro.length > 0)
+    .map((group, index) => ({
+      name: group.name || `Sector ${index + 1}`,
+      order: Number.isFinite(Number(group.order)) ? Number(group.order) : index,
+      sectorMacro: group.sectorMacro,
+      jumpRange: Number.isFinite(Number(group.jumpRange)) ? Number(group.jumpRange) : 3,
+      coverageSectorMacros: Array.isArray(group.coverageSectorMacros) ? group.coverageSectorMacros : [],
+      connectedGroupIds: Array.isArray(group.connectedGroupIds)
+        ? group.connectedGroupIds
+            .map((id) => oldIdToSectorMacro.get(id) || id)
+            .filter((id): id is string => typeof id === 'string' && id.length > 0)
+        : [],
+      tradeStation: normalizeTradeStation(group.tradeStation),
+      color: group.color as string | undefined
+    }))
+
+  const validGroupKeys = new Set(groups.map((group) => getGroupKey(group)))
+  const stationPlans: BindingStationPlan[] = rawStationPlans
+    .filter((plan): plan is Record<string, unknown> => typeof plan === 'object' && plan !== null)
+    .map((plan) => {
+      const rawGroupId = plan.groupId as string | null | undefined
+      const migratedGroupId = rawGroupId ? (oldIdToSectorMacro.get(rawGroupId) || rawGroupId) : rawGroupId
+      return {
+        id: (plan.id as string) || crypto.randomUUID(),
+        saveStationCode: plan.saveStationCode as string | undefined,
+        groupId: migratedGroupId && validGroupKeys.has(migratedGroupId) ? migratedGroupId : null,
+        name: (plan.name as string) || (plan.saveStationCode ? String(plan.saveStationCode) : 'Virtual Station'),
+        type: (plan.type as StationType) || 'industrial',
+        modules: Array.isArray(plan.modules) ? plan.modules : [],
+        settings: { ...DEFAULT_STATION_SETTINGS, ...(plan.settings as Partial<StationSettings> || {}) },
+        lockedWares: Array.isArray(plan.lockedWares) ? deepClone(plan.lockedWares as string[]) : [],
+        warePriority: (plan.warePriority && typeof plan.warePriority === 'object') ? deepClone(plan.warePriority as Record<string, number>) : {},
+        sectorMacro: plan.sectorMacro as string | undefined,
+        position: plan.position as { x: number; y: number; z: number } | undefined
+      }
+    })
+
+  return { groups, stationPlans }
 }
 
 function normalizeTradeStation(input: unknown): TradeStationBinding | undefined {
@@ -80,34 +136,9 @@ function normalizeState(input: Partial<SavedSaveBindingsState> | null | undefine
     ? input.list
         .filter((item): item is SaveBindingPlan => !!item && typeof item.gameGuid === 'string' && item.gameGuid.length > 0)
         .map((item) => {
-          const groups = Array.isArray(item.groups) ? item.groups.map((group, index) => ({
-            id: group.id || crypto.randomUUID(),
-            name: group.name || `Sector ${index + 1}`,
-            order: Number.isFinite(Number(group.order)) ? Number(group.order) : index,
-            sectorMacro: group.sectorMacro,
-            jumpRange: Number.isFinite(Number(group.jumpRange)) ? Number(group.jumpRange) : 3,
-            coverageSectorMacros: Array.isArray(group.coverageSectorMacros) ? group.coverageSectorMacros : [],
-            connectedGroupIds: Array.isArray(group.connectedGroupIds) ? group.connectedGroupIds : [],
-            tradeStation: normalizeTradeStation(group.tradeStation),
-            color: group.color as string | undefined
-          })) : []
-
+          const rawGroups = Array.isArray(item.groups) ? item.groups as Array<Partial<BindingSectorGroup> & { id?: string }> : []
           const rawStationPlans = Array.isArray((item as any).stationPlans) ? (item as any).stationPlans as unknown[] : []
-          const normalizedStationPlans: BindingStationPlan[] = rawStationPlans
-            .filter((plan): plan is Record<string, unknown> => typeof plan === 'object' && plan !== null)
-            .map((plan) => ({
-              id: (plan.id as string) || crypto.randomUUID(),
-              saveStationCode: plan.saveStationCode as string | undefined,
-              groupId: plan.groupId as string | null | undefined,
-              name: (plan.name as string) || (plan.saveStationCode ? String(plan.saveStationCode) : 'Virtual Station'),
-              type: (plan.type as StationType) || 'industrial',
-              modules: Array.isArray(plan.modules) ? plan.modules : [],
-              settings: { ...DEFAULT_STATION_SETTINGS, ...(plan.settings as Partial<StationSettings> || {}) },
-              lockedWares: Array.isArray(plan.lockedWares) ? deepClone(plan.lockedWares as string[]) : [],
-              warePriority: (plan.warePriority && typeof plan.warePriority === 'object') ? deepClone(plan.warePriority as Record<string, number>) : {},
-              sectorMacro: plan.sectorMacro as string | undefined,
-              position: plan.position as { x: number; y: number; z: number } | undefined
-            }))
+          const { groups, stationPlans } = normalizeGroupRefsToSectorMacros(rawGroups, rawStationPlans)
 
           return {
             gameGuid: item.gameGuid,
@@ -116,7 +147,7 @@ function normalizeState(input: Partial<SavedSaveBindingsState> | null | undefine
             appliedAutoGroupArchiveTime: item.appliedAutoGroupArchiveTime as number | undefined,
             blueprintEmpireId: item.blueprintEmpireId,
             groups,
-            stationPlans: normalizedStationPlans,
+            stationPlans,
             prefJumpRange: item.prefJumpRange,
             bridgeSearchJumpRange: item.bridgeSearchJumpRange,
             prefThreshold: item.prefThreshold,
@@ -338,7 +369,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
   function updateGroup(gameGuid: string, groupId: string, patch: Partial<BindingSectorGroup>) {
     if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) loadDraftForGameGuid(gameGuid)
     if (!draftBinding.value) return false
-    const group = draftBinding.value.groups.find((item) => item.id === groupId)
+    const group = draftBinding.value.groups.find((item) => getGroupKey(item) === groupId)
     if (!group) return false
     Object.assign(group, patch)
     draftBinding.value.updatedAt = Date.now()
@@ -349,7 +380,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) loadDraftForGameGuid(gameGuid)
     if (!draftBinding.value) return false
     const before = draftBinding.value.groups.length
-    draftBinding.value.groups = draftBinding.value.groups.filter((item) => item.id !== groupId)
+    draftBinding.value.groups = draftBinding.value.groups.filter((item) => getGroupKey(item) !== groupId)
     draftBinding.value.groups.forEach((group, order) => { group.order = order })
     draftBinding.value.groups.forEach((group) => {
       group.connectedGroupIds = (group.connectedGroupIds || []).filter((id) => id !== groupId)
@@ -371,7 +402,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     if (!draftBinding.value || draftBinding.value.gameGuid !== input.gameGuid) loadDraftForGameGuid(input.gameGuid)
     if (!draftBinding.value) return
     
-    const group = draftBinding.value.groups.find((item) => item.id === input.sectorGroupId)
+    const group = draftBinding.value.groups.find((item) => getGroupKey(item) === input.sectorGroupId)
     if (!group) return
     
     updateGroup(input.gameGuid, input.sectorGroupId, {
@@ -400,8 +431,8 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
   function setGroupConnection(gameGuid: string, sourceGroupId: string, targetGroupId: string, connected: boolean) {
     if (sourceGroupId === targetGroupId) return
     if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) loadDraftForGameGuid(gameGuid)
-    const source = draftBinding.value?.groups.find((item) => item.id === sourceGroupId)
-    const target = draftBinding.value?.groups.find((item) => item.id === targetGroupId)
+    const source = draftBinding.value?.groups.find((item) => getGroupKey(item) === sourceGroupId)
+    const target = draftBinding.value?.groups.find((item) => getGroupKey(item) === targetGroupId)
     if (!source || !target) return
     const sourceSet = new Set(source.connectedGroupIds || [])
     const targetSet = new Set(target.connectedGroupIds || [])
@@ -515,7 +546,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
   }): TradeStationBinding | null {
     if (!draftBinding.value || draftBinding.value.gameGuid !== input.gameGuid) loadDraftForGameGuid(input.gameGuid)
     if (!draftBinding.value) return null
-    const group = draftBinding.value.groups.find((item) => item.id === input.groupId)
+    const group = draftBinding.value.groups.find((item) => getGroupKey(item) === input.groupId)
     if (!group) return null
 
     let ts = group.tradeStation
@@ -529,7 +560,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
       }
       group.tradeStation = ts
     } else {
-      ts.saveStationCode = input.saveStationCode ?? ts.saveStationCode
+      ts.saveStationCode = input.saveStationCode
       ts.name = input.name ?? ts.name
       if (input.sectorMacro !== undefined) ts.sectorMacro = input.sectorMacro
       if (input.position !== undefined) ts.position = input.position
@@ -537,7 +568,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     // Remove same station from other groups
     if (input.saveStationCode) {
       for (const other of draftBinding.value.groups) {
-        if (other.id !== group.id && other.tradeStation?.saveStationCode === input.saveStationCode) {
+        if (getGroupKey(other) !== getGroupKey(group) && other.tradeStation?.saveStationCode === input.saveStationCode) {
           other.tradeStation = undefined
         }
       }
@@ -549,7 +580,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
   function deleteTradeStation(gameGuid: string, groupId: string) {
     if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) loadDraftForGameGuid(gameGuid)
     if (!draftBinding.value) return false
-    const group = draftBinding.value.groups.find((item) => item.id === groupId)
+    const group = draftBinding.value.groups.find((item) => getGroupKey(item) === groupId)
     if (!group?.tradeStation) return false
     group.tradeStation = undefined
     draftBinding.value.updatedAt = Date.now()
@@ -564,7 +595,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
   }) {
     if (!draftBinding.value || draftBinding.value.gameGuid !== input.gameGuid) loadDraftForGameGuid(input.gameGuid)
     if (!draftBinding.value) return false
-    const group = draftBinding.value.groups.find((item) => item.id === input.groupId)
+    const group = draftBinding.value.groups.find((item) => getGroupKey(item) === input.groupId)
     if (!group?.tradeStation) return false
     group.tradeStation.sectorMacro = input.sectorMacro
     group.tradeStation.position = input.position
@@ -575,7 +606,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
   function unbindTradeStation(gameGuid: string, groupId: string) {
     if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) loadDraftForGameGuid(gameGuid)
     if (!draftBinding.value) return false
-    const group = draftBinding.value.groups.find((item) => item.id === groupId)
+    const group = draftBinding.value.groups.find((item) => getGroupKey(item) === groupId)
     if (!group?.tradeStation) return false
     
     // Clear saveStationCode and reset position to sector center
@@ -669,93 +700,77 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     if (bridgeSearchJumpRange !== undefined) draftBinding.value.bridgeSearchJumpRange = bridgeSearchJumpRange
     if (prefThreshold !== undefined) draftBinding.value.prefThreshold = prefThreshold
 
-    const existingIds = new Set(draftBinding.value.groups.map((g) => g.id))
-    // Also map by sectorMacro for matching standalone groups that changed UUID
-    const existingBySector = new Map<string, string>()
-    for (const g of draftBinding.value.groups) {
-      if (g.sectorMacro) existingBySector.set(g.sectorMacro, g.id)
-    }
+    const existingIds = new Set(draftBinding.value.groups.map((g) => getGroupKey(g)).filter((id) => id.length > 0))
     const createdIds = new Set<string>()
     const targetIdsInDraftOrder: string[] = []
 
     for (const draft of drafts) {
-      // Match by UUID first, then by sectorMacro
-      let targetId = existingIds.has(draft.id) ? draft.id : undefined
-      if (!targetId && draft.sectorMacro) {
-        targetId = existingBySector.get(draft.sectorMacro)
-      }
+      if (!draft.sectorMacro) continue
+      const draftKey = draft.sectorMacro
+      const targetId = existingIds.has(draftKey) ? draftKey : undefined
       if (targetId) {
         // Clear old connections before re-syncing from draft
-        const bindingGroup = draftBinding.value!.groups.find((g) => g.id === targetId)!
+        const bindingGroup = draftBinding.value!.groups.find((g) => getGroupKey(g) === targetId)!
         bindingGroup.connectedGroupIds = []
         updateGroup(gameGuid, targetId, {
+          name: draft.name,
+          sectorMacro: draft.sectorMacro,
           jumpRange: draft.jumpRange,
           color: draft.color
         })
-        if (draft.sectorMacro) {
-          const entries = buildCoverageEntries(
-            draft.sectorMacro,
-            draft.coverageSectorMacros,
-            sectorGraph,
-            sectorClusterMap
-          )
-          bindSectorGroup({
-            gameGuid,
-            sectorGroupId: targetId,
-            sectorMacro: draft.sectorMacro,
-            jumpRange: draft.jumpRange,
-            coverageSectorMacros: entries
-          })
-        }
+        const entries = buildCoverageEntries(
+          draft.sectorMacro,
+          draft.coverageSectorMacros,
+          sectorGraph,
+          sectorClusterMap
+        )
+        bindSectorGroup({
+          gameGuid,
+          sectorGroupId: targetId,
+          sectorMacro: draft.sectorMacro,
+          jumpRange: draft.jumpRange,
+          coverageSectorMacros: entries
+        })
         createdIds.add(targetId)
         targetIdsInDraftOrder.push(targetId)
       } else {
-        // Use draft UUID directly so connectedGroupIds don't need translation
-        const group = createDefaultGroup(draft.name, draftBinding.value!.groups.length)
-        group.id = draft.id
+        const group = createDefaultGroup(draft.name, draftBinding.value!.groups.length, draft.sectorMacro)
         group.color = draft.color
         draftBinding.value!.groups.push(group)
-        createdIds.add(group.id)
-        targetIdsInDraftOrder.push(group.id)
+        createdIds.add(draftKey)
+        targetIdsInDraftOrder.push(draftKey)
 
-        if (draft.sectorMacro) {
-          const entries = buildCoverageEntries(
-            draft.sectorMacro,
-            draft.coverageSectorMacros,
-            sectorGraph,
-            sectorClusterMap
-          )
-          bindSectorGroup({
-            gameGuid,
-            sectorGroupId: group.id,
-            sectorMacro: draft.sectorMacro,
-            jumpRange: draft.jumpRange,
-            coverageSectorMacros: entries
-          })
-        }
-
-        if (draft.connectedGroupIds.length > 0) {
-          for (const targetId of draft.connectedGroupIds) {
-            if (createdIds.has(targetId) || existingIds.has(targetId)) {
-              setGroupConnection(gameGuid, group.id, targetId, true)
-            }
-          }
-        }
+        const entries = buildCoverageEntries(
+          draft.sectorMacro,
+          draft.coverageSectorMacros,
+          sectorGraph,
+          sectorClusterMap
+        )
+        bindSectorGroup({
+          gameGuid,
+          sectorGroupId: draftKey,
+          sectorMacro: draft.sectorMacro,
+          jumpRange: draft.jumpRange,
+          coverageSectorMacros: entries
+        })
       }
     }
 
+    const draftIdToSectorMacro = new Map(drafts.filter((draft) => draft.sectorMacro).map((draft) => [draft.id, draft.sectorMacro!]))
+    const validDraftIds = new Set(drafts.map((draft) => draft.sectorMacro).filter((id): id is string => !!id))
     for (const draft of drafts) {
-      if (!existingIds.has(draft.id)) continue
-      for (const targetId of draft.connectedGroupIds) {
-        if (createdIds.has(targetId) || existingIds.has(targetId)) {
-          setGroupConnection(gameGuid, draft.id, targetId, true)
+      if (!draft.sectorMacro) continue
+      for (const rawTargetId of draft.connectedGroupIds) {
+        const targetId = draftIdToSectorMacro.get(rawTargetId) || rawTargetId
+        if (validDraftIds.has(targetId)) {
+          setGroupConnection(gameGuid, draft.sectorMacro, targetId, true)
         }
       }
     }
 
     // Remove groups no longer in the drafts
-    draftBinding.value.groups = draftBinding.value.groups.filter((g) => createdIds.has(g.id))
-    const groupById = new Map(draftBinding.value.groups.map((group) => [group.id, group]))
+    draftBinding.value.groups = draftBinding.value.groups.filter((g) => createdIds.has(getGroupKey(g)))
+    const groupById = new Map(draftBinding.value.groups.map((group) => [getGroupKey(group), group]))
     draftBinding.value.groups = targetIdsInDraftOrder.map((id) => groupById.get(id)!)
     draftBinding.value.groups.forEach((group, order) => { group.order = order })
 
@@ -763,9 +778,9 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     if (draftBinding.value) {
       const sectorToGroup = new Map<string, string>()
       for (const group of draftBinding.value.groups) {
-        if (group.sectorMacro) sectorToGroup.set(group.sectorMacro, group.id)
+        if (group.sectorMacro) sectorToGroup.set(group.sectorMacro, group.sectorMacro)
         for (const entry of group.coverageSectorMacros) {
-          if (!sectorToGroup.has(entry.ref)) sectorToGroup.set(entry.ref, group.id)
+          if (!sectorToGroup.has(entry.ref) && group.sectorMacro) sectorToGroup.set(entry.ref, group.sectorMacro)
         }
       }
       for (const plan of draftBinding.value.stationPlans) {

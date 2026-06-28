@@ -152,7 +152,7 @@ export function useProductionToolbarPresenter(store: ToolbarPresenterStore): Use
     mode: computed(() => store.session.mode),
     titleModel: computed(() => {
       if (store.session.workbenchMode === 'transit' && store.activeBinding?.groups) {
-        const group = store.activeBinding.groups.find(g => g.id === store.session.activeTransitSectorId)
+        const group = store.activeBinding.groups.find(g => g.sectorMacro === store.session.activeTransitSectorId)
         if (group) return { value: group.name, placeholder: store.titlePlaceholder }
       }
       return { value: store.titleValue, placeholder: store.titlePlaceholder }
