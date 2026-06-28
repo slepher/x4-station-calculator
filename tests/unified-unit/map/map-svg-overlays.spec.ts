@@ -5,6 +5,28 @@ import { computed, ref } from 'vue'
 import { describe, expect, it } from 'vitest'
 import { useMapSvgOverlays } from '@/composables/useMapSvgOverlays'
 
+const sectorsFromClusters = (clusters: ReturnType<typeof computed<Record<string, any>>>) =>
+  computed(() =>
+    Object.fromEntries(
+      Object.values(clusters.value).flatMap((cluster: any) =>
+        Object.values(cluster.sectors || {}).map((sector: any) => [sector.id, sector])
+      )
+    )
+  )
+
+const clustersForMap = (clusters: ReturnType<typeof computed<Record<string, any>>>) =>
+  computed(() =>
+    Object.fromEntries(
+      Object.entries(clusters.value).map(([clusterId, cluster]: [string, any]) => [
+        clusterId,
+        {
+          ...cluster,
+          sectors: Array.isArray(cluster.sectors) ? cluster.sectors : Object.keys(cluster.sectors || {})
+        }
+      ])
+    )
+  )
+
 describe('useMapSvgOverlays save POI culling', () => {
   it('keeps only save POIs inside the viewport content bounds', () => {
     const clusters = computed(() => ({
@@ -53,7 +75,8 @@ describe('useMapSvgOverlays save POI culling', () => {
     ])
 
     const overlays = useMapSvgOverlays({
-      clusters,
+      clusters: clustersForMap(clusters),
+      sectors: sectorsFromClusters(clusters),
       layoutState,
       placementOverlays: ref([]),
       placementPreview: ref(null),
@@ -104,7 +127,8 @@ describe('useMapSvgOverlays save POI culling', () => {
     }))
 
     const overlays = useMapSvgOverlays({
-      clusters,
+      clusters: clustersForMap(clusters),
+      sectors: sectorsFromClusters(clusters),
       layoutState,
       placementOverlays: ref([]),
       placementPreview: ref(null),
@@ -173,7 +197,8 @@ describe('useMapSvgOverlays save POI culling', () => {
     }))
 
     const overlays = useMapSvgOverlays({
-      clusters,
+      clusters: clustersForMap(clusters),
+      sectors: sectorsFromClusters(clusters),
       layoutState,
       placementOverlays: ref([]),
       placementPreview: ref(null),
@@ -233,7 +258,8 @@ describe('useMapSvgOverlays save POI culling', () => {
     }))
 
     const overlays = useMapSvgOverlays({
-      clusters,
+      clusters: clustersForMap(clusters),
+      sectors: sectorsFromClusters(clusters),
       layoutState,
       placementOverlays: ref([]),
       placementPreview: ref(null),
@@ -301,7 +327,8 @@ describe('useMapSvgOverlays save POI culling', () => {
     }))
 
     const overlays = useMapSvgOverlays({
-      clusters,
+      clusters: clustersForMap(clusters),
+      sectors: sectorsFromClusters(clusters),
       layoutState,
       placementOverlays: ref([]),
       placementPreview: ref(null),
@@ -383,7 +410,8 @@ describe('useMapSvgOverlays save POI culling', () => {
     const maxScale = ref(1.2)
 
     const overlays = useMapSvgOverlays({
-      clusters,
+      clusters: clustersForMap(clusters),
+      sectors: sectorsFromClusters(clusters),
       layoutState,
       placementOverlays: ref([]),
       placementPreview: ref(null),
@@ -424,5 +452,85 @@ describe('useMapSvgOverlays save POI culling', () => {
     expect(midSize).toBeLessThan(scale05Size || 0)
     expect(midSize).toBeGreaterThan(10)
     expect((maxScaleSize || 0) * 1.2).toBeCloseTo(10 * 1.2, 1)
+  })
+
+  it('freezes binding non-hub large icon map size below the configured scale', () => {
+    const clusters = computed(() => ({
+      cluster_01: {
+        id: 'cluster_01',
+        normalized: { pixel_basis: { x: 0, y: 0 } },
+        sectors: {
+          sector_alpha: {
+            id: 'sector_alpha',
+            macro: 'sector_alpha_macro',
+            normalized: {
+              center_offset_ratio: { x: 0, y: 0 },
+              sector_radius_ratio: 0.6
+            }
+          }
+        }
+      }
+    }))
+
+    const layoutState = computed(() => ({
+      cfg: { width: 1000, height: 1000, padX: 0, padY: 0, topPad: 0 },
+      fit: { minX: 0, minY: 0, scale: 1, offsetX: 0, offsetY: 0 },
+      centers: {
+        cluster_01: { x: 500, y: 500 }
+      },
+      clusterRadius: 100
+    }))
+
+    const currentScale = ref(0.7)
+    const overlays = useMapSvgOverlays({
+      clusters: clustersForMap(clusters),
+      sectors: sectorsFromClusters(clusters),
+      layoutState,
+      placementOverlays: ref([{
+        key: 'binding:station:factory',
+        id: 'factory',
+        kind: 'station' as const,
+        name: 'Factory',
+        icon: 'factory' as const,
+        location: {
+          cluster_id: 'cluster_01',
+          sector_id: 'sector_alpha',
+          pos: { x: 0, z: 0 },
+          sunlight: 0,
+          resources: []
+        },
+        localRatio: { x: 0, y: 0 },
+        savePoiVisual: {
+          key: 'binding:station:factory',
+          code: 'Factory',
+          category: 'playerStation' as const,
+          owner: 'player',
+          sectorMacro: 'sector_alpha_macro',
+          sectorName: 'Alpha',
+          position: { x: 0, z: 0 },
+          tag: 'shipyard',
+          largeIconFreezeBelowScale: 0.8
+        }
+      }]),
+      placementPreview: ref(null),
+      savePoiOverlays: ref([]),
+      viewportContentBounds: ref({
+        left: 350,
+        top: 350,
+        right: 650,
+        bottom: 650
+      }),
+      minScale: ref(0.4),
+      maxScale: ref(1.2),
+      currentScale,
+      zoomProgress: ref(0),
+      clusterVisibilityThresholdPx: ref(0),
+      isDragging: ref(false),
+      factionColorMap: ref(undefined)
+    })
+
+    const iconSize = overlays.overlayScreenItems.value[0]?.iconSize || 0
+    expect(iconSize * 0.8).toBeCloseTo(33.714, 1)
+    expect(iconSize * currentScale.value).toBeCloseTo(29.5, 1)
   })
 })

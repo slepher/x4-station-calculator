@@ -410,6 +410,7 @@ export interface SavePoiOverlayItem {
   shipId?: string
   macro?: string
   unlocked?: boolean
+  largeIconFreezeBelowScale?: number
 }
 
 export interface SavePoiSectorGroup<T> {

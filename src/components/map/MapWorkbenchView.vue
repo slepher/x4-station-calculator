@@ -123,6 +123,7 @@ const clusterRefHeightPx = ref(142)
 const clusterRadiusFromLayout = ref(0)
 const centersFromLayout = ref<Record<string, { x: number; y: number }>>({})
 const MAX_SCALE_MULTIPLIER = 4
+const BINDING_NON_HUB_LARGE_ICON_FREEZE_BELOW_SCALE = 0.8
 const TOOLTIP_OFFSET = 14
 const TOOLTIP_VIEWPORT_PADDING = 12
 const ENABLE_MAP_SECTOR_TOOLTIP_MEASUREMENT = true
@@ -515,7 +516,8 @@ const buildBindingSavePoiVisual = (input: {
     factoryGroup: classification.factoryGroup,
     productionProfile: classification.productionProfile,
     profileName: classification.profileName,
-    is_headquarter: classification.is_headquarter
+    is_headquarter: classification.is_headquarter,
+    largeIconFreezeBelowScale: BINDING_NON_HUB_LARGE_ICON_FREEZE_BELOW_SCALE
   }
 }
 
@@ -733,10 +735,14 @@ const savePoiOverlays = computed<SavePoiOverlayItem[]>(() => {
     savePoiVisibility.value,
     activeSavePoiCategory.value
   )
+  const activeBinding = saveBindingStore.activeBinding
+  const bindingStationScaleModeActive = Boolean(isSavePanelOpen.value &&
+    activeBinding &&
+    bindingContextGameGuid.value === activeBinding.gameGuid &&
+    (bindingContextStage.value === 'select-sector' || bindingContextStage.value === 'select-station'))
 
   // Build a set of save station codes bound to tradestations
   const boundToTradestationCodes = new Set<string>()
-  const activeBinding = saveBindingStore.activeBinding
   if (isBindingDraftOverlayActive.value && liveStore.autoGroupResult) {
     for (const group of liveStore.autoGroupResult.groups) {
       const sel = group.selectedTradeStation
@@ -764,11 +770,19 @@ const savePoiOverlays = computed<SavePoiOverlayItem[]>(() => {
       
       // Set tag to 'tradestation' if bound to tradestation
       const isBoundTradestation = overlay.category === 'playerStation' && boundToTradestationCodes.has(overlay.code)
+      const isStationPoi =
+        overlay.category === 'playerStation' ||
+        overlay.category === 'npcStation' ||
+        overlay.category === 'xenonStation' ||
+        overlay.category === 'khaakStation'
       
       return {
         ...overlay,
         sectorName: sectorData?.displayName || overlay.sectorName,
-        tag: isBoundTradestation ? 'tradestation' : overlay.tag
+        tag: isBoundTradestation ? 'tradestation' : overlay.tag,
+        largeIconFreezeBelowScale: bindingStationScaleModeActive && isStationPoi && !isBoundTradestation
+          ? BINDING_NON_HUB_LARGE_ICON_FREEZE_BELOW_SCALE
+          : undefined
       }
     })
 })

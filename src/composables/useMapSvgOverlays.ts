@@ -84,8 +84,19 @@ export function useMapSvgOverlays(args: {
       : null
     const poiColor = factionColor || SAVE_POI_COLORS[poi.category]
     const poiFilterId = factionColor ? `faction-color-${svgIdSafe(factionColor.replace('#', ''))}` : null
+    const largeIconScaleDivisor = poi.largeIconFreezeBelowScale && clampedScale < poi.largeIconFreezeBelowScale
+      ? poi.largeIconFreezeBelowScale
+      : clampedScale
+    const largeIconScreenSizeForPoi = isLargeMapSavePoiIcon(poi)
+      ? getMapDynamicLargePoiIconSize({
+          clusterRadius: args.layoutState.value.clusterRadius,
+          currentScale: args.currentScale.value,
+          maxScale: args.maxScale.value,
+          freezeBelowScale: poi.largeIconFreezeBelowScale
+        })
+      : largeIconScreenSize
     const iconSize = isLargeMapSavePoiIcon(poi)
-      ? largeIconScreenSize / clampedScale
+      ? largeIconScreenSizeForPoi / largeIconScaleDivisor
       : getMapSavePoiBaseIconSize(poi)
 
     return {

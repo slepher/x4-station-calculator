@@ -38,19 +38,23 @@ export function getMapDynamicLargePoiIconSize(args: {
   clusterRadius: number
   currentScale: number
   maxScale: number
+  freezeBelowScale?: number
 }): number {
   const clampedCurrentScale = Math.max(args.currentScale, 0)
   const clampedMaxScale = Math.max(args.maxScale, 1e-6)
+  const dynamicScale = Math.max(args.freezeBelowScale && clampedCurrentScale < args.freezeBelowScale
+    ? args.freezeBelowScale
+    : clampedCurrentScale, 0)
   const halfClusterScreenSizeAtThreshold = args.clusterRadius * MAP_LARGE_POI_MAX_CLUSTER_SCALE
   const maxScaleScreenSize = MAP_ICON_SIZES.savePoiLarge * clampedMaxScale
-  if (clampedCurrentScale <= MAP_LARGE_POI_MAX_CLUSTER_SCALE) {
-    return args.clusterRadius * clampedCurrentScale
+  if (dynamicScale <= MAP_LARGE_POI_MAX_CLUSTER_SCALE) {
+    return args.clusterRadius * dynamicScale
   }
   const progress = Math.max(
     0,
     Math.min(
       1,
-      (clampedCurrentScale - MAP_LARGE_POI_MAX_CLUSTER_SCALE) /
+      (dynamicScale - MAP_LARGE_POI_MAX_CLUSTER_SCALE) /
         Math.max(clampedMaxScale - MAP_LARGE_POI_MAX_CLUSTER_SCALE, 1e-6)
     )
   )
