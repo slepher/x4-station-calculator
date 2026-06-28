@@ -73,7 +73,7 @@ const emit = defineEmits<{
         </g>
         <polygon
           :points="hexPoints(cluster.sectors[0]?.sx || cluster.cx, cluster.sectors[0]?.sy || cluster.cy, cluster.sectors[0]?.radius || cluster.singleRadius || 0)"
-          fill="none"
+          fill="transparent"
           :stroke="sectorStrokeColor(cluster.sectors[0]?.id || '', cluster.sectors[0]?.color || cluster.color)"
           :stroke-width="sectorStrokeWidth(cluster.sectors[0]?.id || '', 2.8)"
           :stroke-opacity="sectorStrokeOpacity(cluster.sectors[0]?.id || '', 0.95)"
@@ -161,7 +161,7 @@ const emit = defineEmits<{
             </g>
             <polygon
               :points="hexPoints(sector.sx, sector.sy, sector.radius)"
-              fill="none"
+              fill="transparent"
               :stroke="sectorStrokeColor(sector.id, sector.color)"
               :stroke-width="sectorStrokeWidth(sector.id, 2.2)"
               :stroke-opacity="sectorStrokeOpacity(sector.id, 0.9)"
