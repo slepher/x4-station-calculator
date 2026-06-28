@@ -4,6 +4,7 @@
 import { computed, ref } from 'vue'
 import { describe, expect, it } from 'vitest'
 import { useMapSvgOverlays } from '@/composables/useMapSvgOverlays'
+import { getMapDynamicLargePoiIconSize } from '@/components/map/utils/mapIconConfig'
 
 const sectorsFromClusters = (clusters: ReturnType<typeof computed<Record<string, any>>>) =>
   computed(() =>
@@ -379,6 +380,72 @@ describe('useMapSvgOverlays save POI culling', () => {
     ])
   })
 
+  it('uses visual color override for save POI icon filters', () => {
+    const clusters = computed(() => ({
+      cluster_01: {
+        id: 'cluster_01',
+        normalized: { pixel_basis: { x: 0, y: 0 } },
+        sectors: {
+          sector_alpha: {
+            id: 'sector_alpha',
+            macro: 'sector_alpha_macro',
+            normalized: {
+              center_offset_ratio: { x: 0, y: 0 },
+              sector_radius_ratio: 0.5
+            }
+          }
+        }
+      }
+    }))
+
+    const layoutState = computed(() => ({
+      cfg: { width: 1000, height: 1000, padX: 0, padY: 0, topPad: 0 },
+      fit: { minX: 0, minY: 0, scale: 1, offsetX: 0, offsetY: 0 },
+      centers: {
+        cluster_01: { x: 500, y: 500 }
+      },
+      clusterRadius: 100
+    }))
+
+    const overlays = useMapSvgOverlays({
+      clusters: clustersForMap(clusters),
+      sectors: sectorsFromClusters(clusters),
+      layoutState,
+      placementOverlays: ref([]),
+      placementPreview: ref(null),
+      savePoiOverlays: ref([
+        {
+          key: 'player-non-hub',
+          code: 'PLAYER-1',
+          category: 'playerStation' as const,
+          sectorMacro: 'sector_alpha_macro',
+          sectorName: 'Alpha',
+          position: { x: 0, z: 0, tx: 0, ty: 0 },
+          owner: 'player',
+          tag: 'shipyard',
+          visualColorOverride: '#22c55e'
+        }
+      ]),
+      viewportContentBounds: ref({
+        left: 350,
+        top: 350,
+        right: 650,
+        bottom: 650
+      }),
+      minScale: ref(0.6),
+      maxScale: ref(1.2),
+      currentScale: ref(1),
+      zoomProgress: ref(0),
+      clusterVisibilityThresholdPx: ref(0),
+      isDragging: ref(false),
+      factionColorMap: ref(undefined)
+    })
+
+    expect(overlays.savePoiScreenItems.value[0]?.color).toBe('#22c55e')
+    expect(overlays.savePoiScreenItems.value[0]?.factionFilterId).toBe('faction-color-22c55e')
+    expect(overlays.factionColorFilters.value.map((item) => item.id)).toEqual(['faction-color-22c55e'])
+  })
+
   it('keeps large icons at half cluster up to scale 0.5, then smoothly shrinks to 10xscale on screen at max scale', () => {
     const clusters = computed(() => ({
       cluster_01: {
@@ -532,5 +599,132 @@ describe('useMapSvgOverlays save POI culling', () => {
     const iconSize = overlays.overlayScreenItems.value[0]?.iconSize || 0
     expect(iconSize * 0.8).toBeCloseTo(33.714, 1)
     expect(iconSize * currentScale.value).toBeCloseTo(29.5, 1)
+  })
+
+  it('uses per-POI large icon base size at max zoom', () => {
+    const clusters = computed(() => ({
+      cluster_01: {
+        id: 'cluster_01',
+        normalized: { pixel_basis: { x: 0, y: 0 } },
+        sectors: {
+          sector_alpha: {
+            id: 'sector_alpha',
+            macro: 'sector_alpha_macro',
+            normalized: {
+              center_offset_ratio: { x: 0, y: 0 },
+              sector_radius_ratio: 0.6
+            }
+          }
+        }
+      }
+    }))
+
+    const layoutState = computed(() => ({
+      cfg: { width: 1000, height: 1000, padX: 0, padY: 0, topPad: 0 },
+      centers: {
+        cluster_01: { x: 500, y: 500 }
+      },
+      clusterRadius: 100
+    }))
+
+    const overlays = useMapSvgOverlays({
+      clusters: clustersForMap(clusters),
+      sectors: sectorsFromClusters(clusters),
+      layoutState,
+      placementOverlays: ref([]),
+      placementPreview: ref(null),
+      savePoiOverlays: ref([{
+        key: 'hub',
+        code: 'Hub',
+        category: 'playerStation' as const,
+        owner: 'player',
+        sectorMacro: 'sector_alpha_macro',
+        sectorName: 'Alpha',
+        position: { x: 0, z: 0, tx: 0, ty: 0 },
+        tag: 'tradestation'
+      }, {
+        key: 'non-hub',
+        code: 'Non Hub',
+        category: 'playerStation' as const,
+        owner: 'player',
+        sectorMacro: 'sector_alpha_macro',
+        sectorName: 'Alpha',
+        position: { x: 0, z: 0, tx: 0.1, ty: 0 },
+        tag: 'shipyard',
+        largeIconBaseSize: 8
+      }]),
+      viewportContentBounds: ref({
+        left: 350,
+        top: 350,
+        right: 650,
+        bottom: 650
+      }),
+      sectorViewportContentBounds: ref(null),
+      minScale: ref(0.4),
+      maxScale: ref(1.2),
+      currentScale: ref(1.2),
+      zoomProgress: ref(1),
+      clusterVisibilityThresholdPx: ref(0),
+      isDragging: ref(false),
+      factionColorMap: ref(undefined)
+    })
+
+    expect(overlays.savePoiScreenItems.value[0]?.iconSize).toBeCloseTo(10, 6)
+    expect(overlays.savePoiScreenItems.value[1]?.iconSize).toBeCloseTo(8, 6)
+  })
+})
+
+describe('getMapDynamicLargePoiIconSize baseSize scaling', () => {
+  it('applies baseSize as a global size factor across all scales', () => {
+    const baseArgs = {
+      clusterRadius: 100,
+      currentScale: 0.8,
+      maxScale: 1.2
+    }
+    const reference = getMapDynamicLargePoiIconSize(baseArgs)
+    const small = getMapDynamicLargePoiIconSize({ ...baseArgs, baseSize: 8 })
+    const large = getMapDynamicLargePoiIconSize({ ...baseArgs, baseSize: 12 })
+    expect(small / reference).toBeCloseTo(0.8, 6)
+    expect(large / reference).toBeCloseTo(1.2, 6)
+  })
+
+  it('applies baseSize as a global size factor at mid scale (cluster-size dominated band)', () => {
+    const baseArgs = {
+      clusterRadius: 142,
+      currentScale: 0.6,
+      maxScale: 1.2
+    }
+    const reference = getMapDynamicLargePoiIconSize(baseArgs)
+    const small = getMapDynamicLargePoiIconSize({ ...baseArgs, baseSize: 8 })
+    const large = getMapDynamicLargePoiIconSize({ ...baseArgs, baseSize: 12 })
+    expect(small / reference).toBeCloseTo(0.8, 6)
+    expect(large / reference).toBeCloseTo(1.2, 6)
+  })
+
+  it('applies baseSize as a global size factor when frozen below freeze threshold', () => {
+    const baseArgs = {
+      clusterRadius: 100,
+      currentScale: 0.4,
+      maxScale: 1.2,
+      freezeBelowScale: 0.8
+    }
+    const reference = getMapDynamicLargePoiIconSize(baseArgs)
+    const small = getMapDynamicLargePoiIconSize({ ...baseArgs, baseSize: 8 })
+    const large = getMapDynamicLargePoiIconSize({ ...baseArgs, baseSize: 12 })
+    expect(small / reference).toBeCloseTo(0.8, 6)
+    expect(large / reference).toBeCloseTo(1.2, 6)
+  })
+
+  it('applies baseSize as a global size factor at max zoom', () => {
+    const baseArgs = {
+      clusterRadius: 100,
+      currentScale: 1.2,
+      maxScale: 1.2
+    }
+    const reference = getMapDynamicLargePoiIconSize(baseArgs)
+    const small = getMapDynamicLargePoiIconSize({ ...baseArgs, baseSize: 8 })
+    const large = getMapDynamicLargePoiIconSize({ ...baseArgs, baseSize: 12 })
+    expect(small / reference).toBeCloseTo(0.8, 6)
+    expect(large / reference).toBeCloseTo(1.2, 6)
   })
 })

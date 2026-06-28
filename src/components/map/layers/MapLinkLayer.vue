@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import jumpgateIconUrl from '@/components/icons/jumpgate.svg'
 import superhighwayIconUrl from '@/components/icons/superhighway.svg'
 import {
@@ -14,18 +15,22 @@ import type {
   MapSectorLinkLine
 } from '@/composables/useMapSvgLinks'
 
-defineProps<{
+const props = defineProps<{
   sectorLinkLines: MapSectorLinkLine[]
   highwaySegments: MapHighwaySegment[]
   gateCircles: MapGateCircle[]
   crossClusterGateLines: MapCrossClusterGateLine[]
   stargateVisualScale: number
+  renderMode?: 'all' | 'base' | 'icons'
   visible?: boolean
 }>()
+
+const renderBaseLinks = computed(() => props.renderMode !== 'icons')
+const renderLinkIcons = computed(() => props.renderMode !== 'base')
 </script>
 
 <template>
-  <g v-if="visible !== false" class="sector-links">
+  <g v-if="visible !== false && renderBaseLinks" class="sector-links">
     <template v-for="link in sectorLinkLines" :key="link.id">
       <line
         :x1="link.start.x.toFixed(1)"
@@ -36,6 +41,11 @@ defineProps<{
         stroke-width="0.4"
         stroke-opacity="0.95"
       />
+    </template>
+  </g>
+
+  <g v-if="visible !== false && renderLinkIcons" class="sector-link-icons">
+    <template v-for="link in sectorLinkLines" :key="link.id">
       <image
         :href="superhighwayIconUrl"
         :x="(link.start.x - getMapSuperhighwayEndpointIconOffset(stargateVisualScale, 'start')).toFixed(1)"
@@ -55,7 +65,7 @@ defineProps<{
     </template>
   </g>
 
-  <g v-if="visible !== false" class="highways">
+  <g v-if="visible !== false && renderBaseLinks" class="highways">
     <template v-for="segment in highwaySegments" :key="segment.id">
       <path
         v-if="segment.type === 'path'"
@@ -78,7 +88,7 @@ defineProps<{
     </template>
   </g>
 
-  <g v-if="visible !== false" class="gates">
+  <g v-if="visible !== false && renderLinkIcons" class="gates">
     <image
       v-for="gate in gateCircles"
       :key="gate.id"
@@ -94,7 +104,7 @@ defineProps<{
     />
   </g>
 
-  <g v-if="visible !== false" class="cross-links">
+  <g v-if="visible !== false && renderBaseLinks" class="cross-links">
     <line
       v-for="line in crossClusterGateLines"
       :key="line.id"

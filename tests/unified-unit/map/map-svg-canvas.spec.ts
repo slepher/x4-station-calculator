@@ -15,6 +15,12 @@ vi.mock('vue-i18n', () => ({
 }))
 
 vi.mock('@/i18n', () => ({
+  default: {
+    global: {
+      locale: { value: 'en' },
+      t: (key: string) => key
+    }
+  },
   loadLanguageAsync: vi.fn(async () => {}),
   setGameFolderName: vi.fn()
 }))
@@ -130,7 +136,7 @@ describe('MapSvgCanvas resource pie fill', () => {
     const lines = wrapper.findAll('g.sector-links line')
     expect(lines).toHaveLength(1)
     expect(lines[0]?.attributes('x1')).not.toBe(lines[0]?.attributes('x2'))
-    expect(wrapper.findAll('g.sector-links image')).toHaveLength(2)
+    expect(wrapper.findAll('g.sector-link-icons image')).toHaveLength(2)
   })
 
   it('renders gate icons inside the svg gates layer', () => {

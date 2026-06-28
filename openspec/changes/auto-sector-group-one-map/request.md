@@ -51,11 +51,15 @@
 - Map 当前显示目标使用单一状态表达：`default-map` 或具体 save archive，不再用 `selectedArchive=null` 隐式表示默认地图。
 - 进入 Map 时如果用户尚未显式选择显示目标，且存在 active binding，则默认显示该 active binding 对应的 save archive；否则显示默认地图。
 - 用户点击默认地图时，Map 显示目标 SHALL 明确变为 `default-map`；用户点击某个存档时，Map 显示目标 SHALL 变为该 archive。
-- 星区组染色与 hub 连线只由 Map 当前显示目标与 active binding 的 `gameGuid` 是否一致决定，不由 save panel 当前 layer 决定。
+- 星区组染色与 hub 连线仅在打开 binding 界面时激活；普通地图模式不显示 persisted binding 的星区组染色或 hub 连线。
+- 地图图层控制不再提供星区组染色和星区组连接开关；这些 binding 视觉由 binding 界面状态决定。
 - Save panel 关闭再打开 SHALL 回到关闭前 layer；只有显式跳转入口才覆盖 layer/stage。
 - 地图背景填充按单个星区决策，优先级 SHALL 为：星区组染色 > 势力背景色 > 默认地图背景。
 - 当星区组染色关闭且势力背景色打开时，星区 SHALL 显示势力背景色，不得因为存在 `sectorGroupColorMap` 而退回默认地图背景。
 - 当星区组染色和势力背景色同时打开时，属于星区组且存在组色的星区 SHALL 只显示星区组染色；不属于星区组或没有组色的星区 MAY 显示势力背景色。
+- Binding 模式下，玩家空间站 SHALL 使用其所属星区组颜色作为图标染色；icon 填充色与 hub/non hub 身份无关，anchor 与 coverage sector 内的玩家站遵循同一染色规则。
+- 玩家空间站图标的 hub/trade station 类型标识、形状、边框、名称等重点视觉 SHALL 保留，不得因为采用 sector group color 而弱化 hub 标识层；color 仅替换填充色输入，不替换 hub 标识。
+- 非玩家空间站不受玩家空间站染色规则影响。
 
 ### UI 与排序
 
@@ -77,7 +81,6 @@
 - 用户色卡选择是 preset，不是永久锁定；后续 compute 可在冲突时调整。
 - Transparent 表示清空颜色，不得持久化为 `0x00000000`。
 - Binding 模式地图颜色来自共享 draft。
-- 非 binding 模式地图颜色来自持久化 active binding。
 
 ## 边界
 
@@ -90,6 +93,7 @@
 - focus-sector / fit-sectors 事件转发。
 - Map compact 样式和 drag sort。
 - Hub color 自动分配、色卡、持久化和 map overlay。
+- Binding 模式下玩家空间站（含 hub 与非 hub）的星区组色图标染色。
 - Map context 下 group card 的 compact 样式、focus-sector 事件和完成态进入 station binding 按钮。
 - `MapBindingSectorGroup.vue` 从 Map production entry 移除。
 
@@ -113,11 +117,12 @@
 - Map pill/assignment 点击可以聚焦地图。
 - Virtual trade station overlay 拖动只改 draft position，不改 `sectorMacro`，且限制在 hub sector。
 - Drag sort 不改变 group 领域数据，不触发计算。
-- Hub color 在 Map 中稳定显示，binding 模式和非 binding 模式来源正确。
+- Hub color 在 Map binding 界面中稳定显示，来源为 shared draft。
 - 透明色不会作为颜色值持久化。
-- 默认地图目标下不显示星区组染色和 hub 连线；显示具体 archive 且 archive guid 等于 active binding guid 时才显示。
+- 普通地图模式不显示星区组染色和 hub 连线；只有打开 binding 界面且 guid 与 active binding 匹配时才显示。
 - 关闭并重新打开 save panel 保持关闭前 layer/stage；点击明确入口时按入口指定界面跳转。
 - 地图背景填充优先级为星区组染色 > 势力背景色 > 默认地图背景；关闭星区组染色但打开势力背景色时，星区显示势力背景色。
+- Binding 模式下，玩家空间站图标（含 hub 与非 hub）使用所属星区组色作为填充色；hub/trade station 的类型标识重点视觉保留。
 
 ## 未决项
 

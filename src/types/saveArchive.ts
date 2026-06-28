@@ -411,6 +411,8 @@ export interface SavePoiOverlayItem {
   macro?: string
   unlocked?: boolean
   largeIconFreezeBelowScale?: number
+  largeIconBaseSize?: number
+  visualColorOverride?: string
 }
 
 export interface SavePoiSectorGroup<T> {

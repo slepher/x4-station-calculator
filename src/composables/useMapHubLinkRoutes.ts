@@ -21,6 +21,7 @@ export type MapHubLinkRouteLine = {
     to: string
   }
   trackPaths: {
+    center: string
     from: string
     to: string
   }
@@ -35,8 +36,9 @@ type RawMapHubLinkRouteLine = RouteLaneOffsetInput & {
 }
 
 const FALLBACK_ROUTE_COLOR = '#f8fafc'
-const ROUTE_TRACK_STROKE_WIDTH_PX = 1.45
-const TRACK_SOLID_HALF_OFFSET_PX = ROUTE_TRACK_STROKE_WIDTH_PX / 2
+const ROUTE_CENTER_STROKE_WIDTH_PX = 0.9
+const ROUTE_SIDE_STROKE_WIDTH_PX = 1.2
+const TRACK_SIDE_OFFSET_PX = (ROUTE_CENTER_STROKE_WIDTH_PX + ROUTE_SIDE_STROKE_WIDTH_PX) / 2
 
 export function useMapHubLinkRoutes(args: {
   clusters: ComputedRef<Record<string, Cluster>>
@@ -101,8 +103,9 @@ export function useMapHubLinkRoutes(args: {
 
 function buildTrackPaths(points: Vec2[]): MapHubLinkRouteLine['trackPaths'] {
   return {
-    from: polylinePath(offsetPolyline(points, -TRACK_SOLID_HALF_OFFSET_PX)),
-    to: polylinePath(offsetPolyline(points, TRACK_SOLID_HALF_OFFSET_PX))
+    center: polylinePath(points),
+    from: polylinePath(offsetPolyline(points, -TRACK_SIDE_OFFSET_PX)),
+    to: polylinePath(offsetPolyline(points, TRACK_SIDE_OFFSET_PX))
   }
 }
 

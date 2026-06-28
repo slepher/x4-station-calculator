@@ -70,9 +70,9 @@
   - [✓] 3.2.2 透明色不持久化：设透明 → confirm → 断言持久化 color 不为 0x00000000 或透明值
   - [✓] 3.2.3 Reload 后 color 保持：confirm → reload → 再次导航到 map binding-sector → 断言之前颜色仍显示
 
-- [✓] 3.3 地图颜色来源：覆盖 binding 模式使用 shared draft，非 binding 模式使用 persisted active binding
+- [✓] 3.3 地图颜色来源：覆盖 binding 模式使用 shared draft，普通地图模式不显示 persisted active binding 星区组染色
   - [✓] 3.3.1 Binding 模式颜色来自 draft：编辑态设非默认色 → 检查 map SVG 对应 sector → 断言颜色与 draft 一致
-  - [✓] 3.3.2 非 binding 模式颜色来自 persistent：confirm 后退出 binding 编辑 → 切换到非 binding map 视图 → 断言 sector group 颜色仍显示
+  - [✓] 3.3.2 普通地图模式不显示 persisted 颜色：confirm 后退出 binding 编辑 → 切换到非 binding map 视图 → 断言 sector group 颜色不显示
 
 - [✓] 3.4 overlay 层级：覆盖 faction owner、hub color、resource pie 的渲染层级
   - [✓] 3.4.1 Hub color 内部六边形可见：有 color group 的 coverage sector → 断言 map SVG 内存在内部六边形 (2/3 半径)

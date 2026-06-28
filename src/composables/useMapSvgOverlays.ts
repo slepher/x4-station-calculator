@@ -82,8 +82,9 @@ export function useMapSvgOverlays(args: {
     const factionColor = factionId && args.factionColorMap.value?.[factionId]
       ? args.factionColorMap.value[factionId]
       : null
-    const poiColor = factionColor || SAVE_POI_COLORS[poi.category]
-    const poiFilterId = factionColor ? `faction-color-${svgIdSafe(factionColor.replace('#', ''))}` : null
+    const poiColor = poi.visualColorOverride || factionColor || SAVE_POI_COLORS[poi.category]
+    const filterColor = poi.visualColorOverride || factionColor
+    const poiFilterId = filterColor ? `faction-color-${svgIdSafe(filterColor.replace('#', ''))}` : null
     const largeIconScaleDivisor = poi.largeIconFreezeBelowScale && clampedScale < poi.largeIconFreezeBelowScale
       ? poi.largeIconFreezeBelowScale
       : clampedScale
@@ -92,7 +93,8 @@ export function useMapSvgOverlays(args: {
           clusterRadius: args.layoutState.value.clusterRadius,
           currentScale: args.currentScale.value,
           maxScale: args.maxScale.value,
-          freezeBelowScale: poi.largeIconFreezeBelowScale
+          freezeBelowScale: poi.largeIconFreezeBelowScale,
+          baseSize: poi.largeIconBaseSize
         })
       : largeIconScreenSize
     const iconSize = isLargeMapSavePoiIcon(poi)
@@ -247,7 +249,6 @@ export function useMapSvgOverlays(args: {
 
   const factionColorFilters = computed<Array<{ id: string; matrix: string }>>(() => {
     const factionColorMap = args.factionColorMap.value
-    if (!factionColorMap) return []
     const filters: Array<{ id: string; matrix: string }> = []
     const addedColors = new Set<string>()
     const visiblePois = [
@@ -258,9 +259,16 @@ export function useMapSvgOverlays(args: {
       ...(args.placementPreview.value?.savePoiVisual ? [args.placementPreview.value.savePoiVisual] : [])
     ]
     visiblePois.forEach((poi) => {
+      if (poi.visualColorOverride && !addedColors.has(poi.visualColorOverride)) {
+        const overrideMatrix = colorToFeColorMatrix(poi.visualColorOverride)
+        if (overrideMatrix) {
+          addedColors.add(poi.visualColorOverride)
+          filters.push({ id: `faction-color-${svgIdSafe(poi.visualColorOverride.replace('#', ''))}`, matrix: overrideMatrix })
+        }
+      }
       const factionId = getPoiFactionId(poi)
       if (!factionId) return
-      const color = factionColorMap[factionId]
+      const color = factionColorMap?.[factionId]
       if (!color || addedColors.has(color)) return
       const matrix = colorToFeColorMatrix(color)
       if (!matrix) return

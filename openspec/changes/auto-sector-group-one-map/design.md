@@ -150,8 +150,8 @@ Group card 标题显示 16×16 色块：
 
 `sectorGroupColorMap` 来源：
 
-- Binding 模式：`liveStore.autoGroupResult.groups`。
-- 非 binding 模式：`saveBindingStore.activeBinding.groups`。
+- Binding 界面激活时：`liveStore.autoGroupResult.groups`。
+- 普通地图模式：返回空 map，不显示 persisted binding 的星区组染色。
 
 Map 显示目标使用一个变量表达：
 
@@ -174,18 +174,20 @@ type MapArchiveTarget =
 星区组染色和 hub route overlay 显示规则：
 
 ```ts
-showBindingOverlay =
+showBindingGroupVisual =
   mapArchiveTarget.kind === 'archive' &&
-  mapArchiveTarget.guid === activeBinding.gameGuid
+  mapArchiveTarget.guid === activeBinding.gameGuid &&
+  savePanelOpen &&
+  bindingStage in ['select-sector', 'select-station']
 ```
 
-因此 save panel 当前 layer 不参与 overlay 显隐。用户在 list、category、coord、binding-sector 或 binding-station 中，只要地图显示目标与 active binding guid 匹配即可显示；选择 default-map 或其他 guid archive 时隐藏。
+因此普通地图模式、list、category、coord 等非 binding 界面不显示星区组染色或 hub route。用户选择 default-map、其他 guid archive，或关闭 save panel 时也隐藏这些 binding 视觉。
 
 Save panel 生命周期：
 
 - 关闭再打开只恢复关闭前的 `mapSavePanelLayer`、`mapBindingStage` 和 binding context。
 - 明确导航入口（例如进入 binding-sector、binding-station、category、list）才覆盖 layer/stage。
-- 地图显示目标与 panel layer/stage 分离，避免打开/关闭面板导致染色/连线切换。
+- 地图显示目标与 panel layer/stage 分离；但星区组染色和 hub route 仍需要 binding stage 激活，避免普通地图模式出现 binding 专用视觉。
 
 渲染层级：
 
@@ -206,6 +208,17 @@ faction owner 区域染色与 sector group 区域染色只作为 sector 内部�
 因此关闭星区组染色时，即使 `sectorGroupColorMap` 中仍有该 sector 的颜色数据，也不得隐藏 faction owner fill；只有星区组染色实际可见时，才 suppress 对应 sector 的 faction owner fill。
 
 每个 sector 至多映射一个 hub color；coverage 互斥由核心分组保证。
+
+### Player station icon color in binding mode
+
+Binding 模式下，地图上的玩家空间站图标填充色按所属星区组颜色染色；hub 与非 hub 玩家站遵循同一染色输入：
+
+- 玩家空间站若位于某个已着色 sector group 的 anchor/coverage sector 中，其图标填充色使用该 sector group color；该规则对 hub 玩家站与非 hub 玩家站一致。
+- 没有所属 group color 的玩家空间站（含 hub 与非 hub）回退到既有玩家空间站颜色。
+- 玩家空间站图标的 hub/trade station 类型标识、形状、边框、名称等重点视觉 SHALL 保留；color 只替换填充色输入，不消除或弱化 hub 标识层。
+- NPC、Xenon、Khaak 等非玩家空间站继续按各自势力/类别颜色显示，不使用 sector group color。
+
+该规则只改变图标染色的展示输入，不改变 save archive 原始 POI 数据，也不改变 binding group 领域状态。
 
 ## Virtual station overlay
 

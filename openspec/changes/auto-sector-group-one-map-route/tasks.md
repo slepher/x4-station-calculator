@@ -34,17 +34,17 @@
 - [x] 5. 创建地图 hub link route overlay
   - [x] 5.1 为 map canvas 增加 hub link route overlay 输入
   - [x] 5.2 binding-sector 页面使用 draft route cache
-  - [x] 5.3 非 binding-sector 页面使用 binding route cache
+  - [x] 5.3 普通地图模式不显示 persisted binding route overlay
   - [x] 5.4 将 route segments 转换为地图 screen coordinates
   - [x] 5.5 绘制每条 hub link 的全部有效候选
   - [x] 5.6 同一 link 的所有候选使用同一颜色且不做透明度降级
   - [x] 5.7 缺 group color 时使用稳定 fallback 样式
 
-- [x] 6. 增加星区组连接图层开关
-  - [x] 6.1 地图图层控制新增 `Sector Group Links` / `星区组连接`
-  - [x] 6.2 非 binding-sector 页面按开关显示或隐藏 hub link route overlay
-  - [x] 6.3 binding-sector 页面无视开关并强制显示 draft routes
-  - [x] 6.4 确认开关不影响 gate、superhighway、highway ring gate、sector group color 与 resource overlay
+- [x] 6. 移除星区组连接图层开关
+  - [x] 6.1 地图图层控制不显示 `Sector Group Links` / `星区组连接`
+  - [x] 6.2 普通地图模式隐藏 hub link route overlay
+  - [x] 6.3 binding-sector 页面显示 draft routes
+  - [x] 6.4 确认现有 gate、superhighway、highway ring gate 高亮不受 route overlay 激活条件影响
 
 - [x] 6.5 修正 link 添加按钮事件，避免点击 `+` 误触发地图 focus
 
@@ -75,6 +75,14 @@
   - [x] 10.2 为 map route view model 增加端点颜色 pair
   - [x] 10.3 route layer 使用“半透明 A / 实色 A / 实色 B / 半透明 B”的紧密双轨复合描边
   - [x] 10.4 增加单元测试覆盖端点颜色 pair 传递
+
+- [x] 11. 将 hub link route 改为 group 色包边 + gate 风格中线
+  - [x] 11.1 文档替换双轨线描述，明确三层复合线语义
+  - [x] 11.2 route view model 输出 center path 与两侧 group color side paths
+  - [x] 11.3 单条原生通道 route 使用中心 lane 替代原生 gate/superhighway/ring-highway 视觉
+  - [x] 11.4 多条同通道 route 继续按 lane 偏移消歧
+  - [x] 11.5 增加单元测试覆盖三层路径渲染
+  - [x] 11.6 route 图层位于原生 link 线条之上、gate / endpoint 图标之下，避免路径遮挡 gate 图标
 
 ## Notes
 

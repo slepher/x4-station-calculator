@@ -208,7 +208,7 @@
 - **并且** 该 binding 对应 guid 下存在可用 archive
 - **当** 系统初始化地图显示目标
 - **那么** Map archive target SHALL 指向该 active binding 对应 archive
-- **并且** 若 archive guid 等于 active binding guid，星区组染色和 hub 连线 SHALL 显示
+- **并且** 普通地图模式下星区组染色和 hub 连线 SHALL 不显示，直到用户进入 binding 界面
 
 #### Scenario: Default map is explicit target
 - **前提** 用户在存档列表点击默认地图
@@ -219,9 +219,11 @@
 
 #### Scenario: Archive target controls binding overlay
 - **前提** 当前 active binding guid 为 A
-- **当** 用户在存档列表选择 guid 为 A 的 archive
+- **当** 用户在存档列表选择 guid 为 A 的 archive 且未进入 binding 界面
 - **那么** Map archive target SHALL 指向该 archive
-- **并且** 系统 SHALL 显示星区组染色和 hub 连线
+- **并且** 系统 SHALL 隐藏星区组染色和 hub 连线
+- **当** 用户进入 guid 为 A 的 binding 界面
+- **那么** 系统 SHALL 显示星区组染色和 hub 连线
 - **当** 用户在存档列表选择 guid 为 B 的 archive
 - **那么** Map archive target SHALL 指向 B 的 archive
 - **并且** 系统 SHALL 隐藏 A 的星区组染色和 hub 连线
@@ -244,15 +246,15 @@
 
 #### Scenario: Sector group fill has priority over faction fill per sector
 - **前提** 势力背景色开关打开
-- **并且** 星区组染色开关打开
+- **并且** 用户处于 binding 界面
 - **并且** 某个 sector 属于星区组且存在 sector group color
 - **当** 系统渲染该 sector 背景
 - **那么** 该 sector SHALL 只显示 sector group color
 - **并且** faction owner fill SHALL NOT 叠加、透出或覆盖该 sector group color
 
-#### Scenario: Faction fill remains visible when sector group fill is disabled
+#### Scenario: Faction fill remains visible outside binding visuals
 - **前提** 势力背景色开关打开
-- **并且** 星区组染色开关关闭
+- **并且** 用户不处于 binding 界面
 - **并且** `sectorGroupColorMap` 中仍存在某个 sector 的颜色数据
 - **当** 系统渲染该 sector 背景
 - **那么** 该 sector SHALL 显示 faction owner fill

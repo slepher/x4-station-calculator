@@ -13,6 +13,7 @@ import MapSavePoiTooltip from './MapSavePoiTooltip.vue'
 import { focusOverlayInViewport } from './focusOverlayInViewport'
 import { getSectorScalePerRadius, getSectorZoneBoundingCenter, sectorLocalRatioToRawPointWithScale, sectorPointToLocalRatioWithScale } from '@/components/map/utils/coordinates'
 import { hexVertices } from '@/components/map/utils/geometry'
+import { MAP_ICON_SIZES } from '@/components/map/utils/mapIconConfig'
 import {
   inferMapArchiveTarget,
   shouldShowBindingOverlayForMapTarget,
@@ -124,6 +125,7 @@ const clusterRadiusFromLayout = ref(0)
 const centersFromLayout = ref<Record<string, { x: number; y: number }>>({})
 const MAX_SCALE_MULTIPLIER = 4
 const BINDING_NON_HUB_LARGE_ICON_FREEZE_BELOW_SCALE = 0.8
+const BINDING_NON_HUB_LARGE_ICON_BASE_SIZE = MAP_ICON_SIZES.bindingNonHubLargeIconBaseSize
 const TOOLTIP_OFFSET = 14
 const TOOLTIP_VIEWPORT_PADDING = 12
 const ENABLE_MAP_SECTOR_TOOLTIP_MEASUREMENT = true
@@ -176,8 +178,6 @@ const savePoiTooltipItem = ref<SavePoiOverlayItem | null>(null)
 const mapDiagnosticVisibility = ref({
   sectorLabels: true,
   sectorLinks: true,
-  sectorGroupColors: true,
-  sectorRoutes: true,
   sectorFactionFill: true
 })
 const activeControlPanel = ref<'diagnostic' | 'poi' | null>(null)
@@ -228,40 +228,32 @@ const showBindingOverlayForDisplayedArchive = computed(() => shouldShowBindingOv
   bindingGuid: saveBindingStore.activeBinding?.gameGuid
 }))
 
-const sectorGroupColorMap = computed<Record<string, string>>(() => {
-  if (!showBindingOverlayForDisplayedArchive.value) return {}
-  const isBinding = isSavePanelOpen.value &&
-    (bindingContextStage.value === 'select-sector' || bindingContextStage.value === 'select-station')
-  if (isBinding && liveStore.autoGroupResult) {
-    const draftMap = buildColorMap(liveStore.autoGroupResult.groups)
-    return draftMap
-  }
+const isBindingGroupVisualActive = computed(() => {
+  if (!showBindingOverlayForDisplayedArchive.value) return false
+  if (!isSavePanelOpen.value) return false
+  if (bindingContextStage.value !== 'select-sector' && bindingContextStage.value !== 'select-station') return false
   const binding = saveBindingStore.activeBinding
-  if (!binding) return {}
-  const bindingMap = buildColorMap(binding.groups)
-  return bindingMap
+  if (!binding) return false
+  return bindingContextGameGuid.value === binding.gameGuid
+})
+const sectorGroupColorMap = computed<Record<string, string>>(() => {
+  if (!isBindingGroupVisualActive.value) return {}
+  if (!liveStore.autoGroupResult) return {}
+  return buildColorMap(liveStore.autoGroupResult.groups)
 })
 const isBindingSectorRouteActive = computed(() => {
-  if (!isSavePanelOpen.value) return false
+  if (!isBindingGroupVisualActive.value) return false
   if (mapSavePanelLayer.value !== 'binding-sector') return false
   const binding = saveBindingStore.activeBinding
   if (!binding) return false
   return bindingContextGameGuid.value === binding.gameGuid
 })
 const hubLinkRouteEntries = computed(() => {
-  if (!showBindingOverlayForDisplayedArchive.value) return []
-  return isBindingSectorRouteActive.value
-    ? liveStore.hubLinkRoutes.draft
-    : liveStore.hubLinkRoutes.binding
+  if (!isBindingSectorRouteActive.value) return []
+  return liveStore.hubLinkRoutes.draft
 })
-const showSectorRoutes = computed(() =>
-  showBindingOverlayForDisplayedArchive.value &&
-  (isBindingSectorRouteActive.value || mapDiagnosticVisibility.value.sectorRoutes)
-)
-const showSectorGroupColors = computed(() =>
-  showBindingOverlayForDisplayedArchive.value &&
-  (mapDiagnosticVisibility.value.sectorGroupColors || bindingContextStage.value === 'select-sector' || bindingContextStage.value === 'select-station')
-)
+const showSectorRoutes = computed(() => isBindingSectorRouteActive.value)
+const showSectorGroupColors = computed(() => isBindingGroupVisualActive.value)
 
 const settledSavePoiViewportContentBounds = ref<{
   left: number
@@ -463,6 +455,9 @@ const resolveSectorDisplayNameByMacro = (sectorMacro: string) => {
 const resolveEmpireSectorGroupName = (sectorGroupId: string) =>
   saveBindingStore.activeBinding?.groups.find((sector) => sector.id === sectorGroupId)?.name || sectorGroupId
 
+const resolveEmpireSectorGroupColor = (sectorGroupId: string | undefined) =>
+  sectorGroupId ? liveStore.autoGroupResult?.groups.find((sector) => sector.id === sectorGroupId)?.color : undefined
+
 const buildBindingSavePoiVisual = (input: {
   key: string
   code: string
@@ -517,7 +512,9 @@ const buildBindingSavePoiVisual = (input: {
     productionProfile: classification.productionProfile,
     profileName: classification.profileName,
     is_headquarter: classification.is_headquarter,
-    largeIconFreezeBelowScale: BINDING_NON_HUB_LARGE_ICON_FREEZE_BELOW_SCALE
+    largeIconFreezeBelowScale: BINDING_NON_HUB_LARGE_ICON_FREEZE_BELOW_SCALE,
+    largeIconBaseSize: BINDING_NON_HUB_LARGE_ICON_BASE_SIZE,
+    visualColorOverride: resolveEmpireSectorGroupColor(input.sectorGroupId)
   }
 }
 
@@ -775,6 +772,8 @@ const savePoiOverlays = computed<SavePoiOverlayItem[]>(() => {
         overlay.category === 'npcStation' ||
         overlay.category === 'xenonStation' ||
         overlay.category === 'khaakStation'
+      const isPlayerStationForColor = bindingStationScaleModeActive &&
+        overlay.category === 'playerStation'
       
       return {
         ...overlay,
@@ -782,7 +781,11 @@ const savePoiOverlays = computed<SavePoiOverlayItem[]>(() => {
         tag: isBoundTradestation ? 'tradestation' : overlay.tag,
         largeIconFreezeBelowScale: bindingStationScaleModeActive && isStationPoi && !isBoundTradestation
           ? BINDING_NON_HUB_LARGE_ICON_FREEZE_BELOW_SCALE
-          : undefined
+          : undefined,
+        largeIconBaseSize: bindingStationScaleModeActive && isStationPoi && !isBoundTradestation
+          ? BINDING_NON_HUB_LARGE_ICON_BASE_SIZE
+          : undefined,
+        visualColorOverride: isPlayerStationForColor ? sectorGroupColorMap.value[overlay.sectorMacro] : undefined
       }
     })
 })
@@ -1781,8 +1784,6 @@ const onSaveVisibilityChange = (visibility: SavePoiVisibility) => {
 const onMapDiagnosticVisibilityChange = (visibility: {
   sectorLabels: boolean
   sectorLinks: boolean
-  sectorGroupColors: boolean
-  sectorRoutes: boolean
   sectorFactionFill: boolean
 }) => {
   mapDiagnosticVisibility.value = visibility

@@ -2,7 +2,7 @@
 
 ## Purpose
 
-本规格定义地图上 hub link route candidates 的预计算、全局单份 route cache、binding/draft link 集合过滤、地图 overlay、路线染色和图层开关行为。该能力用于在 map 与 binding-sector 编辑流程中直观看到当前 binding 的 sector group hub 间运输路径候选。
+本规格定义地图上 hub link route candidates 的预计算、全局单份 route cache、draft link 集合过滤、地图 overlay、路线染色和图层控制行为。该能力用于在 map binding-sector 编辑流程中直观看到当前 binding 的 sector group hub 间运输路径候选。
 
 ## ADDED Requirements
 
@@ -91,7 +91,7 @@ transit hub 运输栏中 `Sector Group` link route SHALL 读取 live production 
 
 ### Requirement: Map SHALL display hub link route overlay by filtering global cache
 
-地图 SHALL 绘制 hub link route overlay，并根据页面状态用当前 draft 或 persisted binding link 集合过滤全局 route cache。
+地图 SHALL 绘制 hub link route overlay，并在 binding-sector 页面用当前 draft link 集合过滤全局 route cache。普通地图模式 SHALL NOT 显示 persisted binding route overlay。
 
 #### Scenario: Binding-sector page shows draft routes
 
@@ -101,12 +101,12 @@ transit hub 运输栏中 `Sector Group` link route SHALL 读取 live production 
 - **那么** 系统 SHALL 显示 draft link 集合对应的 hub link route candidates
 - **并且** 系统 SHALL 不显示 draft link 集合之外的 cached route
 
-#### Scenario: Non-binding-sector page shows persisted binding routes
+#### Scenario: Ordinary map hides persisted binding routes
 
 - **前提** 地图不处于 binding-sector 页面
 - **并且** 当前 active binding 存在 persisted hub links
-- **当** 星区组连接图层开关打开
-- **那么** 系统 SHALL 显示 persisted binding link 集合对应的 hub link route candidates
+- **当** 地图渲染 route overlay
+- **那么** 系统 SHALL NOT 显示 persisted binding link 集合对应的 hub link route candidates
 
 #### Scenario: Every valid candidate is drawn
 
@@ -230,30 +230,27 @@ transit hub 运输栏中 `Sector Group` link route SHALL 读取 live production 
 - **那么** 系统 SHALL 只保留一条可视 route row
 - **并且** 系统 SHALL 优先保留 ring-highway 的 lane 语义
 
-### Requirement: Sector Group Links layer toggle SHALL control route overlay outside binding-sector
+### Requirement: Sector Group Links layer toggle SHALL NOT exist
 
-地图图层控制 SHALL 增加“星区组连接 / Sector Group Links”开关，并且 binding-sector 页面 SHALL 无视该开关。
+地图图层控制 SHALL NOT 提供“星区组连接 / Sector Group Links”开关；hub link route overlay 仅由 binding-sector 界面状态激活。
 
-#### Scenario: Layer toggle hides persisted routes outside binding-sector
+#### Scenario: Ordinary map hides persisted routes
 
 - **前提** 地图不处于 binding-sector 页面
-- **并且** “星区组连接 / Sector Group Links”开关关闭
 - **当** 地图渲染 overlay
 - **那么** hub link route overlay SHALL 不显示
 
-#### Scenario: Layer toggle shows persisted routes outside binding-sector
+#### Scenario: Map layer panel does not expose route toggle
 
-- **前提** 地图不处于 binding-sector 页面
-- **并且** “星区组连接 / Sector Group Links”开关打开
-- **当** 地图渲染 overlay
-- **那么** 系统 SHALL 显示当前 persisted binding 的 hub link route overlay
+- **前提** 用户打开地图图层控制
+- **当** 系统渲染图层控制项
+- **那么** 系统 SHALL NOT 显示“星区组连接 / Sector Group Links”开关
 
-#### Scenario: Binding-sector ignores layer toggle
+#### Scenario: Binding-sector shows draft routes
 
 - **前提** 地图处于 binding-sector 页面
-- **并且** “星区组连接 / Sector Group Links”开关关闭
 - **当** 地图渲染 overlay
-- **那么** 系统 SHALL 仍然显示当前 draft link 集合对应的 hub link route overlay
+- **那么** 系统 SHALL 显示当前 draft link 集合对应的 hub link route overlay
 
 #### Scenario: Link add button does not focus sector
 
@@ -262,8 +259,8 @@ transit hub 运输栏中 `Sector Group` link route SHALL 读取 live production 
 - **那么** 系统 SHALL 只添加该 link
 - **并且** SHALL NOT 因事件冒泡触发对应 sector focus
 
-#### Scenario: Sector Group Links toggle does not affect existing overlays
+#### Scenario: Route overlay activation does not affect existing map structures
 
-- **前提** 用户切换“星区组连接 / Sector Group Links”开关
+- **前提** hub link route overlay 激活或隐藏
 - **当** 地图重新渲染
-- **那么** 现有 gate、superhighway、highway ring gate 高亮、sector group color overlay 与资源 overlay SHALL 不受该开关影响
+- **那么** 现有 gate、superhighway 与 highway ring gate 高亮 SHALL 不受 route overlay 激活条件影响

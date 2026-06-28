@@ -86,7 +86,7 @@ function uniqueSortedLinkIds(segments: RouteLaneOffsetInput[]): string[] {
 }
 
 function laneOffsetForIndex(index: number, count: number, nativeMapLink: boolean): number {
-  if (count <= 1) return nativeMapLink ? -BASE_LANE_OFFSET_PX : 0
+  if (count <= 1) return 0
   if (!nativeMapLink) {
     if (index === 0) return 0
     const sideIndex = index - 1

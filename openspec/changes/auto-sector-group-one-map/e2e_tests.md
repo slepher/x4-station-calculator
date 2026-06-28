@@ -20,7 +20,7 @@
 
 - [ ] 3.1 色卡交互：覆盖编辑态色块打开选择器、预设色更新 draft、透明色清空 color
 - [ ] 3.2 颜色持久化：覆盖 confirm 写入 group color，透明色不持久化为 `0x00000000`
-- [ ] 3.3 地图颜色来源：覆盖 binding 模式使用 shared draft，非 binding 模式使用 persisted active binding
+- [ ] 3.3 地图颜色来源：覆盖 binding 模式使用 shared draft，普通地图模式不显示 persisted active binding 星区组染色
 - [ ] 3.4 overlay 层级：覆盖 faction owner、hub color、resource pie 的渲染层级
 
 ## 4 Virtual Station Tab

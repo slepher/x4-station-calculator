@@ -2,7 +2,7 @@
 
 ## 背景
 
-`sector-hub-transport` 已经实现 transit hub 到 linked hub station 的 route candidate 算法，并在 transit transport presenter 中用于 `Sector Group` 路径展示。`auto-sector-group-one-map` 已经定义地图 binding-sector 使用 shared draft、非 binding 场景使用 persisted binding 的数据切换规则。
+`sector-hub-transport` 已经实现 transit hub 到 linked hub station 的 route candidate 算法，并在 transit transport presenter 中用于 `Sector Group` 路径展示。`auto-sector-group-one-map` 已经定义地图 binding-sector 使用 shared draft 的数据切换规则；普通地图模式不显示 binding 专用的 hub route overlay。
 
 本变更把 hub link route candidates 前移到 `useLiveProductionStore` 预计算，并把同一份结果提供给：
 
@@ -35,7 +35,7 @@
 - vue/map：
   - 地图只接收已经计算好的 route overlay 数据。
   - 地图负责 screen coordinate 转换与 SVG 绘制，不负责 route builder 调用。
-  - 图层开关只决定 overlay 是否渲染，不改变 store route cache。
+  - route overlay 只由 binding-sector 界面状态决定是否渲染，不改变 store route cache。
 
 ## 数据模型
 
@@ -111,6 +111,8 @@ route algorithm 的口径不在本变更中修改：simple path、gate jump 上�
 - `binding`：当前 persisted binding link key 集合对应的 entries。
 - `draft`：当前 binding-sector shared draft link key 集合对应的 entries。
 
+普通地图模式不使用 persisted binding route 视图渲染地图 overlay；persisted binding route cache 仍可服务 transit hub 展示或后续 binding 初始化。
+
 ## 染色规则
 
 每条 hub link 的颜色由两端 group 决定，而不是从两端中选择一个代表色。hub link 表达的是两个区域对象之间的无向连接，不是 source/target 流量，因此两端颜色在视觉上平等。
@@ -123,17 +125,23 @@ route algorithm 的口径不在本变更中修改：simple path、gate jump 上�
 横截面：半透明 A | 实色 A | 半透明 A
 ```
 
-新视觉取消半透明底层，只保留两条紧密贴合的实色轨道，降低双色 route 本身的视觉复杂度：
+新视觉改为三层复合线，让 route 仍像“一条地图连接”，同时表达两端 group：
 
 ```text
-左轨：实色 A stroke
-右轨：实色 B stroke
-横截面：实色 A | 实色 B
+A group color 细边 | gate 风格中线 | B group color 细边
 ```
 
-两条实色轨道不留可见空隙，不混合为中间色，也不使用渐变暗示方向。实现上 map route view model 应保留两端 endpoint colors；route layer 在 lane 偏移后的中心线上生成两条平行轨道，并让两条实色轨的中心距等于实色 stroke 宽度，从而贴边相接但不互相覆盖。
+中线使用原生 gate 连接线的颜色和宽度，负责表达连接通道本身；两侧细边使用两端 endpoint colors，负责表达 link 属于哪两个 sector group。三层线不使用渐变，不把两端颜色混合为中间色，也不通过透明度表达候选优先级。
 
-若任一端 group 无颜色，该端使用地图 route layer 的 fallback stroke。fallback 只影响该端轨道显示，不影响其它 link。
+实现上 map route view model 应保留：
+
+- lane 偏移后的 center path。
+- 沿 center path 两侧偏移的 from/to side paths。
+- 两端 endpoint colors。
+
+route layer 先绘制两侧 group color 细边，再绘制 gate 风格中线。若任一端 group 无颜色，只替换该侧细边为 fallback stroke，不影响中线或另一侧细边。
+
+SVG 图层顺序需要把 hub link route 放在原生 link 线条之上，但放在 gate / superhighway endpoint 图标之下。这样单条原生通道 route 可以覆盖原生连接线，而不会遮挡 gate 图标本身。
 
 同一 link 的所有 candidates 使用同一对端点颜色。候选不使用透明度降级，也不通过样式表达最优/次优。
 
@@ -162,7 +170,8 @@ lane 分配规则：
 - 同一 hub link 的多条 candidate 经过同一 lane group 时共用同一 lane。
 - 同一 hub link 在同一 A-B 通道同时存在普通内部段与环形高速段时，渲染层 SHALL 只保留一条可视 route，并优先保留 `ring-highway` 语义。
 - lane side 与 lane order 应稳定，避免重新渲染时左右跳动。
-- `gate:`、`superhighway:`、`ring-highway:` 属于原生 map link 通道，中心线保留给原生连接；即使只有一条 route 经过，也应偏到一侧。
+- `gate:`、`superhighway:`、`ring-highway:` 属于原生 map link 通道；只有一条 binding route 经过时，该 route 可使用中心 lane 并以三层复合线替代原生连接视觉。
+- `gate:`、`superhighway:`、`ring-highway:` 上有多条不同 hub link 经过时，中心线保留给原生连接，多条 route 按两侧 lane 分开。
 - 普通 `sector-internal:` 不属于原生 map link 通道；只有一条 route 时可走中心线，多条不同 hub link 共用该通道时按“中心线 + 两侧 lane”展开。
 - 如果某个 `sector-internal` lane group 中存在 `ring-highway`，整个 group 视为原生环形高速通道，中心线空出，普通内部 route 也不得占用中心线。
 
@@ -208,16 +217,14 @@ lane 分配规则：
 ```text
 if current map page is binding-sector:
   routeEntries = liveStore.hubLinkRoutes.draft // filtered global cache
-  forceVisible = true
 else:
-  routeEntries = liveStore.hubLinkRoutes.binding // filtered global cache
-  forceVisible = false
+  routeEntries = []
 ```
 
 可见性规则：
 
 ```text
-visible = forceVisible || mapLayerVisibility.sectorRoutes
+visible = current map page is binding-sector
 ```
 
 渲染时只绘制 `entry.candidates` 非空的 routes。每个 candidate 先按 sector visit 聚合，再把 visual segments 转为 SVG path，并在 map route view model 中补充 lane 偏移：
@@ -229,14 +236,9 @@ visible = forceVisible || mapLayerVisibility.sectorRoutes
 
 为避免地图层引入业务组装，segment 到 screen coordinate 的转换应是 map composable 或 layer 的纯渲染转换，不调用 store 或 route builder。
 
-## 图层开关
+## 图层控制
 
-地图图层控制增加 `sectorRoutes` 开关：
-
-- 文案：`Sector Group Links` / `星区组连接`。
-- 非 binding-sector 页面受该开关控制。
-- binding-sector 页面无视该开关，强制显示 draft routes。
-- 该开关不影响现有 gate、superhighway、highway ring gate 高亮、sector group color overlay、resource overlay。
+地图图层控制不提供 `sectorRoutes` 开关，也不显示 `Sector Group Links` / `星区组连接` 项。hub link route overlay 是 binding-sector 编辑界面的专用视觉，普通地图模式不激活。
 
 ## transit hub 运输栏接入
 
@@ -251,11 +253,6 @@ visible = forceVisible || mapLayerVisibility.sectorRoutes
 `Station` 分类暂不迁移，避免把本次地图 link overlay 范围扩大到所有 station routes。
 
 ## i18n
-
-需要新增或复用地图图层控制文案：
-
-- `Sector Group Links`
-- `星区组连接`
 
 如果地图 route overlay 增加 tooltip 或 legend，再补充对应中英文文案；本变更不要求新增候选路径 legend。
 

@@ -13,8 +13,9 @@ describe('map SVG layer order', () => {
     const sectorFillIndex = canvas.indexOf('<MapSectorFillLayer')
     const groupColorIndex = canvas.indexOf('<MapSectorGroupColorLayer')
     const sectorIndex = canvas.indexOf('<MapSectorLayer')
-    const linkIndex = canvas.indexOf('<MapLinkLayer')
+    const baseLinkIndex = canvas.indexOf('render-mode="base"')
     const routeIndex = canvas.indexOf('<MapHubLinkRouteLayer')
+    const iconLinkIndex = canvas.indexOf('render-mode="icons"')
     const overlayIndex = canvas.indexOf('<MapOverlayLayer')
 
     expect(sectorFillIndex).toBeGreaterThan(-1)
@@ -22,8 +23,10 @@ describe('map SVG layer order', () => {
     expect(groupColorIndex).toBeGreaterThan(sectorFillIndex)
     expect(sectorIndex).toBeGreaterThan(groupColorIndex)
     expect(routeIndex).toBeGreaterThan(sectorIndex)
-    expect(linkIndex).toBeGreaterThan(routeIndex)
-    expect(overlayIndex).toBeGreaterThan(linkIndex)
+    expect(baseLinkIndex).toBeGreaterThan(sectorIndex)
+    expect(routeIndex).toBeGreaterThan(baseLinkIndex)
+    expect(iconLinkIndex).toBeGreaterThan(routeIndex)
+    expect(overlayIndex).toBeGreaterThan(iconLinkIndex)
   })
 
   it('splits sector fill from sector border so borders stay above fills', () => {

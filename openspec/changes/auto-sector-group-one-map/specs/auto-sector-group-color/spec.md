@@ -161,7 +161,7 @@
 
 ### Requirement: Map Sector Coloring
 
-系统 MUST 在地图上用 hub 颜色标记其覆盖星区。
+系统 MUST 在 binding 界面的地图上用 hub 颜色标记其覆盖星区；普通地图模式不显示 persisted binding 的 hub 覆盖星区染色。
 
 #### Scenario: Coverage sectors are mutually exclusive
 - **前提** 自动星区划分结果存在多个 hub

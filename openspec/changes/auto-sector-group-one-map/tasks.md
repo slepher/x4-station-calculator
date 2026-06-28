@@ -53,13 +53,13 @@
 
 ## 6. Map overlay
 
-- [ ] Binding 模式从 shared draft 构建 `sectorGroupColorMap`
-- [ ] 非 binding 模式从 persisted active binding 构建 `sectorGroupColorMap`
+- [x] Binding 模式从 shared draft 构建 `sectorGroupColorMap`
+- [x] 普通地图模式不从 persisted active binding 构建 `sectorGroupColorMap`
 - [ ] 用单一 Map archive target 表达 `default-map` 或具体 archive，避免用 `selectedArchive=null` 表示默认地图
 - [ ] 进入 Map 且未显式选择目标时，优先推导 active binding 对应 archive
 - [ ] 玩家存档组标题和组级详情入口解析为最新有效 archive target
-- [ ] 星区组染色和 hub 连线仅在 archive target guid 等于 active binding guid 时显示
-- [ ] 默认地图 target 隐藏星区组染色和 hub 连线
+- [x] 星区组染色和 hub 连线仅在 binding 界面激活且 archive target guid 等于 active binding guid 时显示
+- [x] 普通地图模式隐藏星区组染色和 hub 连线
 - [ ] Save panel 关闭再打开恢复关闭前 layer/stage；显式导航入口可覆盖恢复状态
 - [ ] faction owner 区域染色和 sector group 区域染色位于底层，不遮蔽高速路、星门、空间站、POI 或路线
 - [ ] sector 六边形边框绘制在区域染色上方
@@ -111,3 +111,17 @@
 ## 10. 构建验证
 
 - [ ] 实现完成后运行 `npm run build`
+
+## 11. Binding player station icon color
+
+- [x] Binding 模式下玩家空间站（含 hub 与非 hub）使用所属星区组色染色
+- [x] anchor sector 与 coverage sector 内的玩家站遵循同一染色规则
+- [x] hub/trade station 类型标识、形状、边框等重点视觉保留，不被染色弱化
+- [x] 非玩家空间站不受该规则影响
+
+## 12. Binding-only map visuals
+
+- [x] 普通地图模式不显示 persisted binding 星区组染色
+- [x] 普通地图模式不显示 persisted binding hub route
+- [x] 地图图层控制移除星区组染色开关
+- [x] 地图图层控制移除星区组连接开关

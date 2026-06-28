@@ -27,14 +27,13 @@ describe('route lane offset', () => {
     expect(second?.points[1]?.y).toBeGreaterThan(0)
   })
 
-  it('only tapers during the final lane-offset distance near each endpoint', () => {
+  it('uses the center lane for a single native route segment', () => {
     const [route] = applyRouteLaneOffsets([
       routeSegment('a', 'link-a', 'gate:one', [{ x: 0, y: 0 }, { x: 100, y: 0 }])
     ])
 
-    expect(route?.laneOffset).toBe(-4)
-    expect(route?.points[1]).toEqual({ x: 4, y: -4 })
-    expect(route?.points.at(-2)).toEqual({ x: 96, y: -4 })
+    expect(route?.laneOffset).toBe(0)
+    expect(route?.points).toEqual([{ x: 0, y: 0 }, { x: 100, y: 0 }])
   })
 
   it('does not offset a single free-space route segment without a native map link', () => {
@@ -65,16 +64,16 @@ describe('route lane offset', () => {
     ])
 
     expect(routes).toHaveLength(1)
-    expect(routes[0]?.laneOffset).toBe(-4)
+    expect(routes[0]?.laneOffset).toBe(0)
   })
 
-  it('treats gate-to-gate segments as native map links and keeps routes off the center line', () => {
+  it('treats single gate-to-gate segments as native replacements on the center line', () => {
     const [route] = applyRouteLaneOffsets([
       routeSegment('a', 'link-a', 'gate-to-gate:one', [{ x: 0, y: 0 }, { x: 100, y: 0 }])
     ])
 
-    expect(route?.laneOffset).toBe(-4)
-    expect(route?.points[1]).toEqual({ x: 4, y: -4 })
+    expect(route?.laneOffset).toBe(0)
+    expect(route?.points).toEqual([{ x: 0, y: 0 }, { x: 100, y: 0 }])
   })
 
   it('deduplicates sector-internal alternatives for the same link and endpoint pair', () => {
@@ -96,13 +95,13 @@ describe('route lane offset', () => {
     expect(route?.points).toEqual([{ x: 0, y: 0 }, { x: 100, y: 0 }])
   })
 
-  it('keeps the center lane open for ring highway routes', () => {
+  it('uses the center lane for a single ring highway route', () => {
     const [route] = applyRouteLaneOffsets([
       routeSegment('ring', 'link-a', 'ring-highway:sector-a:highway-a|highway-b', [{ x: 0, y: 0 }, { x: 100, y: 0 }])
     ])
 
-    expect(route?.laneOffset).toBe(-4)
-    expect(route?.points[1]).toEqual({ x: 4, y: -4 })
+    expect(route?.laneOffset).toBe(0)
+    expect(route?.points).toEqual([{ x: 0, y: 0 }, { x: 100, y: 0 }])
   })
 
   it('treats sector-internal routes sharing a ring highway channel as native lanes', () => {
@@ -124,7 +123,7 @@ describe('route lane offset', () => {
 
     expect(routes).toHaveLength(1)
     expect(routes[0]?.id).toBe('ring')
-    expect(routes[0]?.laneOffset).toBe(-4)
+    expect(routes[0]?.laneOffset).toBe(0)
   })
 })
 

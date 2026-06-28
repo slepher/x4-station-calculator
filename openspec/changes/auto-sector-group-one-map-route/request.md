@@ -32,7 +32,7 @@
 - 添加 link 时，如果全局 cache 中已有对应 link key 的 route entry，系统 SHALL 复用该 entry。
 - 添加 link 时，如果全局 cache 中不存在对应 link key 的 route entry，系统 SHALL 使用 `sector-hub-transport` 新计算一份并写入全局 cache。
 - binding-sector 页面 SHALL 根据当前 draft link 集合过滤全局 cache。
-- 非 binding-sector 页面 SHALL 根据当前 persisted binding link 集合过滤全局 cache。
+- 普通地图模式 SHALL NOT 显示 persisted binding link route overlay。
 - 全局 route cache 的 key SHALL 不带 `binding` / `draft` scope，也 SHALL NOT 只使用 group id。
 - 全局 route cache 的 key SHALL 绑定路径两端实际端点：`sectorA + posA + sectorB + posB`。
 - 两端端点 SHALL 以无向方式规范化；同一对端点 A-B 与 B-A SHALL 复用同一份路径数据。
@@ -42,19 +42,18 @@
 
 - 地图 SHALL 新增 hub link route overlay。
 - binding-sector 页面 SHALL 显示当前 draft link 集合对应的全局 route 数据。
-- binding-sector 页面 SHALL 无视星区组连接图层开关，始终显示 draft link routes。
-- 非 binding-sector 地图页面 SHALL 显示当前 persisted binding link 集合对应的全局 route 数据。
-- 非 binding-sector 地图页面 SHALL 受“星区组连接 / Sector Group Links”图层开关控制。
-- “星区组连接 / Sector Group Links”开关只控制 hub link route overlay，不影响现有 gate、superhighway、highway ring gate 高亮、sector group color overlay 或资源 overlay。
+- 普通地图模式 SHALL NOT 显示 persisted binding hub link route overlay。
+- 地图图层控制 SHALL NOT 提供“星区组连接 / Sector Group Links”开关；hub link route overlay 的显隐由 binding 界面状态决定。
 
 ### 路线染色
 
 - 每条 hub link route 的颜色 SHALL 同时表达 link 两端 group 的 `color`。
 - hub link SHALL 被视为两个区域对象之间的无向关系，而不是 source/target 流量；两端颜色 SHALL 平等显示。
-- 路线 SHALL 使用紧密贴合的双色实线双轨，而不是单色线或混合中间色。
-- 旧单色视觉为“更宽半透明原色底层 + 较窄实色原色上层”，新双色视觉 SHALL 取消半透明底层。
-- 新双色视觉 SHALL 只绘制两条紧密贴合的实色轨道，横截面呈现为 `实色 A | 实色 B`。
-- 两条实色轨道 SHALL 紧密连接，不应保留可见空隙。
+- 路线 SHALL 使用三层复合线，而不是单色线、渐变线或两条并列独立线。
+- 三层复合线横截面 SHALL 为 `A group color 细边 | gate 风格中线 | B group color 细边`。
+- 中线 SHALL 使用地图原生 gate 连接线的颜色、宽度和可读性语义；即使该 route segment 不是 gate segment，也使用同一中线风格来表达“连接通道”。
+- 两侧细边 SHALL 分别使用 link 两端 group color，平等表达两端 group。
+- 当某个原生 gate / superhighway / ring-highway 基础通道上只有一条 binding route 时，该 route SHOULD 走中心 lane，在视觉上替代原生连接线；当同一基础通道有多条 binding route 时，仍通过稳定 lane 偏移分开，避免覆盖。
 - 若任一端 group 没有 `color`，该端 SHALL 使用稳定 fallback 样式，不得阻断其它路线绘制。
 - 同一条 hub link 的所有候选 SHALL 使用同一对端点颜色。
 - 候选路线 SHALL 不使用透明度降级表达优先级；所有候选都是可考虑选择。
@@ -75,21 +74,19 @@
 
 ### 图层控制
 
-- 地图图层控制 SHALL 增加“星区组连接 / Sector Group Links”开关。
-- 开关默认状态 SHOULD 与现有地图图层控制策略保持一致。
-- 非 binding-sector 页面关闭该开关时 SHALL 隐藏 persisted binding hub link route。
-- binding-sector 页面打开时 SHALL 强制显示 draft hub link route，不受开关状态影响。
+- 地图图层控制 SHALL NOT 增加“星区组连接 / Sector Group Links”开关。
+- binding-sector 页面打开时 SHALL 显示 draft hub link route。
+- 普通地图模式 SHALL 隐藏 hub link route。
 
 ## 边界
 
 ### In Scope
 
 - live production store 中预计算并保留全局单份 hub link route candidates。
-- binding/draft link 集合对全局 route cache 的显示过滤规则。
+- draft link 集合对全局 route cache 的显示过滤规则。
 - transit hub `Sector Group` link 路径读取预计算结果。
 - 地图 hub link route overlay。
-- 地图图层控制增加“星区组连接 / Sector Group Links”开关。
-- 必要的 i18n 文案。
+- 移除地图图层控制中的“星区组连接 / Sector Group Links”开关。
 - build validation。
 
 ### Out of Scope
@@ -104,23 +101,23 @@
 ## 验收标准（DoD）
 
 - 地图在 binding-sector 页面显示当前 draft link 集合对应的 hub link route candidates。
-- 地图在 binding-sector 页面无视“星区组连接 / Sector Group Links”开关，始终显示 draft link routes。
-- 地图在非 binding-sector 页面显示当前 persisted binding link 集合对应的 hub link route candidates。
+- 地图在 binding-sector 页面显示 draft link routes。
+- 地图在普通地图模式不显示 persisted binding hub link route candidates。
 - 删除 link 不删除全局 route cache 中已计算的路径数据。
 - 重新添加 link 时，如果全局 route cache 已存在该 link route，则复用既有候选；不存在时才新计算。
-- 非 binding-sector 页面关闭“星区组连接 / Sector Group Links”开关后，hub link route overlay 被隐藏。
+- 地图图层控制中不存在“星区组连接 / Sector Group Links”开关。
 - 每条 hub link 绘制全部有效候选路径，而不是只绘制最优路径。
 - 每条候选路径在每个星区内只绘制进入点到离开点的聚合直线，不显示星区内部中途绕行。
 - 同一 hub link 在同一星区内相同进入/离开点的多条候选合并为一条；不同 hub link 保留各自可视段。
 - 带 `problems` 的不完整候选不绘制在地图 route overlay 中。
-- 每条路线使用两端 group color 的紧密双轨复合线，不生成混合中间色。
+- 每条路线使用两端 group color 包边 + gate 风格中线的三层复合线，不生成混合中间色。
 - 同一条 hub link 的所有候选使用同一对端点颜色，不通过透明度降级表达优先级。
 - 不同 hub link route 在同一基础线路上不会完全覆盖；同一 hub link 的多条候选在同一基础线路上可共用 lane。
-- route 与原生 gate / superhighway / highway 连接不会完全重合；经过 gate 或 highway endpoint 时允许收束到端点。
+- 多条 route 与原生 gate / superhighway / highway 连接不会互相覆盖；单条 route 可占用原生中心 lane 并以三层复合线替代原生连接视觉。
 - 星区内部 A-B 路线以端点直连方式显示；存在环形高速直连的 A-B 通道中线保持空出，紫色/橙色等不同 link 不会有任一路线占用中线。
 - 同一 link 在同一 A-B 通道不会因为“过环形高速”和“直连”两个候选而重复绘制两条路线。
 - transit hub `Sector Group` link 路径读取 live production store 的预计算结果。
-- 现有 gate、superhighway、highway ring gate 高亮、sector group color overlay 不受星区组连接开关影响。
+- 现有 gate、superhighway、highway ring gate 高亮不受 hub link route overlay 激活条件影响。
 - `npm run build` 通过。
 
 ## 未决项

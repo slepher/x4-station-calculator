@@ -5,7 +5,8 @@ export const MAP_ICON_SIZES = {
   preview: 20,
   savePoiLarge: 10,
   savePoiSmall: 6,
-  savePoiSpecial: 8
+  savePoiSpecial: 8,
+  bindingNonHubLargeIconBaseSize: 8
 } as const
 
 export const MAP_LINK_ICON_SIZES = {
@@ -39,26 +40,32 @@ export function getMapDynamicLargePoiIconSize(args: {
   currentScale: number
   maxScale: number
   freezeBelowScale?: number
+  baseSize?: number
 }): number {
   const clampedCurrentScale = Math.max(args.currentScale, 0)
   const clampedMaxScale = Math.max(args.maxScale, 1e-6)
   const dynamicScale = Math.max(args.freezeBelowScale && clampedCurrentScale < args.freezeBelowScale
     ? args.freezeBelowScale
     : clampedCurrentScale, 0)
+  const baseSize = args.baseSize ?? MAP_ICON_SIZES.savePoiLarge
+  const sizeFactor = baseSize / MAP_ICON_SIZES.savePoiLarge
   const halfClusterScreenSizeAtThreshold = args.clusterRadius * MAP_LARGE_POI_MAX_CLUSTER_SCALE
   const maxScaleScreenSize = MAP_ICON_SIZES.savePoiLarge * clampedMaxScale
+  let referenceScreenSize: number
   if (dynamicScale <= MAP_LARGE_POI_MAX_CLUSTER_SCALE) {
-    return args.clusterRadius * dynamicScale
-  }
-  const progress = Math.max(
-    0,
-    Math.min(
-      1,
-      (dynamicScale - MAP_LARGE_POI_MAX_CLUSTER_SCALE) /
-        Math.max(clampedMaxScale - MAP_LARGE_POI_MAX_CLUSTER_SCALE, 1e-6)
+    referenceScreenSize = args.clusterRadius * dynamicScale
+  } else {
+    const progress = Math.max(
+      0,
+      Math.min(
+        1,
+        (dynamicScale - MAP_LARGE_POI_MAX_CLUSTER_SCALE) /
+          Math.max(clampedMaxScale - MAP_LARGE_POI_MAX_CLUSTER_SCALE, 1e-6)
+      )
     )
-  )
-  return halfClusterScreenSizeAtThreshold + (maxScaleScreenSize - halfClusterScreenSizeAtThreshold) * progress
+    referenceScreenSize = halfClusterScreenSizeAtThreshold + (maxScaleScreenSize - halfClusterScreenSizeAtThreshold) * progress
+  }
+  return referenceScreenSize * sizeFactor
 }
 
 export function getMapSuperhighwayEndpointIconSize(_stargateVisualScale: number, end: 'start' | 'end'): number {

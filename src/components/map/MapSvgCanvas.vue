@@ -464,6 +464,16 @@ watchEffect(() => {
       @sector-leave="emitSectorLeave"
     />
 
+    <MapLinkLayer
+      :visible="showSectorLinks"
+      render-mode="base"
+      :sector-link-lines="sectorLinkLines"
+      :highway-segments="highwaySegments"
+      :gate-circles="gateCircles"
+      :cross-cluster-gate-lines="crossClusterGateLines"
+      :stargate-visual-scale="STARGATE_VISUAL_SCALE"
+    />
+
     <MapHubLinkRouteLayer
       :visible="showSectorRoutes"
       :route-lines="hubLinkRouteLines"
@@ -471,6 +481,7 @@ watchEffect(() => {
 
     <MapLinkLayer
       :visible="showSectorLinks"
+      render-mode="icons"
       :sector-link-lines="sectorLinkLines"
       :highway-segments="highwaySegments"
       :gate-circles="gateCircles"
