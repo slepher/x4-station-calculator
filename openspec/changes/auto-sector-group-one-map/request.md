@@ -78,6 +78,8 @@
 - 自动分配应尽量保持已有有效颜色稳定。
 - 与自身 anchor/coverage faction 色冲突，或与 5 跳内 hub 色冲突时，可以重分配；冲突按 CIE2000 ΔE < 10，或可比较 hue 时 OKLCH hue 距离 < 10° 判定。
 - 5 跳外 hub 允许复用颜色。
+- 所有新进入 hub/group card 列表的 group 都应立即获得算法色，包括显式 [计算] 生成的 hub、assignment 中选择“独立成组”生成/恢复的 hub、bridge plan 接受后形成的 hub，以及其他交互式新增 hub 路径。
+- 新 hub 默认 SHALL NOT 显示透明/空色块；透明只表示用户通过色卡显式清空颜色。
 - 用户色卡选择是 preset，不是永久锁定；后续 compute 可在冲突时调整。
 - Transparent 表示清空颜色，不得持久化为 `0x00000000`。
 - Binding 模式地图颜色来自共享 draft。
@@ -118,6 +120,7 @@
 - Virtual trade station overlay 拖动只改 draft position，不改 `sectorMacro`，且限制在 hub sector。
 - Drag sort 不改变 group 领域数据，不触发计算。
 - Hub color 在 Map binding 界面中稳定显示，来源为 shared draft。
+- 独立成组、bridge 和其他新 hub 入口创建的 group 在 card 和地图上默认显示算法分配色，不显示透明色块。
 - 透明色不会作为颜色值持久化。
 - 普通地图模式不显示星区组染色和 hub 连线；只有打开 binding 界面且 guid 与 active binding 匹配时才显示。
 - 关闭并重新打开 save panel 保持关闭前 layer/stage；点击明确入口时按入口指定界面跳转。

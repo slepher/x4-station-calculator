@@ -8,7 +8,7 @@
 
 ### Requirement: Color Auto-Assignment
 
-系统 MUST 在自动分组计算时为缺色、新增或颜色冲突的 hub 分配颜色，并尽量保持已有颜色稳定。颜色仅用于地图显示区分，不代表用户业务选择。用户通过色卡调整的是预设颜色，不是不可更改颜色；系统 MAY 在后续 compute 中修改存在冲突的预设颜色。
+系统 MUST 在自动分组计算和交互式新增 hub 时为缺色、新增或颜色冲突的 hub 分配颜色，并尽量保持已有颜色稳定。颜色仅用于地图显示区分，不代表用户业务选择。用户通过色卡调整的是预设颜色，不是不可更改颜色；系统 MAY 在后续 compute 中修改存在冲突的预设颜色。
 
 #### Scenario: Existing automatic color preserved when valid
 - **前提** 某 hub 已有 `color` 值
@@ -88,6 +88,22 @@
 - **当** 用户在 [计算] 后到提交前完成新增 hub 操作
 - **那么** 系统 SHALL 仅为该新增 hub 分配颜色
 - **并且** 系统 SHALL NOT 改变其他 hub 的颜色
+- **并且** 新增 hub 的 card SHALL 显示非透明色块，除非用户随后显式清空颜色
+
+#### Scenario: Standalone assignment-created hub gets color
+- **前提** 用户在 assignment 中为某 sector 选择“独立成组”
+- **当** 该 sector 生成或恢复为 hub/group card
+- **那么** 系统 SHALL 为该 hub 分配算法色
+- **并且** 该 hub 的 card SHALL NOT 默认显示透明/空色块
+- **并且** 系统 SHALL NOT 因该操作自动改变其他 hub 的颜色
+
+#### Scenario: Bridge-created hub gets color
+- **前提** 用户接受 bridge plan
+- **并且** bridge plan 产生一个或多个新 hub/group card
+- **当** 系统应用 bridge plan 到 shared draft
+- **那么** 系统 SHALL 为每个 bridge 新 hub 分配算法色
+- **并且** bridge 新 hub 的 card SHALL NOT 默认显示透明/空色块
+- **并且** 系统 SHALL NOT 因该操作自动改变既有 hub 的颜色
 
 #### Scenario: Interactive edit affects at most one hub color
 - **前提** 用户已点击 [计算] 且尚未提交

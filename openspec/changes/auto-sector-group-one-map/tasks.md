@@ -37,6 +37,9 @@
 - [ ] 实现 30 色 UI palette 和 27 色 auto palette
 - [ ] 保留有效已有颜色
 - [ ] 对缺色、新增或冲突 hub 重分配
+- [x] assignment 独立成组生成/恢复的新 hub 立即分配算法色
+- [x] bridge plan 产生的新 hub 立即分配算法色
+- [x] 新 hub 默认不显示透明/空色块，透明只来自用户显式清空
 - [ ] 避开自身 anchor/coverage faction 色
 - [ ] 避开 5 跳内 hub color 和 hub faction 色
 - [ ] 允许 5 跳外颜色复用

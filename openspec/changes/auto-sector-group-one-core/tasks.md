@@ -16,7 +16,7 @@
 - [ ] Sector 默认归属按距离、hub score、稳定 key 和 excluded default 规则决胜
 - [ ] Incremental 使用每个既有 group 自己的 `jumpRange`
 - [ ] 保持等距 score 差距小于 30% 的 unresolved assignment 规则
-- [ ] 保持 Tier 2 超出覆盖跳数但 5 跳内的扩展吸收规则
+- [x] 保持超出覆盖跳数但 5 跳内的扩展吸收规则，超过 5 跳仅 standalone 且不默认选中
 
 ## 3. MST 与 bridge
 
@@ -48,7 +48,8 @@
 
 - [ ] Hub anchor sector 不生成 ordinary assignment card
 - [ ] 当前 coverage 命中的所有 groups 都成为 options
-- [ ] 扩展 options 只取最近距离层，且不默认选中
+- [x] 扩展 options 只取 5 跳内最近距离层，且不默认选中
+- [x] 超过 5 跳或无 hub 时生成 standalone-only unresolved assignment
 - [ ] 无当前命中时处理 baseline 重新吸收或 standalone-only 默认规则
 - [ ] Standalone 始终最后，且不作为自动 fallback
 - [x] 显式 Standalone 选择按 `sectorMacro` upsert hub group，避免重复 append

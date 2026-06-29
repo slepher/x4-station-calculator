@@ -14,7 +14,7 @@ import {
   getSaveSectorsWithPlayerStations,
   getPlayerStationsInSector
 } from './saveBindingUtils'
-import { stabilizeHubColors, type HubColorContext } from './hubColor'
+import { stabilizeHubColors, stabilizeEditedHubColor, type HubColorContext } from './hubColor'
 import { selectTradeStationCandidates, determineDefaultTradeStation } from './tradeStationSelection'
 
 export const DEFAULT_JUMP_RANGE = 2
@@ -34,7 +34,7 @@ export interface AssignmentOption {
 
 export interface SectorAssignment {
   sectorMacro: string
-  status: 'auto' | 'uncertain_tie' | 'uncertain_extend' | 'standalone' | 'exception'
+  status: 'auto' | 'uncertain_tie' | 'uncertain_extend' | 'unresolved_no_candidate' | 'standalone' | 'exception'
   displayBucket: 'resolved' | 'unresolved'
   defaultGroupId?: string
   options: AssignmentOption[]
@@ -580,7 +580,8 @@ export function applyBridgePlanToDraft(
   getSectorName: (macro: string) => string,
   sectorGraph: Record<string, string[]>,
   sectorClusterMap: Record<string, string>,
-  bridgeSearchJumpRange: number = DEFAULT_BRIDGE_SEARCH_JUMP_RANGE
+  bridgeSearchJumpRange: number = DEFAULT_BRIDGE_SEARCH_JUMP_RANGE,
+  colorCtx?: HubColorContext
 ): AutoGroupResult {
   const existingAnchors = new Set(result.groups.map((g) => g.sectorMacro).filter(Boolean) as string[])
   const bridgeGroups: GroupDraftInfo[] = []
@@ -607,6 +608,11 @@ export function applyBridgePlanToDraft(
   }
 
   const groups = [...result.groups, ...bridgeGroups]
+  if (colorCtx) {
+    for (const group of bridgeGroups) {
+      stabilizeEditedHubColor(group, groups, colorCtx)
+    }
+  }
   computeGroupGraph(groups, sectorGraph, sectorClusterMap, resolveBridgeSearchJumpRange(prefJumpRange, bridgeSearchJumpRange))
   const assignedSectors = new Map<string, string>()
   for (const group of groups) {
@@ -1187,8 +1193,13 @@ export function buildAssignmentResult(
     if (candidates.length === 0) {
       assignments.push(withDisplayBucket({
         sectorMacro,
-        status: 'exception',
-        options: [],
+        status: 'unresolved_no_candidate',
+        options: [{
+          type: 'standalone' as const,
+          distance: 0,
+          extendsRange: false,
+          resultingGroupSize: 1
+        }],
         selectedOptionIndex: null
       }))
       continue
@@ -1201,7 +1212,9 @@ export function buildAssignmentResult(
     if (currentRangeHits.length === 0) {
       // Only minimum extension distance groups become options
       const minDist = Math.min(...candidates.map((g) => g.distance))
-      optionsSource = candidates.filter((g) => g.distance === minDist)
+      optionsSource = minDist <= MAX_UNCERTAIN_JUMP
+        ? candidates.filter((g) => g.distance === minDist)
+        : []
     }
 
     // Build options from all hit groups
@@ -1259,7 +1272,7 @@ export function buildAssignmentResult(
     const isUncertain = defaultOptionIndex === null && optionsSource.length > 0
     const status = isUncertain
       ? (currentRangeHits.length > 0 ? 'uncertain_tie' : 'uncertain_extend')
-      : (defaultOptionIndex !== null ? 'auto' : 'exception')
+      : (defaultOptionIndex !== null ? 'auto' : 'unresolved_no_candidate')
 
     const defaultGroupId = defaultOptionIndex !== null
       ? options[defaultOptionIndex]?.targetGroupId
@@ -1606,7 +1619,8 @@ export function applyStandaloneToResult(
   sectorClusterMap: Record<string, string>,
   prefJumpRange: number,
   getSectorName: (macro: string) => string,
-  bridgeSearchJumpRange: number = DEFAULT_BRIDGE_SEARCH_JUMP_RANGE
+  bridgeSearchJumpRange: number = DEFAULT_BRIDGE_SEARCH_JUMP_RANGE,
+  colorCtx?: HubColorContext
 ): AutoGroupResult {
   const assignments = [...result.assignments]
   const idx = assignments.findIndex((a) => a.sectorMacro === sectorMacro)
@@ -1677,8 +1691,10 @@ export function applyStandaloneToResult(
       virtualTradeStationPosition: groups[existingGroupIndex]!.virtualTradeStationPosition,
       tradeStationRetainEnabled: groups[existingGroupIndex]!.tradeStationRetainEnabled
     }
+    if (colorCtx) stabilizeEditedHubColor(groups[existingGroupIndex]!, groups, colorCtx)
   } else {
     groups.push(newGroup)
+    if (colorCtx) stabilizeEditedHubColor(newGroup, groups, colorCtx)
   }
   computeGroupGraph(groups, sectorGraph, sectorClusterMap, resolveBridgeSearchJumpRange(prefJumpRange, bridgeSearchJumpRange))
 

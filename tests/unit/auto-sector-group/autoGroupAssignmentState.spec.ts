@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 import {
   applyAbsorbToResult,
   applyStandaloneToResult,
+  applyBridgePlanToDraft,
+  buildAssignmentResult,
   groupIncremental,
   setGroupPinnedInResult,
   sortAssignmentsForDisplay,
@@ -175,6 +177,75 @@ describe('autoGroup assignment state after user selection', () => {
     expect(assignment.displayBucket).toBe('unresolved')
   })
 
+  it('assigns a generated color when standalone selection creates a hub', () => {
+    const updated = applyStandaloneToResult(
+      buildResult(),
+      'B',
+      sectorGraph,
+      sectorClusterMap,
+      1,
+      (macro) => macro,
+      undefined,
+      {
+        getFactionColor: () => undefined,
+        getDistance: (from, to) => from === to ? 0 : 1,
+        maxHop: 5
+      }
+    )
+
+    expect(updated.groups.find((group) => group.sectorMacro === 'B')?.color).toBeTruthy()
+    expect(updated.groups.find((group) => group.sectorMacro === 'B')?.color).not.toBe('transparent')
+  })
+
+  it('assigns a generated color when bridge selection creates a hub', () => {
+    const base = buildResult()
+    const plan = {
+      id: 'bridge-plan',
+      recommended: true,
+      selected: false,
+      units: [{
+        unitId: 'unit-c',
+        label: 'C',
+        reaches: [],
+        candidates: [{ sectorMacro: 'C', score: 10 }],
+        selectedSectorMacro: 'C'
+      }],
+      connectedComponentCount: 2,
+      planScore: 10,
+      totalJump: 1,
+      maxJump: 1,
+      stableKey: 'unit-c'
+    }
+    const graph = {
+      A: ['B'],
+      B: ['A', 'C'],
+      C: ['B']
+    }
+    const clusterMap = {
+      A: 'A',
+      B: 'B',
+      C: 'C'
+    }
+
+    const updated = applyBridgePlanToDraft(
+      { ...base, bridgePlans: [plan], playerSectorMacros: ['A', 'B', 'C'] },
+      plan,
+      1,
+      (macro) => macro,
+      graph,
+      clusterMap,
+      undefined,
+      {
+        getFactionColor: () => undefined,
+        getDistance: (from, to) => from === to ? 0 : 1,
+        maxHop: 5
+      }
+    )
+
+    expect(updated.groups.find((group) => group.sectorMacro === 'C')?.color).toBeTruthy()
+    expect(updated.groups.find((group) => group.sectorMacro === 'C')?.color).not.toBe('transparent')
+  })
+
   it('does not add duplicate hub groups when standalone is selected repeatedly', () => {
     const first = applyStandaloneToResult(buildResult(), 'B', sectorGraph, sectorClusterMap, 1, (macro) => macro)
     const second = applyStandaloneToResult(first, 'B', sectorGraph, sectorClusterMap, 1, (macro) => macro)
@@ -190,6 +261,60 @@ describe('autoGroup assignment state after user selection', () => {
     expect(assignment.selectedOptionIndex).toBe(0)
     expect(assignment.status).toBe('auto')
     expect(assignment.displayBucket).toBe('unresolved')
+  })
+
+  it('uses standalone-only unresolved assignment when nearest hub is beyond max extension jump', () => {
+    const graph = {
+      A: ['B'],
+      B: ['A', 'C'],
+      C: ['B', 'D'],
+      D: ['C', 'E'],
+      E: ['D', 'F'],
+      F: ['E', 'G'],
+      G: ['F', 'H'],
+      H: ['G']
+    }
+    const clusterMap = {
+      A: 'A',
+      B: 'B',
+      C: 'C',
+      D: 'D',
+      E: 'E',
+      F: 'F',
+      G: 'G',
+      H: 'H'
+    }
+    const group = {
+      ...buildResult().groups[0]!,
+      id: 'hubA',
+      sectorMacro: 'A',
+      jumpRange: 1,
+      originalJumpRange: 1
+    }
+
+    const assignments = buildAssignmentResult(['H'], new Map([['A', 'hubA']]), [group], graph, clusterMap)
+    const assignment = assignments.find((candidate) => candidate.sectorMacro === 'H')!
+
+    expect(assignment.options).toEqual([
+      { type: 'standalone', distance: 0, extendsRange: false, resultingGroupSize: 1 }
+    ])
+    expect(assignment.selectedOptionIndex).toBeNull()
+    expect(assignment.displayBucket).toBe('unresolved')
+    expect(assignment.status).not.toBe('auto')
+  })
+
+  it('uses standalone-only unresolved assignments when no hub exists', () => {
+    const assignments = buildAssignmentResult(['A', 'B'], new Map(), [], sectorGraph, sectorClusterMap)
+
+    expect(assignments.map((assignment) => assignment.sectorMacro)).toEqual(['A', 'B'])
+    for (const assignment of assignments) {
+      expect(assignment.options).toEqual([
+        { type: 'standalone', distance: 0, extendsRange: false, resultingGroupSize: 1 }
+      ])
+      expect(assignment.selectedOptionIndex).toBeNull()
+      expect(assignment.displayBucket).toBe('unresolved')
+      expect(assignment.status).not.toBe('auto')
+    }
   })
 
   it('unpin keeps the hub and adds a default standalone assignment, while pin removes it', () => {

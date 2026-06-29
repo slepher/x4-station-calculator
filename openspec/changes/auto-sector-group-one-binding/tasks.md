@@ -46,6 +46,7 @@
 - [ ] 明确并实现 `calcBaselinePillState` 作为 pill UI diff 基线
 - [ ] 移除旧的 edit restore snapshot 语义；[退出] 只退出编辑态
 - [ ] `handleColorChange` 不直接写持久化 binding
+- [x] shared draft 保留 one-map 对独立成组 / bridge 新 hub 分配的 `group.color`
 - [ ] `handleConfirm` 成功后写入 `appliedAutoGroupArchiveTime`
 - [ ] `handleConfirm` 成功时先应用 auto groups，再同步 virtual station drafts
 - [ ] virtual station apply 只同步无 `saveStationCode` 的 station plans

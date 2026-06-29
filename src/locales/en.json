@@ -167,6 +167,7 @@
     "auto_assigned": "Auto Assigned",
     "uncertain_tie": "Score Tie",
     "uncertain_extend": "Range Extend",
+    "unresolved_no_candidate": "Needs Choice",
     "standalone": "Standalone",
     "exception": "Exception",
     "resolve_all_uncertain": "Resolve all uncertain assignments to continue",

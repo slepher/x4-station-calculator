@@ -284,6 +284,15 @@ Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触�
 - **并且** SHALL 同时恢复 group、assignment、bridge decision、trade station、hub color、retain 字段和 virtual station drafts 到最近计算基线
 - **并且** SHALL NOT 切换 active binding/archive 或重新运行分组算法
 
+#### Scenario: Shared draft preserves hub color assigned by map color rules
+
+- **前提** 用户在 shared draft 中通过独立成组、bridge 或其他交互新增路径产生 hub/group card
+- **并且** one-map Hub color 规则已经为该 hub 写入 `group.color`
+- **当** Live 或 Map binding 面板读取同一 shared draft
+- **那么** 系统 SHALL 保留该 `group.color`
+- **并且** SHALL 在确认前不直接写入持久化 binding
+- **并且** 确认成功时 SHALL 将该颜色作为 group 数据的一部分写入 binding
+
 #### Scenario: Trade station card list follows groups
 
 - **前提** Trade Station 区域中存在 N 个 group card

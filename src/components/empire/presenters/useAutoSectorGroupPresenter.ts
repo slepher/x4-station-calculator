@@ -405,7 +405,7 @@ function handleSelectOption(sectorMacro: string, optionIndex: number) {
     autoGroupResult.value = applyAbsorbToResult(autoGroupResult.value, sectorMacro, optionIndex, sectorGraph, sectorClusterMap, prefJumpRange.value, bridgeSearchJumpRange.value)
   }
   if (opt.type === 'standalone') {
-    autoGroupResult.value = applyStandaloneToResult(autoGroupResult.value, sectorMacro, sectorGraph, sectorClusterMap, prefJumpRange.value, getSectorDisplayName, bridgeSearchJumpRange.value)
+    autoGroupResult.value = applyStandaloneToResult(autoGroupResult.value, sectorMacro, sectorGraph, sectorClusterMap, prefJumpRange.value, getSectorDisplayName, bridgeSearchJumpRange.value, buildHubColorContext())
   }
   applyTradeStationDefaultsToResult()
 }
@@ -645,7 +645,8 @@ function handleSelectBridgePlan(planId: string) {
     getSectorDisplayName,
     sectorGraphInfo.value.sectorGraph,
     sectorGraphInfo.value.sectorClusterMap,
-    bridgeSearchJumpRange.value
+    bridgeSearchJumpRange.value,
+    buildHubColorContext()
   )
 }
 
@@ -1419,7 +1420,7 @@ const hasUncertainAssignments = computed(() => {
 
 function isUnresolvedAssignment(assignment: SectorAssignment): boolean {
   return assignment.selectedOptionIndex === null &&
-    (assignment.status === 'uncertain_tie' || assignment.status === 'uncertain_extend')
+    (assignment.status === 'uncertain_tie' || assignment.status === 'uncertain_extend' || assignment.status === 'unresolved_no_candidate')
 }
 
 const hasPendingBridgeDecision = computed(() => {

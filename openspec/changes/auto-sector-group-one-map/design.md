@@ -123,6 +123,14 @@ Map Hub tab 使用 groups 数组顺序作为排序权威：
 6. 多候选时使用 maximin 选择最优。
 7. 无可解析候选时才使用 fallback。
 
+触发路径：
+
+- 显式 [计算] 产生整批 groups 时，使用全量稳定流程为缺色、新增或冲突 hub 分配颜色。
+- 用户在 assignment 中选择“独立成组”后，若该 sector 生成或恢复为 hub/group card，必须对该 hub 运行局部颜色稳定。
+- 用户接受 bridge plan 后，bridge 形成的新 hub 必须对每个新增 hub 运行局部颜色稳定。
+- 其他交互式新增 hub 路径也必须使用同一局部颜色稳定入口；新增 hub 的 card 默认不得显示透明/空色块。
+- 透明/空色块只来自用户显式清空 `group.color`，不得作为新 hub 的默认显示状态。
+
 冲突判定：
 
 - 两个颜色 CIE2000 ΔE < 10 时视为冲突。
@@ -132,6 +140,7 @@ Map Hub tab 使用 groups 数组顺序作为排序权威：
 交互后局部稳定：
 
 - 计算后到提交前，新增一个 hub 只为该 hub 分配颜色。
+- assignment 独立成组、bridge 接受和其他交互式新增 hub 均属于“新增 hub”路径。
 - 调整一个 hub coverage 时，只判断该 hub 是否需要重分配。
 - 单次操作不得自动改变超过一个 hub 的颜色。
 

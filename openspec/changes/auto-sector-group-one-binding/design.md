@@ -156,6 +156,7 @@ Handler 规则：
 - 读写 `liveStore.virtualStationDrafts`，但 UI 展示结构由 presenter 组装。
 - 计算按钮可以运行纯算法并更新共享 draft。
 - 颜色修改只改共享 draft，不直接写 binding。
+- 独立成组、bridge 等路径导致 shared draft 新增 hub 时，presenter/store 交互必须保留 one-map 颜色规则产生的 `group.color`；binding 层不另行定义颜色算法。
 - 确认按钮执行最终持久化，并返回成功/失败状态给 panel。
 
 ## Button 行为

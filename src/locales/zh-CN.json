@@ -167,6 +167,7 @@
     "auto_assigned": "自动分配",
     "uncertain_tie": "分数接近",
     "uncertain_extend": "需要扩展",
+    "unresolved_no_candidate": "待选择",
     "standalone": "独立",
     "exception": "异常",
     "resolve_all_uncertain": "请解决所有存疑分配以继续",

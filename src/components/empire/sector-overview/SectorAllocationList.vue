@@ -162,6 +162,7 @@ const sortedAssignments = computed(() => {
         class="allocation-card"
         :class="{
           'card-uncertain': assignment.status === 'uncertain_tie' || assignment.status === 'uncertain_extend',
+          'card-no-candidate': assignment.status === 'unresolved_no_candidate',
           'card-auto': assignment.status === 'auto',
           'card-standalone': assignment.status === 'standalone'
         }"
@@ -176,6 +177,7 @@ const sortedAssignments = computed(() => {
           <span v-if="assignment.status === 'auto'" class="card-badge badge-auto">{{ t('sector.auto_assigned') }}</span>
           <span v-else-if="assignment.status === 'uncertain_tie'" class="card-badge badge-uncertain">{{ t('sector.uncertain_tie') }}</span>
           <span v-else-if="assignment.status === 'uncertain_extend'" class="card-badge badge-uncertain">{{ t('sector.uncertain_extend') }}</span>
+          <span v-else-if="assignment.status === 'unresolved_no_candidate'" class="card-badge badge-uncertain">{{ t('sector.unresolved_no_candidate') }}</span>
           <span v-else-if="assignment.status === 'standalone'" class="card-badge badge-standalone">{{ t('sector.standalone') }}</span>
           <span v-else class="card-badge badge-bad">{{ t('sector.exception') }}</span>
         </div>

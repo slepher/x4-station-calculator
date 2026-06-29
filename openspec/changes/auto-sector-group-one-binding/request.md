@@ -28,6 +28,7 @@ Trade station 在 Live 计算模式中作为第三列展示和 confirm gate 的�
 - 用户在计算模式内显式点击“计算”时，可以由 presenter 编排输入并更新共享 draft。
 - `useAutoSectorGroupPresenter` 是 UI 连接与交互编排层，必须以 live store 的 `autoGroupResult` 作为唯一共享 draft 数据源。
 - `handleColorChange` 不得直接调用 `saveBindingStore.updateGroup()` 写持久化 binding；颜色写入由确认流程处理。
+- binding shared draft SHALL 保留 one-map 定义的 hub color 状态；独立成组、bridge 等交互式新增 hub 的颜色分配规则由 one-map 的 Hub color 章节定义，binding 只负责承载和确认写入 shared draft 中的 `color`。
 - `handleConfirm()` 成功后记录 `appliedAutoGroupArchiveTime`。
 - `handleConfirm()` 成功流程 SHALL 先应用 auto groups，再应用 virtual station drafts；virtual station apply 只同步无 `saveStationCode` 的 station plans。
 - Live 展示模式为 `[存档 3fr] | [星区 4fr] | [资源 5fr]`。

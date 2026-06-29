@@ -26,7 +26,7 @@ import { useActiveViewStore } from './useActiveViewStore'
 import { DEFAULT_STATION_SETTINGS, type StationComputeDeps } from './state/stationSettings'
 import { StationDerivedMap, type StationDerivedStaticDeps } from './state/StationDerivedMap'
 import { DEFAULT_HUB_CONFIG } from './logic/autoGroupHub'
-import { DEFAULT_JUMP_RANGE, DEFAULT_BRIDGE_SEARCH_JUMP_RANGE, type AutoGroupResult, type GroupDraftInfo, type SectorAssignment, type AssignmentOption, groupCleanSlate, groupIncremental, getDistance, enrichAutoGroupResult } from './logic/autoGroup'
+import { DEFAULT_JUMP_RANGE, DEFAULT_BRIDGE_SEARCH_JUMP_RANGE, type AutoGroupResult, type GroupDraftInfo, type SectorAssignment, groupCleanSlate, groupIncremental, buildAssignmentResult, enrichAutoGroupResult } from './logic/autoGroup'
 import { buildSectorGraphFromMaps } from './logic/saveBindingUtils'
 import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
 import { getSectorZoneBoundingCenter } from '@/components/map/utils/coordinates'
@@ -434,70 +434,15 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       gameData.maps.sectors || {}
     )
 
-    const anchorSectors = new Set(groups.map((g) => g.sectorMacro).filter(Boolean) as string[])
-    const assignments: SectorAssignment[] = []
-
-    for (const sectorMacro of playerSectorMacros) {
-      if (anchorSectors.has(sectorMacro)) continue
-
-      const candidates: Array<{ groupId: string; distance: number; jumpRange: number }> = []
-      for (const group of groups) {
-        if (!group.sectorMacro) continue
-        const dist = getDistance(group.sectorMacro, sectorMacro, sectorGraph, sectorClusterMap)
-        if (dist !== null) {
-          candidates.push({ groupId: group.id, distance: dist, jumpRange: group.jumpRange })
-        }
+    const assignedSectors = new Map<string, string>()
+    for (const group of groups) {
+      if (group.sectorMacro) assignedSectors.set(group.sectorMacro, group.id)
+      for (const sectorMacro of group.coverageSectorMacros) {
+        assignedSectors.set(sectorMacro, group.id)
       }
-
-      if (candidates.length === 0) {
-        assignments.push({
-          sectorMacro,
-          status: 'exception',
-          displayBucket: 'unresolved',
-          options: [],
-          selectedOptionIndex: null
-        })
-        continue
-      }
-
-      const currentRangeHits = candidates.filter((c) => c.distance <= c.jumpRange)
-      let optionsSource = currentRangeHits.length > 0 ? currentRangeHits
-        : candidates.filter((c) => c.distance === Math.min(...candidates.map((g) => g.distance)))
-
-      const sortedByDist = [...optionsSource].sort((a, b) => a.distance - b.distance)
-      const options: AssignmentOption[] = sortedByDist.map((c) => ({
-        type: 'absorb' as const,
-        targetGroupId: c.groupId,
-        distance: c.distance,
-        extendsRange: c.distance > c.jumpRange,
-        resultingGroupSize: playerSectorMacros.length
-      }))
-
-      options.push({
-        type: 'standalone' as const,
-        distance: 0,
-        extendsRange: false,
-        resultingGroupSize: 1
-      })
-
-      // Find which group currently covers this sector
-      const coveredByGroupId = groups.find((g) =>
-        g.coverageSectorMacros.includes(sectorMacro)
-      )?.id
-
-      const defaultOptionIndex = coveredByGroupId
-        ? options.findIndex((o) => o.targetGroupId === coveredByGroupId)
-        : null
-
-      assignments.push({
-        sectorMacro,
-        status: defaultOptionIndex !== null ? 'auto' : 'uncertain_tie',
-        displayBucket: defaultOptionIndex !== null ? 'resolved' : 'unresolved',
-        defaultGroupId: coveredByGroupId,
-        options,
-        selectedOptionIndex: defaultOptionIndex !== null ? defaultOptionIndex : null
-      })
     }
+    const unassignedSectors = playerSectorMacros.filter((sectorMacro) => !assignedSectors.has(sectorMacro))
+    const assignments: SectorAssignment[] = buildAssignmentResult(unassignedSectors, assignedSectors, groups, sectorGraph, sectorClusterMap)
 
     return { groups, assignments, bridgePlans: [], playerSectorMacros }
   }

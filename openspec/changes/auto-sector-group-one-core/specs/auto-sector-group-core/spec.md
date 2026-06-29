@@ -148,7 +148,18 @@
 - **并且** 该 sector 在某 hub 的 5 跳内
 - **当** 系统生成 assignment
 - **那么** 系统 SHALL 自动生成吸收选项
+- **并且** SHALL NOT 默认选中该扩展吸收选项
 - **并且** SHALL 不将 Tier 2 sector 自动独立成 hub
+
+#### Scenario: Extension options are capped at five jumps
+- **前提** 某玩家 sector 不在任何 group 当前覆盖范围内
+- **并且** 该 sector 到最近 hub 的距离大于 5
+- **当** 系统生成 assignment
+- **那么** 系统 SHALL NOT 为该 hub 生成 absorb option
+- **并且** 系统 SHALL NOT 显示“扩展跳数至 6/7/...”
+- **并且** options SHALL 仅包含 standalone
+- **并且** `selectedOptionIndex` SHALL 为 `null`
+- **并且** 该 card SHALL 处于 unresolved / 待选择状态
 
 #### Scenario: Repeated standalone selection is idempotent
 - **前提** 某玩家 sector `S` 存在 ordinary assignment card
@@ -465,7 +476,7 @@
 
 #### Scenario: Extend options use nearest distance layer only
 - **前提** 某玩家 sector 不在任何 group 当前 jumpRange 内
-- **并且** 多个 group 可通过扩展 jumpRange 命中该 sector
+- **并且** 多个 group 可在 5 跳内通过扩展 jumpRange 命中该 sector
 - **当** 系统生成 options
 - **那么** 系统 SHALL 只保留最小扩展距离层的 group
 - **并且** SHALL 将这些 options 标记为扩展 option
@@ -481,11 +492,12 @@
 
 #### Scenario: No group option leaves standalone only
 - **前提** 某玩家 sector 不在任何 group 当前 jumpRange 内
-- **并且** 没有可用扩展 group option
+- **并且** 没有 5 跳内可用扩展 group option
 - **并且** 不存在 baseline group 可重新吸收该 sector
 - **当** 系统生成 assignment card
 - **那么** options SHALL 仅包含 standalone
 - **并且** standalone SHALL NOT 作为自动兜底默认值
+- **并且** `selectedOptionIndex` SHALL 为 `null`
 
 #### Scenario: Excluded default remains manually selectable
 - **前提** 某玩家 sector 位于 group G 覆盖范围内

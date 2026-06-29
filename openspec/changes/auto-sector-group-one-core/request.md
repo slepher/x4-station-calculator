@@ -20,7 +20,7 @@
 - Incremental 模式 SHALL 先完成新/回归 pure hub 识别，再决定普通玩家 sector 的 coverage / assignment 归属；不得让 baseline group 的保留 coverage 在新/回归 hub 被发现前抢占其邻近范围节点。
 - Sector 默认归属必须按明确规则决定：当前覆盖范围命中且未被 `excludedDefaultAssignmentSectorMacros` 排除的 group 才可默认；多命中时按距离、hub score、稳定 key 决胜；等距且 score 差距小于 30% 时 unresolved。
 - 等距且 hub score 差距小于 30% 的玩家星区必须成为 unresolved assignment。
-- 超出覆盖跳数但在 5 跳内的 Tier 2 玩家星区可生成扩展吸收 option，但不得自动独立成 hub。
+- 超出覆盖跳数但在 5 跳内的玩家星区可生成扩展吸收 option，但不得自动选中；超过 5 跳的 group 不得生成 absorb option。
 
 ### 星区图、MST 与 bridge
 
@@ -62,7 +62,8 @@
 
 - Hub anchor sector 不生成普通 assignment card。
 - 玩家 sector 位于多个 group 当前覆盖范围时，所有命中 group 都必须作为 option。
-- 无当前命中时，只保留最小扩展距离层的 group options，且扩展 option 不默认选中。
+- 无当前命中时，只保留 5 跳内的最小扩展距离层 group options，且扩展 option 不默认选中。
+- 若某玩家 sector 没有任何当前命中或 5 跳内扩展候选，无论是否存在更远 hub，都 SHALL 仅显示 standalone option，且 `selectedOptionIndex=null`。
 - 若无当前命中且存在 baseline group 可重新吸收该 sector，则可按 baseline group 生成默认吸收；否则仅保留 standalone option。
 - Excluded default group 仍可手动选择，但不得默认选中。
 - Standalone 始终作为最后 option，且不得作为自动 fallback 默认值。

@@ -94,7 +94,7 @@ const unresolvedTooltip = computed(() => {
   const allocNames: string[] = []
   if (hasPendingBridgeDecision.value) { allocCount++; allocNames.push(t('sector.connected')) }
   for (const a of result.assignments ?? []) {
-    if (a.selectedOptionIndex === null && (a.status === 'uncertain_tie' || a.status === 'uncertain_extend')) {
+    if (a.selectedOptionIndex === null && (a.status === 'uncertain_tie' || a.status === 'uncertain_extend' || a.status === 'unresolved_no_candidate')) {
       allocCount++
       allocNames.push(getTooltipSectorName(a.sectorMacro))
     }

@@ -101,7 +101,7 @@ Assignment card 只针对非 anchor 玩家 sector。
 Option 生成顺序：
 
 1. 当前 coverage 命中 groups。
-2. 无当前命中时，最近扩展距离层 groups。
+2. 无当前命中时，最近扩展距离层 groups；扩展距离必须 `<= MAX_UNCERTAIN_JUMP`，当前值为 5。
 3. Standalone。
 
 默认规则：
@@ -109,6 +109,8 @@ Option 生成顺序：
 - 当前命中且未被 excluded default 的 group 可以默认。
 - 扩展 option 不默认。
 - Standalone 不自动 fallback 默认。
+- 若没有当前命中，也没有 5 跳内扩展命中，则只生成 standalone option，并保持 `selectedOptionIndex=null`。
+- 距离大于 5 的 group 不得作为 absorb option，也不得被显示为“扩展跳数至 6/7/... ”。
 - 已选中的 Standalone option 不再是可点击 action；presenter 收到与当前 `selectedOptionIndex` 相同的选择时直接忽略。
 - 领域层仍将显式选择 Standalone 实现为 upsert 行为：已有同 `sectorMacro` hub group 时更新/复用它；没有时才创建新 group。
 - Standalone upsert 后仍需从其他 groups coverage 中移除该 sector，并重算 affected assignment options。
