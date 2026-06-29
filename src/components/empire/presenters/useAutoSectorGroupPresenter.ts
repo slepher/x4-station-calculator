@@ -157,16 +157,7 @@ function hasPendingBridgeDecisionInResult(result: AutoGroupResult | null): boole
 
 function setAutoGroupResult(result: AutoGroupResult | null) {
   liveStore.setAutoGroupResult(result)
-  if (result && !calcBaselinePillState.value) {
-    calcBaselinePillState.value = {
-      coverageByGroupId: Object.fromEntries(
-        result.groups.map((g) => [g.id, [...g.coverageSectorMacros]])
-      ),
-      connectedGroupIdsByGroupId: Object.fromEntries(
-        result.groups.map((g) => [g.id, [...g.connectedGroupIds]])
-      )
-    }
-  }
+  if (!calcBaselinePillState.value) liveStore.refreshCalcBaselinePillStateFromBinding()
   applyTradeStationDefaultsToResult()
   liveStore.captureCalculationBaseline()
 }
@@ -354,6 +345,7 @@ function handleUpdatePrefJumpRange(range: number) {
 }
 
 function handleEnterEdit() {
+  if (hasPendingBridgeDecision.value) return
   calculationMode.value = 'edit'
 }
 
@@ -412,6 +404,7 @@ function handleSelectOption(sectorMacro: string, optionIndex: number) {
 
 function handleCycleRecalcState(groupId: string) {
   if (!autoGroupResult.value) return
+  if (hasPendingBridgeDecision.value) return
   const result = autoGroupResult.value
   const group = result.groups.find((g) => g.id === groupId)
   if (!group) return
@@ -581,6 +574,7 @@ function handleAddCandidateCoverage(groupId: string, sectorMacro: string) {
 
 function handleDeleteGroup(groupId: string) {
   if (calculationMode.value !== 'edit') return
+  if (hasPendingBridgeDecision.value) return
   if (!autoGroupResult.value) return
   const result = autoGroupResult.value
   const idx = result.groups.findIndex((g) => g.id === groupId)
@@ -656,10 +650,12 @@ function handleResetAssignments() {
 
 function handleAddHubClick() {
   if (calculationMode.value !== 'edit') return
+  if (hasPendingBridgeDecision.value) return
   showHubAddMenu.value = !showHubAddMenu.value
 }
 
 function handleAddHubDraft(sectorMacro: string) {
+  if (hasPendingBridgeDecision.value) return
   if (!autoGroupResult.value) return
   showHubAddMenu.value = false
   const result = autoGroupResult.value
@@ -1353,14 +1349,7 @@ function doConfirm() {
     })) ?? []
   }))
   liveStore.setAutoGroupResult({ ...result, groups: confirmedGroups })
-  liveStore.calcBaselinePillState = {
-    coverageByGroupId: Object.fromEntries(
-      confirmedGroups.map((g) => [g.id, [...g.coverageSectorMacros]])
-    ),
-    connectedGroupIdsByGroupId: Object.fromEntries(
-      confirmedGroups.map((g) => [g.id, [...g.connectedGroupIds]])
-    )
-  }
+  liveStore.refreshCalcBaselinePillStateFromBinding()
 }
 
 function triggerAutoGroup() {

@@ -22,13 +22,15 @@ const props = withDefaults(defineProps<{
   view?: 'map' | 'live'
   showSelectGroupButton?: boolean
   showDragHandle?: boolean
+  structureDisabled?: boolean
   baselineCoverageByGroupId?: Record<string, string[]>
   baselineConnectedGroupIdsByGroupId?: Record<string, string[]>
   tradeStationCaps?: Record<string, number>
 }>(), {
   view: 'live',
   showSelectGroupButton: false,
-  showDragHandle: false
+  showDragHandle: false,
+  structureDisabled: false
 })
 
 const emit = defineEmits<{
@@ -105,6 +107,30 @@ function canEditJumpRange(group: GroupDraftInfo): boolean {
   return group.isPinned
 }
 
+function getBaselineKey(group: GroupDraftInfo): string {
+  return group.sectorMacro || group.id
+}
+
+function getBaselineCoverage(group: GroupDraftInfo): string[] {
+  const coverageByGroupId = props.baselineCoverageByGroupId
+  if (!coverageByGroupId) return []
+  return coverageByGroupId[getBaselineKey(group)] ?? coverageByGroupId[group.id] ?? []
+}
+
+function getBaselineConnectedGroupIds(group: GroupDraftInfo): string[] {
+  const connectedByGroupId = props.baselineConnectedGroupIdsByGroupId
+  if (!connectedByGroupId) return []
+  return connectedByGroupId[getBaselineKey(group)] ?? connectedByGroupId[group.id] ?? []
+}
+
+function isNewComparedToBaseline(group: GroupDraftInfo): boolean {
+  if (!props.diffEnabled) return false
+  const baselineCoverage = props.baselineCoverageByGroupId
+  if (!baselineCoverage) return false
+  return !Object.prototype.hasOwnProperty.call(baselineCoverage, getBaselineKey(group)) &&
+    !Object.prototype.hasOwnProperty.call(baselineCoverage, group.id)
+}
+
 function emitToggleTradeStationRetain(groupId: string) {
   emit('toggle-retain-trade-station', groupId)
 }
@@ -151,7 +177,7 @@ function buildUnifiedPills(group: GroupDraftInfo): Map<number, UnifiedPillEntry[
   }
 
   const canEdit = props.editable && group.isPinned
-  const baselineCov = new Set(props.baselineCoverageByGroupId?.[group.id] ?? [])
+  const baselineCov = new Set(getBaselineCoverage(group))
 
   for (const d of distances) {
     if (d.sectorMacro === group.sectorMacro) continue
@@ -179,7 +205,7 @@ function buildUnifiedPills(group: GroupDraftInfo): Map<number, UnifiedPillEntry[
   }
 
   const connectedSet = new Set(group.connectedGroupIds)
-  const baselineConns = new Set(props.baselineConnectedGroupIdsByGroupId?.[group.id] ?? [])
+  const baselineConns = new Set(getBaselineConnectedGroupIds(group))
   for (const other of props.groups) {
     if (other.id === group.id) continue
     if (!other.sectorMacro) continue
@@ -190,7 +216,7 @@ function buildUnifiedPills(group: GroupDraftInfo): Map<number, UnifiedPillEntry[
       if (!byJump.has(jump)) byJump.set(jump, [])
       byJump.get(jump)!.push({
         type: 'connected', macro: other.sectorMacro, jump,
-        baseline: baselineConns.has(other.id), removed: false, wasInBaseline: false,
+        baseline: baselineConns.has(other.id) || (!!other.sectorMacro && baselineConns.has(other.sectorMacro)), removed: false, wasInBaseline: false,
         hasPlayerStation: props.playerSectorMacros.includes(other.sectorMacro),
         connectedGroupId: other.id,
         connectedGroupName: other.sectorMacro ? getSectorName(other.sectorMacro) : other.name,
@@ -200,7 +226,7 @@ function buildUnifiedPills(group: GroupDraftInfo): Map<number, UnifiedPillEntry[
       if (!byJump.has(jump)) byJump.set(jump, [])
       byJump.get(jump)!.push({
         type: 'connected', macro: other.sectorMacro, jump,
-        baseline: false, removed: false, wasInBaseline: baselineConns.has(other.id),
+        baseline: false, removed: false, wasInBaseline: baselineConns.has(other.id) || (!!other.sectorMacro && baselineConns.has(other.sectorMacro)),
         hasPlayerStation: props.playerSectorMacros.includes(other.sectorMacro),
         connectedGroupId: other.id,
         connectedGroupName: other.sectorMacro ? getSectorName(other.sectorMacro) : other.name,
@@ -212,8 +238,8 @@ function buildUnifiedPills(group: GroupDraftInfo): Map<number, UnifiedPillEntry[
   if (!props.editable && props.diffEnabled && props.baselineCoverageByGroupId) {
     const currentCov = new Set(group.coverageSectorMacros)
     const currentConn = new Set(group.connectedGroupIds)
-    const baselineCovEntries = props.baselineCoverageByGroupId[group.id] ?? []
-    const baselineConnEntries = props.baselineConnectedGroupIdsByGroupId?.[group.id] ?? []
+    const baselineCovEntries = getBaselineCoverage(group)
+    const baselineConnEntries = getBaselineConnectedGroupIds(group)
 
     for (const sectorMacro of baselineCovEntries) {
       if (currentCov.has(sectorMacro)) continue
@@ -229,9 +255,14 @@ function buildUnifiedPills(group: GroupDraftInfo): Map<number, UnifiedPillEntry[
       })
     }
 
+    const currentConnSectorMacros = new Set(
+      group.connectedGroupIds
+        .map((connId) => props.groups.find((g) => g.id === connId)?.sectorMacro)
+        .filter((sectorMacro): sectorMacro is string => !!sectorMacro)
+    )
     for (const connId of baselineConnEntries) {
-      if (currentConn.has(connId)) continue
-      const targetGroup = props.groups.find(g => g.id === connId)
+      if (currentConn.has(connId) || currentConnSectorMacros.has(connId)) continue
+      const targetGroup = props.groups.find(g => g.id === connId || g.sectorMacro === connId)
       if (!targetGroup || !targetGroup.sectorMacro) continue
       const jump = distMap.get(targetGroup.sectorMacro)
       if (jump === undefined) continue
@@ -297,7 +328,7 @@ function onAnchorPillClick(macro: string) {
     class="group-item"
     @keydown="onEsc"
     :class="{
-      'group-item--new': group.isNew,
+      'group-item--new': isNewComparedToBaseline(group),
       'group-item--pinned': group.isPinned,
       'group-item--unpinned': !group.isPinned && group.baseline,
       'group-item--baseline': group.baseline && !editable,
@@ -340,8 +371,9 @@ function onAnchorPillClick(macro: string) {
           v-if="!group.enteredOtherGroupCoverage"
           class="action-btn state-btn"
           :class="group.isPinned ? 'state-btn--pinned' : 'state-btn--unpinned'"
+          :disabled="props.structureDisabled"
           :title="getPinnedTitle(group)"
-          @click="emit('cycle-recalc-state', group.id)"
+          @click="!props.structureDisabled && emit('cycle-recalc-state', group.id)"
         >
           <svg class="state-icon" :class="group.isPinned ? 'state-icon--pinned' : 'state-icon--unpinned'" viewBox="0 0 24 24" fill="none">
             <template v-if="group.isPinned">
@@ -366,8 +398,9 @@ function onAnchorPillClick(macro: string) {
         <button
           v-if="props.editable && group.isNew && !group.baseline"
           class="action-btn state-btn state-btn--delete"
+          :disabled="props.structureDisabled"
           :title="t('sector.delete_hub')"
-          @click="emit('delete-group', group.id)"
+          @click="!props.structureDisabled && emit('delete-group', group.id)"
         >
           <svg class="state-icon" viewBox="0 0 24 24" fill="none">
             <path d="M6 7h12l-1 14H7L6 7z" stroke="currentColor" stroke-width="1.5"/>

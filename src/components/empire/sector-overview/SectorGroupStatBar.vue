@@ -12,12 +12,14 @@ const props = withDefaults(defineProps<{
   tradeStationRetainIndeterminate?: boolean
   showAddHub?: boolean
   editDisabled?: boolean
+  addDisabled?: boolean
 }>(), {
   view: 'live',
   tradeStationRetainEnabled: false,
   tradeStationRetainIndeterminate: false,
   showAddHub: false,
-  editDisabled: true
+  editDisabled: true,
+  addDisabled: false
 })
 
 const emit = defineEmits<{
@@ -68,7 +70,7 @@ function onTradeStationRetainChange(e: Event) {
       <div class="stat-bar-right">
         <template v-if="mode === 'edit'">
           <button class="bar-btn cancel-btn" @click="emit('exit')">{{ t('sector.exit') }}</button>
-          <button class="bar-btn add-btn" @click="emit('add-hub')">{{ showAddHub ? t('sector.cancel_add_hub') : t('sector.add_hub') }}</button>
+          <button class="bar-btn add-btn" :disabled="addDisabled" @click="emit('add-hub')">{{ showAddHub ? t('sector.cancel_add_hub') : t('sector.add_hub') }}</button>
         </template>
         <template v-else>
           <button class="bar-btn recalc-btn" :disabled="editDisabled" @click="emit('edit')">{{ t('sector.edit') }}</button>
@@ -121,6 +123,10 @@ function onTradeStationRetainChange(e: Event) {
 
 .add-btn {
   @apply bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-600/30;
+}
+
+.add-btn:disabled {
+  @apply opacity-40 cursor-not-allowed hover:bg-emerald-600/20;
 }
 
 .recalc-btn {

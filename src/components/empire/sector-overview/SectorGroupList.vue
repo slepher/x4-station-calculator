@@ -18,13 +18,15 @@ const props = withDefaults(defineProps<{
   view?: 'map' | 'live'
   showSelectGroupButton?: boolean
   draggable?: boolean
+  structureDisabled?: boolean
   baselineCoverageByGroupId?: Record<string, string[]>
   baselineConnectedGroupIdsByGroupId?: Record<string, string[]>
   tradeStationCaps?: Record<string, number>
 }>(), {
   view: 'live',
   showSelectGroupButton: false,
-  draggable: false
+  draggable: false,
+  structureDisabled: false
 })
 
 const emit = defineEmits<{
@@ -54,6 +56,7 @@ const cardBase = computed(() => ({
   diffEnabled: props.diffEnabled,
   view: props.view,
   showSelectGroupButton: props.showSelectGroupButton,
+  structureDisabled: props.structureDisabled,
   baselineCoverageByGroupId: props.baselineCoverageByGroupId,
   baselineConnectedGroupIdsByGroupId: props.baselineConnectedGroupIdsByGroupId,
   tradeStationCaps: props.tradeStationCaps ?? {}

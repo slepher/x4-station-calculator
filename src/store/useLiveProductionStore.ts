@@ -136,6 +136,26 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     connectedGroupIdsByGroupId: Record<string, string[]>
   } | null>(null)
 
+  function refreshCalcBaselinePillStateFromBinding() {
+    const binding = activeBinding.value
+    if (!binding) {
+      calcBaselinePillState.value = null
+      return
+    }
+    calcBaselinePillState.value = {
+      coverageByGroupId: Object.fromEntries(
+        binding.groups
+          .filter((group) => !!group.sectorMacro)
+          .map((group) => [group.sectorMacro!, group.coverageSectorMacros.map((sector) => sector.ref)])
+      ),
+      connectedGroupIdsByGroupId: Object.fromEntries(
+        binding.groups
+          .filter((group) => !!group.sectorMacro)
+          .map((group) => [group.sectorMacro!, [...(group.connectedGroupIds || [])]])
+      )
+    }
+  }
+
   function resolveTransitRouteSectorLabel(sector: { id: string; name?: string; nameId?: string }): string {
     if (sector.nameId && i18n.global.te(sector.nameId)) return i18n.global.t(sector.nameId)
     return sector.name || sector.id
@@ -455,8 +475,10 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     _lastDraftInitKey = draftKey
     if (!archive || !archive.isValid || !binding) {
       setAutoGroupResult(null)
+      refreshCalcBaselinePillStateFromBinding()
       return
     }
+    refreshCalcBaselinePillStateFromBinding()
 
     let result: AutoGroupResult
     const { sectorGraph, sectorClusterMap } = buildSectorGraphFromMaps(
@@ -511,14 +533,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       prefJumpRange: prefJumpRange.value
     }, sectorGraph, sectorClusterMap)
     setAutoGroupResult(enrichedResult)
-    calcBaselinePillState.value = {
-      coverageByGroupId: Object.fromEntries(
-        enrichedResult.groups.map((g) => [g.id, [...g.coverageSectorMacros]])
-      ),
-      connectedGroupIdsByGroupId: Object.fromEntries(
-        enrichedResult.groups.map((g) => [g.id, [...g.connectedGroupIds]])
-      )
-    }
     calculationMode.value = 'result'
   }
 
@@ -2528,6 +2542,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     bridgeSearchJumpRange,
     prefThreshold,
     calcBaselinePillState,
+    refreshCalcBaselinePillStateFromBinding,
     needsAutoGroupRecalc,
     setAutoGroupResult,
     captureCalculationBaseline,
