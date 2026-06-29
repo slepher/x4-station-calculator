@@ -104,19 +104,26 @@ gameGuid:archiveTime
 
 ### calcBaselinePillState
 
-`calcBaselinePillState` 是 pill UI diff 基线，不是 [重置] 数据源。
+`calcBaselinePillState` 是 saved binding UI diff 基线，不是 [重置] 数据源，也不是计算结果快照。
 
 更新时间点：
 
-1. active binding/archive 初始化出第一份 result 时写入。
-2. 显式 [计算] 不覆盖该基线。
-3. 确认成功后更新为确认后的 groups。
+1. active binding/archive 初始化时，从当前 `SaveBindingPlan.groups` 写入。
+2. 显式 [计算]、[快速计算]、[重置]、pin / unpin 不覆盖该基线。
+3. 确认成功后，先保存 binding，再从保存后的 `SaveBindingPlan.groups` 刷新。
 
 用途：
 
 - `SectorGroupList` 的 `baselineCoverageByGroupId`。
 - `SectorGroupList` 的 `baselineConnectedGroupIdsByGroupId`。
-- 用于粗边框、removed pill 等“与初始/已确认基线比较”的展示。
+- group 新增高亮。
+- coverage/connected pill 的粗边框、removed pill 等“与 saved binding 比较”的展示。
+
+身份口径：
+
+- baseline map key 使用 hub `sectorMacro`，不使用 runtime group id。
+- card 读取 baseline 时优先使用 `group.sectorMacro`，仅无 `sectorMacro` 时 fallback 到 `group.id`。
+- saved binding 的 `connectedGroupIds` 也按 hub `sectorMacro` 解释；UI 中 runtime group id 与 sectorMacro 不一致时，比较逻辑 SHALL 以 `sectorMacro` 对齐。
 
 ### SaveBinding Version 2 Group Identity
 
@@ -215,17 +222,26 @@ pin / unpin 是 shared draft 的即时变换，不是持久化提交动作，也
 1. `autoGroupResult.groups` 保留当前 hub/group card；unpin 不从当前 hub 列表删除 group。
 2. unpin 只将 group `isPinned=false`；pin 只将 group `isPinned=true`。
 3. unpin 为该 group 的 `sectorMacro` 新增/恢复 assignment，并默认选中 standalone option；pin 移除该 `sectorMacro` 对应 assignment。
-4. unpin 生成的 assignment 需要携带仅用于当前 draft 展示排序的 unpin 顺序；assignment 列表展示时将这类 assignment 放在最上方，并按 unpin 先后顺序排列。
-5. unpin 生成 assignment options 时复用标准 assignment 展示规则：当前范围内命中的 absorb 候选全部显示；无当前范围命中时只显示最小扩展候选；超过 `MAX_UNCERTAIN_JUMP` 的 absorb 候选不显示。
-6. pin / unpin 不修改 group 顺序、coverage、connections、trade station、virtual station draft 或其他 assignment 选择。
-7. `isPinned=false` 只影响下一次显式 [计算] 的 base input：`buildRecalculateBaseGroups()` SHALL 只读取 `isPinned=true` 的 groups。
-8. 显式 [计算] 后，如果此前 unpin 的 sector 被算法重新选为 hub，则它是新的计算结果 hub：需要清除该 sector 的 unpin 展示状态，并将对应 group 归一为 pinned hub 状态。
-9. 用户在 assignment 中显式点击“独立成组”时，才调用既有 `applyStandaloneToResult()`，并保留它自动计算 coverage 与 derived candidates 的行为。
-10. pin / unpin 入口只属于 hub/group card；assignment card 不显示 pin / unpin 按钮。
-11. result/edit 模式的 hub/group card 都显示 pin / unpin 按钮；result 模式不得隐藏该按钮。
-12. pin / unpin 可以在 result/edit 模式触发，但都只写 live store 的 shared draft，不直接写 `saveBindingStore`。
-13. 单纯 pin / unpin 不改变可持久化字段时，dirty comparison 应将其视为 `hasChanges=false`。
-14. absorb 一个 sector 到其他 group 时，如果该 sector 同时存在自身 hub group，则删除所有同 `sectorMacro` 的自身 hub group，清理其他 group 的 `connectedGroupIds` 和 assignment options 中指向被删除 group 的引用。
+4. unpin 生成的 assignment 设 `displayBucket='unpin'`，并携带 `unpinOrder` 记录 unpin 先后顺序。assignment 列表展示时将 `displayBucket='unpin'` 的 card 放在最上方，unpin 组内按 `unpinOrder` 排列。
+5. `displayBucket` 扩展为三态：`'resolved' | 'unresolved' | 'unpin'`。`'unpin'` 在排序时优先于 `'resolved'` 和 `'unresolved'`；`'resolved'` 和 `'unresolved'` 之间保持原 `displayBucket` 顺序。
+6. `displayBucket` 在 assignment 创建时确定，用户选择 absorb 或 standalone option 后 SHALL NOT 改变。只有 unpin 创建 assignment 时设为 `'unpin'`，pin 删除 assignment 时移除；显式 [计算] 重建 assignments 时按 `selectedOptionIndex` 重新确定 `'resolved' | 'unresolved'`。
+7. unpin 生成 assignment options 时复用标准 assignment 展示规则：当前范围内命中的 absorb 候选全部显示；无当前范围命中时只显示最小扩展候选；超过 `MAX_UNCERTAIN_JUMP` 的 absorb 候选不显示。
+8. pin / unpin 不修改 group 顺序、coverage、connections、trade station、virtual station draft 或其他 assignment 选择。
+9. `isPinned=false` 只影响下一次显式 [计算] 的 base input：`buildRecalculateBaseGroups()` SHALL 只读取 `isPinned=true` 的 groups。
+10. 显式 [计算] 后，如果此前 unpin 的 sector 被算法重新选为 hub，则它是新的计算结果 hub：需要清除该 sector 的 unpin 展示状态，并将对应 group 归一为 pinned hub 状态。
+11. 用户在 assignment 中显式点击"独立成组"时，才调用既有 `applyStandaloneToResult()`，并保留它自动计算 coverage 与 derived candidates 的行为。
+12. `applyStandaloneToResult()` 追加 derived absorb candidates 时 SHALL 覆盖 range 内和扩展两种距离：距离 `≤ prefJumpRange` 的追加 `extendsRange=false`；距离 `> prefJumpRange` 且 `≤ MAX_UNCERTAIN_JUMP` 的追加 `extendsRange=true`；距离 `> MAX_UNCERTAIN_JUMP` 的不追加。
+13. 追加候选后 `selectedOptionIndex` 和 `status` 的更新规则采用"新 hub 相对当前选中项是否更优"的比较，不强制切换到全局 best：
+    - 新 hub 在 range 内（`extendsRange=false`）且当前已有选中项：新 hub 比当前选中项更优（距离更近，或同距离 score 更高）时切换到新 hub，`status='auto'`；不更优或产生平局时保持不变。
+    - 新 hub 在 range 内且当前为 `uncertain_tie`（`selected=null`）：新 hub 明确打破原有平局时选中新 hub，`status='auto'`；仍平局时保持 `null` 和 `uncertain_tie`。
+    - 新 hub 为扩展候选（`extendsRange=true`）且无其他 range 内命中：`selectedOptionIndex=null`，`status` 保持 `uncertain_extend`，与 `buildAssignmentResult` 的 uncertain_extend 语义对齐。
+    - 新 hub 为扩展候选且存在其他 range 内命中：`selectedOptionIndex` 和 `status` 保持不变。
+14. pin / unpin 入口只属于 hub/group card；assignment card 不显示 pin / unpin 按钮。
+15. result/edit 模式的 hub/group card 都显示 pin / unpin 按钮；result 模式不得隐藏该按钮。
+16. pin / unpin 可以在 result/edit 模式触发，但都只写 live store 的 shared draft，不直接写 `saveBindingStore`。
+17. 单纯 pin / unpin 不改变可持久化字段时，dirty comparison 应将其视为 `hasChanges=false`。
+18. absorb 一个 sector 到其他 group 时，如果该 sector 同时存在自身 hub group，则删除所有同 `sectorMacro` 的自身 hub group，清理其他 group 的 `connectedGroupIds` 和 assignment options 中指向被删除 group 的引用。
+19. unpin assignment 被用户选择 absorb 到其他 group 后，SHALL 只更新 `selectedOptionIndex` 和 `status`，SHALL NOT 改变 `displayBucket` 或 `unpinOrder`；该 assignment 继续留在 unpin 顶部位置。
 
 实现边界：
 
@@ -275,7 +291,7 @@ pin / unpin 是 shared draft 的即时变换，不是持久化提交动作，也
 6. 保存 binding。
 7. 同步 live flow。
 8. 将 result groups 规范化为保存后的 baseline UI 状态：`baseline=true`，清理 `isNew`、新增高亮和跨覆盖临时提示，保留用户确认后的顺序和字段。
-9. 更新 `calcBaselinePillState`。
+9. 从保存后的 `SaveBindingPlan.groups` 刷新 `calcBaselinePillState`。
 10. 更新 `calculationBaseline` 为确认后的 autoGroupResult 与 virtual station drafts。
 11. 重新计算 dirty 状态；若 draft 与 binding 一致，`hasChanges=false`。
 12. 确认成功后确认按钮置灰，不跳转。

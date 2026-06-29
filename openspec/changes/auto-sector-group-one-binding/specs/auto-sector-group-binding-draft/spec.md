@@ -442,7 +442,7 @@ Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触�
 
 ### Requirement: Snapshot And Baseline Timing
 
-系统 SHALL 区分重置快照 `calculationBaseline` 和 UI diff 基线 `calcBaselinePillState`。
+系统 SHALL 区分重置快照 `calculationBaseline` 和 saved binding UI diff 基线 `calcBaselinePillState`。
 
 #### Scenario: Calculation baseline timing
 
@@ -462,12 +462,22 @@ Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触�
 
 #### Scenario: Pill baseline timing
 
-- **前提** 当前 active binding/archive 初始化出第一份 result
-- **当** `calcBaselinePillState` 为空
-- **那么** 系统 SHALL 从当前 groups 记录 coverage 和 connected group ids
-- **并且** 显式「计算」 SHALL NOT 覆盖该 baseline
+- **前提** 当前 active binding 存在已保存 `SaveBindingPlan.groups`
+- **当** 系统初始化 shared draft 或刷新 UI diff baseline
+- **那么** 系统 SHALL 从已保存 binding groups 记录 coverage 和 connected group ids
+- **并且** SHALL 使用 hub `sectorMacro` 作为 `calcBaselinePillState` key
+- **并且** 显式「计算」、快速计算、重置、pin / unpin SHALL NOT 用当前计算结果覆盖该 baseline
 - **当** 用户确认成功
-- **那么** 系统 SHALL 使用确认后的 groups 更新 `calcBaselinePillState`
+- **那么** 系统 SHALL 先写入 binding
+- **并且** SHALL 从保存后的 binding groups 刷新 `calcBaselinePillState`
+
+#### Scenario: Group new highlight uses saved binding baseline
+
+- **前提** 某 runtime group 的 `id` 与 `sectorMacro` 不一致
+- **并且** 已保存 binding groups 中存在同一 `sectorMacro`
+- **当** 系统渲染 group card
+- **那么** 该 group SHALL NOT 显示新增 group 高亮
+- **并且** coverage/connected pill diff SHALL 以 saved binding 中同一 `sectorMacro` 的 group 作为 baseline
 
 #### Scenario: Post-confirm saved UI state
 
@@ -479,7 +489,7 @@ Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触�
 - **并且** 顶部「确定」按钮 SHALL 置灰/禁用
 - **并且** 当前页面 SHALL 继续停留在星区编辑页面
 - **并且** result groups SHALL 清理 `isNew` 等仅表示未保存新增的 transient 高亮标记
-- **并且** `calcBaselinePillState` SHALL 更新为确认后的 groups，coverage/connected pill SHALL NOT 继续显示相对确认前的差异高亮
+- **并且** `calcBaselinePillState` SHALL 从保存后的 binding groups 刷新，group 新增高亮和 coverage/connected pill SHALL NOT 继续显示相对确认前的差异高亮
 - **并且** uncertain assignment 提示 MAY 继续显示，但 SHALL NOT 被解释为未保存改动
 
 #### Scenario: Styled secondary confirm dialog
@@ -507,6 +517,8 @@ Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触�
 - **并且** `autoGroupResult.assignments` SHALL 包含 `sectorMacro=S` 的 assignment
 - **并且** 该 assignment SHALL 默认选中 standalone option
 - **并且** 该 assignment SHALL 在 assignment 列表最上方的 unpin 专门位置展示
+- **并且** 该 assignment 的 `displayBucket` SHALL 设为 `'unpin'`
+- **并且** 该 assignment 的 `unpinOrder` SHALL 记录 unpin 先后顺序，用于 unpin 组内排序
 - **并且** 该 assignment 的 absorb options SHALL 复用标准 assignment 展示规则，当前范围内命中的 absorb 候选 SHALL 全部显示
 - **并且** 无当前范围命中时 SHALL 只显示最小扩展候选
 - **并且** 超过最大不确定扩展跳数的 absorb option SHALL NOT 显示
@@ -522,6 +534,17 @@ Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触�
 - **那么** assignment 列表 SHALL 将 `S1` 和 `S2` 放在最上方的 unpin 专门位置
 - **并且** `S1` SHALL 排在 `S2` 之前
 - **并且** 其他非 unpin assignment SHALL 排在这些 unpin assignment 之后
+
+#### Scenario: Absorb preserves unpin display position
+
+- **前提** 当前 `autoGroupResult.assignments` 中存在 `displayBucket='unpin'` 的 assignment `A`
+- **并且** `A.sectorMacro=S`
+- **当** 用户对 `A` 选择 absorb 到目标 group `T`
+- **那么** 系统 SHALL 更新 `A.selectedOptionIndex` 和 `A.status` 为 `'auto'`
+- **并且** SHALL NOT 改变 `A.displayBucket`
+- **并且** SHALL NOT 改变 `A.unpinOrder`
+- **并且** `A` SHALL 继续留在 assignment 列表最上方的 unpin 专门位置
+- **并且** 系统 SHALL 将 `S` 加入目标 group `T` 的 coverage
 
 #### Scenario: Pin removes hub assignment
 
@@ -573,8 +596,50 @@ Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触�
 - **当** 用户显式选择「独立成组」
 - **那么** 系统 SHALL 使用既有 standalone 逻辑创建 `S` 的 hub group
 - **并且** SHALL 按 `prefJumpRange` 计算 coverage 并排除已占用 sector
-- **并且** SHALL 允许向邻近 assignment 追加 derived absorb candidates
+- **并且** SHALL 向邻近 assignment 追加以 `S` 为 hub 的 derived absorb candidates
+- **并且** 对距离 `≤ prefJumpRange` 的 sector SHALL 追加 `extendsRange=false` 的 absorb option
+- **并且** 对距离 `> prefJumpRange` 且 `≤ MAX_UNCERTAIN_JUMP` 的 sector SHALL 追加 `extendsRange=true` 的 absorb option
+- **并且** 对距离 `> MAX_UNCERTAIN_JUMP` 的 sector SHALL NOT 追加 absorb option
 - **并且** 若新候选是更优选择，邻近 sector MAY 被该 standalone hub 吸收到 coverage
+- **并且** 被追加候选的 assignment SHALL 按以下规则更新 `selectedOptionIndex` 和 `status`
+
+#### Scenario: Standalone derived candidate default selection
+
+- **前提** sector `S` 显式独立成组后，系统为邻近 sector `T` 追加以 `S` 为 hub 的 derived absorb candidate
+- **当** 新 hub `S` 到 `T` 的距离 `≤ prefJumpRange`（`extendsRange=false`）
+- **并且** `T` 当前已有选中项（`selectedOptionIndex !== null`）
+- **当** 新 hub `S` 比当前选中项更优（距离更近，或同距离 score 更高）
+- **那么** `T.selectedOptionIndex` SHALL 切换到新 hub `S` 对应的 option
+- **并且** `T.status` SHALL 为 `'auto'`
+- **当** 新 hub `S` 不比当前选中项更优
+- **那么** `T.selectedOptionIndex` SHALL 保持不变
+- **并且** `T.status` SHALL 保持不变
+- **当** 新 hub `S` 加入后与当前选中项产生 score 平局
+- **那么** `T.selectedOptionIndex` SHALL 保持不变
+- **并且** `T.status` SHALL 保持不变
+
+#### Scenario: Standalone derived candidate resolves uncertain tie
+
+- **前提** sector `T` 当前为 `uncertain_tie`（`selectedOptionIndex === null`，多个 range 内候选 score 平局）
+- **当** 新 hub `S` 到 `T` 的距离 `≤ prefJumpRange`（`extendsRange=false`）
+- **当** 新 hub `S` 明确打破原有平局（距离更近，或同距离 score 明显更优）
+- **那么** `T.selectedOptionIndex` SHALL 指向新 hub `S` 对应的 option
+- **并且** `T.status` SHALL 为 `'auto'`
+- **当** 新 hub `S` 加入后仍存在 score 平局
+- **那么** `T.selectedOptionIndex` SHALL 保持 `null`
+- **并且** `T.status` SHALL 保持 `'uncertain_tie'`
+
+#### Scenario: Standalone derived candidate extension only
+
+- **前提** sector `S` 显式独立成组后，系统为邻近 sector `T` 追加 derived absorb candidate
+- **当** 新 hub `S` 到 `T` 的距离 `> prefJumpRange` 且 `≤ MAX_UNCERTAIN_JUMP`（`extendsRange=true`）
+- **并且** `T` 的 options 中无其他 range 内 absorb 命中
+- **那么** `T.selectedOptionIndex` SHALL 为 `null`
+- **并且** `T.status` SHALL 保持 `'uncertain_extend'`
+- **并且** UI SHALL 显示「需要扩展」tag 且无 radio 默认选中
+- **当** `T` 的 options 中同时存在其他 range 内 absorb 命中
+- **那么** `T.selectedOptionIndex` SHALL 保持不变
+- **并且** `T.status` SHALL 保持不变
 
 #### Scenario: Absorb removes own hub by sector macro
 

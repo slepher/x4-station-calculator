@@ -5,7 +5,7 @@
 - [ ] 在 `useLiveProductionStore` 中维护 `autoGroupResult`
 - [ ] 在 `useLiveProductionStore` 中维护 `calculationMode`
 - [ ] 在 `useLiveProductionStore` 中维护 `prefJumpRange`、`bridgeSearchJumpRange`、`prefThreshold`
-- [ ] 在 `useLiveProductionStore` 中维护 `calcBaselinePillState`
+- [ ] 在 `useLiveProductionStore` 中维护从 saved binding groups 构造的 `calcBaselinePillState`
 - [ ] 在 `useLiveProductionStore` 中维护 `virtualStationDrafts`
 - [ ] 在 `useLiveProductionStore` 中维护 virtual station draft context 初始化 key
 - [ ] 实现 `needsAutoGroupRecalc`
@@ -43,7 +43,7 @@
 - [ ] Handler 统一读写 live store 共享 draft
 - [x] 明确并实现 `calculationBaseline` 作为 [重置] 数据源
 - [x] `calculationBaseline` 覆盖 autoGroupResult 与 virtual station drafts
-- [ ] 明确并实现 `calcBaselinePillState` 作为 pill UI diff 基线
+- [x] 明确并实现 `calcBaselinePillState` 作为 saved binding UI diff 基线，覆盖 group 新增高亮和 pill diff
 - [ ] 移除旧的 edit restore snapshot 语义；[退出] 只退出编辑态
 - [ ] `handleColorChange` 不直接写持久化 binding
 - [x] shared draft 保留 one-map 对独立成组 / bridge 新 hub 分配的 `group.color`
@@ -65,7 +65,13 @@
 - [x] 确保单纯 pin / unpin 不产生可持久化 dirty，`hasChanges` 保持 false
 - [x] 确保 unpin 不调用 `applyStandaloneToResult()`，不抢占其他 coverage
 - [ ] 确保 assignment 显式「独立成组」仍保留既有 standalone coverage / derived candidates 行为
+- [ ] `applyStandaloneToResult()` 追加扩展跳数 derived absorb candidates（`> prefJumpRange` 且 `≤ MAX_UNCERTAIN_JUMP`，`extendsRange=true`）
+- [ ] `applyStandaloneToResult()` 追加候选后：新 hub range 内且比当前选中更优 → 切换；不更优/平局 → 保持；新 hub 扩展且无 range 内命中 → `selectedOptionIndex=null`、`status='uncertain_extend'`；不强制切换到全局 best
 - [ ] absorb 到其他 group 时按 `sectorMacro` 删除自身 hub，并清理 connections / assignment options / trade station
+- [ ] `displayBucket` 扩展为三态 `'resolved' | 'unresolved' | 'unpin'`
+- [ ] unpin 生成 assignment 时设 `displayBucket='unpin'` + `unpinOrder`
+- [ ] `sortAssignmentsForDisplay` 按 `displayBucket` 分组排序，unpin 组内按 `unpinOrder` 排列
+- [ ] `resolveUncertainAssignment` 不清除 `displayBucket` 和 `unpinOrder`，absorb 后 unpin assignment 留在顶部
 
 ## 5. Live 双模式
 

@@ -35,7 +35,7 @@ export interface AssignmentOption {
 export interface SectorAssignment {
   sectorMacro: string
   status: 'auto' | 'uncertain_tie' | 'uncertain_extend' | 'unresolved_no_candidate' | 'standalone' | 'exception'
-  displayBucket: 'resolved' | 'unresolved'
+  displayBucket: 'resolved' | 'unresolved' | 'unpin'
   defaultGroupId?: string
   options: AssignmentOption[]
   selectedOptionIndex: number | null
@@ -590,7 +590,7 @@ export function applyBridgePlanToDraft(
     if (existingAnchors.has(unit.selectedSectorMacro)) continue
     existingAnchors.add(unit.selectedSectorMacro)
     bridgeGroups.push({
-      id: `auto_${crypto.randomUUID()}`,
+      id: unit.selectedSectorMacro,
       name: getSectorName(unit.selectedSectorMacro),
       sectorMacro: unit.selectedSectorMacro,
       jumpRange: prefJumpRange,
@@ -599,7 +599,7 @@ export function applyBridgePlanToDraft(
       connectedGroupIds: [],
       excludedDefaultAssignmentSectorMacros: [],
       isNew: true,
-      isPinned: false,
+      isPinned: true,
       coverageRetainEnabled: true,
       connectionRetainEnabled: true,
       hubScore: selectedUnitScore(unit),
@@ -799,7 +799,7 @@ export function groupCleanSlate(
         connectedGroupIds: [],
         excludedDefaultAssignmentSectorMacros: [],
         isNew: true,
-        isPinned: false,
+        isPinned: true,
       coverageRetainEnabled: true,
       connectionRetainEnabled: true,
         hubScore: hub.score,
@@ -1080,7 +1080,7 @@ export function groupIncremental(
         connectedGroupIds: [],
         excludedDefaultAssignmentSectorMacros: [],
         isNew: true,
-        isPinned: false,
+        isPinned: true,
       coverageRetainEnabled: true,
       connectionRetainEnabled: true,
         hubScore: hub.score,
@@ -1353,7 +1353,6 @@ export function resolveUncertainAssignment(
 ): SectorAssignment {
   return {
     ...assignment,
-    unpinOrder: undefined,
     selectedOptionIndex: optionIndex,
     status: 'auto'
   }
@@ -1408,7 +1407,7 @@ function buildStandaloneSelectedAssignment(
   return {
     sectorMacro,
     status: 'standalone',
-    displayBucket: 'resolved',
+    displayBucket: 'unpin',
     options,
     selectedOptionIndex: standaloneIndex,
     unpinOrder
@@ -1420,8 +1419,9 @@ export function sortAssignmentsForDisplay(
   groups: GroupDraftInfo[]
 ): SectorAssignment[] {
   const order: Record<string, number> = {
-    unresolved: 0,
-    resolved: 1
+    unpin: 0,
+    unresolved: 1,
+    resolved: 2
   }
   const groupAnchors = new Set(groups.map((group) => group.sectorMacro).filter(Boolean))
 
@@ -1434,13 +1434,13 @@ export function sortAssignmentsForDisplay(
       return !isAnchor
     })
     .sort((a, b) => {
-      const aIsUnpin = a.unpinOrder !== undefined
-      const bIsUnpin = b.unpinOrder !== undefined
-      if (aIsUnpin || bIsUnpin) {
-        if (aIsUnpin && bIsUnpin) return a.unpinOrder! - b.unpinOrder!
-        return aIsUnpin ? -1 : 1
+      const aOrder = order[a.displayBucket] ?? 9
+      const bOrder = order[b.displayBucket] ?? 9
+      if (aOrder !== bOrder) return aOrder - bOrder
+      if (a.displayBucket === 'unpin' && b.displayBucket === 'unpin') {
+        return (a.unpinOrder ?? 0) - (b.unpinOrder ?? 0)
       }
-      return (order[a.displayBucket] ?? 9) - (order[b.displayBucket] ?? 9)
+      return 0
     })
 }
 
@@ -1702,6 +1702,7 @@ export function applyStandaloneToResult(
   assignments[idx] = {
     ...assignment,
     unpinOrder: undefined,
+    displayBucket: assignment.displayBucket === 'unpin' ? 'resolved' : assignment.displayBucket,
     selectedOptionIndex: standaloneIdx >= 0 ? standaloneIdx : assignment.options.length,
     status: 'standalone'
   }
@@ -1713,6 +1714,7 @@ export function applyStandaloneToResult(
   }
 
   // Append derived candidates from the new standalone group without removing initial candidates.
+  const newGroupRef = groups.find((g) => g.id === groupId)
   for (let i = 0; i < assignments.length; i++) {
     const a = assignments[i]!
     if (a.sectorMacro === sectorMacro) continue
@@ -1721,14 +1723,15 @@ export function applyStandaloneToResult(
     const dist = getCoverageSectors(sectorMacro, 99, sectorGraph, sectorClusterMap)
       .find((d) => d.sectorMacro === a.sectorMacro)?.distance
 
-    if (dist === undefined || dist > prefJumpRange) continue
+    if (dist === undefined) continue
+    if (dist > MAX_UNCERTAIN_JUMP) continue
     if (a.options.some((option) => option.targetGroupId === groupId)) continue
 
     const newOpt: AssignmentOption = {
       type: 'absorb' as const,
       targetGroupId: groupId,
       distance: dist,
-      extendsRange: false,
+      extendsRange: dist > prefJumpRange,
       resultingGroupSize: 1,
       source: 'derived_standalone',
       sourceGroupId: groupId
@@ -1738,11 +1741,72 @@ export function applyStandaloneToResult(
     const si = opts.findIndex((o) => o.type === 'standalone')
     if (si >= 0) opts.splice(si, 0, newOpt)
     else opts.push(newOpt)
-    const bestIdx = findBestOptionIndex(opts)
+    const newOptIdx = opts.indexOf(newOpt)
+
+    let nextSelected = a.selectedOptionIndex
+    let nextStatus = a.status
+
+    if (!newOpt.extendsRange) {
+      const currentSelected = nextSelected !== null ? opts[nextSelected] : null
+      if (currentSelected && currentSelected.type === 'absorb' && !currentSelected.extendsRange) {
+        const newIsCloser = newOpt.distance < currentSelected.distance
+        const sameDist = newOpt.distance === currentSelected.distance
+        const newScore = newGroupRef?.hubScore
+        const currentGroup = groups.find((g) => g.id === currentSelected.targetGroupId)
+        const currentScore = currentGroup?.hubScore
+        const newIsBetterScore = sameDist && newScore !== undefined && currentScore !== undefined && newScore > currentScore * (1 + SCORE_TIE_THRESHOLD)
+        const isTie = sameDist && newScore !== undefined && currentScore !== undefined && Math.abs(newScore - currentScore) / Math.max(newScore, currentScore) < SCORE_TIE_THRESHOLD
+        if (newIsCloser || newIsBetterScore) {
+          nextSelected = newOptIdx
+          nextStatus = 'auto'
+        } else if (isTie) {
+          // 新 hub 加入后与当前选中项平局，保持原选择
+        }
+      } else if (!currentSelected || currentSelected.type === 'standalone') {
+        const newScore = newGroupRef?.hubScore
+        const rangeAbsorbs = opts.filter((o) => o.type === 'absorb' && !o.extendsRange)
+        const minDist = Math.min(...rangeAbsorbs.map((o) => o.distance))
+        const sameDistAbsorbs = rangeAbsorbs.filter((o) => o.distance === minDist)
+        if (newOpt.distance < minDist) {
+          nextSelected = newOptIdx
+          nextStatus = 'auto'
+        } else if (newOpt.distance === minDist && sameDistAbsorbs.length >= 2) {
+          if (sameDistAbsorbs.length === 2 && newScore !== undefined) {
+            const otherOpt = sameDistAbsorbs.find((o) => o !== newOpt)!
+            const otherGroup = groups.find((g) => g.id === otherOpt.targetGroupId)
+            const otherScore = otherGroup?.hubScore
+            if (otherScore !== undefined) {
+              const maxScore = Math.max(newScore, otherScore)
+              if (Math.abs(newScore - otherScore) / maxScore < SCORE_TIE_THRESHOLD) {
+                // 仍平局，保持 null
+              } else if (newScore > otherScore) {
+                nextSelected = newOptIdx
+                nextStatus = 'auto'
+              }
+            } else {
+              // 无 score 无法判断，保持 null
+            }
+          } else {
+            // 多于 2 个同距离候选，保持 null
+          }
+        } else if (newOpt.distance === minDist && sameDistAbsorbs.length === 1) {
+          nextSelected = newOptIdx
+          nextStatus = 'auto'
+        }
+      }
+    } else {
+      const hasInRangeHit = opts.some((o) => o.type === 'absorb' && !o.extendsRange)
+      if (!hasInRangeHit) {
+        nextSelected = null
+        nextStatus = a.status === 'uncertain_extend' ? 'uncertain_extend' : a.status
+      }
+    }
+
     assignments[i] = {
       ...a,
       options: opts,
-      selectedOptionIndex: bestIdx
+      selectedOptionIndex: nextSelected,
+      status: nextStatus
     }
   }
 

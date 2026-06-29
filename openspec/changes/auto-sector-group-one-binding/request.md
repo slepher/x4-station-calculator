@@ -44,9 +44,10 @@ Trade station 在 Live 计算模式中作为第三列展示和 confirm gate 的�
 - 确认成功后，系统 SHOULD 将 `calculationBaseline` 更新为确认后的 draft，避免之后 [重置] 回到确认前状态。
 - 单纯 pin / unpin SHALL NOT 更新 `calculationBaseline`；它们只改变当前 shared draft 的展示/输入状态。
 - [重置] SHALL 恢复到最近 `calculationBaseline`，不得恢复到用户 pin / unpin 后的临时状态，除非该状态已经通过初始化、显式计算或确认成功成为新的 baseline。
-- `calcBaselinePillState` 是“UI diff 基线”，用于 coverage/connected pill 的粗边框、虚线 removed 等基线展示。
-- `calcBaselinePillState` SHALL 在 active binding/archive 初始化时写入；显式 [计算] 不应覆盖它。
-- 确认成功后，`calcBaselinePillState` SHALL 更新为确认后的 groups。
+- `calcBaselinePillState` 是“saved binding UI diff 基线”，用于 group 新增高亮、coverage/connected pill 的粗边框、虚线 removed 等基线展示；它 SHALL 只从已保存 `SaveBindingPlan.groups` 构造。
+- `calcBaselinePillState` SHALL 使用 hub `sectorMacro` 作为 key；runtime group id 不得影响 saved baseline 对齐。
+- 显式 [计算]、[快速计算]、[重置]、pin / unpin SHALL NOT 用当前计算结果覆盖 `calcBaselinePillState`。
+- 确认成功后，系统 SHALL 先写入 binding，再从保存后的 `SaveBindingPlan.groups` 刷新 `calcBaselinePillState`。
 - edit/result 仅为视图切换，不改变共享 draft 数据。
 
 ### Live 展示模式按钮
@@ -91,7 +92,7 @@ Trade station 在 Live 计算模式中作为第三列展示和 confirm gate 的�
 - 确认成功后，若当前 shared draft 与保存后的 binding 在 group 顺序、coverage、connections、颜色、jump range、trade station 选择和 virtual station draft 上一致，则 `hasChanges` SHALL 为 false。
 - `hasChanges=false` 时，顶部 [确定] 按钮 SHALL 置灰/禁用；该状态不得被仍存在的 uncertain assignment 覆盖。
 - 确认成功后，当前 result groups SHALL 转为保存后的 baseline UI 状态：清理 `isNew`、新增 hub 高亮、跨覆盖临时提示等 transient 标记；保留用户确认后的 group 顺序、颜色、coverage、connections、trade station 选择。
-- 确认成功后，`calcBaselinePillState` SHALL 更新为确认后的 groups，使 coverage/connected pill 不再显示相对确认前的差异高亮。
+- 确认成功后，`calcBaselinePillState` SHALL 从保存后的 binding groups 刷新，使 group 新增高亮和 coverage/connected pill 不再显示相对确认前的差异高亮。
 - 确认成功后仍停留在星区编辑页面，不跳转到 Live 展示模式。
 
 ### Pin / Unpin 口径
@@ -102,13 +103,18 @@ Trade station 在 Live 计算模式中作为第三列展示和 confirm gate 的�
 - unpin hub SHALL 只将该 group 的 `isPinned` 置为 `false`；pin SHALL 只将该 group 的 `isPinned` 置为 `true`。
 - unpin SHALL 让该 hub 的定位星区出现在 assignment 列表中，默认选中“独立成组” option；pin SHALL 从 assignment 列表移除该 hub 的定位星区。
 - unpin 生成的 assignment SHALL 在 assignment 列表最上方的专门位置展示；多次 unpin 时 SHALL 按用户 unpin 的先后顺序排列。
+- unpin 生成的 assignment SHALL 设 `displayBucket='unpin'` 并携带 `unpinOrder`；`displayBucket` 扩展为三态 `'resolved' | 'unresolved' | 'unpin'`。
+- `displayBucket` 在 assignment 创建时确定，用户选择 absorb 或 standalone option 后 SHALL NOT 改变。
+- unpin assignment 被选择 absorb 后 SHALL 只更新 `selectedOptionIndex` 和 `status`，SHALL NOT 改变 `displayBucket` 或 `unpinOrder`，继续留在 unpin 顶部位置。
 - unpin 生成的 assignment options SHALL 复用标准 assignment 展示规则：当前范围内命中的 absorb 候选全部显示；无当前范围命中时只显示最小扩展候选；超过最大不确定扩展跳数的 absorb 候选 SHALL NOT 显示。
 - pin / unpin SHALL NOT 修改 group 顺序、coverage、connections、trade station、virtual station draft 或其他 assignment 选择。
 - `isPinned=false` 的 group 可以存在于当前 shared draft / hub card 列表中，用于展示和继续切回 pin。
-- `isPinned=false` 的 group SHALL NOT 作为下一次显式 [计算] 的 pinned base input；这才是“不包含 unpinned 数据”的范围。
+- `isPinned=false` 的 group SHALL NOT 作为下一次显式 [计算] 的 pinned base input；这才是"不包含 unpinned 数据"的范围。
 - 若某个此前 unpin 的定位星区在下一次显式 [计算] 后重新成为 hub/group card，系统 SHALL 将其视为计算结果中的正常 hub，不得继续保留为 unpin 状态，也不得保留对应的 unpin assignment。
 - result/edit 模式均可触发 card 上的 pin / unpin；二者都直接修改 shared draft，但不直接写持久化 binding。
-- assignment 中用户显式选择“独立成组”仍 SHALL 使用既有 standalone 行为，包括按 `prefJumpRange` 计算 coverage、排除已占用 sector、追加 derived absorb candidates 并允许邻近 sector 被更优候选吸收。
+- assignment 中用户显式选择"独立成组"仍 SHALL 使用既有 standalone 行为，包括按 `prefJumpRange` 计算 coverage、排除已占用 sector、追加 derived absorb candidates 并允许邻近 sector 被更优候选吸收。
+- `applyStandaloneToResult()` 追加 derived absorb candidates 时 SHALL 覆盖 range 内和扩展两种距离：距离 `≤ prefJumpRange` 追加 `extendsRange=false`；距离 `> prefJumpRange` 且 `≤ MAX_UNCERTAIN_JUMP` 追加 `extendsRange=true`；距离 `> MAX_UNCERTAIN_JUMP` 不追加。
+- 追加候选后 `selectedOptionIndex` 更新采用"新 hub 相对当前选中项是否更优"的比较：新 hub 在 range 内且比当前选中项更优时切换；不更优或产生平局时保持原选择；新 hub 为扩展候选且无 range 内命中时 `selectedOptionIndex=null`、`status` 保持 `uncertain_extend`；不强制切换到全局 best。
 - assignment 中用户选择 absorb 到其他 group SHALL 删除该 sector 自身 hub group（不论是否新建），清理其 trade station / connections，并将该 sector 加入目标 group coverage。
 - 若历史数据或旧 bug 导致同一 `sectorMacro` 出现多个 hub group，absorb SHALL 以 `sectorMacro` 为依据清理全部重复 hub，避免残留重复身份。
 

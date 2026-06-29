@@ -195,6 +195,7 @@ describe('autoGroup assignment state after user selection', () => {
 
     expect(updated.groups.find((group) => group.sectorMacro === 'B')?.color).toBeTruthy()
     expect(updated.groups.find((group) => group.sectorMacro === 'B')?.color).not.toBe('transparent')
+    expect(updated.groups.find((group) => group.sectorMacro === 'B')?.isPinned).toBe(false)
   })
 
   it('assigns a generated color when bridge selection creates a hub', () => {
@@ -244,6 +245,7 @@ describe('autoGroup assignment state after user selection', () => {
 
     expect(updated.groups.find((group) => group.sectorMacro === 'C')?.color).toBeTruthy()
     expect(updated.groups.find((group) => group.sectorMacro === 'C')?.color).not.toBe('transparent')
+    expect(updated.groups.find((group) => group.sectorMacro === 'C')?.isPinned).toBe(true)
   })
 
   it('does not add duplicate hub groups when standalone is selected repeatedly', () => {
