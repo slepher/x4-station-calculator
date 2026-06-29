@@ -889,6 +889,54 @@ describe('autoGroup assignment state after user selection', () => {
         expect(tAssignment.status).toBe('uncertain_tie')
       }
     })
+
+    it('preserves explicit standalone selection when new hub appends range hit', () => {
+      const baseGroup = buildResult().groups[0]!
+      const result: AutoGroupResult = {
+        groups: [
+          { ...baseGroup, id: 'H1', sectorMacro: 'H1', jumpRange: 1, originalJumpRange: 1 }
+        ],
+        assignments: [
+          {
+            sectorMacro: 'S',
+            status: 'uncertain_extend',
+            displayBucket: 'unresolved',
+            selectedOptionIndex: null,
+            options: [
+              { type: 'absorb', targetGroupId: 'H1', distance: 2, extendsRange: true, resultingGroupSize: 2 },
+              { type: 'standalone', distance: 0, extendsRange: false, resultingGroupSize: 1 }
+            ]
+          },
+          {
+            sectorMacro: 'T',
+            status: 'standalone',
+            displayBucket: 'resolved',
+            selectedOptionIndex: 1,
+            options: [
+              { type: 'absorb', targetGroupId: 'H1', distance: 2, extendsRange: true, resultingGroupSize: 2 },
+              { type: 'standalone', distance: 0, extendsRange: false, resultingGroupSize: 1 }
+            ]
+          }
+        ],
+        bridgePlans: [],
+        playerSectorMacros: ['H1', 'S', 'T']
+      }
+
+      const standaloneGraph = {
+        S: ['T'],
+        T: ['S', 'H1'],
+        H1: ['T']
+      }
+      const standaloneCluster = { S: 'S', T: 'T', H1: 'H1' }
+
+      const updated = applyStandaloneToResult(result, 'S', standaloneGraph, standaloneCluster, 1, (macro) => macro)
+
+      const tAssignment = updated.assignments.find((a) => a.sectorMacro === 'T')!
+      const standaloneIdx = tAssignment.options.findIndex((o) => o.type === 'standalone')
+
+      expect(tAssignment.selectedOptionIndex).toBe(standaloneIdx)
+      expect(tAssignment.status).toBe('standalone')
+    })
   })
 
   describe('rebuildAssignmentsForJumpRangeChange', () => {

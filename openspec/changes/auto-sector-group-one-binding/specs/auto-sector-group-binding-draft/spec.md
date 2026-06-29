@@ -629,6 +629,18 @@ Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触�
 - **那么** `T.selectedOptionIndex` SHALL 保持 `null`
 - **并且** `T.status` SHALL 保持 `'uncertain_tie'`
 
+#### Scenario: Standalone derived candidate preserves explicit standalone selection
+
+- **前提** sector `T` 当前 `status='standalone'`，`selectedOptionIndex` 指向 standalone option
+- **当** 新 hub `S` 独立成组后，系统为 `T` 追加 derived absorb candidate
+- **当** 新 hub `S` 到 `T` 的距离 `≤ prefJumpRange`（`extendsRange=false`）
+- **那么** `T.selectedOptionIndex` SHALL 保持指向 standalone option
+- **并且** `T.status` SHALL 保持 `'standalone'`
+- **并且** 系统 SHALL 只追加 option，不自动切换选择
+- **当** 新 hub `S` 到 `T` 的距离 `> prefJumpRange`（`extendsRange=true`）
+- **那么** `T.selectedOptionIndex` SHALL 保持指向 standalone option
+- **并且** `T.status` SHALL 保持 `'standalone'`
+
 #### Scenario: Standalone derived candidate extension only
 
 - **前提** sector `S` 显式独立成组后，系统为邻近 sector `T` 追加 derived absorb candidate

@@ -1744,6 +1744,9 @@ export function applyStandaloneToResult(
     const newOptIdx = opts.indexOf(newOpt)
 
     let nextSelected = a.selectedOptionIndex
+    if (nextSelected !== null && si >= 0 && nextSelected >= si) {
+      nextSelected = nextSelected + 1
+    }
     let nextStatus = a.status
 
     if (!newOpt.extendsRange) {
@@ -1762,7 +1765,7 @@ export function applyStandaloneToResult(
         } else if (isTie) {
           // 新 hub 加入后与当前选中项平局，保持原选择
         }
-      } else if (!currentSelected || currentSelected.type === 'standalone') {
+      } else if (!currentSelected) {
         const newScore = newGroupRef?.hubScore
         const rangeAbsorbs = opts.filter((o) => o.type === 'absorb' && !o.extendsRange)
         const minDist = Math.min(...rangeAbsorbs.map((o) => o.distance))

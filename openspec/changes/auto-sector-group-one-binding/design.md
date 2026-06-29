@@ -232,8 +232,9 @@ pin / unpin 是 shared draft 的即时变换，不是持久化提交动作，也
 11. 用户在 assignment 中显式点击"独立成组"时，才调用既有 `applyStandaloneToResult()`，并保留它自动计算 coverage 与 derived candidates 的行为。
 12. `applyStandaloneToResult()` 追加 derived absorb candidates 时 SHALL 覆盖 range 内和扩展两种距离：距离 `≤ prefJumpRange` 的追加 `extendsRange=false`；距离 `> prefJumpRange` 且 `≤ MAX_UNCERTAIN_JUMP` 的追加 `extendsRange=true`；距离 `> MAX_UNCERTAIN_JUMP` 的不追加。
 13. 追加候选后 `selectedOptionIndex` 和 `status` 的更新规则采用"新 hub 相对当前选中项是否更优"的比较，不强制切换到全局 best：
-    - 新 hub 在 range 内（`extendsRange=false`）且当前已有选中项：新 hub 比当前选中项更优（距离更近，或同距离 score 更高）时切换到新 hub，`status='auto'`；不更优或产生平局时保持不变。
+    - 新 hub 在 range 内（`extendsRange=false`）且当前已有 range 内 absorb 选中项：新 hub 比当前选中项更优（距离更近，或同距离 score 更高）时切换到新 hub，`status='auto'`；不更优或产生平局时保持不变。
     - 新 hub 在 range 内且当前为 `uncertain_tie`（`selected=null`）：新 hub 明确打破原有平局时选中新 hub，`status='auto'`；仍平局时保持 `null` 和 `uncertain_tie`。
+    - 新 hub 在 range 内且当前为显式 standalone 选择（`selected` 指向 standalone option，`status='standalone'`）：只追加 option，不自动切换选择。standalone 是用户显式意图，不等于 `selected=null` 的 uncertain 状态。
     - 新 hub 为扩展候选（`extendsRange=true`）且无其他 range 内命中：`selectedOptionIndex=null`，`status` 保持 `uncertain_extend`，与 `buildAssignmentResult` 的 uncertain_extend 语义对齐。
     - 新 hub 为扩展候选且存在其他 range 内命中：`selectedOptionIndex` 和 `status` 保持不变。
 14. pin / unpin 入口只属于 hub/group card；assignment card 不显示 pin / unpin 按钮。

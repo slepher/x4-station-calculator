@@ -66,7 +66,7 @@
 - [x] 确保 unpin 不调用 `applyStandaloneToResult()`，不抢占其他 coverage
 - [ ] 确保 assignment 显式「独立成组」仍保留既有 standalone coverage / derived candidates 行为
 - [ ] `applyStandaloneToResult()` 追加扩展跳数 derived absorb candidates（`> prefJumpRange` 且 `≤ MAX_UNCERTAIN_JUMP`，`extendsRange=true`）
-- [ ] `applyStandaloneToResult()` 追加候选后：新 hub range 内且比当前选中更优 → 切换；不更优/平局 → 保持；新 hub 扩展且无 range 内命中 → `selectedOptionIndex=null`、`status='uncertain_extend'`；不强制切换到全局 best
+- [ ] `applyStandaloneToResult()` 追加候选后：新 hub range 内且比当前选中更优 → 切换；不更优/平局 → 保持；当前为显式 standalone 选择 → 只追加 option 不切换；新 hub 扩展且无 range 内命中 → `selectedOptionIndex=null`、`status='uncertain_extend'`；不强制切换到全局 best
 - [ ] absorb 到其他 group 时按 `sectorMacro` 删除自身 hub，并清理 connections / assignment options / trade station
 - [ ] `displayBucket` 扩展为三态 `'resolved' | 'unresolved' | 'unpin'`
 - [ ] unpin 生成 assignment 时设 `displayBucket='unpin'` + `unpinOrder`
