@@ -1437,23 +1437,15 @@ function buildStandaloneSelectedAssignment(
 
 export function sortAssignmentsForDisplay(
   assignments: SectorAssignment[],
-  groups: GroupDraftInfo[]
+  _groups: GroupDraftInfo[]
 ): SectorAssignment[] {
   const order: Record<string, number> = {
     unpin: 0,
     unresolved: 1,
     resolved: 2
   }
-  const groupAnchors = new Set(groups.map((group) => group.sectorMacro).filter(Boolean))
 
   return [...assignments]
-    .filter((assignment) => {
-      if (assignment.status === 'auto' && groupAnchors.has(assignment.sectorMacro)) {
-        const group = groups.find((g) => g.sectorMacro === assignment.sectorMacro && g.id === assignment.defaultGroupId)
-        if (group && group.isPinned) return false
-      }
-      return true
-    })
     .sort((a, b) => {
       const aOrder = order[a.displayBucket] ?? 9
       const bOrder = order[b.displayBucket] ?? 9
