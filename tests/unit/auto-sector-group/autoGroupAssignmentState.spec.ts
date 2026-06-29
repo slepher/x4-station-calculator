@@ -2,9 +2,13 @@ import { describe, expect, it } from 'vitest'
 import {
   applyAbsorbToResult,
   applyStandaloneToResult,
+  groupIncremental,
   setGroupPinnedInResult,
+  sortAssignmentsForDisplay,
   type AutoGroupResult
 } from '@/store/logic/autoGroup'
+import type { SaveArchive, PlayerStationEntry } from '@/types/saveArchive'
+import type { X4Module } from '@/types/x4'
 
 const sectorGraph = {
   A: ['B'],
@@ -62,6 +66,105 @@ function buildResult(): AutoGroupResult {
   }
 }
 
+function buildStation(code: string, moduleRef: string = 'storage'): PlayerStationEntry {
+  return {
+    code,
+    macro: '',
+    owner: '',
+    relative_position: { x: 0, y: 0, z: 0 },
+    position: { x: 0, y: 0, z: 0 },
+    modules: [{ ref: moduleRef, amount: 1 }]
+  }
+}
+
+function buildArchiveWithStations(sectorMacros: string[], pureHubSectorMacros: string[] = sectorMacros): SaveArchive {
+  const pureHubSectors = new Set(pureHubSectorMacros)
+  return {
+    meta: {
+      id: '',
+      guid: '',
+      time: 0,
+      playerName: '',
+      version: '',
+      filename: '',
+      parser_version: '',
+      source: 'json',
+      createdAt: new Date(),
+      sectorCount: sectorMacros.length
+    },
+    sectors: Object.fromEntries(
+      sectorMacros.map((sectorMacro) => [
+        sectorMacro,
+        {
+          name: sectorMacro,
+          player_stations: {
+            [`${sectorMacro}_station`]: buildStation(
+              `${sectorMacro}_station`,
+              pureHubSectors.has(sectorMacro) ? 'storage' : 'production'
+            )
+          }
+        }
+      ])
+    ),
+    isCompatible: true,
+    isValid: true
+  }
+}
+
+const modulesByMacroId: Record<string, X4Module> = {
+  storage: {
+    id: 'storage',
+    macroId: 'storage',
+    wareId: '',
+    nameId: '',
+    name: 'storage',
+    dlc_tag: '',
+    type: 'storage',
+    method: 'default',
+    group: '',
+    race: '',
+    isPlayerBlueprint: true,
+    buildTime: 0,
+    buildCost: {},
+    cycleTime: 0,
+    workforce: { capacity: 0, needed: 0, maxBonus: 0 },
+    outputs: {},
+    inputs: {},
+    dockingCount: 0,
+    buildProcessorCount: 0,
+    buildShipClasses: [],
+    color: '',
+    color_rgb: '',
+    tier: 0,
+    cargo: { type: 'container', capacity: 10 }
+  },
+  production: {
+    id: 'production',
+    macroId: 'production',
+    wareId: '',
+    nameId: '',
+    name: 'production',
+    dlc_tag: '',
+    type: 'production',
+    method: 'default',
+    group: '',
+    race: '',
+    isPlayerBlueprint: true,
+    buildTime: 0,
+    buildCost: {},
+    cycleTime: 0,
+    workforce: { capacity: 0, needed: 0, maxBonus: 0 },
+    outputs: {},
+    inputs: {},
+    dockingCount: 0,
+    buildProcessorCount: 0,
+    buildShipClasses: [],
+    color: '',
+    color_rgb: '',
+    tier: 0
+  }
+}
+
 describe('autoGroup assignment state after user selection', () => {
   it('marks standalone selection as standalone without moving its display bucket', () => {
     const updated = applyStandaloneToResult(buildResult(), 'B', sectorGraph, sectorClusterMap, 1, (macro) => macro)
@@ -70,6 +173,14 @@ describe('autoGroup assignment state after user selection', () => {
     expect(assignment.selectedOptionIndex).toBe(1)
     expect(assignment.status).toBe('standalone')
     expect(assignment.displayBucket).toBe('unresolved')
+  })
+
+  it('does not add duplicate hub groups when standalone is selected repeatedly', () => {
+    const first = applyStandaloneToResult(buildResult(), 'B', sectorGraph, sectorClusterMap, 1, (macro) => macro)
+    const second = applyStandaloneToResult(first, 'B', sectorGraph, sectorClusterMap, 1, (macro) => macro)
+
+    expect(second).toBe(first)
+    expect(second.groups.filter((group) => group.sectorMacro === 'B')).toHaveLength(1)
   })
 
   it('marks absorb selection as auto without moving its display bucket', () => {
@@ -189,6 +300,109 @@ describe('autoGroup assignment state after user selection', () => {
 
     expect(assignment.options.filter((option) => option.type === 'absorb').map((option) => option.targetGroupId)).toEqual(['gB', 'gC'])
     expect(assignment.options[assignment.selectedOptionIndex!]?.type).toBe('standalone')
+  })
+
+  it('orders unpin assignments first by the order they were unpinned', () => {
+    const baseGroup = buildResult().groups[0]!
+    const result: AutoGroupResult = {
+      ...buildResult(),
+      groups: [
+        baseGroup,
+        {
+          ...baseGroup,
+          id: 'gB',
+          name: 'Group B',
+          sectorMacro: 'B'
+        }
+      ],
+      assignments: [
+        {
+          sectorMacro: 'C',
+          status: 'uncertain_extend',
+          displayBucket: 'unresolved',
+          selectedOptionIndex: null,
+          options: [
+            { type: 'standalone', distance: 0, extendsRange: false, resultingGroupSize: 1 }
+          ]
+        }
+      ],
+      playerSectorMacros: ['A', 'B', 'C']
+    }
+
+    const firstUnpin = setGroupPinnedInResult(result, 'gB', false, sectorGraph, sectorClusterMap)
+    const secondUnpin = setGroupPinnedInResult(firstUnpin, 'g1', false, sectorGraph, sectorClusterMap)
+    const sorted = sortAssignmentsForDisplay(secondUnpin.assignments, secondUnpin.groups)
+
+    expect(sorted.map((assignment) => assignment.sectorMacro)).toEqual(['B', 'A', 'C'])
+  })
+
+  it('normalizes previously unpinned sectors that reappear as calculated hubs', async () => {
+    const autoGroup = await import('@/store/logic/autoGroup')
+    const result: AutoGroupResult = {
+      ...buildResult(),
+      groups: [
+        {
+          ...buildResult().groups[0]!,
+          isPinned: false
+        }
+      ],
+      assignments: [
+        {
+          sectorMacro: 'A',
+          status: 'standalone',
+          displayBucket: 'resolved',
+          selectedOptionIndex: 0,
+          options: [
+            { type: 'standalone', distance: 0, extendsRange: false, resultingGroupSize: 1 }
+          ]
+        }
+      ]
+    }
+
+    const normalized = (autoGroup as any).normalizeReappearedUnpinnedHubs(result, new Set(['A'])) as AutoGroupResult
+
+    expect(normalized.groups[0]!.isPinned).toBe(true)
+    expect(normalized.assignments.some((assignment) => assignment.sectorMacro === 'A')).toBe(false)
+  })
+
+  it('finds recalculated hubs before retained coverage can occupy them', () => {
+    const result = groupIncremental(
+      buildArchiveWithStations(['A', 'B', 'C'], ['A', 'C']),
+      [
+        {
+          name: 'Group C',
+          order: 0,
+          sectorMacro: 'C',
+          jumpRange: 2,
+          coverageSectorMacros: [{ ref: 'A', jump: 0 }, { ref: 'B', jump: 0 }],
+          connectedGroupIds: []
+        }
+      ],
+      modulesByMacroId,
+      {
+        A: ['B'],
+        B: ['A', 'D'],
+        D: ['B', 'C'],
+        C: ['D']
+      },
+      {
+        A: 'A',
+        B: 'B',
+        D: 'D',
+        C: 'C'
+      },
+      { containerThreshold: 1 },
+      2,
+      5
+    )
+
+    const groupA = result.groups.find((group) => group.sectorMacro === 'A')!
+    const groupC = result.groups.find((group) => group.sectorMacro === 'C')!
+
+    expect(groupA).toBeTruthy()
+    expect(groupA.coverageSectorMacros).toContain('B')
+    expect(groupC.coverageSectorMacros).not.toContain('A')
+    expect(groupC.coverageSectorMacros).not.toContain('B')
   })
 
   it('absorbs a sector by removing its own hub even when the hub is not new', () => {

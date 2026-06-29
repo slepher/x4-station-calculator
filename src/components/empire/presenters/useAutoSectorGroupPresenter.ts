@@ -7,7 +7,7 @@ import { useActiveViewStore } from '@/store/useActiveViewStore'
 import { useSaveBindingStore } from '@/store/useSaveBindingStore'
 import { useLiveProductionStore } from '@/store/useLiveProductionStore'
 import { useBlueprintProductionStore } from '@/store/useBlueprintProductionStore'
-import { groupCleanSlate, groupIncremental, applyAbsorbToResult, applyStandaloneToResult, applyBridgePlanToDraft, buildAssignmentResult, setGroupPinnedInResult, type AutoGroupResult, type GroupDraftInfo, type SectorAssignment, getDistance } from '@/store/logic/autoGroup'
+import { groupCleanSlate, groupIncremental, applyAbsorbToResult, applyStandaloneToResult, applyBridgePlanToDraft, buildAssignmentResult, setGroupPinnedInResult, normalizeReappearedUnpinnedHubs, type AutoGroupResult, type GroupDraftInfo, type SectorAssignment, getDistance } from '@/store/logic/autoGroup'
 import { buildSectorGraphFromMaps, getCoverageSectors, getPlayerStationsInSector } from '@/store/logic/saveBindingUtils'
 import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
 import { getSectorZoneBoundingCenter } from '@/components/map/utils/coordinates'
@@ -279,6 +279,11 @@ function runCalculationFromEditInput() {
 
   // Capture user-edited state from current edit draft (by anchor sector)
   const currentDraft = autoGroupResult.value
+  const previouslyUnpinnedSectorMacros = new Set(
+    currentDraft?.groups
+      .filter((group) => !group.isPinned && group.sectorMacro)
+      .map((group) => group.sectorMacro!) ?? []
+  )
 
   let result: AutoGroupResult
   if (!recalculateInput || recalculateInput.baseGroups.length === 0) {
@@ -331,8 +336,13 @@ function runCalculationFromEditInput() {
     currentDraft?.groups ?? []
   )
 
-  stabilizeHubColors(groupsWithPrevTrade, buildHubColorContext())
-  setAutoGroupResult({ ...result, groups: groupsWithPrevTrade })
+  const normalizedResult = normalizeReappearedUnpinnedHubs(
+    { ...result, groups: groupsWithPrevTrade },
+    previouslyUnpinnedSectorMacros
+  )
+
+  stabilizeHubColors(normalizedResult.groups, buildHubColorContext())
+  setAutoGroupResult(normalizedResult)
   calculationMode.value = 'result'
 }
 
@@ -387,6 +397,7 @@ function handleSelectOption(sectorMacro: string, optionIndex: number) {
   if (!autoGroupResult.value) return
   const assignment = autoGroupResult.value.assignments.find((a) => a.sectorMacro === sectorMacro)
   if (!assignment) return
+  if (assignment.selectedOptionIndex === optionIndex) return
   const opt = assignment.options[optionIndex]
   if (!opt) return
   const { sectorGraph, sectorClusterMap } = sectorGraphInfo.value

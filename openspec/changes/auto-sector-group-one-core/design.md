@@ -62,10 +62,12 @@ Incremental 从已保存 groups 生成下一版草案：
 
 1. 保存的 groups 作为 baseline groups。
 2. 每个 baseline group 保留自己的 `jumpRange`。
-3. 新玩家 sector 按当前 coverage、扩展覆盖、standalone 规则生成 assignment。
-4. 手动保留的 connection 作为 fixed edges。
-5. 必要时生成 bridge groups。
-6. 按 retain 规则重算 trade station 默认值。
+3. 扫描当前存档中不属于 baseline anchor 的玩家 sector，先识别新/回归 pure hub，并为这些 hub 创建 draft group。
+4. 在 baseline groups 与新/回归 hub groups 都确定之后，再决定普通玩家 sector 的 coverage / assignment 归属。
+5. 普通玩家 sector 若同时位于新/回归 hub 与 baseline group 覆盖范围内，按统一 assignment 默认规则决胜，而不是由 baseline 保留 coverage 预先占用。
+6. 手动保留的 connection 作为 fixed edges。
+7. 必要时生成 bridge groups。
+8. 按 retain 规则重算 trade station 默认值。
 
 ## Link / MST
 
@@ -107,6 +109,9 @@ Option 生成顺序：
 - 当前命中且未被 excluded default 的 group 可以默认。
 - 扩展 option 不默认。
 - Standalone 不自动 fallback 默认。
+- 已选中的 Standalone option 不再是可点击 action；presenter 收到与当前 `selectedOptionIndex` 相同的选择时直接忽略。
+- 领域层仍将显式选择 Standalone 实现为 upsert 行为：已有同 `sectorMacro` hub group 时更新/复用它；没有时才创建新 group。
+- Standalone upsert 后仍需从其他 groups coverage 中移除该 sector，并重算 affected assignment options。
 
 用户选择后，只更新 card 内部选择和 draft group 数据，不改变 card 所属 bucket 或排序。
 

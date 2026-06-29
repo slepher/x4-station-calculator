@@ -101,6 +101,8 @@
 - [x] 三个 retain 主开关同步到各 group retain 字段
 - [x] 三个 retain 主开关由 groups 聚合派生，mixed 时新增 hub 默认 off
 - [ ] 计算后按 bridge/assignment、trade station、hub 顺序切换到首个待处理 tab
+- [x] unpin 生成的 assignment 排在 assignment 列表顶部，并按 unpin 先后顺序排列
+- [x] 显式计算后此前 unpin 的 sector 若重新成为 hub，则归一为 pinned hub 并清除对应 unpin assignment
 
 ## 7. 构建验证
 

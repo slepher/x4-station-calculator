@@ -2,6 +2,7 @@
 import { useI18n } from 'vue-i18n'
 import { computed } from 'vue'
 import type { SectorAssignment, GroupDraftInfo, BridgePlanOption, BridgePlanUnit } from '@/store/logic/autoGroup'
+import { sortAssignmentsForDisplay } from '@/store/logic/autoGroup'
 import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
 import type { X4MapCluster, X4MapSector } from '@/types/x4'
 
@@ -84,21 +85,7 @@ const hasPendingBridgePlans = computed(() =>
 )
 
 const sortedAssignments = computed(() => {
-  const order: Record<string, number> = {
-    'unresolved': 0,
-    'resolved': 1
-  }
-  // Filter out pure hub anchors (they ARE the group, nothing to assign)
-  const groupAnchors = new Set(props.groups.map((g) => g.sectorMacro).filter(Boolean))
-  return [...props.assignments]
-    .filter((a) => {
-      if (a.status !== 'auto') return true
-      const isAnchor = a.defaultGroupId
-        ? groupAnchors.has(a.sectorMacro) && props.groups.find((g) => g.id === a.defaultGroupId)?.sectorMacro === a.sectorMacro
-        : false
-      return !isAnchor
-    })
-    .sort((a, b) => (order[a.displayBucket] ?? 9) - (order[b.displayBucket] ?? 9))
+  return sortAssignmentsForDisplay(props.assignments, props.groups)
 })
 
 </script>
@@ -200,9 +187,9 @@ const sortedAssignments = computed(() => {
             class="option-row"
             :class="{
               'option-selected': assignment.selectedOptionIndex === idx,
-              'option-hoverable': assignment.status !== 'auto' || assignment.options.length > 1
+              'option-hoverable': assignment.selectedOptionIndex !== idx && assignment.options.length > 1
             }"
-            @click="!disabled && assignment.options.length > 1 && (assignment.status !== 'auto' || true) && emit('select-option', assignment.sectorMacro, idx)"
+            @click="!disabled && assignment.options.length > 1 && assignment.selectedOptionIndex !== idx && emit('select-option', assignment.sectorMacro, idx)"
           >
             <span class="option-radio" :class="{ 'radio-checked': assignment.selectedOptionIndex === idx }">
               {{ assignment.selectedOptionIndex === idx ? '●' : '○' }}

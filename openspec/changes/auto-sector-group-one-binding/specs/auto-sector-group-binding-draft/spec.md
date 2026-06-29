@@ -497,11 +497,22 @@ Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触�
 - **并且** `G.isPinned` SHALL 变为 `false`
 - **并且** `autoGroupResult.assignments` SHALL 包含 `sectorMacro=S` 的 assignment
 - **并且** 该 assignment SHALL 默认选中 standalone option
+- **并且** 该 assignment SHALL 在 assignment 列表最上方的 unpin 专门位置展示
 - **并且** 该 assignment 的 absorb options SHALL 复用标准 assignment 展示规则，当前范围内命中的 absorb 候选 SHALL 全部显示
 - **并且** 无当前范围命中时 SHALL 只显示最小扩展候选
 - **并且** 超过最大不确定扩展跳数的 absorb option SHALL NOT 显示
 - **并且** 系统 SHALL NOT 调用 standalone coverage 计算
 - **并且** 系统 SHALL NOT 修改 group 顺序、coverage、connections、trade station、virtual station draft 或其他 assignment 选择
+
+#### Scenario: Multiple unpin assignments keep unpin order
+
+- **前提** 当前 `autoGroupResult.groups` 中存在 hub group `G1` 和 `G2`
+- **并且** `G1.sectorMacro=S1`
+- **并且** `G2.sectorMacro=S2`
+- **当** 用户先对 `G1` 执行 unpin，再对 `G2` 执行 unpin
+- **那么** assignment 列表 SHALL 将 `S1` 和 `S2` 放在最上方的 unpin 专门位置
+- **并且** `S1` SHALL 排在 `S2` 之前
+- **并且** 其他非 unpin assignment SHALL 排在这些 unpin assignment 之后
 
 #### Scenario: Pin removes hub assignment
 
@@ -521,6 +532,16 @@ Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触�
 - **当** 用户点击显式「计算」或「快速计算」
 - **那么** `buildRecalculateBaseGroups()` SHALL NOT 将 `G` 输出到 pinned base groups
 - **并且** 下一次计算 SHALL NOT 把 `G` 作为固定 hub 输入
+
+#### Scenario: Reappeared unpinned sector becomes normal calculated hub
+
+- **前提** 当前 `autoGroupResult.groups` 中存在 `isPinned=false` 的 group `G`
+- **并且** `G.sectorMacro=S`
+- **当** 用户点击显式「计算」或「快速计算」
+- **并且** 计算结果中 `S` 重新成为 hub/group card
+- **那么** 该计算结果中的 `S` group SHALL NOT 保持 unpin 状态
+- **并且** 该计算结果中的 `S` group `isPinned` SHALL 为 `true`
+- **并且** `autoGroupResult.assignments` SHALL NOT 保留 `sectorMacro=S` 的 unpin assignment
 
 #### Scenario: Pin unpin button is a group card action
 

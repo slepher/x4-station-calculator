@@ -12,6 +12,7 @@
 - [ ] 保持 container-only 容量统计，并合并 `modules[]` 与 `constructions[]`
 - [ ] 实现 pure hub、hub score、clean slate 和 incremental 的最终规则
 - [ ] Clean slate 按 `generateHubs` 决定是否自动生成 pure hub
+- [x] Incremental 先识别新/回归 pure hub，再决定 coverage / assignment 归属
 - [ ] Sector 默认归属按距离、hub score、稳定 key 和 excluded default 规则决胜
 - [ ] Incremental 使用每个既有 group 自己的 `jumpRange`
 - [ ] 保持等距 score 差距小于 30% 的 unresolved assignment 规则
@@ -50,6 +51,7 @@
 - [ ] 扩展 options 只取最近距离层，且不默认选中
 - [ ] 无当前命中时处理 baseline 重新吸收或 standalone-only 默认规则
 - [ ] Standalone 始终最后，且不作为自动 fallback
+- [x] 显式 Standalone 选择按 `sectorMacro` upsert hub group，避免重复 append
 - [ ] 用户选择 option 后不改变 card 身份和排序
 - [ ] Confirm 按 UUID 优先、`sectorMacro` 兜底匹配 groups
 - [ ] Confirm 后按最终 coverage 重分配 station plans

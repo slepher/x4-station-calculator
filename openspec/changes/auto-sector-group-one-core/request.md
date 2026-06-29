@@ -17,6 +17,7 @@
 - Clean slate 模式先扫描所有玩家站并生成 sector 级 hub 信息；`generateHubs=true` 时从 pure hubs 创建初始 groups，再将覆盖跳数内玩家星区分配给最近 hub。
 - Clean slate 下若 `generateHubs=false`，不得自动生成新的 pure hub，只使用 pinned/手动输入 hub 继续计算。
 - Incremental 模式以已保存 groups 作为 baseline input，既有 group 使用自己的 `jumpRange`，新 group 使用当前默认覆盖跳数。
+- Incremental 模式 SHALL 先完成新/回归 pure hub 识别，再决定普通玩家 sector 的 coverage / assignment 归属；不得让 baseline group 的保留 coverage 在新/回归 hub 被发现前抢占其邻近范围节点。
 - Sector 默认归属必须按明确规则决定：当前覆盖范围命中且未被 `excludedDefaultAssignmentSectorMacros` 排除的 group 才可默认；多命中时按距离、hub score、稳定 key 决胜；等距且 score 差距小于 30% 时 unresolved。
 - 等距且 hub score 差距小于 30% 的玩家星区必须成为 unresolved assignment。
 - 超出覆盖跳数但在 5 跳内的 Tier 2 玩家星区可生成扩展吸收 option，但不得自动独立成 hub。
@@ -65,6 +66,7 @@
 - 若无当前命中且存在 baseline group 可重新吸收该 sector，则可按 baseline group 生成默认吸收；否则仅保留 standalone option。
 - Excluded default group 仍可手动选择，但不得默认选中。
 - Standalone 始终作为最后 option，且不得作为自动 fallback 默认值。
+- 同一 assignment 已选中 Standalone 后，UI / presenter SHALL NOT 再次触发 Standalone 添加行为；领域层仍 SHALL 按 `sectorMacro` upsert 作为防御，避免重复 append hub group。
 - 用户选择 assignment 后不得改变 card 身份和顺序。
 - 确认时按 UUID 优先、`sectorMacro` 兜底匹配已有 group，避免重复 standalone group。
 - 确认时重建 `sector -> groupId`，并按最终 coverage 重分配 station plans。

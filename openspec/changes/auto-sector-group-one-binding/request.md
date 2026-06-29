@@ -100,10 +100,12 @@ Trade station 在 Live 计算模式中作为第三列展示和 confirm gate 的�
 - result/edit 模式的 hub/group card 均 SHALL 显示 pin / unpin 按钮；result 模式不得隐藏该按钮。
 - unpin hub SHALL 只将该 group 的 `isPinned` 置为 `false`；pin SHALL 只将该 group 的 `isPinned` 置为 `true`。
 - unpin SHALL 让该 hub 的定位星区出现在 assignment 列表中，默认选中“独立成组” option；pin SHALL 从 assignment 列表移除该 hub 的定位星区。
+- unpin 生成的 assignment SHALL 在 assignment 列表最上方的专门位置展示；多次 unpin 时 SHALL 按用户 unpin 的先后顺序排列。
 - unpin 生成的 assignment options SHALL 复用标准 assignment 展示规则：当前范围内命中的 absorb 候选全部显示；无当前范围命中时只显示最小扩展候选；超过最大不确定扩展跳数的 absorb 候选 SHALL NOT 显示。
 - pin / unpin SHALL NOT 修改 group 顺序、coverage、connections、trade station、virtual station draft 或其他 assignment 选择。
 - `isPinned=false` 的 group 可以存在于当前 shared draft / hub card 列表中，用于展示和继续切回 pin。
 - `isPinned=false` 的 group SHALL NOT 作为下一次显式 [计算] 的 pinned base input；这才是“不包含 unpinned 数据”的范围。
+- 若某个此前 unpin 的定位星区在下一次显式 [计算] 后重新成为 hub/group card，系统 SHALL 将其视为计算结果中的正常 hub，不得继续保留为 unpin 状态，也不得保留对应的 unpin assignment。
 - result/edit 模式均可触发 card 上的 pin / unpin；二者都直接修改 shared draft，但不直接写持久化 binding。
 - assignment 中用户显式选择“独立成组”仍 SHALL 使用既有 standalone 行为，包括按 `prefJumpRange` 计算 coverage、排除已占用 sector、追加 derived absorb candidates 并允许邻近 sector 被更优候选吸收。
 - assignment 中用户选择 absorb 到其他 group SHALL 删除该 sector 自身 hub group（不论是否新建），清理其 trade station / connections，并将该 sector 加入目标 group coverage。

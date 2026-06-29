@@ -120,6 +120,15 @@
 - **那么** 系统 SHALL NOT 从 pure hub 自动创建新 group
 - **并且** SHALL 只使用 pinned baseline groups、手动新增 hub 和 bridge 输入继续生成 coverage、connections 和 assignments
 
+#### Scenario: Incremental discovers hubs before assigning coverage
+- **前提** 当前 incremental 输入中存在 baseline group `C`
+- **并且** 最新存档中存在未作为 baseline anchor 的 pure hub sector `A`
+- **并且** 玩家 sector `B` 位于 `A` 的覆盖范围内，也位于 `C` 的覆盖范围内
+- **当** 系统运行 incremental 分组
+- **那么** 系统 SHALL 先识别 `A` 并创建 hub group
+- **并且** SHALL 在 `A` 和 `C` 都存在后再决定 `B` 的归属
+- **并且** 系统 SHALL NOT 因 `C` 的保留 coverage 先占位而阻止 `B` 归属到距离更近或默认规则更优的 `A`
+
 #### Scenario: Default assignment uses distance score and stable key
 - **前提** 某玩家 sector 位于多个 group 当前覆盖范围内
 - **并且** 这些 group 均未通过 `excludedDefaultAssignmentSectorMacros` 排除该 sector
@@ -140,6 +149,14 @@
 - **当** 系统生成 assignment
 - **那么** 系统 SHALL 自动生成吸收选项
 - **并且** SHALL 不将 Tier 2 sector 自动独立成 hub
+
+#### Scenario: Repeated standalone selection is idempotent
+- **前提** 某玩家 sector `S` 存在 ordinary assignment card
+- **并且** `S` 的 Standalone option 已被选中
+- **当** 用户再次点击该已选中的 Standalone option
+- **那么** UI / presenter SHALL NOT 再次触发 Standalone 添加行为
+- **并且** 系统 SHALL 至多保留一个 `sectorMacro=S` 的 hub group
+- **并且** 领域层收到重复 Standalone 请求时 SHALL 更新/复用已有 group，而不是再次 append 新 group
 
 ### Requirement: MST Connections and Bridge Plans
 

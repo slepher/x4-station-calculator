@@ -39,6 +39,7 @@ export interface SectorAssignment {
   defaultGroupId?: string
   options: AssignmentOption[]
   selectedOptionIndex: number | null
+  unpinOrder?: number
 }
 
 export interface GroupDraftInfo {
@@ -1039,25 +1040,30 @@ export function groupIncremental(
     for (const sectorMacro of playerSectorMacros) {
       if (excludedSectorSet.has(sectorMacro)) continue
       if (existingAnchors.has(sectorMacro)) continue
-      if (assignedSectors.has(sectorMacro)) continue
       const hub = getSectorPureHub(sectorMacro, sectorStationMap.get(sectorMacro) || [], modulesByMacroId, config)
       if (hub) pureHubs.push(hub)
     }
     pureHubs.sort((a, b) => b.score - a.score)
 
     const pureHubAnchors = new Set(pureHubs.map((h) => h.sectorMacro))
-    const occupiedSectors = new Set(assignedSectors.keys())
+    const occupiedSectors = new Set(existingAnchors)
     let groupCounter = groups.length
     for (const hub of pureHubs) {
-      if (assignedSectors.has(hub.sectorMacro)) continue
+      if (occupiedSectors.has(hub.sectorMacro)) continue
       const groupId = hub.sectorMacro
       const allCoverage = getSectorCoverageMacros(hub.sectorMacro, prefJumpRange, sectorGraph, sectorClusterMap)
       const coverage = allCoverage.filter((m) =>
         playerSectorMacros.includes(m) &&
         !occupiedSectors.has(m) &&
         m !== hub.sectorMacro &&
-        !pureHubAnchors.has(m)
+          !pureHubAnchors.has(m)
       )
+      for (let i = 0; i < groups.length; i++) {
+        groups[i] = {
+          ...groups[i]!,
+          coverageSectorMacros: groups[i]!.coverageSectorMacros.filter((sectorMacro) => sectorMacro !== hub.sectorMacro)
+        }
+      }
       groups.push({
         id: groupId,
         name: `Sector ${++groupCounter}`,
@@ -1334,6 +1340,7 @@ export function resolveUncertainAssignment(
 ): SectorAssignment {
   return {
     ...assignment,
+    unpinOrder: undefined,
     selectedOptionIndex: optionIndex,
     status: 'auto'
   }
@@ -1343,7 +1350,8 @@ function buildStandaloneSelectedAssignment(
   sectorMacro: string,
   groups: GroupDraftInfo[],
   sectorGraph: Record<string, string[]>,
-  sectorClusterMap: Record<string, string>
+  sectorClusterMap: Record<string, string>,
+  unpinOrder?: number
 ): SectorAssignment {
   const candidateGroups = groups.filter((group) => group.sectorMacro !== sectorMacro)
   const candidates: Array<{ groupId: string; distance: number; jumpRange: number; score?: number }> = []
@@ -1389,7 +1397,60 @@ function buildStandaloneSelectedAssignment(
     status: 'standalone',
     displayBucket: 'resolved',
     options,
-    selectedOptionIndex: standaloneIndex
+    selectedOptionIndex: standaloneIndex,
+    unpinOrder
+  }
+}
+
+export function sortAssignmentsForDisplay(
+  assignments: SectorAssignment[],
+  groups: GroupDraftInfo[]
+): SectorAssignment[] {
+  const order: Record<string, number> = {
+    unresolved: 0,
+    resolved: 1
+  }
+  const groupAnchors = new Set(groups.map((group) => group.sectorMacro).filter(Boolean))
+
+  return [...assignments]
+    .filter((assignment) => {
+      if (assignment.status !== 'auto') return true
+      const isAnchor = assignment.defaultGroupId
+        ? groupAnchors.has(assignment.sectorMacro) && groups.find((group) => group.id === assignment.defaultGroupId)?.sectorMacro === assignment.sectorMacro
+        : false
+      return !isAnchor
+    })
+    .sort((a, b) => {
+      const aIsUnpin = a.unpinOrder !== undefined
+      const bIsUnpin = b.unpinOrder !== undefined
+      if (aIsUnpin || bIsUnpin) {
+        if (aIsUnpin && bIsUnpin) return a.unpinOrder! - b.unpinOrder!
+        return aIsUnpin ? -1 : 1
+      }
+      return (order[a.displayBucket] ?? 9) - (order[b.displayBucket] ?? 9)
+    })
+}
+
+export function normalizeReappearedUnpinnedHubs(
+  result: AutoGroupResult,
+  previouslyUnpinnedSectorMacros: Set<string>
+): AutoGroupResult {
+  if (previouslyUnpinnedSectorMacros.size === 0) return result
+  const reappearedAnchors = new Set(
+    result.groups
+      .map((group) => group.sectorMacro)
+      .filter((sectorMacro): sectorMacro is string => !!sectorMacro && previouslyUnpinnedSectorMacros.has(sectorMacro))
+  )
+  if (reappearedAnchors.size === 0) return result
+
+  return {
+    ...result,
+    groups: result.groups.map((group) =>
+      group.sectorMacro && reappearedAnchors.has(group.sectorMacro)
+        ? { ...group, isPinned: true }
+        : group
+    ),
+    assignments: result.assignments.filter((assignment) => !reappearedAnchors.has(assignment.sectorMacro))
   }
 }
 
@@ -1419,13 +1480,14 @@ export function setGroupPinnedInResult(
   if (result.assignments.some((assignment) => assignment.sectorMacro === sectorMacro)) {
     return { ...result, groups }
   }
+  const nextUnpinOrder = Math.max(0, ...result.assignments.map((assignment) => assignment.unpinOrder ?? 0)) + 1
 
   return {
     ...result,
     groups,
     assignments: [
       ...result.assignments,
-      buildStandaloneSelectedAssignment(sectorMacro, groups, sectorGraph, sectorClusterMap)
+      buildStandaloneSelectedAssignment(sectorMacro, groups, sectorGraph, sectorClusterMap, nextUnpinOrder)
     ]
   }
 }
@@ -1553,6 +1615,16 @@ export function applyStandaloneToResult(
   const assignment = assignments[idx]!
 
   let groups = [...result.groups]
+  const existingGroup = result.groups.find((g) => g.sectorMacro === sectorMacro)
+  const standaloneIdx = assignment.options.findIndex((o) => o.type === 'standalone')
+  if (
+    existingGroup &&
+    standaloneIdx >= 0 &&
+    assignment.selectedOptionIndex === standaloneIdx &&
+    assignment.status === 'standalone'
+  ) {
+    return result
+  }
 
   // Default: all player sectors are occupied (already in some group)
   const occupied = new Set(result.playerSectorMacros)
@@ -1567,7 +1639,6 @@ export function applyStandaloneToResult(
 
 
   // Reuse existing standalone group ID if one already exists for this sector
-  const existingGroup = result.groups.find((g) => g.sectorMacro === sectorMacro)
   const groupId = existingGroup ? existingGroup.id : sectorMacro
   const allSectors = getCoverageSectors(sectorMacro, prefJumpRange, sectorGraph, sectorClusterMap)
 
@@ -1595,19 +1666,33 @@ export function applyStandaloneToResult(
     hubScore: undefined
   }
 
-  groups.push(newGroup)
+  const existingGroupIndex = groups.findIndex((group) => group.sectorMacro === sectorMacro)
+  if (existingGroupIndex >= 0) {
+    groups[existingGroupIndex] = {
+      ...newGroup,
+      connectedGroupIds: groups[existingGroupIndex]!.connectedGroupIds,
+      color: groups[existingGroupIndex]!.color,
+      savedTradeStationCode: groups[existingGroupIndex]!.savedTradeStationCode,
+      selectedTradeStation: groups[existingGroupIndex]!.selectedTradeStation,
+      virtualTradeStationPosition: groups[existingGroupIndex]!.virtualTradeStationPosition,
+      tradeStationRetainEnabled: groups[existingGroupIndex]!.tradeStationRetainEnabled
+    }
+  } else {
+    groups.push(newGroup)
+  }
   computeGroupGraph(groups, sectorGraph, sectorClusterMap, resolveBridgeSearchJumpRange(prefJumpRange, bridgeSearchJumpRange))
 
   // Select standalone option, keep card visible
-  const standaloneIdx = assignment.options.findIndex((o) => o.type === 'standalone')
   assignments[idx] = {
     ...assignment,
+    unpinOrder: undefined,
     selectedOptionIndex: standaloneIdx >= 0 ? standaloneIdx : assignment.options.length,
     status: 'standalone'
   }
 
   // Remove this sector from other groups' coverage
-  for (let i = 0; i < groups.length - 1; i++) {
+  for (let i = 0; i < groups.length; i++) {
+    if (groups[i]!.sectorMacro === sectorMacro) continue
     groups[i] = { ...groups[i]!, coverageSectorMacros: groups[i]!.coverageSectorMacros.filter((m) => m !== sectorMacro) }
   }
 

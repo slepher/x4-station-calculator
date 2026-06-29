@@ -214,20 +214,23 @@ pin / unpin 是 shared draft 的即时变换，不是持久化提交动作，也
 1. `autoGroupResult.groups` 保留当前 hub/group card；unpin 不从当前 hub 列表删除 group。
 2. unpin 只将 group `isPinned=false`；pin 只将 group `isPinned=true`。
 3. unpin 为该 group 的 `sectorMacro` 新增/恢复 assignment，并默认选中 standalone option；pin 移除该 `sectorMacro` 对应 assignment。
-4. unpin 生成 assignment options 时复用标准 assignment 展示规则：当前范围内命中的 absorb 候选全部显示；无当前范围命中时只显示最小扩展候选；超过 `MAX_UNCERTAIN_JUMP` 的 absorb 候选不显示。
-5. pin / unpin 不修改 group 顺序、coverage、connections、trade station、virtual station draft 或其他 assignment 选择。
-6. `isPinned=false` 只影响下一次显式 [计算] 的 base input：`buildRecalculateBaseGroups()` SHALL 只读取 `isPinned=true` 的 groups。
-7. 用户在 assignment 中显式点击“独立成组”时，才调用既有 `applyStandaloneToResult()`，并保留它自动计算 coverage 与 derived candidates 的行为。
-8. pin / unpin 入口只属于 hub/group card；assignment card 不显示 pin / unpin 按钮。
-9. result/edit 模式的 hub/group card 都显示 pin / unpin 按钮；result 模式不得隐藏该按钮。
-10. pin / unpin 可以在 result/edit 模式触发，但都只写 live store 的 shared draft，不直接写 `saveBindingStore`。
-11. 单纯 pin / unpin 不改变可持久化字段时，dirty comparison 应将其视为 `hasChanges=false`。
-12. absorb 一个 sector 到其他 group 时，如果该 sector 同时存在自身 hub group，则删除所有同 `sectorMacro` 的自身 hub group，清理其他 group 的 `connectedGroupIds` 和 assignment options 中指向被删除 group 的引用。
+4. unpin 生成的 assignment 需要携带仅用于当前 draft 展示排序的 unpin 顺序；assignment 列表展示时将这类 assignment 放在最上方，并按 unpin 先后顺序排列。
+5. unpin 生成 assignment options 时复用标准 assignment 展示规则：当前范围内命中的 absorb 候选全部显示；无当前范围命中时只显示最小扩展候选；超过 `MAX_UNCERTAIN_JUMP` 的 absorb 候选不显示。
+6. pin / unpin 不修改 group 顺序、coverage、connections、trade station、virtual station draft 或其他 assignment 选择。
+7. `isPinned=false` 只影响下一次显式 [计算] 的 base input：`buildRecalculateBaseGroups()` SHALL 只读取 `isPinned=true` 的 groups。
+8. 显式 [计算] 后，如果此前 unpin 的 sector 被算法重新选为 hub，则它是新的计算结果 hub：需要清除该 sector 的 unpin 展示状态，并将对应 group 归一为 pinned hub 状态。
+9. 用户在 assignment 中显式点击“独立成组”时，才调用既有 `applyStandaloneToResult()`，并保留它自动计算 coverage 与 derived candidates 的行为。
+10. pin / unpin 入口只属于 hub/group card；assignment card 不显示 pin / unpin 按钮。
+11. result/edit 模式的 hub/group card 都显示 pin / unpin 按钮；result 模式不得隐藏该按钮。
+12. pin / unpin 可以在 result/edit 模式触发，但都只写 live store 的 shared draft，不直接写 `saveBindingStore`。
+13. 单纯 pin / unpin 不改变可持久化字段时，dirty comparison 应将其视为 `hasChanges=false`。
+14. absorb 一个 sector 到其他 group 时，如果该 sector 同时存在自身 hub group，则删除所有同 `sectorMacro` 的自身 hub group，清理其他 group 的 `connectedGroupIds` 和 assignment options 中指向被删除 group 的引用。
 
 实现边界：
 
 - store/logic 层提供纯 result transform，负责保持 `groups`、`assignments`、connections 与 options 的一致性。
 - presenter 只负责响应 UI action、取得 `sectorGraphInfo` 并写回 live store shared draft。
+- Vue 层只消费 presenter 提供的 assignment 顺序；不直接重新解释 pin/unpin 领域状态。
 - Vue 组件只从 hub/group card 发出 pin / unpin action，不直接拼装 assignment 或修改 store。
 
 ### SectorGroupStatBar
