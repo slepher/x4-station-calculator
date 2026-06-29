@@ -16,6 +16,7 @@ export interface TradeStationCandidate {
   hasProduction: boolean
   hasVolume: boolean
   isPureHub: boolean
+  qualified: boolean
 }
 
 export interface TradeStationSelection {
@@ -32,7 +33,8 @@ export function stationHubToCandidate(info: StationHubInfo): TradeStationCandida
     prodLines: info.prodLines,
     hasProduction: info.prodLines > 0,
     hasVolume: info.containerCap > 0,
-    isPureHub: info.isPureHub
+    isPureHub: info.isPureHub,
+    qualified: info.qualified
   }
 }
 

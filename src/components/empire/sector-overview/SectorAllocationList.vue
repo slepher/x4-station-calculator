@@ -3,6 +3,7 @@ import { useI18n } from 'vue-i18n'
 import { computed } from 'vue'
 import type { SectorAssignment, GroupDraftInfo, BridgePlanOption, BridgePlanUnit } from '@/store/logic/autoGroup'
 import { sortAssignmentsForDisplay } from '@/store/logic/autoGroup'
+import type { TradeStationCandidate } from '@/store/logic/tradeStationSelection'
 import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
 import type { X4MapCluster, X4MapSector } from '@/types/x4'
 
@@ -12,6 +13,7 @@ const props = withDefaults(defineProps<{
   groups: GroupDraftInfo[]
   maps: { clusters: Record<string, X4MapCluster>; sectors: Record<string, X4MapSector> } | null | undefined
   stationCounts: Record<string, number>
+  sectorStationCandidates?: Record<string, TradeStationCandidate[]>
   disabled?: boolean
   view?: 'map' | 'live'
 }>(), {
@@ -53,6 +55,13 @@ function getClusterDisplayName(clusterMacro: string): string {
   return cluster.name || clusterMacro
 }
 
+function formatCap(cap: number): string {
+  if (cap >= 1_000_000) {
+    return (cap / 1_000_000).toFixed(1) + 'M'
+  }
+  return Math.round(cap).toLocaleString()
+}
+
 function getOptionLabel(opt: SectorAssignment['options'][number]): string {
   if (opt.type === 'standalone') return t('sector.independent_group')
   const groupName = opt.targetGroupId ? getGroupName(opt.targetGroupId) : '-'
@@ -60,6 +69,14 @@ function getOptionLabel(opt: SectorAssignment['options'][number]): string {
   if (opt.extendsRange) parts.push(`(${t('sector.extends_range', { dist: opt.distance })})`)
   else parts.push(`(${t('sector.distance_n', { n: opt.distance })})`)
   return parts.join(' ')
+}
+
+function getStandaloneInfo(sectorMacro: string): string | null {
+  const candidates = props.sectorStationCandidates?.[sectorMacro]
+  if (!candidates || candidates.length === 0) return null
+  const topWithCap = candidates.find((c) => c.containerCap > 0)
+  if (!topWithCap) return null
+  return `${topWithCap.stationCode} - ${formatCap(topWithCap.containerCap)}`
 }
 
 function getStationCount(macro: string): number {
@@ -196,7 +213,12 @@ const sortedAssignments = computed(() => {
             <span class="option-radio" :class="{ 'radio-checked': assignment.selectedOptionIndex === idx }">
               {{ assignment.selectedOptionIndex === idx ? '●' : '○' }}
             </span>
-            <span class="option-label">{{ getOptionLabel(opt) }}</span>
+            <span class="option-label">
+              {{ getOptionLabel(opt) }}
+              <template v-if="opt.type === 'standalone'">
+                <span v-if="getStandaloneInfo(assignment.sectorMacro)" class="option-sub"> / {{ getStandaloneInfo(assignment.sectorMacro) }}</span>
+              </template>
+            </span>
           </div>
         </div>
       </div>

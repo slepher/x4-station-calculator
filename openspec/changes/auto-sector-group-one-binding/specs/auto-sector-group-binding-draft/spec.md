@@ -603,6 +603,15 @@ Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触�
 - **并且** 若新候选是更优选择，邻近 sector MAY 被该 standalone hub 吸收到 coverage
 - **并且** 被追加候选的 assignment SHALL 按以下规则更新 `selectedOptionIndex` 和 `status`
 
+#### Scenario: Standalone option shows top station candidate
+
+- **前提** 系统在载入存档生成 `AutoGroupResult` 时 SHALL 为每个 player sector 预计算 station 候选列表 `sectorStationCandidates: Record<string, TradeStationCandidate[]>`
+- **当** 系统渲染 assignment card 的 standalone option
+- **那么** SHALL 从该 sector 的 `sectorStationCandidates` 取排序最靠前且 `containerCap > 0` 的候选
+- **并且** SHALL 显示空间站 code 和 containerCap（格式与 Trade Station 栏一致，如 `12.0M`）
+- **当** 该 sector 不存在 `containerCap > 0` 的空间站
+- **那么** SHALL 显示「独立成组」不附带空间站信息
+
 #### Scenario: Standalone derived candidate default selection
 
 - **前提** sector `S` 显式独立成组后，系统为邻近 sector `T` 追加以 `S` 为 hub 的 derived absorb candidate

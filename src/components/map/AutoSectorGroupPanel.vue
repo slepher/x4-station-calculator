@@ -334,7 +334,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
             </div>
             <div class="column column-allocation">
               <SectorAllocationList :assignments="autoGroupResult?.assignments ?? []" :bridge-plans="autoGroupResult?.bridgePlans ?? []"
-                :groups="autoGroupResult?.groups ?? []" :maps="gameDataMaps" :station-counts="stationCounts"
+                :groups="autoGroupResult?.groups ?? []" :maps="gameDataMaps" :station-counts="stationCounts" :sector-station-candidates="autoGroupResult?.sectorStationCandidates"
                 @select-option="handleSelectOption" @select-bridge-plan="handleSelectBridgePlan" @select-bridge-center="handleSelectBridgeCenter" @focus-sector="emit('focus-sector', $event)"
               />
             </div>
@@ -425,7 +425,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
           </div>
           <div v-show="activeTab === 'allocation'">
             <SectorAllocationList :assignments="autoGroupResult?.assignments ?? []" :bridge-plans="autoGroupResult?.bridgePlans ?? []"
-              :groups="autoGroupResult?.groups ?? []" :maps="gameDataMaps" :station-counts="stationCounts" view="map"
+              :groups="autoGroupResult?.groups ?? []" :maps="gameDataMaps" :station-counts="stationCounts" :sector-station-candidates="autoGroupResult?.sectorStationCandidates" view="map"
               @select-option="handleSelectOption" @select-bridge-plan="handleSelectBridgePlan" @select-bridge-center="handleSelectBridgeCenter" @focus-sector="emit('focus-sector', $event)"
             />
           </div>

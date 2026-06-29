@@ -72,6 +72,11 @@
 - [ ] unpin 生成 assignment 时设 `displayBucket='unpin'` + `unpinOrder`
 - [ ] `sortAssignmentsForDisplay` 按 `displayBucket` 分组排序，unpin 组内按 `unpinOrder` 排列
 - [ ] `resolveUncertainAssignment` 不清除 `displayBucket` 和 `unpinOrder`，absorb 后 unpin assignment 留在顶部
+- [ ] `AutoGroupResult` 新增 `sectorStationCandidates: Record<string, TradeStationCandidate[]>`
+- [ ] `groupCleanSlate` / `groupIncremental` / `buildAssignmentsFromBinding` 生成 result 时预计算所有 player sector 的 station 候选
+- [ ] Vue Trade Station 栏从预计算数据按 hub group `sectorMacro` 过滤显示
+- [ ] Standalone option 显示该 sector 排序最靠前且 `containerCap > 0` 的候选（station code + containerCap）
+- [ ] 不存在 `containerCap > 0` 候选时 standalone option 只显示「独立成组」
 
 ## 5. Live 双模式
 

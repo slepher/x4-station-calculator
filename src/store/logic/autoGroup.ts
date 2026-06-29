@@ -15,7 +15,7 @@ import {
   getPlayerStationsInSector
 } from './saveBindingUtils'
 import { stabilizeHubColors, stabilizeEditedHubColor, type HubColorContext } from './hubColor'
-import { selectTradeStationCandidates, determineDefaultTradeStation } from './tradeStationSelection'
+import { selectTradeStationCandidates, determineDefaultTradeStation, type TradeStationCandidate } from './tradeStationSelection'
 
 export const DEFAULT_JUMP_RANGE = 2
 export const DEFAULT_BRIDGE_SEARCH_JUMP_RANGE = 5
@@ -105,6 +105,23 @@ export interface AutoGroupResult {
   bridgePlans: BridgePlanOption[]
   selectedBridgePlanId?: string
   playerSectorMacros: string[]
+  sectorStationCandidates?: Record<string, TradeStationCandidate[]>
+}
+
+export function buildSectorStationCandidates(
+  sectorStationMap: Map<string, PlayerStationEntry[]>,
+  modulesByMacroId: Record<string, X4Module>,
+  config: HubDetectionConfig
+): Record<string, TradeStationCandidate[]> {
+  const result: Record<string, TradeStationCandidate[]> = {}
+  for (const [sectorMacro, stations] of sectorStationMap) {
+    if (stations.length === 0) {
+      result[sectorMacro] = []
+      continue
+    }
+    result[sectorMacro] = selectTradeStationCandidates(stations, modulesByMacroId, false, config)
+  }
+  return result
 }
 
 function buildSectorDistanceMap(
@@ -971,7 +988,9 @@ export function groupCleanSlate(
   )
   const syncedGroups = syncSelectedAbsorptionsToCoverage(groups, assignments)
 
-  return { groups: syncedGroups, assignments, bridgePlans, playerSectorMacros }
+  const sectorStationCandidates = buildSectorStationCandidates(sectorStationMap, modulesByMacroId, config)
+
+  return { groups: syncedGroups, assignments, bridgePlans, playerSectorMacros, sectorStationCandidates }
 }
 
 export function groupIncremental(
@@ -1146,7 +1165,9 @@ export function groupIncremental(
   )
   const syncedGroups = syncSelectedAbsorptionsToCoverage(groups, assignments)
 
-  return { groups: syncedGroups, assignments, bridgePlans, playerSectorMacros }
+  const sectorStationCandidates = buildSectorStationCandidates(sectorStationMap, modulesByMacroId, config)
+
+  return { groups: syncedGroups, assignments, bridgePlans, playerSectorMacros, sectorStationCandidates }
 }
 
 function getSectorCoverageMacros(
@@ -2007,5 +2028,14 @@ export function enrichAutoGroupResult(
 
   stabilizeHubColors(enrichedGroups, colorCtx)
 
-  return { ...result, groups: enrichedGroups }
+  const sectorStationMap = new Map<string, PlayerStationEntry[]>()
+  for (const s of getSaveSectorsWithPlayerStations(deps.archive)) {
+    sectorStationMap.set(s.sectorMacro, s.playerStations)
+  }
+  const sectorStationCandidates = buildSectorStationCandidates(
+    sectorStationMap, deps.modulesByMacroId,
+    { containerThreshold: deps.containerThreshold }
+  )
+
+  return { ...result, groups: enrichedGroups, sectorStationCandidates }
 }

@@ -62,8 +62,19 @@ appliedAutoGroupArchiveTime === undefined
    - 不运行 grouping algorithm。
    - 不改变 group 结构。
 4. 富化本地化名称、颜色上下文、trade station 展示状态。
-5. 写入 `calcBaselinePillState`。
-6. 设置 `calculationMode='result'`。
+5. 预计算所有 player sector 的 station 候选列表 `sectorStationCandidates`。
+6. 写入 `calcBaselinePillState`。
+7. 设置 `calculationMode='result'`。
+
+### sectorStationCandidates 预计算
+
+`AutoGroupResult` 新增 `sectorStationCandidates: Record<string, TradeStationCandidate[]>`，为每个 player sector 预计算 station 候选列表。
+
+- 在 `groupCleanSlate` / `groupIncremental` / `buildAssignmentsFromBinding` 生成 result 时，遍历所有 player sector 的空间站，使用 `selectTradeStationCandidates` 生成候选列表。
+- 候选列表按 score 排序，与 Trade Station 栏使用同一数据源。
+- Vue Trade Station 栏从该预计算数据按当前 hub group 的 `sectorMacro` 过滤显示。
+- Standalone option 显示从该预计算数据取该 sector 排序最靠前且 `containerCap > 0` 的候选，显示 station code 和 containerCap（格式与 Trade Station 栏一致）。
+- 不存在 `containerCap > 0` 的候选时，standalone option 只显示「独立成组」不附带空间站信息。
 
 初始化只由 store 生命周期和 active context 切换触发。组件挂载和 tab 切换不得调用初始化。
 

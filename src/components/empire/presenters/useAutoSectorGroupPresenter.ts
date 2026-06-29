@@ -788,34 +788,29 @@ function handleQuickCalculate() {
 }
 
 const tradeStationCandidates = computed(() => {
-  const archive = saveStore.selectedArchive
   const result = autoGroupResult.value
-  if (!archive || !result) return {} as Record<string, TradeStationCandidate[]>
+  if (!result?.sectorStationCandidates) return {} as Record<string, TradeStationCandidate[]>
 
   const candidates: Record<string, TradeStationCandidate[]> = {}
   for (const group of result.groups) {
     if (!group.sectorMacro) continue
-    const stations = getPlayerStationsInSector(archive, group.sectorMacro)
+    const allCandidates = result.sectorStationCandidates[group.sectorMacro] ?? []
 
-    const skipQualifiedThreshold = group.source !== 'auto'
-    let requireQualified = false
-    if (skipQualifiedThreshold && stations.length > 0) {
-      const hasQualified = stations.some((s) => {
-        const info = detectStationHub(s, gameDataStore.modulesByMacroId, { containerThreshold: prefThreshold.value })
-        return info.qualified
-      })
-      requireQualified = hasQualified
-    }
-
-    if (stations.length === 0) {
+    if (allCandidates.length === 0) {
       candidates[group.id] = []
       continue
     }
 
-    candidates[group.id] = selectTradeStationCandidates(
-      stations, gameDataStore.modulesByMacroId, requireQualified,
-      { containerThreshold: prefThreshold.value }
-    )
+    if (group.source !== 'auto') {
+      const hasQualified = allCandidates.some((c) => c.qualified)
+      if (hasQualified) {
+        candidates[group.id] = allCandidates.filter((c) => c.qualified)
+      } else {
+        candidates[group.id] = allCandidates
+      }
+    } else {
+      candidates[group.id] = allCandidates
+    }
   }
   return candidates
 })

@@ -5,6 +5,7 @@ import {
   applyBridgePlanToDraft,
   buildAssignmentResult,
   groupIncremental,
+  groupCleanSlate,
   setGroupPinnedInResult,
   sortAssignmentsForDisplay,
   rebuildAssignmentsForJumpRangeChange,
@@ -1105,6 +1106,46 @@ describe('autoGroup assignment state after user selection', () => {
       const dAssignment = updated.assignments.find((a) => a.sectorMacro === 'D')!
       expect(dAssignment.selectedOptionIndex).toBeNull()
       expect(dAssignment.status).toBe('uncertain_extend')
+    })
+  })
+
+  describe('sectorStationCandidates precomputation', () => {
+    const stationGraph = {
+      H: ['T'],
+      T: ['H']
+    }
+    const stationCluster = { H: 'H', T: 'T' }
+
+    it('precomputes station candidates for all player sectors in groupCleanSlate', () => {
+      const archive = buildArchiveWithStations(['H', 'T'])
+      const result = groupCleanSlate(archive, modulesByMacroId, stationGraph, stationCluster)
+
+      expect(result.sectorStationCandidates).toBeTruthy()
+      expect(result.sectorStationCandidates!['H']).toBeTruthy()
+      expect(result.sectorStationCandidates!['H']!.length).toBeGreaterThan(0)
+      expect(result.sectorStationCandidates!['T']).toBeTruthy()
+      expect(result.sectorStationCandidates!['T']!.length).toBeGreaterThan(0)
+    })
+
+    it('station candidates are sorted by score descending', () => {
+      const archive = buildArchiveWithStations(['H'])
+      const result = groupCleanSlate(archive, modulesByMacroId, stationGraph, stationCluster)
+
+      const candidates = result.sectorStationCandidates!['H']!
+      for (let i = 1; i < candidates.length; i++) {
+        expect(candidates[i]!.score).toBeLessThanOrEqual(candidates[i - 1]!.score)
+      }
+    })
+
+    it('sectorStationCandidates contains stationCode and containerCap for each candidate', () => {
+      const archive = buildArchiveWithStations(['H'])
+      const result = groupCleanSlate(archive, modulesByMacroId, stationGraph, stationCluster)
+
+      const candidates = result.sectorStationCandidates!['H']!
+      for (const c of candidates) {
+        expect(c.stationCode).toBeTruthy()
+        expect(typeof c.containerCap).toBe('number')
+      }
     })
   })
 })
