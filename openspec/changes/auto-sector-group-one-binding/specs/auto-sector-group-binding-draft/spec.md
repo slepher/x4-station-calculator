@@ -766,3 +766,55 @@ Save binding state SHALL use version 2 for sector group identity based on hub `s
 - **当** `H` 与其他 range 内候选同距离平局
 - **那么** `T.selectedOptionIndex` SHALL 为 `null`
 - **并且** `T.status` SHALL 为 `'uncertain_tie'`
+
+### Requirement: Assignment Options Update Rules Summary
+
+系统 SHALL 在以下变更场景中增量更新 assignment options 和 selectedOptionIndex，遵循统一规则集。全量重建 assignments 仅发生于显式 [计算] / [快速计算]。
+
+#### R1: Derived Candidate Append（独立成组追加候选）
+
+| 条件 | 行为 |
+| --- | --- |
+| 新 hub 距离 `≤ prefJumpRange` | 追加 `extendsRange=false` 的 absorb option |
+| 新 hub 距离 `> prefJumpRange` 且 `≤ MAX_UNCERTAIN_JUMP` | 追加 `extendsRange=true` 的 absorb option |
+| 新 hub 距离 `> MAX_UNCERTAIN_JUMP` | 不追加 |
+| 目标 sector 已有 range 内 absorb 命中 | 不追加扩展候选（`R3`） |
+
+#### R2: Extension vs Range-internal Coexistence
+
+| 规则 | 说明 |
+| --- | --- |
+| 不可共存 | range 内命中与扩展候选 SHALL NOT 同时存在于同一 sector 的 options |
+| 新增 range 内命中 | 移除所有 `extendsRange=true` 的 absorb option |
+| 最后 range 内命中消失 | 补充 `≤ MAX_UNCERTAIN_JUMP` 的扩展候选 |
+| 已有 range 内命中时不追加扩展 | 独立成组追加候选时遵守此规则 |
+
+#### R3: Selection Update After Options Change
+
+| 当前状态 | 新 hub range 内且更优 | 新 hub range 内不更优/平局 | 新 hub 扩展且无 range 内命中 |
+| --- | --- | --- | --- |
+| `selected=null` (`uncertain_extend`) | 选新 hub, `status='auto'` | 若同距离平局→`null`, `uncertain_tie` | `null`, `uncertain_extend` |
+| `selected=null` (`uncertain_tie`) | 新 hub 打破平局才选, `status='auto'` | 仍平局→`null`, `uncertain_tie` | 保持 `null` |
+| 已选中某 range 内 absorb | 更优才切换, `status='auto'` | 保持原选择 | 保持原选择 |
+| 已选中 standalone | **只追加 option，不切换** | 保持 | 保持 |
+
+#### R4: JumpRange Change Incremental Rebuild
+
+| 场景 | 受影响 sector 范围 | 重算内容 |
+| --- | --- | --- |
+| 增大跳数 (old→new, new>old) | 距离该 hub 在 `(old, new]` 的 sector | options + `selectedOptionIndex`（按 R3） |
+| 减小跳数 (old→new, new<old) | 距离该 hub 在 `(new, old]` 的 sector | options + `selectedOptionIndex`（按 R3） |
+| 距离 `≤ min(old, new)` | 不重算 | — |
+| 减小后原选中 hub 变扩展、有其他 range 命中 | — | 选最优剩余 range 内候选；平局 `null`+`uncertain_tie` |
+| 减小后原选中 hub 变扩展、无其他 range 命中 | — | `null`+`uncertain_extend` |
+| 扩展 absorb 后 hub 跳数扩大 | 同距离其他 sector | 按 R4 增大规则重算 |
+
+#### R5: Unpin Assignment Display
+
+| 规则 | 说明 |
+| --- | --- |
+| `displayBucket='unpin'` | unpin 生成 assignment 时设置，排序始终在最顶部 |
+| `unpinOrder` | 记录 unpin 先后顺序，仅用于 unpin 组内排序 |
+| absorb 后 | 不清除 `displayBucket` 和 `unpinOrder`，留在顶部位置 |
+| standalone 后 | `displayBucket` 从 `'unpin'` 改为 `'resolved'`，离开顶部 |
+| pin 后 | assignment 从列表移除 |
