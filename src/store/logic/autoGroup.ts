@@ -1448,11 +1448,11 @@ export function sortAssignmentsForDisplay(
 
   return [...assignments]
     .filter((assignment) => {
-      if (assignment.status !== 'auto') return true
-      const isAnchor = assignment.defaultGroupId
-        ? groupAnchors.has(assignment.sectorMacro) && groups.find((group) => group.id === assignment.defaultGroupId)?.sectorMacro === assignment.sectorMacro
-        : false
-      return !isAnchor
+      if (assignment.status === 'auto' && groupAnchors.has(assignment.sectorMacro)) {
+        const group = groups.find((g) => g.sectorMacro === assignment.sectorMacro && g.id === assignment.defaultGroupId)
+        if (group && group.isPinned) return false
+      }
+      return true
     })
     .sort((a, b) => {
       const aOrder = order[a.displayBucket] ?? 9

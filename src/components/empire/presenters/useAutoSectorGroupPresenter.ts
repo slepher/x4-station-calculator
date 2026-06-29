@@ -1344,7 +1344,12 @@ function doConfirm() {
       connectedGroupIds: group.connectedGroupIds
     })) ?? []
   }))
-  liveStore.setAutoGroupResult({ ...result, groups: confirmedGroups })
+  const groupAnchors = new Set(confirmedGroups.map((g) => g.sectorMacro).filter(Boolean) as string[])
+  liveStore.setAutoGroupResult({
+    ...result,
+    groups: confirmedGroups,
+    assignments: result.assignments.filter((a) => !groupAnchors.has(a.sectorMacro))
+  })
   liveStore.refreshCalcBaselinePillStateFromBinding()
 }
 
