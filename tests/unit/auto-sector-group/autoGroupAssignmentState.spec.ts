@@ -311,6 +311,56 @@ describe('autoGroup assignment state after user selection', () => {
     expect(assignment.displayBucket).toBe('unresolved')
   })
 
+  it('rebuilds other affected sector options when extension absorb extends hub jumpRange', () => {
+    const baseGroup = buildResult().groups[0]!
+    const absorbGraph = {
+      H: ['M1'],
+      M1: ['H', 'M2'],
+      M2: ['M1', 'M3'],
+      M3: ['M2', 'T', 'U'],
+      T: ['M3'],
+      U: ['M3']
+    }
+    const absorbCluster = { H: 'H', M1: 'M1', M2: 'M2', M3: 'M3', T: 'T', U: 'U' }
+    const result: AutoGroupResult = {
+      groups: [
+        { ...baseGroup, id: 'H', sectorMacro: 'H', jumpRange: 2, originalJumpRange: 2 }
+      ],
+      assignments: [
+        {
+          sectorMacro: 'T',
+          status: 'uncertain_extend',
+          displayBucket: 'unresolved',
+          selectedOptionIndex: 0,
+          options: [
+            { type: 'absorb', targetGroupId: 'H', distance: 3, extendsRange: true, resultingGroupSize: 2 },
+            { type: 'standalone', distance: 0, extendsRange: false, resultingGroupSize: 1 }
+          ]
+        },
+        {
+          sectorMacro: 'U',
+          status: 'uncertain_extend',
+          displayBucket: 'unresolved',
+          selectedOptionIndex: null,
+          options: [
+            { type: 'absorb', targetGroupId: 'H', distance: 3, extendsRange: true, resultingGroupSize: 2 },
+            { type: 'standalone', distance: 0, extendsRange: false, resultingGroupSize: 1 }
+          ]
+        }
+      ],
+      bridgePlans: [],
+      playerSectorMacros: ['H', 'T', 'U']
+    }
+
+    const updated = applyAbsorbToResult(result, 'T', 0, absorbGraph, absorbCluster, 2)
+
+    const uAssignment = updated.assignments.find((a) => a.sectorMacro === 'U')!
+    const hOpt = uAssignment.options.find((o) => o.targetGroupId === 'H')!
+    expect(hOpt.extendsRange).toBe(false)
+    expect(uAssignment.selectedOptionIndex).toBe(uAssignment.options.indexOf(hOpt))
+    expect(uAssignment.status).toBe('auto')
+  })
+
   it('uses standalone-only unresolved assignment when nearest hub is beyond max extension jump', () => {
     const graph = {
       A: ['B'],

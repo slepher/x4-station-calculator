@@ -1630,6 +1630,14 @@ export function applyAbsorbToResult(
   )
   computeGroupGraph(groups, sectorGraph, sectorClusterMap, resolveBridgeSearchJumpRange(prefJumpRange, bridgeSearchJumpRange))
 
+  if (opt.extendsRange) {
+    return rebuildAssignmentsForJumpRangeChange(
+      { ...result, groups, assignments: assignments as SectorAssignment[] },
+      opt.targetGroupId, newJumpRange, sectorGraph, sectorClusterMap,
+      g.jumpRange
+    )
+  }
+
   return { ...result, groups, assignments: assignments as SectorAssignment[] }
 }
 
@@ -1864,11 +1872,12 @@ export function rebuildAssignmentsForJumpRangeChange(
   groupId: string,
   newRange: number,
   sectorGraph: Record<string, string[]>,
-  sectorClusterMap: Record<string, string>
+  sectorClusterMap: Record<string, string>,
+  oldRangeOverride?: number
 ): AutoGroupResult {
   const group = result.groups.find((g) => g.id === groupId)
   if (!group?.sectorMacro) return result
-  const oldRange = group.jumpRange
+  const oldRange = oldRangeOverride ?? group.jumpRange
   if (newRange === oldRange) return result
 
   const sectorMacro = group.sectorMacro
