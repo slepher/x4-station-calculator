@@ -662,6 +662,14 @@ Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触�
 - **那么** `T.selectedOptionIndex` SHALL 保持不变
 - **并且** `T.status` SHALL 保持不变
 
+#### Scenario: Extension options removed when range hit appears
+
+- **前提** sector `T` 的 options 中当前只有扩展跳数候选（`extendsRange=true`）
+- **当** 某变化导致 `T` 新增了 range 内候选（`extendsRange=false`）
+- **那么** `T` 的 options 中所有 `extendsRange=true` 的 absorb option SHALL 被移除
+- **并且** `T` 的 options SHALL 只保留 range 内 absorb 候选和 standalone option
+- **并且** 此规则 SHALL 与 `buildAssignmentResult` 的 uncertain_extend 语义对齐（range 内命中时只展示 range 内候选）
+
 #### Scenario: Absorb removes own hub by sector macro
 
 - **前提** sector `S` 出现在 assignment 列表中
@@ -746,3 +754,14 @@ Save binding state SHALL use version 2 for sector group identity based on hub `s
 - **并且** `T` 无其他 range 内 absorb 命中
 - **那么** `T.selectedOptionIndex` SHALL 变为 `null`
 - **并且** `T.status` SHALL 变为 `'uncertain_extend'`
+
+#### Scenario: JumpRange decrease switches to best remaining range hit
+
+- **前提** sector `T` 当前 `selectedOptionIndex` 指向 `G` 的 range 内 absorb option
+- **并且** `T` 还有另一个 hub `H` 的 range 内 absorb option
+- **当** `G` 的 `jumpRange` 减小使 `G` 对 `T` 从 range 内变为扩展
+- **那么** `T.selectedOptionIndex` SHALL 指向 `H` 的 option
+- **并且** `T.status` SHALL 保持 `'auto'`
+- **当** `H` 与其他 range 内候选同距离平局
+- **那么** `T.selectedOptionIndex` SHALL 为 `null`
+- **并且** `T.status` SHALL 为 `'uncertain_tie'`

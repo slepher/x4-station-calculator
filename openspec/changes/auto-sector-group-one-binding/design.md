@@ -157,6 +157,8 @@ gameGuid:archiveTime
 - [编辑] 只设置 `calculationMode='edit'`。
 - [退出] 只设置 `calculationMode='result'`。
 - [退出] 不恢复 coverage、connection、assignment、trade station 或颜色。
+- 追加 range 内候选后 SHALL 移除非 standalone 的扩展候选，与 `buildAssignmentResult` 的 range 内/扩展不共存语义对齐。
+- 减小跳数导致原选中 hub 变为扩展，但其他 hub 仍有 range 内命中时 SHALL 自动选最优剩余 range 内候选；平局时 `null` + `uncertain_tie`。
 - 用户若要回到最近计算结果，必须使用 [重置]。
 
 ## Presenter

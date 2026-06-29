@@ -1827,6 +1827,21 @@ export function applyStandaloneToResult(
       }
     }
 
+    // When a new range-internal option appears, remove all extension absorb options
+    // to match buildAssignmentResult (range hits and extension hits do not coexist)
+    if (!newOpt.extendsRange) {
+      const filtered = opts.filter((o) => o.type !== 'absorb' || !o.extendsRange)
+      if (filtered.length !== opts.length) {
+        if (nextSelected !== null) {
+          const oldOpt = opts[nextSelected]!
+          nextSelected = filtered.findIndex((o) => o === oldOpt || (o.targetGroupId === oldOpt.targetGroupId && o.type === oldOpt.type))
+          if (nextSelected < 0) nextSelected = null
+        }
+        opts.length = 0
+        opts.push(...filtered)
+      }
+    }
+
     assignments[i] = {
       ...a,
       options: opts,
@@ -1933,8 +1948,16 @@ export function rebuildAssignmentsForJumpRangeChange(
             nextSelected = null
             nextStatus = 'uncertain_extend'
           } else {
-            nextSelected = null
-            nextStatus = a.status === 'uncertain_extend' ? 'uncertain_extend' : a.status
+            const rangeAbsorbs = rebuiltAssignment.options.filter((o) => o.type === 'absorb' && !o.extendsRange)
+            const minDist = Math.min(...rangeAbsorbs.map((o) => o.distance))
+            const bestOpts = rangeAbsorbs.filter((o) => o.distance === minDist)
+            if (bestOpts.length === 1) {
+              nextSelected = rebuiltAssignment.options.indexOf(bestOpts[0]!)
+              nextStatus = 'auto'
+            } else {
+              nextSelected = null
+              nextStatus = 'uncertain_tie'
+            }
           }
         }
       }

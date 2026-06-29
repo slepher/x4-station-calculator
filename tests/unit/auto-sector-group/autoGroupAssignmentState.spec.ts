@@ -938,6 +938,55 @@ describe('autoGroup assignment state after user selection', () => {
       expect(tAssignment.selectedOptionIndex).toBe(standaloneIdx)
       expect(tAssignment.status).toBe('standalone')
     })
+
+    it('removes extension absorb options when new range hit is appended', () => {
+      const baseGroup = buildResult().groups[0]!
+      const result: AutoGroupResult = {
+        groups: [
+          { ...baseGroup, id: 'H1', sectorMacro: 'H1', jumpRange: 1, originalJumpRange: 1 }
+        ],
+        assignments: [
+          {
+            sectorMacro: 'S',
+            status: 'uncertain_extend',
+            displayBucket: 'unresolved',
+            selectedOptionIndex: null,
+            options: [
+              { type: 'absorb', targetGroupId: 'H1', distance: 2, extendsRange: true, resultingGroupSize: 2 },
+              { type: 'standalone', distance: 0, extendsRange: false, resultingGroupSize: 1 }
+            ]
+          },
+          {
+            sectorMacro: 'T',
+            status: 'uncertain_extend',
+            displayBucket: 'unresolved',
+            selectedOptionIndex: null,
+            options: [
+              { type: 'absorb', targetGroupId: 'H1', distance: 2, extendsRange: true, resultingGroupSize: 2 },
+              { type: 'standalone', distance: 0, extendsRange: false, resultingGroupSize: 1 }
+            ]
+          }
+        ],
+        bridgePlans: [],
+        playerSectorMacros: ['H1', 'S', 'T']
+      }
+
+      const standaloneGraph = {
+        S: ['T'],
+        T: ['S', 'H1'],
+        H1: ['T']
+      }
+      const standaloneCluster = { S: 'S', T: 'T', H1: 'H1' }
+
+      const updated = applyStandaloneToResult(result, 'S', standaloneGraph, standaloneCluster, 1, (macro) => macro)
+
+      const tAssignment = updated.assignments.find((a) => a.sectorMacro === 'T')!
+      const extensionOpts = tAssignment.options.filter((o) => o.type === 'absorb' && o.extendsRange)
+      expect(extensionOpts).toHaveLength(0)
+
+      const rangeOpts = tAssignment.options.filter((o) => o.type === 'absorb' && !o.extendsRange)
+      expect(rangeOpts.length).toBeGreaterThan(0)
+    })
   })
 
   describe('rebuildAssignmentsForJumpRangeChange', () => {
@@ -1106,6 +1155,48 @@ describe('autoGroup assignment state after user selection', () => {
       const dAssignment = updated.assignments.find((a) => a.sectorMacro === 'D')!
       expect(dAssignment.selectedOptionIndex).toBeNull()
       expect(dAssignment.status).toBe('uncertain_extend')
+    })
+
+    it('switches to best remaining range hit when selected hub becomes extension', () => {
+      const baseGroup = buildResult().groups[0]!
+      const multiGraph = {
+        H1: ['M1'],
+        H2: ['M1'],
+        M1: ['H1', 'H2', 'M2'],
+        M2: ['M1', 'T'],
+        T: ['M2']
+      }
+      const multiCluster = { H1: 'H1', H2: 'H2', M1: 'M1', M2: 'M2', T: 'T' }
+      const result: AutoGroupResult = {
+        groups: [
+          { ...baseGroup, id: 'H1', sectorMacro: 'H1', jumpRange: 5, originalJumpRange: 5 },
+          { ...baseGroup, id: 'H2', sectorMacro: 'H2', jumpRange: 5, originalJumpRange: 5 }
+        ],
+        assignments: [
+          {
+            sectorMacro: 'T',
+            status: 'auto',
+            displayBucket: 'resolved',
+            selectedOptionIndex: 0,
+            options: [
+              { type: 'absorb', targetGroupId: 'H1', distance: 3, extendsRange: false, resultingGroupSize: 2 },
+              { type: 'absorb', targetGroupId: 'H2', distance: 4, extendsRange: false, resultingGroupSize: 2 },
+              { type: 'standalone', distance: 0, extendsRange: false, resultingGroupSize: 1 }
+            ]
+          }
+        ],
+        bridgePlans: [],
+        playerSectorMacros: ['H1', 'H2', 'T']
+      }
+
+      const updated = rebuildAssignmentsForJumpRangeChange(
+        result, 'H1', 2, multiGraph, multiCluster
+      )
+
+      const tAssignment = updated.assignments.find((a) => a.sectorMacro === 'T')!
+      const h2Opt = tAssignment.options.find((o) => o.targetGroupId === 'H2')!
+      expect(tAssignment.selectedOptionIndex).toBe(tAssignment.options.indexOf(h2Opt))
+      expect(tAssignment.status).toBe('auto')
     })
   })
 
