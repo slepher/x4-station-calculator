@@ -1756,6 +1756,7 @@ export function applyStandaloneToResult(
     if (dist === undefined) continue
     if (dist > MAX_UNCERTAIN_JUMP) continue
     if (a.options.some((option) => option.targetGroupId === groupId)) continue
+    if (dist > prefJumpRange && a.options.some((o) => o.type === 'absorb' && !o.extendsRange)) continue
 
     const newOpt: AssignmentOption = {
       type: 'absorb' as const,

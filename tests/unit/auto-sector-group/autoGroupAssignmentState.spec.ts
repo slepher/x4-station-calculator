@@ -989,6 +989,58 @@ describe('autoGroup assignment state after user selection', () => {
       expect(tAssignment.status).toBe('standalone')
     })
 
+    it('does not append extension candidate when sector already has range hit', () => {
+      const baseGroup = buildResult().groups[0]!
+      const result: AutoGroupResult = {
+        groups: [
+          { ...baseGroup, id: 'H1', sectorMacro: 'H1', jumpRange: 1, originalJumpRange: 1 }
+        ],
+        assignments: [
+          {
+            sectorMacro: 'S',
+            status: 'uncertain_extend',
+            displayBucket: 'unresolved',
+            selectedOptionIndex: null,
+            options: [
+              { type: 'absorb', targetGroupId: 'H1', distance: 5, extendsRange: true, resultingGroupSize: 2 },
+              { type: 'standalone', distance: 0, extendsRange: false, resultingGroupSize: 1 }
+            ]
+          },
+          {
+            sectorMacro: 'T',
+            status: 'auto',
+            displayBucket: 'resolved',
+            selectedOptionIndex: 0,
+            options: [
+              { type: 'absorb', targetGroupId: 'H1', distance: 1, extendsRange: false, resultingGroupSize: 2 },
+              { type: 'standalone', distance: 0, extendsRange: false, resultingGroupSize: 1 }
+            ]
+          }
+        ],
+        bridgePlans: [],
+        playerSectorMacros: ['H1', 'S', 'T']
+      }
+
+      const standaloneGraph = {
+        S: ['M1'],
+        M1: ['S', 'M2'],
+        M2: ['M1', 'T'],
+        T: ['M2', 'H1'],
+        H1: ['T']
+      }
+      const standaloneCluster = { S: 'S', M1: 'M1', M2: 'M2', T: 'T', H1: 'H1' }
+
+      const updated = applyStandaloneToResult(result, 'S', standaloneGraph, standaloneCluster, 1, (macro) => macro)
+
+      const tAssignment = updated.assignments.find((a) => a.sectorMacro === 'T')!
+      const sGroup = updated.groups.find((g) => g.sectorMacro === 'S')!
+      const sOpt = tAssignment.options.find((o) => o.targetGroupId === sGroup.id)
+      expect(sOpt).toBeUndefined()
+
+      expect(tAssignment.selectedOptionIndex).toBe(0)
+      expect(tAssignment.status).toBe('auto')
+    })
+
     it('removes extension absorb options when new range hit is appended', () => {
       const baseGroup = buildResult().groups[0]!
       const result: AutoGroupResult = {
