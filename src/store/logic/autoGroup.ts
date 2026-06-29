@@ -1698,7 +1698,8 @@ export function applyStandaloneToResult(
     isPinned: false,
       coverageRetainEnabled: true,
       connectionRetainEnabled: true,
-    hubScore: undefined
+      tradeStationRetainEnabled: true,
+      hubScore: undefined
   }
 
   const existingGroupIndex = groups.findIndex((group) => group.sectorMacro === sectorMacro)
