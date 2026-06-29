@@ -243,7 +243,7 @@ pin / unpin 是 shared draft 的即时变换，不是持久化提交动作，也
 9. `isPinned=false` 只影响下一次显式 [计算] 的 base input：`buildRecalculateBaseGroups()` SHALL 只读取 `isPinned=true` 的 groups。
 10. 显式 [计算] 后，如果此前 unpin 的 sector 被算法重新选为 hub，则它是新的计算结果 hub：需要清除该 sector 的 unpin 展示状态，并将对应 group 归一为 pinned hub 状态。
 11. 用户在 assignment 中显式点击"独立成组"时，才调用既有 `applyStandaloneToResult()`，并保留它自动计算 coverage 与 derived candidates 的行为。
-12. `applyStandaloneToResult()` 追加 derived absorb candidates 时 SHALL 覆盖 range 内和扩展两种距离：距离 `≤ prefJumpRange` 的追加 `extendsRange=false`；距离 `> prefJumpRange` 且 `≤ MAX_UNCERTAIN_JUMP` 的追加 `extendsRange=true`；距离 `> MAX_UNCERTAIN_JUMP` 的不追加。
+12. `applyStandaloneToResult()` 追加 derived absorb candidates 时 SHALL 覆盖 range 内和扩展两种距离：距离 `≤ prefJumpRange` 的追加 `extendsRange=false`；距离 `> prefJumpRange` 且 `≤ MAX_UNCERTAIN_JUMP` 的追加 `extendsRange=true`；距离 `> MAX_UNCERTAIN_JUMP` 的不追加。目标 sector 已有 range 内命中时 SHALL NOT 追加扩展候选。
 13. 追加候选后 `selectedOptionIndex` 和 `status` 的更新规则采用"新 hub 相对当前选中项是否更优"的比较，不强制切换到全局 best：
     - 新 hub 在 range 内（`extendsRange=false`）且当前已有 range 内 absorb 选中项：新 hub 比当前选中项更优（距离更近，或同距离 score 更高）时切换到新 hub，`status='auto'`；不更优或产生平局时保持不变。
     - 新 hub 在 range 内且当前为 `uncertain_tie`（`selected=null`）：新 hub 明确打破原有平局时选中新 hub，`status='auto'`；仍平局时保持 `null` 和 `uncertain_tie`。

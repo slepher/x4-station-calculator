@@ -113,7 +113,7 @@ Trade station 在 Live 计算模式中作为第三列展示和 confirm gate 的�
 - 若某个此前 unpin 的定位星区在下一次显式 [计算] 后重新成为 hub/group card，系统 SHALL 将其视为计算结果中的正常 hub，不得继续保留为 unpin 状态，也不得保留对应的 unpin assignment。
 - result/edit 模式均可触发 card 上的 pin / unpin；二者都直接修改 shared draft，但不直接写持久化 binding。
 - assignment 中用户显式选择"独立成组"仍 SHALL 使用既有 standalone 行为，包括按 `prefJumpRange` 计算 coverage、排除已占用 sector、追加 derived absorb candidates 并允许邻近 sector 被更优候选吸收。
-- `applyStandaloneToResult()` 追加 derived absorb candidates 时 SHALL 覆盖 range 内和扩展两种距离：距离 `≤ prefJumpRange` 追加 `extendsRange=false`；距离 `> prefJumpRange` 且 `≤ MAX_UNCERTAIN_JUMP` 追加 `extendsRange=true`；距离 `> MAX_UNCERTAIN_JUMP` 不追加。
+- `applyStandaloneToResult()` 追加 derived absorb candidates 时 SHALL 覆盖 range 内和扩展两种距离：距离 `≤ prefJumpRange` 追加 `extendsRange=false`；距离 `> prefJumpRange` 且 `≤ MAX_UNCERTAIN_JUMP` 追加 `extendsRange=true`，但目标 sector 已有 range 内命中时 SHALL NOT 追加扩展候选；距离 `> MAX_UNCERTAIN_JUMP` 不追加。
 - 追加候选后 `selectedOptionIndex` 更新采用"新 hub 相对当前选中项是否更优"的比较：新 hub 在 range 内且比当前选中项更优时切换；不更优或产生平局时保持原选择；当前为显式 standalone 选择时只追加 option 不切换；新 hub 为扩展候选且无 range 内命中时 `selectedOptionIndex=null`、`status` 保持 `uncertain_extend`；不强制切换到全局 best。
 - assignment 中用户选择 absorb 到其他 group SHALL 删除该 sector 自身 hub group（不论是否新建），清理其 trade station / connections，并将该 sector 加入目标 group coverage。
 - 若历史数据或旧 bug 导致同一 `sectorMacro` 出现多个 hub group，absorb SHALL 以 `sectorMacro` 为依据清理全部重复 hub，避免残留重复身份。

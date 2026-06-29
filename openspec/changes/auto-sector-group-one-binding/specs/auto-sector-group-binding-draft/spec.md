@@ -599,6 +599,7 @@ Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触�
 - **并且** SHALL 向邻近 assignment 追加以 `S` 为 hub 的 derived absorb candidates
 - **并且** 对距离 `≤ prefJumpRange` 的 sector SHALL 追加 `extendsRange=false` 的 absorb option
 - **并且** 对距离 `> prefJumpRange` 且 `≤ MAX_UNCERTAIN_JUMP` 的 sector SHALL 追加 `extendsRange=true` 的 absorb option
+- **并且** 若目标 sector 已有 range 内 absorb 命中，SHALL NOT 追加扩展候选
 - **并且** 对距离 `> MAX_UNCERTAIN_JUMP` 的 sector SHALL NOT 追加 absorb option
 - **并且** 若新候选是更优选择，邻近 sector MAY 被该 standalone hub 吸收到 coverage
 - **并且** 被追加候选的 assignment SHALL 按以下规则更新 `selectedOptionIndex` 和 `status`
