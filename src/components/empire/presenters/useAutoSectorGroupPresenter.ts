@@ -7,7 +7,7 @@ import { useActiveViewStore } from '@/store/useActiveViewStore'
 import { useSaveBindingStore } from '@/store/useSaveBindingStore'
 import { useLiveProductionStore } from '@/store/useLiveProductionStore'
 import { useBlueprintProductionStore } from '@/store/useBlueprintProductionStore'
-import { groupCleanSlate, groupIncremental, applyAbsorbToResult, applyStandaloneToResult, applyBridgePlanToDraft, buildAssignmentResult, setGroupPinnedInResult, normalizeReappearedUnpinnedHubs, rebuildAssignmentsForJumpRangeChange, type AutoGroupResult, type GroupDraftInfo, type SectorAssignment, getDistance } from '@/store/logic/autoGroup'
+import { groupCleanSlate, groupIncremental, applyAbsorbToResult, applyStandaloneToResult, applyBridgePlanToDraft, buildAssignmentResult, setGroupPinnedInResult, normalizeReappearedUnpinnedHubs, rebuildAssignmentsForJumpRangeChange, preserveEditAssignmentSelections, type AutoGroupResult, type GroupDraftInfo, type SectorAssignment, getDistance } from '@/store/logic/autoGroup'
 import { buildSectorGraphFromMaps, getCoverageSectors, getPlayerStationsInSector } from '@/store/logic/saveBindingUtils'
 import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
 import { getSectorZoneBoundingCenter } from '@/components/map/utils/coordinates'
@@ -367,16 +367,10 @@ function rebuildAssignmentsFromGroups() {
   }
 
   const unassigned = result.playerSectorMacros.filter((m) => !assignedSectors.has(m))
-  const newAssignments = buildAssignmentResult(unassigned, assignedSectors, result.groups, sectorGraph, sectorClusterMap)
-
-  const prevSelected = new Map(result.assignments.map((a) => [a.sectorMacro, a.selectedOptionIndex]))
-  for (const a of newAssignments) {
-    const prev = prevSelected.get(a.sectorMacro)
-    if (prev !== undefined && prev !== null && prev < a.options.length) {
-      a.selectedOptionIndex = prev
-      a.displayBucket = 'resolved'
-    }
-  }
+  const newAssignments = preserveEditAssignmentSelections(
+    result.assignments,
+    buildAssignmentResult(unassigned, assignedSectors, result.groups, sectorGraph, sectorClusterMap)
+  )
 
   autoGroupResult.value = { ...result, assignments: newAssignments }
 }
@@ -470,7 +464,7 @@ function handleUpdateJumpRange(groupId: string, range: number) {
   const withCoverage = { ...result, groups, assignments: result.assignments }
   // Then incrementally rebuild affected assignments
   autoGroupResult.value = rebuildAssignmentsForJumpRangeChange(
-    withCoverage, groupId, range, sectorGraph, sectorClusterMap
+    withCoverage, groupId, range, sectorGraph, sectorClusterMap, undefined, false
   )
 }
 
@@ -728,7 +722,6 @@ function getExistingAnchorSectors(): Set<string> {
 }
 
 function handleToggleRetainCoverage(groupId: string) {
-  if (calculationMode.value !== 'edit') return
   if (!autoGroupResult.value) return
   const result = autoGroupResult.value
   const groups = [...result.groups]
@@ -749,7 +742,6 @@ function handleColorChange(groupId: string, color: string | undefined) {
 }
 
 function handleToggleRetainConnection(groupId: string) {
-  if (calculationMode.value !== 'edit') return
   if (!autoGroupResult.value) return
   const result = autoGroupResult.value
   const groups = [...result.groups]

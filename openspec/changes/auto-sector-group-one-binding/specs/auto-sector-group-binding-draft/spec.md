@@ -328,9 +328,10 @@ Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触�
 #### Scenario: Trade station retain controls
 
 - **前提** 共享自动分组面板渲染
-- **当** 用户查看参数栏或 edit 模式 group card
+- **当** 用户查看参数栏或 result/edit 模式 group card
 - **那么** 参数栏 SHALL 显示 `tradeStationRetainEnabled` 主开关
-- **并且** edit 模式 group card SHALL 显示对应 group 的 `tradeStationRetainEnabled` 开关
+- **并且** result/edit 模式 group card SHALL 显示对应 group 的 `connectionRetainEnabled`、`coverageRetainEnabled` 和 `tradeStationRetainEnabled` 开关
+- **并且** overview 展示态 group card SHALL NOT 显示 pin/unpin 控件
 
 #### Scenario: Retain masters are derived and mixed defaults off
 
@@ -723,19 +724,19 @@ Save binding state SHALL use version 2 for sector group identity based on hub `s
 - **那么** 系统 SHALL 重算 `T` 的 options，`G` 对应 option 的 `extendsRange` 从 `true` 变为 `false`
 - **并且** 距离 `≤ oldRange` 的 sector SHALL NOT 重算 options
 
-#### Scenario: JumpRange increase switches selection when hub becomes range hit
+#### Scenario: Result extension absorb range expansion switches selection when hub becomes range hit
 
 - **前提** sector `T` 当前 `selectedOptionIndex=null`，`status='uncertain_extend'`
 - **并且** `T` 之前主动选择了 `G` 的扩展选项（`extendsRange=true`）
-- **当** `G` 的 `jumpRange` 增大使 `G` 对 `T` 从扩展候选变为 range 内候选
+- **当** 用户在 result 模式显式选择扩展 absorb，使 `G` 的 `jumpRange` 扩大并让 `G` 对 `T` 从扩展候选变为 range 内候选
 - **那么** `T.selectedOptionIndex` SHALL 指向 `G` 对应的 option
 - **并且** `T.status` SHALL 变为 `'auto'`
 
-#### Scenario: JumpRange increase keeps selection when hub not better than current
+#### Scenario: Result extension absorb range expansion keeps selection when hub not better than current
 
 - **前提** sector `T` 当前已选中其他 hub `H` 的 range 内 absorb option
 - **并且** `G` 的 jumpRange 增大使 `G` 对 `T` 从扩展候选变为 range 内候选
-- **当** `G` 对 `T` 的距离不比 `H` 更近
+- **当** 用户在 result 模式显式选择扩展 absorb 且 `G` 对 `T` 的距离不比 `H` 更近
 - **那么** `T.selectedOptionIndex` SHALL 保持指向 `H`
 - **并且** `T.status` SHALL 保持不变
 
@@ -747,25 +748,21 @@ Save binding state SHALL use version 2 for sector group identity based on hub `s
 - **那么** 系统 SHALL 重算 `T` 的 options，`G` 对应 option 的 `extendsRange` 从 `false` 变为 `true`
 - **并且** 距离 `≤ newRange` 的 sector SHALL NOT 重算 options
 
-#### Scenario: JumpRange decrease downgrades selection when hub becomes extension
+#### Scenario: Edit JumpRange decrease clears selection when selected hub becomes invalid
 
 - **前提** sector `T` 当前 `selectedOptionIndex` 指向 `G` 的 range 内 absorb option
 - **并且** `T.status='auto'`
-- **当** `G` 的 `jumpRange` 减小使 `G` 对 `T` 从 range 内候选变为扩展候选
-- **并且** `T` 无其他 range 内 absorb 命中
+- **当** 用户在 edit 模式将 `G` 的 `jumpRange` 减小，使 `G` 对 `T` 从 range 内候选变为扩展候选
 - **那么** `T.selectedOptionIndex` SHALL 变为 `null`
-- **并且** `T.status` SHALL 变为 `'uncertain_extend'`
+- **并且** `T.status` SHALL 按剩余候选保持待用户选择语义
 
-#### Scenario: JumpRange decrease switches to best remaining range hit
+#### Scenario: Edit JumpRange decrease does not switch to best remaining range hit
 
 - **前提** sector `T` 当前 `selectedOptionIndex` 指向 `G` 的 range 内 absorb option
 - **并且** `T` 还有另一个 hub `H` 的 range 内 absorb option
-- **当** `G` 的 `jumpRange` 减小使 `G` 对 `T` 从 range 内变为扩展
-- **那么** `T.selectedOptionIndex` SHALL 指向 `H` 的 option
-- **并且** `T.status` SHALL 保持 `'auto'`
-- **当** `H` 与其他 range 内候选同距离平局
-- **那么** `T.selectedOptionIndex` SHALL 为 `null`
-- **并且** `T.status` SHALL 为 `'uncertain_tie'`
+- **当** 用户在 edit 模式将 `G` 的 `jumpRange` 减小，使 `G` 对 `T` 从 range 内变为扩展
+- **那么** `T.selectedOptionIndex` SHALL 变为 `null`
+- **并且** 系统 SHALL NOT 自动切换到 `H` 或其他剩余 range 内候选
 
 ### Requirement: Assignment Options Update Rules Summary
 
@@ -802,12 +799,11 @@ Save binding state SHALL use version 2 for sector group identity based on hub `s
 
 | 场景 | 受影响 sector 范围 | 重算内容 |
 | --- | --- | --- |
-| 增大跳数 (old→new, new>old) | 距离该 hub 在 `(old, new]` 的 sector | options + `selectedOptionIndex`（按 R3） |
-| 减小跳数 (old→new, new<old) | 距离该 hub 在 `(new, old]` 的 sector | options + `selectedOptionIndex`（按 R3） |
+| result 模式扩展 absorb 导致 range 扩大 | 同距离受影响 sector | options + `selectedOptionIndex`（按 R3） |
+| edit 模式增大跳数 (old→new, new>old) | 距离该 hub 在 `(old, new]` 的 sector | options / extendsRange / R2；不自动切换 `selectedOptionIndex` |
+| edit 模式减小跳数 (old→new, new<old) | 距离该 hub 在 `(new, old]` 的 sector | options / extendsRange / R2；仅原选中 option 失效时清除 `selectedOptionIndex` |
 | 距离 `≤ min(old, new)` | 不重算 | — |
-| 减小后原选中 hub 变扩展、有其他 range 命中 | — | 选最优剩余 range 内候选；平局 `null`+`uncertain_tie` |
-| 减小后原选中 hub 变扩展、无其他 range 命中 | — | `null`+`uncertain_extend` |
-| 扩展 absorb 后 hub 跳数扩大 | 同距离其他 sector | 按 R4 增大规则重算 |
+| edit 模式原选中 option 失效 | 当前选中项被本次 options 维护删除或转为不可继续选中 | `selectedOptionIndex=null` |
 
 #### R5: Unpin Assignment Display
 
@@ -818,3 +814,17 @@ Save binding state SHALL use version 2 for sector group identity based on hub `s
 | absorb 后 | 不清除 `displayBucket` 和 `unpinOrder`，留在顶部位置 |
 | standalone 后 | `displayBucket` 从 `'unpin'` 改为 `'resolved'`，离开顶部 |
 | pin 后 | assignment 从列表移除 |
+
+#### R6: Edit Mode Direct Operations（无联动选择）
+
+edit 模式下直接操作 groups/coverage/connected/jumpRange，options 可随结构变化维护；`selectedOptionIndex` 只允许在用户直接操作的 sector 或原选中 option 被删除/失效的 sector 上修改。系统 SHALL NOT 因更优、更近、平局、range 内/扩展变化，对其他 sector 自动切换选择。
+
+| 操作 | 行为 |
+| --- | --- |
+| **加入 coverage** | 修改目标 group coverage；该 sector 的 `selectedOptionIndex` 设为指向该 group 的 absorb option |
+| **移出 coverage** | 修改目标 group coverage；该 sector 的 `selectedOptionIndex` 清除 |
+| **新增 hub** | eligible sectors 追加该 hub 的 absorb option（按 R1）。range 内追加时移除扩展候选（R2）。其他 sector 的 **`selectedOptionIndex` 不动** |
+| **移除 hub（未被选中）** | 每个其他 sector 删除该 hub 的 absorb option。若无 range 内命中 → 补充扩展候选（R2 反向）。**`selectedOptionIndex` 不动** |
+| **移除 hub（被选中）** | 删除该 hub 的 absorb option。若某 assignment 当前 `selectedOptionIndex` 指向被删除的 hub option，则将该 assignment 的 `selectedOptionIndex` 清为 `null` |
+| **connected toggle** | 只改 `connectedGroupIds`，不动 assignment |
+| **edit 模式修改跳数** | 按 R4 重算受影响 sector 的 options（extendsRange 更新 + R2）。**不自动选新的**。若原选中项因跳数变化失效 → 清除选择 |

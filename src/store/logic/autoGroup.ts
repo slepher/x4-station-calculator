@@ -1866,7 +1866,8 @@ export function rebuildAssignmentsForJumpRangeChange(
   newRange: number,
   sectorGraph: Record<string, string[]>,
   sectorClusterMap: Record<string, string>,
-  oldRangeOverride?: number
+  oldRangeOverride?: number,
+  autoSelect: boolean = true
 ): AutoGroupResult {
   const group = result.groups.find((g) => g.id === groupId)
   if (!group?.sectorMacro) return result
@@ -1917,6 +1918,34 @@ export function rebuildAssignmentsForJumpRangeChange(
     let nextStatus = a.status
 
     const hubOpt = rebuiltAssignment.options.find((o) => o.targetGroupId === groupId)
+    if (!autoSelect) {
+      const prevSelectedOption = a.selectedOptionIndex !== null
+        ? a.options[a.selectedOptionIndex]
+        : undefined
+      if (prevSelectedOption) {
+        if (prevSelectedOption.type === 'absorb' && prevSelectedOption.targetGroupId === groupId && prevSelectedOption.extendsRange === false && hubOpt?.extendsRange === true) {
+          nextSelected = null
+          nextStatus = 'uncertain_extend'
+        } else if (prevSelectedOption.type === 'standalone') {
+          const mappedIdx = rebuiltAssignment.options.findIndex((o) => o.type === 'standalone')
+          nextSelected = mappedIdx >= 0 ? mappedIdx : null
+        } else {
+          const mappedIdx = rebuiltAssignment.options.findIndex((o) =>
+            o.type === prevSelectedOption.type && o.targetGroupId === prevSelectedOption.targetGroupId
+          )
+          nextSelected = mappedIdx >= 0 ? mappedIdx : null
+        }
+      }
+
+      assignments[i] = {
+        ...a,
+        options: rebuiltAssignment.options,
+        selectedOptionIndex: nextSelected,
+        status: nextStatus as SectorAssignment['status']
+      }
+      continue
+    }
+
     if (hubOpt) {
       const hubOptIdx = rebuiltAssignment.options.indexOf(hubOpt)
       if (!hubOpt.extendsRange) {
@@ -1998,6 +2027,42 @@ function findBestOptionIndex(options: AssignmentOption[]): number | null {
   if (bestIdx !== null) return bestIdx
   const standaloneIdx = options.findIndex((o) => o.type === 'standalone')
   return standaloneIdx >= 0 ? standaloneIdx : null
+}
+
+function findMatchingOptionIndex(options: AssignmentOption[], selected: AssignmentOption): number {
+  if (selected.type === 'standalone') {
+    return options.findIndex((o) => o.type === 'standalone')
+  }
+  return options.findIndex((o) =>
+    o.type === selected.type && o.targetGroupId === selected.targetGroupId
+  )
+}
+
+export function preserveEditAssignmentSelections(
+  previousAssignments: SectorAssignment[],
+  nextAssignments: SectorAssignment[]
+): SectorAssignment[] {
+  const previousBySector = new Map(previousAssignments.map((a) => [a.sectorMacro, a]))
+  return nextAssignments.map((assignment) => {
+    const previous = previousBySector.get(assignment.sectorMacro)
+    if (!previous || previous.selectedOptionIndex === null) return assignment
+
+    const previousSelected = previous.options[previous.selectedOptionIndex]
+    if (!previousSelected) {
+      return { ...assignment, selectedOptionIndex: null }
+    }
+
+    const mappedIndex = findMatchingOptionIndex(assignment.options, previousSelected)
+    if (mappedIndex < 0) {
+      return { ...assignment, selectedOptionIndex: null }
+    }
+
+    return {
+      ...assignment,
+      selectedOptionIndex: mappedIndex,
+      displayBucket: 'resolved'
+    }
+  })
 }
 
 export function enrichAutoGroupResult(

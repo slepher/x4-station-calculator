@@ -133,7 +133,7 @@ Trade station 在 Live 计算模式中作为第三列展示和 confirm gate 的�
 - [桥接跳数]：更新 `bridgeSearchJumpRange`，且不得小于覆盖跳数。
 - [覆盖跳数]：更新 `prefJumpRange`；若桥接跳数低于覆盖跳数，需要同步抬高桥接跳数。覆盖跳数只影响下一次显式 [计算]，不触发 assignment 增量重算。
 - [Hub 阈值]：更新 `prefThreshold`，影响下一次显式 [计算]。
-- Group card jumpRange 修改 SHALL 增量重算受影响 assignment：距离该 hub 在 `(oldRange, newRange]`（增大）或 `(newRange, oldRange]`（减小）的 sector 重算 options 和 `selectedOptionIndex`，距离 `≤ min(oldRange, newRange)` 的 sector 不动。重算选择规则与 standalone derived candidate 一致：该 hub 在新 range 内且比当前选中项更优时切换，不更优或平局时保持原选择。
+- Group card jumpRange 修改只存在于 edit 模式。它 SHALL 增量维护受影响 assignment 的 options / `extendsRange` / R2 候选不共存状态：距离该 hub 在 `(oldRange, newRange]`（增大）或 `(newRange, oldRange]`（减小）的 sector 重算 options，距离 `≤ min(oldRange, newRange)` 的 sector 不动。`selectedOptionIndex` 不因更优、更近或平局自动切换；仅当当前选中 option 因本次跳数变化失效时清除。
 
 ### Tab 与自动切换
 
@@ -184,8 +184,9 @@ Trade station 在 Live 计算模式中作为第三列展示和 confirm gate 的�
 - **追加候选（R1）**：独立成组后，新 hub 距离 `≤ prefJumpRange` 追加 range 内 option；`> prefJumpRange && ≤ MAX_UNCERTAIN_JUMP` 追加扩展 option；`> MAX_UNCERTAIN_JUMP` 不追加。
 - **不共存（R2）**：range 内命中与扩展候选不共存于同一 sector。新增 range 内命中时移除扩展候选；已有 range 内命中时独立成组不追加扩展候选。
 - **选择更新（R3）**：`selectedOptionIndex` 只在"新 hub range 内且更优"时切换；不更优/平局保持原选择；standalone 选择只加不切；仅扩展候选时 `selected=null` + `uncertain_extend`。
-- **跳数变化（R4）**：card jumpRange 变化增量重算距离 `∈ (old, new]` 的 sector，按 R3 更新选择。扩展 absorb 联动同距离 sector。
-- **Unpin 排序（R5）**：`displayBucket='unpin'` + `unpinOrder` 维持顶部位置；absorb 不清除；standalone 后改为 `'resolved'`。
+- **跳数变化（R4）**：result 模式没有直接增减 range 的 card 编辑；只有扩展 absorb 会导致 hub range 扩大，并按 R3 更新选择。**edit 模式**（card 直接修改跳数）只维护 options / extendsRange / R2，不自动选新的，原选中失效才清除。
+- **Unpin 排序（R5）**：`displayBucket='unpin'` + `unpinOrder` 维持顶部位置；absorb 不清除；standalone 改为 `'resolved'`；pin 移除。
+- **Edit 直接操作（R6）**：edit 模式下 options 可随 groups/coverage/hub/jumpRange 的结构变化维护；`selectedOptionIndex` 只允许在用户直接操作的 sector 或原选中 option 被删除/失效的 sector 上修改。不得因更优、更近、平局、range 内/扩展变化，对其他 sector 自动切换选择。
 
 ## 未决项
 

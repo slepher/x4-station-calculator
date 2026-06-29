@@ -55,6 +55,48 @@ describe('SectorGroupCard structure lock', () => {
     expect(wrapper.find('.group-name').text()).toBe('Hub')
   })
 
+  it('hides pin and unpin button when recalc state controls are disabled', () => {
+    const group = baseGroup()
+    const wrapper = mount(SectorGroupCard, {
+      props: {
+        group,
+        groups: [group],
+        assignments: [],
+        maps: null,
+        sectorGraph: {},
+        sectorClusterMap: {},
+        playerSectorMacros: [],
+        editable: false,
+        diffEnabled: false,
+        showRecalcStateButton: false
+      }
+    })
+
+    expect(wrapper.find('button.state-btn').exists()).toBe(false)
+    expect(wrapper.find('.group-name').text()).toBe('Hub')
+  })
+
+  it('shows retain controls separately from edit-only controls', () => {
+    const group = baseGroup()
+    const wrapper = mount(SectorGroupCard, {
+      props: {
+        group,
+        groups: [group],
+        assignments: [],
+        maps: null,
+        sectorGraph: {},
+        sectorClusterMap: {},
+        playerSectorMacros: [],
+        editable: false,
+        retainEditable: true,
+        diffEnabled: true
+      }
+    })
+
+    expect(wrapper.findAll('.retain-chk')).toHaveLength(3)
+    expect(wrapper.find('.jump-readonly').exists()).toBe(true)
+  })
+
   it('uses saved binding sectorMacro baseline for new-group highlight', () => {
     const group = baseGroup({ id: 'runtime-random-id', isNew: true })
     const wrapper = mount(SectorGroupCard, {

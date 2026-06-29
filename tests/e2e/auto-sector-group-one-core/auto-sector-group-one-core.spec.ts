@@ -281,8 +281,8 @@ test.describe('2 编辑态与 Assignment', () => {
     // 2.1.5 显示 jump rows、覆盖星区数、uncertain 数量
     await expect(firstCard.locator('.group-stats')).toBeVisible()
 
-    // 2.1.6 不显示 retain、pin/unpin、删除、pill action
-    await expect(firstCard.locator('.retain-chk')).toHaveCount(0)
+    // 2.1.6 result 模式显示 retain，不显示删除
+    await expect(firstCard.locator('.retain-chk')).toHaveCount(3)
     await expect(firstCard.locator('.state-btn--delete')).toHaveCount(0)
   })
 

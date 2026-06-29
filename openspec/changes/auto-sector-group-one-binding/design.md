@@ -158,7 +158,7 @@ gameGuid:archiveTime
 - [退出] 只设置 `calculationMode='result'`。
 - [退出] 不恢复 coverage、connection、assignment、trade station 或颜色。
 - 追加 range 内候选后 SHALL 移除非 standalone 的扩展候选，与 `buildAssignmentResult` 的 range 内/扩展不共存语义对齐。
-- 减小跳数导致原选中 hub 变为扩展，但其他 hub 仍有 range 内命中时 SHALL 自动选最优剩余 range 内候选；平局时 `null` + `uncertain_tie`。
+- result 模式下扩展 absorb 导致 hub range 扩大时，受影响 assignment 的选择按 R3 更新。edit 模式下 card 直接修改跳数只维护候选结构，不因更优、更近或平局自动切换其他 sector 的选择。
 - 用户若要回到最近计算结果，必须使用 [重置]。
 
 ## Presenter
@@ -277,7 +277,7 @@ Group card 上的 jumpRange 修改 SHALL 增量重算受影响 assignment，不�
 重算内容：
 
 - 对每个受影响 sector，使用 `buildAssignmentResult` 逻辑重新生成该 sector 的 options（包含所有 hub 的候选，该 hub 的 `extendsRange` 按新 jumpRange 计算）。
-- `selectedOptionIndex` 更新采用与 standalone derived candidate 相同的规则：该 hub 在新 range 内且比当前选中项更优（距离更近，或同距离 score 更高）时切换到该 hub；不更优或平局时保持原选择；该 hub 变为扩展候选且无其他 range 内命中时 `selectedOptionIndex=null`、`status='uncertain_extend'`。
+- Group card jumpRange 修改属于 edit 模式底层编辑。对每个受影响 sector，只维护 options / `extendsRange` / R2 候选不共存状态。`selectedOptionIndex` 不因更优、更近或平局自动切换；仅当当前选中 option 因本次跳数变化失效时清除。
 - `displayBucket` 不变。
 
 ### SectorGroupStatBar
@@ -403,13 +403,34 @@ Map 面板不拥有自己的 draft。进入 binding 阶段时读取 live store �
 
 ### R4: JumpRange Change
 
-- 增大（`old→new`）：重算距离该 hub `∈ (old,new]` 的 sector 的 options + `selectedOptionIndex`（按 R3）。
-- 减小（`old→new`）：重算距离该 hub `∈ (new,old]` 的 sector。原选中该 hub 且有其他 range 命中 → 选最优剩余；无其他 → `null, uncertain_extend`。
+**result 模式**（扩展 absorb 触发）：
+- result 模式没有直接增减 range 的 card 编辑。
+- 用户显式选择扩展 absorb 后，目标 hub 的 range 扩大到覆盖该 sector。
+- 对同距离受影响 sector 重算 options + `selectedOptionIndex`（按 R3）。
+
+**edit 模式**（card 直接修改跳数）：
+- 只重算受影响 sector 的 options（extendsRange 更新 + R2）。
+- **不自动选新的**。仅当原选中项因跳数变化失效时清除选择。
+
 - 距离 `≤ min(old, new)` 不重算。
-- 扩展 absorb 后 hub 跳数扩大 → 按增大规则重算同距离其他 sector。
 
 ### R5: Unpin Assignment
 
 - `displayBucket='unpin'` + `unpinOrder` 维持顶部位置。
 - absorb 后不清除 `displayBucket`/`unpinOrder`。
 - standalone 后 `displayBucket` 从 `'unpin'` 改为 `'resolved'`。
+- pin 后 assignment 从列表移除。
+
+### R6: Edit Mode Direct Operations
+
+edit 模式原则：options 可随 groups/coverage/hub/jumpRange 的结构变化维护；`selectedOptionIndex` 只允许在用户直接操作的 sector 或原选中 option 被删除/失效的 sector 上修改。不得因更优、更近、平局、range 内/扩展变化，对其他 sector 自动切换选择。
+
+| 操作 | 行为 |
+| --- | --- |
+| 加入 coverage | 修改目标 group coverage；该 sector 的 `selectedOptionIndex` 指向该 group 的 absorb option |
+| 移出 coverage | 修改目标 group coverage；该 sector 的 `selectedOptionIndex` 清除 |
+| 新增 hub | 对 eligible sectors 追加该 hub 的 absorb option（R1）。range 内时移除扩展候选（R2）。其他 sector 的 **`selectedOptionIndex` 不动** |
+| 移除 hub（未被选中） | 删除该 hub 的 option。无 range 内时补充扩展候选（R2 反向）。**`selectedOptionIndex` 不动** |
+| 移除 hub（被选中） | 删除该 hub 的 option；选中项指向被删除 hub 的 sector 清除 `selectedOptionIndex=null` |
+| connected toggle | 只改 `connectedGroupIds` |
+| 修改跳数 | 更新 extendsRange + R2。不自动选；原选中失效则清除 |

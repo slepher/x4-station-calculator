@@ -9,6 +9,7 @@ import {
   setGroupPinnedInResult,
   sortAssignmentsForDisplay,
   rebuildAssignmentsForJumpRangeChange,
+  preserveEditAssignmentSelections,
   type AutoGroupResult
 } from '@/store/logic/autoGroup'
 import type { SaveArchive, PlayerStationEntry } from '@/types/saveArchive'
@@ -1174,6 +1175,39 @@ describe('autoGroup assignment state after user selection', () => {
       expect(dAssignment.status).toBe('auto')
     })
 
+    it('keeps selection unchanged in edit mode when jumpRange increase makes hub a range hit', () => {
+      const baseGroup = buildResult().groups[0]!
+      const result: AutoGroupResult = {
+        groups: [
+          { ...baseGroup, id: 'H', sectorMacro: 'H', jumpRange: 3, originalJumpRange: 3 }
+        ],
+        assignments: [
+          {
+            sectorMacro: 'D',
+            status: 'uncertain_extend',
+            displayBucket: 'unresolved',
+            selectedOptionIndex: 0,
+            options: [
+              { type: 'absorb', targetGroupId: 'H', distance: 5, extendsRange: true, resultingGroupSize: 2 },
+              { type: 'standalone', distance: 0, extendsRange: false, resultingGroupSize: 1 }
+            ]
+          }
+        ],
+        bridgePlans: [],
+        playerSectorMacros: ['H', 'D']
+      }
+
+      const updated = rebuildAssignmentsForJumpRangeChange(
+        result, 'H', 5, graph, clusterMap, undefined, false
+      )
+
+      const dAssignment = updated.assignments.find((a) => a.sectorMacro === 'D')!
+      const hOpt = dAssignment.options.find((o) => o.targetGroupId === 'H')!
+      expect(hOpt.extendsRange).toBe(false)
+      expect(dAssignment.selectedOptionIndex).toBe(0)
+      expect(dAssignment.status).toBe('uncertain_extend')
+    })
+
     it('keeps selection when hub becomes range hit but is not better than current', () => {
       const baseGroup = buildResult().groups[0]!
       const multiGraph = {
@@ -1299,6 +1333,40 @@ describe('autoGroup assignment state after user selection', () => {
       const h2Opt = tAssignment.options.find((o) => o.targetGroupId === 'H2')!
       expect(tAssignment.selectedOptionIndex).toBe(tAssignment.options.indexOf(h2Opt))
       expect(tAssignment.status).toBe('auto')
+    })
+  })
+
+  describe('preserveEditAssignmentSelections', () => {
+    it('clears selectedOptionIndex when the selected hub option was removed', () => {
+      const previous: AutoGroupResult['assignments'] = [
+        {
+          sectorMacro: 'T',
+          status: 'auto',
+          displayBucket: 'resolved',
+          selectedOptionIndex: 0,
+          options: [
+            { type: 'absorb', targetGroupId: 'H1', distance: 1, extendsRange: false, resultingGroupSize: 2 },
+            { type: 'absorb', targetGroupId: 'H2', distance: 2, extendsRange: false, resultingGroupSize: 2 },
+            { type: 'standalone', distance: 0, extendsRange: false, resultingGroupSize: 1 }
+          ]
+        }
+      ]
+      const next: AutoGroupResult['assignments'] = [
+        {
+          sectorMacro: 'T',
+          status: 'auto',
+          displayBucket: 'resolved',
+          selectedOptionIndex: 0,
+          options: [
+            { type: 'absorb', targetGroupId: 'H2', distance: 2, extendsRange: false, resultingGroupSize: 2 },
+            { type: 'standalone', distance: 0, extendsRange: false, resultingGroupSize: 1 }
+          ]
+        }
+      ]
+
+      const [updated] = preserveEditAssignmentSelections(previous, next)
+
+      expect(updated!.selectedOptionIndex).toBeNull()
     })
   })
 

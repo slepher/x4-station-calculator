@@ -14,9 +14,11 @@ const props = withDefaults(defineProps<{
   sectorClusterMap: Record<string, string>
   playerSectorMacros: string[]
   editable: boolean
+  retainEditable?: boolean
   diffEnabled: boolean
   view?: 'map' | 'live'
   showSelectGroupButton?: boolean
+  showRecalcStateButton?: boolean
   draggable?: boolean
   structureDisabled?: boolean
   baselineCoverageByGroupId?: Record<string, string[]>
@@ -24,7 +26,9 @@ const props = withDefaults(defineProps<{
   tradeStationCaps?: Record<string, number>
 }>(), {
   view: 'live',
+  retainEditable: false,
   showSelectGroupButton: false,
+  showRecalcStateButton: true,
   draggable: false,
   structureDisabled: false
 })
@@ -53,9 +57,11 @@ const cardBase = computed(() => ({
   sectorClusterMap: props.sectorClusterMap,
   playerSectorMacros: props.playerSectorMacros,
   editable: props.editable,
+  retainEditable: props.retainEditable,
   diffEnabled: props.diffEnabled,
   view: props.view,
   showSelectGroupButton: props.showSelectGroupButton,
+  showRecalcStateButton: props.showRecalcStateButton,
   structureDisabled: props.structureDisabled,
   baselineCoverageByGroupId: props.baselineCoverageByGroupId,
   baselineConnectedGroupIdsByGroupId: props.baselineConnectedGroupIdsByGroupId,

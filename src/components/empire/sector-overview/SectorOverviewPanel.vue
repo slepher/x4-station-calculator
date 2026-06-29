@@ -84,6 +84,7 @@ defineExpose({ triggerAutoGroup })
           :sector-cluster-map="sectorGraphInfo.sectorClusterMap"
           :player-sector-macros="autoGroupResult?.playerSectorMacros ?? []"
           :editable="false"
+          :show-recalc-state-button="false"
           :draggable="false"
           :diff-enabled="false"
           :trade-station-caps="tradeStationCaps"

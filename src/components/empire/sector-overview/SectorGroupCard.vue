@@ -18,18 +18,22 @@ const props = withDefaults(defineProps<{
   sectorClusterMap: Record<string, string>
   playerSectorMacros: string[]
   editable: boolean
+  retainEditable?: boolean
   diffEnabled: boolean
   view?: 'map' | 'live'
   showSelectGroupButton?: boolean
   showDragHandle?: boolean
+  showRecalcStateButton?: boolean
   structureDisabled?: boolean
   baselineCoverageByGroupId?: Record<string, string[]>
   baselineConnectedGroupIdsByGroupId?: Record<string, string[]>
   tradeStationCaps?: Record<string, number>
 }>(), {
   view: 'live',
+  retainEditable: false,
   showSelectGroupButton: false,
   showDragHandle: false,
+  showRecalcStateButton: true,
   structureDisabled: false
 })
 
@@ -355,20 +359,20 @@ function onAnchorPillClick(macro: string) {
         />
       </div>
       <div class="group-actions">
-        <label v-if="props.editable" class="retain-chk" :title="t('sector.bridge_retain')">
+        <label v-if="props.retainEditable" class="retain-chk" :title="t('sector.bridge_retain')">
           <input type="checkbox" class="bar-checkbox" :checked="group.connectionRetainEnabled" :disabled="!group.isPinned" @change="emit('toggle-retain-connection', group.id)" />
           <span class="retain-label">{{ t('sector.connected') }}</span>
         </label>
-        <label v-if="props.editable" class="retain-chk" :title="t('sector.coverage_retain')">
+        <label v-if="props.retainEditable" class="retain-chk" :title="t('sector.coverage_retain')">
           <input type="checkbox" class="bar-checkbox" :checked="group.coverageRetainEnabled" :disabled="!group.isPinned" @change="emit('toggle-retain-coverage', group.id)" />
           <span class="retain-label">{{ t('sector.group_coverage_jump_short') }}</span>
         </label>
-        <label v-if="props.editable" class="retain-chk" :title="t('sector.trade_station_retain')">
+        <label v-if="props.retainEditable" class="retain-chk" :title="t('sector.trade_station_retain')">
           <input type="checkbox" class="bar-checkbox" :checked="!!group.tradeStationRetainEnabled" :disabled="!group.isPinned" @change="emitToggleTradeStationRetain(group.id)" />
           <span class="retain-label">{{ t('sector.trade_station_short') }}</span>
         </label>
         <button
-          v-if="!group.enteredOtherGroupCoverage"
+          v-if="props.showRecalcStateButton && !group.enteredOtherGroupCoverage"
           class="action-btn state-btn"
           :class="group.isPinned ? 'state-btn--pinned' : 'state-btn--unpinned'"
           :disabled="props.structureDisabled"

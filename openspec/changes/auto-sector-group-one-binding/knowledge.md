@@ -86,7 +86,7 @@
 | `.jump-readonly` | 只读跳数显示（result 模式） |
 | `.jump-control` | 可编辑跳数控件（edit 模式） |
 | `.group-stats` | 统计行（覆盖数、不确定数） |
-| `.retain-chk` | 保留复选框（edit 模式） |
+| `.retain-chk` | 保留复选框（result/edit 模式） |
 | `.state-btn` | 组操作按钮 |
 | `.state-btn--pinned` | 钉选按钮 |
 | `.state-btn--unpinned` | 取消钉选按钮 |
