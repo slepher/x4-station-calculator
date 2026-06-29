@@ -7,6 +7,7 @@ import {
   groupIncremental,
   setGroupPinnedInResult,
   sortAssignmentsForDisplay,
+  rebuildAssignmentsForJumpRangeChange,
   type AutoGroupResult
 } from '@/store/logic/autoGroup'
 import type { SaveArchive, PlayerStationEntry } from '@/types/saveArchive'
@@ -887,6 +888,175 @@ describe('autoGroup assignment state after user selection', () => {
         expect(tAssignment.selectedOptionIndex).toBeNull()
         expect(tAssignment.status).toBe('uncertain_tie')
       }
+    })
+  })
+
+  describe('rebuildAssignmentsForJumpRangeChange', () => {
+    const graph = {
+      H: ['M1'],
+      M1: ['H', 'M2'],
+      M2: ['M1', 'M3'],
+      M3: ['M2', 'M4'],
+      M4: ['M3', 'D'],
+      D: ['M4']
+    }
+    const clusterMap = { H: 'H', M1: 'M1', M2: 'M2', M3: 'M3', M4: 'M4', D: 'D' }
+
+    function buildHubResult(hubId: string, jumpRange: number, unassigned: string[]): AutoGroupResult {
+      const baseGroup = buildResult().groups[0]!
+      return {
+        groups: [
+          {
+            ...baseGroup,
+            id: hubId,
+            name: `Group ${hubId}`,
+            sectorMacro: hubId,
+            jumpRange,
+            originalJumpRange: jumpRange
+          }
+        ],
+        assignments: unassigned.map((sectorMacro) => ({
+          sectorMacro,
+          status: 'uncertain_extend' as const,
+          displayBucket: 'unresolved' as const,
+          selectedOptionIndex: null,
+          options: [
+            { type: 'standalone' as const, distance: 0, extendsRange: false, resultingGroupSize: 1 }
+          ]
+        })),
+        bridgePlans: [],
+        playerSectorMacros: [hubId, ...unassigned]
+      }
+    }
+
+    it('recalculates affected sector options when jumpRange increases', () => {
+      const result = buildHubResult('H', 3, ['D'])
+      const updated = rebuildAssignmentsForJumpRangeChange(
+        result, 'H', 5, graph, clusterMap
+      )
+
+      const dAssignment = updated.assignments.find((a) => a.sectorMacro === 'D')!
+      const hOpt = dAssignment.options.find((o) => o.targetGroupId === 'H')
+      expect(hOpt).toBeTruthy()
+      expect(hOpt!.extendsRange).toBe(false)
+    })
+
+    it('switches selection to hub when it becomes range hit and was previously selected as extension', () => {
+      const baseGroup = buildResult().groups[0]!
+      const result: AutoGroupResult = {
+        groups: [
+          { ...baseGroup, id: 'H', sectorMacro: 'H', jumpRange: 3, originalJumpRange: 3 }
+        ],
+        assignments: [
+          {
+            sectorMacro: 'D',
+            status: 'uncertain_extend',
+            displayBucket: 'unresolved',
+            selectedOptionIndex: 0,
+            options: [
+              { type: 'absorb', targetGroupId: 'H', distance: 5, extendsRange: true, resultingGroupSize: 2 },
+              { type: 'standalone', distance: 0, extendsRange: false, resultingGroupSize: 1 }
+            ]
+          }
+        ],
+        bridgePlans: [],
+        playerSectorMacros: ['H', 'D']
+      }
+
+      const updated = rebuildAssignmentsForJumpRangeChange(
+        result, 'H', 5, graph, clusterMap
+      )
+
+      const dAssignment = updated.assignments.find((a) => a.sectorMacro === 'D')!
+      const hOpt = dAssignment.options.find((o) => o.targetGroupId === 'H')!
+      expect(hOpt.extendsRange).toBe(false)
+      expect(dAssignment.selectedOptionIndex).toBe(dAssignment.options.indexOf(hOpt))
+      expect(dAssignment.status).toBe('auto')
+    })
+
+    it('keeps selection when hub becomes range hit but is not better than current', () => {
+      const baseGroup = buildResult().groups[0]!
+      const multiGraph = {
+        H1: ['T'],
+        H2: ['M1'],
+        M1: ['H2', 'M2'],
+        M2: ['M1', 'T'],
+        T: ['H1', 'M2']
+      }
+      const multiCluster = { H1: 'H1', H2: 'H2', M1: 'M1', M2: 'M2', T: 'T' }
+      const result: AutoGroupResult = {
+        groups: [
+          { ...baseGroup, id: 'H1', sectorMacro: 'H1', jumpRange: 3, originalJumpRange: 3 },
+          { ...baseGroup, id: 'H2', sectorMacro: 'H2', jumpRange: 3, originalJumpRange: 3 }
+        ],
+        assignments: [
+          {
+            sectorMacro: 'T',
+            status: 'auto',
+            displayBucket: 'resolved',
+            selectedOptionIndex: 0,
+            options: [
+              { type: 'absorb', targetGroupId: 'H1', distance: 1, extendsRange: false, resultingGroupSize: 2 },
+              { type: 'absorb', targetGroupId: 'H2', distance: 3, extendsRange: true, resultingGroupSize: 2 },
+              { type: 'standalone', distance: 0, extendsRange: false, resultingGroupSize: 1 }
+            ]
+          }
+        ],
+        bridgePlans: [],
+        playerSectorMacros: ['H1', 'H2', 'T']
+      }
+
+      const updated = rebuildAssignmentsForJumpRangeChange(
+        result, 'H2', 4, multiGraph, multiCluster
+      )
+
+      const tAssignment = updated.assignments.find((a) => a.sectorMacro === 'T')!
+      const h1Opt = tAssignment.options.find((o) => o.targetGroupId === 'H1')!
+      expect(tAssignment.selectedOptionIndex).toBe(tAssignment.options.indexOf(h1Opt))
+      expect(tAssignment.status).toBe('auto')
+    })
+
+    it('recalculates affected sector options when jumpRange decreases', () => {
+      const result = buildHubResult('H', 5, ['D'])
+      const updated = rebuildAssignmentsForJumpRangeChange(
+        result, 'H', 3, graph, clusterMap
+      )
+
+      const dAssignment = updated.assignments.find((a) => a.sectorMacro === 'D')!
+      const hOpt = dAssignment.options.find((o) => o.targetGroupId === 'H')
+      expect(hOpt).toBeTruthy()
+      expect(hOpt!.extendsRange).toBe(true)
+    })
+
+    it('downgrades selection when hub becomes extension and no other range hit exists', () => {
+      const baseGroup = buildResult().groups[0]!
+      const result: AutoGroupResult = {
+        groups: [
+          { ...baseGroup, id: 'H', sectorMacro: 'H', jumpRange: 5, originalJumpRange: 5 }
+        ],
+        assignments: [
+          {
+            sectorMacro: 'D',
+            status: 'auto',
+            displayBucket: 'resolved',
+            selectedOptionIndex: 0,
+            options: [
+              { type: 'absorb', targetGroupId: 'H', distance: 5, extendsRange: false, resultingGroupSize: 2 },
+              { type: 'standalone', distance: 0, extendsRange: false, resultingGroupSize: 1 }
+            ]
+          }
+        ],
+        bridgePlans: [],
+        playerSectorMacros: ['H', 'D']
+      }
+
+      const updated = rebuildAssignmentsForJumpRangeChange(
+        result, 'H', 3, graph, clusterMap
+      )
+
+      const dAssignment = updated.assignments.find((a) => a.sectorMacro === 'D')!
+      expect(dAssignment.selectedOptionIndex).toBeNull()
+      expect(dAssignment.status).toBe('uncertain_extend')
     })
   })
 })

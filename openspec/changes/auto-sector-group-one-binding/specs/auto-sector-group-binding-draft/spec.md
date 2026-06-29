@@ -680,3 +680,48 @@ Save binding state SHALL use version 2 for sector group identity based on hub `s
 - **当** group 存在定位星区 `sectorMacro`
 - **那么** runtime `GroupDraftInfo.id` SHALL 等于该 `sectorMacro`
 - **并且** 系统 SHALL NOT 为该 group 生成随机 auto uuid 作为身份
+
+### Requirement: Group Card JumpRange Incremental Assignment Rebuild
+
+系统 SHALL 在 group card 上的 jumpRange 修改后增量重算受影响 assignment，不重建全部 assignments。
+
+#### Scenario: JumpRange increase recalculates affected sector options
+
+- **前提** hub group `G` 的 `jumpRange` 为 `oldRange`
+- **并且** sector `T` 距离 `G` 为 `d`，`oldRange < d ≤ newRange`
+- **当** 用户将 `G` 的 `jumpRange` 从 `oldRange` 增大到 `newRange`
+- **那么** 系统 SHALL 重算 `T` 的 options，`G` 对应 option 的 `extendsRange` 从 `true` 变为 `false`
+- **并且** 距离 `≤ oldRange` 的 sector SHALL NOT 重算 options
+
+#### Scenario: JumpRange increase switches selection when hub becomes range hit
+
+- **前提** sector `T` 当前 `selectedOptionIndex=null`，`status='uncertain_extend'`
+- **并且** `T` 之前主动选择了 `G` 的扩展选项（`extendsRange=true`）
+- **当** `G` 的 `jumpRange` 增大使 `G` 对 `T` 从扩展候选变为 range 内候选
+- **那么** `T.selectedOptionIndex` SHALL 指向 `G` 对应的 option
+- **并且** `T.status` SHALL 变为 `'auto'`
+
+#### Scenario: JumpRange increase keeps selection when hub not better than current
+
+- **前提** sector `T` 当前已选中其他 hub `H` 的 range 内 absorb option
+- **并且** `G` 的 jumpRange 增大使 `G` 对 `T` 从扩展候选变为 range 内候选
+- **当** `G` 对 `T` 的距离不比 `H` 更近
+- **那么** `T.selectedOptionIndex` SHALL 保持指向 `H`
+- **并且** `T.status` SHALL 保持不变
+
+#### Scenario: JumpRange decrease recalculates affected sector options
+
+- **前提** hub group `G` 的 `jumpRange` 为 `oldRange`
+- **并且** sector `T` 距离 `G` 为 `d`，`newRange < d ≤ oldRange`
+- **当** 用户将 `G` 的 `jumpRange` 从 `oldRange` 减小到 `newRange`
+- **那么** 系统 SHALL 重算 `T` 的 options，`G` 对应 option 的 `extendsRange` 从 `false` 变为 `true`
+- **并且** 距离 `≤ newRange` 的 sector SHALL NOT 重算 options
+
+#### Scenario: JumpRange decrease downgrades selection when hub becomes extension
+
+- **前提** sector `T` 当前 `selectedOptionIndex` 指向 `G` 的 range 内 absorb option
+- **并且** `T.status='auto'`
+- **当** `G` 的 `jumpRange` 减小使 `G` 对 `T` 从 range 内候选变为扩展候选
+- **并且** `T` 无其他 range 内 absorb 命中
+- **那么** `T.selectedOptionIndex` SHALL 变为 `null`
+- **并且** `T.status` SHALL 变为 `'uncertain_extend'`

@@ -128,8 +128,9 @@ Trade station 在 Live 计算模式中作为第三列展示和 confirm gate 的�
 - [交易站保留]：主开关同步所有 group 的 `tradeStationRetainEnabled`；主开关由各 group 状态聚合得出，mixed 时新 hub 默认 off。
 - [节点]：控制下一次计算是否允许生成新的 pure hub；clean slate 且无 baseline/pinned input 时不可关闭。
 - [桥接跳数]：更新 `bridgeSearchJumpRange`，且不得小于覆盖跳数。
-- [覆盖跳数]：更新 `prefJumpRange`；若桥接跳数低于覆盖跳数，需要同步抬高桥接跳数。
+- [覆盖跳数]：更新 `prefJumpRange`；若桥接跳数低于覆盖跳数，需要同步抬高桥接跳数。覆盖跳数只影响下一次显式 [计算]，不触发 assignment 增量重算。
 - [Hub 阈值]：更新 `prefThreshold`，影响下一次显式 [计算]。
+- Group card jumpRange 修改 SHALL 增量重算受影响 assignment：距离该 hub 在 `(oldRange, newRange]`（增大）或 `(newRange, oldRange]`（减小）的 sector 重算 options 和 `selectedOptionIndex`，距离 `≤ min(oldRange, newRange)` 的 sector 不动。重算选择规则与 standalone derived candidate 一致：该 hub 在新 range 内且比当前选中项更优时切换，不更优或平局时保持原选择。
 
 ### Tab 与自动切换
 

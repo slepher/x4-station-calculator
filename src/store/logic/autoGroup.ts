@@ -1819,6 +1819,113 @@ export function applyStandaloneToResult(
   return { ...result, groups, assignments: assignments as SectorAssignment[] }
 }
 
+export function rebuildAssignmentsForJumpRangeChange(
+  result: AutoGroupResult,
+  groupId: string,
+  newRange: number,
+  sectorGraph: Record<string, string[]>,
+  sectorClusterMap: Record<string, string>
+): AutoGroupResult {
+  const group = result.groups.find((g) => g.id === groupId)
+  if (!group?.sectorMacro) return result
+  const oldRange = group.jumpRange
+  if (newRange === oldRange) return result
+
+  const sectorMacro = group.sectorMacro
+  const minRange = Math.min(oldRange, newRange)
+  const maxRange = Math.max(oldRange, newRange)
+
+  const groups = result.groups.map((g) =>
+    g.id === groupId ? { ...g, jumpRange: newRange } : g
+  )
+
+  const assignments = [...result.assignments]
+  const anchorSectors = new Set(groups.map((g) => g.sectorMacro).filter(Boolean) as string[])
+
+  for (let i = 0; i < assignments.length; i++) {
+    const a = assignments[i]!
+    if (anchorSectors.has(a.sectorMacro)) continue
+
+    const dist = getCoverageSectors(sectorMacro, 99, sectorGraph, sectorClusterMap)
+      .find((d) => d.sectorMacro === a.sectorMacro)?.distance
+    if (dist === undefined) continue
+    if (dist <= minRange) continue
+    if (dist > maxRange) continue
+
+    const assignedSectors = new Map<string, string>()
+    for (const g of groups) {
+      if (g.sectorMacro) assignedSectors.set(g.sectorMacro, g.id)
+      for (const m of g.coverageSectorMacros) {
+        if (!assignedSectors.has(m)) assignedSectors.set(m, g.id)
+      }
+    }
+    const unassigned = result.playerSectorMacros.filter((m) => !assignedSectors.has(m))
+    const rebuilt = buildAssignmentResult(unassigned, assignedSectors, groups, sectorGraph, sectorClusterMap)
+    const rebuiltAssignment = rebuilt.find((r) => r.sectorMacro === a.sectorMacro)
+    if (!rebuiltAssignment) continue
+
+    const prevSelectedTarget = a.selectedOptionIndex !== null
+      ? a.options[a.selectedOptionIndex]?.targetGroupId
+      : undefined
+    const prevWasExtension = a.selectedOptionIndex !== null
+      ? a.options[a.selectedOptionIndex]?.extendsRange
+      : undefined
+
+    let nextSelected = a.selectedOptionIndex
+    let nextStatus = a.status
+
+    const hubOpt = rebuiltAssignment.options.find((o) => o.targetGroupId === groupId)
+    if (hubOpt) {
+      const hubOptIdx = rebuiltAssignment.options.indexOf(hubOpt)
+      if (!hubOpt.extendsRange) {
+        if (prevSelectedTarget === groupId || prevWasExtension === true) {
+          nextSelected = hubOptIdx
+          nextStatus = 'auto'
+        } else if (a.selectedOptionIndex === null) {
+          const rangeAbsorbs = rebuiltAssignment.options.filter((o) => o.type === 'absorb' && !o.extendsRange)
+          const minDist = Math.min(...rangeAbsorbs.map((o) => o.distance))
+          if (hubOpt.distance < minDist) {
+            nextSelected = hubOptIdx
+            nextStatus = 'auto'
+          } else if (hubOpt.distance === minDist && rangeAbsorbs.length === 1) {
+            nextSelected = hubOptIdx
+            nextStatus = 'auto'
+          }
+        } else {
+          const currentSelected = a.selectedOptionIndex !== null ? rebuiltAssignment.options[a.selectedOptionIndex] : null
+          if (currentSelected && currentSelected.type === 'absorb' && !currentSelected.extendsRange) {
+            const hubIsCloser = hubOpt.distance < currentSelected.distance
+            if (hubIsCloser) {
+              nextSelected = hubOptIdx
+              nextStatus = 'auto'
+            }
+          }
+        }
+      } else {
+        if (prevSelectedTarget === groupId && !prevWasExtension) {
+          const hasInRangeHit = rebuiltAssignment.options.some((o) => o.type === 'absorb' && !o.extendsRange)
+          if (!hasInRangeHit) {
+            nextSelected = null
+            nextStatus = 'uncertain_extend'
+          } else {
+            nextSelected = null
+            nextStatus = a.status === 'uncertain_extend' ? 'uncertain_extend' : a.status
+          }
+        }
+      }
+    }
+
+    assignments[i] = {
+      ...a,
+      options: rebuiltAssignment.options,
+      selectedOptionIndex: nextSelected,
+      status: nextStatus as SectorAssignment['status']
+    }
+  }
+
+  return { ...result, groups, assignments: assignments as SectorAssignment[] }
+}
+
 function findBestOptionIndex(options: AssignmentOption[]): number | null {
   let bestIdx: number | null = null
   let bestDist = Infinity

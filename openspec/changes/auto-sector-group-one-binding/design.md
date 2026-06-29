@@ -250,6 +250,22 @@ pin / unpin 是 shared draft 的即时变换，不是持久化提交动作，也
 - Vue 层只消费 presenter 提供的 assignment 顺序；不直接重新解释 pin/unpin 领域状态。
 - Vue 组件只从 hub/group card 发出 pin / unpin action，不直接拼装 assignment 或修改 store。
 
+### Group card jumpRange 增量重算
+
+Group card 上的 jumpRange 修改 SHALL 增量重算受影响 assignment，不重建全部 assignments。
+
+受影响 sector 判定：
+
+- 增大跳数（oldRange → newRange, newRange > oldRange）：距离该 hub 在 `(oldRange, newRange]` 的 sector。
+- 减小跳数（oldRange → newRange, newRange < oldRange）：距离该 hub 在 `(newRange, oldRange]` 的 sector。
+- 距离 `≤ min(oldRange, newRange)` 的 sector 不重算。
+
+重算内容：
+
+- 对每个受影响 sector，使用 `buildAssignmentResult` 逻辑重新生成该 sector 的 options（包含所有 hub 的候选，该 hub 的 `extendsRange` 按新 jumpRange 计算）。
+- `selectedOptionIndex` 更新采用与 standalone derived candidate 相同的规则：该 hub 在新 range 内且比当前选中项更优（距离更近，或同距离 score 更高）时切换到该 hub；不更优或平局时保持原选择；该 hub 变为扩展候选且无其他 range 内命中时 `selectedOptionIndex=null`、`status='uncertain_extend'`。
+- `displayBucket` 不变。
+
 ### SectorGroupStatBar
 
 | 按钮/控件 | 行为 |

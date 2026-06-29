@@ -7,7 +7,7 @@ import { useActiveViewStore } from '@/store/useActiveViewStore'
 import { useSaveBindingStore } from '@/store/useSaveBindingStore'
 import { useLiveProductionStore } from '@/store/useLiveProductionStore'
 import { useBlueprintProductionStore } from '@/store/useBlueprintProductionStore'
-import { groupCleanSlate, groupIncremental, applyAbsorbToResult, applyStandaloneToResult, applyBridgePlanToDraft, buildAssignmentResult, setGroupPinnedInResult, normalizeReappearedUnpinnedHubs, type AutoGroupResult, type GroupDraftInfo, type SectorAssignment, getDistance } from '@/store/logic/autoGroup'
+import { groupCleanSlate, groupIncremental, applyAbsorbToResult, applyStandaloneToResult, applyBridgePlanToDraft, buildAssignmentResult, setGroupPinnedInResult, normalizeReappearedUnpinnedHubs, rebuildAssignmentsForJumpRangeChange, type AutoGroupResult, type GroupDraftInfo, type SectorAssignment, getDistance } from '@/store/logic/autoGroup'
 import { buildSectorGraphFromMaps, getCoverageSectors, getPlayerStationsInSector } from '@/store/logic/saveBindingUtils'
 import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
 import { getSectorZoneBoundingCenter } from '@/components/map/utils/coordinates'
@@ -417,17 +417,19 @@ function handleUpdateJumpRange(groupId: string, range: number) {
   if (calculationMode.value !== 'edit') return
   if (!autoGroupResult.value) return
   const result = autoGroupResult.value
-  const groups = [...result.groups]
-  const idx = groups.findIndex((g) => g.id === groupId)
+  const idx = result.groups.findIndex((g) => g.id === groupId)
   if (idx < 0) return
-  const group = groups[idx]!
+  const group = result.groups[idx]!
   const prevRange = group.jumpRange
 
   if (range === prevRange) return
 
-  // Recompute coverage based on new jumpRange
   const { sectorGraph, sectorClusterMap } = sectorGraphInfo.value
-  if (group.sectorMacro && sectorGraph) {
+  if (!sectorGraph) return
+
+  // First update coverage based on new jumpRange
+  const groups = [...result.groups]
+  if (group.sectorMacro) {
     const distances = getCoverageSectors(group.sectorMacro, range, sectorGraph, sectorClusterMap)
     const newRangeMacros = new Set(distances.map((d) => d.sectorMacro))
 
@@ -435,7 +437,6 @@ function handleUpdateJumpRange(groupId: string, range: number) {
 
     let newCoverage: string[]
     if (range > prevRange) {
-      // Build set of sectors already in other groups' active coverage
       const otherCoverage = new Set<string>()
       for (let i = 0; i < groups.length; i++) {
         if (i === idx) continue
@@ -444,8 +445,6 @@ function handleUpdateJumpRange(groupId: string, range: number) {
         }
       }
 
-      // Increase: only add sectors at NEW jump levels (prevRange < distance <= range)
-      // Existing coverage and candidates at prior ranges are unchanged.
       const existing = new Set(group.coverageSectorMacros)
       for (const d of distances) {
         if (d.distance <= prevRange) continue
@@ -460,7 +459,6 @@ function handleUpdateJumpRange(groupId: string, range: number) {
       }
       newCoverage = [...existing]
     } else {
-      // Decrease: remove out-of-range sectors
       newCoverage = group.coverageSectorMacros.filter((m) => newRangeMacros.has(m))
     }
 
@@ -469,8 +467,11 @@ function handleUpdateJumpRange(groupId: string, range: number) {
     groups[idx] = { ...group, jumpRange: range }
   }
 
-  autoGroupResult.value = { ...result, groups, assignments: result.assignments }
-  rebuildAssignmentsFromGroups()
+  const withCoverage = { ...result, groups, assignments: result.assignments }
+  // Then incrementally rebuild affected assignments
+  autoGroupResult.value = rebuildAssignmentsForJumpRangeChange(
+    withCoverage, groupId, range, sectorGraph, sectorClusterMap
+  )
 }
 
 

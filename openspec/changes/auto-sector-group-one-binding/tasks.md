@@ -110,6 +110,10 @@
 - [ ] 计算后按 bridge/assignment、trade station、hub 顺序切换到首个待处理 tab
 - [x] unpin 生成的 assignment 排在 assignment 列表顶部，并按 unpin 先后顺序排列
 - [x] 显式计算后此前 unpin 的 sector 若重新成为 hub，则归一为 pinned hub 并清除对应 unpin assignment
+- [ ] Group card jumpRange 增大时增量重算受影响 sector 的 options（`extendsRange` 从 true 变 false）
+- [ ] Group card jumpRange 增大时按选择规则更新受影响 sector 的 `selectedOptionIndex`（新 range 内更优才切换）
+- [ ] Group card jumpRange 减小时增量重算受影响 sector 的 options（`extendsRange` 从 false 变 true）
+- [ ] Group card jumpRange 减小时按选择规则更新受影响 sector 的 `selectedOptionIndex`（无 range 内命中时 `null` + `uncertain_extend`）
 
 ## 7. 构建验证
 
