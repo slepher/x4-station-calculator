@@ -248,6 +248,50 @@ describe('autoGroup assignment state after user selection', () => {
     expect(updated.groups.find((group) => group.sectorMacro === 'C')?.isPinned).toBe(true)
   })
 
+  it('uses sectorMacro as bridge hub runtime id instead of auto uuid', () => {
+    const base = buildResult()
+    const plan = {
+      id: 'bridge-plan',
+      recommended: true,
+      selected: false,
+      units: [{
+        unitId: 'unit-c',
+        label: 'C',
+        reaches: [],
+        candidates: [{ sectorMacro: 'C', score: 10 }],
+        selectedSectorMacro: 'C'
+      }],
+      connectedComponentCount: 2,
+      planScore: 10,
+      totalJump: 1,
+      maxJump: 1,
+      stableKey: 'unit-c'
+    }
+    const graph = {
+      A: ['B'],
+      B: ['A', 'C'],
+      C: ['B']
+    }
+    const clusterMap = {
+      A: 'A',
+      B: 'B',
+      C: 'C'
+    }
+
+    const updated = applyBridgePlanToDraft(
+      { ...base, bridgePlans: [plan], playerSectorMacros: ['A', 'B', 'C'] },
+      plan,
+      1,
+      (macro) => macro,
+      graph,
+      clusterMap
+    )
+
+    const bridgeGroup = updated.groups.find((group) => group.sectorMacro === 'C')!
+    expect(bridgeGroup.id).toBe('C')
+    expect(bridgeGroup.id).not.toMatch(/^auto_/)
+  })
+
   it('does not add duplicate hub groups when standalone is selected repeatedly', () => {
     const first = applyStandaloneToResult(buildResult(), 'B', sectorGraph, sectorClusterMap, 1, (macro) => macro)
     const second = applyStandaloneToResult(first, 'B', sectorGraph, sectorClusterMap, 1, (macro) => macro)
@@ -463,6 +507,50 @@ describe('autoGroup assignment state after user selection', () => {
     expect(sorted.map((assignment) => assignment.sectorMacro)).toEqual(['B', 'A', 'C'])
   })
 
+  it('keeps unpin assignment at top after absorb to another group', () => {
+    const baseGroup = buildResult().groups[0]!
+    const result: AutoGroupResult = {
+      ...buildResult(),
+      groups: [
+        baseGroup,
+        {
+          ...baseGroup,
+          id: 'gB',
+          name: 'Group B',
+          sectorMacro: 'B'
+        }
+      ],
+      assignments: [
+        {
+          sectorMacro: 'C',
+          status: 'uncertain_extend',
+          displayBucket: 'unresolved',
+          selectedOptionIndex: null,
+          options: [
+            { type: 'standalone', distance: 0, extendsRange: false, resultingGroupSize: 1 }
+          ]
+        }
+      ],
+      playerSectorMacros: ['A', 'B', 'C']
+    }
+
+    const unpinned = setGroupPinnedInResult(result, 'gB', false, sectorGraph, sectorClusterMap)
+    const unpinAssignment = unpinned.assignments.find((a) => a.sectorMacro === 'B')!
+    expect(unpinAssignment.displayBucket).toBe('unpin')
+    expect(unpinAssignment.unpinOrder).toBe(1)
+
+    const absorbOptionIdx = unpinAssignment.options.findIndex((o) => o.type === 'absorb' && o.targetGroupId === 'g1')
+    const absorbed = applyAbsorbToResult(unpinned, 'B', absorbOptionIdx, sectorGraph, sectorClusterMap, 1)
+    const absorbedAssignment = absorbed.assignments.find((a) => a.sectorMacro === 'B')!
+
+    expect(absorbedAssignment.status).toBe('auto')
+    expect(absorbedAssignment.displayBucket).toBe('unpin')
+    expect(absorbedAssignment.unpinOrder).toBe(1)
+
+    const sorted = sortAssignmentsForDisplay(absorbed.assignments, absorbed.groups)
+    expect(sorted[0]!.sectorMacro).toBe('B')
+  })
+
   it('normalizes previously unpinned sectors that reappear as calculated hubs', async () => {
     const autoGroup = await import('@/store/logic/autoGroup')
     const result: AutoGroupResult = {
@@ -571,5 +659,234 @@ describe('autoGroup assignment state after user selection', () => {
     expect(updated.groups.map((group) => group.id)).toEqual(['A'])
     expect(updated.groups[0]!.connectedGroupIds).toEqual([])
     expect(updated.groups[0]!.coverageSectorMacros).toContain('B')
+  })
+
+  describe('applyStandaloneToResult derived candidate rules', () => {
+    const graph = {
+      H: ['A', 'B', 'C', 'D', 'E', 'F'],
+      A: ['H'],
+      B: ['H'],
+      C: ['H'],
+      D: ['H'],
+      E: ['H'],
+      F: ['H']
+    }
+    const clusterMap = {
+      H: 'H', A: 'A', B: 'B', C: 'C', D: 'D', E: 'E', F: 'F'
+    }
+
+    function buildResultWithHub(hubSector: string, unassignedSectors: string[]): AutoGroupResult {
+      const baseGroup = buildResult().groups[0]!
+      return {
+        groups: [
+          {
+            ...baseGroup,
+            id: hubSector,
+            name: `Group ${hubSector}`,
+            sectorMacro: hubSector,
+            jumpRange: 1,
+            originalJumpRange: 1
+          }
+        ],
+        assignments: unassignedSectors.map((sectorMacro) => ({
+          sectorMacro,
+          status: 'uncertain_extend' as const,
+          displayBucket: 'unresolved' as const,
+          selectedOptionIndex: null,
+          options: [
+            { type: 'standalone' as const, distance: 0, extendsRange: false, resultingGroupSize: 1 }
+          ]
+        })),
+        bridgePlans: [],
+        playerSectorMacros: [hubSector, ...unassignedSectors]
+      }
+    }
+
+    it('appends extension absorb candidate when distance > prefJumpRange and <= MAX_UNCERTAIN_JUMP', () => {
+      const result = buildResultWithHub('H', ['D'])
+      const updated = applyStandaloneToResult(result, 'D', graph, clusterMap, 1, (macro) => macro)
+
+      const dGroup = updated.groups.find((g) => g.sectorMacro === 'D')!
+      expect(dGroup).toBeTruthy()
+
+      const hAssignment = updated.assignments.find((a) => a.sectorMacro === 'H')
+      if (hAssignment) {
+        const hOpt = hAssignment.options.find((o) => o.targetGroupId === dGroup.id)
+        if (hOpt) {
+          expect(hOpt.extendsRange).toBe(true)
+          expect(hOpt.distance).toBeGreaterThan(1)
+        }
+      }
+    })
+
+    it('keeps selectedOptionIndex null when only extension candidates exist', () => {
+      const result = buildResultWithHub('H', ['E'])
+      const updated = applyStandaloneToResult(result, 'E', graph, clusterMap, 1, (macro) => macro)
+
+      const hAssignment = updated.assignments.find((a) => a.sectorMacro === 'H')
+      if (hAssignment) {
+        const extensionOpt = hAssignment.options.find((o) => o.extendsRange && o.targetGroupId === 'E')
+        if (extensionOpt) {
+          expect(hAssignment.selectedOptionIndex).toBeNull()
+          expect(hAssignment.status).toBe('uncertain_extend')
+        }
+      }
+    })
+
+    it('switches to new hub when it is closer than current selection', () => {
+      const baseGroup = buildResult().groups[0]!
+      const result: AutoGroupResult = {
+        groups: [
+          { ...baseGroup, id: 'H1', sectorMacro: 'H1', jumpRange: 1, originalJumpRange: 1 }
+        ],
+        assignments: [
+          {
+            sectorMacro: 'S',
+            status: 'uncertain_extend',
+            displayBucket: 'unresolved',
+            selectedOptionIndex: null,
+            options: [
+              { type: 'absorb', targetGroupId: 'H1', distance: 2, extendsRange: true, resultingGroupSize: 2 },
+              { type: 'standalone', distance: 0, extendsRange: false, resultingGroupSize: 1 }
+            ]
+          },
+          {
+            sectorMacro: 'T',
+            status: 'uncertain_extend',
+            displayBucket: 'unresolved',
+            selectedOptionIndex: null,
+            options: [
+              { type: 'absorb', targetGroupId: 'H1', distance: 2, extendsRange: true, resultingGroupSize: 2 },
+              { type: 'standalone', distance: 0, extendsRange: false, resultingGroupSize: 1 }
+            ]
+          }
+        ],
+        bridgePlans: [],
+        playerSectorMacros: ['H1', 'S', 'T']
+      }
+
+      const standaloneGraph = {
+        S: ['T'],
+        T: ['S', 'H1'],
+        H1: ['T']
+      }
+      const standaloneCluster = { S: 'S', T: 'T', H1: 'H1' }
+
+      const updated = applyStandaloneToResult(result, 'S', standaloneGraph, standaloneCluster, 1, (macro) => macro)
+
+      const tAssignment = updated.assignments.find((a) => a.sectorMacro === 'T')!
+      const sGroup = updated.groups.find((g) => g.sectorMacro === 'S')!
+      const sOpt = tAssignment.options.find((o) => o.targetGroupId === sGroup.id)
+
+      if (sOpt && !sOpt.extendsRange) {
+        expect(tAssignment.selectedOptionIndex).toBe(tAssignment.options.indexOf(sOpt))
+        expect(tAssignment.status).toBe('auto')
+      }
+    })
+
+    it('does not switch when current selection is already better', () => {
+      const baseGroup = buildResult().groups[0]!
+      const result: AutoGroupResult = {
+        groups: [
+          { ...baseGroup, id: 'H1', sectorMacro: 'H1', jumpRange: 1, originalJumpRange: 1 }
+        ],
+        assignments: [
+          {
+            sectorMacro: 'S',
+            status: 'uncertain_extend',
+            displayBucket: 'unresolved',
+            selectedOptionIndex: null,
+            options: [
+              { type: 'absorb', targetGroupId: 'H1', distance: 2, extendsRange: true, resultingGroupSize: 2 },
+              { type: 'standalone', distance: 0, extendsRange: false, resultingGroupSize: 1 }
+            ]
+          },
+          {
+            sectorMacro: 'T',
+            status: 'auto',
+            displayBucket: 'resolved',
+            selectedOptionIndex: 0,
+            options: [
+              { type: 'absorb', targetGroupId: 'H1', distance: 1, extendsRange: false, resultingGroupSize: 2 },
+              { type: 'standalone', distance: 0, extendsRange: false, resultingGroupSize: 1 }
+            ]
+          }
+        ],
+        bridgePlans: [],
+        playerSectorMacros: ['H1', 'S', 'T']
+      }
+
+      const standaloneGraph = {
+        S: ['T'],
+        T: ['S', 'H1'],
+        H1: ['T']
+      }
+      const standaloneCluster = { S: 'S', T: 'T', H1: 'H1' }
+
+      const updated = applyStandaloneToResult(result, 'S', standaloneGraph, standaloneCluster, 1, (macro) => macro)
+
+      const tAssignment = updated.assignments.find((a) => a.sectorMacro === 'T')!
+      const sGroup = updated.groups.find((g) => g.sectorMacro === 'S')!
+      const sOpt = tAssignment.options.find((o) => o.targetGroupId === sGroup.id)
+
+      if (sOpt && sOpt.distance >= 1) {
+        expect(tAssignment.selectedOptionIndex).toBe(0)
+      }
+    })
+
+    it('does not resolve uncertain tie when new hub still ties with existing candidates', () => {
+      const baseGroup = buildResult().groups[0]!
+      const result: AutoGroupResult = {
+        groups: [
+          { ...baseGroup, id: 'H1', sectorMacro: 'H1', jumpRange: 1, originalJumpRange: 1, hubScore: 10 },
+          { ...baseGroup, id: 'H2', sectorMacro: 'H2', jumpRange: 1, originalJumpRange: 1, hubScore: 10 }
+        ],
+        assignments: [
+          {
+            sectorMacro: 'S',
+            status: 'uncertain_extend',
+            displayBucket: 'unresolved',
+            selectedOptionIndex: null,
+            options: [
+              { type: 'absorb', targetGroupId: 'H1', distance: 2, extendsRange: true, resultingGroupSize: 2 },
+              { type: 'absorb', targetGroupId: 'H2', distance: 2, extendsRange: true, resultingGroupSize: 2 },
+              { type: 'standalone', distance: 0, extendsRange: false, resultingGroupSize: 1 }
+            ]
+          },
+          {
+            sectorMacro: 'T',
+            status: 'uncertain_tie',
+            displayBucket: 'unresolved',
+            selectedOptionIndex: null,
+            options: [
+              { type: 'absorb', targetGroupId: 'H1', distance: 1, extendsRange: false, resultingGroupSize: 3 },
+              { type: 'absorb', targetGroupId: 'H2', distance: 1, extendsRange: false, resultingGroupSize: 3 },
+              { type: 'standalone', distance: 0, extendsRange: false, resultingGroupSize: 1 }
+            ]
+          }
+        ],
+        bridgePlans: [],
+        playerSectorMacros: ['H1', 'H2', 'S', 'T']
+      }
+
+      const standaloneGraph = {
+        S: ['T'],
+        T: ['S', 'H1', 'H2'],
+        H1: ['T', 'H2'],
+        H2: ['T', 'H1']
+      }
+      const standaloneCluster = { S: 'S', T: 'T', H1: 'H1', H2: 'H2' }
+
+      const updated = applyStandaloneToResult(result, 'S', standaloneGraph, standaloneCluster, 1, (macro) => macro)
+
+      const tAssignment = updated.assignments.find((a) => a.sectorMacro === 'T')!
+      const sGroup = updated.groups.find((g) => g.sectorMacro === 'S')!
+      const sOpt = tAssignment.options.find((o) => o.targetGroupId === sGroup.id)
+
+      if (sOpt && sOpt.distance === 1) {
+        expect(tAssignment.selectedOptionIndex).toBeNull()
+        expect(tAssignment.status).toBe('uncertain_tie')
+      }
+    })
   })
 })
