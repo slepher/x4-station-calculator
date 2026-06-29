@@ -177,6 +177,16 @@ Trade station 在 Live 计算模式中作为第三列展示和 confirm gate 的�
 - Virtual station draft 与 shared draft 生命周期一致，计算保留、重置恢复、提交应用的边界明确。
 - 提交时仅同步无 `saveStationCode` 的 virtual station plans，带 `saveStationCode` 的 save station plans 不被修改。
 
+## Assignment 变更规则
+
+以下为增量变更规则汇总（全量重建仅发生于显式 [计算] / [快速计算]）：
+
+- **追加候选（R1）**：独立成组后，新 hub 距离 `≤ prefJumpRange` 追加 range 内 option；`> prefJumpRange && ≤ MAX_UNCERTAIN_JUMP` 追加扩展 option；`> MAX_UNCERTAIN_JUMP` 不追加。
+- **不共存（R2）**：range 内命中与扩展候选不共存于同一 sector。新增 range 内命中时移除扩展候选；已有 range 内命中时独立成组不追加扩展候选。
+- **选择更新（R3）**：`selectedOptionIndex` 只在"新 hub range 内且更优"时切换；不更优/平局保持原选择；standalone 选择只加不切；仅扩展候选时 `selected=null` + `uncertain_extend`。
+- **跳数变化（R4）**：card jumpRange 变化增量重算距离 `∈ (old, new]` 的 sector，按 R3 更新选择。扩展 absorb 联动同距离 sector。
+- **Unpin 排序（R5）**：`displayBucket='unpin'` + `unpinOrder` 维持顶部位置；absorb 不清除；standalone 后改为 `'resolved'`。
+
 ## 未决项
 
 无。

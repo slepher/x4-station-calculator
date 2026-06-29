@@ -380,3 +380,36 @@ prefThreshold?: number
 ## Map 共享关系
 
 Map 面板不拥有自己的 draft。进入 binding 阶段时读取 live store 共享 draft。Map 的具体 UI 和颜色渲染由 map change 定义。
+
+## Assignment 变更规则汇总
+
+全量重建 assignments 仅发生于显式 [计算] / [快速计算]。以下为增量变更规则：
+
+### R2: Extension vs Range-internal Coexistence
+
+- range 内命中与扩展候选不共存于同一 sector 的 options。
+- 新增 range 内命中 → 移除该 sector 所有 `extendsRange=true` 的 absorb option。
+- 最后 range 内消失 → `buildAssignmentResult` 自动补充扩展候选。
+- 已有 range 内命中时 → 独立成组不追加扩展候选。
+
+### R3: Selection Update After Options Change
+
+| 当前状态 | 新 hub range 内 & 更优 | 不更优/平局 | 新 hub 扩展 & 无 range 内 |
+| --- | --- | --- | --- |
+| `selected=null, uncertain_extend` | 选中, `auto` | 平局→`null, uncertain_tie` | `null, uncertain_extend` |
+| `selected=null, uncertain_tie` | 打破平局才选, `auto` | 仍平局→保持 `null` | 保持 `null` |
+| 已选中 range 内 absorb | 更优才切 | 保持 | 保持 |
+| 已选中 standalone | **只加不切** | 保持 | 保持 |
+
+### R4: JumpRange Change
+
+- 增大（`old→new`）：重算距离该 hub `∈ (old,new]` 的 sector 的 options + `selectedOptionIndex`（按 R3）。
+- 减小（`old→new`）：重算距离该 hub `∈ (new,old]` 的 sector。原选中该 hub 且有其他 range 命中 → 选最优剩余；无其他 → `null, uncertain_extend`。
+- 距离 `≤ min(old, new)` 不重算。
+- 扩展 absorb 后 hub 跳数扩大 → 按增大规则重算同距离其他 sector。
+
+### R5: Unpin Assignment
+
+- `displayBucket='unpin'` + `unpinOrder` 维持顶部位置。
+- absorb 后不清除 `displayBucket`/`unpinOrder`。
+- standalone 后 `displayBucket` 从 `'unpin'` 改为 `'resolved'`。
