@@ -48,7 +48,7 @@ const {
   bridgeRetainEnabled, coverageRetainEnabled, tradeStationRetainEnabled,
   showHubAddMenu, autoGroupResult, canDragGroups,
   calculationMode, calcBaselinePillState,
-  gameDataMaps, sectorGraphInfo,
+  gameDataMaps, sectorReachability, sectorGraphInfo,
   tradeStationCandidates, selectedTradeStations, tradeStationCaps,
   blueprintEmpires, selectedBlueprintEmpireId, blueprintStationSources,
   virtualStationGroups, activeVirtualStationDragKey,
@@ -319,6 +319,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
               />
               <SectorGroupList :groups="autoGroupResult?.groups ?? []" :assignments="autoGroupResult?.assignments ?? []"
                 :maps="gameDataMaps" :sector-graph="sectorGraphInfo.sectorGraph" :sector-cluster-map="sectorGraphInfo.sectorClusterMap"
+                :sector-reachability="sectorReachability"
                 :player-sector-macros="autoGroupResult?.playerSectorMacros ?? []"
                 :editable="calculationMode === 'edit'" :retain-editable="calculationMode === 'result' || calculationMode === 'edit'"               :diff-enabled="true"
                 :baseline-coverage-by-group-id="calcBaselinePillState?.coverageByGroupId"
@@ -408,6 +409,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
             />
             <SectorGroupList :groups="autoGroupResult?.groups ?? []" :assignments="autoGroupResult?.assignments ?? []"
               :maps="gameDataMaps" :sector-graph="sectorGraphInfo.sectorGraph" :sector-cluster-map="sectorGraphInfo.sectorClusterMap"
+              :sector-reachability="sectorReachability"
               :player-sector-macros="autoGroupResult?.playerSectorMacros ?? []"
               :editable="calculationMode === 'edit'" :retain-editable="calculationMode === 'result' || calculationMode === 'edit'"               :diff-enabled="true"
               :baseline-coverage-by-group-id="calcBaselinePillState?.coverageByGroupId"

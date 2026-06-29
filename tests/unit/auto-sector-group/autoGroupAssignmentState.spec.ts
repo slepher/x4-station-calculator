@@ -303,6 +303,65 @@ describe('autoGroup assignment state after user selection', () => {
     expect(second.groups.filter((group) => group.sectorMacro === 'B')).toHaveLength(1)
   })
 
+  it('keeps an existing explicit standalone selection when another standalone hub adds an extension option', () => {
+    const graph = {
+      H: ['H1'],
+      H1: ['H', 'H2'],
+      H2: ['H1', 'T'],
+      T: ['H2', 'S1'],
+      S1: ['T', 'S2'],
+      S2: ['S1', 'S'],
+      S: ['S2']
+    }
+    const clusterMap = {
+      H: 'H',
+      H1: 'H1',
+      H2: 'H2',
+      T: 'T',
+      S1: 'S1',
+      S2: 'S2',
+      S: 'S'
+    }
+    const baseGroup = buildResult().groups[0]!
+    const result: AutoGroupResult = {
+      groups: [
+        { ...baseGroup, id: 'H', name: 'Hub H', sectorMacro: 'H', jumpRange: 1, originalJumpRange: 1 }
+      ],
+      assignments: [
+        {
+          sectorMacro: 'T',
+          status: 'standalone',
+          displayBucket: 'unresolved',
+          selectedOptionIndex: 1,
+          options: [
+            { type: 'absorb', targetGroupId: 'H', distance: 3, extendsRange: true, resultingGroupSize: 2 },
+            { type: 'standalone', distance: 0, extendsRange: false, resultingGroupSize: 1 }
+          ]
+        },
+        {
+          sectorMacro: 'S',
+          status: 'uncertain_extend',
+          displayBucket: 'unresolved',
+          selectedOptionIndex: null,
+          options: [
+            { type: 'absorb', targetGroupId: 'H', distance: 6, extendsRange: true, resultingGroupSize: 2 },
+            { type: 'standalone', distance: 0, extendsRange: false, resultingGroupSize: 1 }
+          ]
+        }
+      ],
+      bridgePlans: [],
+      playerSectorMacros: ['H', 'T', 'S']
+    }
+
+    const updated = applyStandaloneToResult(result, 'S', graph, clusterMap, 1, (macro) => macro)
+    const tAssignment = updated.assignments.find((assignment) => assignment.sectorMacro === 'T')!
+
+    expect(tAssignment.options.some((option) => option.type === 'absorb' && option.targetGroupId === 'S' && option.extendsRange)).toBe(true)
+    expect(tAssignment.selectedSectorMacro).toBe('T')
+    expect(tAssignment.options[tAssignment.selectedOptionIndex!]?.type).toBe('standalone')
+    expect(tAssignment.status).toBe('standalone')
+  })
+
   it('marks absorb selection as auto without moving its display bucket', () => {
     const updated = applyAbsorbToResult(buildResult(), 'B', 0, sectorGraph, sectorClusterMap, 1)
     const assignment = updated.assignments.find((a) => a.sectorMacro === 'B')!
@@ -601,6 +660,48 @@ describe('autoGroup assignment state after user selection', () => {
     expect(absorbedAssignment.unpinOrder).toBe(1)
 
     const sorted = sortAssignmentsForDisplay(absorbed.assignments, absorbed.groups)
+    expect(sorted[0]!.sectorMacro).toBe('B')
+  })
+
+  it('keeps unpin assignment at top after switching back to standalone', () => {
+    const baseGroup = buildResult().groups[0]!
+    const result: AutoGroupResult = {
+      ...buildResult(),
+      groups: [
+        baseGroup,
+        {
+          ...baseGroup,
+          id: 'gB',
+          name: 'Group B',
+          sectorMacro: 'B'
+        }
+      ],
+      assignments: [
+        {
+          sectorMacro: 'C',
+          status: 'uncertain_extend',
+          displayBucket: 'unresolved',
+          selectedOptionIndex: null,
+          options: [
+            { type: 'standalone', distance: 0, extendsRange: false, resultingGroupSize: 1 }
+          ]
+        }
+      ],
+      playerSectorMacros: ['A', 'B', 'C']
+    }
+
+    const unpinned = setGroupPinnedInResult(result, 'gB', false, sectorGraph, sectorClusterMap)
+    const unpinAssignment = unpinned.assignments.find((a) => a.sectorMacro === 'B')!
+    const absorbOptionIdx = unpinAssignment.options.findIndex((o) => o.type === 'absorb' && o.targetGroupId === 'g1')
+    const absorbed = applyAbsorbToResult(unpinned, 'B', absorbOptionIdx, sectorGraph, sectorClusterMap, 1)
+    const standalone = applyStandaloneToResult(absorbed, 'B', sectorGraph, sectorClusterMap, 1, (macro) => macro)
+    const standaloneAssignment = standalone.assignments.find((a) => a.sectorMacro === 'B')!
+
+    expect(standaloneAssignment.status).toBe('standalone')
+    expect(standaloneAssignment.displayBucket).toBe('unpin')
+    expect(standaloneAssignment.unpinOrder).toBe(1)
+
+    const sorted = sortAssignmentsForDisplay(standalone.assignments, standalone.groups)
     expect(sorted[0]!.sectorMacro).toBe('B')
   })
 

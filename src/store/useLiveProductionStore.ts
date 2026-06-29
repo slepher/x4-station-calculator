@@ -462,7 +462,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       }
     }
     const unassignedSectors = playerSectorMacros.filter((sectorMacro) => !assignedSectors.has(sectorMacro))
-    const assignments: SectorAssignment[] = buildAssignmentResult(unassignedSectors, assignedSectors, groups, sectorGraph, sectorClusterMap)
+    const assignments: SectorAssignment[] = buildAssignmentResult(unassignedSectors, assignedSectors, groups, sectorGraph, sectorClusterMap, gameData.sectorReachability)
 
     return { groups, assignments, bridgePlans: [], playerSectorMacros }
   }
@@ -491,13 +491,15 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
           archive, binding.groups, gameData.modulesByMacroId,
           sectorGraph, sectorClusterMap,
           { containerThreshold: prefThreshold.value },
-          prefJumpRange.value, bridgeSearchJumpRange.value
+          prefJumpRange.value, bridgeSearchJumpRange.value,
+          [], true, gameData.sectorReachability
         )
       } else {
         result = groupCleanSlate(
           archive, gameData.modulesByMacroId, sectorGraph, sectorClusterMap,
           { containerThreshold: prefThreshold.value },
-          prefJumpRange.value, bridgeSearchJumpRange.value
+          prefJumpRange.value, bridgeSearchJumpRange.value,
+          [], true, gameData.sectorReachability
         )
       }
     } else {

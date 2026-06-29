@@ -1078,6 +1078,8 @@ export interface X4Map {
   highwayRingChains?: X4MapHighwayRingChain[]
 }
 
+export type SectorReachability = Record<string, Record<string, number>>
+
 export interface X4MapSectorResourceEntry {
   ware: string
   reserve?: number

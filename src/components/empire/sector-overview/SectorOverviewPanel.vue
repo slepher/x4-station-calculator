@@ -17,6 +17,7 @@ const {
   t,
   autoGroupResult,
   gameDataMaps,
+  sectorReachability,
   sectorGraphInfo,
   triggerAutoGroup,
   handleUploadComplete,
@@ -82,6 +83,7 @@ defineExpose({ triggerAutoGroup })
           :maps="gameDataMaps"
           :sector-graph="sectorGraphInfo.sectorGraph"
           :sector-cluster-map="sectorGraphInfo.sectorClusterMap"
+          :sector-reachability="sectorReachability"
           :player-sector-macros="autoGroupResult?.playerSectorMacros ?? []"
           :editable="false"
           :show-recalc-state-button="false"

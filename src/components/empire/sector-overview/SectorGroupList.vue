@@ -3,7 +3,7 @@ import draggable from 'vuedraggable'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { GroupDraftInfo, SectorAssignment } from '@/store/logic/autoGroup'
-import type { X4MapSector } from '@/types/x4'
+import type { SectorReachability, X4MapSector } from '@/types/x4'
 import SectorGroupCard from './SectorGroupCard.vue'
 
 const props = withDefaults(defineProps<{
@@ -12,6 +12,7 @@ const props = withDefaults(defineProps<{
   maps: { clusters: Record<string, { sectors?: string[] }>; sectors: Record<string, X4MapSector> } | null | undefined
   sectorGraph: Record<string, string[]>
   sectorClusterMap: Record<string, string>
+  sectorReachability?: SectorReachability
   playerSectorMacros: string[]
   editable: boolean
   retainEditable?: boolean
@@ -55,6 +56,7 @@ const cardBase = computed(() => ({
   maps: props.maps,
   sectorGraph: props.sectorGraph,
   sectorClusterMap: props.sectorClusterMap,
+  sectorReachability: props.sectorReachability,
   playerSectorMacros: props.playerSectorMacros,
   editable: props.editable,
   retainEditable: props.retainEditable,

@@ -19,7 +19,8 @@ import type {
   StationSettings,
   StationType,
   TradeStationBinding,
-  X4MapSector
+  X4MapSector,
+  SectorReachability
 } from '@/types/x4'
 
 const CURRENT_SAVE_BINDING_VERSION = 2
@@ -674,9 +675,13 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     sectorMacro: string,
     coverageSectors: string[],
     sectorGraph: Record<string, string[]>,
-    sectorClusterMap: Record<string, string>
+    sectorClusterMap: Record<string, string>,
+    sectorReachability?: SectorReachability
   ): CoverageSectorEntry[] {
-    const distances = getCoverageSectors(sectorMacro, 99, sectorGraph, sectorClusterMap)
+    const cachedDistances = sectorReachability?.[sectorMacro]
+    const distances = cachedDistances
+      ? Object.entries(cachedDistances).map(([macro, distance]) => ({ sectorMacro: macro, distance }))
+      : getCoverageSectors(sectorMacro, 99, sectorGraph, sectorClusterMap)
     const distanceMap = new Map(distances.map((d) => [d.sectorMacro, d.distance]))
     return coverageSectors.map((sector) => ({
       ref: sector,
@@ -691,7 +696,8 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     sectorClusterMap: Record<string, string>,
     prefJumpRange?: number,
     bridgeSearchJumpRange?: number,
-    prefThreshold?: number
+    prefThreshold?: number,
+    sectorReachability?: SectorReachability
   ) {
     if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) loadDraftForGameGuid(gameGuid)
     if (!draftBinding.value) return
@@ -722,7 +728,8 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
           draft.sectorMacro,
           draft.coverageSectorMacros,
           sectorGraph,
-          sectorClusterMap
+          sectorClusterMap,
+          sectorReachability
         )
         bindSectorGroup({
           gameGuid,
@@ -744,7 +751,8 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
           draft.sectorMacro,
           draft.coverageSectorMacros,
           sectorGraph,
-          sectorClusterMap
+          sectorClusterMap,
+          sectorReachability
         )
         bindSectorGroup({
           gameGuid,

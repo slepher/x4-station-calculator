@@ -603,7 +603,20 @@ Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触�
 - **并且** 若目标 sector 已有 range 内 absorb 命中，SHALL NOT 追加扩展候选
 - **并且** 对距离 `> MAX_UNCERTAIN_JUMP` 的 sector SHALL NOT 追加 absorb option
 - **并且** 若新候选是更优选择，邻近 sector MAY 被该 standalone hub 吸收到 coverage
-- **并且** 被追加候选的 assignment SHALL 按以下规则更新 `selectedOptionIndex` 和 `status`
+- **并且** 被追加候选的 assignment SHALL 按以下规则更新 `selectedSectorMacro`、兼容派生字段 `selectedOptionIndex` 和 `status`
+
+#### Scenario: Assignment selection uses stable sector identity
+
+- **前提** assignment card 渲染一个 sector `T`
+- **当** 用户选择 standalone option
+- **那么** `T.selectedSectorMacro` SHALL 等于 `T`
+- **并且** `T.selectedOptionIndex` SHALL 由 `selectedSectorMacro` 映射到当前 standalone option，仅作为 presenter/UI 兼容字段保留
+- **当** 用户选择 absorb option 指向 hub sector `S`
+- **那么** `T.selectedSectorMacro` SHALL 等于 `S`
+- **并且** UI `select-option` 事件 SHALL 传递 `selectedSectorMacro`，不得只传递 option index
+- **当** 系统插入、删除或重排 `T.options`
+- **那么** 系统 SHALL 保留 `selectedSectorMacro` 并重新派生 `selectedOptionIndex`
+- **并且** 系统 SHALL NOT 因 option index 变化而改变用户已有选择
 
 #### Scenario: Standalone option shows top station candidate
 
@@ -642,14 +655,16 @@ Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触�
 
 #### Scenario: Standalone derived candidate preserves explicit standalone selection
 
-- **前提** sector `T` 当前 `status='standalone'`，`selectedOptionIndex` 指向 standalone option
+- **前提** sector `T` 当前 `status='standalone'`，`selectedSectorMacro=T` 且 `selectedOptionIndex` 指向 standalone option
 - **当** 新 hub `S` 独立成组后，系统为 `T` 追加 derived absorb candidate
 - **当** 新 hub `S` 到 `T` 的距离 `≤ prefJumpRange`（`extendsRange=false`）
-- **那么** `T.selectedOptionIndex` SHALL 保持指向 standalone option
+- **那么** `T.selectedSectorMacro` SHALL 保持 `T`
+- **并且** `T.selectedOptionIndex` SHALL 重新映射并保持指向 standalone option
 - **并且** `T.status` SHALL 保持 `'standalone'`
 - **并且** 系统 SHALL 只追加 option，不自动切换选择
 - **当** 新 hub `S` 到 `T` 的距离 `> prefJumpRange`（`extendsRange=true`）
-- **那么** `T.selectedOptionIndex` SHALL 保持指向 standalone option
+- **那么** `T.selectedSectorMacro` SHALL 保持 `T`
+- **并且** `T.selectedOptionIndex` SHALL 重新映射并保持指向 standalone option
 - **并且** `T.status` SHALL 保持 `'standalone'`
 
 #### Scenario: Standalone derived candidate extension only

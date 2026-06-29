@@ -21,7 +21,7 @@ const props = withDefaults(defineProps<{
 })
 
 const emit = defineEmits<{
-  (e: 'select-option', sectorMacro: string, optionIndex: number): void
+  (e: 'select-option', sectorMacro: string, selectedSectorMacro: string): void
   (e: 'select-bridge-plan', planId: string): void
   (e: 'select-bridge-center', planId: string, unitId: string, sectorMacro: string): void
   (e: 'focus-sector', sectorMacro: string): void
@@ -69,6 +69,18 @@ function getOptionLabel(opt: SectorAssignment['options'][number]): string {
   if (opt.extendsRange) parts.push(`(${t('sector.extends_range', { dist: opt.distance })})`)
   else parts.push(`(${t('sector.distance_n', { n: opt.distance })})`)
   return parts.join(' ')
+}
+
+function getOptionSelectedSectorMacro(assignment: SectorAssignment, opt: SectorAssignment['options'][number]): string | null {
+  if (opt.type === 'standalone') return assignment.sectorMacro
+  return opt.targetGroupId ?? null
+}
+
+function isOptionSelected(assignment: SectorAssignment, opt: SectorAssignment['options'][number], idx: number): boolean {
+  if (assignment.selectedSectorMacro !== undefined) {
+    return assignment.selectedSectorMacro === getOptionSelectedSectorMacro(assignment, opt)
+  }
+  return assignment.selectedOptionIndex === idx
 }
 
 function getStandaloneInfo(sectorMacro: string): string | null {
@@ -205,13 +217,13 @@ const sortedAssignments = computed(() => {
             :key="idx"
             class="option-row"
             :class="{
-              'option-selected': assignment.selectedOptionIndex === idx,
-              'option-hoverable': assignment.selectedOptionIndex !== idx && assignment.options.length > 1
+              'option-selected': isOptionSelected(assignment, opt, idx),
+              'option-hoverable': !isOptionSelected(assignment, opt, idx) && assignment.options.length > 1
             }"
-            @click="!disabled && assignment.options.length > 1 && assignment.selectedOptionIndex !== idx && emit('select-option', assignment.sectorMacro, idx)"
+            @click="!disabled && assignment.options.length > 1 && !isOptionSelected(assignment, opt, idx) && getOptionSelectedSectorMacro(assignment, opt) && emit('select-option', assignment.sectorMacro, getOptionSelectedSectorMacro(assignment, opt)!)"
           >
-            <span class="option-radio" :class="{ 'radio-checked': assignment.selectedOptionIndex === idx }">
-              {{ assignment.selectedOptionIndex === idx ? '●' : '○' }}
+            <span class="option-radio" :class="{ 'radio-checked': isOptionSelected(assignment, opt, idx) }">
+              {{ isOptionSelected(assignment, opt, idx) ? '●' : '○' }}
             </span>
             <span class="option-label">
               {{ getOptionLabel(opt) }}

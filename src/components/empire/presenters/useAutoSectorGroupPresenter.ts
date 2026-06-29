@@ -7,8 +7,8 @@ import { useActiveViewStore } from '@/store/useActiveViewStore'
 import { useSaveBindingStore } from '@/store/useSaveBindingStore'
 import { useLiveProductionStore } from '@/store/useLiveProductionStore'
 import { useBlueprintProductionStore } from '@/store/useBlueprintProductionStore'
-import { groupCleanSlate, groupIncremental, applyAbsorbToResult, applyStandaloneToResult, applyBridgePlanToDraft, buildAssignmentResult, setGroupPinnedInResult, normalizeReappearedUnpinnedHubs, rebuildAssignmentsForJumpRangeChange, preserveEditAssignmentSelections, type AutoGroupResult, type GroupDraftInfo, type SectorAssignment, getDistance } from '@/store/logic/autoGroup'
-import { buildSectorGraphFromMaps, getCoverageSectors, getPlayerStationsInSector } from '@/store/logic/saveBindingUtils'
+import { groupCleanSlate, groupIncremental, applyAbsorbToResult, applyStandaloneToResult, applyBridgePlanToDraft, buildAssignmentResult, setGroupPinnedInResult, normalizeReappearedUnpinnedHubs, rebuildAssignmentsForJumpRangeChange, preserveEditAssignmentSelections, type AutoGroupResult, type GroupDraftInfo, type SectorAssignment } from '@/store/logic/autoGroup'
+import { buildSectorGraphFromMaps, getCoverageSectors, getPlayerStationsInSector, getReachableCoverageSectors } from '@/store/logic/saveBindingUtils'
 import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
 import { getSectorZoneBoundingCenter } from '@/components/map/utils/coordinates'
 import { stabilizeHubColors, stabilizeEditedHubColor, type HubColorContext } from '@/store/logic/hubColor'
@@ -32,7 +32,6 @@ const liveMode = ref<'display' | 'calculate'>('display')
 
 function buildHubColorContext(): HubColorContext {
   const maps = gameDataStore.maps
-  const { sectorGraph, sectorClusterMap } = sectorGraphInfo.value
 
   return {
     getFactionColor: (sectorMacro: string) => {
@@ -47,7 +46,7 @@ function buildHubColorContext(): HubColorContext {
       return undefined
     },
     getDistance: (from: string, to: string) => {
-      return getDistance(from, to, sectorGraph, sectorClusterMap)
+      return gameDataStore.sectorReachability[from]?.[to] ?? null
     },
     maxHop: 5
   }
@@ -72,6 +71,7 @@ const virtualStationDragState = ref<{
 const activeVirtualStationDragKey = ref<string | null>(null)
 
 const gameDataMaps = computed(() => gameDataStore.maps)
+const sectorReachability = computed(() => gameDataStore.sectorReachability)
 
 const canDragGroups = computed(() => {
   if (!autoGroupResult.value) return false
@@ -211,7 +211,8 @@ function runAutoGroup(options: { force?: boolean } = {}) {
     const result = groupIncremental(
       archive, binding.groups, gameDataStore.modulesByMacroId,
       sectorGraph, sectorClusterMap,
-      { containerThreshold: prefThreshold.value }, prefJumpRange.value, bridgeSearchJumpRange.value
+      { containerThreshold: prefThreshold.value }, prefJumpRange.value, bridgeSearchJumpRange.value,
+      [], true, gameDataStore.sectorReachability
     )
     if (result.assignments.length === 0) {
       setAutoGroupResult(buildStoreGroups(binding.groups, result.playerSectorMacros))
@@ -224,7 +225,8 @@ function runAutoGroup(options: { force?: boolean } = {}) {
   } else {
     const result = groupCleanSlate(
       archive, gameDataStore.modulesByMacroId, sectorGraph, sectorClusterMap,
-      { containerThreshold: prefThreshold.value }, prefJumpRange.value, bridgeSearchJumpRange.value
+      { containerThreshold: prefThreshold.value }, prefJumpRange.value, bridgeSearchJumpRange.value,
+      [], true, gameDataStore.sectorReachability
     )
     const namedGroups = result.groups.map((g) => ({
       ...g, name: g.sectorMacro ? getSectorDisplayName(g.sectorMacro) : g.name,
@@ -283,7 +285,7 @@ function runCalculationFromEditInput() {
     result = groupCleanSlate(
       archive, gameDataStore.modulesByMacroId, sectorGraph, sectorClusterMap,
       { containerThreshold: prefThreshold.value }, prefJumpRange.value, bridgeSearchJumpRange.value,
-      excludedSectorMacros, nodeEnabled.value
+      excludedSectorMacros, nodeEnabled.value, gameDataStore.sectorReachability
     )
     result = {
       ...result,
@@ -298,7 +300,7 @@ function runCalculationFromEditInput() {
       archive, recalculateInput.baseGroups, gameDataStore.modulesByMacroId,
       sectorGraph, sectorClusterMap,
       { containerThreshold: prefThreshold.value }, prefJumpRange.value, bridgeSearchJumpRange.value,
-      recalculateInput.excludedSectorMacros, nodeEnabled.value
+      recalculateInput.excludedSectorMacros, nodeEnabled.value, gameDataStore.sectorReachability
     )
     result = {
       ...result,
@@ -369,7 +371,7 @@ function rebuildAssignmentsFromGroups() {
   const unassigned = result.playerSectorMacros.filter((m) => !assignedSectors.has(m))
   const newAssignments = preserveEditAssignmentSelections(
     result.assignments,
-    buildAssignmentResult(unassigned, assignedSectors, result.groups, sectorGraph, sectorClusterMap)
+    buildAssignmentResult(unassigned, assignedSectors, result.groups, sectorGraph, sectorClusterMap, gameDataStore.sectorReachability)
   )
 
   autoGroupResult.value = { ...result, assignments: newAssignments }
@@ -379,19 +381,32 @@ function handleUpdateBridgeSearchJumpRange(range: number) {
   bridgeSearchJumpRange.value = Math.max(range, prefJumpRange.value)
 }
 
-function handleSelectOption(sectorMacro: string, optionIndex: number) {
+function getAssignmentOptionSelectedSectorMacro(
+  assignmentSectorMacro: string,
+  option: SectorAssignment['options'][number] | undefined
+): string | null {
+  if (!option) return null
+  if (option.type === 'standalone') return assignmentSectorMacro
+  return option.targetGroupId ?? null
+}
+
+function handleSelectOption(sectorMacro: string, selectedSectorMacro: string) {
   if (!autoGroupResult.value) return
   const assignment = autoGroupResult.value.assignments.find((a) => a.sectorMacro === sectorMacro)
   if (!assignment) return
-  if (assignment.selectedOptionIndex === optionIndex) return
+  if (assignment.selectedSectorMacro === selectedSectorMacro) return
+  const optionIndex = assignment.options.findIndex((option) =>
+    getAssignmentOptionSelectedSectorMacro(assignment.sectorMacro, option) === selectedSectorMacro
+  )
+  if (optionIndex < 0) return
   const opt = assignment.options[optionIndex]
   if (!opt) return
   const { sectorGraph, sectorClusterMap } = sectorGraphInfo.value
   if (opt.type === 'absorb' && opt.targetGroupId) {
-    autoGroupResult.value = applyAbsorbToResult(autoGroupResult.value, sectorMacro, optionIndex, sectorGraph, sectorClusterMap, prefJumpRange.value, bridgeSearchJumpRange.value)
+    autoGroupResult.value = applyAbsorbToResult(autoGroupResult.value, sectorMacro, optionIndex, sectorGraph, sectorClusterMap, prefJumpRange.value, bridgeSearchJumpRange.value, gameDataStore.sectorReachability)
   }
   if (opt.type === 'standalone') {
-    autoGroupResult.value = applyStandaloneToResult(autoGroupResult.value, sectorMacro, sectorGraph, sectorClusterMap, prefJumpRange.value, getSectorDisplayName, bridgeSearchJumpRange.value, buildHubColorContext())
+    autoGroupResult.value = applyStandaloneToResult(autoGroupResult.value, sectorMacro, sectorGraph, sectorClusterMap, prefJumpRange.value, getSectorDisplayName, bridgeSearchJumpRange.value, buildHubColorContext(), gameDataStore.sectorReachability)
   }
   applyTradeStationDefaultsToResult()
 }
@@ -404,7 +419,7 @@ function handleCycleRecalcState(groupId: string) {
   if (!group) return
   if (group.enteredOtherGroupCoverage) return
   const { sectorGraph, sectorClusterMap } = sectorGraphInfo.value
-  autoGroupResult.value = setGroupPinnedInResult(result, groupId, !group.isPinned, sectorGraph, sectorClusterMap)
+  autoGroupResult.value = setGroupPinnedInResult(result, groupId, !group.isPinned, sectorGraph, sectorClusterMap, gameDataStore.sectorReachability)
 }
 
 function handleUpdateJumpRange(groupId: string, range: number) {
@@ -424,7 +439,9 @@ function handleUpdateJumpRange(groupId: string, range: number) {
   // First update coverage based on new jumpRange
   const groups = [...result.groups]
   if (group.sectorMacro) {
-    const distances = getCoverageSectors(group.sectorMacro, range, sectorGraph, sectorClusterMap)
+    const effectiveRange = Math.max(0, Math.min(5, range))
+    const distances = getReachableCoverageSectors(gameDataStore.sectorReachability, group.sectorMacro, effectiveRange)
+      || getCoverageSectors(group.sectorMacro, effectiveRange, sectorGraph, sectorClusterMap)
     const newRangeMacros = new Set(distances.map((d) => d.sectorMacro))
 
     const allAnchorSectors = new Set(groups.filter((g) => g.sectorMacro).map((g) => g.sectorMacro!))
@@ -456,15 +473,15 @@ function handleUpdateJumpRange(groupId: string, range: number) {
       newCoverage = group.coverageSectorMacros.filter((m) => newRangeMacros.has(m))
     }
 
-    groups[idx] = { ...group, jumpRange: range, coverageSectorMacros: newCoverage }
+    groups[idx] = { ...group, jumpRange: effectiveRange, coverageSectorMacros: newCoverage }
   } else {
-    groups[idx] = { ...group, jumpRange: range }
+    groups[idx] = { ...group, jumpRange: Math.max(0, Math.min(5, range)) }
   }
 
   const withCoverage = { ...result, groups, assignments: result.assignments }
   // Then incrementally rebuild affected assignments
   autoGroupResult.value = rebuildAssignmentsForJumpRangeChange(
-    withCoverage, groupId, range, sectorGraph, sectorClusterMap, undefined, false
+    withCoverage, groupId, Math.max(0, Math.min(5, range)), sectorGraph, sectorClusterMap, undefined, false, gameDataStore.sectorReachability
   )
 }
 
@@ -635,7 +652,8 @@ function handleSelectBridgePlan(planId: string) {
     sectorGraphInfo.value.sectorGraph,
     sectorGraphInfo.value.sectorClusterMap,
     bridgeSearchJumpRange.value,
-    buildHubColorContext()
+    buildHubColorContext(),
+    gameDataStore.sectorReachability
   )
 }
 
@@ -1276,7 +1294,7 @@ function doConfirm() {
   const guid = activeViewStore.activeBinding
   if (!guid) return
   const result = autoGroupResult.value!
-  saveBindingStore.createAutoGroups(guid, result.groups, sectorGraphInfo.value.sectorGraph, sectorGraphInfo.value.sectorClusterMap, prefJumpRange.value, bridgeSearchJumpRange.value, prefThreshold.value)
+  saveBindingStore.createAutoGroups(guid, result.groups, sectorGraphInfo.value.sectorGraph, sectorGraphInfo.value.sectorClusterMap, prefJumpRange.value, bridgeSearchJumpRange.value, prefThreshold.value, gameDataStore.sectorReachability)
   const activeBinding = saveBindingStore.activeBinding
   if (activeBinding) {
     for (const group of result.groups) {
@@ -1453,6 +1471,7 @@ return {
     calculationMode,
     calcBaselinePillState,
     gameDataMaps,
+    sectorReachability,
     sectorGraphInfo,
     liveMode,
     runAutoGroup,

@@ -1,4 +1,4 @@
-import type { GroupSaveBinding, StationSaveBinding, ResolvedGroupSaveBinding, ResolvedStationSaveBinding } from '@/types/x4'
+import type { GroupSaveBinding, StationSaveBinding, ResolvedGroupSaveBinding, ResolvedStationSaveBinding, SectorReachability } from '@/types/x4'
 import type { SaveArchive, PlayerStationEntry, NpcStationEntry, CodeMap } from '@/types/saveArchive'
 import { buildSectorGraph } from './mapSectorGraph'
 
@@ -213,6 +213,28 @@ export function getSaveSectorsWithPlayerStations(
 export interface SectorCoverageResult {
   sectorMacro: string
   distance: number
+}
+
+export function getReachableDistance(
+  reachability: SectorReachability | undefined,
+  from: string,
+  to: string
+): number | null {
+  const distance = reachability?.[from]?.[to]
+  return typeof distance === 'number' ? distance : null
+}
+
+export function getReachableCoverageSectors(
+  reachability: SectorReachability | undefined,
+  startSectorMacro: string,
+  jumpRange: number
+): SectorCoverageResult[] | null {
+  const targets = reachability?.[startSectorMacro]
+  if (!targets) return null
+  return Object.entries(targets)
+    .filter(([, distance]) => distance <= jumpRange)
+    .map(([sectorMacro, distance]) => ({ sectorMacro, distance }))
+    .sort((a, b) => a.distance - b.distance || a.sectorMacro.localeCompare(b.sectorMacro))
 }
 
 export function getCoverageSectors(

@@ -5,9 +5,9 @@ import { SketchPicker } from 'vue-color'
 import { HUB_PALETTE } from '@/store/logic/hubColor'
 import type { GroupDraftInfo, SectorAssignment } from '@/store/logic/autoGroup'
 import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
-import { getCoverageSectors } from '@/store/logic/saveBindingUtils'
+import { getCoverageSectors, getReachableCoverageSectors } from '@/store/logic/saveBindingUtils'
 import JumpInput from '@/components/common/JumpInput.vue'
-import type { X4MapSector } from '@/types/x4'
+import type { SectorReachability, X4MapSector } from '@/types/x4'
 
 const props = withDefaults(defineProps<{
   group: GroupDraftInfo
@@ -16,6 +16,7 @@ const props = withDefaults(defineProps<{
   maps: { clusters: Record<string, { sectors?: string[] }>; sectors: Record<string, X4MapSector> } | null | undefined
   sectorGraph: Record<string, string[]>
   sectorClusterMap: Record<string, string>
+  sectorReachability?: SectorReachability
   playerSectorMacros: string[]
   editable: boolean
   retainEditable?: boolean
@@ -169,7 +170,8 @@ function buildUnifiedPills(group: GroupDraftInfo): Map<number, UnifiedPillEntry[
 
   const allAnchorSectors = new Set(props.groups.filter(g => g.sectorMacro).map(g => g.sectorMacro!))
   const distMap = new Map<string, number>()
-  const distances = getCoverageSectors(group.sectorMacro, 99, props.sectorGraph, props.sectorClusterMap)
+  const distances = getReachableCoverageSectors(props.sectorReachability, group.sectorMacro, 5)
+    || getCoverageSectors(group.sectorMacro, 5, props.sectorGraph, props.sectorClusterMap)
   for (const d of distances) distMap.set(d.sectorMacro, d.distance)
 
   const otherActiveCoverage = new Map<string, string>()
@@ -195,7 +197,7 @@ function buildUnifiedPills(group: GroupDraftInfo): Map<number, UnifiedPillEntry[
         action: canEdit && group.coverageRetainEnabled ? 'remove' : null
       })
     }
-    if (d.distance <= group.jumpRange && !allAnchorSectors.has(d.sectorMacro) && props.editable && group.isPinned && group.coverageRetainEnabled) {
+    if (d.distance <= Math.min(group.jumpRange, 5) && !allAnchorSectors.has(d.sectorMacro) && props.editable && group.isPinned && group.coverageRetainEnabled) {
       const isOtherCoverage = otherActiveCoverage.has(d.sectorMacro)
       if (!byJump.has(d.distance)) byJump.set(d.distance, [])
       byJump.get(d.distance)!.push({

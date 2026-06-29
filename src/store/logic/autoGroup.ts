@@ -1,4 +1,4 @@
-import type { X4Module } from '@/types/x4'
+import type { SectorReachability, X4Module } from '@/types/x4'
 import type { PlayerStationEntry, SaveArchive } from '@/types/saveArchive'
 import type { BindingSectorGroup } from '@/types/x4'
 import {
@@ -11,6 +11,8 @@ import {
 } from './autoGroupHub'
 import {
   getCoverageSectors,
+  getReachableCoverageSectors,
+  getReachableDistance,
   getSaveSectorsWithPlayerStations,
   getPlayerStationsInSector
 } from './saveBindingUtils'
@@ -38,6 +40,7 @@ export interface SectorAssignment {
   displayBucket: 'resolved' | 'unresolved' | 'unpin'
   defaultGroupId?: string
   options: AssignmentOption[]
+  selectedSectorMacro?: string | null
   selectedOptionIndex: number | null
   unpinOrder?: number
 }
@@ -163,7 +166,25 @@ export function getDistance(
 }
 
 function resolveBridgeSearchJumpRange(groupCoverageJumpRange: number, bridgeSearchJumpRange: number): number {
-  return Math.max(groupCoverageJumpRange, bridgeSearchJumpRange)
+  return Math.min(MAX_UNCERTAIN_JUMP, Math.max(groupCoverageJumpRange, bridgeSearchJumpRange))
+}
+
+function clampTransportJumpRange(value: number): number {
+  return Math.max(0, Math.min(MAX_UNCERTAIN_JUMP, value))
+}
+
+function getTransportDistance(
+  from: string,
+  to: string,
+  sectorGraph: Record<string, string[]>,
+  sectorClusterMap: Record<string, string>,
+  sectorReachability?: SectorReachability
+): number | null {
+  if (sectorReachability) {
+    return getReachableDistance(sectorReachability, from, to)
+  }
+  const distance = getDistance(from, to, sectorGraph, sectorClusterMap)
+  return distance !== null && distance <= MAX_UNCERTAIN_JUMP ? distance : null
 }
 
 function getDisplayBucket(selectedOptionIndex: number | null): 'resolved' | 'unresolved' {
@@ -177,6 +198,39 @@ function withDisplayBucket<T extends { selectedOptionIndex: number | null }>(
     ...assignment,
     displayBucket: getDisplayBucket(assignment.selectedOptionIndex)
   }
+}
+
+function getOptionSelectedSectorMacro(assignmentSectorMacro: string, option: AssignmentOption | undefined): string | null {
+  if (!option) return null
+  if (option.type === 'standalone') return assignmentSectorMacro
+  return option.targetGroupId ?? null
+}
+
+function findOptionIndexBySelectedSectorMacro(
+  assignmentSectorMacro: string,
+  options: AssignmentOption[],
+  selectedSectorMacro: string | null | undefined
+): number | null {
+  if (!selectedSectorMacro) return null
+  const index = options.findIndex((option) => getOptionSelectedSectorMacro(assignmentSectorMacro, option) === selectedSectorMacro)
+  return index >= 0 ? index : null
+}
+
+function getAssignmentSelectedSectorMacro(assignment: SectorAssignment): string | null {
+  if (assignment.selectedSectorMacro !== undefined) return assignment.selectedSectorMacro
+  if (assignment.selectedOptionIndex === null) return null
+  return getOptionSelectedSectorMacro(assignment.sectorMacro, assignment.options[assignment.selectedOptionIndex])
+}
+
+function getSelectedOption(assignment: SectorAssignment): AssignmentOption | undefined {
+  const selectedIndex = findOptionIndexBySelectedSectorMacro(
+    assignment.sectorMacro,
+    assignment.options,
+    getAssignmentSelectedSectorMacro(assignment)
+  )
+  if (selectedIndex !== null) return assignment.options[selectedIndex]
+  if (assignment.selectedOptionIndex === null) return undefined
+  return assignment.options[assignment.selectedOptionIndex]
 }
 
 class UnionFind {
@@ -233,8 +287,10 @@ export function computeGroupGraph(
   groups: GroupDraftInfo[],
   sectorGraph: Record<string, string[]>,
   sectorClusterMap: Record<string, string>,
-  maxDistance: number = DEFAULT_BRIDGE_SEARCH_JUMP_RANGE
+  maxDistance: number = DEFAULT_BRIDGE_SEARCH_JUMP_RANGE,
+  sectorReachability?: SectorReachability
 ): void {
+  const effectiveMaxDistance = clampTransportJumpRange(maxDistance)
   // Save existing connections to preserve as fixed edges
   const fixedConnections: Array<{ a: number; b: number }> = []
   const idToIndex = new Map(groups.map((g, i) => [g.id, i]))
@@ -263,8 +319,8 @@ export function computeGroupGraph(
     for (let j = i + 1; j < anchors.length; j++) {
       const a = anchors[i]!
       const b = anchors[j]!
-      const dist = getDistance(a.group.sectorMacro!, b.group.sectorMacro!, sectorGraph, sectorClusterMap)
-      if (dist === null || dist > maxDistance) continue
+      const dist = getTransportDistance(a.group.sectorMacro!, b.group.sectorMacro!, sectorGraph, sectorClusterMap, sectorReachability)
+      if (dist === null || dist > effectiveMaxDistance) continue
       const ids = [a.group.id, b.group.id].sort()
       edges.push({ a: a.index, b: b.index, weight: dist, key: `${ids[0]}:${ids[1]}` })
     }
@@ -440,8 +496,10 @@ function buildPlanFromUnits(
   units: BridgePlanUnit[],
   sectorGraph: Record<string, string[]>,
   sectorClusterMap: Record<string, string>,
-  bridgeSearchJumpRange: number
+  bridgeSearchJumpRange: number,
+  sectorReachability?: SectorReachability
 ): BridgePlanOption | null {
+  const effectiveBridgeSearchJumpRange = clampTransportJumpRange(bridgeSearchJumpRange)
   const nodes: Array<{ id: string; kind: 'component' | 'unit'; label: string; sectorMacros: string[]; componentIndex?: number; unit?: BridgePlanUnit }> = []
 
   for (let i = 0; i < components.length; i++) {
@@ -475,13 +533,13 @@ function buildPlanFromUnits(
       let minDist: number | null = null
       for (const mi of nodes[i]!.sectorMacros) {
         for (const mj of nodes[j]!.sectorMacros) {
-          const dist = getDistance(mi, mj, sectorGraph, sectorClusterMap)
+          const dist = getTransportDistance(mi, mj, sectorGraph, sectorClusterMap, sectorReachability)
           if (dist !== null && (minDist === null || dist < minDist)) {
             minDist = dist
           }
         }
       }
-      if (minDist === null || minDist > bridgeSearchJumpRange) continue
+      if (minDist === null || minDist > effectiveBridgeSearchJumpRange) continue
       const ids = [nodes[i]!.id, nodes[j]!.id].sort()
       edges.push({ a: i, b: j, weight: minDist, key: `${ids[0]}:${ids[1]}` })
     }
@@ -546,7 +604,8 @@ export function buildBridgePlanOptions(
   sectorGraph: Record<string, string[]>,
   sectorClusterMap: Record<string, string>,
   bridgeSearchJumpRange: number = DEFAULT_BRIDGE_SEARCH_JUMP_RANGE,
-  excludedSectorMacros: string[] = []
+  excludedSectorMacros: string[] = [],
+  sectorReachability?: SectorReachability
 ): BridgePlanOption[] {
   const components = collectConnectedComponents(groups)
   if (components.length <= 1) return []
@@ -561,7 +620,7 @@ export function buildBridgePlanOptions(
   for (const combo of combos) {
     const stableKey = planStableKey(combo)
     if (seen.has(stableKey)) continue
-    const plan = buildPlanFromUnits(plans.length, groups, components, combo, sectorGraph, sectorClusterMap, bridgeSearchJumpRange)
+    const plan = buildPlanFromUnits(plans.length, groups, components, combo, sectorGraph, sectorClusterMap, bridgeSearchJumpRange, sectorReachability)
     if (!plan) continue
     seen.add(stableKey)
     plans.push(plan)
@@ -598,7 +657,8 @@ export function applyBridgePlanToDraft(
   sectorGraph: Record<string, string[]>,
   sectorClusterMap: Record<string, string>,
   bridgeSearchJumpRange: number = DEFAULT_BRIDGE_SEARCH_JUMP_RANGE,
-  colorCtx?: HubColorContext
+  colorCtx?: HubColorContext,
+  sectorReachability?: SectorReachability
 ): AutoGroupResult {
   const existingAnchors = new Set(result.groups.map((g) => g.sectorMacro).filter(Boolean) as string[])
   const bridgeGroups: GroupDraftInfo[] = []
@@ -630,7 +690,7 @@ export function applyBridgePlanToDraft(
       stabilizeEditedHubColor(group, groups, colorCtx)
     }
   }
-  computeGroupGraph(groups, sectorGraph, sectorClusterMap, resolveBridgeSearchJumpRange(prefJumpRange, bridgeSearchJumpRange))
+  computeGroupGraph(groups, sectorGraph, sectorClusterMap, resolveBridgeSearchJumpRange(prefJumpRange, bridgeSearchJumpRange), sectorReachability)
   const assignedSectors = new Map<string, string>()
   for (const group of groups) {
     if (group.sectorMacro) assignedSectors.set(group.sectorMacro, group.id)
@@ -640,7 +700,8 @@ export function applyBridgePlanToDraft(
     assignedSectors,
     groups,
     sectorGraph,
-    sectorClusterMap
+    sectorClusterMap,
+    sectorReachability
   )
   const syncedGroups = syncSelectedAbsorptionsToCoverage(groups, assignments)
 
@@ -752,7 +813,8 @@ export function groupCleanSlate(
   prefJumpRange: number = DEFAULT_JUMP_RANGE,
   bridgeSearchJumpRange: number = DEFAULT_BRIDGE_SEARCH_JUMP_RANGE,
   excludedSectorMacros: string[] = [],
-  generateHubs: boolean = true
+  generateHubs: boolean = true,
+  sectorReachability?: SectorReachability
 ): AutoGroupResult {
   const resolvedBridgeSearchJumpRange = resolveBridgeSearchJumpRange(prefJumpRange, bridgeSearchJumpRange)
   const excludedSectorSet = new Set(excludedSectorMacros)
@@ -797,7 +859,7 @@ export function groupCleanSlate(
       if (assignedSectors.has(sectorMacro)) continue
 
       const groupId = sectorMacro
-      const allCoverage = getSectorCoverageMacros(sectorMacro, prefJumpRange, sectorGraph, sectorClusterMap)
+      const allCoverage = getSectorCoverageMacros(sectorMacro, prefJumpRange, sectorGraph, sectorClusterMap, sectorReachability)
       const coverage = allCoverage.filter((m) =>
         playerSectorMacros.includes(m) &&
         !occupiedSectors.has(m) &&
@@ -833,8 +895,8 @@ export function groupCleanSlate(
     }
   }
 
-  computeGroupGraph(groups, sectorGraph, sectorClusterMap, resolvedBridgeSearchJumpRange)
-  let bridgePlans = buildBridgePlanOptions(groups, playerSectorMacros, sectorHubMap, sectorGraph, sectorClusterMap, resolvedBridgeSearchJumpRange, excludedSectorMacros)
+  computeGroupGraph(groups, sectorGraph, sectorClusterMap, resolvedBridgeSearchJumpRange, sectorReachability)
+  let bridgePlans = buildBridgePlanOptions(groups, playerSectorMacros, sectorHubMap, sectorGraph, sectorClusterMap, resolvedBridgeSearchJumpRange, excludedSectorMacros, sectorReachability)
   if (bridgePlans.length === 1) {
     const applied = applyBridgePlanToDraft(
       { groups, assignments: [], bridgePlans, playerSectorMacros },
@@ -843,7 +905,9 @@ export function groupCleanSlate(
       (m) => m,
       sectorGraph,
       sectorClusterMap,
-      resolvedBridgeSearchJumpRange
+      resolvedBridgeSearchJumpRange,
+      undefined,
+      sectorReachability
     )
     groups.splice(0, groups.length, ...applied.groups)
     bridgePlans = applied.bridgePlans
@@ -862,12 +926,12 @@ export function groupCleanSlate(
 
     for (const group of groups) {
       if (!group.sectorMacro) continue
-      const dist = getDistance(group.sectorMacro, sectorMacro, sectorGraph, sectorClusterMap)
-      if (dist !== null && dist <= group.jumpRange) {
+      const dist = getTransportDistance(group.sectorMacro, sectorMacro, sectorGraph, sectorClusterMap, sectorReachability)
+      if (dist !== null && dist <= clampTransportJumpRange(group.jumpRange)) {
         candidates.push({
           groupId: group.id,
           distance: dist,
-          jumpRange: group.jumpRange,
+          jumpRange: clampTransportJumpRange(group.jumpRange),
           score: group.hubScore
         })
       }
@@ -889,12 +953,12 @@ export function groupCleanSlate(
       const candidates: Array<{ groupId: string; distance: number; jumpRange: number; score?: number }> = []
       for (const group of groups) {
         if (!group.sectorMacro) continue
-        const dist = getDistance(group.sectorMacro, sectorMacro, sectorGraph, sectorClusterMap)
-        if (dist !== null && dist <= group.jumpRange) {
+        const dist = getTransportDistance(group.sectorMacro, sectorMacro, sectorGraph, sectorClusterMap, sectorReachability)
+        if (dist !== null && dist <= clampTransportJumpRange(group.jumpRange)) {
           candidates.push({
             groupId: group.id,
             distance: dist,
-            jumpRange: group.jumpRange,
+            jumpRange: clampTransportJumpRange(group.jumpRange),
             score: group.hubScore
           })
         }
@@ -924,12 +988,12 @@ export function groupCleanSlate(
     const candidates: Array<{ groupId: string; distance: number; jumpRange: number; score?: number }> = []
     for (const group of groups) {
       if (!group.sectorMacro) continue
-      const dist = getDistance(group.sectorMacro, sectorMacro, sectorGraph, sectorClusterMap)
+      const dist = getTransportDistance(group.sectorMacro, sectorMacro, sectorGraph, sectorClusterMap, sectorReachability)
       if (dist !== null) {
         candidates.push({
           groupId: group.id,
           distance: dist,
-          jumpRange: group.jumpRange,
+          jumpRange: clampTransportJumpRange(group.jumpRange),
           score: group.hubScore
         })
       }
@@ -959,12 +1023,12 @@ export function groupCleanSlate(
     const candidates: Array<{ groupId: string; distance: number; jumpRange: number; score?: number }> = []
     for (const group of groups) {
       if (!group.sectorMacro) continue
-      const dist = getDistance(group.sectorMacro, sectorMacro, sectorGraph, sectorClusterMap)
+      const dist = getTransportDistance(group.sectorMacro, sectorMacro, sectorGraph, sectorClusterMap, sectorReachability)
       if (dist !== null) {
         candidates.push({
           groupId: group.id,
           distance: dist,
-          jumpRange: group.jumpRange,
+          jumpRange: clampTransportJumpRange(group.jumpRange),
           score: group.hubScore
         })
       }
@@ -984,7 +1048,8 @@ export function groupCleanSlate(
     assignedSectors,
     groups,
     sectorGraph,
-    sectorClusterMap
+    sectorClusterMap,
+    sectorReachability
   )
   const syncedGroups = syncSelectedAbsorptionsToCoverage(groups, assignments)
 
@@ -1003,7 +1068,8 @@ export function groupIncremental(
   prefJumpRange: number = DEFAULT_JUMP_RANGE,
   bridgeSearchJumpRange: number = DEFAULT_BRIDGE_SEARCH_JUMP_RANGE,
   excludedSectorMacros: string[] = [],
-  generateHubs: boolean = true
+  generateHubs: boolean = true,
+  sectorReachability?: SectorReachability
 ): AutoGroupResult {
   const resolvedBridgeSearchJumpRange = resolveBridgeSearchJumpRange(prefJumpRange, bridgeSearchJumpRange)
   const sectorsWithStations = getSaveSectorsWithPlayerStations(archive)
@@ -1076,7 +1142,7 @@ export function groupIncremental(
     for (const hub of pureHubs) {
       if (occupiedSectors.has(hub.sectorMacro)) continue
       const groupId = hub.sectorMacro
-      const allCoverage = getSectorCoverageMacros(hub.sectorMacro, prefJumpRange, sectorGraph, sectorClusterMap)
+      const allCoverage = getSectorCoverageMacros(hub.sectorMacro, prefJumpRange, sectorGraph, sectorClusterMap, sectorReachability)
       const coverage = allCoverage.filter((m) =>
         playerSectorMacros.includes(m) &&
         !occupiedSectors.has(m) &&
@@ -1113,8 +1179,8 @@ export function groupIncremental(
     }
   }
 
-  computeGroupGraph(groups, sectorGraph, sectorClusterMap, resolvedBridgeSearchJumpRange)
-  let bridgePlans = buildBridgePlanOptions(groups, playerSectorMacros, sectorHubMap, sectorGraph, sectorClusterMap, resolvedBridgeSearchJumpRange, excludedSectorMacros)
+  computeGroupGraph(groups, sectorGraph, sectorClusterMap, resolvedBridgeSearchJumpRange, sectorReachability)
+  let bridgePlans = buildBridgePlanOptions(groups, playerSectorMacros, sectorHubMap, sectorGraph, sectorClusterMap, resolvedBridgeSearchJumpRange, excludedSectorMacros, sectorReachability)
   if (bridgePlans.length === 1) {
     const applied = applyBridgePlanToDraft(
       { groups, assignments: [], bridgePlans, playerSectorMacros },
@@ -1123,7 +1189,9 @@ export function groupIncremental(
       (m) => m,
       sectorGraph,
       sectorClusterMap,
-      resolvedBridgeSearchJumpRange
+      resolvedBridgeSearchJumpRange,
+      undefined,
+      sectorReachability
     )
     groups.splice(0, groups.length, ...applied.groups)
     bridgePlans = applied.bridgePlans
@@ -1136,12 +1204,12 @@ export function groupIncremental(
 
     for (const group of groups) {
       if (!group.sectorMacro) continue
-      const dist = getDistance(group.sectorMacro, sectorMacro, sectorGraph, sectorClusterMap)
+      const dist = getTransportDistance(group.sectorMacro, sectorMacro, sectorGraph, sectorClusterMap, sectorReachability)
       if (dist !== null) {
         candidates.push({
           groupId: group.id,
           distance: dist,
-          jumpRange: group.jumpRange
+          jumpRange: clampTransportJumpRange(group.jumpRange)
         })
       }
     }
@@ -1161,7 +1229,8 @@ export function groupIncremental(
     assignedSectors,
     groups,
     sectorGraph,
-    sectorClusterMap
+    sectorClusterMap,
+    sectorReachability
   )
   const syncedGroups = syncSelectedAbsorptionsToCoverage(groups, assignments)
 
@@ -1174,9 +1243,12 @@ function getSectorCoverageMacros(
   sectorMacro: string,
   jumpRange: number,
   sectorGraph: Record<string, string[]>,
-  sectorClusterMap: Record<string, string>
+  sectorClusterMap: Record<string, string>,
+  sectorReachability?: SectorReachability
 ): string[] {
-  const results = getCoverageSectors(sectorMacro, jumpRange, sectorGraph, sectorClusterMap)
+  const effectiveJumpRange = clampTransportJumpRange(jumpRange)
+  const results = getReachableCoverageSectors(sectorReachability, sectorMacro, effectiveJumpRange)
+    || getCoverageSectors(sectorMacro, effectiveJumpRange, sectorGraph, sectorClusterMap)
   return results.map((r) => r.sectorMacro)
 }
 
@@ -1185,7 +1257,8 @@ export function buildAssignmentResult(
   assignedSectors: Map<string, string>,
   groups: GroupDraftInfo[],
   sectorGraph: Record<string, string[]>,
-  sectorClusterMap: Record<string, string>
+  sectorClusterMap: Record<string, string>,
+  sectorReachability?: SectorReachability
 ): SectorAssignment[] {
   const assignments: SectorAssignment[] = []
   const allSectors = [...unassignedSectors, ...Array.from(assignedSectors.keys())]
@@ -1200,12 +1273,12 @@ export function buildAssignmentResult(
     const candidates: Array<{ groupId: string; distance: number; jumpRange: number; score?: number }> = []
     for (const group of groups) {
       if (!group.sectorMacro) continue
-      const dist = getDistance(group.sectorMacro, sectorMacro, sectorGraph, sectorClusterMap)
+      const dist = getTransportDistance(group.sectorMacro, sectorMacro, sectorGraph, sectorClusterMap, sectorReachability)
       if (dist !== null) {
         candidates.push({
           groupId: group.id,
           distance: dist,
-          jumpRange: group.jumpRange,
+          jumpRange: clampTransportJumpRange(group.jumpRange),
           score: group.hubScore
         })
       }
@@ -1221,6 +1294,7 @@ export function buildAssignmentResult(
           extendsRange: false,
           resultingGroupSize: 1
         }],
+        selectedSectorMacro: null,
         selectedOptionIndex: null
       }))
       continue
@@ -1304,6 +1378,7 @@ export function buildAssignmentResult(
       status: status as SectorAssignment['status'],
       defaultGroupId,
       options,
+      selectedSectorMacro: defaultGroupId ?? null,
       selectedOptionIndex: defaultOptionIndex
     }))
   }
@@ -1319,8 +1394,7 @@ function syncSelectedAbsorptionsToCoverage(
   const groupById = new Map(nextGroups.map((group) => [group.id, group]))
 
   for (const assignment of assignments) {
-    if (assignment.selectedOptionIndex === null) continue
-    const selected = assignment.options[assignment.selectedOptionIndex]
+    const selected = getSelectedOption(assignment)
     if (!selected || selected.type !== 'absorb' || !selected.targetGroupId) continue
 
     for (const group of nextGroups) {
@@ -1342,13 +1416,14 @@ function syncSelectedAbsorptionsToCoverage(
 function normalizeGroupJumpRanges(
   groups: GroupDraftInfo[],
   sectorGraph: Record<string, string[]>,
-  sectorClusterMap: Record<string, string>
+  sectorClusterMap: Record<string, string>,
+  sectorReachability?: SectorReachability
 ): GroupDraftInfo[] {
   return groups.map((group) => {
     if (!group.sectorMacro) return group
-    let jumpRange = group.originalJumpRange
+    let jumpRange = clampTransportJumpRange(group.originalJumpRange)
     for (const sectorMacro of group.coverageSectorMacros) {
-      const dist = getDistance(group.sectorMacro, sectorMacro, sectorGraph, sectorClusterMap)
+      const dist = getTransportDistance(group.sectorMacro, sectorMacro, sectorGraph, sectorClusterMap, sectorReachability)
       if (dist !== null) jumpRange = Math.max(jumpRange, dist)
     }
     return { ...group, jumpRange }
@@ -1372,8 +1447,10 @@ export function resolveUncertainAssignment(
   assignment: SectorAssignment,
   optionIndex: number
 ): SectorAssignment {
+  const selectedSectorMacro = getOptionSelectedSectorMacro(assignment.sectorMacro, assignment.options[optionIndex])
   return {
     ...assignment,
+    selectedSectorMacro,
     selectedOptionIndex: optionIndex,
     status: 'auto'
   }
@@ -1384,18 +1461,19 @@ function buildStandaloneSelectedAssignment(
   groups: GroupDraftInfo[],
   sectorGraph: Record<string, string[]>,
   sectorClusterMap: Record<string, string>,
-  unpinOrder?: number
+  unpinOrder?: number,
+  sectorReachability?: SectorReachability
 ): SectorAssignment {
   const candidateGroups = groups.filter((group) => group.sectorMacro !== sectorMacro)
   const candidates: Array<{ groupId: string; distance: number; jumpRange: number; score?: number }> = []
   for (const group of candidateGroups) {
     if (!group.sectorMacro) continue
-    const distance = getDistance(group.sectorMacro, sectorMacro, sectorGraph, sectorClusterMap)
+    const distance = getTransportDistance(group.sectorMacro, sectorMacro, sectorGraph, sectorClusterMap, sectorReachability)
     if (distance === null) continue
     candidates.push({
       groupId: group.id,
       distance,
-      jumpRange: group.jumpRange,
+      jumpRange: clampTransportJumpRange(group.jumpRange),
       score: group.hubScore
     })
   }
@@ -1430,6 +1508,7 @@ function buildStandaloneSelectedAssignment(
     status: 'standalone',
     displayBucket: 'unpin',
     options,
+    selectedSectorMacro: sectorMacro,
     selectedOptionIndex: standaloneIndex,
     unpinOrder
   }
@@ -1485,7 +1564,8 @@ export function setGroupPinnedInResult(
   groupId: string,
   isPinned: boolean,
   sectorGraph: Record<string, string[]>,
-  sectorClusterMap: Record<string, string>
+  sectorClusterMap: Record<string, string>,
+  sectorReachability?: SectorReachability
 ): AutoGroupResult {
   const group = result.groups.find((candidate) => candidate.id === groupId)
   if (!group?.sectorMacro) return result
@@ -1513,7 +1593,7 @@ export function setGroupPinnedInResult(
     groups,
     assignments: [
       ...result.assignments,
-      buildStandaloneSelectedAssignment(sectorMacro, groups, sectorGraph, sectorClusterMap, nextUnpinOrder)
+      buildStandaloneSelectedAssignment(sectorMacro, groups, sectorGraph, sectorClusterMap, nextUnpinOrder, sectorReachability)
     ]
   }
 }
@@ -1525,7 +1605,8 @@ export function applyAbsorbToResult(
   sectorGraph: Record<string, string[]>,
   sectorClusterMap: Record<string, string>,
   prefJumpRange: number = DEFAULT_JUMP_RANGE,
-  bridgeSearchJumpRange: number = DEFAULT_BRIDGE_SEARCH_JUMP_RANGE
+  bridgeSearchJumpRange: number = DEFAULT_BRIDGE_SEARCH_JUMP_RANGE,
+  sectorReachability?: SectorReachability
 ): AutoGroupResult {
   const assignments = [...result.assignments]
   const idx = assignments.findIndex((a) => a.sectorMacro === sectorMacro)
@@ -1574,9 +1655,8 @@ export function applyAbsorbToResult(
   // Extend jump range if needed
   let newJumpRange = g.jumpRange
   if (opt.extendsRange && g.sectorMacro) {
-    const distances = getCoverageSectors(g.sectorMacro, 99, sectorGraph, sectorClusterMap)
-    const dist = distances.find((d) => d.sectorMacro === sectorMacro)?.distance
-    if (dist !== undefined && dist > newJumpRange) {
+    const dist = getTransportDistance(g.sectorMacro, sectorMacro, sectorGraph, sectorClusterMap, sectorReachability)
+    if (dist !== null && dist > newJumpRange) {
       newJumpRange = dist
     }
   }
@@ -1594,6 +1674,7 @@ export function applyAbsorbToResult(
       if (filteredOptions.length === a.options.length) continue
 
       let selectedOptionIndex = a.selectedOptionIndex
+      let selectedSectorMacro = getAssignmentSelectedSectorMacro(a)
       if (selectedOptionIndex !== null) {
         const selectedOption = a.options[selectedOptionIndex]
         if (
@@ -1601,15 +1682,22 @@ export function applyAbsorbToResult(
           (selectedOption?.targetGroupId !== undefined && removedGroupIds.has(selectedOption.targetGroupId))
         ) {
           selectedOptionIndex = findBestOptionIndex(filteredOptions)
+          selectedSectorMacro = selectedOptionIndex === null
+            ? null
+            : getOptionSelectedSectorMacro(a.sectorMacro, filteredOptions[selectedOptionIndex])
         } else {
           const remappedIndex = filteredOptions.findIndex((option) => option === selectedOption)
           selectedOptionIndex = remappedIndex >= 0 ? remappedIndex : findBestOptionIndex(filteredOptions)
+          selectedSectorMacro = selectedOptionIndex === null
+            ? null
+            : getOptionSelectedSectorMacro(a.sectorMacro, filteredOptions[selectedOptionIndex])
         }
       }
 
       assignments[i] = {
         ...a,
         options: filteredOptions,
+        selectedSectorMacro,
         selectedOptionIndex
       }
     }
@@ -1618,15 +1706,16 @@ export function applyAbsorbToResult(
   groups = normalizeGroupJumpRanges(
     syncSelectedAbsorptionsToCoverage(groups, assignments as SectorAssignment[]),
     sectorGraph,
-    sectorClusterMap
+    sectorClusterMap,
+    sectorReachability
   )
-  computeGroupGraph(groups, sectorGraph, sectorClusterMap, resolveBridgeSearchJumpRange(prefJumpRange, bridgeSearchJumpRange))
+  computeGroupGraph(groups, sectorGraph, sectorClusterMap, resolveBridgeSearchJumpRange(prefJumpRange, bridgeSearchJumpRange), sectorReachability)
 
   if (opt.extendsRange) {
     return rebuildAssignmentsForJumpRangeChange(
       { ...result, groups, assignments: assignments as SectorAssignment[] },
       opt.targetGroupId, newJumpRange, sectorGraph, sectorClusterMap,
-      g.jumpRange
+      g.jumpRange, true, sectorReachability
     )
   }
 
@@ -1641,7 +1730,8 @@ export function applyStandaloneToResult(
   prefJumpRange: number,
   getSectorName: (macro: string) => string,
   bridgeSearchJumpRange: number = DEFAULT_BRIDGE_SEARCH_JUMP_RANGE,
-  colorCtx?: HubColorContext
+  colorCtx?: HubColorContext,
+  sectorReachability?: SectorReachability
 ): AutoGroupResult {
   const assignments = [...result.assignments]
   const idx = assignments.findIndex((a) => a.sectorMacro === sectorMacro)
@@ -1675,7 +1765,8 @@ export function applyStandaloneToResult(
 
   // Reuse existing standalone group ID if one already exists for this sector
   const groupId = existingGroup ? existingGroup.id : sectorMacro
-  const allSectors = getCoverageSectors(sectorMacro, prefJumpRange, sectorGraph, sectorClusterMap)
+  const allSectors = getReachableCoverageSectors(sectorReachability, sectorMacro, clampTransportJumpRange(prefJumpRange))
+    || getCoverageSectors(sectorMacro, clampTransportJumpRange(prefJumpRange), sectorGraph, sectorClusterMap)
 
   const coverage = allSectors
     .map((c) => c.sectorMacro)
@@ -1718,13 +1809,12 @@ export function applyStandaloneToResult(
     groups.push(newGroup)
     if (colorCtx) stabilizeEditedHubColor(newGroup, groups, colorCtx)
   }
-  computeGroupGraph(groups, sectorGraph, sectorClusterMap, resolveBridgeSearchJumpRange(prefJumpRange, bridgeSearchJumpRange))
+  computeGroupGraph(groups, sectorGraph, sectorClusterMap, resolveBridgeSearchJumpRange(prefJumpRange, bridgeSearchJumpRange), sectorReachability)
 
   // Select standalone option, keep card visible
   assignments[idx] = {
     ...assignment,
-    unpinOrder: undefined,
-    displayBucket: assignment.displayBucket === 'unpin' ? 'resolved' : assignment.displayBucket,
+    selectedSectorMacro: sectorMacro,
     selectedOptionIndex: standaloneIdx >= 0 ? standaloneIdx : assignment.options.length,
     status: 'standalone'
   }
@@ -1742,10 +1832,9 @@ export function applyStandaloneToResult(
     if (a.sectorMacro === sectorMacro) continue
     if (a.status === 'exception') continue
 
-    const dist = getCoverageSectors(sectorMacro, 99, sectorGraph, sectorClusterMap)
-      .find((d) => d.sectorMacro === a.sectorMacro)?.distance
+    const dist = getTransportDistance(sectorMacro, a.sectorMacro, sectorGraph, sectorClusterMap, sectorReachability)
 
-    if (dist === undefined) continue
+    if (dist === null) continue
     if (dist > MAX_UNCERTAIN_JUMP) continue
     if (a.options.some((option) => option.targetGroupId === groupId)) continue
     if (dist > prefJumpRange && a.options.some((o) => o.type === 'absorb' && !o.extendsRange)) continue
@@ -1761,15 +1850,13 @@ export function applyStandaloneToResult(
     }
 
     const opts = [...a.options]
+    const previousSelectedSectorMacro = getAssignmentSelectedSectorMacro(a)
     const si = opts.findIndex((o) => o.type === 'standalone')
     if (si >= 0) opts.splice(si, 0, newOpt)
     else opts.push(newOpt)
     const newOptIdx = opts.indexOf(newOpt)
 
-    let nextSelected = a.selectedOptionIndex
-    if (nextSelected !== null && si >= 0 && nextSelected >= si) {
-      nextSelected = nextSelected + 1
-    }
+    let nextSelected = findOptionIndexBySelectedSectorMacro(a.sectorMacro, opts, previousSelectedSectorMacro)
     let nextStatus = a.status
 
     if (!newOpt.extendsRange) {
@@ -1822,7 +1909,7 @@ export function applyStandaloneToResult(
       }
     } else {
       const hasInRangeHit = opts.some((o) => o.type === 'absorb' && !o.extendsRange)
-      if (!hasInRangeHit) {
+      if (!hasInRangeHit && previousSelectedSectorMacro === null) {
         nextSelected = null
         nextStatus = a.status === 'uncertain_extend' ? 'uncertain_extend' : a.status
       }
@@ -1846,6 +1933,9 @@ export function applyStandaloneToResult(
     assignments[i] = {
       ...a,
       options: opts,
+      selectedSectorMacro: nextSelected === null
+        ? null
+        : getOptionSelectedSectorMacro(a.sectorMacro, opts[nextSelected]),
       selectedOptionIndex: nextSelected,
       status: nextStatus
     }
@@ -1867,19 +1957,21 @@ export function rebuildAssignmentsForJumpRangeChange(
   sectorGraph: Record<string, string[]>,
   sectorClusterMap: Record<string, string>,
   oldRangeOverride?: number,
-  autoSelect: boolean = true
+  autoSelect: boolean = true,
+  sectorReachability?: SectorReachability
 ): AutoGroupResult {
   const group = result.groups.find((g) => g.id === groupId)
   if (!group?.sectorMacro) return result
-  const oldRange = oldRangeOverride ?? group.jumpRange
-  if (newRange === oldRange) return result
+  const oldRange = clampTransportJumpRange(oldRangeOverride ?? group.jumpRange)
+  const effectiveNewRange = clampTransportJumpRange(newRange)
+  if (effectiveNewRange === oldRange) return result
 
   const sectorMacro = group.sectorMacro
-  const minRange = Math.min(oldRange, newRange)
-  const maxRange = Math.max(oldRange, newRange)
+  const minRange = Math.min(oldRange, effectiveNewRange)
+  const maxRange = Math.max(oldRange, effectiveNewRange)
 
   const groups = result.groups.map((g) =>
-    g.id === groupId ? { ...g, jumpRange: newRange } : g
+    g.id === groupId ? { ...g, jumpRange: effectiveNewRange } : g
   )
 
   const assignments = [...result.assignments]
@@ -1889,9 +1981,8 @@ export function rebuildAssignmentsForJumpRangeChange(
     const a = assignments[i]!
     if (anchorSectors.has(a.sectorMacro)) continue
 
-    const dist = getCoverageSectors(sectorMacro, 99, sectorGraph, sectorClusterMap)
-      .find((d) => d.sectorMacro === a.sectorMacro)?.distance
-    if (dist === undefined) continue
+    const dist = getTransportDistance(sectorMacro, a.sectorMacro, sectorGraph, sectorClusterMap, sectorReachability)
+    if (dist === null) continue
     if (dist <= minRange) continue
     if (dist > maxRange) continue
 
@@ -1903,35 +1994,34 @@ export function rebuildAssignmentsForJumpRangeChange(
       }
     }
     const unassigned = result.playerSectorMacros.filter((m) => !assignedSectors.has(m))
-    const rebuilt = buildAssignmentResult(unassigned, assignedSectors, groups, sectorGraph, sectorClusterMap)
+    const rebuilt = buildAssignmentResult(unassigned, assignedSectors, groups, sectorGraph, sectorClusterMap, sectorReachability)
     const rebuiltAssignment = rebuilt.find((r) => r.sectorMacro === a.sectorMacro)
     if (!rebuiltAssignment) continue
 
-    const prevSelectedTarget = a.selectedOptionIndex !== null
-      ? a.options[a.selectedOptionIndex]?.targetGroupId
-      : undefined
-    const prevWasExtension = a.selectedOptionIndex !== null
-      ? a.options[a.selectedOptionIndex]?.extendsRange
-      : undefined
+    const previousSelectedSectorMacro = getAssignmentSelectedSectorMacro(a)
+    const previousSelectedOption = getSelectedOption(a)
+    const prevSelectedTarget = previousSelectedOption?.targetGroupId
+    const prevWasExtension = previousSelectedOption?.extendsRange
 
-    let nextSelected = a.selectedOptionIndex
+    let nextSelected = findOptionIndexBySelectedSectorMacro(
+      a.sectorMacro,
+      rebuiltAssignment.options,
+      previousSelectedSectorMacro
+    )
     let nextStatus = a.status
 
     const hubOpt = rebuiltAssignment.options.find((o) => o.targetGroupId === groupId)
     if (!autoSelect) {
-      const prevSelectedOption = a.selectedOptionIndex !== null
-        ? a.options[a.selectedOptionIndex]
-        : undefined
-      if (prevSelectedOption) {
-        if (prevSelectedOption.type === 'absorb' && prevSelectedOption.targetGroupId === groupId && prevSelectedOption.extendsRange === false && hubOpt?.extendsRange === true) {
+      if (previousSelectedOption) {
+        if (previousSelectedOption.type === 'absorb' && previousSelectedOption.targetGroupId === groupId && previousSelectedOption.extendsRange === false && hubOpt?.extendsRange === true) {
           nextSelected = null
           nextStatus = 'uncertain_extend'
-        } else if (prevSelectedOption.type === 'standalone') {
+        } else if (previousSelectedOption.type === 'standalone') {
           const mappedIdx = rebuiltAssignment.options.findIndex((o) => o.type === 'standalone')
           nextSelected = mappedIdx >= 0 ? mappedIdx : null
         } else {
           const mappedIdx = rebuiltAssignment.options.findIndex((o) =>
-            o.type === prevSelectedOption.type && o.targetGroupId === prevSelectedOption.targetGroupId
+            o.type === previousSelectedOption.type && o.targetGroupId === previousSelectedOption.targetGroupId
           )
           nextSelected = mappedIdx >= 0 ? mappedIdx : null
         }
@@ -1940,6 +2030,9 @@ export function rebuildAssignmentsForJumpRangeChange(
       assignments[i] = {
         ...a,
         options: rebuiltAssignment.options,
+        selectedSectorMacro: nextSelected === null
+          ? null
+          : getOptionSelectedSectorMacro(a.sectorMacro, rebuiltAssignment.options[nextSelected]),
         selectedOptionIndex: nextSelected,
         status: nextStatus as SectorAssignment['status']
       }
@@ -1952,7 +2045,7 @@ export function rebuildAssignmentsForJumpRangeChange(
         if (prevSelectedTarget === groupId || prevWasExtension === true) {
           nextSelected = hubOptIdx
           nextStatus = 'auto'
-        } else if (a.selectedOptionIndex === null) {
+        } else if (previousSelectedSectorMacro === null) {
           const rangeAbsorbs = rebuiltAssignment.options.filter((o) => o.type === 'absorb' && !o.extendsRange)
           const minDist = Math.min(...rangeAbsorbs.map((o) => o.distance))
           if (hubOpt.distance < minDist) {
@@ -1963,7 +2056,7 @@ export function rebuildAssignmentsForJumpRangeChange(
             nextStatus = 'auto'
           }
         } else {
-          const currentSelected = a.selectedOptionIndex !== null ? rebuiltAssignment.options[a.selectedOptionIndex] : null
+          const currentSelected = nextSelected !== null ? rebuiltAssignment.options[nextSelected] : null
           if (currentSelected && currentSelected.type === 'absorb' && !currentSelected.extendsRange) {
             const hubIsCloser = hubOpt.distance < currentSelected.distance
             if (hubIsCloser) {
@@ -1992,11 +2085,17 @@ export function rebuildAssignmentsForJumpRangeChange(
           }
         }
       }
+    } else if (prevSelectedTarget === groupId && rebuiltAssignment.selectedOptionIndex !== null) {
+      nextSelected = rebuiltAssignment.selectedOptionIndex
+      nextStatus = rebuiltAssignment.status
     }
 
     assignments[i] = {
       ...a,
       options: rebuiltAssignment.options,
+      selectedSectorMacro: nextSelected === null
+        ? null
+        : getOptionSelectedSectorMacro(a.sectorMacro, rebuiltAssignment.options[nextSelected]),
       selectedOptionIndex: nextSelected,
       status: nextStatus as SectorAssignment['status']
     }
@@ -2045,20 +2144,22 @@ export function preserveEditAssignmentSelections(
   const previousBySector = new Map(previousAssignments.map((a) => [a.sectorMacro, a]))
   return nextAssignments.map((assignment) => {
     const previous = previousBySector.get(assignment.sectorMacro)
-    if (!previous || previous.selectedOptionIndex === null) return assignment
+    const previousSelectedSectorMacro = previous ? getAssignmentSelectedSectorMacro(previous) : null
+    if (!previous || previousSelectedSectorMacro === null) return assignment
 
-    const previousSelected = previous.options[previous.selectedOptionIndex]
+    const previousSelected = getSelectedOption(previous)
     if (!previousSelected) {
-      return { ...assignment, selectedOptionIndex: null }
+      return { ...assignment, selectedSectorMacro: null, selectedOptionIndex: null }
     }
 
     const mappedIndex = findMatchingOptionIndex(assignment.options, previousSelected)
     if (mappedIndex < 0) {
-      return { ...assignment, selectedOptionIndex: null }
+      return { ...assignment, selectedSectorMacro: null, selectedOptionIndex: null }
     }
 
     return {
       ...assignment,
+      selectedSectorMacro: getOptionSelectedSectorMacro(assignment.sectorMacro, assignment.options[mappedIndex]),
       selectedOptionIndex: mappedIndex,
       displayBucket: 'resolved'
     }
@@ -2076,7 +2177,8 @@ export function enrichAutoGroupResult(
     prefJumpRange: number
   },
   sectorGraph: Record<string, string[]>,
-  sectorClusterMap: Record<string, string>
+  sectorClusterMap: Record<string, string>,
+  sectorReachability?: SectorReachability
 ): AutoGroupResult {
   const enrichedGroups = result.groups.map((g) => {
     let name = g.name
@@ -2112,7 +2214,7 @@ export function enrichAutoGroupResult(
   const colorCtx: HubColorContext = {
     getFactionColor: deps.getFactionColor,
     getDistance: (from: string, to: string) => {
-      return getDistance(from, to, sectorGraph, sectorClusterMap)
+      return getTransportDistance(from, to, sectorGraph, sectorClusterMap, sectorReachability)
     },
     maxHop: 5
   }

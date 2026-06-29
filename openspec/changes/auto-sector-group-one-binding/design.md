@@ -161,6 +161,18 @@ gameGuid:archiveTime
 - result 模式下扩展 absorb 导致 hub range 扩大时，受影响 assignment 的选择按 R3 更新。edit 模式下 card 直接修改跳数只维护候选结构，不因更优、更近或平局自动切换其他 sector 的选择。
 - 用户若要回到最近计算结果，必须使用 [重置]。
 
+### Assignment selection identity
+
+`SectorAssignment` 的真实选择状态使用 stable sector identity：
+
+- `selectedSectorMacro=null` 表示未解决或无当前选择。
+- `selectedSectorMacro === assignment.sectorMacro` 表示选择 standalone / 独立成组。
+- `selectedSectorMacro === option.targetGroupId` 表示选择吸收到目标 hub group；当前 one-binding 口径下 `targetGroupId` SHALL 等于 hub `sectorMacro`。
+
+`selectedOptionIndex` 暂时保留为 presenter/UI 兼容字段，由 `selectedSectorMacro` 映射到当前 `options` 得出。任何会插入、删除或重排 assignment options 的逻辑，必须先保留 `selectedSectorMacro`，再重算 `selectedOptionIndex`；不得把 option 下标作为领域选择真值。
+
+Vue allocation 列表的选择事件 SHALL 传递 `selectedSectorMacro`。Presenter 可以在调用既有算法函数前把该 sector 映射为当前 option index，但事件边界和领域状态都不得依赖旧 index。
+
 ## Presenter
 
 Presenter 使用：
