@@ -16,6 +16,9 @@ const props = withDefaults(defineProps<{
   playerSectorMacros: string[]
   editable: boolean
   retainEditable?: boolean
+  jumpRangeEditable?: boolean
+  forceUnpinned?: boolean
+  pinDisabled?: boolean
   diffEnabled: boolean
   view?: 'map' | 'live'
   showSelectGroupButton?: boolean
@@ -28,6 +31,9 @@ const props = withDefaults(defineProps<{
 }>(), {
   view: 'live',
   retainEditable: false,
+  jumpRangeEditable: false,
+  forceUnpinned: false,
+  pinDisabled: false,
   showSelectGroupButton: false,
   showRecalcStateButton: true,
   draggable: false,
@@ -60,6 +66,9 @@ const cardBase = computed(() => ({
   playerSectorMacros: props.playerSectorMacros,
   editable: props.editable,
   retainEditable: props.retainEditable,
+  jumpRangeEditable: props.jumpRangeEditable,
+  forceUnpinned: props.forceUnpinned,
+  pinDisabled: props.pinDisabled,
   diffEnabled: props.diffEnabled,
   view: props.view,
   showSelectGroupButton: props.showSelectGroupButton,

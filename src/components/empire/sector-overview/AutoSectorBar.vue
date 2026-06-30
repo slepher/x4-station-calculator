@@ -10,22 +10,20 @@ const props = withDefaults(defineProps<{
   prefThreshold: number
   nodeEnabled: boolean
   canDisableNode: boolean
+  editDisabled?: boolean
   unresolvedAllocationCount?: number
   unresolvedTradeStationCount?: number
   unresolvedTitle?: string
   showConfirm?: boolean
   confirmDisabled?: boolean
-  showBack?: boolean
 }>(), {
   view: 'live',
+  editDisabled: false,
   unresolvedAllocationCount: 0,
   unresolvedTradeStationCount: 0,
   unresolvedTitle: '',
   showConfirm: true,
-  confirmDisabled: false,
-  showBack: true,
-  needsRecalc: false,
-  editDisabled: true
+  confirmDisabled: false
 })
 
 const emit = defineEmits<{
@@ -37,114 +35,27 @@ const emit = defineEmits<{
   (e: 'quick-calculate'): void
   (e: 'reset'): void
   (e: 'confirm'): void
-  (e: 'back'): void
   (e: 'map'): void
 }>()
 
 const { t } = useI18n()
-
-const jumpOptions = [1, 2, 3, 4, 5]
-const bridgeJumpOptions = [2, 3, 4, 5]
-const thresholdOptions = [
-  { label: '1M', value: 1_000_000 },
-  { label: '3M', value: 3_000_000 },
-  { label: '5M', value: 5_000_000 },
-  { label: '10M', value: 10_000_000 },
-  { label: '20M', value: 20_000_000 }
-]
-
-const nodeDisabled = computed(() => props.mode === 'edit' && !props.canDisableNode)
-const thresholdDisabled = computed(() => !props.nodeEnabled)
 
 const hasUnresolved = computed(() => (props.unresolvedAllocationCount ?? 0) + (props.unresolvedTradeStationCount ?? 0) > 0)
 </script>
 
 <template>
   <div class="auto-sector-bar" :class="{ 'auto-sector-bar--map': view === 'map' }">
-    <template v-if="view === 'live'">
-      <div class="bar-row bar-row--live">
-        <div class="bar-left">
-          <div class="param-field" :title="t('sector.bridge_search_jump')">
-            <span class="bar-label">{{ t('sector.connected') }}</span>
-            <select class="bar-select bar-select--narrow" :value="bridgeSearchJumpRange" @change="emit('update:bridgeSearchJumpRange', Number(($event.target as HTMLSelectElement).value))">
-              <option v-for="j in bridgeJumpOptions" :key="j" :value="j" :disabled="j < prefJumpRange">{{ j }}{{ t('sector.jump_unit') }}</option>
-            </select>
-          </div>
-          <div class="param-field" :title="t('sector.node_enabled_desc')">
-            <label class="bar-label-inline">
-              <input type="checkbox" class="bar-checkbox" :checked="nodeEnabled" :disabled="nodeDisabled" @change="emit('update:nodeEnabled', ($event.target as HTMLInputElement).checked)" />
-              <span class="bar-label">{{ t('sector.node_enabled') }}</span>
-            </label>
-          </div>
-          <div class="param-field" :title="t('sector.group_coverage_jump')">
-            <span class="bar-label">{{ t('sector.group_coverage_jump_short') }}</span>
-            <select class="bar-select bar-select--narrow" :value="prefJumpRange" :disabled="thresholdDisabled" @change="emit('update:prefJumpRange', Number(($event.target as HTMLSelectElement).value))">
-              <option v-for="j in jumpOptions" :key="j" :value="j">{{ j }}{{ t('sector.jump_unit') }}</option>
-            </select>
-          </div>
-          <div class="param-field" :title="t('sector.default_threshold')">
-            <span class="bar-label">{{ t('sector.trade_station_short') }}</span>
-            <select class="bar-select" :value="prefThreshold" :disabled="thresholdDisabled" @change="emit('update:prefThreshold', Number(($event.target as HTMLSelectElement).value))">
-              <option v-for="opt in thresholdOptions" :key="opt.value" :value="opt.value">{{ opt.label }}{{ t('sector.volume_unit_m3') }}</option>
-            </select>
-          </div>
-        </div>
-        <div class="bar-right">
-          <button v-if="showBack" class="bar-btn back-btn" @click="emit('back')">{{ t('sector.back') }}</button>
-          <span v-if="hasUnresolved" class="bar-unresolved" v-tippy="{ content: unresolvedTitle, allowHTML: true, placement: 'top', theme: 'material' }">
-            {{ t('sector.unresolved') }}<template v-if="unresolvedAllocationCount">&nbsp;◈{{ unresolvedAllocationCount }}</template><template v-if="unresolvedTradeStationCount">&nbsp;◉{{ unresolvedTradeStationCount }}</template>
-          </span>
-          <button class="bar-btn map-btn" @click="emit('map')">{{ t('sector.map') }}</button>
-          <button class="bar-btn reset-btn" @click="emit('reset')">{{ t('sector.reset') }}</button>
-          <button v-if="showConfirm" class="bar-btn confirm-btn" :disabled="confirmDisabled" @click="emit('confirm')">{{ t('sector.confirm') }}</button>
-          <button v-if="mode === 'edit'" class="bar-btn calc-btn" @click="emit('calculate')">{{ t('sector.calculate') }}</button>
-          <button v-else class="bar-btn calc-btn" @click="emit('quick-calculate')">{{ t('sector.calculate') }}</button>
-        </div>
+    <div class="bar-row" :class="view === 'map' ? 'bar-row--map' : 'bar-row--live'">
+      <div class="bar-left"></div>
+      <div class="bar-right">
+        <span v-if="hasUnresolved" class="bar-unresolved" v-tippy="{ content: unresolvedTitle, allowHTML: true, placement: 'top', theme: 'material' }">
+          {{ t('sector.unresolved') }}<template v-if="unresolvedAllocationCount">&nbsp;◈{{ unresolvedAllocationCount }}</template><template v-if="unresolvedTradeStationCount">&nbsp;◉{{ unresolvedTradeStationCount }}</template>
+        </span>
+        <button v-if="view !== 'map'" class="bar-btn map-btn" @click="emit('map')">{{ t('sector.map') }}</button>
+        <button class="bar-btn reset-btn" @click="emit('reset')">{{ t('sector.reset') }}</button>
+        <button v-if="showConfirm" class="bar-btn confirm-btn" :disabled="confirmDisabled" @click="emit('confirm')">{{ t('sector.confirm') }}</button>
       </div>
-    </template>
-    <template v-else>
-      <div class="bar-row bar-row--map">
-        <div class="bar-left">
-          <div class="param-field" :title="t('sector.bridge_search_jump')">
-            <span class="bar-label">{{ t('sector.connected') }}</span>
-            <select class="bar-select bar-select--narrow" :value="bridgeSearchJumpRange" @change="emit('update:bridgeSearchJumpRange', Number(($event.target as HTMLSelectElement).value))">
-              <option v-for="j in bridgeJumpOptions" :key="j" :value="j" :disabled="j < prefJumpRange">{{ j }}</option>
-            </select>
-          </div>
-          <div class="param-field" :title="t('sector.node_enabled_desc')">
-            <label class="bar-label-inline">
-              <input type="checkbox" class="bar-checkbox" :checked="nodeEnabled" :disabled="nodeDisabled" @change="emit('update:nodeEnabled', ($event.target as HTMLInputElement).checked)" />
-              <span class="bar-label">{{ t('sector.node_enabled') }}</span>
-            </label>
-          </div>
-          <div class="param-field" :title="t('sector.group_coverage_jump')">
-            <span class="bar-label">{{ t('sector.group_coverage_jump_short') }}</span>
-            <select class="bar-select bar-select--narrow" :value="prefJumpRange" :disabled="thresholdDisabled" @change="emit('update:prefJumpRange', Number(($event.target as HTMLSelectElement).value))">
-              <option v-for="j in jumpOptions" :key="j" :value="j">{{ j }}</option>
-            </select>
-          </div>
-          <div class="param-field" :title="t('sector.default_threshold')">
-            <span class="bar-label">{{ t('sector.trade_station_short') }}</span>
-            <select class="bar-select" :value="prefThreshold" :disabled="thresholdDisabled" @change="emit('update:prefThreshold', Number(($event.target as HTMLSelectElement).value))">
-              <option v-for="opt in thresholdOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-            </select>
-          </div>
-        </div>
-      </div>
-      <div class="bar-row bar-row--map !justify-end">
-        <div class="bar-right">
-          <span v-if="hasUnresolved" class="bar-unresolved" v-tippy="{ content: unresolvedTitle, allowHTML: true, placement: 'top', theme: 'material' }">
-            {{ t('sector.unresolved') }}<template v-if="unresolvedAllocationCount">&nbsp;◈{{ unresolvedAllocationCount }}</template><template v-if="unresolvedTradeStationCount">&nbsp;◉{{ unresolvedTradeStationCount }}</template>
-          </span>
-          <button class="bar-btn reset-btn" @click="emit('reset')">{{ t('sector.reset') }}</button>
-          <button v-if="showConfirm" class="bar-btn confirm-btn" :disabled="confirmDisabled" @click="emit('confirm')">{{ t('sector.confirm') }}</button>
-          <button v-if="mode === 'edit'" class="bar-btn calc-btn" @click="emit('calculate')">{{ t('sector.calculate') }}</button>
-          <button v-else class="bar-btn calc-btn" @click="emit('quick-calculate')">
-            {{ t('sector.calculate') }}
-          </button>
-        </div>
-      </div>
-    </template>
+    </div>
   </div>
 </template>
 
@@ -211,10 +122,6 @@ const hasUnresolved = computed(() => (props.unresolvedAllocationCount ?? 0) + (p
 
 .calc-btn--needs-recalc {
   @apply border-red-500/50;
-}
-
-.back-btn {
-  @apply bg-slate-600/20 text-slate-300 border border-slate-500/30 hover:bg-slate-600/30;
 }
 
 .map-btn {

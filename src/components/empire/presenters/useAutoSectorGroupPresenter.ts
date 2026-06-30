@@ -241,8 +241,9 @@ function runAutoGroup(options: { force?: boolean } = {}) {
   }
 }
 
-function buildRecalculateBaseGroups(): { baseGroups: BindingSectorGroup[]; excludedSectorMacros: string[] } | null {
+function buildRecalculateBaseGroups(ignoreCurrentNodes = false): { baseGroups: BindingSectorGroup[]; excludedSectorMacros: string[] } | null {
   if (!autoGroupResult.value) return null
+  if (ignoreCurrentNodes) return { baseGroups: [], excludedSectorMacros: [] }
   const pinnedGroups = autoGroupResult.value.groups.filter((group) => group.isPinned && group.sectorMacro)
   const baseGroups = pinnedGroups
     .map((group, index) => ({
@@ -263,11 +264,11 @@ function buildRecalculateBaseGroups(): { baseGroups: BindingSectorGroup[]; exclu
   return { baseGroups, excludedSectorMacros: [] }
 }
 
-function runCalculationFromEditInput() {
+function runCalculationFromEditInput(ignoreCurrentNodes = false): boolean {
   const archive = saveStore.selectedArchive
   const guid = activeViewStore.activeBinding
-  const recalculateInput = buildRecalculateBaseGroups()
-  if (!archive || !archive.isValid || !guid) return
+  const recalculateInput = buildRecalculateBaseGroups(ignoreCurrentNodes)
+  if (!archive || !archive.isValid || !guid) return false
 
   // Capture user-edited state from current edit draft (by anchor sector)
   const currentDraft = autoGroupResult.value
@@ -336,6 +337,7 @@ function runCalculationFromEditInput() {
   stabilizeHubColors(normalizedResult.groups, buildHubColorContext())
   setAutoGroupResult(normalizedResult)
   calculationMode.value = 'result'
+  return true
 }
 
 function runResetCalculationFromBinding() {
@@ -477,7 +479,6 @@ function handleCycleRecalcState(groupId: string) {
 }
 
 function handleUpdateJumpRange(groupId: string, range: number) {
-  if (calculationMode.value !== 'edit') return
   if (!autoGroupResult.value) return
   const result = autoGroupResult.value
   const idx = result.groups.findIndex((g) => g.id === groupId)

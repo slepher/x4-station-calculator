@@ -65,7 +65,7 @@ const {
   handleToggleRetainCoverage, handleToggleRetainConnection,
   handleToggleTradeStationRetain, handleMasterBridgeRetain,
   handleMasterCoverageRetain, handleMasterTradeStationRetain,
-  handleSelectTradeStation, handleConfirm, handleQuickCalculate,
+  handleSelectTradeStation, handleConfirm,
   hasUncertainAssignments, hasPendingBridgeDecision,
    hasUnresolvedTradeStations, showConfirmPopup, hasChanges,
   hasAutoResult, stationCounts, canDisableNode,
@@ -124,13 +124,45 @@ watch(() => props.gameGuid, async (guid) => {
 }, { immediate: true })
 
 const activeTab = ref<'hub' | 'allocation' | 'tradeStation' | 'virtualStation'>('hub')
+const panelMode = ref<'preview' | 'edit' | 'generate'>('preview')
+const ignoreCurrentNodes = ref(false)
 const blueprintEmpireMenuOpen = ref(false)
 const blueprintEmpireMenuRef = ref<HTMLElement | null>(null)
 const blueprintEmpireMenuTriggerEl = ref<HTMLElement | null>(null)
 const blueprintEmpireMenuStyle = ref<Record<string, string>>({})
 
-function onCalculate() { runCalculationFromEditInput(); switchToFirstUnresolvedTab() }
-function onQuickCalc() { handleQuickCalculate(); switchToFirstUnresolvedTab() }
+const jumpOptions = [1, 2, 3, 4, 5]
+const bridgeJumpOptions = [2, 3, 4, 5]
+const thresholdOptions = [
+  { label: '1M', value: 1_000_000 },
+  { label: '3M', value: 3_000_000 },
+  { label: '5M', value: 5_000_000 },
+  { label: '10M', value: 10_000_000 },
+  { label: '20M', value: 20_000_000 }
+]
+
+const thresholdDisabled = computed(() => !nodeEnabled.value)
+const nodeDisabled = computed(() => !canDisableNode.value)
+
+function setPanelMode(mode: 'preview' | 'edit' | 'generate') {
+  if (mode === 'edit' && (!autoGroupResult.value || hasPendingBridgeDecision.value)) return
+  if (mode !== 'generate') ignoreCurrentNodes.value = false
+  panelMode.value = mode
+  if (mode === 'edit') {
+    handleEnterEdit()
+  } else if (calculationMode.value === 'edit') {
+    handleExitEdit()
+  }
+}
+
+function onGenerate() {
+  const ok = runCalculationFromEditInput(ignoreCurrentNodes.value)
+  if (!ok) return
+  ignoreCurrentNodes.value = false
+  panelMode.value = 'preview'
+  switchToFirstUnresolvedTab()
+}
+
 function onReset() { handleResetAssignments(); switchToFirstUnresolvedTab() }
 function onConfirm() {
   handleConfirm()
@@ -266,7 +298,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
     <div v-if="!hasAutoResult" class="map-panel-empty">{{ t('sector.no_groups') }}</div>
     <template v-else>
       <template v-if="layout === 'columns'">
-        <div class="px-4 pt-3 mb-2">
+        <div class="px-4 pt-3">
         <AutoSectorBar
           :mode="calculationMode === 'edit' ? 'edit' : 'result'"
           view="live"
@@ -275,21 +307,14 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
           :pref-threshold="prefThreshold"
           :node-enabled="nodeEnabled"
           :can-disable-node="canDisableNode"
+          :edit-disabled="!autoGroupResult || hasPendingBridgeDecision"
           :unresolved-allocation-count="unresolvedTooltip.allocCount"
             :unresolved-trade-station-count="unresolvedTooltip.tsCount"
             :unresolved-title="unresolvedTooltip.html"
             :show-confirm="true"
             :confirm-disabled="hasUnresolvedTradeStations || !hasChanges"
-            :show-back="false"
-            @update:pref-jump-range="handleUpdatePrefJumpRange"
-            @update:bridge-search-jump-range="handleUpdateBridgeSearchJumpRange"
-            @update:pref-threshold="prefThreshold = $event"
-            @update:node-enabled="nodeEnabled = $event"
-          @calculate="onCalculate"
-          @quick-calculate="onQuickCalc"
           @reset="onReset"
           @confirm="onConfirm"
-          @back="emit('back')"
           @map="emit('map')"
         />
         </div>
@@ -298,23 +323,69 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
             <div class="column column-hub">
               <SectorGroupStatBar
                 :mode="calculationMode === 'edit' ? 'edit' : 'result'"
+                :panel-mode="panelMode"
                 view="live"
-                :bridge-retain-enabled="bridgeRetainEnabled"
-                :coverage-retain-enabled="coverageRetainEnabled"
-                :trade-station-retain-enabled="tradeStationRetainEnabled"
-                :bridge-retain-indeterminate="bridgeRetainIndeterminate"
-                :coverage-retain-indeterminate="coverageRetainIndeterminate"
-                :trade-station-retain-indeterminate="tradeStationRetainIndeterminate"
                 :show-add-hub="showHubAddMenu"
                 :edit-disabled="!autoGroupResult || hasPendingBridgeDecision"
                 :add-disabled="hasPendingBridgeDecision"
-                @update:bridge-retain-enabled="handleMasterBridgeRetain"
-                @update:coverage-retain-enabled="handleMasterCoverageRetain"
-                @update:trade-station-retain-enabled="handleMasterTradeStationRetain"
-                @edit="handleEnterEdit"
-                @exit="handleExitEdit"
+                @update:panel-mode="setPanelMode"
                 @add-hub="handleAddHubClick"
               />
+              <div v-if="panelMode === 'generate'" class="generate-card">
+                <div class="generate-row">
+                  <div class="param-field" :title="t('sector.bridge_search_jump')">
+                    <span class="bar-label">{{ t('sector.connected') }}</span>
+                    <select class="bar-select bar-select--narrow" :value="bridgeSearchJumpRange" @change="handleUpdateBridgeSearchJumpRange(Number(($event.target as HTMLSelectElement).value))">
+                      <option v-for="j in bridgeJumpOptions" :key="j" :value="j" :disabled="j < prefJumpRange">{{ j }}{{ t('sector.jump_unit') }}</option>
+                    </select>
+                  </div>
+                  <div class="param-field" :title="t('sector.node_enabled_desc')">
+                    <label class="bar-label-inline">
+                      <input type="checkbox" class="bar-checkbox" :checked="nodeEnabled" :disabled="nodeDisabled" @change="nodeEnabled = ($event.target as HTMLInputElement).checked" />
+                      <span class="bar-label">{{ t('sector.node_enabled') }}</span>
+                    </label>
+                  </div>
+                  <div class="param-field" :title="t('sector.group_coverage_jump')">
+                    <span class="bar-label">{{ t('sector.group_coverage_jump_short') }}</span>
+                    <select class="bar-select bar-select--narrow" :value="prefJumpRange" :disabled="thresholdDisabled" @change="handleUpdatePrefJumpRange(Number(($event.target as HTMLSelectElement).value))">
+                      <option v-for="j in jumpOptions" :key="j" :value="j">{{ j }}{{ t('sector.jump_unit') }}</option>
+                    </select>
+                  </div>
+                  <div class="param-field" :title="t('sector.default_threshold')">
+                    <span class="bar-label">{{ t('sector.trade_station_short') }}</span>
+                    <select class="bar-select" :value="prefThreshold" :disabled="thresholdDisabled" @change="prefThreshold = Number(($event.target as HTMLSelectElement).value)">
+                      <option v-for="opt in thresholdOptions" :key="opt.value" :value="opt.value">{{ opt.label }}{{ t('sector.volume_unit_m3') }}</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="generate-row generate-row--actions">
+                  <div class="generate-retain-group">
+                    <label class="retain-chk" :title="t('sector.bridge_retain')">
+                      <input type="checkbox" class="bar-checkbox" :checked="bridgeRetainEnabled" :indeterminate.prop="bridgeRetainIndeterminate" :disabled="ignoreCurrentNodes" @change="handleMasterBridgeRetain(($event.target as HTMLInputElement).checked)" />
+                      <span class="retain-label">{{ t('sector.connected') }}</span>
+                    </label>
+                    <label class="retain-chk" :title="t('sector.coverage_retain')">
+                      <input type="checkbox" class="bar-checkbox" :checked="coverageRetainEnabled" :indeterminate.prop="coverageRetainIndeterminate" :disabled="ignoreCurrentNodes" @change="handleMasterCoverageRetain(($event.target as HTMLInputElement).checked)" />
+                      <span class="retain-label">{{ t('sector.group_coverage_jump_short') }}</span>
+                    </label>
+                    <label class="retain-chk" :title="t('sector.trade_station_retain')">
+                      <input type="checkbox" class="bar-checkbox" :checked="tradeStationRetainEnabled" :indeterminate.prop="tradeStationRetainIndeterminate" :disabled="ignoreCurrentNodes" @change="handleMasterTradeStationRetain(($event.target as HTMLInputElement).checked)" />
+                      <span class="retain-label">{{ t('sector.trade_station_short') }}</span>
+                    </label>
+                  </div>
+                  <div class="generate-actions">
+                    <button type="button" class="icon-btn" :class="{ active: ignoreCurrentNodes }" v-tippy="{ content: t('sector.ignore_current_nodes_tip'), placement: 'top', theme: 'material' }" @click="ignoreCurrentNodes = !ignoreCurrentNodes" :aria-label="t('sector.ignore_current_nodes')">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <circle cx="7" cy="7" r="3" />
+                        <circle cx="17" cy="17" r="3" />
+                        <path d="M9.3 9.3 14.7 14.7" />
+                        <path d="M4 20 20 4" />
+                      </svg>
+                    </button>
+                    <button type="button" class="bar-btn generate-btn" @click="onGenerate">{{ t('sector.generate_plan') }}</button>
+                  </div>
+                </div>
+              </div>
               <HubAddMenu mode="overlay" :open="showHubAddMenu" :player-sector-macros="autoGroupResult?.playerSectorMacros ?? []" :occupied-sector-macros="[...getExistingAnchorSectors()]"
                 @close="showHubAddMenu = false" @add-hub="(m: string) => { handleAddHubDraft(m); showHubAddMenu = false }" @focus-sector="emit('focus-sector', $event)"
               />
@@ -322,7 +393,12 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
                 :maps="gameDataMaps" :sector-graph="sectorGraphInfo.sectorGraph" :sector-cluster-map="sectorGraphInfo.sectorClusterMap"
                 :sector-reachability="sectorReachability"
                 :player-sector-macros="autoGroupResult?.playerSectorMacros ?? []"
-                :editable="calculationMode === 'edit'" :retain-editable="calculationMode === 'result' || calculationMode === 'edit'"               :diff-enabled="true"
+                :editable="panelMode === 'edit'"
+                :retain-editable="panelMode === 'generate'"
+                :jump-range-editable="panelMode === 'edit' || panelMode === 'generate'"
+                :force-unpinned="panelMode === 'generate' && ignoreCurrentNodes"
+                :pin-disabled="panelMode === 'generate' && ignoreCurrentNodes"
+                :diff-enabled="true"
                 :baseline-coverage-by-group-id="calcBaselinePillState?.coverageByGroupId"
                 :baseline-connected-group-ids-by-group-id="calcBaselinePillState?.connectedGroupIdsByGroupId"
                 :draggable="canDragGroups" :structure-disabled="hasPendingBridgeDecision" view="live" :trade-station-caps="tradeStationCaps"
@@ -358,20 +434,14 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
             :pref-threshold="prefThreshold"
             :node-enabled="nodeEnabled"
             :can-disable-node="canDisableNode"
+            :edit-disabled="!autoGroupResult || hasPendingBridgeDecision"
             :unresolved-allocation-count="unresolvedTooltip.allocCount"
             :unresolved-trade-station-count="unresolvedTooltip.tsCount"
             :unresolved-title="unresolvedTooltip.html"
             :show-confirm="true"
             :confirm-disabled="hasUnresolvedTradeStations || !hasChanges"
-            @update:pref-jump-range="handleUpdatePrefJumpRange"
-            @update:bridge-search-jump-range="handleUpdateBridgeSearchJumpRange"
-            @update:pref-threshold="prefThreshold = $event"
-            @update:node-enabled="nodeEnabled = $event"
-            @calculate="onCalculate"
-            @quick-calculate="onQuickCalc"
             @reset="onReset"
             @confirm="onConfirm"
-            @back="emit('back')"
             @map="emit('map')"
           />
         </div>
@@ -388,23 +458,69 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
           <div v-show="activeTab === 'hub'">
             <SectorGroupStatBar
               :mode="calculationMode === 'edit' ? 'edit' : 'result'"
+              :panel-mode="panelMode"
               view="map"
-              :bridge-retain-enabled="bridgeRetainEnabled"
-              :coverage-retain-enabled="coverageRetainEnabled"
-              :trade-station-retain-enabled="tradeStationRetainEnabled"
-              :bridge-retain-indeterminate="bridgeRetainIndeterminate"
-              :coverage-retain-indeterminate="coverageRetainIndeterminate"
-              :trade-station-retain-indeterminate="tradeStationRetainIndeterminate"
               :show-add-hub="showHubAddMenu"
               :edit-disabled="!autoGroupResult || hasPendingBridgeDecision"
               :add-disabled="hasPendingBridgeDecision"
-              @update:bridge-retain-enabled="handleMasterBridgeRetain"
-              @update:coverage-retain-enabled="handleMasterCoverageRetain"
-              @update:trade-station-retain-enabled="handleMasterTradeStationRetain"
-              @edit="handleEnterEdit"
-              @exit="handleExitEdit"
+              @update:panel-mode="setPanelMode"
               @add-hub="handleAddHubClick"
             />
+            <div v-if="panelMode === 'generate'" class="generate-card generate-card--map">
+              <div class="generate-row">
+                <div class="param-field" :title="t('sector.bridge_search_jump')">
+                  <span class="bar-label">{{ t('sector.connected') }}</span>
+                  <select class="bar-select bar-select--narrow" :value="bridgeSearchJumpRange" @change="handleUpdateBridgeSearchJumpRange(Number(($event.target as HTMLSelectElement).value))">
+                    <option v-for="j in bridgeJumpOptions" :key="j" :value="j" :disabled="j < prefJumpRange">{{ j }}</option>
+                  </select>
+                </div>
+                <div class="param-field" :title="t('sector.node_enabled_desc')">
+                  <label class="bar-label-inline">
+                    <input type="checkbox" class="bar-checkbox" :checked="nodeEnabled" :disabled="nodeDisabled" @change="nodeEnabled = ($event.target as HTMLInputElement).checked" />
+                    <span class="bar-label">{{ t('sector.node_enabled') }}</span>
+                  </label>
+                </div>
+                <div class="param-field" :title="t('sector.group_coverage_jump')">
+                  <span class="bar-label">{{ t('sector.group_coverage_jump_short') }}</span>
+                  <select class="bar-select bar-select--narrow" :value="prefJumpRange" :disabled="thresholdDisabled" @change="handleUpdatePrefJumpRange(Number(($event.target as HTMLSelectElement).value))">
+                    <option v-for="j in jumpOptions" :key="j" :value="j">{{ j }}</option>
+                  </select>
+                </div>
+                <div class="param-field" :title="t('sector.default_threshold')">
+                  <span class="bar-label">{{ t('sector.trade_station_short') }}</span>
+                  <select class="bar-select" :value="prefThreshold" :disabled="thresholdDisabled" @change="prefThreshold = Number(($event.target as HTMLSelectElement).value)">
+                    <option v-for="opt in thresholdOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+                  </select>
+                </div>
+              </div>
+              <div class="generate-row generate-row--actions">
+                <div class="generate-retain-group">
+                  <label class="retain-chk" :title="t('sector.bridge_retain')">
+                    <input type="checkbox" class="bar-checkbox" :checked="bridgeRetainEnabled" :indeterminate.prop="bridgeRetainIndeterminate" :disabled="ignoreCurrentNodes" @change="handleMasterBridgeRetain(($event.target as HTMLInputElement).checked)" />
+                    <span class="retain-label">{{ t('sector.connected') }}</span>
+                  </label>
+                  <label class="retain-chk" :title="t('sector.coverage_retain')">
+                    <input type="checkbox" class="bar-checkbox" :checked="coverageRetainEnabled" :indeterminate.prop="coverageRetainIndeterminate" :disabled="ignoreCurrentNodes" @change="handleMasterCoverageRetain(($event.target as HTMLInputElement).checked)" />
+                    <span class="retain-label">{{ t('sector.group_coverage_jump_short') }}</span>
+                  </label>
+                  <label class="retain-chk" :title="t('sector.trade_station_retain')">
+                    <input type="checkbox" class="bar-checkbox" :checked="tradeStationRetainEnabled" :indeterminate.prop="tradeStationRetainIndeterminate" :disabled="ignoreCurrentNodes" @change="handleMasterTradeStationRetain(($event.target as HTMLInputElement).checked)" />
+                    <span class="retain-label">{{ t('sector.trade_station_short') }}</span>
+                  </label>
+                </div>
+                <div class="generate-actions">
+                  <button type="button" class="icon-btn" :class="{ active: ignoreCurrentNodes }" v-tippy="{ content: t('sector.ignore_current_nodes_tip'), placement: 'top', theme: 'material' }" @click="ignoreCurrentNodes = !ignoreCurrentNodes" :aria-label="t('sector.ignore_current_nodes')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                      <circle cx="7" cy="7" r="3" />
+                      <circle cx="17" cy="17" r="3" />
+                      <path d="M9.3 9.3 14.7 14.7" />
+                      <path d="M4 20 20 4" />
+                    </svg>
+                  </button>
+                  <button type="button" class="bar-btn generate-btn" @click="onGenerate">{{ t('sector.generate_plan') }}</button>
+                </div>
+              </div>
+            </div>
             <HubAddMenu :open="showHubAddMenu" :player-sector-macros="autoGroupResult?.playerSectorMacros ?? []" :occupied-sector-macros="[...getExistingAnchorSectors()]"
               @close="showHubAddMenu = false" @add-hub="(m: string) => { handleAddHubDraft(m); showHubAddMenu = false }" @focus-sector="emit('focus-sector', $event)"
             />
@@ -412,7 +528,12 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
               :maps="gameDataMaps" :sector-graph="sectorGraphInfo.sectorGraph" :sector-cluster-map="sectorGraphInfo.sectorClusterMap"
               :sector-reachability="sectorReachability"
               :player-sector-macros="autoGroupResult?.playerSectorMacros ?? []"
-              :editable="calculationMode === 'edit'" :retain-editable="calculationMode === 'result' || calculationMode === 'edit'"               :diff-enabled="true"
+              :editable="panelMode === 'edit'"
+              :retain-editable="panelMode === 'generate'"
+              :jump-range-editable="panelMode === 'edit' || panelMode === 'generate'"
+              :force-unpinned="panelMode === 'generate' && ignoreCurrentNodes"
+              :pin-disabled="panelMode === 'generate' && ignoreCurrentNodes"
+              :diff-enabled="true"
               :baseline-coverage-by-group-id="calcBaselinePillState?.coverageByGroupId"
               :baseline-connected-group-ids-by-group-id="calcBaselinePillState?.connectedGroupIdsByGroupId"
               view="map" :draggable="canDragGroups" :structure-disabled="hasPendingBridgeDecision" :trade-station-caps="tradeStationCaps"
@@ -607,6 +728,83 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
 .auto-sector-group-map-panel--tabs { @apply flex h-full min-h-0 flex-col overflow-hidden; }
 .map-panel-empty { @apply text-sm text-slate-500 text-center py-6; }
 .map-tab-header { @apply shrink-0 px-3; }
+.generate-card {
+  @apply flex flex-col gap-2 rounded border border-slate-700/50 bg-slate-800/50 p-1.5 mb-2;
+}
+.generate-card--map {
+  @apply gap-1 p-1;
+}
+.generate-row {
+  @apply flex flex-wrap items-center gap-1.5;
+}
+.generate-row--actions {
+  @apply justify-between;
+}
+.generate-retain-group {
+  @apply flex flex-wrap items-center gap-1.5;
+}
+.generate-actions {
+  @apply flex items-center gap-1.5;
+}
+.param-field {
+  @apply inline-flex items-center gap-1 rounded border border-slate-700/60 bg-slate-900/30 px-1.5 py-1;
+}
+.bar-label {
+  @apply text-xs text-slate-400;
+}
+.bar-label-inline,
+.retain-chk {
+  @apply inline-flex items-center gap-0.5 cursor-pointer;
+}
+.bar-checkbox {
+  @apply h-3.5 w-3.5 accent-sky-500 disabled:cursor-not-allowed disabled:opacity-40;
+}
+.bar-select {
+  @apply h-6 rounded border border-slate-600 bg-slate-900 px-1.5 text-xs text-slate-200 focus:border-sky-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-40;
+}
+.bar-select--narrow {
+  @apply w-12;
+}
+.retain-label {
+  @apply text-xs text-slate-400;
+}
+.bar-btn {
+  @apply rounded px-2.5 py-1 text-xs font-medium transition-colors;
+}
+.generate-btn {
+  @apply border border-amber-500/30 bg-amber-500/20 text-amber-300 hover:bg-amber-500/30;
+}
+.icon-btn {
+  @apply inline-flex h-7 w-7 items-center justify-center rounded border border-slate-600/50 bg-slate-900/40 text-slate-400 transition-colors hover:border-sky-500/40 hover:text-sky-300;
+}
+.icon-btn.active {
+  @apply border-amber-500/40 bg-amber-500/20 text-amber-300;
+}
+.icon-btn svg {
+  @apply h-4 w-4;
+}
+.generate-card--map .param-field {
+  @apply px-1 py-0.5 gap-0.5;
+}
+.generate-card--map .bar-label,
+.generate-card--map .retain-label {
+  @apply text-[10px];
+}
+.generate-card--map .bar-select {
+  @apply h-5 px-1 text-[11px];
+}
+.generate-card--map .bar-select--narrow {
+  @apply w-10;
+}
+.generate-card--map .bar-btn {
+  @apply h-6 px-1.5 py-0 text-[11px];
+}
+.generate-card--map .icon-btn {
+  @apply h-6 w-6;
+}
+.generate-card--map .icon-btn svg {
+  @apply h-3.5 w-3.5;
+}
 .tab-bar { @apply mx-3 flex shrink-0 border-b border-slate-700/50 mb-3; }
 .tab-btn { @apply px-3 py-1.5 text-xs font-medium text-slate-400 border-b-2 border-transparent transition-colors; }
 .tab-btn:hover:not(:disabled) { @apply text-slate-200; }

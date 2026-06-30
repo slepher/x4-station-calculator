@@ -676,7 +676,7 @@ export function applyBridgePlanToDraft(
       connectedGroupIds: [],
       excludedDefaultAssignmentSectorMacros: [],
       isNew: true,
-      isPinned: true,
+      isPinned: false,
       coverageRetainEnabled: true,
       connectionRetainEnabled: true,
       hubScore: selectedUnitScore(unit),
@@ -1108,7 +1108,7 @@ export function groupIncremental(
     isPinned: true,
       coverageRetainEnabled: true,
       connectionRetainEnabled: true,
-      tradeStationRetainEnabled: group.tradeStationRetainEnabled ?? true,
+      tradeStationRetainEnabled: true,
     hubScore: undefined,
     color: group.color
   }))

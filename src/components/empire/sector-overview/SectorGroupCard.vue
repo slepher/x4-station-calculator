@@ -20,6 +20,9 @@ const props = withDefaults(defineProps<{
   playerSectorMacros: string[]
   editable: boolean
   retainEditable?: boolean
+  jumpRangeEditable?: boolean
+  forceUnpinned?: boolean
+  pinDisabled?: boolean
   diffEnabled: boolean
   view?: 'map' | 'live'
   showSelectGroupButton?: boolean
@@ -32,6 +35,9 @@ const props = withDefaults(defineProps<{
 }>(), {
   view: 'live',
   retainEditable: false,
+  jumpRangeEditable: false,
+  forceUnpinned: false,
+  pinDisabled: false,
   showSelectGroupButton: false,
   showDragHandle: false,
   showRecalcStateButton: true,
@@ -103,14 +109,16 @@ function getSectorName(macro: string): string {
   return macro
 }
 
-function getPinnedTitle(group: GroupDraftInfo): string {
-  return group.isPinned ? t('sector.recalc_state_pin') : t('sector.recalc_state_normal')
+function getPinnedTitle(): string {
+  return effectivePinned.value ? t('sector.recalc_state_pin') : t('sector.recalc_state_normal')
 }
 
-function canEditJumpRange(group: GroupDraftInfo): boolean {
-  if (!props.editable) return false
-  return group.isPinned
+function canEditJumpRange(): boolean {
+  if (!props.jumpRangeEditable) return false
+  return effectivePinned.value
 }
+
+const effectivePinned = computed(() => props.forceUnpinned ? false : props.group.isPinned)
 
 function getBaselineKey(group: GroupDraftInfo): string {
   return group.sectorMacro || group.id
@@ -327,6 +335,29 @@ function onAnchorPillClick(macro: string) {
     emit('focus-sector', macro)
   }
 }
+
+function isCoverageDimmed(): boolean {
+  return props.retainEditable && (!effectivePinned.value || !props.group.coverageRetainEnabled)
+}
+
+function isTradeStationDimmed(): boolean {
+  return props.retainEditable && (!effectivePinned.value || !props.group.tradeStationRetainEnabled)
+}
+
+function isConnectionDimmed(entry: UnifiedPillEntry): boolean {
+  if (!props.retainEditable || entry.type !== 'connected') return false
+  const other = entry.connectedGroupId ? props.groups.find((group) => group.id === entry.connectedGroupId) : undefined
+  const otherPinned = props.forceUnpinned ? false : (other?.isPinned ?? true)
+  const currentRetain = props.group.connectionRetainEnabled
+  const otherRetain = other?.connectionRetainEnabled ?? false
+  return (!currentRetain && !otherRetain) || (!currentRetain && !otherPinned) || (!otherRetain && !effectivePinned.value)
+}
+
+function isPillDimmed(entry: UnifiedPillEntry): boolean {
+  if (entry.type === 'connected') return isConnectionDimmed(entry)
+  if (entry.type === 'coverage' || entry.type === 'candidate') return isCoverageDimmed()
+  return false
+}
 </script>
 
 <template>
@@ -335,8 +366,8 @@ function onAnchorPillClick(macro: string) {
     @keydown="onEsc"
     :class="{
       'group-item--new': isNewComparedToBaseline(group),
-      'group-item--pinned': group.isPinned,
-      'group-item--unpinned': !group.isPinned && group.baseline,
+      'group-item--pinned': effectivePinned,
+      'group-item--unpinned': !effectivePinned && group.baseline,
       'group-item--baseline': group.baseline && !editable,
       'group-item--map': view === 'map'
     }"
@@ -362,27 +393,27 @@ function onAnchorPillClick(macro: string) {
       </div>
       <div class="group-actions">
         <label v-if="props.retainEditable" class="retain-chk" :title="t('sector.bridge_retain')">
-          <input type="checkbox" class="bar-checkbox" :checked="group.connectionRetainEnabled" :disabled="!group.isPinned" @change="emit('toggle-retain-connection', group.id)" />
+          <input type="checkbox" class="bar-checkbox" :checked="group.connectionRetainEnabled" :disabled="!effectivePinned" @change="emit('toggle-retain-connection', group.id)" />
           <span class="retain-label">{{ t('sector.connected') }}</span>
         </label>
         <label v-if="props.retainEditable" class="retain-chk" :title="t('sector.coverage_retain')">
-          <input type="checkbox" class="bar-checkbox" :checked="group.coverageRetainEnabled" :disabled="!group.isPinned" @change="emit('toggle-retain-coverage', group.id)" />
+          <input type="checkbox" class="bar-checkbox" :checked="group.coverageRetainEnabled" :disabled="!effectivePinned" @change="emit('toggle-retain-coverage', group.id)" />
           <span class="retain-label">{{ t('sector.group_coverage_jump_short') }}</span>
         </label>
         <label v-if="props.retainEditable" class="retain-chk" :title="t('sector.trade_station_retain')">
-          <input type="checkbox" class="bar-checkbox" :checked="!!group.tradeStationRetainEnabled" :disabled="!group.isPinned" @change="emitToggleTradeStationRetain(group.id)" />
+          <input type="checkbox" class="bar-checkbox" :checked="!!group.tradeStationRetainEnabled" :disabled="!effectivePinned" @change="emitToggleTradeStationRetain(group.id)" />
           <span class="retain-label">{{ t('sector.trade_station_short') }}</span>
         </label>
         <button
           v-if="props.showRecalcStateButton && !group.enteredOtherGroupCoverage"
           class="action-btn state-btn"
-          :class="group.isPinned ? 'state-btn--pinned' : 'state-btn--unpinned'"
-          :disabled="props.structureDisabled"
-          :title="getPinnedTitle(group)"
-          @click="!props.structureDisabled && emit('cycle-recalc-state', group.id)"
+          :class="effectivePinned ? 'state-btn--pinned' : 'state-btn--unpinned'"
+          :disabled="props.structureDisabled || props.pinDisabled"
+          :title="getPinnedTitle()"
+          @click="!props.structureDisabled && !props.pinDisabled && emit('cycle-recalc-state', group.id)"
         >
-          <svg class="state-icon" :class="group.isPinned ? 'state-icon--pinned' : 'state-icon--unpinned'" viewBox="0 0 24 24" fill="none">
-            <template v-if="group.isPinned">
+          <svg class="state-icon" :class="effectivePinned ? 'state-icon--pinned' : 'state-icon--unpinned'" viewBox="0 0 24 24" fill="none">
+            <template v-if="effectivePinned">
               <path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z" fill="currentColor"/>
             </template>
             <template v-else>
@@ -429,10 +460,10 @@ function onAnchorPillClick(macro: string) {
               {{ getSectorName(group.sectorMacro || '') }}
             </span>
           </span>
-          <span
-            v-if="group.selectedTradeStation"
-            class="pill pill--trade-station"
-            :class="{ 'cursor-pointer hover:text-sky-300': view === 'map' }"
+            <span
+              v-if="group.selectedTradeStation"
+              class="pill pill--trade-station"
+              :class="{ 'cursor-pointer hover:text-sky-300': view === 'map', 'pill--dimmed': isTradeStationDimmed() }"
           >
             <span class="pill-dot pill-dot--small" :class="group.selectedTradeStation.type === 'virtual' ? 'pill-dot--empty' : 'pill-dot--filled'"/>
             <span class="pill-label" @click.stop="view === 'map' && group.sectorMacro && emit('focus-sector', group.sectorMacro)">
@@ -441,7 +472,7 @@ function onAnchorPillClick(macro: string) {
             </span>
           </span>
           <div class="jump-control">
-            <template v-if="!canEditJumpRange(group)">
+            <template v-if="!canEditJumpRange()">
               <span class="jump-readonly">{{ group.jumpRange }}</span>
             </template>
             <JumpInput
@@ -471,6 +502,7 @@ function onAnchorPillClick(macro: string) {
                 'pill--baseline': props.diffEnabled && entry.baseline,
                 'pill--new': props.diffEnabled && (entry.wasInBaseline || (!entry.baseline && !entry.removed && entry.type !== 'candidate' && entry.action !== 'add')),
                 'pill--removed': props.diffEnabled && entry.removed,
+                'pill--dimmed': isPillDimmed(entry),
                 'cursor-pointer': view === 'map'
               }"
             >
@@ -654,6 +686,10 @@ function onAnchorPillClick(macro: string) {
 
 .pill--removed {
   @apply border-dashed opacity-60;
+}
+
+.pill--dimmed {
+  @apply opacity-35;
 }
 
 .pill--connected {
