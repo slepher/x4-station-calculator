@@ -16,9 +16,9 @@
 
 ## 3 计算、重置与提交
 
-- [ ] 3.1 显式计算：覆盖 [计算] 按钮（edit 模式全重算 / result 模式快速重算共用）更新 shared draft 与 `calculationBaseline`
+- [ ] 3.1 显式计算：覆盖 [计算] 按钮（edit 模式全重算 / result 模式快速重算共用）更新 shared draft，但不捕获计算完成 baseline
 - [ ] 3.2 编辑退出：覆盖 [编辑] 后直接修改 shared draft，[退出] 只切回 result 不恢复 snapshot
-- [ ] 3.3 重置：覆盖 [重置] 从 `calculationBaseline` 恢复 group、assignment、trade station、hub color、retain 和 virtual station drafts
+- [ ] 3.3 重置：覆盖 [重置] 从 saved binding groups + 当前参数重算 group、assignment、bridge、trade station、hub color、retain 和 virtual station drafts
 - [ ] 3.4 确认 gate：覆盖 edit/no-result/trade-station/uncertain assignment gate 的阻断关系
 - [ ] 3.5 确认成功：覆盖写入 binding、记录 `appliedAutoGroupArchiveTime`、同步 live flow、更新 baseline
 

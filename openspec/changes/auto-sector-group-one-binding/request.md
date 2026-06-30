@@ -11,7 +11,7 @@ Trade station 在 Live 计算模式中作为第三列展示和 confirm gate 的�
 - `useLiveProductionStore` 持有当前 active binding/archive 的唯一共享 draft。
 - 系统 SHALL NOT 为多个 binding 同时维护并行 draft cache。
 - `autoGroupResult`、`calculationMode`、`prefJumpRange`、`bridgeSearchJumpRange`、`prefThreshold`、`calcBaselinePillState` 归属于 live store。
-- `calculationBaseline` 归属于 live store，作为跨 Live/Map/presenter 生命周期共享的重置快照。
+- 系统不再维护“计算完成 baseline”作为 [重置] 数据源；[重置] SHALL 使用当前 active binding 的已保存 groups 与当前参数重新计算。
 - `SaveBindingPlan.groups` 的持久化身份 SHALL 使用定位星区 `sectorMacro`；group 不再保存独立 `id` 字段。
 - save binding state 版本 SHALL 升至 2；从旧版本加载时，旧 group `id` 引用 SHALL 迁移为对应 group 的 `sectorMacro`。
 - `connectedGroupIds` 与 `stationPlans.groupId` 在迁移后 SHALL 存储 hub `sectorMacro`，不再存储随机 group id。
@@ -36,14 +36,15 @@ Trade station 在 Live 计算模式中作为第三列展示和 confirm gate 的�
 - 详情按钮只切换到计算模式，不运行算法。
 - 确认成功后确认按钮置灰，不跳转到展示模式。
 
-### Snapshot 与基线口径
+### Reset 与 saved binding 基线口径
 
-- `calculationBaseline` 是“重置快照”，用于 [重置] 恢复到最近一次初始化或显式 [计算] 形成的计算结果。
-- `calculationBaseline` SHALL 在 live store `setAutoGroupResult(result)` 时更新；显式 [计算] 会通过该路径刷新 baseline。
-- `calculationBaseline` SHALL 覆盖 autoGroupResult 与 virtual station drafts，确保 [重置] 不产生 group 与 virtual station draft 的半旧半新状态。
-- 确认成功后，系统 SHOULD 将 `calculationBaseline` 更新为确认后的 draft，避免之后 [重置] 回到确认前状态。
-- 单纯 pin / unpin SHALL NOT 更新 `calculationBaseline`；它们只改变当前 shared draft 的展示/输入状态。
-- [重置] SHALL 恢复到最近 `calculationBaseline`，不得恢复到用户 pin / unpin 后的临时状态，除非该状态已经通过初始化、显式计算或确认成功成为新的 baseline。
+- [重置] SHALL 丢弃当前 shared draft 中尚未确认的 group、assignment、bridge decision、trade station、hub color、retain 与 virtual station draft 变更。
+- [重置] SHALL 从当前 active binding 的已保存 groups 构造计算输入，并按当前参数重新运行核心算法。
+- 当前参数包括 `bridgeSearchJumpRange`（连接跳数）、`prefJumpRange`（覆盖跳数）、`nodeEnabled`（节点开关）与 `prefThreshold`（交易站/Hub 阈值）。
+- binding 有已保存 groups 时，[重置] SHALL 使用这些 groups 作为 incremental base input；binding 无 groups 时 SHALL 使用 clean slate input。
+- [重置] 不切换 active binding 或 selected archive，但会重建当前 active binding/archive 的唯一 shared draft。
+- [重置] 后 virtual station drafts SHALL 重新从当前 binding 中无 `saveStationCode` 的 station plans 初始化，并按重算后的 groups 归属。
+- [重置] 不再恢复或维护最近一次计算完成的 `calculationBaseline`。
 - `calcBaselinePillState` 是“saved binding UI diff 基线”，用于 group 新增高亮、coverage/connected pill 的粗边框、虚线 removed 等基线展示；它 SHALL 只从已保存 `SaveBindingPlan.groups` 构造。
 - `calcBaselinePillState` SHALL 使用 hub `sectorMacro` 作为 key；runtime group id 不得影响 saved baseline 对齐。
 - 显式 [计算]、[快速计算]、[重置]、pin / unpin SHALL NOT 用当前计算结果覆盖 `calcBaselinePillState`。
@@ -73,14 +74,15 @@ Trade station 在 Live 计算模式中作为第三列展示和 confirm gate 的�
 
 - [返回]：从计算模式回到展示模式；不提交、不计算、不重置 draft。
 - [地图]：跳转到 Map binding 面板；Map 读取同一 shared draft。
-- [计算]：使用当前编辑输入运行核心算法，更新 `autoGroupResult` 和 `calculationBaseline`，结束后进入 result 模式，并切到首个未解决 tab。
+- [计算]：使用当前编辑输入运行核心算法，更新 `autoGroupResult`，结束后进入 result 模式，并切到首个未解决 tab。
 - [快速计算]：与 [计算] 一样运行 `runCalculationFromEditInput()`，用于 result/toolbar 场景的快速重算入口。
-- [重置]：从 `calculationBaseline` 克隆恢复整份 `autoGroupResult`，包括 group、assignment、bridge decision、trade station、hub color 和 retain 字段；不切换 active binding/archive，不运行算法。
-- [重置] 同时恢复 virtual station drafts 到 `calculationBaseline` 中记录的状态。
+- [重置]：使用当前 active binding 的已保存 groups 与当前参数重新运行核心算法，替换整份 `autoGroupResult`；不切换 active binding/archive。
+- [重置] 同时重建 virtual station drafts，并按重算结果归属。
+- [重置] 完成后 SHALL 与 [计算] 使用同一 tab 自动切换规则；若重算结果存在 pending bridge plans，SHALL 切到 allocation/bridge 页面。
 - [提交]：调用 `handleConfirm()`；当 trade station 未解决、无 result、或需要二次确认时不提交。
 - [提交二次确认]：当仍有 uncertain assignment 但无 trade station 未解决时，第一次点击打开 popup；popup 中再次确认才允许提交。
 - [提交二次确认] popup SHALL 使用当前应用的确认弹窗视觉规格：有遮罩、边框面板、主次按钮样式和明确 hover/disabled 状态；不得出现无修饰纯文本按钮。
-- popup [取消] 只关闭 popup，不修改 draft、binding、baseline 或当前 tab。
+- popup [取消] 只关闭 popup，不修改 draft、binding 或当前 tab。
 - popup [确定] 执行与直接提交相同的 `doConfirm()` 成功路径。
 
 ### 确认后的已保存态
@@ -170,11 +172,11 @@ Trade station 在 Live 计算模式中作为第三列展示和 confirm gate 的�
 - 无变化路径不重新分组，只从 binding 构建 assignments。
 - 展示模式和详情模式切换不触发计算。
 - 每个按钮的状态变化、提交 gate 和 tab 自动切换符合上文定义。
-- `calculationBaseline` 与 `calcBaselinePillState` 的更新时间点明确，且互不替代。
+- [重置] 基于 saved binding 与当前参数重算；`calcBaselinePillState` 仅作为 saved binding UI diff 基线。
 - 确认成功记录 applied archive time，确认按钮置灰。
 - `normalizeState()` 保留新增 SaveBindingPlan 字段。
 - `normalizeState()` SHALL 将旧版 group id 引用迁移为 hub `sectorMacro`，并从持久化 group 对象中移除 `id` 字段。
-- Virtual station draft 与 shared draft 生命周期一致，计算保留、重置恢复、提交应用的边界明确。
+- Virtual station draft 与 shared draft 生命周期一致，计算保留、重置重建、提交应用的边界明确。
 - 提交时仅同步无 `saveStationCode` 的 virtual station plans，带 `saveStationCode` 的 save station plans 不被修改。
 
 ## Assignment 变更规则

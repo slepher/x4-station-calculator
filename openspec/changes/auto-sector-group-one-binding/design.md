@@ -28,13 +28,12 @@ prefJumpRange: Ref<number>
 bridgeSearchJumpRange: Ref<number>
 prefThreshold: Ref<number>
 calcBaselinePillState: Ref<CalcBaselinePillState | null>
-calculationBaseline: Ref<CalculationBaseline | null>
 needsAutoGroupRecalc: Computed<boolean>
 virtualStationDrafts: Ref<BindingStationPlan[]>
 virtualStationDraftInitializedKey: Ref<string | null>
 ```
 
-Presenter 仍可持有 UI 辅助状态，但共享草案和重置快照不得离开 live store。当前设计保留以下 presenter-local 状态：
+Presenter 仍可持有 UI 辅助状态，但共享草案不得离开 live store。当前设计保留以下 presenter-local 状态：
 
 - `nodeEnabled`: 下一次计算是否允许生成新 pure hub。
 - `showHubAddMenu`: 添加 hub 菜单显示状态。
@@ -94,24 +93,27 @@ gameGuid:archiveTime
 
 [计算] / [快速计算] 会重新生成 `autoGroupResult.groups`，但不会清空 `virtualStationDrafts`。重算完成后只更新归属结果。
 
-## Snapshot 与基线
+## Reset 与基线
 
-### calculationBaseline
+### Reset from saved binding
 
-`calculationBaseline` 是 [重置] 的数据源。
+[重置] 不再使用最近一次计算完成的快照。`handleResetAssignments()` 由 presenter 编排，读取当前 active binding 的已保存 groups，并使用当前参数重新运行核心算法。
 
-更新时间点：
+当前参数：
 
-1. live store `setAutoGroupResult(result)` 时克隆 `result` 与当前 `virtualStationDrafts` 写入。
-2. Store 初始化或 active context 切换生成 result 后，经 `setAutoGroupResult()` 写入。
-3. 用户显式 [计算] / [快速计算] 生成 result 后，经 `setAutoGroupResult()` 写入。
-4. 确认成功后 SHOULD 更新为确认后的 result，避免 [重置] 回退到确认前。
+1. `bridgeSearchJumpRange`：连接跳数。
+2. `prefJumpRange`：覆盖跳数。
+3. `nodeEnabled`：是否允许生成新的 pure hub。
+4. `prefThreshold`：交易站 / Hub 阈值。
 
-使用点：
+计算路径：
 
-- [重置] 调用 `handleResetAssignments()`。
-- `handleResetAssignments()` 通过 live store 从 `calculationBaseline` clone 恢复 `autoGroupResult` 与 `virtualStationDrafts`。
-- 该恢复不改变 active binding、selected archive 或 liveMode。
+1. 无 active binding 或 selected archive 时不修改当前 draft。
+2. binding 有 groups 时，将 saved binding groups 作为 base input 调用 `groupIncremental()`。
+3. binding 无 groups 时调用 `groupCleanSlate()`。
+4. 生成 result 后执行与显式计算一致的名称富化、颜色稳定、trade station 默认值和 virtual station draft 归属重算。
+5. 用新 result 替换 `autoGroupResult`，并将 `calculationMode` 设为 `'result'`。
+6. 重置完成后按 pending bridge / uncertain assignment / unresolved trade station / hub 顺序自动切换 tab；若存在 pending bridge plans，Allocation 区域 SHALL 显示 bridge plan list。
 
 ### calcBaselinePillState
 
@@ -159,7 +161,7 @@ gameGuid:archiveTime
 - [退出] 不恢复 coverage、connection、assignment、trade station 或颜色。
 - 追加 range 内候选后 SHALL 移除非 standalone 的扩展候选，与 `buildAssignmentResult` 的 range 内/扩展不共存语义对齐。
 - result 模式下扩展 absorb 导致 hub range 扩大时，受影响 assignment 的选择按 R3 更新。edit 模式下 card 直接修改跳数只维护候选结构，不因更优、更近或平局自动切换其他 sector 的选择。
-- 用户若要回到最近计算结果，必须使用 [重置]。
+- 用户若要丢弃当前 draft 临时修改，必须使用 [重置] 从 saved binding 与当前参数重新计算。
 
 ### Assignment selection identity
 
@@ -233,9 +235,9 @@ Live sidebar 在固定菜单和动态星区/站点列表之间的分隔线区域
 | 覆盖跳数 | 更新 `prefJumpRange`，必要时抬高桥接跳数 | 可作为下一次计算参数 |
 | Hub 阈值 | 更新 `prefThreshold` | 可作为下一次计算参数 |
 | 节点 | 控制下一次计算是否生成新 pure hub | 只作为下一次计算输入 |
-| 计算 | 运行 `runCalculationFromEditInput()`，更新 result 和 `calculationBaseline` | 同 edit |
+| 计算 | 运行 `runCalculationFromEditInput()`，更新 result | 同 edit |
 | 快速计算 | 运行同一计算路径 | 同 edit |
-| 重置 | 从 `calculationBaseline` 恢复 | 同 edit |
+| 重置 | 从 saved binding + 当前参数重算 | 同 edit |
 | 提交 | 直接提交，不依赖当前模式 | 通过 gate 后提交 |
 
 ### Pin / Unpin Draft Transform
@@ -334,9 +336,8 @@ Group card 上的 jumpRange 修改 SHALL 增量重算受影响 assignment，不�
 7. 同步 live flow。
 8. 将 result groups 规范化为保存后的 baseline UI 状态：`baseline=true`，清理 `isNew`、新增高亮和跨覆盖临时提示，保留用户确认后的顺序和字段。
 9. 从保存后的 `SaveBindingPlan.groups` 刷新 `calcBaselinePillState`。
-10. 更新 `calculationBaseline` 为确认后的 autoGroupResult 与 virtual station drafts。
-11. 重新计算 dirty 状态；若 draft 与 binding 一致，`hasChanges=false`。
-12. 确认成功后确认按钮置灰，不跳转。
+10. 重新计算 dirty 状态；若 draft 与 binding 一致，`hasChanges=false`。
+11. 确认成功后确认按钮置灰，不跳转。
 
 `hasChanges` 只表示 shared draft 相对已保存 binding 是否有未保存修改。uncertain assignment、未分配提示和二次确认 gate 不得在确认成功后单独让 `hasChanges=true`。
 

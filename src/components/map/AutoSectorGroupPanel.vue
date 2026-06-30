@@ -131,6 +131,7 @@ const blueprintEmpireMenuStyle = ref<Record<string, string>>({})
 
 function onCalculate() { runCalculationFromEditInput(); switchToFirstUnresolvedTab() }
 function onQuickCalc() { handleQuickCalculate(); switchToFirstUnresolvedTab() }
+function onReset() { handleResetAssignments(); switchToFirstUnresolvedTab() }
 function onConfirm() {
   handleConfirm()
 }
@@ -286,7 +287,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
             @update:node-enabled="nodeEnabled = $event"
           @calculate="onCalculate"
           @quick-calculate="onQuickCalc"
-          @reset="handleResetAssignments"
+          @reset="onReset"
           @confirm="onConfirm"
           @back="emit('back')"
           @map="emit('map')"
@@ -368,7 +369,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
             @update:node-enabled="nodeEnabled = $event"
             @calculate="onCalculate"
             @quick-calculate="onQuickCalc"
-            @reset="handleResetAssignments"
+            @reset="onReset"
             @confirm="onConfirm"
             @back="emit('back')"
             @map="emit('map')"

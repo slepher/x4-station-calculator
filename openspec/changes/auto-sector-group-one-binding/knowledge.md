@@ -211,8 +211,8 @@ expect(at).toBeDefined()
 ### 验证 `normalizeState` 字段保留
 通过直接设置 localStorage 的 `x4_save_bindings` JSON 并重新加载，然后验证字段值。
 
-### 验证 reset 不执行算法
-通过 spy 或检查 `autoGroupResult` 内容与 `calculationBaseline` 一致来验证。
+### 验证 reset 从 binding 重算
+通过 spy 或检查 `autoGroupResult` 内容来自 saved binding groups + 当前参数，且不同于 reset 前临时 draft。
 
 ### Edit 模式限制
 - 按钮行为：edit 模式下 `handleConfirm()` 返回 false

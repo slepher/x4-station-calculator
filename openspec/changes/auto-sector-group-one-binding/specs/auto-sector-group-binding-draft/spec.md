@@ -20,7 +20,6 @@
   - `prefJumpRange: Ref<number>`
   - `bridgeSearchJumpRange: Ref<number>`
   - `prefThreshold: Ref<number>`
-  - `calculationBaseline: Ref<CalculationBaseline | null>`
   - `needsAutoGroupRecalc: Computed<boolean>`
   - `virtualStationDrafts: Ref<BindingStationPlan[]>`
   - `virtualStationDraftInitializedKey: Ref<string | null>`
@@ -276,13 +275,15 @@ Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触�
 - **那么** 共用确认按钮 SHALL disabled
 - **并且** SHALL NOT 写入 binding
 
-#### Scenario: Shared reset restores full baseline
+#### Scenario: Shared reset recalculates from saved binding
 
 - **前提** 用户在共用 `AutoSectorBar` 点击 [重置]
 - **当** 系统执行重置
-- **那么** SHALL 从 `calculationBaseline` 克隆恢复整份 shared draft
-- **并且** SHALL 同时恢复 group、assignment、bridge decision、trade station、hub color、retain 字段和 virtual station drafts 到最近计算基线
-- **并且** SHALL NOT 切换 active binding/archive 或重新运行分组算法
+- **那么** SHALL 丢弃当前 shared draft 中尚未确认的 group、assignment、bridge decision、trade station、hub color、retain 字段和 virtual station drafts 变更
+- **并且** SHALL 使用当前 active binding 的已保存 groups 作为输入，按当前 `bridgeSearchJumpRange`、`prefJumpRange`、`nodeEnabled` 和 `prefThreshold` 重新运行分组算法
+- **并且** binding 有已保存 groups 时 SHALL 走 incremental 计算；binding 无 groups 时 SHALL 走 clean slate 计算
+- **并且** SHALL NOT 切换 active binding/archive
+- **并且** SHALL 重新初始化 virtual station drafts，并按重算后的 groups 归属
 
 #### Scenario: Shared draft preserves hub color assigned by map color rules
 
@@ -376,17 +377,17 @@ Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触�
 - **当** 用户点击「计算」或「快速计算」
 - **那么** 系统 SHALL 使用当前编辑输入运行核心算法
 - **并且** SHALL 更新 `autoGroupResult`
-- **并且** SHALL 更新 `calculationBaseline`
 - **并且** SHALL 根据未解决项切换到第一个待处理 tab
 
 #### Scenario: Reset button
 
-- **前提** `calculationBaseline` 非 null
+- **前提** 当前存在 active binding 和有效 selected archive
 - **当** 用户点击「重置」
-- **那么** 系统 SHALL 从 `calculationBaseline` clone 恢复 `autoGroupResult`
-- **并且** SHALL 从 `calculationBaseline` clone 恢复 `virtualStationDrafts`
+- **那么** 系统 SHALL 使用当前 active binding 的已保存 groups 与当前参数重算并替换 `autoGroupResult`
+- **并且** SHALL 重建 `virtualStationDrafts` 并按重算后的 groups 归属
 - **并且** SHALL NOT 切换 active binding
 - **并且** SHALL NOT 切换 selected archive
+- **并且** 当重算结果存在 pending bridge plans 时，SHALL 切换到 allocation tab 并显示 bridge plan list
 
 #### Scenario: Edit and exit buttons
 
@@ -443,23 +444,22 @@ Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触�
 
 ### Requirement: Snapshot And Baseline Timing
 
-系统 SHALL 区分重置快照 `calculationBaseline` 和 saved binding UI diff 基线 `calcBaselinePillState`。
+系统 SHALL 区分 [重置] 的 saved binding 重算来源和 saved binding UI diff 基线 `calcBaselinePillState`。
 
-#### Scenario: Calculation baseline timing
+#### Scenario: Reset does not keep calculation baseline
 
 - **前提** 系统通过初始化或显式计算得到新的 `AutoGroupResult`
-- **当** 系统调用 live store `setAutoGroupResult(result)`
-- **那么** SHALL clone `result` 写入 `calculationBaseline`
-- **并且** [重置] SHALL 使用该 baseline 恢复 shared draft
+- **当** 系统更新 shared draft
+- **那么** SHALL NOT 捕获最近计算完成快照作为 [重置] 数据源
+- **并且** [重置] SHALL 始终以当前 active binding 的已保存 groups 与当前参数为输入重新计算
 
-#### Scenario: Pin and unpin do not capture baseline
+#### Scenario: Pin and unpin are discarded by reset
 
-- **前提** 当前 shared draft 已存在 `calculationBaseline`
+- **前提** 当前 shared draft 已从 saved binding 初始化或计算生成
 - **当** 用户对 hub 执行 pin 或 unpin
 - **那么** 系统 SHALL 修改当前 shared draft
-- **并且** SHALL NOT 更新 `calculationBaseline`
 - **当** 用户随后点击「重置」
-- **那么** 系统 SHALL 恢复到 pin / unpin 之前最近一次 baseline 对应的 shared draft
+- **那么** 系统 SHALL 丢弃该 pin / unpin 临时变更，并从 saved binding 与当前参数重新计算
 
 #### Scenario: Pill baseline timing
 

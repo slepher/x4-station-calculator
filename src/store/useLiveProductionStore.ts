@@ -123,10 +123,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   const autoGroupResult = shallowRef<AutoGroupResult | null>(null)
   const virtualStationDrafts = ref<BindingStationPlan[]>([])
   const virtualStationDraftInitializedKey = ref<string | null>(null)
-  const calculationBaseline = ref<{
-    autoGroupResult: AutoGroupResult
-    virtualStationDrafts: BindingStationPlan[]
-  } | null>(null)
   const calculationMode = ref<'result' | 'edit'>('result')
   const prefJumpRange = ref(DEFAULT_JUMP_RANGE)
   const bridgeSearchJumpRange = ref(DEFAULT_BRIDGE_SEARCH_JUMP_RANGE)
@@ -201,33 +197,24 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     recomputeVirtualStationDraftGroups(groups)
   }
 
-  function captureCalculationBaseline(result: AutoGroupResult | null = autoGroupResult.value) {
-    if (!result) {
-      calculationBaseline.value = null
-      return
-    }
-    calculationBaseline.value = {
-      autoGroupResult: deepClone(result),
-      virtualStationDrafts: deepClone(virtualStationDrafts.value)
-    }
-  }
-
   function setAutoGroupResult(result: AutoGroupResult | null) {
     autoGroupResult.value = result
     if (!result) {
-      calculationBaseline.value = null
       virtualStationDrafts.value = []
       virtualStationDraftInitializedKey.value = null
       return
     }
     initializeVirtualStationDraftsForAutoGroups(result.groups)
-    captureCalculationBaseline(result)
   }
 
-  function resetAutoGroupResultToBaseline() {
-    if (!calculationBaseline.value) return
-    autoGroupResult.value = deepClone(calculationBaseline.value.autoGroupResult)
-    virtualStationDrafts.value = deepClone(calculationBaseline.value.virtualStationDrafts)
+  function setAutoGroupResultFromBindingReset(result: AutoGroupResult | null) {
+    autoGroupResult.value = result
+    virtualStationDraftInitializedKey.value = null
+    if (!result) {
+      virtualStationDrafts.value = []
+      return
+    }
+    initializeVirtualStationDraftsForAutoGroups(result.groups)
   }
 
   function createVirtualStationDraftFromBlueprint(input: {
@@ -2535,7 +2522,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     overviewBuyMultiplier,
     overviewSellMultiplier,
     autoGroupResult,
-    calculationBaseline,
     hubLinkRoutes,
     virtualStationDrafts,
     virtualStationDraftInitializedKey,
@@ -2547,8 +2533,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     refreshCalcBaselinePillStateFromBinding,
     needsAutoGroupRecalc,
     setAutoGroupResult,
-    captureCalculationBaseline,
-    resetAutoGroupResultToBaseline,
+    setAutoGroupResultFromBindingReset,
     initAutoGroupDraft,
     initializeVirtualStationDraftsForAutoGroups,
     recomputeVirtualStationDraftGroups,

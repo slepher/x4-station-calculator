@@ -41,8 +41,8 @@
 - [ ] Presenter 通过 `storeToRefs(liveStore)` 读取共享 draft
 - [ ] 删除 presenter 内跨面板共享 draft 本地 ref
 - [ ] Handler 统一读写 live store 共享 draft
-- [x] 明确并实现 `calculationBaseline` 作为 [重置] 数据源
-- [x] `calculationBaseline` 覆盖 autoGroupResult 与 virtual station drafts
+- [x] 移除 `calculationBaseline` 作为 [重置] 数据源
+- [x] 实现 [重置] 基于 saved binding groups + 当前参数重算 shared draft
 - [x] 明确并实现 `calcBaselinePillState` 作为 saved binding UI diff 基线，覆盖 group 新增高亮和 pill diff
 - [ ] 移除旧的 edit restore snapshot 语义；[退出] 只退出编辑态
 - [ ] `handleColorChange` 不直接写持久化 binding
@@ -55,7 +55,7 @@
 - [x] 二次确认 popup 使用当前组件可生效的弹窗与主次按钮样式
 - [x] 确认成功后清理 result groups 的 `isNew` 等未保存 transient 高亮标记
 - [x] 确认成功后将 `hasChanges` 与 uncertain assignment 提示解耦，draft 与 binding 一致时按钮置灰
-- [x] 实现 pin / unpin 不刷新 `calculationBaseline`
+- [x] 实现 pin / unpin 只修改当前 shared draft；[重置] 会丢弃临时 pin / unpin 并按 saved binding 重算
 - [x] pin / unpin 按钮只出现在 hub/group card，assignment card 不显示该按钮
 - [x] result/edit 模式的 hub/group card 都显示 pin / unpin 按钮
 - [x] 实现 unpin 保留 hub/group card，仅切换 `isPinned=false`
@@ -106,9 +106,10 @@
 - [x] Sidebar [星区编辑详情] 持久化当前菜单选择，只进入详情模式，不触发计算
 - [ ] 展示模式 [地图] 进入 Map binding，不修改 draft
 - [ ] 计算模式 [返回] 返回展示模式，不提交、不计算、不重置
-- [ ] [计算] / [快速计算] 更新 shared draft 和 `calculationBaseline`
-- [x] [重置] 从 `calculationBaseline` 恢复 shared draft
-- [x] [重置] 同时恢复 virtual station drafts
+- [x] [计算] / [快速计算] 更新 shared draft，不再捕获计算完成 baseline
+- [x] [重置] 从 saved binding groups + 当前参数重算 shared draft
+- [x] [重置] 重建 virtual station drafts 并按重算后 groups 归属
+- [x] [重置] 后若存在 pending bridge plans，切换到 allocation/bridge 页面
 - [ ] [提交] 按 edit、无 result、trade station、uncertain assignment gate 返回成功/失败
 - [ ] [编辑] 进入 edit 模式，不创建恢复 snapshot
 - [ ] [退出] 返回 result 模式，不恢复 draft

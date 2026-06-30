@@ -25,10 +25,10 @@
   - [✓] 1.3.6 当 `autoGroupResult=null` 时 sidebar 入口置灰禁用
   - [✓] 1.3.7 当 `needsAutoGroupRecalc=true` 时 sidebar 入口显示红点提示
 
-- [✓] 1.4 确认成功后确认按钮置灰：覆盖确认成功后确认按钮置灰，不跳转，保留确认后的 baseline
+- [ ] 1.4 确认成功后确认按钮置灰：覆盖确认成功后确认按钮置灰，不跳转，不捕获计算完成 baseline
   - [✓] 1.4.1 在计算模式完成所有 assignment 和 trade station 后点击确认
   - [✓] 1.4.2 确认后确认按钮置灰（hasChanges=false）
-  - [✓] 1.4.3 确认后 `calculationBaseline` 更新为确认后的 result
+  - [ ] 1.4.3 确认后不维护 `calculationBaseline`
   - [✓] 1.4.4 确认后 `calcBaselinePillState` 更新为确认后的 groups
 
 ## 2 Shared Draft 生命周期
@@ -57,10 +57,10 @@
 
 ## 3 计算、重置与提交
 
-- [✓] 3.1 显式计算：覆盖 [计算] 按钮（edit 模式全重算 / result 模式快速重算共用）更新 shared draft 与 `calculationBaseline`
+- [ ] 3.1 显式计算：覆盖 [计算] 按钮（edit 模式全重算 / result 模式快速重算共用）更新 shared draft，但不捕获计算完成 baseline
   - [✓] 3.1.1 在计算模式中修改跳数或阈值后点击计算按钮
   - [✓] 3.1.2 确认 `autoGroupResult` 更新为新的分组结果
-  - [✓] 3.1.3 确认 `calculationBaseline` 更新为最新计算结果
+  - [ ] 3.1.3 确认不捕获 `calculationBaseline`
   - [✓] 3.1.4 在 result 模式点击计算按钮（触发 quick-calculate emit），确认执行计算路径
   - [✓] 3.1.5 确认显式计算后自动切换到首个未解决 tab（pending bridge -> allocation，unresolved trade station -> tradeStation，否则 -> hub）
 
@@ -70,10 +70,10 @@
   - [✓] 3.2.3 确认退出后 draft 修改保留（不恢复进入编辑前的 snapshot）
   - [✓] 3.2.4 确认退出操作不调用 snapshot 恢复逻辑
 
-- [✓] 3.3 重置：覆盖 [重置] 从 `calculationBaseline` 恢复 group、assignment、trade station、hub color、retain 和 virtual station drafts
+- [ ] 3.3 重置：覆盖 [重置] 从 saved binding groups + 当前参数重算 group、assignment、trade station、hub color、retain 和 virtual station drafts
   - [✓] 3.3.1 在计算模式中修改 draft（改 assignment、改颜色），点击重置按钮
-  - [✓] 3.3.2 确认 `autoGroupResult` 恢复为 `calculationBaseline` 的内容
-  - [✓] 3.3.3 确认 `virtualStationDrafts` 恢复为 baseline 记录的状态
+  - [ ] 3.3.2 确认 `autoGroupResult` 来自 saved binding groups + 当前参数重算，而非当前 draft
+  - [ ] 3.3.3 确认 `virtualStationDrafts` 从 binding 重新初始化并按重算 groups 归属
   - [✓] 3.3.4 确认重置不切换 active binding 或 selected archive
   - [✓] 3.3.5 确认重置不重新运行分组算法
 
@@ -89,7 +89,7 @@
   - [✓] 3.5.2 确认 `appliedAutoGroupArchiveTime` 记录为当前 selected archive time
   - [✓] 3.5.3 确认 live flow 已同步
   - [✓] 3.5.4 确认 `calcBaselinePillState` 更新为确认后的 groups
-  - [✓] 3.5.5 确认 `calculationBaseline` 更新为确认后的 draft
+  - [ ] 3.5.5 确认不维护 `calculationBaseline`
   - [✓] 3.5.6 确认后 Live 回到展示模式
 
 ## 4 Virtual Station Draft

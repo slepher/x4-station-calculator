@@ -159,7 +159,6 @@ function setAutoGroupResult(result: AutoGroupResult | null) {
   liveStore.setAutoGroupResult(result)
   if (!calcBaselinePillState.value) liveStore.refreshCalcBaselinePillStateFromBinding()
   applyTradeStationDefaultsToResult()
-  liveStore.captureCalculationBaseline()
 }
 
 function buildStoreGroups(groups: BindingSectorGroup[], playerSectorMacros: string[]): AutoGroupResult {
@@ -336,6 +335,61 @@ function runCalculationFromEditInput() {
 
   stabilizeHubColors(normalizedResult.groups, buildHubColorContext())
   setAutoGroupResult(normalizedResult)
+  calculationMode.value = 'result'
+}
+
+function runResetCalculationFromBinding() {
+  const archive = saveStore.selectedArchive
+  const guid = activeViewStore.activeBinding
+  if (!archive || !archive.isValid || !guid) return
+  const binding = saveBindingStore.getBindingByGameGuid(guid)
+  if (!binding) return
+
+  const { sectorGraph, sectorClusterMap } = sectorGraphInfo.value
+  let result: AutoGroupResult
+  if (binding.groups.length > 0) {
+    result = groupIncremental(
+      archive,
+      binding.groups,
+      gameDataStore.modulesByMacroId,
+      sectorGraph,
+      sectorClusterMap,
+      { containerThreshold: prefThreshold.value },
+      prefJumpRange.value,
+      bridgeSearchJumpRange.value,
+      [],
+      nodeEnabled.value,
+      gameDataStore.sectorReachability
+    )
+    if (result.assignments.length === 0) {
+      result = buildStoreGroups(binding.groups, result.playerSectorMacros)
+    }
+  } else {
+    result = groupCleanSlate(
+      archive,
+      gameDataStore.modulesByMacroId,
+      sectorGraph,
+      sectorClusterMap,
+      { containerThreshold: prefThreshold.value },
+      prefJumpRange.value,
+      bridgeSearchJumpRange.value,
+      [],
+      nodeEnabled.value,
+      gameDataStore.sectorReachability
+    )
+  }
+
+  result = {
+    ...result,
+    groups: result.groups.map((group) => ({
+      ...group,
+      name: group.sectorMacro ? getSectorDisplayName(group.sectorMacro) : group.name
+    }))
+  }
+  stabilizeHubColors(result.groups, buildHubColorContext())
+  liveStore.setAutoGroupResultFromBindingReset(result)
+  if (!calcBaselinePillState.value) liveStore.refreshCalcBaselinePillStateFromBinding()
+  applyTradeStationDefaultsToResult()
   calculationMode.value = 'result'
 }
 
@@ -658,7 +712,7 @@ function handleSelectBridgePlan(planId: string) {
 }
 
 function handleResetAssignments() {
-  liveStore.resetAutoGroupResultToBaseline()
+  runResetCalculationFromBinding()
 }
 
 function handleAddHubClick() {

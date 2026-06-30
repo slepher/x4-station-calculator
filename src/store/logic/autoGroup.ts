@@ -881,6 +881,7 @@ export function groupCleanSlate(
         isPinned: true,
       coverageRetainEnabled: true,
       connectionRetainEnabled: true,
+      tradeStationRetainEnabled: true,
         hubScore: hub.score,
         hubStationCode: hub.stationCode,
         savedTradeStationCode: hub.stationCode,
@@ -1107,6 +1108,7 @@ export function groupIncremental(
     isPinned: true,
       coverageRetainEnabled: true,
       connectionRetainEnabled: true,
+      tradeStationRetainEnabled: group.tradeStationRetainEnabled ?? true,
     hubScore: undefined,
     color: group.color
   }))
@@ -1168,6 +1170,7 @@ export function groupIncremental(
         isPinned: true,
       coverageRetainEnabled: true,
       connectionRetainEnabled: true,
+      tradeStationRetainEnabled: true,
         hubScore: hub.score,
         hubStationCode: hub.stationCode,
         savedTradeStationCode: hub.stationCode,
