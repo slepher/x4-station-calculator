@@ -620,11 +620,15 @@ Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触�
 
 #### Scenario: Standalone option shows top station candidate
 
-- **前提** 系统在载入存档生成 `AutoGroupResult` 时 SHALL 为每个 player sector 预计算 station 候选列表 `sectorStationCandidates: Record<string, TradeStationCandidate[]>`
+- **前提** 系统在载入存档生成 `AutoGroupResult` 时 SHALL 为每个 player sector 预计算 station 原始候选池 `sectorStationCandidates: Record<string, TradeStationCandidate[]>`
+- **并且** 原始候选池 SHALL 按 score 排序、保留 `containerCap` / `isPureHub` / `qualified` 信息、不得按 `qualified` / `requireQualified` 过滤、不得做 top 5 截断
+- **并且** `score` SHALL 统一使用 `containerCap / (1 + ln(1 + prodLines))`，不得按 `qualified` 分支切换公式
+- **并且** 原始候选池 SHALL 应用零货舱规则：存在任意 `containerCap > 0` 时剔除 `containerCap = 0`；全部为 0 时保留这些站
 - **当** 系统渲染 assignment card 的 standalone option
-- **那么** SHALL 从该 sector 的 `sectorStationCandidates` 取排序最靠前且 `containerCap > 0` 的候选
+- **那么** SHALL 复用与 Trade Station 栏一致的 presenter 展示候选规则，取该 sector 展示候选中排序最靠前的候选
+- **并且** 该展示候选规则 SHALL 包含 top 5 保留最多 2 个 pure qualified 候选的规则
 - **并且** SHALL 显示空间站 code 和 containerCap（格式与 Trade Station 栏一致，如 `12.0M`）
-- **当** 该 sector 不存在 `containerCap > 0` 的空间站
+- **当** 该 sector 不存在展示候选
 - **那么** SHALL 显示「独立成组」不附带空间站信息
 
 #### Scenario: Standalone derived candidate default selection

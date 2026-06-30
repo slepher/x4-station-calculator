@@ -17,7 +17,7 @@ import {
   getPlayerStationsInSector
 } from './saveBindingUtils'
 import { stabilizeHubColors, stabilizeEditedHubColor, type HubColorContext } from './hubColor'
-import { selectTradeStationCandidates, determineDefaultTradeStation, type TradeStationCandidate } from './tradeStationSelection'
+import { selectTradeStationCandidates, selectTradeStationDisplayCandidates, determineDefaultTradeStation, type TradeStationCandidate } from './tradeStationSelection'
 
 export const DEFAULT_JUMP_RANGE = 2
 export const DEFAULT_BRIDGE_SEARCH_JUMP_RANGE = 5
@@ -2191,14 +2191,11 @@ export function enrichAutoGroupResult(
     if (!selectedTradeStation && g.sectorMacro) {
       const stations = getPlayerStationsInSector(deps.archive, g.sectorMacro)
       if (stations.length > 0) {
-        const hasQualified = stations.some((s) => {
-          const info = detectStationHub(s, deps.modulesByMacroId, { containerThreshold: deps.containerThreshold })
-          return info.qualified
-        })
-        const candidates = selectTradeStationCandidates(
-          stations, deps.modulesByMacroId, hasQualified,
+        const rawCandidates = selectTradeStationCandidates(
+          stations, deps.modulesByMacroId, false,
           { containerThreshold: deps.containerThreshold }
         )
+        const candidates = selectTradeStationDisplayCandidates(rawCandidates, deps.containerThreshold)
         if (candidates.length > 0) {
           const aDefault = determineDefaultTradeStation(candidates)
           if (aDefault) {

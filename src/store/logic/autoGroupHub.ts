@@ -97,12 +97,7 @@ export function detectStationHub(
   const prodLines = countProductionLines(refs, modulesByMacroId)
   const qualified = containerCap >= config.containerThreshold
 
-  let score: number
-  if (qualified) {
-    score = containerCap / (1 + Math.log(1 + prodLines))
-  } else {
-    score = containerCap
-  }
+  const score = containerCap / (1 + Math.log(1 + prodLines))
 
   const isPureHub = qualified && prodLines === 0
 

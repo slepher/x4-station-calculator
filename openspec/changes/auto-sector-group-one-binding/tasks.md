@@ -77,10 +77,12 @@
 - [ ] `sortAssignmentsForDisplay` 按 `displayBucket` 分组排序，unpin 组内按 `unpinOrder` 排列
 - [ ] `resolveUncertainAssignment` 不清除 `displayBucket` 和 `unpinOrder`，absorb 后 unpin assignment 留在顶部
 - [ ] `AutoGroupResult` 新增 `sectorStationCandidates: Record<string, TradeStationCandidate[]>`
-- [ ] `groupCleanSlate` / `groupIncremental` / `buildAssignmentsFromBinding` 生成 result 时预计算所有 player sector 的 station 候选
-- [ ] Vue Trade Station 栏从预计算数据按 hub group `sectorMacro` 过滤显示
-- [ ] Standalone option 显示该 sector 排序最靠前且 `containerCap > 0` 的候选（station code + containerCap）
-- [ ] 不存在 `containerCap > 0` 候选时 standalone option 只显示「独立成组」
+- [ ] `groupCleanSlate` / `groupIncremental` / `buildAssignmentsFromBinding` 生成 result 时预计算所有 player sector 的 station 原始候选池
+- [ ] 原始候选池按 score 排序，保留 `containerCap` / `isPureHub` / `qualified` 信息，不按 `qualified` / `requireQualified` 过滤，不做 top 5 截断
+- [ ] 原始候选池应用零货舱规则：存在任意 `containerCap > 0` 时剔除 0；全部为 0 时保留
+- [ ] Vue Trade Station 栏从预计算数据按 hub group `sectorMacro` 获取原始候选池，并由 presenter 按 `containerThreshold` 与 top 5 原则生成展示候选；展示候选池中存在 pure qualified 候选时，top 5 尽量保留最多 2 个 pure qualified 候选
+- [ ] Standalone option 复用 Trade Station 栏展示候选规则，显示该 sector 展示候选中排序最靠前的候选（station code + containerCap）
+- [ ] 不存在展示候选时 standalone option 只显示「独立成组」
 
 ## 5. Live 双模式
 

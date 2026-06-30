@@ -2,6 +2,9 @@
 import { useI18n } from 'vue-i18n'
 import type { GroupDraftInfo } from '@/store/logic/autoGroup'
 import type { TradeStationCandidate, TradeStationSelection } from '@/store/logic/tradeStationSelection'
+import { SAVE_POI_ICON_MAP, getSavePoiIconUrl } from '@/components/map/utils/style'
+import factoryIconUrl from '@/components/icons/factory.svg'
+import type { SavePoiOverlayItem } from '@/types/saveArchive'
 
 const props = defineProps<{
   group: GroupDraftInfo
@@ -42,6 +45,26 @@ function formatCap(cap: number): string {
 function formatCoordKm(value: number): string {
   return `${(value / 1000).toFixed(1)}km`
 }
+
+function getCandidateIconUrl(candidate: TradeStationCandidate): string {
+  const poiLike: SavePoiOverlayItem = {
+    key: `trade-station-candidate:${candidate.stationCode}`,
+    code: candidate.stationCode,
+    category: 'playerStation',
+    owner: 'player',
+    sectorMacro: props.group.sectorMacro || '',
+    sectorName: props.group.name,
+    position: { x: 0, y: 0, z: 0 },
+    tag: candidate.tag,
+    factoryGroup: candidate.factoryGroup,
+    is_headquarter: candidate.isHeadquarter
+  }
+  return getSavePoiIconUrl(poiLike) || factoryIconUrl
+}
+
+function getVirtualIconUrl(): string {
+  return SAVE_POI_ICON_MAP.tradestation || factoryIconUrl
+}
 </script>
 
 <template>
@@ -61,8 +84,11 @@ function formatCoordKm(value: number): string {
         :class="{ 'candidate-item--selected': isSelected('player', candidate.stationCode) }"
         @click="!disabled && onSelectPlayer(candidate.stationCode)"
       >
-        <span class="option-radio" :class="{ 'radio-checked': isSelected('player', candidate.stationCode) }">
-          {{ isSelected('player', candidate.stationCode) ? '●' : '○' }}
+        <span
+          class="candidate-icon-wrap"
+          :class="{ 'candidate-icon-wrap--selected': isSelected('player', candidate.stationCode) }"
+        >
+          <img class="candidate-icon" :src="getCandidateIconUrl(candidate)" alt="" />
         </span>
         <span class="candidate-info">
           <span class="candidate-name">{{ candidate.stationCode }}</span>
@@ -76,8 +102,11 @@ function formatCoordKm(value: number): string {
         :class="{ 'candidate-item--selected': isSelected('virtual') }"
         @click="!disabled && onSelectVirtual()"
       >
-        <span class="option-radio" :class="{ 'radio-checked': isSelected('virtual') }">
-          {{ isSelected('virtual') ? '●' : '○' }}
+        <span
+          class="candidate-icon-wrap"
+          :class="{ 'candidate-icon-wrap--selected': isSelected('virtual') }"
+        >
+          <img class="candidate-icon" :src="getVirtualIconUrl()" alt="" />
         </span>
         <span class="candidate-info">
           <span class="candidate-name">{{ t('sector.virtual_trade_station') }}</span>
@@ -116,19 +145,24 @@ function formatCoordKm(value: number): string {
 }
 
 .candidate-item--selected {
-  @apply bg-sky-500/20 text-sky-200;
+  @apply bg-emerald-500/10 text-emerald-200;
 }
 
 .candidate-item--virtual {
   @apply border-t border-slate-700/30 mt-0.5 pt-2;
 }
 
-.option-radio {
-  @apply text-slate-500 text-sm flex-shrink-0;
+.candidate-icon-wrap {
+  @apply relative flex h-6 w-6 flex-shrink-0 items-center justify-center;
 }
 
-.radio-checked {
-  @apply text-sky-400;
+.candidate-icon-wrap--selected {
+  filter: drop-shadow(0 0 7px rgba(52, 211, 153, 0.95)) drop-shadow(0 0 14px rgba(16, 185, 129, 0.55));
+}
+
+.candidate-icon {
+  @apply h-6 w-6 object-contain;
+  filter: brightness(0) saturate(100%) invert(64%) sepia(60%) saturate(450%) hue-rotate(84deg) brightness(92%) contrast(91%);
 }
 
 .candidate-info {
@@ -140,7 +174,7 @@ function formatCoordKm(value: number): string {
 }
 
 .candidate-item--selected .candidate-name {
-  @apply text-sky-200;
+  @apply text-emerald-200;
 }
 
 .candidate-meta {
@@ -154,5 +188,13 @@ function formatCoordKm(value: number): string {
 
 .trade-station-card--map .candidate-item {
   @apply px-1.5 py-1 text-[11px];
+}
+
+.trade-station-card--map .candidate-icon-wrap {
+  @apply h-5 w-5;
+}
+
+.trade-station-card--map .candidate-icon {
+  @apply h-5 w-5;
 }
 </style>

@@ -119,9 +119,10 @@ Trade station 在 Live 计算模式中作为第三列展示和 confirm gate 的�
 - 追加候选后 `selectedOptionIndex` 更新采用"新 hub 相对当前选中项是否更优"的比较：新 hub 在 range 内且比当前选中项更优时切换；不更优或产生平局时保持原选择；当前为显式 standalone 选择时只追加 option 不切换；新 hub 为扩展候选且无 range 内命中时 `selectedOptionIndex=null`、`status` 保持 `uncertain_extend`；不强制切换到全局 best。
 - assignment 中用户选择 absorb 到其他 group SHALL 删除该 sector 自身 hub group（不论是否新建），清理其 trade station / connections，并将该 sector 加入目标 group coverage。
 - 若历史数据或旧 bug 导致同一 `sectorMacro` 出现多个 hub group，absorb SHALL 以 `sectorMacro` 为依据清理全部重复 hub，避免残留重复身份。
-- 系统在载入存档生成 `AutoGroupResult` 时 SHALL 为每个 player sector 预计算 station 候选列表 `sectorStationCandidates`，按 score 排序。
-- Vue Trade Station 栏从预计算数据按当前 hub group 的 `sectorMacro` 过滤显示；提交时也只提交当前 hub group 的选择。
-- Standalone option SHALL 从该 sector 的预计算候选取排序最靠前且 `containerCap > 0` 的候选，显示 station code 和 containerCap（格式与 Trade Station 栏一致）；不存在时只显示「独立成组」。
+- 系统在载入存档生成 `AutoGroupResult` 时 SHALL 为每个 player sector 预计算 station 原始候选池 `sectorStationCandidates`，按 score 排序；`score` SHALL 统一使用 `containerCap / (1 + ln(1 + prodLines))`，不得按 `qualified` 分支切换公式；原始候选池不得按 `qualified` / `requireQualified` 过滤，也不得做 top 5 截断。
+- 原始候选池 SHALL 应用零货舱规则：存在任意 `containerCap > 0` 的空间站时剔除 `containerCap = 0`；全部空间站均为 `containerCap = 0` 时保留这些空间站。
+- Vue Trade Station 栏从预计算数据按当前 hub group 的 `sectorMacro` 过滤，并由 presenter 按当前 `containerThreshold` 与 top 5 原则生成展示候选；若展示候选池中存在 pure qualified 候选（`isPureHub=true`），top 5 SHALL 尽量保留最多 2 个 pure qualified 候选；提交时也只提交当前 hub group 的选择。
+- Standalone option SHALL 复用与 Trade Station 栏一致的展示候选规则，取该 sector 展示候选中排序最靠前的候选，显示 station code 和 containerCap（格式与 Trade Station 栏一致）；不存在展示候选时只显示「独立成组」。
 
 ### Hub 列控制按钮
 

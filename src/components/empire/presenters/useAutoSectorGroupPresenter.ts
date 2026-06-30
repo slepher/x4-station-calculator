@@ -12,8 +12,7 @@ import { buildSectorGraphFromMaps, getCoverageSectors, getPlayerStationsInSector
 import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
 import { getSectorZoneBoundingCenter } from '@/components/map/utils/coordinates'
 import { stabilizeHubColors, stabilizeEditedHubColor, type HubColorContext } from '@/store/logic/hubColor'
-import { selectTradeStationCandidates, determineDefaultTradeStation, type TradeStationCandidate, type TradeStationSelection } from '@/store/logic/tradeStationSelection'
-import { detectStationHub } from '@/store/logic/autoGroupHub'
+import { selectTradeStationCandidates, selectTradeStationDisplayCandidates, determineDefaultTradeStation, type TradeStationCandidate, type TradeStationSelection } from '@/store/logic/tradeStationSelection'
 import type { BindingSectorGroup, BindingStationPlan, StationPlan, X4MapSector } from '@/types/x4'
 
 
@@ -161,7 +160,11 @@ function setAutoGroupResult(result: AutoGroupResult | null) {
   applyTradeStationDefaultsToResult()
 }
 
-function buildStoreGroups(groups: BindingSectorGroup[], playerSectorMacros: string[]): AutoGroupResult {
+function buildStoreGroups(
+  groups: BindingSectorGroup[],
+  playerSectorMacros: string[],
+  sectorStationCandidates?: Record<string, TradeStationCandidate[]>
+): AutoGroupResult {
   const storeGroups: GroupDraftInfo[] = groups.map((g) => ({
     id: g.sectorMacro || '',
     name: g.sectorMacro ? getSectorDisplayName(g.sectorMacro) : g.name,
@@ -186,7 +189,7 @@ function buildStoreGroups(groups: BindingSectorGroup[], playerSectorMacros: stri
     color: g.color,
     baseline: true
   }))
-  return { groups: storeGroups, assignments: [], bridgePlans: [], playerSectorMacros }
+  return { groups: storeGroups, assignments: [], bridgePlans: [], playerSectorMacros, sectorStationCandidates }
 }
 
 function runAutoGroup(options: { force?: boolean } = {}) {
@@ -214,7 +217,7 @@ function runAutoGroup(options: { force?: boolean } = {}) {
       [], true, gameDataStore.sectorReachability
     )
     if (result.assignments.length === 0) {
-      setAutoGroupResult(buildStoreGroups(binding.groups, result.playerSectorMacros))
+      setAutoGroupResult(buildStoreGroups(binding.groups, result.playerSectorMacros, result.sectorStationCandidates))
       setResultModeDefaults()
       return
     }
@@ -364,7 +367,7 @@ function runResetCalculationFromBinding() {
       gameDataStore.sectorReachability
     )
     if (result.assignments.length === 0) {
-      result = buildStoreGroups(binding.groups, result.playerSectorMacros)
+      result = buildStoreGroups(binding.groups, result.playerSectorMacros, result.sectorStationCandidates)
     }
   } else {
     result = groupCleanSlate(
@@ -745,15 +748,11 @@ function handleAddHubDraft(sectorMacro: string) {
   if (archive) {
     const stations = getPlayerStationsInSector(archive, sectorMacro)
     if (stations.length > 0) {
-      const hasQualified = stations.some((s) => {
-        const info = detectStationHub(s, gameDataStore.modulesByMacroId, { containerThreshold: prefThreshold.value })
-        return info.qualified
-      })
-      const requireQualified = hasQualified
-      const candidates = selectTradeStationCandidates(
-        stations, gameDataStore.modulesByMacroId, requireQualified,
+      const rawCandidates = selectTradeStationCandidates(
+        stations, gameDataStore.modulesByMacroId, false,
         { containerThreshold: prefThreshold.value }
       )
+      const candidates = selectTradeStationDisplayCandidates(rawCandidates, prefThreshold.value)
       const aDefault = determineDefaultTradeStation(candidates)
       if (aDefault && aDefault.type === 'player') {
         savedTradeStationCode = aDefault.stationCode
@@ -866,16 +865,7 @@ const tradeStationCandidates = computed(() => {
       continue
     }
 
-    if (group.source !== 'auto') {
-      const hasQualified = allCandidates.some((c) => c.qualified)
-      if (hasQualified) {
-        candidates[group.id] = allCandidates.filter((c) => c.qualified)
-      } else {
-        candidates[group.id] = allCandidates
-      }
-    } else {
-      candidates[group.id] = allCandidates
-    }
+    candidates[group.id] = selectTradeStationDisplayCandidates(allCandidates, prefThreshold.value)
   }
   return candidates
 })

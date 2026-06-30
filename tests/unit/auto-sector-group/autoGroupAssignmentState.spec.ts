@@ -12,6 +12,7 @@ import {
   preserveEditAssignmentSelections,
   type AutoGroupResult
 } from '@/store/logic/autoGroup'
+import { selectTradeStationDisplayCandidates } from '@/store/logic/tradeStationSelection'
 import type { SaveArchive, PlayerStationEntry } from '@/types/saveArchive'
 import type { X4Module } from '@/types/x4'
 
@@ -71,14 +72,25 @@ function buildResult(): AutoGroupResult {
   }
 }
 
-function buildStation(code: string, moduleRef: string = 'storage'): PlayerStationEntry {
+function buildStation(code: string, moduleRef: string = 'storage', amount: number = 1): PlayerStationEntry {
   return {
     code,
     macro: '',
     owner: '',
     relative_position: { x: 0, y: 0, z: 0 },
     position: { x: 0, y: 0, z: 0 },
-    modules: [{ ref: moduleRef, amount: 1 }]
+    modules: [{ ref: moduleRef, amount }]
+  }
+}
+
+function buildStationWithModules(code: string, modules: PlayerStationEntry['modules']): PlayerStationEntry {
+  return {
+    code,
+    macro: '',
+    owner: '',
+    relative_position: { x: 0, y: 0, z: 0 },
+    position: { x: 0, y: 0, z: 0 },
+    modules
   }
 }
 
@@ -248,7 +260,7 @@ describe('autoGroup assignment state after user selection', () => {
 
     expect(updated.groups.find((group) => group.sectorMacro === 'C')?.color).toBeTruthy()
     expect(updated.groups.find((group) => group.sectorMacro === 'C')?.color).not.toBe('transparent')
-    expect(updated.groups.find((group) => group.sectorMacro === 'C')?.isPinned).toBe(true)
+    expect(updated.groups.find((group) => group.sectorMacro === 'C')?.isPinned).toBe(false)
   })
 
   it('uses sectorMacro as bridge hub runtime id instead of auto uuid', () => {
@@ -1491,12 +1503,74 @@ describe('autoGroup assignment state after user selection', () => {
 
     it('station candidates are sorted by score descending', () => {
       const archive = buildArchiveWithStations(['H'])
+      archive.sectors.H!.player_stations = {
+        low_storage: buildStation('low_storage', 'storage', 1),
+        production_only: buildStation('production_only', 'production'),
+        high_storage: buildStation('high_storage', 'storage', 3)
+      }
       const result = groupCleanSlate(archive, modulesByMacroId, stationGraph, stationCluster)
 
       const candidates = result.sectorStationCandidates!['H']!
+      expect(candidates.map((c) => c.stationCode)).toEqual(['high_storage', 'low_storage'])
       for (let i = 1; i < candidates.length; i++) {
         expect(candidates[i]!.score).toBeLessThanOrEqual(candidates[i - 1]!.score)
       }
+    })
+
+    it('uses production penalty in score even when station is below container threshold', () => {
+      const archive = buildArchiveWithStations(['H'])
+      archive.sectors.H!.player_stations = {
+        low_storage_many_prod: buildStationWithModules('low_storage_many_prod', [
+          { ref: 'storage', amount: 4 },
+          { ref: 'production', amount: 54 }
+        ]),
+        lower_storage_less_prod: buildStationWithModules('lower_storage_less_prod', [
+          { ref: 'storage', amount: 3 },
+          { ref: 'production', amount: 10 }
+        ])
+      }
+
+      const result = groupCleanSlate(
+        archive,
+        modulesByMacroId,
+        stationGraph,
+        stationCluster,
+        { containerThreshold: 50 }
+      )
+
+      const candidates = result.sectorStationCandidates!['H']!
+      expect(candidates.map((c) => c.stationCode)).toEqual([
+        'lower_storage_less_prod',
+        'low_storage_many_prod'
+      ])
+      expect(candidates[0]!.score).toBeGreaterThan(candidates[1]!.score)
+    })
+
+    it('keeps all non-zero raw station candidates without top 5 or qualified filtering', () => {
+      const archive = buildArchiveWithStations(['H'])
+      archive.sectors.H!.player_stations = Object.fromEntries([
+        ['low_storage', buildStation('low_storage', 'storage', 1)],
+        ...Array.from({ length: 6 }, (_, index) => [
+          `production_${index}`,
+          buildStationWithModules(`production_${index}`, [
+            { ref: 'storage', amount: 10 + index },
+            { ref: 'production', amount: 1 }
+          ])
+        ] as const)
+      ])
+
+      const result = groupCleanSlate(
+        archive,
+        modulesByMacroId,
+        stationGraph,
+        stationCluster,
+        { containerThreshold: 50 }
+      )
+
+      const candidates = result.sectorStationCandidates!['H']!
+      expect(candidates).toHaveLength(7)
+      expect(candidates.map((c) => c.stationCode)).toContain('low_storage')
+      expect(candidates.find((c) => c.stationCode === 'low_storage')?.qualified).toBe(false)
     })
 
     it('sectorStationCandidates contains stationCode and containerCap for each candidate', () => {
@@ -1508,6 +1582,77 @@ describe('autoGroup assignment state after user selection', () => {
         expect(c.stationCode).toBeTruthy()
         expect(typeof c.containerCap).toBe('number')
       }
+    })
+
+    it('excludes stations without container capacity from trade station candidates', () => {
+      const archive = buildArchiveWithStations(['H'])
+      archive.sectors.H!.player_stations = {
+        qualified_storage: buildStation('qualified_storage', 'storage', 2),
+        production_only: buildStation('production_only', 'production')
+      }
+
+      const result = groupCleanSlate(archive, modulesByMacroId, stationGraph, stationCluster)
+
+      expect(result.sectorStationCandidates!['H']!.map((c) => c.stationCode)).toEqual(['qualified_storage'])
+    })
+
+    it('keeps zero-capacity stations when all raw station candidates have no container capacity', () => {
+      const archive = buildArchiveWithStations(['H'])
+      archive.sectors.H!.player_stations = {
+        production_only_a: buildStation('production_only_a', 'production'),
+        production_only_b: buildStation('production_only_b', 'production')
+      }
+
+      const result = groupCleanSlate(archive, modulesByMacroId, stationGraph, stationCluster)
+
+      expect(result.sectorStationCandidates!['H']!.map((c) => c.stationCode)).toEqual([
+        'production_only_a',
+        'production_only_b'
+      ])
+    })
+
+    it('display candidates keep up to two pure qualified candidates in top 5', () => {
+      const archive = buildArchiveWithStations(['H'])
+      archive.sectors.H!.player_stations = {
+        production_0: buildStationWithModules('production_0', [{ ref: 'storage', amount: 100 }, { ref: 'production', amount: 1 }]),
+        production_1: buildStationWithModules('production_1', [{ ref: 'storage', amount: 90 }, { ref: 'production', amount: 1 }]),
+        production_2: buildStationWithModules('production_2', [{ ref: 'storage', amount: 80 }, { ref: 'production', amount: 1 }]),
+        production_3: buildStationWithModules('production_3', [{ ref: 'storage', amount: 70 }, { ref: 'production', amount: 1 }]),
+        production_4: buildStationWithModules('production_4', [{ ref: 'storage', amount: 60 }, { ref: 'production', amount: 1 }]),
+        pure_0: buildStation('pure_0', 'storage', 2),
+        pure_1: buildStation('pure_1', 'storage', 1)
+      }
+      const result = groupCleanSlate(
+        archive,
+        modulesByMacroId,
+        stationGraph,
+        stationCluster,
+        { containerThreshold: 1 }
+      )
+
+      const displayCandidates = selectTradeStationDisplayCandidates(result.sectorStationCandidates!['H']!, 1)
+
+      expect(displayCandidates).toHaveLength(5)
+      expect(displayCandidates.filter((c) => c.stationCode.startsWith('pure_')).map((c) => c.stationCode)).toEqual([
+        'pure_0',
+        'pure_1'
+      ])
+    })
+
+    it('attaches station icon semantics to raw candidates', () => {
+      const archive = buildArchiveWithStations(['H'])
+      archive.sectors.H!.player_stations = {
+        shiptech_station: {
+          ...buildStation('shiptech_station', 'storage', 1),
+          tag: 'factory',
+          factoryGroup: 'shiptech'
+        }
+      }
+
+      const result = groupCleanSlate(archive, modulesByMacroId, stationGraph, stationCluster)
+
+      const candidate = result.sectorStationCandidates!['H']![0]!
+      expect(candidate.iconTag).toBe('shiptech')
     })
   })
 })

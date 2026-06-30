@@ -67,13 +67,14 @@ appliedAutoGroupArchiveTime === undefined
 
 ### sectorStationCandidates 预计算
 
-`AutoGroupResult` 新增 `sectorStationCandidates: Record<string, TradeStationCandidate[]>`，为每个 player sector 预计算 station 候选列表。
+`AutoGroupResult` 新增 `sectorStationCandidates: Record<string, TradeStationCandidate[]>`，为每个 player sector 预计算 station 原始候选池。
 
-- 在 `groupCleanSlate` / `groupIncremental` / `buildAssignmentsFromBinding` 生成 result 时，遍历所有 player sector 的空间站，使用 `selectTradeStationCandidates` 生成候选列表。
-- 候选列表按 score 排序，与 Trade Station 栏使用同一数据源。
-- Vue Trade Station 栏从该预计算数据按当前 hub group 的 `sectorMacro` 过滤显示。
-- Standalone option 显示从该预计算数据取该 sector 排序最靠前且 `containerCap > 0` 的候选，显示 station code 和 containerCap（格式与 Trade Station 栏一致）。
-- 不存在 `containerCap > 0` 的候选时，standalone option 只显示「独立成组」不附带空间站信息。
+- 在 `groupCleanSlate` / `groupIncremental` / `buildAssignmentsFromBinding` 生成 result 时，遍历所有 player sector 的空间站，生成原始候选池。
+- 原始候选池按 score 排序，保留 `containerCap`、`prodLines`、`score`、`isPureHub`、`qualified` 信息，不按 `qualified` / `requireQualified` 过滤，也不做 top 5 截断。`score` 统一使用 `containerCap / (1 + ln(1 + prodLines))`，不得按 `qualified` 分支切换公式。
+- 原始候选池应用零货舱规则：存在任意 `containerCap > 0` 的空间站时剔除 `containerCap = 0`；全部空间站均为 `containerCap = 0` 时保留这些空间站。
+- Vue Trade Station 栏从该预计算数据按当前 hub group 的 `sectorMacro` 取原始候选池，并由 presenter 按当前 `containerThreshold` 与 top 5 原则生成展示候选；若展示候选池中存在 pure qualified 候选（`isPureHub=true`），top 5 SHALL 尽量保留最多 2 个 pure qualified 候选。
+- Standalone option 复用与 Trade Station 栏一致的展示候选规则，显示该 sector 展示候选中排序最靠前的候选 station code 和 containerCap（格式与 Trade Station 栏一致）。
+- 不存在展示候选时，standalone option 只显示「独立成组」不附带空间站信息。
 
 初始化只由 store 生命周期和 active context 切换触发。组件挂载和 tab 切换不得调用初始化。
 

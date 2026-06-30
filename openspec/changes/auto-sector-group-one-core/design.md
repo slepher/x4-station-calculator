@@ -144,15 +144,17 @@ Trade station 选择与 group 生命周期同步：
 
 - 新增 group 时创建候选列表并按默认值规则设置 `selectedTradeStation`。
 - 删除 group 时删除对应 card 和 draft 中的 trade station 选择。
-- 玩家 sector hub 使用手动 hub 候选规则：有 qualified 站时只列 qualified，否则列全部玩家站。
+- 玩家 sector hub 使用统一候选规则：候选原始数据来自 anchor sector 内玩家站，不按 auto/manual/bridge 来源分叉。
 - 非玩家 sector hub 无玩家站时使用虚拟交易站，不生成虚拟 `stationPlan`。
 - 重置入口由 binding 层的共用顶部栏统一处理，使用 `calculationBaseline` 恢复整份 shared draft；core 不定义区域级 reset 按钮语义。
 - Confirm gate 同时检查 bridge、assignment 和 trade station。
 
 候选来源：
 
-- 自动 hub：anchor sector 内玩家站，top 5，保护 pure hub。
-- 手动/bridge hub：优先 qualified，否则全部玩家站。
+- 原始候选池：anchor sector 内玩家站，计算并保留 `containerCap`、`prodLines`、`score`、`isPureHub`、`qualified`、`iconTag`，按 score 排序，不做 `requireQualified` 过滤，也不在 store 层做 top 5 截断。`score` 统一使用 `containerCap / (1 + ln(1 + prodLines))`，不得按 `qualified` 分支切换公式。`iconTag` 复用现有玩家空间站 POI 图标语义：优先使用存档已有 `tag/factoryGroup`，缺失时基于空间站模块分类推导。
+- 零货舱规则：若存在任意 `containerCap > 0` 的空间站，则从原始候选池剔除 `containerCap = 0`；若所有空间站均为 `containerCap = 0`，则保留这些空间站。
+- 展示候选：presenter 基于原始候选池和当前 `containerThreshold` 做展示筛选，并在展示层执行 top 5 原则；若展示候选池中存在 pure qualified 候选（`isPureHub=true`），top 5 SHALL 尽量保留最多 2 个 pure qualified 候选，可替换 top 5 末尾的非 pure qualified 候选；`containerThreshold` 是生成新 hub 的依据，不是原始候选池过滤条件。
+- 候选图标：Trade Station 栏使用现有 save station icon 映射渲染候选 `iconTag`；当前选中的候选图标使用光晕高亮。虚拟交易站候选使用 trade station 图标并遵循相同选中高亮。
 - 无玩家站：虚拟交易站。
 
 ## 持久化

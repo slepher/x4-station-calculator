@@ -63,7 +63,10 @@
 ## 6. Trade station
 
 - [ ] 实现 trade station candidate 计算
-- [ ] 实现自动 hub、手动 hub、bridge hub、无玩家站 hub 的默认值规则
+- [ ] 实现 trade station 原始候选池：按 score 排序、保留 `isPureHub` / `qualified` 信息、不按 `requireQualified` 过滤、不在 store 层 top 5 截断
+- [ ] 实现原始候选池零货舱规则：存在 `containerCap > 0` 时剔除 0；全部为 0 时保留
+- [ ] presenter 基于原始候选池和 `containerThreshold` 生成展示候选，并在展示层执行 top 5 原则；展示候选池中存在 pure qualified 候选时，top 5 尽量保留最多 2 个 pure qualified 候选
+- [ ] 实现无玩家站 hub 的虚拟交易站默认值，以及候选默认选择规则
 - [ ] Hub 添加时同步生成 trade station 候选和默认选择
 - [ ] Hub 删除时同步移除 trade station draft 状态
 - [ ] 实现 `tradeStationRetainEnabled` 与 `savedTradeStationCode`

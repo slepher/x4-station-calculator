@@ -27,7 +27,7 @@
 
 ## 4 Trade Station
 
-- [ ] 4.1 候选列表：覆盖自动 hub、手动 hub、bridge hub、无玩家站 hub 的候选差异
+- [ ] 4.1 候选列表：覆盖原始候选池、presenter 展示筛选、top 5 保留 pure qualified、零货舱规则、无玩家站 hub
 - [ ] 4.2 默认值：覆盖 pure hub、混合候选、全生产站候选、无玩家站 virtual station 默认值
 - [ ] 4.3 retain：覆盖 trade station retain 启用时优先使用 saved code
 - [ ] 4.4 confirm gate：覆盖 bridge、assignment、trade station 三类未解决项阻断提交

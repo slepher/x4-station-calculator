@@ -89,7 +89,7 @@
   - [✓] 3.2.2 验证该 sector 从其他 group active coverage 中移除
   - [✓] 3.2.3 验证该 sector 不再有 ordinary assignment card
   - [✓] 3.2.4 验证新 group 自动生成 trade station 候选和默认选择
-  - [✓] 3.2.5 验证 manual hub 的 trade station 候选使用 qualified 优先规则
+  - [✓] 3.2.5 验证 manual hub 的 trade station 展示候选来自统一原始候选池，不使用 qualified-only 分叉
 
 - [✓] 3.3 添加非玩家 sector hub：覆盖不创建虚拟 stationPlan，默认使用 virtual trade station
   - [✓] 3.3.1 在 hub 添加菜单输入搜索条件，选择无玩家站的 sector 作为 hub
@@ -112,11 +112,11 @@
 
 ## 4 Trade Station
 
-- [✓] 4.1 候选列表：覆盖自动 hub、手动 hub、bridge hub、无玩家站 hub 的候选差异
-  - [✓] 4.1.1 验证自动 hub 候选来自 anchor sector 内玩家站，按 score 排序，top 5，保护 pure hub
-  - [✓] 4.1.2 验证手动 hub 有 qualified 站时只列 qualified
-  - [✓] 4.1.3 验证手动 hub 无 qualified 站时列全部玩家站
-  - [✓] 4.1.4 验证 bridge hub 候选规则与手动 hub 一致
+- [✓] 4.1 候选列表：覆盖原始候选池、presenter 展示筛选、top 5 保留 pure qualified、零货舱规则、无玩家站 hub
+  - [✓] 4.1.1 验证原始候选池来自 anchor sector 内玩家站，按 score 排序，保留 `isPureHub` / `qualified` 信息且不做 top 5 截断
+  - [✓] 4.1.2 验证存在 `containerCap > 0` 候选时剔除 `containerCap = 0`
+  - [✓] 4.1.3 验证所有玩家站 `containerCap = 0` 时原始候选池保留这些站
+  - [✓] 4.1.4 验证 presenter 按当前 `containerThreshold` 和 top 5 原则生成展示候选，并在存在 pure qualified 候选时尽量保留最多 2 个
   - [✓] 4.1.5 验证无玩家站 hub 候选仅包含虚拟交易站
 
 - [✓] 4.2 默认值：覆盖 pure hub、混合候选、全生产站候选、无玩家站 virtual station 默认值

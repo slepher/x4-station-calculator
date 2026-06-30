@@ -78,8 +78,12 @@
 ### Trade station
 
 - 每个 hub group 都必须有 trade station 选择。
-- 自动 hub 候选来自 anchor sector 内玩家站，按 score 排序，最多 top 5，并保护 pure hub。
-- 手动 hub 和 bridge hub 有 qualified 站时只列 qualified；没有 qualified 时列全部玩家站。
+- 原始 trade station 候选池来自 hub anchor sector 内全部玩家站，按 score 排序，不按 `qualified` / `requireQualified` 过滤，也不在原始数据层做 top 5 截断。
+- 原始候选池 SHALL 保留 `containerCap`、`prodLines`、`score`、`isPureHub`、`qualified` 等信息；`score` SHALL 统一使用 `containerCap / (1 + ln(1 + prodLines))`，不得按 `qualified` 分支切换公式；`qualified` 仅作为信息和生成新 hub 的依据，不作为候选展示过滤条件。
+- 原始候选池 SHALL 按现有玩家空间站 POI 图标语义为每个候选生成 `iconTag`，优先使用存档已有 `tag/factoryGroup`，缺失时基于空间站模块分类推导。
+- 原始候选池的零货舱规则：若该 sector 存在任意 `containerCap > 0` 的空间站，则剔除 `containerCap = 0` 的空间站；若所有空间站均为 `containerCap = 0`，则保留这些空间站以避免候选池为空。
+- Trade Station 栏由 presenter 基于原始候选池和当前 `containerThreshold` 生成展示列表，并在展示层执行 top 5 原则；若展示候选池中存在 pure qualified 候选（`isPureHub=true`），top 5 SHALL 尽量保留最多 2 个 pure qualified 候选，可替换 top 5 末尾的非 pure qualified 候选；不得按 hub `source` 区分 auto/manual/bridge 的 qualified-only 展示规则。
+- Trade Station 栏 SHALL 按现有 save station icon 映射显示每个候选的图标；当前选中的候选图标 SHALL 有光晕高亮。
 - 无玩家站 hub 使用虚拟交易站，默认选中。
 - Mixed pure hub/生产站候选中，若第一名不是 pure hub，则不自动默认。
 - 全生产站候选中，第一名 score 大于第二名 1.3 倍才默认选中。

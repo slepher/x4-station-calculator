@@ -1,5 +1,6 @@
 import type { X4Module } from '@/types/x4'
 import type { PlayerStationEntry } from '@/types/saveArchive'
+import { getPoiIconTag } from './stationPoiSemantics'
 import {
   detectStationHub,
   DEFAULT_HUB_CONFIG,
@@ -17,6 +18,10 @@ export interface TradeStationCandidate {
   hasVolume: boolean
   isPureHub: boolean
   qualified: boolean
+  iconTag?: string
+  tag?: string
+  factoryGroup?: string
+  isHeadquarter?: boolean
 }
 
 export interface TradeStationSelection {
@@ -24,7 +29,19 @@ export interface TradeStationSelection {
   stationCode: string
 }
 
-export function stationHubToCandidate(info: StationHubInfo): TradeStationCandidate {
+function resolveStationIconTag(
+  station: PlayerStationEntry | undefined
+): string | undefined {
+  if (!station) return undefined
+  const tag = station.tag
+  const factoryGroup = station.factoryGroup
+  return getPoiIconTag({ tag, factoryGroup }) || undefined
+}
+
+export function stationHubToCandidate(
+  info: StationHubInfo,
+  station?: PlayerStationEntry
+): TradeStationCandidate {
   return {
     stationCode: info.stationCode,
     macro: info.stationMacro,
@@ -34,41 +51,60 @@ export function stationHubToCandidate(info: StationHubInfo): TradeStationCandida
     hasProduction: info.prodLines > 0,
     hasVolume: info.containerCap > 0,
     isPureHub: info.isPureHub,
-    qualified: info.qualified
+    qualified: info.qualified,
+    iconTag: resolveStationIconTag(station),
+    tag: station?.tag,
+    factoryGroup: station?.factoryGroup,
+    isHeadquarter: station?.is_headquarter
   }
 }
 
 export function selectTradeStationCandidates(
   stations: PlayerStationEntry[],
   modulesByMacroId: Record<string, X4Module>,
-  requireQualified: boolean,
+  _requireQualified: boolean,
   config: HubDetectionConfig = DEFAULT_HUB_CONFIG
 ): TradeStationCandidate[] {
   if (stations.length === 0) return []
 
   const scored = stations
-    .map((s) => detectStationHub(s, modulesByMacroId, config))
-    .filter((info) => {
-      if (requireQualified) return info.qualified
-      return true
-    })
+    .map((station) => ({
+      station,
+      info: detectStationHub(station, modulesByMacroId, config)
+    }))
+  const hasContainerStation = scored.some(({ info }) => info.containerCap > 0)
+  const rawCandidates = hasContainerStation
+    ? scored.filter(({ info }) => info.containerCap > 0)
+    : scored
 
-  if (scored.length === 0 && requireQualified) {
-    return stations
-      .map((s) => detectStationHub(s, modulesByMacroId, config))
-      .map(stationHubToCandidate)
-  }
+  rawCandidates.sort((a, b) => b.info.score - a.info.score)
 
-  scored.sort((a, b) => b.score - a.score)
+  return rawCandidates.map(({ station, info }) => stationHubToCandidate(info, station))
+}
 
-  const top5 = scored.slice(0, 5).map(stationHubToCandidate)
+export function selectTradeStationDisplayCandidates(
+  candidates: TradeStationCandidate[],
+  containerThreshold: number,
+  limit: number = 5
+): TradeStationCandidate[] {
+  if (candidates.length === 0) return []
+
+  const displayCandidates = candidates.map((candidate) => {
+    const qualified = candidate.containerCap >= containerThreshold
+    return {
+      ...candidate,
+      qualified,
+      isPureHub: qualified && candidate.prodLines === 0
+    }
+  })
+
+  const top5 = displayCandidates.slice(0, limit)
 
   const pureHubsInTop = top5.filter((c) => c.isPureHub)
   if (pureHubsInTop.length < 2 && top5.length >= 2) {
-    const remainingPureHubs = scored
-      .slice(5)
-      .filter((h) => h.isPureHub)
-      .map(stationHubToCandidate)
+    const remainingPureHubs = displayCandidates
+      .slice(limit)
+      .filter((candidate) => candidate.isPureHub)
     const needed = 2 - pureHubsInTop.length
     const pureHubsToAdd = remainingPureHubs.slice(0, needed)
 

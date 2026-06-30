@@ -8,40 +8,64 @@
 
 ### Requirement: TradeStation 候选值计算
 
-系统 SHALL 在自动分组计算完成后，为每个 group 的锚点星区计算贸易站候选列表。
+系统 SHALL 在自动分组计算完成后，为每个 group 的锚点星区计算贸易站原始候选池，并由 presenter 基于原始候选池生成 Trade Station 栏展示候选。
 
-#### Scenario: 自动生成 hub 的候选列表
+#### Scenario: 原始候选池计算
 
-- **前提**：星区 A 有 4 个玩家空间站，其中 2 个 pureHub（qualified 且 prodLines===0）、2 个生产站
+- **前提**：星区 A 有多个玩家空间站，其中包含 pureHub、生产站和低于 `containerThreshold` 的空间站
 - **当**：系统生成自动分组结果，星区 A 成为 hub anchor
-- **那么**：候选列表包含全部 4 个站，按 score 降序排列为 top 5
-- **并且**：top 5 中至少保留 2 个 pureHub（如星区内存在 >= 2 个 pureHub）
+- **那么**：原始候选池 SHALL 包含该 anchor sector 内符合零货舱规则的玩家空间站，按 score 降序排序
+- **并且**：原始候选池 SHALL 保留 `containerCap`、`prodLines`、`score`、`isPureHub`、`qualified`、`iconTag` 信息
+- **并且**：`score` SHALL 统一使用 `containerCap / (1 + ln(1 + prodLines))`，不得按 `qualified` 分支切换公式
+- **并且**：`iconTag` SHALL 复用现有玩家空间站 POI 图标语义生成；存档已有 `tag/factoryGroup` 时优先使用，缺失时基于空间站模块分类推导
+- **并且**：原始候选池 SHALL NOT 按 `qualified` / `requireQualified` 过滤
+- **并且**：原始候选池 SHALL NOT 做 top 5 截断
 
-#### Scenario: 用户手动添加 hub 且有 qualified 站
+#### Scenario: 零货舱空间站过滤
 
-- **前提**：星区 B 有 3 个玩家空间站，其中 1 个 qualified（>= 5M containerCap）但非 pureHub，2 个不 qualified
-- **当**：用户手动在星区 B 添加 hub
-- **那么**：候选列表仅包含 1 个 qualified 站
+- **前提**：星区 B 有多个玩家空间站
+- **并且**：至少一个空间站 `containerCap > 0`
+- **当**：系统计算该 sector 的原始候选池
+- **那么**：原始候选池 SHALL 剔除 `containerCap = 0` 的空间站
 
-#### Scenario: 用户手动添加 hub 且无 qualified 站
+#### Scenario: 全部空间站无货舱
 
-- **前提**：星区 C 有 2 个玩家空间站，均不 qualified（containerCap < 5M）
-- **当**：用户手动在星区 C 添加 hub
-- **那么**：候选列表包含全部 2 个站（忽略阈值限制）
+- **前提**：星区 C 的玩家空间站全部 `containerCap = 0`
+- **当**：系统计算该 sector 的原始候选池
+- **那么**：原始候选池 SHALL 保留这些 `containerCap = 0` 的空间站
 
-#### Scenario: bridge hub 的候选列表
+#### Scenario: 展示候选由 presenter 筛选
 
-- **前提**：星区 E 成为 bridge plan 中的一个 unit anchor，星区内有 3 个玩家空间站
-- **当**：bridge plan 被采用，该 unit 创建为 bridge group
-- **那么**：候选列表包含全部 3 个站（不强制 qualified 阈值，与手动 hub 同规则）
+- **前提**：某 hub group 存在原始候选池
+- **当**：Trade Station 栏渲染该 group 的候选列表
+- **那么**：presenter SHALL 基于原始候选池和当前 `containerThreshold` 生成展示候选
+- **并且**：top 5 原则 SHALL 在 presenter 展示层执行
+- **并且**：展示候选 SHALL NOT 按 hub `source` 区分 auto/manual/bridge 的 qualified-only 规则
 
-#### Scenario: 不足 5 个候选且 pureHub 补充
+#### Scenario: 候选列表显示空间站图标
 
-- **前提**：星区 D 有 2 个 pureHub 和 4 个生产站（共 6 个玩家站），pureHub 的 score 排在第 4-6 位
-- **当**：计算候选列表
-- **那么**：返回前 3 个生产站（score 1-3）+ 2 个 pureHub（score 4-5），共 5 个候选
-- **并且**：pureHub 通过替换最低分非 pureHub 进入 top 5，非追加
-- **并且**：候选总数不超过 5
+- **前提**：Trade Station 栏渲染某 group 的展示候选
+- **当**：候选是玩家空间站
+- **那么**：候选行 SHALL 显示按该候选 `iconTag` 映射得到的空间站图标
+- **并且**：当前选中的候选图标 SHALL 显示光晕高亮
+- **当**：候选是虚拟交易站
+- **那么**：候选行 SHALL 显示 trade station 图标
+- **并且**：虚拟交易站被选中时，其图标 SHALL 显示同样的光晕高亮
+
+#### Scenario: 展示 top 5 保留 pure qualified 候选
+
+- **前提**：某 hub group 的展示候选池中存在 pure qualified 候选（`isPureHub=true`）
+- **并且**：按 score 直接取 top 5 时 pure qualified 候选少于 2 个
+- **当**：presenter 生成 Trade Station 栏展示候选
+- **那么**：top 5 SHALL 尽量补入最多 2 个 pure qualified 候选
+- **并且**：补入 pure qualified 候选时 SHALL 替换 top 5 末尾的非 pure qualified 候选，候选总数 SHALL NOT 超过 5
+
+#### Scenario: containerThreshold 不过滤原始候选池
+
+- **前提**：星区 D 有低于 `containerThreshold` 但 `containerCap > 0` 的玩家空间站
+- **当**：系统计算该 sector 的原始候选池
+- **那么**：该空间站 SHALL 保留在原始候选池中
+- **并且**：`containerThreshold` SHALL 仅作为生成新 hub 和展示层筛选的依据
 
 ### Requirement: TradeStation 默认值算法
 
