@@ -70,9 +70,10 @@ appliedAutoGroupArchiveTime === undefined
 `AutoGroupResult` 新增 `sectorStationCandidates: Record<string, TradeStationCandidate[]>`，为每个 player sector 预计算 station 原始候选池。
 
 - 在 `groupCleanSlate` / `groupIncremental` / `buildAssignmentsFromBinding` 生成 result 时，遍历所有 player sector 的空间站，生成原始候选池。
-- 原始候选池按 score 排序，保留 `containerCap`、`prodLines`、`score`、`isPureHub`、`qualified` 信息，不按 `qualified` / `requireQualified` 过滤，也不做 top 5 截断。`score` 统一使用 `containerCap / (1 + ln(1 + prodLines))`，不得按 `qualified` 分支切换公式。
+- 原始候选池按 score 排序，保留 `containerCap`、`prodLines`、`score`、`isPureHub`、`qualified`、`tag`、`factoryGroup`、`isHeadquarter`、`iconTag` 信息，不按 `qualified` / `requireQualified` 过滤，也不做 top 5 截断。`score` 统一使用 `containerCap / (1 + ln(1 + prodLines))`，不得按 `qualified` 分支切换公式。图标语义字段来自存档中已生成的玩家空间站语义，候选池计算不重新按模块或 construction 推导空间站类型。
 - 原始候选池应用零货舱规则：存在任意 `containerCap > 0` 的空间站时剔除 `containerCap = 0`；全部空间站均为 `containerCap = 0` 时保留这些空间站。
 - Vue Trade Station 栏从该预计算数据按当前 hub group 的 `sectorMacro` 取原始候选池，并由 presenter 按当前 `containerThreshold` 与 top 5 原则生成展示候选；若展示候选池中存在 pure qualified 候选（`isPureHub=true`），top 5 SHALL 尽量保留最多 2 个 pure qualified 候选。
+- Trade Station 栏展示候选时复用 save station sidebar 的图标映射和绿色染色：玩家站按 `tag/factoryGroup/isHeadquarter` 显示图标，虚拟交易站显示 trade station 图标；图标替代旧 radio 圆点，选中态使用绿色光晕；普通模式图标本体和占位为 24px，地图紧凑模式为 20px，不使用额外圆形背景。
 - Standalone option 复用与 Trade Station 栏一致的展示候选规则，显示该 sector 展示候选中排序最靠前的候选 station code 和 containerCap（格式与 Trade Station 栏一致）。
 - 不存在展示候选时，standalone option 只显示「独立成组」不附带空间站信息。
 

@@ -120,8 +120,10 @@ Trade station 在 Live 计算模式中作为第三列展示和 confirm gate 的�
 - assignment 中用户选择 absorb 到其他 group SHALL 删除该 sector 自身 hub group（不论是否新建），清理其 trade station / connections，并将该 sector 加入目标 group coverage。
 - 若历史数据或旧 bug 导致同一 `sectorMacro` 出现多个 hub group，absorb SHALL 以 `sectorMacro` 为依据清理全部重复 hub，避免残留重复身份。
 - 系统在载入存档生成 `AutoGroupResult` 时 SHALL 为每个 player sector 预计算 station 原始候选池 `sectorStationCandidates`，按 score 排序；`score` SHALL 统一使用 `containerCap / (1 + ln(1 + prodLines))`，不得按 `qualified` 分支切换公式；原始候选池不得按 `qualified` / `requireQualified` 过滤，也不得做 top 5 截断。
+- 原始候选池 SHALL 携带存档已生成的玩家空间站图标语义字段（`tag`、`factoryGroup`、`isHeadquarter`、`iconTag`），候选池计算阶段 SHALL NOT 重新按模块或 construction 推导空间站类型。
 - 原始候选池 SHALL 应用零货舱规则：存在任意 `containerCap > 0` 的空间站时剔除 `containerCap = 0`；全部空间站均为 `containerCap = 0` 时保留这些空间站。
 - Vue Trade Station 栏从预计算数据按当前 hub group 的 `sectorMacro` 过滤，并由 presenter 按当前 `containerThreshold` 与 top 5 原则生成展示候选；若展示候选池中存在 pure qualified 候选（`isPureHub=true`），top 5 SHALL 尽量保留最多 2 个 pure qualified 候选；提交时也只提交当前 hub group 的选择。
+- Vue Trade Station 栏 SHALL 使用与 save station sidebar 一致的图标映射和绿色染色显示候选图标，以图标替代旧 radio 圆点；选中图标 SHALL 使用绿色光晕；普通模式图标为 24px，地图紧凑模式为 20px，不显示额外圆形背景。
 - Standalone option SHALL 复用与 Trade Station 栏一致的展示候选规则，取该 sector 展示候选中排序最靠前的候选，显示 station code 和 containerCap（格式与 Trade Station 栏一致）；不存在展示候选时只显示「独立成组」。
 
 ### Hub 列控制按钮

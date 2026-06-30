@@ -621,13 +621,15 @@ Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触�
 #### Scenario: Standalone option shows top station candidate
 
 - **前提** 系统在载入存档生成 `AutoGroupResult` 时 SHALL 为每个 player sector 预计算 station 原始候选池 `sectorStationCandidates: Record<string, TradeStationCandidate[]>`
-- **并且** 原始候选池 SHALL 按 score 排序、保留 `containerCap` / `isPureHub` / `qualified` 信息、不得按 `qualified` / `requireQualified` 过滤、不得做 top 5 截断
+- **并且** 原始候选池 SHALL 按 score 排序、保留 `containerCap` / `isPureHub` / `qualified` / `tag` / `factoryGroup` / `isHeadquarter` / `iconTag` 信息、不得按 `qualified` / `requireQualified` 过滤、不得做 top 5 截断
 - **并且** `score` SHALL 统一使用 `containerCap / (1 + ln(1 + prodLines))`，不得按 `qualified` 分支切换公式
+- **并且** 图标语义字段 SHALL 来自存档中已生成的玩家空间站语义，候选池计算 SHALL NOT 重新按模块或 construction 推导空间站类型
 - **并且** 原始候选池 SHALL 应用零货舱规则：存在任意 `containerCap > 0` 时剔除 `containerCap = 0`；全部为 0 时保留这些站
 - **当** 系统渲染 assignment card 的 standalone option
 - **那么** SHALL 复用与 Trade Station 栏一致的 presenter 展示候选规则，取该 sector 展示候选中排序最靠前的候选
 - **并且** 该展示候选规则 SHALL 包含 top 5 保留最多 2 个 pure qualified 候选的规则
 - **并且** SHALL 显示空间站 code 和 containerCap（格式与 Trade Station 栏一致，如 `12.0M`）
+- **并且** Trade Station 栏候选 SHALL 复用 save station sidebar 图标映射和绿色染色，以图标替代旧 radio 圆点；选中态使用绿色光晕；普通模式图标为 24px，地图紧凑模式为 20px，不显示额外圆形背景
 - **当** 该 sector 不存在展示候选
 - **那么** SHALL 显示「独立成组」不附带空间站信息
 

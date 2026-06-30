@@ -15,9 +15,10 @@
 - **前提**：星区 A 有多个玩家空间站，其中包含 pureHub、生产站和低于 `containerThreshold` 的空间站
 - **当**：系统生成自动分组结果，星区 A 成为 hub anchor
 - **那么**：原始候选池 SHALL 包含该 anchor sector 内符合零货舱规则的玩家空间站，按 score 降序排序
-- **并且**：原始候选池 SHALL 保留 `containerCap`、`prodLines`、`score`、`isPureHub`、`qualified`、`iconTag` 信息
+- **并且**：原始候选池 SHALL 保留 `containerCap`、`prodLines`、`score`、`isPureHub`、`qualified`、`iconTag`、`tag`、`factoryGroup`、`isHeadquarter` 信息
 - **并且**：`score` SHALL 统一使用 `containerCap / (1 + ln(1 + prodLines))`，不得按 `qualified` 分支切换公式
-- **并且**：`iconTag` SHALL 复用现有玩家空间站 POI 图标语义生成；存档已有 `tag/factoryGroup` 时优先使用，缺失时基于空间站模块分类推导
+- **并且**：`iconTag` SHALL 复用存档中已生成的玩家空间站 POI 语义字段，由 `tag/factoryGroup` 映射得到
+- **并且**：候选池计算 SHALL NOT 在此阶段重新按模块或 construction 推导空间站类型
 - **并且**：原始候选池 SHALL NOT 按 `qualified` / `requireQualified` 过滤
 - **并且**：原始候选池 SHALL NOT 做 top 5 截断
 
@@ -46,8 +47,12 @@
 
 - **前提**：Trade Station 栏渲染某 group 的展示候选
 - **当**：候选是玩家空间站
-- **那么**：候选行 SHALL 显示按该候选 `iconTag` 映射得到的空间站图标
-- **并且**：当前选中的候选图标 SHALL 显示光晕高亮
+- **那么**：候选行 SHALL 显示按该候选 `tag/factoryGroup/isHeadquarter` 通过现有 save station icon 映射得到的空间站图标
+- **并且**：候选行 SHALL 使用图标替代旧 radio 圆点
+- **并且**：候选图标 SHALL 使用 sidebar 同款绿色染色
+- **并且**：当前选中的候选图标 SHALL 显示绿色光晕高亮
+- **并且**：普通候选列表图标本体和外层占位 SHALL 为 24px，地图紧凑模式 SHALL 为 20px
+- **并且**：候选图标 SHALL NOT 使用额外圆形背景
 - **当**：候选是虚拟交易站
 - **那么**：候选行 SHALL 显示 trade station 图标
 - **并且**：虚拟交易站被选中时，其图标 SHALL 显示同样的光晕高亮

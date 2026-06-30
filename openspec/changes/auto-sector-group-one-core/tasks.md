@@ -66,6 +66,8 @@
 - [ ] 实现 trade station 原始候选池：按 score 排序、保留 `isPureHub` / `qualified` 信息、不按 `requireQualified` 过滤、不在 store 层 top 5 截断
 - [ ] 实现原始候选池零货舱规则：存在 `containerCap > 0` 时剔除 0；全部为 0 时保留
 - [ ] presenter 基于原始候选池和 `containerThreshold` 生成展示候选，并在展示层执行 top 5 原则；展示候选池中存在 pure qualified 候选时，top 5 尽量保留最多 2 个 pure qualified 候选
+- [ ] 原始候选池携带存档已生成的 `tag` / `factoryGroup` / `isHeadquarter` / `iconTag` 图标语义字段，候选池计算阶段不重新按模块或 construction 推导空间站类型
+- [ ] Trade Station 候选列表使用 save station icon 映射渲染候选图标，以图标替代 radio 圆点；图标使用 sidebar 同款绿色染色，选中态使用绿色光晕；普通模式 24px，地图紧凑模式 20px，且不使用额外圆形背景
 - [ ] 实现无玩家站 hub 的虚拟交易站默认值，以及候选默认选择规则
 - [ ] Hub 添加时同步生成 trade station 候选和默认选择
 - [ ] Hub 删除时同步移除 trade station draft 状态
@@ -80,3 +82,31 @@
 ## 7. 构建验证
 
 - [ ] 实现完成后运行 `npm run build`
+
+## 8. Reachability 缓存与距离接入
+
+- [x] 新增 `scripts/generate_sector_reachability.ts`
+- [x] 使用 `getopts` 支持 `--version <version>` 和 `--help`
+- [x] 解析版本到 `src/assets/x4_game_data/<folderName>/data/maps.json`
+- [x] 复用现有 sector graph 构建逻辑，保持单向 superhighway 排除规则一致
+- [x] 对所有地图 sector 生成 `0..5` 跳 reachability
+- [x] 输出稳定排序的 `sector_reachability.json`
+- [x] 打印版本、source 数量、target 数量、输出路径等生成统计
+- [x] 增加 `SectorReachability` 类型定义
+- [x] 在 `GameDataFiles` 中加入 `sectorReachability`
+- [x] 在 `loadGameDataFiles()` 中加载 `sector_reachability.json`
+- [x] 在 game data store 中暴露当前版本 reachability
+- [x] 新增 reachability 查表 helper，统一返回 `number | null`
+- [x] `buildAssignmentResult()` 改为使用 reachability 查距
+- [x] standalone upsert 和派生 options 改为使用 reachability 查距
+- [x] jumpRange 变更后的 assignment 重建改为使用 reachability 查距
+- [x] `computeGroupGraph()` / MST 候选边改为使用 reachability 查距
+- [x] confirm 写入 coverage entries 时使用 reachability 写入 jump
+- [x] 移除 auto-sector-group assignment 路径中的重复运行时 BFS
+- [x] presenter 从 game data store 读取 reachability 并传入领域函数
+- [x] Sector group card 统一 pill 距离判断改为使用 reachability
+- [x] 保持现有页面布局、按钮、card、pill 和 option 操作流程不变
+- [x] 将 `jumpRange` 和 `bridgeSearchJumpRange` 的有效计算范围限制到 `0..5`
+- [x] 运行 `vite-node scripts/generate_sector_reachability.ts --version 8.0`
+- [x] 运行 `vite-node scripts/generate_sector_reachability.ts --version 9.0`
+- [x] 检查两个版本均生成 `data/sector_reachability.json`

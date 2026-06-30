@@ -51,3 +51,5 @@
 - [ ] 6.5 防止 connection retain 关闭后仍作为 fixed edge 输入
 - [ ] 6.6 防止 `__virtual__` 写入持久化 `saveStationCode`
 - [ ] 6.7 防止旧 `hubStationCode` 或 fallback best station 覆盖用户选择
+- [ ] 6.8 防止 5 跳外 group 生成 absorb option 或 connected candidate
+- [ ] 6.9 防止 auto-sector-group assignment 路径回退到运行时重复 BFS

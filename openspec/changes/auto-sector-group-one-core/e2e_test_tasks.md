@@ -194,3 +194,11 @@
 
 - [✓] 6.7 防止旧 `hubStationCode` 或 fallback best station 覆盖用户选择
   - [✓] 6.7.1 用户手动选择 trade station 后确认，验证未被旧逻辑覆盖
+
+- [✓] 6.8 防止 5 跳外 group 生成 absorb option 或 connected candidate
+  - [✓] 6.8.1 构造 reachability 查不到的 group-sector 距离，验证 assignment 只保留 standalone 或其他 5 跳内候选
+  - [✓] 6.8.2 构造 reachability 查不到的 group anchor pair，验证不显示 connected candidate 且不进入 MST 候选边
+
+- [✓] 6.9 防止 auto-sector-group assignment 路径回退到运行时重复 BFS
+  - [✓] 6.9.1 验证 presenter 从 game data store 读取 reachability 并传入领域函数
+  - [✓] 6.9.2 验证 assignment、pill、MST 距离判断使用 reachability helper

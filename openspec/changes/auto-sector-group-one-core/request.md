@@ -2,7 +2,7 @@
 
 ## 目标
 
-定义自动星区分组的核心领域行为：从玩家空间站和星区图生成 hub groups、coverage、connections、bridge groups、assignment options，并在确认时写入 binding。Trade station 选择属于 group 写入的核心数据，因此并入本 change，而不是作为独立 change。
+定义自动星区分组的核心领域行为：从玩家空间站和星区图生成 hub groups、coverage、connections、bridge groups、assignment options，并在确认时写入 binding。Trade station 选择属于 group 写入的核心数据，5 跳星区可达缓存属于核心距离数据来源，因此都并入本 change，而不是作为独立 change。
 
 本 change 不负责 Live/Map 面板如何共享 draft，也不负责地图侧栏和颜色渲染；这些分别由 `auto-sector-group-one-binding` 和 `auto-sector-group-one-map` 承担。
 
@@ -25,6 +25,10 @@
 ### 星区图、MST 与 bridge
 
 - 单向 superhighway 不得作为双向可达边。
+- 自动星区分组的距离语义必须优先使用版本化离线生成的 `sector_reachability.json`，而不是在 assignment、pill 或 connection 路径重复运行全图 BFS。
+- `sector_reachability.json` 由 `scripts/generate_sector_reachability.ts --version <version>` 生成，按 `sourceSectorMacro -> targetSectorMacro -> jumpDistance` 组织，并覆盖该版本地图中的所有星区。
+- 缓存只记录 `0..5` 跳内可达星区；若 `reachability[source][target]` 不存在，领域语义为“超过 5 跳或不可达”。
+- 5 跳是运输船自动导航能力的领域上限；`jumpRange` 与 `bridgeSearchJumpRange` 的有效计算范围不得超过 5，旧持久化值超过 5 时运行时按 5 处理。
 - `computeGroupGraph()` 基于 group anchor 之间的距离构建 MST，并双向写入 `connectedGroupIds`。
 - Link 生成只在 anchor pair 距离小于等于 `bridgeSearchJumpRange` 时作为候选边。
 - 用户保留的连接是固定边；重新计算时 MST 只补充缺失边，不删除固定边。
@@ -79,11 +83,12 @@
 
 - 每个 hub group 都必须有 trade station 选择。
 - 原始 trade station 候选池来自 hub anchor sector 内全部玩家站，按 score 排序，不按 `qualified` / `requireQualified` 过滤，也不在原始数据层做 top 5 截断。
-- 原始候选池 SHALL 保留 `containerCap`、`prodLines`、`score`、`isPureHub`、`qualified` 等信息；`score` SHALL 统一使用 `containerCap / (1 + ln(1 + prodLines))`，不得按 `qualified` 分支切换公式；`qualified` 仅作为信息和生成新 hub 的依据，不作为候选展示过滤条件。
-- 原始候选池 SHALL 按现有玩家空间站 POI 图标语义为每个候选生成 `iconTag`，优先使用存档已有 `tag/factoryGroup`，缺失时基于空间站模块分类推导。
+- 原始候选池 SHALL 保留 `containerCap`、`prodLines`、`score`、`isPureHub`、`qualified`、`iconTag`、`tag`、`factoryGroup`、`isHeadquarter` 等信息；`score` SHALL 统一使用 `containerCap / (1 + ln(1 + prodLines))`，不得按 `qualified` 分支切换公式；`qualified` 仅作为信息和生成新 hub 的依据，不作为候选展示过滤条件。
+- 原始候选池 SHALL 复制存档中已生成的玩家空间站语义字段，并按现有 POI 语义由 `tag/factoryGroup` 生成 `iconTag`；候选池计算 SHALL NOT 在此阶段重新按模块或 construction 推导空间站类型。
 - 原始候选池的零货舱规则：若该 sector 存在任意 `containerCap > 0` 的空间站，则剔除 `containerCap = 0` 的空间站；若所有空间站均为 `containerCap = 0`，则保留这些空间站以避免候选池为空。
 - Trade Station 栏由 presenter 基于原始候选池和当前 `containerThreshold` 生成展示列表，并在展示层执行 top 5 原则；若展示候选池中存在 pure qualified 候选（`isPureHub=true`），top 5 SHALL 尽量保留最多 2 个 pure qualified 候选，可替换 top 5 末尾的非 pure qualified 候选；不得按 hub `source` 区分 auto/manual/bridge 的 qualified-only 展示规则。
-- Trade Station 栏 SHALL 按现有 save station icon 映射显示每个候选的图标；当前选中的候选图标 SHALL 有光晕高亮。
+- Trade Station 栏 SHALL 按现有 save station icon 映射显示每个候选的图标，用图标替代旧 radio 圆点；候选图标 SHALL 使用 sidebar 同款绿色染色，当前选中的候选图标 SHALL 有绿色光晕高亮。
+- Trade Station 栏普通候选图标本体 SHALL 使用 24px 外层占位尺寸；地图紧凑模式候选图标本体 SHALL 使用 20px 外层占位尺寸，不额外保留圆形背景。
 - 无玩家站 hub 使用虚拟交易站，默认选中。
 - Mixed pure hub/生产站候选中，若第一名不是 pure hub，则不自动默认。
 - 全生产站候选中，第一名 score 大于第二名 1.3 倍才默认选中。
@@ -97,6 +102,8 @@
 ### In Scope
 
 - Hub detection、clean slate、incremental、sector graph distance。
+- 离线生成并加载版本化 `sector_reachability.json`。
+- assignment、coverage/candidate、connected candidate、MST/bridge 候选距离统一使用 reachability 缓存。
 - MST connections、bridge plan、bridge group 持久化。
 - 编辑态输入、统一 pill 行、assignment option 与 confirm 写入。
 - Sector group card 的编辑态/非编辑态展示、操作按钮和 baseline/current diff 标记。
@@ -115,6 +122,8 @@
 ## 验收标准（DoD）
 
 - 自动分组生成的 groups、coverage、connections、assignments 与 trade station 状态符合本 change specs。
+- `vite-node scripts/generate_sector_reachability.ts --version 8.0` 和 `--version 9.0` 能生成对应版本的 `sector_reachability.json`，且每个 source 只包含 `0..5` 跳 target。
+- 运行时 auto-sector-group 使用 reachability 缓存查距，5 跳外 sector 不生成 absorb option、connected candidate 或 MST 候选边。
 - 编辑态输入可以实时修改 shared draft，但不会直接污染最终 binding；只有确认动作写入持久化。
 - 确认前 bridge、assignment、trade station 未决项均被 gate。
 - 确认后 groups、coverage、connections、station plan group assignment、trade station 均写入一致。

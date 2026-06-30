@@ -78,9 +78,11 @@
 - [ ] `resolveUncertainAssignment` 不清除 `displayBucket` 和 `unpinOrder`，absorb 后 unpin assignment 留在顶部
 - [ ] `AutoGroupResult` 新增 `sectorStationCandidates: Record<string, TradeStationCandidate[]>`
 - [ ] `groupCleanSlate` / `groupIncremental` / `buildAssignmentsFromBinding` 生成 result 时预计算所有 player sector 的 station 原始候选池
-- [ ] 原始候选池按 score 排序，保留 `containerCap` / `isPureHub` / `qualified` 信息，不按 `qualified` / `requireQualified` 过滤，不做 top 5 截断
+- [ ] 原始候选池按 score 排序，保留 `containerCap` / `isPureHub` / `qualified` / `tag` / `factoryGroup` / `isHeadquarter` / `iconTag` 信息，不按 `qualified` / `requireQualified` 过滤，不做 top 5 截断
+- [ ] 原始候选池图标语义字段来自存档中已生成的玩家空间站语义，候选池计算阶段不重新按模块或 construction 推导空间站类型
 - [ ] 原始候选池应用零货舱规则：存在任意 `containerCap > 0` 时剔除 0；全部为 0 时保留
 - [ ] Vue Trade Station 栏从预计算数据按 hub group `sectorMacro` 获取原始候选池，并由 presenter 按 `containerThreshold` 与 top 5 原则生成展示候选；展示候选池中存在 pure qualified 候选时，top 5 尽量保留最多 2 个 pure qualified 候选
+- [ ] Trade Station 栏候选使用 save station sidebar 图标映射和绿色染色，以图标替代 radio 圆点；选中态使用绿色光晕；普通模式 24px，地图紧凑模式 20px，不显示额外圆形背景
 - [ ] Standalone option 复用 Trade Station 栏展示候选规则，显示该 sector 展示候选中排序最靠前的候选（station code + containerCap）
 - [ ] 不存在展示候选时 standalone option 只显示「独立成组」
 
