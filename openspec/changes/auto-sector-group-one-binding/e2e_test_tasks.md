@@ -57,18 +57,18 @@
 
 ## 3 计算、重置与提交
 
-- [ ] 3.1 显式计算：覆盖 [计算] 按钮（edit 模式全重算 / result 模式快速重算共用）更新 shared draft，但不捕获计算完成 baseline
-  - [✓] 3.1.1 在计算模式中修改跳数或阈值后点击计算按钮
+- [ ] 3.1 显式生成：覆盖 [生成方案] 按钮更新 shared draft，但不捕获计算完成 baseline
+  - [✓] 3.1.1 切到生成模式，修改跳数或阈值后点击生成方案按钮
   - [✓] 3.1.2 确认 `autoGroupResult` 更新为新的分组结果
   - [ ] 3.1.3 确认不捕获 `calculationBaseline`
-  - [✓] 3.1.4 在 result 模式点击计算按钮（触发 quick-calculate emit），确认执行计算路径
-  - [✓] 3.1.5 确认显式计算后自动切换到首个未解决 tab（pending bridge -> allocation，unresolved trade station -> tradeStation，否则 -> hub）
+  - [✓] 3.1.4 在生成模式点击生成方案按钮，确认执行生成路径
+  - [✓] 3.1.5 确认显式生成后自动切换到首个未解决 tab（pending bridge -> allocation，unresolved trade station -> tradeStation，否则 -> hub）
 
-- [✓] 3.2 编辑退出：覆盖 [编辑] 后直接修改 shared draft，[退出] 只切回 result 不恢复 snapshot
-  - [✓] 3.2.1 在 result 模式点击编辑按钮，确认进入 edit 模式
-  - [✓] 3.2.2 在 edit 模式下修改 coverage/assignment 等，点击退出按钮，确认切回 result 模式
-  - [✓] 3.2.3 确认退出后 draft 修改保留（不恢复进入编辑前的 snapshot）
-  - [✓] 3.2.4 确认退出操作不调用 snapshot 恢复逻辑
+- [✓] 3.2 编辑切换：覆盖通过三态按钮进入编辑后直接修改 shared draft，切回预览不恢复 snapshot
+  - [✓] 3.2.1 通过三态按钮从预览切到编辑，确认进入编辑模式
+  - [✓] 3.2.2 在编辑模式下修改 coverage/assignment 等，通过三态按钮切回预览，确认不恢复 snapshot
+  - [✓] 3.2.3 确认切回预览后 draft 修改保留（不恢复进入编辑前的 snapshot）
+  - [✓] 3.2.4 确认模式切换不调用 snapshot 恢复逻辑
 
 - [ ] 3.3 重置：覆盖 [重置] 从 saved binding groups + 当前参数重算 group、assignment、trade station、hub color、retain 和 virtual station drafts
   - [✓] 3.3.1 在计算模式中修改 draft（改 assignment、改颜色），点击重置按钮
@@ -78,7 +78,7 @@
   - [✓] 3.3.5 确认重置不重新运行分组算法
 
 - [✓] 3.4 确认 gate：覆盖 edit/no-result/trade-station/uncertain assignment gate 的阻断关系
-  - [✓] 3.4.1 在 edit 模式下点击确认，确认被拦截（返回 false，不写入 binding）
+  - [✓] 3.4.1 在编辑模式下点击确认，确认被拦截（返回 false，不写入 binding）
   - [✓] 3.4.2 在无 result 时点击确认，确认被拦截
   - [✓] 3.4.3 存在未解决 trade station 时点击确认，确认被拦截且不打开 uncertain assignment popup
   - [✓] 3.4.4 存在 uncertain assignment 时点击确认，确认打开二次确认 popup 并返回 false
@@ -106,8 +106,8 @@
   - [✓] 4.2.3 打开 Virtual Station tab 再关闭，确认 drafts 不变
   - [✓] 4.2.4 同 context 下反复进出计算模式，确认 drafts 保留
 
-- [✓] 4.3 重新计算：覆盖 [计算] 后 virtual station drafts 保留并按新 groups 重算归属
-  - [✓] 4.3.1 在已有 virtual station drafts 的状态下点击计算
+- [✓] 4.3 重新生成：覆盖 [生成方案] 后 virtual station drafts 保留并按新 groups 重算归属
+  - [✓] 4.3.1 在已有 virtual station drafts 的状态下点击生成方案
   - [✓] 4.3.2 确认 `virtualStationDrafts` 内容保留
   - [✓] 4.3.3 确认按新 groups 重算了归属（`groupId` 更新）
   - [✓] 4.3.4 确认无当前 group 归属的 draft 保留为未分组状态

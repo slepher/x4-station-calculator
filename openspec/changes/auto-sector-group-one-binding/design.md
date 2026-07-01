@@ -12,6 +12,7 @@ useAutoSectorGroupPresenter
   reads store refs
   assembles UI state
   orchestrates explicit user actions
+  owns panel mode and transient generation overlay
 
 Vue panels
   render and emit
@@ -38,6 +39,8 @@ Presenter 仍可持有 UI 辅助状态，但共享草案不得离开 live store�
 - `nodeEnabled`: 下一次计算是否允许生成新 pure hub。
 - `showHubAddMenu`: 添加 hub 菜单显示状态。
 - `activeTab`: AutoSectorGroupPanel 内的 `hub | allocation | tradeStation` 当前页。
+- `panelMode`: AutoSectorGroupPanel 外显模式 `preview | edit | generate`，UI 文案显示为 `[查看 | 编辑 | 重算]`。
+- `ignoreCurrentNodes`: 重算模式“忽略当前节点”overlay。
 
 `bridgeRetainEnabled` / `coverageRetainEnabled` / `tradeStationRetainEnabled` 为派生态，不是独立真值；它们由当前 `autoGroupResult.groups` 聚合得出。mixed 状态时，新增 hub 默认取 `false`。
 
@@ -93,7 +96,7 @@ gameGuid:archiveTime
 2. 当前 context 已初始化时，保留现有 `virtualStationDrafts`，不得因组件挂载、Map/Live 切换或打开 Virtual Station tab 覆盖用户编辑。
 3. 每次 groups 变化后，按当前 groups 的 anchor/coverage 重算 virtual station 的 `groupId`；无命中时保留 draft 并标记为未分组。
 
-[计算] / [快速计算] 会重新生成 `autoGroupResult.groups`，但不会清空 `virtualStationDrafts`。重算完成后只更新归属结果。
+[重新计算] 或其他显式重算入口会重新生成 `autoGroupResult.groups`，但不会清空 `virtualStationDrafts`。重算完成后只更新归属结果。
 
 ## Reset 与基线
 
@@ -113,7 +116,7 @@ gameGuid:archiveTime
 1. 无 active binding 或 selected archive 时不修改当前 draft。
 2. binding 有 groups 时，将 saved binding groups 作为 base input 调用 `groupIncremental()`。
 3. binding 无 groups 时调用 `groupCleanSlate()`。
-4. 生成 result 后执行与显式计算一致的名称富化、颜色稳定、trade station 默认值和 virtual station draft 归属重算。
+4. 生成 result 后执行与显式生成/重算一致的名称富化、颜色稳定、trade station 默认值和 virtual station draft 归属重算。
 5. 用新 result 替换 `autoGroupResult`，并将 `calculationMode` 设为 `'result'`。
 6. 重置完成后按 pending bridge / uncertain assignment / unresolved trade station / hub 顺序自动切换 tab；若存在 pending bridge plans，Allocation 区域 SHALL 显示 bridge plan list。
 
@@ -124,7 +127,7 @@ gameGuid:archiveTime
 更新时间点：
 
 1. active binding/archive 初始化时，从当前 `SaveBindingPlan.groups` 写入。
-2. 显式 [计算]、[快速计算]、[重置]、pin / unpin 不覆盖该基线。
+2. 显式生成/重算、[重置]、pin / unpin 不覆盖该基线。
 3. 确认成功后，先保存 binding，再从保存后的 `SaveBindingPlan.groups` 刷新。
 
 用途：
@@ -158,11 +161,10 @@ gameGuid:archiveTime
 
 旧设计中的 `editSnapshot` / “取消恢复进入编辑前状态”不再作为最终口径。当前编辑态直接修改 shared draft：
 
-- [编辑] 只设置 `calculationMode='edit'`。
-- [退出] 只设置 `calculationMode='result'`。
-- [退出] 不恢复 coverage、connection、assignment、trade station 或颜色。
+- 三态按钮切到 `编辑` 时允许直接编辑当前 shared draft。
+- 三态按钮从 `编辑` 切回 `查看` 或 `重算` 时，不恢复 coverage、connection、assignment、trade station 或颜色。
 - 追加 range 内候选后 SHALL 移除非 standalone 的扩展候选，与 `buildAssignmentResult` 的 range 内/扩展不共存语义对齐。
-- result 模式下扩展 absorb 导致 hub range 扩大时，受影响 assignment 的选择按 R3 更新。edit 模式下 card 直接修改跳数只维护候选结构，不因更优、更近或平局自动切换其他 sector 的选择。
+- 查看模式下扩展 absorb 导致 hub range 扩大时，受影响 assignment 的选择按 R3 更新。编辑/重算模式下 card 直接修改跳数只维护候选结构，不因更优、更近或平局自动切换其他 sector 的选择。
 - 用户若要丢弃当前 draft 临时修改，必须使用 [重置] 从 saved binding 与当前参数重新计算。
 
 ### Assignment selection identity
@@ -190,7 +192,7 @@ Handler 规则：
 
 - 读写 `liveStore.autoGroupResult`。
 - 读写 `liveStore.virtualStationDrafts`，但 UI 展示结构由 presenter 组装。
-- 计算按钮可以运行纯算法并更新共享 draft。
+- `[重新计算]` 可以运行纯算法并更新共享 draft。
 - 颜色修改只改共享 draft，不直接写 binding。
 - 独立成组、bridge 等路径导致 shared draft 新增 hub 时，presenter/store 交互必须保留 one-map 颜色规则产生的 `group.color`；binding 层不另行定义颜色算法。
 - 确认按钮执行最终持久化，并返回成功/失败状态给 panel。
@@ -223,24 +225,131 @@ Live sidebar 在固定菜单和动态星区/站点列表之间的分隔线区域
 - `autoGroupResult=null` 时置灰禁用。
 - `needsAutoGroupRecalc=true` 时显示红点提示。
 - `activeBindingStation` 变化时，星区编辑详情必须加入固定模式保护列表，避免选择站点或星区后被自动改写为 `station` / `overview`。
-- AutoSectorBar [返回] 或用户点击其他 sidebar 菜单时，应显式切回对应 workbench 值。
+- 用户点击其他 sidebar 菜单时，应显式切回对应 workbench 值；AutoSectorBar 不再显示历史 [返回]。
 
 图标使用与 `blueprint.svg`、`tlt_research.svg` 一致的 128pt 单色 SVG 风格：粗圆环外框，内部用星区节点、连接线和编辑笔表达“星区分组编辑”。该入口只在 Live/save-binding sidebar 显示；Map binding 面板继续通过自己的 binding-sector 流程进入自动分组面板。
 
 ### AutoSectorBar
 
-| 按钮/控件 | edit 模式 | result 模式 |
-| --- | --- | --- |
-| 返回 | emit `back` | 同 edit |
-| 地图 | emit `map`，进入 Map binding | 同 edit |
-| 桥接跳数 | 更新 `bridgeSearchJumpRange`，不得小于覆盖跳数 | 可作为下一次计算参数 |
-| 覆盖跳数 | 更新 `prefJumpRange`，必要时抬高桥接跳数 | 可作为下一次计算参数 |
-| Hub 阈值 | 更新 `prefThreshold` | 可作为下一次计算参数 |
-| 节点 | 控制下一次计算是否生成新 pure hub | 只作为下一次计算输入 |
-| 计算 | 运行 `runCalculationFromEditInput()`，更新 result | 同 edit |
-| 快速计算 | 运行同一计算路径 | 同 edit |
-| 重置 | 从 saved binding + 当前参数重算 | 同 edit |
-| 提交 | 直接提交，不依赖当前模式 | 通过 gate 后提交 |
+历史 `result/edit` 口径在 UI 上调整为 `[查看 | 编辑 | 重算]` 三态模式。内部状态仍为 `preview | edit | generate`：`preview` 对应查看当前方案语义，`edit` 对应直接编辑 draft 结构语义，`generate` 对应编辑下一次重算所需输入并执行重算。
+
+| 按钮/控件 | preview 模式 | edit 模式 | generate 模式 |
+| --- | --- | --- | --- |
+| 三态模式 | 切换到 edit/generate | 切换到 preview/generate | 切换到 preview/edit |
+| 地图 | live columns 布局 emit `map`，进入 Map binding；Map/tabs 布局隐藏 | 同 preview | 同 preview |
+| 重置 | 从 saved binding + 当前参数重算 | 同 preview | 同 preview |
+| 提交 | 通过 gate 后提交 | 通过 gate 后提交 | 通过 gate 后提交 |
+| 重算设置 card | 不显示 | 不显示 | 显示 |
+| 重新计算 | 不显示 | 不显示 | 运行 `runCalculationFromEditInput()`，更新 shared draft/result，成功后切回 preview |
+
+页面顶部操作区保留页面级动作和状态，例如 [地图]、[重置]、[确定] 和未解决提示；历史 [返回] 按钮不再渲染。三态模式切换渲染在同一 `AutoSectorBar` 左侧，与 [确定] / [重置] 同行。`edit` 模式不再渲染额外 [退出] 按钮，离开编辑通过三态切换完成。
+
+### 重算设置 card
+
+重算设置 card 是 `generate` 模式唯一重算入口，包含两行：
+
+```text
+连接 4跳   节点 ✓   覆盖 2跳   交易站 5Mm³
+保留连接 ◩   保留覆盖 ✓   保留交易站 ✓        [忽略当前节点 icon] [重新计算]
+```
+
+第一行控件读写现有重算参数：
+
+- `bridgeSearchJumpRange`
+- `nodeEnabled`
+- `prefJumpRange`
+- `prefThreshold`
+
+第二行左侧的 retain checkbox 是 hub retain 的聚合/批量入口，不是独立全局真值：
+
+- checked：所有可编辑 hub 对应 retain 均为 true。
+- unchecked：所有可编辑 hub 对应 retain 均为 false。
+- mixed：hub 之间存在不一致。
+
+第二行右侧：
+
+- “忽略当前节点”是 transient overlay。
+- `[重新计算]` 调用现有显式计算路径。
+
+该 card 渲染在 `SectorGroupStatBar` 正下方；Live columns 和 Map hub tab 使用相同位置语义，只允许紧凑程度不同。Map compact 布局下，“忽略当前节点”图标按钮和 `[重新计算]` 按钮使用一致高度，避免动作区视觉错位。
+
+### 忽略当前节点 overlay
+
+新增 presenter-local 状态：
+
+```ts
+const ignoreCurrentNodes = ref(false)
+```
+
+生命周期：
+
+- 进入 `generate` / `重算` 模式时默认为 `false`。
+- 用户点击图标时 toggle。
+- 切出 `generate` 模式时清除。
+- `[重新计算]` 成功后清除。
+- 不写入 live store shared draft，不持久化。
+
+显示与提交：
+
+- `ignoreCurrentNodes=false`：hub card 按自身 `isPinned` 显示并提交。
+- `ignoreCurrentNodes=true`：hub card 在 `generate` 模式下显示为 unpin，单卡 pin/unpin 控件禁用，提交时 base input 为空。
+
+该 overlay 不应修改 assignment 列的持久选择真值；Assignment / Trade Station 列可以基于当前 draft 刷新，但 overlay 本身只影响重算模式显示和重算提交输入。
+
+### Retain 显示与半透明
+
+retain checkbox 只在 `generate` 模式渲染。
+
+card retain 仍是 hub draft 状态：
+
+- `connectionRetainEnabled`
+- `coverageRetainEnabled`
+- `tradeStationRetainEnabled`
+
+unpin 状态下 retain checkbox disabled。由于“忽略当前节点”激活时所有 hub 显示为 unpin，因此 retain 自然走同一 disabled 规则。
+
+半透明显示用于表达“数据存在但本次重算不携带”：
+
+- coverage retain unchecked：coverage/range pill 半透明。
+- trade station retain unchecked：selected trade station / station display 半透明。
+- connection retain unchecked：connection pill 是否半透明需要同时看连接双方。
+
+connection 判断使用双方状态，避免单侧 card 误导：
+
+```text
+both retain on -> connection carried
+both retain off -> connection dimmed / not carried
+one retain off + other unpinned -> connection dimmed / not carried
+```
+
+### 重算模式下的 Pin / Unpin 与 JumpRange
+
+card pin/unpin 不限制在 `generate` / 重算模式显示；既有非重算模式展示可以保留。
+
+在 `generate` / `重算` 模式：
+
+- 单卡 pin/unpin 直接写当前 draft hub 的 `isPinned`。
+- `ignoreCurrentNodes=true` 时，单卡 pin/unpin 禁用，视觉显示由 overlay 覆盖为 unpin。
+
+bridge 新产生的 hub 默认 `isPinned=false`。这是 bridge hub 的通用默认行为，不应只放在 reset 路径中。
+
+`generate` / `重算` 模式允许编辑 hub jumpRange。该编辑直接作用于当前 draft，并实时更新 coverage/range 数据，保持 card 展示和提交输入一致。
+
+约束：
+
+- jumpRange 扩大或缩小时更新该 hub 的范围星区。
+- 不自动吸收 assignment。
+- 不自动切换 assignment 选择。
+- 与编辑模式的“不默认吸收”语义保持一致。
+
+`[重新计算]`：
+
+1. 读取当前 draft 和重算设置 card 参数。
+2. 若 `ignoreCurrentNodes=true`，提交空 base input。
+3. 若 `ignoreCurrentNodes=false`，按当前 draft 中 pinned hub 作为 base input。
+4. 运行重算逻辑并更新 current shared draft/result。
+5. 成功后切换到 `preview` 模式并清除 overlay。
+6. 不自动保存。
 
 ### Pin / Unpin Draft Transform
 
@@ -253,11 +362,11 @@ pin / unpin 是 shared draft 的即时变换，不是持久化提交动作，也
 3. unpin 为该 group 的 `sectorMacro` 新增/恢复 assignment，并默认选中 standalone option；pin 移除该 `sectorMacro` 对应 assignment。
 4. unpin 生成的 assignment 设 `displayBucket='unpin'`，并携带 `unpinOrder` 记录 unpin 先后顺序。assignment 列表展示时将 `displayBucket='unpin'` 的 card 放在最上方，unpin 组内按 `unpinOrder` 排列。
 5. `displayBucket` 扩展为三态：`'resolved' | 'unresolved' | 'unpin'`。`'unpin'` 在排序时优先于 `'resolved'` 和 `'unresolved'`；`'resolved'` 和 `'unresolved'` 之间保持原 `displayBucket` 顺序。
-6. `displayBucket` 在 assignment 创建时确定，用户选择 absorb 或 standalone option 后 SHALL NOT 改变。只有 unpin 创建 assignment 时设为 `'unpin'`，pin 删除 assignment 时移除；显式 [计算] 重建 assignments 时按 `selectedOptionIndex` 重新确定 `'resolved' | 'unresolved'`。
+6. `displayBucket` 在 assignment 创建时确定，用户选择 absorb 或 standalone option 后 SHALL NOT 改变。只有 unpin 创建 assignment 时设为 `'unpin'`，pin 删除 assignment 时移除；显式生成/重算重建 assignments 时按 `selectedOptionIndex` 重新确定 `'resolved' | 'unresolved'`。
 7. unpin 生成 assignment options 时复用标准 assignment 展示规则：当前范围内命中的 absorb 候选全部显示；无当前范围命中时只显示最小扩展候选；超过 `MAX_UNCERTAIN_JUMP` 的 absorb 候选不显示。
 8. pin / unpin 不修改 group 顺序、coverage、connections、trade station、virtual station draft 或其他 assignment 选择。
-9. `isPinned=false` 只影响下一次显式 [计算] 的 base input：`buildRecalculateBaseGroups()` SHALL 只读取 `isPinned=true` 的 groups。
-10. 显式 [计算] 后，如果此前 unpin 的 sector 被算法重新选为 hub，则它是新的计算结果 hub：需要清除该 sector 的 unpin 展示状态，并将对应 group 归一为 pinned hub 状态。
+9. `isPinned=false` 只影响下一次显式生成/重算的 base input：`buildRecalculateBaseGroups()` SHALL 只读取 `isPinned=true` 的 groups。
+10. 显式生成/重算后，如果此前 unpin 的 sector 被算法重新选为 hub，则它是新的计算结果 hub：需要清除该 sector 的 unpin 展示状态，并将对应 group 归一为 pinned hub 状态。
 11. 用户在 assignment 中显式点击"独立成组"时，才调用既有 `applyStandaloneToResult()`，并保留它自动计算 coverage 与 derived candidates 的行为。
 12. `applyStandaloneToResult()` 追加 derived absorb candidates 时 SHALL 覆盖 range 内和扩展两种距离：距离 `≤ prefJumpRange` 的追加 `extendsRange=false`；距离 `> prefJumpRange` 且 `≤ MAX_UNCERTAIN_JUMP` 的追加 `extendsRange=true`；距离 `> MAX_UNCERTAIN_JUMP` 的不追加。目标 sector 已有 range 内命中时 SHALL NOT 追加扩展候选。
 13. 追加候选后 `selectedOptionIndex` 和 `status` 的更新规则采用"新 hub 相对当前选中项是否更优"的比较，不强制切换到全局 best：
@@ -267,8 +376,8 @@ pin / unpin 是 shared draft 的即时变换，不是持久化提交动作，也
     - 新 hub 为扩展候选（`extendsRange=true`）且无其他 range 内命中：`selectedOptionIndex=null`，`status` 保持 `uncertain_extend`，与 `buildAssignmentResult` 的 uncertain_extend 语义对齐。
     - 新 hub 为扩展候选且存在其他 range 内命中：`selectedOptionIndex` 和 `status` 保持不变。
 14. pin / unpin 入口只属于 hub/group card；assignment card 不显示 pin / unpin 按钮。
-15. result/edit 模式的 hub/group card 都显示 pin / unpin 按钮；result 模式不得隐藏该按钮。
-16. pin / unpin 可以在 result/edit 模式触发，但都只写 live store 的 shared draft，不直接写 `saveBindingStore`。
+15. 查看/编辑/重算模式的 hub/group card 都显示 pin / unpin 按钮；查看模式不得隐藏该按钮。
+16. pin / unpin 可以在查看/编辑/重算模式触发，但都只写 live store 的 shared draft，不直接写 `saveBindingStore`。
 17. 单纯 pin / unpin 不改变可持久化字段时，dirty comparison 应将其视为 `hasChanges=false`。
 18. absorb 一个 sector 到其他 group 时，如果该 sector 同时存在自身 hub group，则删除所有同 `sectorMacro` 的自身 hub group，清理其他 group 的 `connectedGroupIds` 和 assignment options 中指向被删除 group 的引用。
 19. unpin assignment 被用户选择 absorb 到其他 group 后，SHALL 只更新 `selectedOptionIndex` 和 `status`，SHALL NOT 改变 `displayBucket` 或 `unpinOrder`；该 assignment 继续留在 unpin 顶部位置。
@@ -293,25 +402,30 @@ Group card 上的 jumpRange 修改 SHALL 增量重算受影响 assignment，不�
 重算内容：
 
 - 对每个受影响 sector，使用 `buildAssignmentResult` 逻辑重新生成该 sector 的 options（包含所有 hub 的候选，该 hub 的 `extendsRange` 按新 jumpRange 计算）。
-- Group card jumpRange 修改属于 edit 模式底层编辑。对每个受影响 sector，只维护 options / `extendsRange` / R2 候选不共存状态。`selectedOptionIndex` 不因更优、更近或平局自动切换；仅当当前选中 option 因本次跳数变化失效时清除。
+- Group card jumpRange 修改属于编辑/重算模式底层编辑。对每个受影响 sector，只维护 options / `extendsRange` / R2 候选不共存状态。`selectedOptionIndex` 不因更优、更近或平局自动切换；仅当当前选中 option 因本次跳数变化失效时清除。
 - `displayBucket` 不变。
 
 ### SectorGroupStatBar
 
 | 按钮/控件 | 行为 |
 | --- | --- |
-| 编辑 | 切换到编辑视图（`calculationMode='edit'`），不改变数据 |
-| 退出 | 切换到结果视图（`calculationMode='result'`），不改变数据 |
+| 模式说明 | 查看/编辑/重算模式均显示短说明和 tooltip；查看说明 assignment 实时联动，编辑说明结构调整不自动改动其他分配，重算说明逐项解释重算输入 |
 | 添加枢纽 | 切换 `showHubAddMenu` |
-| 桥接保留 | 同步所有 group 的 `connectionRetainEnabled`；主开关由 groups 聚合得出 |
-| 覆盖保留 | 同步所有 group 的 `coverageRetainEnabled`；主开关由 groups 聚合得出 |
-| 交易站保留 | 同步所有 group 的 `tradeStationRetainEnabled`；主开关由 groups 聚合得出 |
+| 桥接保留 | 只在 `generate` / 重算模式的重算设置 card 中显示；同步所有 group 的 `connectionRetainEnabled`；主开关由 groups 聚合得出 |
+| 覆盖保留 | 只在 `generate` / 重算模式的重算设置 card 中显示；同步所有 group 的 `coverageRetainEnabled`；主开关由 groups 聚合得出 |
+| 交易站保留 | 只在 `generate` / 重算模式的重算设置 card 中显示；同步所有 group 的 `tradeStationRetainEnabled`；主开关由 groups 聚合得出 |
+
+说明文本：
+
+- 查看：常显“分配选择会实时联动其他星区”。tooltip 说明右侧 assignment 选择会实时影响其他星区的候选、覆盖和联动结果，并包含固定 / 取消固定说明。
+- 编辑：常显“结构调整不自动改动其他分配”。tooltip 说明可手动调整枢纽、覆盖范围、连接与交易站，且结构调整不会自动替用户改动其他星区的分配选择，并包含固定 / 取消固定说明。
+- 重算：常显“设置计算输入，重新计算后再确定保存”。tooltip 逐项说明连接跳数、节点、覆盖跳数、交易站阈值、保留连接、保留覆盖、保留交易站、忽略当前节点，并说明固定 hub 会作为重算基础输入；取消固定 hub 不作为本次重算输入，也不会直接提交保存。
 
 ### Confirm
 
 `handleConfirm()` 返回 boolean：
 
-- edit 模式：返回 `false`。
+- 编辑模式：返回 `false`。
 - 无 result：返回 `false`。
 - trade station 未解决：返回 `false`。
 - uncertain assignment 未解决且 popup 未打开：打开二次确认 popup，返回 `false`。
@@ -354,8 +468,7 @@ Group card 上的 jumpRange 修改 SHALL 增量重算受影响 assignment，不�
 触发时机：
 
 - 初次 `autoGroupResult` 有 groups 时，仅执行一次。
-- [计算] 后执行。
-- [快速计算] 后执行。
+- [重新计算] 或其他显式重算入口后执行。
 
 ## SaveBindingPlan
 
@@ -398,7 +511,7 @@ Map 面板不拥有自己的 draft。进入 binding 阶段时读取 live store �
 
 ## Assignment 变更规则汇总
 
-全量重建 assignments 仅发生于显式 [计算] / [快速计算]。以下为增量变更规则：
+全量重建 assignments 仅发生于显式生成/重算。以下为增量变更规则：
 
 ### R2: Extension vs Range-internal Coexistence
 
@@ -418,12 +531,12 @@ Map 面板不拥有自己的 draft。进入 binding 阶段时读取 live store �
 
 ### R4: JumpRange Change
 
-**result 模式**（扩展 absorb 触发）：
-- result 模式没有直接增减 range 的 card 编辑。
+**查看模式**（扩展 absorb 触发）：
+- 查看模式没有直接增减 range 的 card 编辑。
 - 用户显式选择扩展 absorb 后，目标 hub 的 range 扩大到覆盖该 sector。
 - 对同距离受影响 sector 重算 options + `selectedOptionIndex`（按 R3）。
 
-**edit 模式**（card 直接修改跳数）：
+**编辑/重算模式**（card 直接修改跳数）：
 - 只重算受影响 sector 的 options（extendsRange 更新 + R2）。
 - **不自动选新的**。仅当原选中项因跳数变化失效时清除选择。
 
@@ -438,7 +551,7 @@ Map 面板不拥有自己的 draft。进入 binding 阶段时读取 live store �
 
 ### R6: Edit Mode Direct Operations
 
-edit 模式原则：options 可随 groups/coverage/hub/jumpRange 的结构变化维护；`selectedOptionIndex` 只允许在用户直接操作的 sector 或原选中 option 被删除/失效的 sector 上修改。不得因更优、更近、平局、range 内/扩展变化，对其他 sector 自动切换选择。
+编辑/重算模式原则：options 可随 groups/coverage/hub/jumpRange 的结构变化维护；`selectedOptionIndex` 只允许在用户直接操作的 sector 或原选中 option 被删除/失效的 sector 上修改。不得因更优、更近、平局、range 内/扩展变化，对其他 sector 自动切换选择。
 
 | 操作 | 行为 |
 | --- | --- |

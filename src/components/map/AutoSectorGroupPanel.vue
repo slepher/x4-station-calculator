@@ -301,6 +301,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
         <div class="px-4 pt-3">
         <AutoSectorBar
           :mode="calculationMode === 'edit' ? 'edit' : 'result'"
+          :panel-mode="panelMode"
           view="live"
           :pref-jump-range="prefJumpRange"
           :bridge-search-jump-range="bridgeSearchJumpRange"
@@ -316,6 +317,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
           @reset="onReset"
           @confirm="onConfirm"
           @map="emit('map')"
+          @update:panel-mode="setPanelMode"
         />
         </div>
         <div class="columns-scroll-area">
@@ -328,7 +330,6 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
                 :show-add-hub="showHubAddMenu"
                 :edit-disabled="!autoGroupResult || hasPendingBridgeDecision"
                 :add-disabled="hasPendingBridgeDecision"
-                @update:panel-mode="setPanelMode"
                 @add-hub="handleAddHubClick"
               />
               <div v-if="panelMode === 'generate'" class="generate-card">
@@ -428,6 +429,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
         <div class="map-tab-header">
           <AutoSectorBar
             :mode="calculationMode === 'edit' ? 'edit' : 'result'"
+            :panel-mode="panelMode"
             view="map"
             :pref-jump-range="prefJumpRange"
             :bridge-search-jump-range="bridgeSearchJumpRange"
@@ -443,6 +445,7 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
             @reset="onReset"
             @confirm="onConfirm"
             @map="emit('map')"
+            @update:panel-mode="setPanelMode"
           />
         </div>
         <div class="tab-bar">
@@ -463,7 +466,6 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
               :show-add-hub="showHubAddMenu"
               :edit-disabled="!autoGroupResult || hasPendingBridgeDecision"
               :add-disabled="hasPendingBridgeDecision"
-              @update:panel-mode="setPanelMode"
               @add-hub="handleAddHubClick"
             />
             <div v-if="panelMode === 'generate'" class="generate-card generate-card--map">

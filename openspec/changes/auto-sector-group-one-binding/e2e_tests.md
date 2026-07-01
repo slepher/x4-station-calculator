@@ -3,7 +3,7 @@
 ## 1 Live 展示与计算模式
 
 - [ ] 1.1 展示模式布局与详情入口：覆盖展示模式三列布局、详情按钮、地图按钮、recalc 红点和无 result 禁用状态
-- [ ] 1.2 计算模式布局与返回：覆盖进入计算模式不触发算法，通过 sidebar 总览返回展示模式不确认、不计算、不重置 draft
+- [ ] 1.2 计算模式布局与返回：覆盖进入计算模式不触发算法，通过 sidebar 总览返回展示模式不确认、不生成、不重置 draft
 - [ ] 1.3 Sidebar 星区编辑详情入口：覆盖 workbench 选择持久化、刷新恢复、station/sector 选择不覆盖该入口
 - [x] 1.4 确认成功后确认按钮置灰：覆盖确认成功后确认按钮置灰，不跳转，保留确认后的 baseline
 
@@ -16,8 +16,8 @@
 
 ## 3 计算、重置与提交
 
-- [ ] 3.1 显式计算：覆盖 [计算] 按钮（edit 模式全重算 / result 模式快速重算共用）更新 shared draft，但不捕获计算完成 baseline
-- [ ] 3.2 编辑退出：覆盖 [编辑] 后直接修改 shared draft，[退出] 只切回 result 不恢复 snapshot
+- [ ] 3.1 显式生成：覆盖 [生成方案] 按钮更新 shared draft，但不捕获计算完成 baseline
+- [ ] 3.2 编辑切换：覆盖通过三态按钮进入编辑后直接修改 shared draft，切回预览不恢复 snapshot
 - [ ] 3.3 重置：覆盖 [重置] 从 saved binding groups + 当前参数重算 group、assignment、bridge、trade station、hub color、retain 和 virtual station drafts
 - [ ] 3.4 确认 gate：覆盖 edit/no-result/trade-station/uncertain assignment gate 的阻断关系
 - [ ] 3.5 确认成功：覆盖写入 binding、记录 `appliedAutoGroupArchiveTime`、同步 live flow、更新 baseline
@@ -26,7 +26,7 @@
 
 - [ ] 4.1 初始化：覆盖从当前 binding 中无 `saveStationCode` 的 station plans 初始化 virtual station drafts
 - [ ] 4.2 保留：覆盖 Live/Map 切换、tab 切换、同 context 重新进入后 virtual station drafts 不被覆盖
-- [ ] 4.3 重新计算：覆盖 [计算] 后 virtual station drafts 保留并按新 groups 重算归属
+- [ ] 4.3 重新生成：覆盖 [生成方案] 后 virtual station drafts 保留并按新 groups 重算归属
 - [ ] 4.4 未分组：覆盖 group/coverage 改变后 virtual station draft 进入未分组状态
 - [ ] 4.5 确认应用：覆盖先应用 auto groups，再同步无 `saveStationCode` virtual station plans，且不修改带 `saveStationCode` 的 save station plans
 

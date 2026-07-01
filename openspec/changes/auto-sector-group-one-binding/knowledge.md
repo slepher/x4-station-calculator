@@ -61,7 +61,7 @@
 
 ### 计算模式（AutoSectorGroupPanel）
 - `layout="columns"` 渲染三列：星区（`5fr`）| 分配（`4fr`）| 交易站（`3fr`）
-- 共用顶部栏：`.auto-sector-bar` — 包含返回、地图、计算、快速计算、重置、提交按钮及参数输入
+- 共用顶部栏：`.auto-sector-bar` — 包含地图、重置、提交按钮、三态模式入口和生成模式参数入口
 - Hub tab 标识：`.group-item` 列表
 - Allocation tab 标识：`.allocation-card` 列表
 - Trade Station tab 标识：`.trade-station-card` 列表
@@ -71,9 +71,9 @@
 |---|---|
 | `.group-item` | 根容器 |
 | `.group-item--new` | 新添加的 hub（手动添加） |
-| `.group-item--pinned` | 已钉选 group（edit 模式） |
+| `.group-item--pinned` | 已钉选 group（编辑/生成模式） |
 | `.group-item--unpinned` | 未钉选 group |
-| `.group-item--baseline` | 基线 group（非 edit 模式） |
+| `.group-item--baseline` | 基线 group（预览模式） |
 | `.group-name` | 组名文本 |
 | `.pill--anchor` | 锚点星区 pill |
 | `.pill--coverage` | 覆盖星区 pills |
@@ -83,10 +83,10 @@
 | `.pill-action--remove` | 移除 pill 按钮 |
 | `.pill-action--add` | 添加 pill 按钮 |
 | `.pill-action--transfer` | 转移 pill 按钮 |
-| `.jump-readonly` | 只读跳数显示（result 模式） |
-| `.jump-control` | 可编辑跳数控件（edit 模式） |
+| `.jump-readonly` | 只读跳数显示（预览模式） |
+| `.jump-control` | 可编辑跳数控件（编辑/生成模式） |
 | `.group-stats` | 统计行（覆盖数、不确定数） |
-| `.retain-chk` | 保留复选框（result/edit 模式） |
+| `.retain-chk` | 保留复选框（生成模式） |
 | `.state-btn` | 组操作按钮 |
 | `.state-btn--pinned` | 钉选按钮 |
 | `.state-btn--unpinned` | 取消钉选按钮 |
@@ -118,9 +118,8 @@
 | `.candidate-name` | 候选名称 |
 
 ### Button Locator（按钮）
-- 编辑按钮：`page.getByRole('button', { name: /编辑|Edit/ })`
-- 退出按钮：`page.getByRole('button', { name: /退出|Exit/ })`
-- 计算按钮：`page.getByRole('button', { name: /计算|Calculate/ })` — edit 模式 emit `calculate`，result 模式 emit `quick-calculate`（同一按钮，无独立"快速计算"按钮）
+- 三态模式按钮：`page.getByRole('button', { name: /预览|Preview|编辑|Edit|生成|Generate/ })`
+- 生成方案按钮：`page.getByRole('button', { name: /生成方案|Generate/i })` — 仅在 `生成` 模式显示，触发显式生成并更新 shared draft
 - 重置按钮：`page.getByRole('button', { name: /重置|Reset/ })`
 - 确认按钮：`page.getByRole('button', { name: /确定|Confirm/ })` — 不是"提交"或"确认"；`showConfirm` 在 `layout="columns"` 模式下为 `true`
 - 添加枢纽按钮：`page.getByRole('button', { name: /添加|^Add$/ })`
@@ -215,7 +214,7 @@ expect(at).toBeDefined()
 通过 spy 或检查 `autoGroupResult` 内容来自 saved binding groups + 当前参数，且不同于 reset 前临时 draft。
 
 ### Edit 模式限制
-- 按钮行为：edit 模式下 `handleConfirm()` 返回 false
+- 按钮行为：编辑模式下 `handleConfirm()` 返回 false
 - 无需恢复 snapshot：退出 edit 只切回 result，不重置 draft
 
 ### 语言设置

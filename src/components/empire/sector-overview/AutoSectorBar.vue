@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 
 const props = withDefaults(defineProps<{
   mode: 'result' | 'edit'
+  panelMode?: 'preview' | 'edit' | 'generate'
   view?: 'live' | 'map'
   prefJumpRange: number
   bridgeSearchJumpRange: number
@@ -17,6 +18,7 @@ const props = withDefaults(defineProps<{
   showConfirm?: boolean
   confirmDisabled?: boolean
 }>(), {
+  panelMode: 'preview',
   view: 'live',
   editDisabled: false,
   unresolvedAllocationCount: 0,
@@ -36,17 +38,29 @@ const emit = defineEmits<{
   (e: 'reset'): void
   (e: 'confirm'): void
   (e: 'map'): void
+  (e: 'update:panelMode', value: 'preview' | 'edit' | 'generate'): void
 }>()
 
 const { t } = useI18n()
 
 const hasUnresolved = computed(() => (props.unresolvedAllocationCount ?? 0) + (props.unresolvedTradeStationCount ?? 0) > 0)
+
+function updatePanelMode(mode: 'preview' | 'edit' | 'generate') {
+  if (mode === 'edit' && props.editDisabled) return
+  emit('update:panelMode', mode)
+}
 </script>
 
 <template>
   <div class="auto-sector-bar" :class="{ 'auto-sector-bar--map': view === 'map' }">
     <div class="bar-row" :class="view === 'map' ? 'bar-row--map' : 'bar-row--live'">
-      <div class="bar-left"></div>
+      <div class="bar-left">
+        <div class="mode-switch" :aria-label="t('sector.mode')">
+          <button type="button" class="mode-btn" :class="{ active: panelMode === 'preview' }" @click="updatePanelMode('preview')">{{ t('sector.preview') }}</button>
+          <button type="button" class="mode-btn" :class="{ active: panelMode === 'edit' }" :disabled="editDisabled" @click="updatePanelMode('edit')">{{ t('sector.edit') }}</button>
+          <button type="button" class="mode-btn" :class="{ active: panelMode === 'generate' }" @click="updatePanelMode('generate')">{{ t('sector.generate') }}</button>
+        </div>
+      </div>
       <div class="bar-right">
         <span v-if="hasUnresolved" class="bar-unresolved" v-tippy="{ content: unresolvedTitle, allowHTML: true, placement: 'top', theme: 'material' }">
           {{ t('sector.unresolved') }}<template v-if="unresolvedAllocationCount">&nbsp;◈{{ unresolvedAllocationCount }}</template><template v-if="unresolvedTradeStationCount">&nbsp;◉{{ unresolvedTradeStationCount }}</template>
@@ -90,6 +104,26 @@ const hasUnresolved = computed(() => (props.unresolvedAllocationCount ?? 0) + (p
 
 .bar-checkbox {
   @apply h-3.5 w-3.5 accent-sky-500;
+}
+
+.mode-switch {
+  @apply inline-flex rounded border border-slate-700/60 bg-slate-900/30 p-0.5;
+}
+
+.mode-btn {
+  @apply px-2.5 py-1 text-xs font-medium rounded text-slate-400 transition-colors;
+}
+
+.mode-btn:hover {
+  @apply text-slate-200 bg-slate-700/30;
+}
+
+.mode-btn.active {
+  @apply text-sky-300 bg-sky-600/20;
+}
+
+.mode-btn:disabled {
+  @apply opacity-40 cursor-not-allowed hover:bg-transparent hover:text-slate-400;
 }
 
 .bar-select {
@@ -155,6 +189,9 @@ const hasUnresolved = computed(() => (props.unresolvedAllocationCount ?? 0) + (p
   @apply w-10;
 }
 .auto-sector-bar--map .bar-btn {
+  @apply px-1.5 py-0.5 text-[11px];
+}
+.auto-sector-bar--map .mode-btn {
   @apply px-1.5 py-0.5 text-[11px];
 }
 </style>

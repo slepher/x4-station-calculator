@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const props = withDefaults(defineProps<{
@@ -24,20 +25,40 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 
-function updatePanelMode(mode: 'preview' | 'edit' | 'generate') {
-  if (mode === 'edit' && props.editDisabled) return
-  emit('update:panelMode', mode)
+const modeSummaryKey = computed(() => {
+  if (props.panelMode === 'edit') return 'sector.mode_edit_summary'
+  if (props.panelMode === 'generate') return 'sector.mode_recalculate_summary'
+  return 'sector.mode_preview_summary'
+})
+
+const modeDetailKey = computed(() => {
+  if (props.panelMode === 'edit') return 'sector.mode_edit_detail'
+  if (props.panelMode === 'generate') return 'sector.mode_recalculate_detail'
+  return 'sector.mode_preview_detail'
+})
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
 }
+
+const modeDetailHtml = computed(() => escapeHtml(t(modeDetailKey.value)).replace(/\n/g, '<br>'))
 </script>
 
 <template>
   <div class="stat-bar" :class="{ 'stat-bar--map': view === 'map' }">
     <div class="stat-bar-row">
       <div class="stat-bar-left">
-        <div class="mode-switch" :aria-label="t('sector.mode')">
-          <button type="button" class="mode-btn" :class="{ active: panelMode === 'preview' }" @click="updatePanelMode('preview')">{{ t('sector.preview') }}</button>
-          <button type="button" class="mode-btn" :class="{ active: panelMode === 'edit' }" :disabled="editDisabled" @click="updatePanelMode('edit')">{{ t('sector.edit') }}</button>
-          <button type="button" class="mode-btn" :class="{ active: panelMode === 'generate' }" @click="updatePanelMode('generate')">{{ t('sector.generate') }}</button>
+        <div
+          class="mode-help"
+          v-tippy="{ content: modeDetailHtml, allowHTML: true, placement: 'top', theme: 'material' }"
+        >
+          <span class="mode-help-icon">i</span>
+          <span class="mode-help-text">{{ t(modeSummaryKey) }}</span>
         </div>
       </div>
       <div class="stat-bar-right">
@@ -66,24 +87,16 @@ function updatePanelMode(mode: 'preview' | 'edit' | 'generate') {
   @apply flex flex-wrap items-center gap-1.5;
 }
 
-.mode-switch {
-  @apply inline-flex rounded border border-slate-700/60 bg-slate-900/30 p-0.5;
+.mode-help {
+  @apply inline-flex items-center gap-1.5 min-w-0 text-xs text-slate-300 cursor-help;
 }
 
-.mode-btn {
-  @apply px-2.5 py-1 text-xs font-medium rounded text-slate-400 transition-colors;
+.mode-help-icon {
+  @apply inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-sky-500/40 bg-sky-500/10 text-[10px] font-semibold text-sky-300;
 }
 
-.mode-btn:hover {
-  @apply text-slate-200 bg-slate-700/30;
-}
-
-.mode-btn.active {
-  @apply text-sky-300 bg-sky-600/20;
-}
-
-.mode-btn:disabled {
-  @apply opacity-40 cursor-not-allowed hover:bg-transparent hover:text-slate-400;
+.mode-help-text {
+  @apply truncate;
 }
 
 .param-field {
@@ -130,7 +143,7 @@ function updatePanelMode(mode: 'preview' | 'edit' | 'generate') {
   @apply px-1.5 py-0.5 text-[11px];
 }
 
-.stat-bar--map .mode-btn {
-  @apply px-1.5 py-0.5 text-[11px];
+.stat-bar--map .mode-help {
+  @apply text-[11px];
 }
 </style>

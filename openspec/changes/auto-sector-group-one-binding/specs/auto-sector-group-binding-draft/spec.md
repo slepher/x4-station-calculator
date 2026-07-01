@@ -111,10 +111,10 @@
 - **那么** 系统 SHALL 保留当前 `virtualStationDrafts`
 - **并且** SHALL NOT 从 binding 重新初始化并覆盖用户编辑
 
-#### Scenario: Recalculate preserves virtual station draft
+#### Scenario: Regenerate preserves virtual station draft
 
 - **前提** 用户已编辑 `virtualStationDrafts`
-- **当** 用户点击 [计算] 或 [快速计算] 重新生成 `autoGroupResult.groups`
+- **当** 用户点击 `[重新计算]` 或其他显式重算入口重新生成 `autoGroupResult.groups`
 - **那么** 系统 SHALL 保留当前 virtual station draft 内容
 - **并且** SHALL 基于最新 groups 重新计算每个 draft 的 group 归属
 - **并且** 无当前 group 归属的 draft SHALL 保留为未分组状态
@@ -158,7 +158,7 @@
 
 ### Requirement: Panels do not trigger automatic calculation
 
-Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触发分组算法。初始数据由 Store 在初始化/上下文切换时生成；计算模式内用户显式点击「计算」时，系统 MAY 运行分组算法更新共享 draft。
+Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触发分组算法。初始数据由 Store 在初始化/上下文切换时生成；计算模式内用户显式点击「重新计算」时，系统 MAY 运行分组算法更新共享 draft。
 
 #### Scenario: Panels do not trigger automatic calculation
 
@@ -192,7 +192,7 @@ Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触�
 
 ### Requirement: Live panel dual mode
 
-系统 SHALL 在 live 面板提供展示模式和计算模式，通过 `liveMode` 切换。展示模式与详情模式切换本身不触发计算，只读取 store 中已有数据；计算模式内用户显式点击「计算」时，系统 MAY 更新共享 draft。
+系统 SHALL 在 live 面板提供展示模式和计算模式，通过 `liveMode` 切换。展示模式与详情模式切换本身不触发计算，只读取 store 中已有数据；计算模式内用户显式点击「重新计算」时，系统 MAY 更新共享 draft。
 
 #### Scenario: Display mode layout
 
@@ -302,7 +302,7 @@ Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触�
 
 ### Requirement: Shared Auto Sector Bar And Retain Controls
 
-系统 SHALL 在 Live/Map 共享面板顶部用统一 `AutoSectorBar` 承载返回、地图、计算、重置、提交、参数输入和全局确认 gate；Allocation 和 Trade Station 只渲染各自列表，不再拥有独立确认栏。系统 SHALL 另外提供 trade station retain 控件。
+系统 SHALL 在 Live/Map 共享面板顶部用统一 `AutoSectorBar` 承载页面级动作、三态模式、重置、提交和全局确认 gate；三态按钮显示为 `[查看 | 编辑 | 重算]`，位于同一 bar 左侧；生成参数和重算动作集中在 `重算` 模式的设置 card 中。Allocation 和 Trade Station 只渲染各自列表，不再拥有独立确认栏。系统 SHALL 另外提供 trade station retain 控件。
 
 #### Scenario: Shared bar blocks unresolved assignment
 
@@ -329,9 +329,9 @@ Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触�
 #### Scenario: Trade station retain controls
 
 - **前提** 共享自动分组面板渲染
-- **当** 用户查看参数栏或 result/edit 模式 group card
-- **那么** 参数栏 SHALL 显示 `tradeStationRetainEnabled` 主开关
-- **并且** result/edit 模式 group card SHALL 显示对应 group 的 `connectionRetainEnabled`、`coverageRetainEnabled` 和 `tradeStationRetainEnabled` 开关
+- **当** 用户进入 `生成` 模式
+- **那么** 重算设置 card SHALL 显示 `tradeStationRetainEnabled` 聚合开关
+- **并且** `生成` 模式 group card SHALL 显示对应 group 的 `connectionRetainEnabled`、`coverageRetainEnabled` 和 `tradeStationRetainEnabled` 开关
 - **并且** overview 展示态 group card SHALL NOT 显示 pin/unpin 控件
 
 #### Scenario: Retain masters are derived and mixed defaults off
@@ -362,21 +362,20 @@ Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触�
 - **并且** SHALL NOT 调用分组算法
 - **并且** SHALL NOT 调用 `initAutoGroupDraft()`
 
-#### Scenario: Back button
+#### Scenario: Legacy back button removed
 
 - **前提** Live 处于计算模式
-- **当** 用户点击「返回」
-- **那么** 系统 SHALL 回到展示模式
-- **并且** SHALL NOT 提交
-- **并且** SHALL NOT 重置 shared draft
-- **并且** SHALL NOT 运行分组算法
+- **当** AutoSectorBar 渲染
+- **那么** 系统 SHALL NOT 显示历史遗留「返回」按钮
 
-#### Scenario: Calculate buttons
+#### Scenario: Recalculate button
 
 - **前提** 用户位于计算模式
-- **当** 用户点击「计算」或「快速计算」
+- **并且** 当前 panel mode 为 `generate`
+- **当** 用户点击「重新计算」
 - **那么** 系统 SHALL 使用当前编辑输入运行核心算法
 - **并且** SHALL 更新 `autoGroupResult`
+- **并且** SHALL 切换到 `preview` / 查看模式
 - **并且** SHALL 根据未解决项切换到第一个待处理 tab
 
 #### Scenario: Reset button
@@ -389,20 +388,24 @@ Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触�
 - **并且** SHALL NOT 切换 selected archive
 - **并且** 当重算结果存在 pending bridge plans 时，SHALL 切换到 allocation tab 并显示 bridge plan list
 
-#### Scenario: Edit and exit buttons
+#### Scenario: Three mode switch moves to top bar and replaces edit and exit buttons
 
 - **前提** 自动分组结果已显示
-- **当** 用户点击「编辑」
-- **那么** 系统 SHALL 设置 `calculationMode = 'edit'`
+- **当** `AutoSectorBar` 渲染
+- **那么** 系统 SHALL 在 bar 左侧显示 `[查看 | 编辑 | 重算]` 三态按钮
+- **并且** SHALL NOT 显示单独「编辑」按钮或「退出」按钮
+- **并且** `SectorGroupStatBar` SHALL 显示当前模式说明文本
+- **当** 用户切换到 `编辑`
+- **那么** 系统 SHALL 允许直接编辑当前 shared draft
 - **并且** SHALL NOT 创建用于取消恢复的 edit snapshot
-- **当** 用户点击「退出」
-- **那么** 系统 SHALL 设置 `calculationMode = 'result'`
+- **当** 用户从 `编辑` 切换到 `查看` 或 `重算`
+- **那么** 系统 SHALL 保留当前 shared draft
 - **并且** SHALL NOT 恢复进入编辑前的 draft
 
 #### Scenario: Confirm gates
 
 - **前提** 用户点击「提交」
-- **当** 当前处于 edit 模式、无 result 或 trade station 未解决
+- **当** 当前处于编辑模式、无 result 或 trade station 未解决
 - **那么** `handleConfirm()` SHALL 返回 false
 - **并且** SHALL NOT 写入 binding
 - **当** 存在 uncertain assignment 且确认 popup 未打开
@@ -448,7 +451,7 @@ Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触�
 
 #### Scenario: Reset does not keep calculation baseline
 
-- **前提** 系统通过初始化或显式计算得到新的 `AutoGroupResult`
+- **前提** 系统通过初始化或显式生成/重算得到新的 `AutoGroupResult`
 - **当** 系统更新 shared draft
 - **那么** SHALL NOT 捕获最近计算完成快照作为 [重置] 数据源
 - **并且** [重置] SHALL 始终以当前 active binding 的已保存 groups 与当前参数为输入重新计算
@@ -467,7 +470,7 @@ Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触�
 - **当** 系统初始化 shared draft 或刷新 UI diff baseline
 - **那么** 系统 SHALL 从已保存 binding groups 记录 coverage 和 connected group ids
 - **并且** SHALL 使用 hub `sectorMacro` 作为 `calcBaselinePillState` key
-- **并且** 显式「计算」、快速计算、重置、pin / unpin SHALL NOT 用当前计算结果覆盖该 baseline
+- **并且** 显式生成/重算、重置、pin / unpin SHALL NOT 用当前计算结果覆盖该 baseline
 - **当** 用户确认成功
 - **那么** 系统 SHALL 先写入 binding
 - **并且** SHALL 从保存后的 binding groups 刷新 `calcBaselinePillState`
@@ -506,7 +509,7 @@ Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触�
 
 ### Requirement: Pin Unpin Group Card State
 
-系统 SHALL 将 pin / unpin 作为 hub/group card 上的 shared draft 状态变换处理。unpin 后 card SHALL 保留在当前 hub 列表中；`isPinned=false` 只影响下一次显式计算是否作为 pinned base input。
+系统 SHALL 将 pin / unpin 作为 hub/group card 上的 shared draft 状态变换处理。unpin 后 card SHALL 保留在当前 hub 列表中；`isPinned=false` 只影响下一次显式生成/重算是否作为 pinned base input。
 
 #### Scenario: Unpin keeps hub card and toggles pinned state
 
@@ -562,7 +565,7 @@ Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触�
 #### Scenario: Pinned base input excludes unpinned groups
 
 - **前提** 当前 `autoGroupResult.groups` 中存在 `isPinned=false` 的 group `G`
-- **当** 用户点击显式「计算」或「快速计算」
+- **当** 用户点击「重新计算」或其他显式重算入口
 - **那么** `buildRecalculateBaseGroups()` SHALL NOT 将 `G` 输出到 pinned base groups
 - **并且** 下一次计算 SHALL NOT 把 `G` 作为固定 hub 输入
 
@@ -570,7 +573,7 @@ Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触�
 
 - **前提** 当前 `autoGroupResult.groups` 中存在 `isPinned=false` 的 group `G`
 - **并且** `G.sectorMacro=S`
-- **当** 用户点击显式「计算」或「快速计算」
+- **当** 用户点击「重新计算」或其他显式重算入口
 - **并且** 计算结果中 `S` 重新成为 hub/group card
 - **那么** 该计算结果中的 `S` group SHALL NOT 保持 unpin 状态
 - **并且** 该计算结果中的 `S` group `isPinned` SHALL 为 `true`
@@ -578,10 +581,10 @@ Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触�
 
 #### Scenario: Pin unpin button is a group card action
 
-- **前提** 当前页面处于 result 模式或 edit 模式
+- **前提** 当前页面处于查看模式、编辑模式或重算模式
 - **当** 系统渲染 hub/group card
 - **那么** card SHALL 显示 pin / unpin 按钮
-- **并且** result 模式 SHALL NOT 隐藏该按钮
+- **并且** 查看模式 SHALL NOT 隐藏该按钮
 - **并且** assignment card SHALL NOT 显示 pin / unpin 按钮
 
 #### Scenario: Pure pin unpin is not dirty
@@ -706,8 +709,8 @@ Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触�
 
 #### Scenario: No edit restore snapshot
 
-- **前提** 用户进入 edit 模式并修改 draft
-- **当** 用户点击「退出」
+- **前提** 用户进入编辑模式并修改 draft
+- **当** 用户通过三态按钮切回 `查看` 或 `重算`
 - **那么** 系统 SHALL 保留当前 shared draft
 - **并且** SHALL NOT 恢复进入 edit 前的 coverage、connection、assignment、trade station 或 color
 
@@ -749,7 +752,7 @@ Save binding state SHALL use version 2 for sector group identity based on hub `s
 
 - **前提** sector `T` 当前 `selectedOptionIndex=null`，`status='uncertain_extend'`
 - **并且** `T` 之前主动选择了 `G` 的扩展选项（`extendsRange=true`）
-- **当** 用户在 result 模式显式选择扩展 absorb，使 `G` 的 `jumpRange` 扩大并让 `G` 对 `T` 从扩展候选变为 range 内候选
+- **当** 用户在查看模式显式选择扩展 absorb，使 `G` 的 `jumpRange` 扩大并让 `G` 对 `T` 从扩展候选变为 range 内候选
 - **那么** `T.selectedOptionIndex` SHALL 指向 `G` 对应的 option
 - **并且** `T.status` SHALL 变为 `'auto'`
 
@@ -757,7 +760,7 @@ Save binding state SHALL use version 2 for sector group identity based on hub `s
 
 - **前提** sector `T` 当前已选中其他 hub `H` 的 range 内 absorb option
 - **并且** `G` 的 jumpRange 增大使 `G` 对 `T` 从扩展候选变为 range 内候选
-- **当** 用户在 result 模式显式选择扩展 absorb 且 `G` 对 `T` 的距离不比 `H` 更近
+- **当** 用户在查看模式显式选择扩展 absorb 且 `G` 对 `T` 的距离不比 `H` 更近
 - **那么** `T.selectedOptionIndex` SHALL 保持指向 `H`
 - **并且** `T.status` SHALL 保持不变
 
@@ -773,7 +776,7 @@ Save binding state SHALL use version 2 for sector group identity based on hub `s
 
 - **前提** sector `T` 当前 `selectedOptionIndex` 指向 `G` 的 range 内 absorb option
 - **并且** `T.status='auto'`
-- **当** 用户在 edit 模式将 `G` 的 `jumpRange` 减小，使 `G` 对 `T` 从 range 内候选变为扩展候选
+- **当** 用户在编辑/重算模式将 `G` 的 `jumpRange` 减小，使 `G` 对 `T` 从 range 内候选变为扩展候选
 - **那么** `T.selectedOptionIndex` SHALL 变为 `null`
 - **并且** `T.status` SHALL 按剩余候选保持待用户选择语义
 
@@ -781,13 +784,13 @@ Save binding state SHALL use version 2 for sector group identity based on hub `s
 
 - **前提** sector `T` 当前 `selectedOptionIndex` 指向 `G` 的 range 内 absorb option
 - **并且** `T` 还有另一个 hub `H` 的 range 内 absorb option
-- **当** 用户在 edit 模式将 `G` 的 `jumpRange` 减小，使 `G` 对 `T` 从 range 内变为扩展
+- **当** 用户在编辑/重算模式将 `G` 的 `jumpRange` 减小，使 `G` 对 `T` 从 range 内变为扩展
 - **那么** `T.selectedOptionIndex` SHALL 变为 `null`
 - **并且** 系统 SHALL NOT 自动切换到 `H` 或其他剩余 range 内候选
 
 ### Requirement: Assignment Options Update Rules Summary
 
-系统 SHALL 在以下变更场景中增量更新 assignment options 和 selectedOptionIndex，遵循统一规则集。全量重建 assignments 仅发生于显式 [计算] / [快速计算]。
+系统 SHALL 在以下变更场景中增量更新 assignment options 和 selectedOptionIndex，遵循统一规则集。全量重建 assignments 仅发生于显式生成/重算。
 
 #### R1: Derived Candidate Append（独立成组追加候选）
 
@@ -820,11 +823,11 @@ Save binding state SHALL use version 2 for sector group identity based on hub `s
 
 | 场景 | 受影响 sector 范围 | 重算内容 |
 | --- | --- | --- |
-| result 模式扩展 absorb 导致 range 扩大 | 同距离受影响 sector | options + `selectedOptionIndex`（按 R3） |
-| edit 模式增大跳数 (old→new, new>old) | 距离该 hub 在 `(old, new]` 的 sector | options / extendsRange / R2；不自动切换 `selectedOptionIndex` |
-| edit 模式减小跳数 (old→new, new<old) | 距离该 hub 在 `(new, old]` 的 sector | options / extendsRange / R2；仅原选中 option 失效时清除 `selectedOptionIndex` |
+| 查看模式扩展 absorb 导致 range 扩大 | 同距离受影响 sector | options + `selectedOptionIndex`（按 R3） |
+| 编辑/重算模式增大跳数 (old→new, new>old) | 距离该 hub 在 `(old, new]` 的 sector | options / extendsRange / R2；不自动切换 `selectedOptionIndex` |
+| 编辑/重算模式减小跳数 (old→new, new<old) | 距离该 hub 在 `(new, old]` 的 sector | options / extendsRange / R2；仅原选中 option 失效时清除 `selectedOptionIndex` |
 | 距离 `≤ min(old, new)` | 不重算 | — |
-| edit 模式原选中 option 失效 | 当前选中项被本次 options 维护删除或转为不可继续选中 | `selectedOptionIndex=null` |
+| 编辑/重算模式原选中 option 失效 | 当前选中项被本次 options 维护删除或转为不可继续选中 | `selectedOptionIndex=null` |
 
 #### R5: Unpin Assignment Display
 
@@ -838,7 +841,7 @@ Save binding state SHALL use version 2 for sector group identity based on hub `s
 
 #### R6: Edit Mode Direct Operations（无联动选择）
 
-edit 模式下直接操作 groups/coverage/connected/jumpRange，options 可随结构变化维护；`selectedOptionIndex` 只允许在用户直接操作的 sector 或原选中 option 被删除/失效的 sector 上修改。系统 SHALL NOT 因更优、更近、平局、range 内/扩展变化，对其他 sector 自动切换选择。
+编辑/重算模式下直接操作 groups/coverage/connected/jumpRange，options 可随结构变化维护；`selectedOptionIndex` 只允许在用户直接操作的 sector 或原选中 option 被删除/失效的 sector 上修改。系统 SHALL NOT 因更优、更近、平局、range 内/扩展变化，对其他 sector 自动切换选择。
 
 | 操作 | 行为 |
 | --- | --- |
@@ -848,4 +851,4 @@ edit 模式下直接操作 groups/coverage/connected/jumpRange，options 可随�
 | **移除 hub（未被选中）** | 每个其他 sector 删除该 hub 的 absorb option。若无 range 内命中 → 补充扩展候选（R2 反向）。**`selectedOptionIndex` 不动** |
 | **移除 hub（被选中）** | 删除该 hub 的 absorb option。若某 assignment 当前 `selectedOptionIndex` 指向被删除的 hub option，则将该 assignment 的 `selectedOptionIndex` 清为 `null` |
 | **connected toggle** | 只改 `connectedGroupIds`，不动 assignment |
-| **edit 模式修改跳数** | 按 R4 重算受影响 sector 的 options（extendsRange 更新 + R2）。**不自动选新的**。若原选中项因跳数变化失效 → 清除选择 |
+| **编辑/重算模式修改跳数** | 按 R4 重算受影响 sector 的 options（extendsRange 更新 + R2）。**不自动选新的**。若原选中项因跳数变化失效 → 清除选择 |
