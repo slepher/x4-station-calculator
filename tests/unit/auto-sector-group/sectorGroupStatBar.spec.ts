@@ -78,4 +78,13 @@ describe('SectorGroupStatBar structure actions', () => {
     expect(help.__tippyValue?.allowHTML).toBe(true)
     expect(help.__tippyValue?.content).toContain('<br>')
   })
+
+  it('uses map-specific preview detail text in map view', () => {
+    const wrapper = mountBar({ panelMode: 'preview', view: 'map' })
+    const help = wrapper.get('.mode-help').element as HTMLElement & {
+      __tippyValue?: { content?: string }
+    }
+
+    expect(help.__tippyValue?.content).toContain('sector.mode_preview_map_detail')
+  })
 })

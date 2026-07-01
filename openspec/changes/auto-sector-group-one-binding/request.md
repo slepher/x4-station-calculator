@@ -145,6 +145,8 @@ Trade station 在 Live 计算模式中作为第三列展示和 confirm gate 的�
 
 - 系统 SHALL 明确区分“仍有 uncertain assignment / 未分配提示”和“当前 draft 有未保存改动”。
 - uncertain assignment 只触发二次确认 gate 和未分配提示；确认成功后即使这些提示仍可见，也 SHALL NOT 让 `hasChanges` 保持为 true。
+- 用户调整 group 显示顺序后，若当前顺序与已保存 binding group 顺序不同，`hasChanges` SHALL 变为 true，顶部 [确定] SHALL 可用。
+- Live 总览 display 界面的星区列表 SHALL NOT 显示拖拽把手。
 - 单纯 pin / unpin 不产生可持久化差异时，`hasChanges` SHALL 保持 false，顶部 [确定] SHALL 保持置灰/禁用。
 - unpin 后若用户进一步在 assignment 中选择 absorb 或显式选择“独立成组”，并导致 group、coverage、connection、trade station 或 virtual station draft 的持久化结构变化，`hasChanges` SHALL 反映该真实差异。
 - 确认成功后，若当前 shared draft 与保存后的 binding 在 group 顺序、coverage、connections、颜色、jump range、trade station 选择和 virtual station draft 上一致，则 `hasChanges` SHALL 为 false。

@@ -13,6 +13,7 @@ import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
 import { getSectorZoneBoundingCenter } from '@/components/map/utils/coordinates'
 import { stabilizeHubColors, stabilizeEditedHubColor, type HubColorContext } from '@/store/logic/hubColor'
 import { selectTradeStationCandidates, selectTradeStationDisplayCandidates, determineDefaultTradeStation, type TradeStationCandidate, type TradeStationSelection } from '@/store/logic/tradeStationSelection'
+import { getBindingGroupOrderKeys, getResultGroupOrderKeys, hasBindingGroupOrderChanged } from './autoSectorGroupDirty'
 import type { BindingSectorGroup, BindingStationPlan, StationPlan, X4MapSector } from '@/types/x4'
 
 
@@ -1124,6 +1125,14 @@ watch([autoGroupResult, activeBinding, virtualStationDrafts], () => {
     logAutoSectorDirty('group-length-differ', {
       resultGroupIds: result.groups.map((group) => group.id),
       bindingGroupIds: binding.groups.map((group) => group.sectorMacro)
+    })
+    hasChanges.value = true
+    return
+  }
+  if (hasBindingGroupOrderChanged(result.groups, binding.groups)) {
+    logAutoSectorDirty('group-order-differ', {
+      resultGroupIds: getResultGroupOrderKeys(result.groups),
+      bindingGroupIds: getBindingGroupOrderKeys(binding.groups)
     })
     hasChanges.value = true
     return

@@ -88,6 +88,7 @@ defineExpose({ triggerAutoGroup })
           :editable="false"
           :show-recalc-state-button="false"
           :draggable="false"
+          :show-drag-handle="false"
           :diff-enabled="false"
           :trade-station-caps="tradeStationCaps"
           @color-change="handleColorChange"

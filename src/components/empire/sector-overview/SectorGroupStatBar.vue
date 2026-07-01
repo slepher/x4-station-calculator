@@ -34,6 +34,7 @@ const modeSummaryKey = computed(() => {
 const modeDetailKey = computed(() => {
   if (props.panelMode === 'edit') return 'sector.mode_edit_detail'
   if (props.panelMode === 'generate') return 'sector.mode_recalculate_detail'
+  if (props.view === 'map') return 'sector.mode_preview_map_detail'
   return 'sector.mode_preview_detail'
 })
 

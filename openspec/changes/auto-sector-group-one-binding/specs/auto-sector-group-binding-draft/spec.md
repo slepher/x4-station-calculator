@@ -594,6 +594,21 @@ Live 和 Map 面板 SHALL NOT 因组件挂载、面板切换或模式切换触�
 - **那么** `hasChanges` SHALL 保持 false
 - **并且** 顶部「确定」按钮 SHALL 保持置灰/禁用
 
+#### Scenario: Reordered groups are dirty
+
+- **前提** 当前 draft 的 group 集合与已保存 binding groups 一致
+- **当** 用户拖动调整 group 顺序，且新顺序不同于已保存 binding groups 顺序
+- **那么** `hasChanges` SHALL 变为 true
+- **并且** 顶部「确定」按钮 SHALL 可用
+- **当** 用户点击「确定」保存
+- **那么** binding groups SHALL 按用户调整后的顺序保存
+- **并且** `hasChanges` SHALL 变为 false
+
+#### Scenario: Overview group list hides drag handles
+
+- **前提** 用户位于 Live 总览 display 界面的星区列表
+- **那么** group card SHALL NOT 显示拖拽把手
+
 #### Scenario: Explicit standalone keeps existing standalone behavior
 
 - **前提** sector `S` 出现在 assignment 列表中

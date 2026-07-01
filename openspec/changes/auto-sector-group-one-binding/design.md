@@ -378,9 +378,11 @@ pin / unpin 是 shared draft 的即时变换，不是持久化提交动作，也
 14. pin / unpin 入口只属于 hub/group card；assignment card 不显示 pin / unpin 按钮。
 15. 查看/编辑/重算模式的 hub/group card 都显示 pin / unpin 按钮；查看模式不得隐藏该按钮。
 16. pin / unpin 可以在查看/编辑/重算模式触发，但都只写 live store 的 shared draft，不直接写 `saveBindingStore`。
-17. 单纯 pin / unpin 不改变可持久化字段时，dirty comparison 应将其视为 `hasChanges=false`。
-18. absorb 一个 sector 到其他 group 时，如果该 sector 同时存在自身 hub group，则删除所有同 `sectorMacro` 的自身 hub group，清理其他 group 的 `connectedGroupIds` 和 assignment options 中指向被删除 group 的引用。
-19. unpin assignment 被用户选择 absorb 到其他 group 后，SHALL 只更新 `selectedOptionIndex` 和 `status`，SHALL NOT 改变 `displayBucket` 或 `unpinOrder`；该 assignment 继续留在 unpin 顶部位置。
+17. group 顺序属于可持久化字段；dirty comparison 应比较 result groups 顺序与 binding groups 顺序，顺序不一致时 `hasChanges=true`。
+18. Live 总览 display 界面的星区列表不显示拖拽把手；`SectorGroupList` 默认不显示拖拽把手，只有星区编辑面板等明确传入 `showDragHandle=true` 的调用方才显示。
+19. 单纯 pin / unpin 不改变可持久化字段时，dirty comparison 应将其视为 `hasChanges=false`。
+20. absorb 一个 sector 到其他 group 时，如果该 sector 同时存在自身 hub group，则删除所有同 `sectorMacro` 的自身 hub group，清理其他 group 的 `connectedGroupIds` 和 assignment options 中指向被删除 group 的引用。
+21. unpin assignment 被用户选择 absorb 到其他 group 后，SHALL 只更新 `selectedOptionIndex` 和 `status`，SHALL NOT 改变 `displayBucket` 或 `unpinOrder`；该 assignment 继续留在 unpin 顶部位置。
 
 实现边界：
 

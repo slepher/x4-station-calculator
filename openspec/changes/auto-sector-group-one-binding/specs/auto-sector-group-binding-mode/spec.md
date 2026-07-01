@@ -20,6 +20,14 @@
 - **并且** `SectorGroupStatBar` SHALL 显示短说明“分配选择会实时联动其他星区”
 - **并且** 说明 tooltip SHALL 包含查看模式右侧 assignment 联动语义和固定 / 取消固定说明
 
+#### Scenario: Map view preview tooltip avoids right-side wording
+
+- **前提** 用户处于地图模式的 `查看` 模式
+- **当** 系统显示 `SectorGroupStatBar` 说明 tooltip
+- **那么** tooltip SHALL 使用地图模式专用说明
+- **并且** SHALL NOT 使用“右侧分配列表”描述 assignment 位置
+- **并且** SHALL 说明用户可切换到分配页签处理 assignment
+
 #### Scenario: Mode switch is in page operation bar
 
 - **前提** 用户进入 auto-sector-group binding 面板

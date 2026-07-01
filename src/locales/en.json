@@ -137,6 +137,7 @@
     "mode": "Mode",
     "mode_preview_summary": "Assignment choices update related sectors live",
     "mode_preview_detail": "View:\nChoices in the assignment list update related sector candidates, coverage, and linked results live.\nUse this mode to resolve unassigned sectors and review the current plan.\n\nPin / Unpin:\nPinned hubs stay in the current plan.\nUnpin turns that hub back into an assignment sector, where it can be absorbed into another hub or made standalone.",
+    "mode_preview_map_detail": "View:\nAfter switching to the Assignment tab, choices there update related sector candidates, coverage, and linked results live.\nUse this in map mode to locate sectors first, then resolve unassigned sectors and review the current plan.\n\nPin / Unpin:\nPinned hubs stay in the current plan.\nUnpin turns that hub back into an assignment sector, where it can be absorbed into another hub or made standalone.",
     "mode_edit_summary": "Structure edits do not auto-change other assignments",
     "mode_edit_detail": "Edit:\nManually adjust hubs, coverage, connections, and trade stations.\nStructure edits do not automatically change other sector assignment choices, which makes this mode suitable for local plan edits.\n\nPin / Unpin:\nPinned hubs stay in the current plan.\nUnpin turns that hub back into an assignment sector, where it can be absorbed into another hub or made standalone.",
     "mode_recalculate_summary": "Set calculation input, then confirm after recalculating",

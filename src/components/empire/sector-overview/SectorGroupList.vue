@@ -24,6 +24,7 @@ const props = withDefaults(defineProps<{
   showSelectGroupButton?: boolean
   showRecalcStateButton?: boolean
   draggable?: boolean
+  showDragHandle?: boolean
   structureDisabled?: boolean
   baselineCoverageByGroupId?: Record<string, string[]>
   baselineConnectedGroupIdsByGroupId?: Record<string, string[]>
@@ -37,6 +38,7 @@ const props = withDefaults(defineProps<{
   showSelectGroupButton: false,
   showRecalcStateButton: true,
   draggable: false,
+  showDragHandle: false,
   structureDisabled: false
 })
 
@@ -79,6 +81,8 @@ const cardBase = computed(() => ({
   tradeStationCaps: props.tradeStationCaps ?? {}
 }))
 
+const dragHandleSelector = computed(() => props.showDragHandle ? '.drag-handle' : undefined)
+
 function onUpdateJumpRange(groupId: string, range: number) { emit('update-jump-range', groupId, range) }
 function onToggleCoverageInput(groupId: string, sectorMacro: string) { emit('toggle-coverage-input', groupId, sectorMacro) }
 function onToggleConnectedInput(groupId: string, connectedGroupId: string) { emit('toggle-connected-input', groupId, connectedGroupId) }
@@ -104,7 +108,7 @@ function onColorChange(groupId: string, color: string | undefined) { emit('color
       :list="groups"
       item-key="id"
       class="flex flex-col gap-2"
-      handle=".drag-handle"
+      :handle="dragHandleSelector"
       :animation="200"
       :force-fallback="true"
       :fallback-on-body="true"
@@ -121,7 +125,7 @@ function onColorChange(groupId: string, color: string | undefined) { emit('color
           :group="group"
           :groups="groups"
           v-bind="cardBase"
-          :show-drag-handle="true"
+          :show-drag-handle="showDragHandle"
           @cycle-recalc-state="onCycleRecalcState"
           @update-jump-range="onUpdateJumpRange"
           @toggle-coverage-input="onToggleCoverageInput"

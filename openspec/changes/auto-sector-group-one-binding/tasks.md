@@ -63,6 +63,8 @@
 - [x] 实现 pin 将 hub 定位星区从 assignment 移除
 - [x] 确保 `isPinned=false` group 不作为下一次显式生成/重算的 pinned base input
 - [x] 确保单纯 pin / unpin 不产生可持久化 dirty，`hasChanges` 保持 false
+- [x] 确保调整 group 顺序会产生可保存 dirty，并由 [确定] 写入 binding group 顺序
+- [x] Live 总览 display 界面的星区列表隐藏拖拽把手
 - [x] 确保 unpin 不调用 `applyStandaloneToResult()`，不抢占其他 coverage
 - [ ] 确保 assignment 显式「独立成组」仍保留既有 standalone coverage / derived candidates 行为
 - [ ] `applyStandaloneToResult()` 追加扩展跳数 derived absorb candidates（`> prefJumpRange` 且 `≤ MAX_UNCERTAIN_JUMP`，`extendsRange=true`）
@@ -136,6 +138,7 @@
 - [x] 三态按钮移动到 `AutoSectorBar` 左侧，与 `[确定]` / `[重置]` 同行
 - [x] `SectorGroupStatBar` 改为三种模式的说明文本区域
 - [x] 查看模式说明 assignment 选择会实时联动其他星区
+- [x] 地图模式查看 tooltip 使用分配页签文案，不使用“右侧分配列表”
 - [x] 编辑模式说明结构调整不自动改动其他分配
 - [x] 重算模式 tooltip 逐项说明连接跳数、节点、覆盖跳数、交易站阈值、保留连接、保留覆盖、保留交易站、忽略当前节点
 - [x] 三种模式 tooltip 均包含 pin / unpin 说明，重算模式额外说明 unpin 不作为重算输入且不会直接提交
