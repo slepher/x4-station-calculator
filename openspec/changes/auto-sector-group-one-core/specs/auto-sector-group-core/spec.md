@@ -113,6 +113,20 @@
 - **那么** 系统 SHALL 为 pure hub 创建初始 group
 - **并且** SHALL 将覆盖跳数内玩家星区分配到最近 pure hub
 
+#### Scenario: Clean slate production fallback seed graph
+- **前提** 当前 guid 没有已有 group
+- **并且** `generateHubs=true`
+- **并且** pure hub seed 少于 2 个
+- **并且** 存档中的某些玩家站连通分量没有 pure hub
+- **并且** 这些分量内存在合格但带产线的玩家站 sector
+- **当** 系统运行 clean slate 分组
+- **那么** 系统 SHALL 从无 pure seed 分量内的合格生产型玩家站 sector 中创建 fallback hub group
+- **并且** fallback hub group SHALL 作为产业骨架锚点参与 coverage、assignment、MST 和 bridge 计算
+- **并且** 系统 SHALL NOT 为了覆盖所有玩家 sector 而持续新增 fallback hub
+- **并且** 当已有 2 个或更多 pure hub seed 时，系统 SHALL NOT 为普通覆盖空洞额外生成 fallback hub
+- **并且** 未被 fallback hub 当前覆盖的玩家 sector SHALL 继续作为 ordinary assignment、扩展吸收或 standalone 决策处理
+- **并且** fallback seed generation SHALL NOT 创建 transit-only bridge group
+
 #### Scenario: Generate hubs disabled uses only input hubs
 - **前提** 当前存在 baseline 或手动输入 hub
 - **并且** `generateHubs=false`

@@ -804,6 +804,58 @@ function determineAssignmentOptions(
   return { options, isUncertain: false, uncertaintyReason: null, defaultGroupId: best.groupId }
 }
 
+function selectProductionFallbackHubs(
+  playerSectorMacros: string[],
+  sectorHubMap: Map<string, StationHubInfo[]>,
+  sectorGraph: Record<string, string[]>,
+  excludedSectorSet: Set<string>,
+  existingSeedSectors: Set<string> = new Set()
+): SectorPureHub[] {
+  const playerSectorSet = new Set(playerSectorMacros)
+  const visited = new Set<string>()
+  const fallbackHubs: SectorPureHub[] = []
+
+  for (const sectorMacro of playerSectorMacros) {
+    if (visited.has(sectorMacro)) continue
+    const component: string[] = []
+    const queue = [sectorMacro]
+    visited.add(sectorMacro)
+
+    while (queue.length > 0) {
+      const current = queue.shift()!
+      component.push(current)
+      for (const next of sectorGraph[current] || []) {
+        if (!playerSectorSet.has(next) || visited.has(next)) continue
+        visited.add(next)
+        queue.push(next)
+      }
+    }
+
+    if (component.some((candidateSector) => existingSeedSectors.has(candidateSector))) continue
+
+    const candidates = component
+      .filter((candidateSector) => !excludedSectorSet.has(candidateSector))
+      .map((candidateSector) => {
+        const bestStation = (sectorHubMap.get(candidateSector) || [])
+          .filter((hub) => hub.qualified && !hub.isPureHub)
+          .sort((a, b) => b.score - a.score || a.stationCode.localeCompare(b.stationCode))[0]
+        if (!bestStation) return null
+        return {
+          sectorMacro: candidateSector,
+          stationCode: bestStation.stationCode,
+          score: bestStation.score,
+          containerCap: bestStation.containerCap
+        }
+      })
+      .filter((candidate): candidate is SectorPureHub => candidate !== null)
+      .sort((a, b) => b.score - a.score || a.sectorMacro.localeCompare(b.sectorMacro))
+
+    if (candidates[0]) fallbackHubs.push(candidates[0])
+  }
+
+  return fallbackHubs.sort((a, b) => b.score - a.score || a.sectorMacro.localeCompare(b.sectorMacro))
+}
+
 export function groupCleanSlate(
   archive: SaveArchive,
   modulesByMacroId: Record<string, X4Module>,
@@ -841,20 +893,25 @@ export function groupCleanSlate(
   }
 
   pureHubs.sort((a, b) => b.score - a.score)
+  const pureHubAnchors = new Set(pureHubs.map((h) => h.sectorMacro))
+  const fallbackHubs = generateHubs && pureHubs.length < 2
+    ? selectProductionFallbackHubs(playerSectorMacros, sectorHubMap, sectorGraph, excludedSectorSet, pureHubAnchors)
+    : []
+  const autoSeedHubs = [...pureHubs, ...fallbackHubs]
 
   const groups: GroupDraftInfo[] = []
   const groupMap = new Map<string, GroupDraftInfo>()
   const assignedSectors = new Map<string, string>()
   const occupiedSectors = new Set<string>()
 
-  // Pure hub anchors should not appear in each other's coverage
-  const pureHubAnchors = new Set(pureHubs.map((h) => h.sectorMacro))
+  // Auto seed anchors should not appear in each other's coverage.
+  const seedHubAnchors = new Set(autoSeedHubs.map((h) => h.sectorMacro))
 
   let groupCounter = 0
 
   // Phase A: Pure hub groups
   if (generateHubs) {
-    for (const hub of pureHubs) {
+    for (const hub of autoSeedHubs) {
       const sectorMacro = hub.sectorMacro
       if (assignedSectors.has(sectorMacro)) continue
 
@@ -864,8 +921,7 @@ export function groupCleanSlate(
         playerSectorMacros.includes(m) &&
         !occupiedSectors.has(m) &&
         m !== sectorMacro &&
-        // Don't claim other pure hub anchors
-        !pureHubAnchors.has(m)
+        !seedHubAnchors.has(m)
       )
 
       const group: GroupDraftInfo = {

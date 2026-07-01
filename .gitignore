@@ -38,6 +38,9 @@ output_assets/
 # 存档提取数据
 save_data/
 save_*
+!tests/fixtures/auto-group/
+!tests/fixtures/auto-group/save_009_minimal.json
+!tests/fixtures/auto-group/save_009_fallback_nopileos_only.json
 
 # 忽略 Python 脚本生成的临时缓存或日志 (如果有)
 scripts/*.log

@@ -15,6 +15,7 @@
 - Pure hub 是 container 容量达到阈值且生产线数为 0 的玩家站。
 - Hub score 使用 `cap / (1 + ln(1 + prod_lines))`。
 - Clean slate 模式先扫描所有玩家站并生成 sector 级 hub 信息；`generateHubs=true` 时从 pure hubs 创建初始 groups，再将覆盖跳数内玩家星区分配给最近 hub。
+- Clean slate 下若 `generateHubs=true` 但 pure hub seed 少于 2 个、无法形成多节点骨架图，系统 SHALL 从无 pure seed 分量内的合格生产型玩家站 sector 中生成代表性 fallback hub seed；已有多个 pure seed 时不得为了补普通覆盖洞而额外生成 fallback seed。fallback seed 不追求覆盖所有玩家 sector，不创建 transit-only bridge group。
 - Clean slate 下若 `generateHubs=false`，不得自动生成新的 pure hub，只使用 pinned/手动输入 hub 继续计算。
 - Incremental 模式以已保存 groups 作为 baseline input，既有 group 使用自己的 `jumpRange`，新 group 使用当前默认覆盖跳数。
 - Incremental 模式 SHALL 先完成新/回归 pure hub 识别，再决定普通玩家 sector 的 coverage / assignment 归属；不得让 baseline group 的保留 coverage 在新/回归 hub 被发现前抢占其邻近范围节点。

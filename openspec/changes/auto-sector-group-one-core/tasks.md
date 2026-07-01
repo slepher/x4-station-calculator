@@ -12,6 +12,7 @@
 - [ ] 保持 container-only 容量统计，并合并 `modules[]` 与 `constructions[]`
 - [ ] 实现 pure hub、hub score、clean slate 和 incremental 的最终规则
 - [ ] Clean slate 按 `generateHubs` 决定是否自动生成 pure hub
+- [x] Clean slate 在无 pure hub 时生成生产型 fallback seed 骨架图且不追求全覆盖
 - [x] Incremental 先识别新/回归 pure hub，再决定 coverage / assignment 归属
 - [ ] Sector 默认归属按距离、hub score、稳定 key 和 excluded default 规则决胜
 - [ ] Incremental 使用每个既有 group 自己的 `jumpRange`

@@ -91,14 +91,20 @@ Clean slate 从 archive player stations 建立初始草案：
 
 1. 统计每个 station 的 container 容量与生产线数。
 2. 按 sector 汇总 hub 候选、最高 hub score、pure hub 标记和玩家站列表。
-3. 当 `generateHubs=true` 时为 pure hub 创建 group；当 `generateHubs=false` 时只使用 pinned/手动输入 hub。
-4. 读取当前版本 `sectorReachability`，以缓存查表作为后续距离来源。
-5. 按覆盖跳数为玩家 sector 计算当前命中 groups。
-6. 当前命中且未 excluded 的 group 可作为默认归属；多命中时按距离、hub score、稳定 key 决胜。
-7. 对等距且 score 差距小于 30% 或所有命中均被 excluded 的 sector 生成 unresolved assignment。
-7. 计算 MST connection。
-8. 如图不连通，生成 bridge plan。
-9. 为每个 hub group 初始化 trade station 候选与默认值。
+3. 当 `generateHubs=true` 时优先为 pure hub 创建 group；当 `generateHubs=false` 时只使用 pinned/手动输入 hub。
+4. 若 `generateHubs=true` 且 pure hub seed 少于 2 个、无法形成多节点骨架图，则从无 pure seed 分量内的合格生产型玩家站 sector 中生成 fallback hub seed：
+   - fallback seed 表达产业骨架锚点，不表达纯仓储站要求。
+   - fallback seed 按有效双向连通的玩家 station 分量选择代表性锚点；已有 pure hub seed 的分量不再补 fallback seed，没有 pure seed 的分量最多自动选择一个最高 score 的合格生产型 sector。
+   - 已有 2 个或更多 pure seed 时，系统 SHALL NOT 为普通覆盖空洞额外生成 fallback seed；这些空洞继续交给 assignment、扩展吸收、standalone 或 bridge。
+   - fallback seed 不循环贪心补齐所有未覆盖玩家 sector；未覆盖 sector 保留给 ordinary assignment、扩展吸收或 standalone 决策。
+   - fallback seed 不创建 transit-only bridge group；bridge group 仍只由 bridge plan 负责。
+5. 读取当前版本 `sectorReachability`，以缓存查表作为后续距离来源。
+6. 按覆盖跳数为玩家 sector 计算当前命中 groups。
+7. 当前命中且未 excluded 的 group 可作为默认归属；多命中时按距离、hub score、稳定 key 决胜。
+8. 对等距且 score 差距小于 30% 或所有命中均被 excluded 的 sector 生成 unresolved assignment。
+9. 计算 MST connection。
+10. 如图不连通，生成 bridge plan。
+11. 为每个 hub group 初始化 trade station 候选与默认值。
 
 ### Incremental
 

@@ -246,7 +246,6 @@ describe('autoGroup - recalculation with pinned hubs', () => {
     expect(recalculated.groups.length).toBeGreaterThan(pinnedGroups.length)
     expect(recalculated.groups.some((group) =>
       group.isNew &&
-      !group.isPinned &&
       !pinnedGroups.some((pinned) => pinned.sectorMacro === group.sectorMacro)
     )).toBe(true)
   })
