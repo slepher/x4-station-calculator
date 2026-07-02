@@ -191,7 +191,7 @@ const handleOpenImport = () => {
         <div class="input-group ml-6">
           <label class="group-label">{{ t('toolbar.sunlight_efficiency') }}</label>
           <div class="x4-composite-input-wrapper">
-            <X4NumberInput v-model="sunlight" :min="0" :max="200" width-class="w-14" class="x4-nested-input" />
+            <X4NumberInput v-model="sunlight" :min="0" :max="2000" width-class="w-16" class="x4-nested-input" />
             <div class="x4-unit-suffix-box">%</div>
           </div>
         </div>
