@@ -271,7 +271,7 @@ const scopeClass = computed(() => {
 
         <div class="input-group ml-6">
           <label class="group-label">{{ t('toolbar.sunlight_efficiency') }}</label>
-          <div class="count-pill min-w-[80px] justify-end">
+          <div class="count-pill min-w-[70px] justify-end">
             <span class="text-xs font-mono font-bold text-sky-400">{{ props.sectorSunlight }}</span>
             <span class="text-[10px] text-slate-500 ml-1">%</span>
           </div>
