@@ -36,6 +36,7 @@ live transit hub 页面 SHALL 将右侧建设成本 `StationDashboard` 替换为
 - **那么** `Station` 分类 SHALL 按 sector 分组显示这些 station
 - **并且** 当前 hub station SHALL NOT 作为目标显示
 - **并且** linked group 的 transit hub station SHALL NOT 出现在 `Station` 分类
+- **注意** 此规则仅适用于运输栏 `Station` 分类。星区侧边栏 station 列表不受此限制（见 `show-transit-hub-in-sector-list` change）。
 
 #### Scenario: Problem category receives incomplete routes
 
