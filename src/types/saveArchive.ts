@@ -103,6 +103,48 @@ export interface WareAmount {
   amount: number
 }
 
+export interface PlayerShipCargo {
+  ware: string
+  amount: number
+}
+
+export type PlayerShipAssignmentState = 'none' | 'resolved' | 'unresolved'
+export type PlayerShipCommanderKind = 'station' | 'ship'
+
+export interface PlayerShipAssignment {
+  state: PlayerShipAssignmentState
+  commander_id?: string
+  commander_kind?: PlayerShipCommanderKind
+  commander_ref?: string
+  role?: string
+}
+
+export interface PlayerShipOrderTarget {
+  name: string
+  value: string
+}
+
+export interface PlayerShipOrderSummary {
+  id: string
+  order: string
+  state?: string
+  failed: boolean
+  targets?: PlayerShipOrderTarget[]
+}
+
+export interface PlayerShipEntry {
+  component_id: string
+  code: string
+  name?: string
+  macro: string
+  class: string
+  cargo?: PlayerShipCargo[]
+  assignment: PlayerShipAssignment
+  default_order?: PlayerShipOrderSummary
+  orders?: PlayerShipOrderSummary[]
+  is_repeat: boolean
+}
+
 export interface StationTradeOverrides {
   max?: WareAmount[]
   buy?: WareAmount[]
@@ -357,6 +399,7 @@ export interface SectorData {
   datavaults?: CodeMap<DatavaultEntry>
   erlking_vaults?: CodeMap<DatavaultEntry>
   abandoned_ships?: CodeMap<AbandonedShipEntry>
+  player_ships?: CodeMap<PlayerShipEntry>
 }
 
 export interface SaveArchive {

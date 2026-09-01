@@ -33,6 +33,10 @@ import {
   CURRENT_POST_PROCESSOR_VERSION,
   postProcessRustSaveArchive
 } from '@/workers/saveParser.post'
+import {
+  classifyPlayerShip,
+  type PlayerShipAvailabilityState
+} from './logic/playerShipAvailability'
 const SAVE_POI_CATEGORIES: SavePoiCategory[] = ['playerStation', 'npcStation', 'xenonStation', 'khaakStation', 'abandonedShip', 'datavault', 'erlkingVault']
 const SAVE_ARCHIVES_STATE_VERSION = 1
 
@@ -73,7 +77,8 @@ function createEmptySectorData(name: string): SectorData {
     player_buildstorages: {},
     datavaults: {},
     erlking_vaults: {},
-    abandoned_ships: {}
+    abandoned_ships: {},
+    player_ships: {}
   }
 }
 
@@ -281,6 +286,7 @@ function normalizeSectorData(
   normalized.khaak_stations = sector.khaak_stations || {}
   normalized.npc_stations = sector.npc_stations || {}
   normalized.player_buildstorages = sector.player_buildstorages || {}
+  normalized.player_ships = sector.player_ships === undefined ? {} : sector.player_ships
 
   return normalized
 }
@@ -505,6 +511,16 @@ export const useSaveStore = defineStore('save', () => {
 
   const selectedArchivePoiOverlays = computed<SavePoiOverlayItem[]>(() => {
     return flattenSavePoiCategoryData(selectedArchivePoiCategories.value)
+  })
+
+  const selectedArchivePlayerShips = computed<PlayerShipAvailabilityState[]>(() => {
+    const archive = selectedArchive.value
+    if (archive === null) return []
+
+    return Object.entries(archive.sectors).flatMap(([sectorMacro, sector]) => {
+      if (sector.player_ships === undefined) return []
+      return Object.values(sector.player_ships).map((ship) => classifyPlayerShip(ship, sectorMacro))
+    })
   })
 
   async function initialize(): Promise<void> {
@@ -818,6 +834,7 @@ export const useSaveStore = defineStore('save', () => {
     totalArchiveCount,
     selectedArchivePoiCategories,
     selectedArchivePoiOverlays,
+    selectedArchivePlayerShips,
     isInitialized,
     initialize,
     checkVersionCompatibility,

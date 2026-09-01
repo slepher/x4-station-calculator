@@ -3,9 +3,11 @@ use crate::faction::FactionParser;
 use crate::model::{
     norm_ver, AbandonedShipEntry, AggregatedEquipment, AggregatedStationModule, ArchiveMeta,
     BuildProgress, BuildStorageEntry, DatavaultEntry, DatavaultWareEntry, FactionStationEntry,
-    Meta, NpcStationEntry, NpcTradeOffer, ParserError, PlayerStationConstruction,
-    PlayerStationEntry, SaveArchive, SectorData, StationBaseEntry, StationEquipment,
-    StationTradeOverrides, Vector3, WareAmount, WorkforceEntry,
+    Meta, NpcStationEntry, NpcTradeOffer, ParserError, PlayerShipAssignment,
+    PlayerShipAssignmentState, PlayerShipCargo, PlayerShipCommanderKind, PlayerShipEntry,
+    PlayerShipOrderSummary, PlayerShipOrderTarget, PlayerStationConstruction, PlayerStationEntry,
+    SaveArchive, SectorData, StationBaseEntry, StationEquipment, StationTradeOverrides, Vector3,
+    WareAmount, WorkforceEntry,
 };
 use crate::research::ResearchParser;
 use crate::terraforming::TerraformingParser;
@@ -16,6 +18,7 @@ struct ComponentCtx {
     class: String,
     id: Option<String>,
     code: Option<String>,
+    name: Option<String>,
     macro_field: Option<String>,
     owner: Option<String>,
     own_offset: Vector3,
@@ -36,6 +39,26 @@ struct ComponentCtx {
     build_progress: Option<BuildProgress>,
     workforces: Vec<WorkforceEntry>,
     trade_offers: Vec<NpcTradeOffer>,
+    subordinate_group: Option<String>,
+    subordinate_roles: HashMap<String, String>,
+    commander_ref: Option<String>,
+    default_order: Option<PlayerShipOrderSummary>,
+    orders: Vec<PlayerShipOrderSummary>,
+    current_order: Option<(bool, PlayerShipOrderSummary)>,
+    is_repeat: bool,
+}
+
+#[derive(Clone, Default)]
+struct ConnectionCtx {
+    kind: String,
+}
+
+#[derive(Clone)]
+struct PendingPlayerShip {
+    sector_id: String,
+    entry: PlayerShipEntry,
+    commander_ref: Option<String>,
+    subordinate_group: Option<String>,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -99,6 +122,7 @@ pub(crate) struct SaveParserCore {
     sectors: HashMap<String, SectorData>,
     sector_stack: VecDeque<String>,
     comp_stack: VecDeque<ComponentCtx>,
+    connection_stack: VecDeque<ConnectionCtx>,
     path: VecDeque<String>,
     tags: usize,
 
@@ -118,6 +142,10 @@ pub(crate) struct SaveParserCore {
     pub(crate) blueprints: BlueprintsParser,
     faction: FactionParser,
     universe_closed: bool,
+    component_kinds: HashMap<String, PlayerShipCommanderKind>,
+    connection_commanders: HashMap<String, String>,
+    commander_roles: HashMap<String, HashMap<String, String>>,
+    pending_player_ships: Vec<PendingPlayerShip>,
 }
 
 impl SaveParserCore {
@@ -129,6 +157,7 @@ impl SaveParserCore {
             sectors: HashMap::new(),
             sector_stack: VecDeque::new(),
             comp_stack: VecDeque::new(),
+            connection_stack: VecDeque::new(),
             path: VecDeque::new(),
             tags: 0,
             station_owner: None,
@@ -147,6 +176,10 @@ impl SaveParserCore {
             blueprints: BlueprintsParser::default(),
             faction: FactionParser::default(),
             universe_closed: false,
+            component_kinds: HashMap::new(),
+            connection_commanders: HashMap::new(),
+            commander_roles: HashMap::new(),
+            pending_player_ships: Vec::new(),
         }
     }
 
@@ -172,6 +205,16 @@ impl SaveParserCore {
 
         if name == "component" {
             let cls = a.get("class").cloned().unwrap_or_default();
+            let component_id = normalize_component_id(a.get("id"));
+            if let Some(id) = component_id.clone() {
+                if cls == "station" {
+                    self.component_kinds
+                        .insert(id, PlayerShipCommanderKind::Station);
+                } else if cls.starts_with("ship_") {
+                    self.component_kinds
+                        .insert(id, PlayerShipCommanderKind::Ship);
+                }
+            }
             let (bp, w, sl) = if cls == "datavault"
                 || a.get("macro")
                     .map(|m| m.to_lowercase().contains("erlking_vault"))
@@ -183,8 +226,9 @@ impl SaveParserCore {
             };
             self.comp_stack.push_back(ComponentCtx {
                 class: cls.clone(),
-                id: normalize_component_id(a.get("id")),
+                id: component_id,
                 code: a.get("code").cloned(),
+                name: a.get("name").cloned(),
                 macro_field: a.get("macro").cloned(),
                 owner: a.get("owner").cloned(),
                 own_offset: Vector3::default(),
@@ -208,6 +252,13 @@ impl SaveParserCore {
                 build_progress: None,
                 workforces: Vec::new(),
                 trade_offers: Vec::new(),
+                subordinate_group: None,
+                subordinate_roles: HashMap::new(),
+                commander_ref: None,
+                default_order: None,
+                orders: Vec::new(),
+                current_order: None,
+                is_repeat: false,
             });
 
             if cls == "sector" {
@@ -226,6 +277,7 @@ impl SaveParserCore {
                     datavaults: HashMap::new(),
                     erlking_vaults: HashMap::new(),
                     abandoned_ships: HashMap::new(),
+                    player_ships: HashMap::new(),
                 });
             }
 
@@ -238,6 +290,98 @@ impl SaveParserCore {
 
             if cls == "zone" {
                 self.current_zone_macro = a.get("macro").cloned();
+            }
+        }
+
+        if name == "connection" {
+            let kind = a.get("connection").cloned().unwrap_or_default();
+            if kind == "subordinates" {
+                if let (Some(connection_id), Some(commander_id)) = (
+                    normalize_component_id(a.get("id")),
+                    self.comp_stack.back().and_then(|ctx| ctx.id.clone()),
+                ) {
+                    self.connection_commanders
+                        .insert(connection_id, commander_id);
+                }
+            }
+            self.connection_stack.push_back(ConnectionCtx { kind });
+        }
+
+        if name == "connected"
+            && self.connection_stack.back().map(|ctx| ctx.kind.as_str()) == Some("commander")
+        {
+            let commander_ref = normalize_component_id(a.get("connection"));
+            if let Some(ship) = self.comp_stack.back_mut() {
+                if ship.class.starts_with("ship_") && ship.owner.as_deref() == Some("player") {
+                    ship.commander_ref = commander_ref;
+                }
+            }
+        }
+
+        if at_tags(&self.path, &["component", "subordinate"]) {
+            if let Some(ship) = self.comp_stack.back_mut() {
+                if ship.class.starts_with("ship_") && ship.owner.as_deref() == Some("player") {
+                    ship.subordinate_group = a.get("group").cloned();
+                }
+            }
+        }
+
+        if at_tags(&self.path, &["component", "subordinates", "group"]) {
+            if let (Some(index), Some(role)) = (
+                a.get("index").cloned(),
+                a.get("assignmment")
+                    .or_else(|| a.get("assignment"))
+                    .cloned(),
+            ) {
+                if let Some(commander) = self.comp_stack.back_mut() {
+                    commander.subordinate_roles.insert(index, role);
+                }
+            }
+        }
+
+        if at_tags(&self.path, &["component", "orders"]) {
+            if let Some(ship) = self.comp_stack.back_mut() {
+                if ship.class.starts_with("ship_") && ship.owner.as_deref() == Some("player") {
+                    ship.is_repeat = a.get("loop") == Some(&"1".to_string())
+                        || a.get("recurring") == Some(&"1".to_string());
+                }
+            }
+        }
+
+        if at_tags(&self.path, &["component", "orders", "order"]) {
+            if let Some(ship) = self.comp_stack.back_mut() {
+                if ship.class.starts_with("ship_") && ship.owner.as_deref() == Some("player") {
+                    ship.is_repeat = ship.is_repeat
+                        || a.get("loop") == Some(&"1".to_string())
+                        || a.get("recurring") == Some(&"1".to_string());
+                    ship.current_order = Some((
+                        a.get("default") == Some(&"1".to_string()),
+                        PlayerShipOrderSummary {
+                            id: normalize_component_id(a.get("id")).unwrap_or_default(),
+                            order: a.get("order").cloned().unwrap_or_default(),
+                            state: a.get("state").cloned(),
+                            failed: a.get("failed") == Some(&"1".to_string()),
+                            targets: Vec::new(),
+                        },
+                    ));
+                }
+            }
+        }
+
+        if at_tags(&self.path, &["component", "orders", "order", "param"])
+            && a.get("type").map(|value| value.as_str()) == Some("component")
+        {
+            if let (Some(name), Some(value)) = (
+                a.get("name").cloned(),
+                normalize_component_id(a.get("value")),
+            ) {
+                if let Some((_, order)) = self
+                    .comp_stack
+                    .back_mut()
+                    .and_then(|ship| ship.current_order.as_mut())
+                {
+                    order.targets.push(PlayerShipOrderTarget { name, value });
+                }
             }
         }
 
@@ -408,7 +552,20 @@ impl SaveParserCore {
                 .map(|tag| tag.as_str())
                 == Some("cargo");
             if parent_is_cargo {
-                if let Some(component) = self.comp_stack.back() {
+                let enclosing_ship_index = self
+                    .comp_stack
+                    .iter()
+                    .rposition(|ctx| ctx.class.starts_with("ship_"));
+                if let Some(index) = enclosing_ship_index {
+                    if let Some(ship) = self.comp_stack.get_mut(index) {
+                        if ship.owner.as_deref() == Some("player") {
+                            if let Some(ware) = a.get("ware").cloned() {
+                                let amount = to_int(a.get("amount"), 1);
+                                *ship.cargo_totals.entry(ware).or_insert(0) += amount;
+                            }
+                        }
+                    }
+                } else if let Some(component) = self.comp_stack.back() {
                     if component.class == "buildstorage" {
                         if let Some(buildstorage) = self.current_buildstorage_ctx_mut() {
                             if let Some(ware) = a.get("ware").cloned() {
@@ -653,6 +810,22 @@ impl SaveParserCore {
             )));
         }
 
+        if name == "order" {
+            if let Some(ship) = self.comp_stack.back_mut() {
+                if let Some((is_default, order)) = ship.current_order.take() {
+                    if is_default {
+                        ship.default_order = Some(order);
+                    } else {
+                        ship.orders.push(order);
+                    }
+                }
+            }
+        }
+
+        if name == "connection" {
+            self.connection_stack.pop_back();
+        }
+
         if name == "entry" && self.entry_idx.is_some() && self.entry_ref.is_some() {
             let construction = PlayerStationConstruction {
                 id: self.entry_id.clone(),
@@ -692,6 +865,13 @@ impl SaveParserCore {
             let ctx = self.comp_stack.back().cloned().ok_or_else(|| {
                 ParserError::parse_error("XML/component stack underflow while closing </component>")
             })?;
+
+            if let Some(component_id) = ctx.id.clone() {
+                if ctx.class == "station" || ctx.class.starts_with("ship_") {
+                    self.commander_roles
+                        .insert(component_id, ctx.subordinate_roles.clone());
+                }
+            }
 
             if let Some(sk) = self.sector_stack.back().cloned() {
                 if let Some(sd) = self.sectors.get_mut(&sk) {
@@ -828,7 +1008,34 @@ impl SaveParserCore {
                             }
                         }
                         _ => {
-                            if ctx
+                            if ctx.class.starts_with("ship_")
+                                && ctx.owner.as_deref() == Some("player")
+                            {
+                                let component_id = ctx.id.clone().unwrap_or_default();
+                                self.pending_player_ships.push(PendingPlayerShip {
+                                    sector_id: sk.clone(),
+                                    entry: PlayerShipEntry {
+                                        component_id: component_id.clone(),
+                                        code: ctx.code.clone().unwrap_or_default(),
+                                        name: ctx.name.clone(),
+                                        macro_field: ctx.macro_field.clone().unwrap_or_default(),
+                                        class: ctx.class.clone(),
+                                        cargo: player_ship_cargo(&ctx.cargo_totals),
+                                        assignment: PlayerShipAssignment {
+                                            state: PlayerShipAssignmentState::None,
+                                            commander_id: None,
+                                            commander_kind: None,
+                                            commander_ref: None,
+                                            role: None,
+                                        },
+                                        default_order: ctx.default_order.clone(),
+                                        orders: ctx.orders.clone(),
+                                        is_repeat: ctx.is_repeat,
+                                    },
+                                    commander_ref: ctx.commander_ref.clone(),
+                                    subordinate_group: ctx.subordinate_group.clone(),
+                                });
+                            } else if ctx
                                 .macro_field
                                 .as_ref()
                                 .map(|m| m.to_lowercase().contains("erlking_vault"))
@@ -908,6 +1115,17 @@ impl SaveParserCore {
             .replace(".gz", "")
             .replace(".xml", "");
 
+        let mut sectors = self.sectors.clone();
+        for pending in &self.pending_player_ships {
+            let mut entry = pending.entry.clone();
+            entry.assignment = self.resolve_player_ship_assignment(pending);
+            if let Some(sector) = sectors.get_mut(&pending.sector_id) {
+                sector
+                    .player_ships
+                    .insert(entry.component_id.clone(), entry);
+            }
+        }
+
         let is_compatible = if let Some(expected) = &self.expected_version {
             norm_ver(&self.meta.version) == norm_ver(expected)
         } else {
@@ -922,11 +1140,11 @@ impl SaveParserCore {
                 player_name: self.meta.player_name.clone(),
                 version: self.meta.version.clone(),
                 filename: f,
-                parser_version: "v10".into(),
+                parser_version: "v11".into(),
                 post_processor_version: None,
                 source: "original".into(),
             },
-            sectors: self.sectors.clone(),
+            sectors,
             is_compatible,
             is_valid: true,
             research: self.research.runtime().clone(),
@@ -935,6 +1153,59 @@ impl SaveParserCore {
             player_relations: self.faction.relations().clone(),
             player_licences: self.faction.licences().clone(),
         })
+    }
+
+    fn resolve_player_ship_assignment(&self, pending: &PendingPlayerShip) -> PlayerShipAssignment {
+        let Some(commander_ref) = pending.commander_ref.clone() else {
+            if pending.subordinate_group.is_some() {
+                return PlayerShipAssignment {
+                    state: PlayerShipAssignmentState::Unresolved,
+                    commander_id: None,
+                    commander_kind: None,
+                    commander_ref: None,
+                    role: None,
+                };
+            }
+            return PlayerShipAssignment {
+                state: PlayerShipAssignmentState::None,
+                commander_id: None,
+                commander_kind: None,
+                commander_ref: None,
+                role: None,
+            };
+        };
+        let Some(commander_id) = self.connection_commanders.get(&commander_ref).cloned() else {
+            return PlayerShipAssignment {
+                state: PlayerShipAssignmentState::Unresolved,
+                commander_id: None,
+                commander_kind: None,
+                commander_ref: Some(commander_ref),
+                role: None,
+            };
+        };
+        let Some(commander_kind) = self.component_kinds.get(&commander_id).cloned() else {
+            return PlayerShipAssignment {
+                state: PlayerShipAssignmentState::Unresolved,
+                commander_id: Some(commander_id),
+                commander_kind: None,
+                commander_ref: Some(commander_ref),
+                role: None,
+            };
+        };
+        let role = pending.subordinate_group.as_ref().and_then(|group| {
+            self.commander_roles
+                .get(&commander_id)
+                .and_then(|roles| roles.get(group))
+                .cloned()
+        });
+
+        PlayerShipAssignment {
+            state: PlayerShipAssignmentState::Resolved,
+            commander_id: Some(commander_id),
+            commander_kind: Some(commander_kind),
+            commander_ref: Some(commander_ref),
+            role,
+        }
     }
 
     fn world_pos(&self) -> Vector3 {
@@ -1035,6 +1306,18 @@ fn ware_amounts(input: &HashMap<String, i64>) -> Vec<WareAmount> {
         .collect::<Vec<_>>();
     wares.sort_by(|a, b| a.ware.cmp(&b.ware));
     wares
+}
+
+fn player_ship_cargo(input: &HashMap<String, i64>) -> Vec<PlayerShipCargo> {
+    let mut cargo = input
+        .iter()
+        .map(|(ware, amount)| PlayerShipCargo {
+            ware: ware.clone(),
+            amount: *amount,
+        })
+        .collect::<Vec<_>>();
+    cargo.sort_by(|a, b| a.ware.cmp(&b.ware));
+    cargo
 }
 
 fn station_trade_overrides(ctx: &ComponentCtx) -> Option<StationTradeOverrides> {

@@ -67,8 +67,9 @@ describe('save parser core (simplified)', () => {
 })
 
 describe('save parser (Rust WASM streaming)', () => {
-  it('uses the NPC trade offer parser schema version', () => {
-    expect(CURRENT_PARSER_VERSION).toBe('v10')
+  it('uses player ship archive v11 without changing post-process v13', () => {
+    expect(CURRENT_PARSER_VERSION).toBe('v11')
+    expect(CURRENT_POST_PROCESSOR_VERSION).toBe('v13')
   })
 
   it('parses xml with pump loop into archive data', async () => {
@@ -92,6 +93,10 @@ describe('save parser (Rust WASM streaming)', () => {
       <component class="station" macro="npc_station_macro" code="NPC-001" owner="argon">
       <trade><offers><production><trade seller="[0x1]" ware="hullparts" price="53900" amount="0" /></production></offers></trade>
       </component>
+      <component class="ship_l" macro="ship_arg_l_trans_container_01_a_macro" name="Player Transport" code="SHIP-001" owner="player" id="[ship-1]">
+      <orders><order id="[wait-1]" default="1" order="Wait" state="started" /></orders>
+      <connections><connection connection="con_storage"><component class="storage" id="[storage-1]"><cargo><ware ware="energycells" amount="20" /></cargo></component></connection></connections>
+      </component>
       </component>
       </savegame>`
     
@@ -114,7 +119,7 @@ describe('save parser (Rust WASM streaming)', () => {
     expect(archive.meta.playerName).toBe('testplayer')
     expect(archive.meta.version).toBe('800')
     expect(archive.meta.filename).toBe('test')
-    expect(archive.meta.parser_version).toBe('v10')
+    expect(archive.meta.parser_version).toBe('v11')
     expect(archive.isCompatible).toBe(true)
     expect(values(archive.sectors.test_sector_macro?.player_stations)).toHaveLength(1)
     expect(archive.sectors.test_sector_macro?.player_stations?.['TEST-001']?.code).toBe('TEST-001')
@@ -123,6 +128,17 @@ describe('save parser (Rust WASM streaming)', () => {
     expect(archive.sectors.test_sector_macro?.npc_stations?.['NPC-001']?.tradeOffers).toEqual([
       { ware: 'hullparts', side: 'sell', price: 539, amount: 0 }
     ])
+    expect(archive.sectors.test_sector_macro?.player_ships?.['ship-1']).toMatchObject({
+      component_id: 'ship-1',
+      code: 'SHIP-001',
+      name: 'Player Transport',
+      macro: 'ship_arg_l_trans_container_01_a_macro',
+      class: 'ship_l',
+      cargo: [{ ware: 'energycells', amount: 20 }],
+      assignment: { state: 'none' },
+      default_order: { id: 'wait-1', order: 'Wait', state: 'started', failed: false },
+      is_repeat: false
+    })
   })
 
   it('parses gzip bytes directly in rust wasm parser', async () => {
@@ -165,6 +181,42 @@ describe('save parser (Rust WASM streaming)', () => {
 })
 
 describe('save parser rust worker enrichment', () => {
+  it('preserves player ship collections through post-processing', () => {
+    const playerShip = {
+      component_id: 'ship-1',
+      code: 'SHIP-001',
+      macro: 'ship_arg_l_trans_container_01_a_macro',
+      class: 'ship_l',
+      assignment: { state: 'none' as const },
+      default_order: { id: 'wait', order: 'Wait', failed: false },
+      orders: [],
+      is_repeat: false
+    }
+    const archive = postProcessRustSaveArchive({
+      meta: {
+        guid: 'g',
+        seed: 1,
+        time: 2,
+        playerName: 'p',
+        version: '800',
+        filename: 'f',
+        parser_version: CURRENT_PARSER_VERSION,
+        source: 'original'
+      },
+      sectors: {
+        sector_alpha: {
+          name: 'Alpha',
+          is_known: true,
+          player_ships: { 'ship-1': playerShip }
+        }
+      },
+      isCompatible: true,
+      isValid: true
+    })
+
+    expect(archive.sectors.sector_alpha?.player_ships).toEqual({ 'ship-1': playerShip })
+  })
+
   it('resolves zone-relative positions from zone dictionaries', () => {
     const archive = postProcessRustSaveArchive({
       meta: {
