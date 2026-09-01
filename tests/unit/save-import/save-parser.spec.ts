@@ -67,8 +67,8 @@ describe('save parser core (simplified)', () => {
 })
 
 describe('save parser (Rust WASM streaming)', () => {
-  it('uses player ship archive v11 without changing post-process v13', () => {
-    expect(CURRENT_PARSER_VERSION).toBe('v11')
+  it('uses NPC buildstorage archive v12 without changing post-process v13', () => {
+    expect(CURRENT_PARSER_VERSION).toBe('v12')
     expect(CURRENT_POST_PROCESSOR_VERSION).toBe('v13')
   })
 
@@ -91,7 +91,7 @@ describe('save parser (Rust WASM streaming)', () => {
       <offset><position x="100" y="200" z="300" /></offset>
       </component>
       <component class="station" macro="npc_station_macro" code="NPC-001" owner="argon">
-      <trade><offers><production><trade seller="[0x1]" ware="hullparts" price="53900" amount="0" /></production></offers></trade>
+      <trade><offers><production><trade id="[0xt1]" seller="[0x1]" ware="hullparts" price="53900" amount="0" desired="3" flags="fixedprice" /></production></offers></trade>
       </component>
       <component class="ship_l" macro="ship_arg_l_trans_container_01_a_macro" name="Player Transport" code="SHIP-001" owner="player" id="[ship-1]">
       <orders><order id="[wait-1]" default="1" order="Wait" state="started" /></orders>
@@ -119,14 +119,14 @@ describe('save parser (Rust WASM streaming)', () => {
     expect(archive.meta.playerName).toBe('testplayer')
     expect(archive.meta.version).toBe('800')
     expect(archive.meta.filename).toBe('test')
-    expect(archive.meta.parser_version).toBe('v11')
+    expect(archive.meta.parser_version).toBe('v12')
     expect(archive.isCompatible).toBe(true)
     expect(values(archive.sectors.test_sector_macro?.player_stations)).toHaveLength(1)
     expect(archive.sectors.test_sector_macro?.player_stations?.['TEST-001']?.code).toBe('TEST-001')
     expect(archive.sectors.test_sector_macro?.player_stations?.['TEST-001']?.owner).toBe('player')
     expect(archive.sectors.test_sector_macro?.player_stations?.['TEST-001']?.relative_position).toEqual({ x: 100, y: 200, z: 300 })
     expect(archive.sectors.test_sector_macro?.npc_stations?.['NPC-001']?.tradeOffers).toEqual([
-      { ware: 'hullparts', side: 'sell', price: 539, amount: 0 }
+      { tradeId: '0xt1', ware: 'hullparts', side: 'sell', price: 539, amount: 0, desired: 3, flags: ['fixedprice'] }
     ])
     expect(archive.sectors.test_sector_macro?.player_ships?.['ship-1']).toMatchObject({
       component_id: 'ship-1',

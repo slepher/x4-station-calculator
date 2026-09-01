@@ -3,7 +3,7 @@ use crate::faction::FactionParser;
 use crate::model::{
     norm_ver, AbandonedShipEntry, AggregatedEquipment, AggregatedStationModule, ArchiveMeta,
     BuildProgress, BuildStorageEntry, DatavaultEntry, DatavaultWareEntry, FactionStationEntry,
-    Meta, NpcStationEntry, NpcTradeOffer, ParserError, PlayerShipAssignment,
+    Meta, NpcBuildStorageEntry, NpcStationEntry, NpcTradeOffer, ParserError, PlayerShipAssignment,
     PlayerShipAssignmentState, PlayerShipCargo, PlayerShipCommanderKind, PlayerShipEntry,
     PlayerShipOrderSummary, PlayerShipOrderTarget, PlayerStationConstruction, PlayerStationEntry,
     SaveArchive, SectorData, StationBaseEntry, StationEquipment, StationTradeOverrides, Vector3,
@@ -11,12 +11,14 @@ use crate::model::{
 };
 use crate::research::ResearchParser;
 use crate::terraforming::TerraformingParser;
-use std::collections::{HashMap, VecDeque};
+use std::collections::{HashMap, HashSet, VecDeque};
 
 #[derive(Clone, Default)]
 struct ComponentCtx {
     class: String,
     id: Option<String>,
+    spawntime: Option<u64>,
+    listener_ids: Vec<String>,
     code: Option<String>,
     name: Option<String>,
     macro_field: Option<String>,
@@ -59,6 +61,20 @@ struct PendingPlayerShip {
     entry: PlayerShipEntry,
     commander_ref: Option<String>,
     subordinate_group: Option<String>,
+}
+
+#[derive(Clone)]
+struct PendingNpcStation {
+    sector_id: String,
+    station_code: String,
+    spawntime: u64,
+    listener_ids: Vec<String>,
+}
+
+#[derive(Clone)]
+struct PendingNpcBuildStorage {
+    spawntime: u64,
+    entry: NpcBuildStorageEntry,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -146,6 +162,8 @@ pub(crate) struct SaveParserCore {
     connection_commanders: HashMap<String, String>,
     commander_roles: HashMap<String, HashMap<String, String>>,
     pending_player_ships: Vec<PendingPlayerShip>,
+    pending_npc_stations: Vec<PendingNpcStation>,
+    pending_npc_buildstorages: Vec<PendingNpcBuildStorage>,
 }
 
 impl SaveParserCore {
@@ -180,6 +198,8 @@ impl SaveParserCore {
             connection_commanders: HashMap::new(),
             commander_roles: HashMap::new(),
             pending_player_ships: Vec::new(),
+            pending_npc_stations: Vec::new(),
+            pending_npc_buildstorages: Vec::new(),
         }
     }
 
@@ -227,6 +247,11 @@ impl SaveParserCore {
             self.comp_stack.push_back(ComponentCtx {
                 class: cls.clone(),
                 id: component_id,
+                spawntime: a
+                    .get("spawntime")
+                    .and_then(|value| value.parse::<f64>().ok())
+                    .map(f64::to_bits),
+                listener_ids: Vec::new(),
                 code: a.get("code").cloned(),
                 name: a.get("name").cloned(),
                 macro_field: a.get("macro").cloned(),
@@ -314,6 +339,16 @@ impl SaveParserCore {
             if let Some(ship) = self.comp_stack.back_mut() {
                 if ship.class.starts_with("ship_") && ship.owner.as_deref() == Some("player") {
                     ship.commander_ref = commander_ref;
+                }
+            }
+        }
+
+        if at_tags(&self.path, &["component", "listeners", "listener"]) {
+            if let Some(station) = self.comp_stack.back_mut() {
+                if station.class == "station" {
+                    if let Some(listener_id) = normalize_component_id(a.get("listener")) {
+                        station.listener_ids.push(listener_id);
+                    }
                 }
             }
         }
@@ -624,19 +659,42 @@ impl SaveParserCore {
                 (false, true) => Some("sell"),
                 _ => None,
             };
-            if let (Some(ware), Some(side), Some(price), Some(amount)) = (
+            if let (
+                Some(trade_id),
+                Some(ware),
+                Some(side),
+                Some(price),
+                Some(amount),
+                Some(desired),
+            ) = (
+                normalize_component_id(a.get("id")),
                 a.get("ware").cloned(),
                 side,
                 a.get("price").and_then(|value| value.parse::<i64>().ok()),
                 a.get("amount").and_then(|value| value.parse::<i64>().ok()),
+                a.get("desired").and_then(|value| value.parse::<i64>().ok()),
             ) {
-                if let Some(station) = self.current_station_ctx_mut() {
-                    station.trade_offers.push(NpcTradeOffer {
-                        ware,
-                        side: side.into(),
-                        price: price as f64 / 100.0,
-                        amount,
-                    });
+                if let Some(holder) = self.comp_stack.back_mut() {
+                    if holder.class == "station" || holder.class == "buildstorage" {
+                        holder.trade_offers.push(NpcTradeOffer {
+                            trade_id,
+                            ware,
+                            side: side.into(),
+                            price: price as f64 / 100.0,
+                            amount,
+                            desired,
+                            flags: a
+                                .get("flags")
+                                .map(|flags| {
+                                    flags
+                                        .split('|')
+                                        .filter(|flag| !flag.is_empty())
+                                        .map(str::to_owned)
+                                        .collect()
+                                })
+                                .unwrap_or_default(),
+                        });
+                    }
                 }
             }
         }
@@ -946,7 +1004,16 @@ impl SaveParserCore {
                                         modules,
                                         equipments,
                                         trade_offers: ctx.trade_offers.clone(),
+                                        build_storage: None,
                                     };
+                                    if let Some(spawntime) = ctx.spawntime.clone() {
+                                        self.pending_npc_stations.push(PendingNpcStation {
+                                            sector_id: sk.clone(),
+                                            station_code: entry.base.code.clone(),
+                                            spawntime,
+                                            listener_ids: ctx.listener_ids.clone(),
+                                        });
+                                    }
                                     sd.npc_stations.insert(entry.base.code.clone(), entry);
                                 }
                             }
@@ -1005,6 +1072,17 @@ impl SaveParserCore {
                                     progress: ctx.build_progress.clone(),
                                 };
                                 sd.player_buildstorages.insert(entry.code.clone(), entry);
+                            } else if let (Some(component_id), Some(code), Some(spawntime)) =
+                                (ctx.id.clone(), ctx.code.clone(), ctx.spawntime.clone())
+                            {
+                                self.pending_npc_buildstorages.push(PendingNpcBuildStorage {
+                                    spawntime,
+                                    entry: NpcBuildStorageEntry {
+                                        component_id,
+                                        code,
+                                        trade_offers: ctx.trade_offers.clone(),
+                                    },
+                                });
                             }
                         }
                         _ => {
@@ -1126,6 +1204,55 @@ impl SaveParserCore {
             }
         }
 
+        let mut buildstorage_indices = HashMap::<(String, u64), Vec<usize>>::new();
+        for (index, pending) in self.pending_npc_buildstorages.iter().enumerate() {
+            buildstorage_indices
+                .entry((
+                    pending.entry.component_id.clone(),
+                    pending.spawntime.clone(),
+                ))
+                .or_default()
+                .push(index);
+        }
+        let station_matches = self
+            .pending_npc_stations
+            .iter()
+            .map(|station| {
+                let candidates = station
+                    .listener_ids
+                    .iter()
+                    .filter_map(|listener_id| {
+                        buildstorage_indices.get(&(listener_id.clone(), station.spawntime))
+                    })
+                    .flatten()
+                    .copied()
+                    .collect::<HashSet<_>>();
+                (candidates.len() == 1).then(|| *candidates.iter().next().unwrap())
+            })
+            .collect::<Vec<_>>();
+        let mut match_counts = HashMap::<usize, usize>::new();
+        for index in station_matches.iter().flatten() {
+            *match_counts.entry(*index).or_default() += 1;
+        }
+        for (station, buildstorage_index) in self
+            .pending_npc_stations
+            .iter()
+            .zip(station_matches.into_iter())
+        {
+            let Some(index) = buildstorage_index else {
+                continue;
+            };
+            if match_counts.get(&index) != Some(&1) {
+                continue;
+            }
+            if let Some(entry) = sectors
+                .get_mut(&station.sector_id)
+                .and_then(|sector| sector.npc_stations.get_mut(&station.station_code))
+            {
+                entry.build_storage = Some(self.pending_npc_buildstorages[index].entry.clone());
+            }
+        }
+
         let is_compatible = if let Some(expected) = &self.expected_version {
             norm_ver(&self.meta.version) == norm_ver(expected)
         } else {
@@ -1140,7 +1267,7 @@ impl SaveParserCore {
                 player_name: self.meta.player_name.clone(),
                 version: self.meta.version.clone(),
                 filename: f,
-                parser_version: "v11".into(),
+                parser_version: "v12".into(),
                 post_processor_version: None,
                 source: "original".into(),
             },

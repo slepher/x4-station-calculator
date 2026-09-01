@@ -254,10 +254,23 @@ pub(crate) struct AggregatedStationModule {
 
 #[derive(Clone, Serialize, Deserialize)]
 pub(crate) struct NpcTradeOffer {
+    #[serde(rename = "tradeId")]
+    pub(crate) trade_id: String,
     pub(crate) ware: String,
     pub(crate) side: String,
     pub(crate) price: f64,
     pub(crate) amount: i64,
+    pub(crate) desired: i64,
+    pub(crate) flags: Vec<String>,
+}
+
+#[derive(Clone, Serialize, Deserialize)]
+pub(crate) struct NpcBuildStorageEntry {
+    #[serde(rename = "componentId")]
+    pub(crate) component_id: String,
+    pub(crate) code: String,
+    #[serde(rename = "tradeOffers", skip_serializing_if = "Vec::is_empty")]
+    pub(crate) trade_offers: Vec<NpcTradeOffer>,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -270,6 +283,8 @@ pub(crate) struct NpcStationEntry {
     pub(crate) equipments: Vec<AggregatedEquipment>,
     #[serde(rename = "tradeOffers", skip_serializing_if = "Vec::is_empty")]
     pub(crate) trade_offers: Vec<NpcTradeOffer>,
+    #[serde(rename = "buildStorage", skip_serializing_if = "Option::is_none")]
+    pub(crate) build_storage: Option<NpcBuildStorageEntry>,
 }
 
 #[derive(Clone, Serialize, Deserialize)]

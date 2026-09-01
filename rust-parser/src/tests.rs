@@ -67,7 +67,7 @@ mod tests {
         let ships = &archive.sectors["sec_alpha"].player_ships;
         let trader = &ships["station-child"];
 
-        assert_eq!(archive.meta.parser_version, "v11");
+        assert_eq!(archive.meta.parser_version, "v12");
         assert_eq!(ships.len(), 6);
         assert!(!ships.contains_key("npc"));
         assert_eq!(trader.name.as_deref(), Some("Transport One"));
@@ -392,7 +392,7 @@ mod tests {
 
     #[test]
     fn imports_npc_trade_offers_without_filtering_or_aggregation() {
-        let xml = r#"<savegame><info><game guid="g" seed="1" time="2" version="8.0"/><player name="p"/></info><faction id="player"><relations><relation faction="argon" relation="-1"/></relations><licences><licence type="capitalship" factions="argon"/></licences></faction><component class="sector" macro="sec_alpha" knownto="player"><component class="station" macro="npc_station" owner="argon" code="NPC-1"><trade><offers><production><trade buyer="[0x1]" ware="hullparts" price="53900" amount="12"/><trade seller="[0x2]" ware="hullparts" price="54050" amount="0"/><trade seller="[0x3]" ware="hullparts" price="54100" amount="7"/></production></offers></trade></component><component class="station" macro="empty_station" owner="argon" code="EMPTY"/><component class="station" macro="xen_station" owner="xenon" code="XEN-1"><trade><offers><production><trade seller="[0x4]" ware="energycells" price="1000" amount="1"/></production></offers></trade></component><component class="station" macro="kha_station" owner="khaak" code="KHA-1"><trade><offers><production><trade buyer="[0x5]" ware="energycells" price="1000" amount="1"/></production></offers></trade></component></component></savegame>"#;
+        let xml = r#"<savegame><info><game guid="g" seed="1" time="2" version="8.0"/><player name="p"/></info><faction id="player"><relations><relation faction="argon" relation="-1"/></relations><licences><licence type="capitalship" factions="argon"/></licences></faction><component class="sector" macro="sec_alpha" knownto="player"><component class="buildstorage" macro="buildstorage" owner="argon" code="BUILD-1" spawntime="42" id="[0xbuild]"><hidden end="1"/><trade><offers><production><trade id="[0xb1]" buyer="[0xbuild]" ware="claytronics" price="234600" amount="8" desired="9" flags="supplies|invertfactionrestriction"/></production></offers></trade></component><component class="station" macro="npc_station" owner="argon" code="NPC-1" spawntime="42" id="[0xstation]"><listeners><listener listener="[0xbuild]" event="killed"/></listeners><trade><offers><production><trade id="[0x1]" buyer="[0xstation]" ware="hullparts" price="53900" amount="12" desired="14"/><trade id="[0x2]" seller="[0xstation]" ware="hullparts" price="54050" amount="0" desired="6" flags="fixedprice"/><trade id="[0x3]" seller="[0xstation]" ware="hullparts" price="54100" amount="7" desired="7"/><trade id="[0xmissing]" buyer="[0xstation]" ware="energycells" price="1000" amount="1"/></production></offers></trade></component><component class="station" macro="empty_station" owner="argon" code="EMPTY"/><component class="station" macro="xen_station" owner="xenon" code="XEN-1"><trade><offers><production><trade id="[0x4]" seller="[0xxen]" ware="energycells" price="1000" amount="1" desired="1"/></production></offers></trade></component><component class="station" macro="kha_station" owner="khaak" code="KHA-1"><trade><offers><production><trade id="[0x5]" buyer="[0xkha]" ware="energycells" price="1000" amount="1" desired="1"/></production></offers></trade></component></component></savegame>"#;
 
         let mut parser = StreamingSaveParser::new(Some("8.0".to_string()));
         parser.push_chunk(xml.as_bytes());
@@ -409,10 +409,13 @@ mod tests {
                 offers[0].ware.as_str(),
                 offers[0].side.as_str(),
                 offers[0].price,
-                offers[0].amount
+                offers[0].amount,
+                offers[0].trade_id.as_str(),
+                offers[0].desired
             ),
-            ("hullparts", "buy", 539.0, 12)
+            ("hullparts", "buy", 539.0, 12, "0x1", 14)
         );
+        assert!(offers[0].flags.is_empty());
         assert_eq!(
             (offers[1].side.as_str(), offers[1].price, offers[1].amount),
             ("sell", 540.5, 0)
@@ -426,8 +429,38 @@ mod tests {
         assert!(sector.xenon_stations.contains_key("XEN-1"));
         assert!(sector.khaak_stations.contains_key("KHA-1"));
 
+        let buildstorage = sector.npc_stations["NPC-1"]
+            .build_storage
+            .as_ref()
+            .expect("buildstorage");
+        assert_eq!(buildstorage.component_id, "0xbuild");
+        assert_eq!(buildstorage.code, "BUILD-1");
+        assert_eq!(buildstorage.trade_offers.len(), 1);
+        assert_eq!(buildstorage.trade_offers[0].trade_id, "0xb1");
+        assert_eq!(
+            buildstorage.trade_offers[0].flags,
+            vec!["supplies", "invertfactionrestriction"]
+        );
+
         let empty = serde_json::to_value(&sector.npc_stations["EMPTY"]).expect("serialize");
         assert!(empty.get("tradeOffers").is_none());
+        assert!(empty.get("buildStorage").is_none());
+    }
+
+    #[test]
+    fn leaves_ambiguous_npc_buildstorage_unlinked() {
+        let xml = r#"<savegame><info><game guid="g" seed="1" time="2" version="8.0"/><player name="p"/></info><component class="sector" macro="sec_alpha"><component class="buildstorage" code="BUILD-1" owner="argon" spawntime="42" id="[0xb1]"/><component class="buildstorage" code="BUILD-2" owner="argon" spawntime="42" id="[0xb2]"/><component class="buildstorage" code="SHARED" owner="argon" spawntime="43" id="[0xshared]"/><component class="station" code="MULTI" owner="argon" spawntime="42" id="[0xs1]"><listeners><listener listener="[0xb1]"/><listener listener="[0xb2]"/></listeners></component><component class="station" code="SHARED-1" owner="argon" spawntime="43" id="[0xs2]"><listeners><listener listener="[0xshared]"/></listeners></component><component class="station" code="SHARED-2" owner="argon" spawntime="43" id="[0xs3]"><listeners><listener listener="[0xshared]"/></listeners></component></component></savegame>"#;
+
+        let mut parser = StreamingSaveParser::new(Some("8.0".to_string()));
+        parser.push_chunk(xml.as_bytes());
+        parser.finish_input();
+        while parser.pump(4096) {}
+
+        let archive = parser.finish_archive("ambiguous.xml").expect("archive");
+        let stations = &archive.sectors["sec_alpha"].npc_stations;
+        assert!(stations["MULTI"].build_storage.is_none());
+        assert!(stations["SHARED-1"].build_storage.is_none());
+        assert!(stations["SHARED-2"].build_storage.is_none());
     }
 
     #[test]
