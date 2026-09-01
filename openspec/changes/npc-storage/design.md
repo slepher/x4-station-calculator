@@ -1,76 +1,127 @@
+# npc-storage 设计文档
+
 ## Context
 
-生产存档导入使用 `saveParserRust.worker.ts → Rust/WASM parser → postProcessRustSaveArchive → SaveStore`。Rust archive 已按 owner 将 station 分为 `player_stations`、`npc_stations`、`xenon_stations` 和 `khaak_stations`，并已提取 `playerRelations` 与 `playerLicences`；当前 `NpcStationEntry` 尚未保存 station 的 `<trade><offers><production>`。
+生产导入链为 `saveParserRust.worker.ts → Rust/WASM parser → postProcessRustSaveArchive → SaveStore`。现有实现只在 component stack 中寻找最近的 `class="station"`，因此能捕获空间站直属报价，但无法捕获 sector/zone 下与 station 同级的 buildstorage 报价。
 
-旧 TypeScript parser 不是生产导入入口，但它仍为 CLI 的 XML 流式剪裁提供结构判断。现有剪裁输出约 2.21 MiB；保留全部 station offers 后约 5.48 MiB，按单个 `ROK-388` station 过滤后为 11,180 bytes。
+真实 `save_009.xml` 给出以下结论：
+
+- 空间站直属 NPC 买单存在 80 组同站同商品多报价；这些组合均为同一 buyer，但普通需求与 `flags="supplies"` 补给需求并存。
+- 空间站直属 seller offer 在该快照中没有同站同商品重复。
+- `WUX-704` 的当前建材仓库是 `WDU-404`；同 zone 出现的 `TQC-894`、`PRN-974` 实际分别属于 `OXQ-033`、`OGE-538`。
+- 全存档中，具备可匹配字段的 buildstorage 有 838 个按 listener 与相同 spawntime 唯一匹配 station，未发现一站多仓。
 
 ## Goals / Non-Goals
 
 **Goals:**
 
-- 在生产 Rust parser 中一次性捕获 NPC station 的买卖报价快照。
-- 让 archive 的价格尺度与静态 ware 数据一致，并保留零值和重复记录。
-- 复用现有 station owner 分组、关系数据和 archive 持久化链。
-- 提供无需提交完整真实存档的小范围 XML 调查与测试数据来源。
+- 无损保存需求分类和后续排序所需的报价事实。
+- 捕获与 station 同级的 NPC buildstorage 报价。
+- 以唯一、可验证的跨组件关系将 buildstorage 归入 station。
+- 保证一个 station 的 archive 输出最多一个 buildStorage。
 
 **Non-Goals:**
 
-- 不新增 UI、presenter 或规划算法。
-- 不在 parser 中聚合同 ware 的买卖报价。
-- 不重新实现声望、许可或 faction 分类。
-- 不把旧 TypeScript parser 恢复为生产业务解析器。
-- 不把包含玩家名称、GUID、资金等真实元数据的剪裁结果直接提交为 fixture。
+- 不实现市场报价 UI、排序、分组和综合评分。
+- 不按成交资格过滤报价。
+- 不从 zone/sector 距离或 XML 顺序猜测归属。
+- 不把 buildstorage 作为独立 NPC station 输出。
 
 ## Decisions
 
-### 1. 在 NPC station 上保存判别联合数组
+### 1. 保存完整报价事实，不在 parser 中生成 UI 排序结构
 
-Archive 新增最小结构 `tradeOffers?: Array<{ ware, side, price, amount }>`，其中 `side` 仅为 `buy | sell`。XML 的 `buyer` 表示 NPC 买入，`seller` 表示 NPC 卖出。
+`NpcTradeOffer` 扩展为：
 
-数组能无损保留同一 station、ware、side 的多条记录；在 parser 中转换成四列或 map 会引入覆盖规则，并把 UI/规划器的聚合责任错误地下沉到 store 数据源。`id`、`flags` 和 `desired` 暂不进入 archive，因为当前规划需求只消费方向、价格和当前数量。
+```ts
+interface NpcTradeOffer {
+  tradeId: string
+  ware: string
+  side: 'buy' | 'sell'
+  price: number
+  amount: number
+  desired: number
+  flags: string[]
+}
+```
 
-备选方案是按 ware 保存 `{ buyPrice, buyAmount, sellPrice, sellAmount }`，但它无法定义重复报价的无损行为，因此不采用。
+`flags` 使用拆分后的稳定 token 数组，避免每个消费者重复解析 `supplies|invertfactionrestriction`。空 flags 输出空数组；`desired` 按存档原值保存，不能用 `amount` fallback。
 
-### 2. 只修改 Rust/WASM 业务解析链
+该结构只表达 archive 事实。空间站自身需求与补给需求由直属 buy offer 是否包含 `supplies` 判定；parser 不生成 UI 专用的排序分数或展示标签。
 
-在 Rust station component context 中暂存 offers；只捕获 station 直属路径下、同时具有 ware/price/amount 且具有 buyer 或 seller 的 production trade 节点。station 关闭并完成 owner 分类时，仅把暂存 offers 移入 `NpcStationEntry`。
+### 2. 在 station 下保存单一 buildStorage 对象
 
-Xenon/Kha'ak 原始 XML 即使存在 offer，也不会获得 NPC offer 字段。旧 TypeScript parser 只扩展 XML 剪裁的节点保留规则，不新增 archive 业务字段，继续满足既有 parser capability boundary。
+```ts
+interface NpcBuildStorageEntry {
+  componentId: string
+  code: string
+  tradeOffers?: NpcTradeOffer[]
+}
 
-### 3. 在 parser 边界归一化价格
+interface NpcStationEntry {
+  tradeOffers?: NpcTradeOffer[]
+  buildStorage?: NpcBuildStorageEntry
+}
+```
 
-存档报价使用百分之一货币单位，而静态 `X4Ware.price` 使用正常游戏货币单位。Rust parser 将合法整数 price 除以 100 后写入 archive；这样所有消费者只处理一种价格尺度，不需要重复转换。
+空间站直属报价与建材仓库报价保持两个明确容器。这样来源由领域层级表达，不需要给每条报价重复添加 holder 类型，也不会把建材仓库伪装成独立空间站。
 
-非法或缺少必要属性的 trade 不生成部分对象。`amount=0` 是合法快照，必须保留。
+### 3. buildstorage 采用跨组件两条件唯一关联
 
-### 4. 报价存在性与当前成交资格分离
+解析过程中暂存：
 
-`tradeOffers` 表达存档中可见的订单快照，不表达玩家当前是否满足声望或许可条件。需要成交资格时，消费逻辑复用 `playerRelations`、`playerLicences` 与 faction 静态数据；parser 不复制该业务判断，也不删除低声望 faction 的快照。
+- station：component ID、spawntime、listener component IDs
+- buildstorage：component ID、code、spawntime、trade offers
 
-### 5. 剪裁 CLI 复用现有流式过滤器
+universe 关闭或具备完整索引后，建立匹配：
 
-`--xml` 与现有 `--class/--code` 参数组合使用。过滤器仅把 production offer 的 trade 节点标记为 relevant，现有 ancestor propagation 自动保留 `<trade><offers><production>` 路径；source、reservation、construction 和事件等节点继续被丢弃。
+```text
+station.listeners contains buildstorage.componentId
+AND station.spawntime == buildstorage.spawntime
+```
 
-真实剪裁结果只用于核对字段和形成测试样例。Rust 回归测试使用匿名、极小的 inline XML，避免把真实玩家元数据或 11 KiB 样本纳入仓库。
+只有结果唯一时才设置 `NpcStationEntry.buildStorage`。匹配为零或多于一条时不建立关系，且不得使用 XML 邻近、component ancestry、同 zone、同 sector、第一条或最后一条补位。
 
-### 6. Parser schema 升级而非 post-process 升级
+`hidden end="1"` 不进入归属或有效性条件；截图与对应报价证明该字段不能被简单解释为“当前不可交易”。
 
-NPC offers 是 Rust parser 输出 schema 的新增字段，因此 Rust archive version 与 TypeScript `CURRENT_PARSER_VERSION` 同步从 v9 提升到 v10。没有新增 post-process 派生行为，`CURRENT_POST_PROCESSOR_VERSION` 保持不变。
+### 4. 报价分类与基数约束
+
+对 station 直属报价：
+
+- `side="buy"` 且 flags 不含 `supplies`：空间站自身需求。
+- `side="buy"` 且 flags 含 `supplies`：空间站补给需求。
+- `side="sell"`：空间站出售单。
+
+对 buildStorage 报价：
+
+- `side="buy"`：建材仓库需求。
+- seller offer 不转为空间站出售单；若未来出现则保留在 buildStorage 原始报价中，交由消费层显式处理异常。
+
+同站同商品 seller offer 的当前数据不重复，但 parser 仍使用数组保持无损；不得通过 map 覆盖来强造“只有一条”。
+
+### 5. 价格、零值与资格边界保持不变
+
+price 在 parser 边界除以 100。`amount=0` 保留。报价存在性不等同于玩家可成交性；声望、许可和 faction 静态信息继续由消费阶段处理。
+
+### 6. Schema 升级与并行 change 协调
+
+完整报价和 buildStorage 都改变 Rust archive schema，因此实现时将 `CURRENT_PARSER_VERSION` 提升到下一版本。若 `save-player-ships` 已先提升版本，本 change 基于合并后的当前版本只再提升一次，不回退或复用旧版本号。
+
+旧 archive 必须重新导入；不得通过 `desired=amount`、`flags=[]` 或 `buildStorage=undefined` fallback 冒充新 contract。
 
 ## Risks / Trade-offs
 
-- [存档报价在游戏继续运行后会过期] → 将字段定义为导入时快照，规划结果显示重新导入触发条件。
-- [重复报价的业务含义尚未完全确认] → parser 无损保留数组，推迟聚合规则到实际消费者。
-- [保留所有 station offers 使默认剪裁从约 2.21 MiB 增至 5.48 MiB] → 调查和样例生成使用 station code 过滤，单站约 11 KiB。
-- [price 除以 100 的约定可能被未来存档版本改变] → 用真实数量级样例和 Rust 单测固定当前版本契约，游戏版本升级时重新验证。
-- [旧 archive 没有 tradeOffers] → parser version 升级使其显式失效，不用 fallback 伪装为空订单。
+- [部分历史 buildstorage 无法唯一匹配] → 不附加到任何 station，避免错误归属；不使用空间位置 fallback。
+- [未来存档可能出现同站多仓或重复 seller] → 保留原始事实并使异常可检测，不静默覆盖。
+- [需要跨组件暂存，不能在 station 关闭时立即完成] → 在 parser 内建立最小 ID 索引，universe 收尾时一次关联。
+- [flags contract 扩大 archive] → 仅保存报价节点已有 token，不复制 source/event 等无关 XML。
 
 ## Migration Plan
 
-1. 先更新 Rust model/core/tests 与 TypeScript archive 类型。
-2. 同步提升 parser version，并重新构建 `src/wasm/`。
-3. 运行 Rust parser、save-import、archive versioning 和 XML 剪裁的定向测试。
-4. 用单站剪裁结果核对 buyer/seller、价格尺度、零数量和 Xenon 排除。
-5. 旧 v9 archive 保留在存储中但显示版本不匹配；用户重新导入原始存档生成 v10 数据。
+1. 扩展 Rust/TypeScript archive model 和 parser 暂存 context。
+2. 捕获 station listeners、station/buildstorage spawntime 与 buildstorage offers。
+3. 在解析收尾阶段执行唯一关联并写入 `NpcStationEntry.buildStorage`。
+4. 同步下一 parser schema version 并重新构建 WASM。
+5. 通过生产构建确认 Rust/WASM 与 TypeScript contract 一致。
 
-回滚时恢复 v9 parser schema/version 和对应 WASM 产物；新增字段仅为附加数据，不需要迁移用户规划或 SaveBinding。
+回滚时同时回滚 schema version、WASM 和 TypeScript contract；旧 archive 不做字段 fallback。
