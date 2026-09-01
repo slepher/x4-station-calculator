@@ -189,6 +189,7 @@ export interface PlayerStationEntry extends StationBaseEntry {
 export interface NpcStationEntry extends StationBaseEntry {
   modules?: AggregatedStationModule[]
   equipments?: AggregatedEquipment[]
+  tradeOffers?: NpcTradeOffer[]
   isShipyard?: boolean
   isWharf?: boolean
   isEquipmentdock?: boolean
@@ -201,6 +202,13 @@ export interface NpcStationEntry extends StationBaseEntry {
   isDefencemodule?: boolean
   isNest?: boolean
   isHive?: boolean
+}
+
+export interface NpcTradeOffer {
+  ware: string
+  side: 'buy' | 'sell'
+  price: number
+  amount: number
 }
 
 export interface FactionStationEntry extends StationBaseEntry {

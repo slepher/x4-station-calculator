@@ -120,6 +120,35 @@ describe('extract save xml filtering', () => {
     expect(result.xml).not.toContain('<offset><position x="10" y="20" z="30"/></offset>')
   })
 
+  it('keeps trade offers for selected stations only', () => {
+    const xml = [
+      '<savegame><info><game guid="GUID-1" version="800"/><player name="pilot"/></info><universe><component class="sector" macro="sector_valid">',
+      '<component class="station" code="ROK-388" owner="freesplit">',
+      '<offset><position x="1" y="2" z="3"/></offset>',
+      '<trade><offers><production>',
+      '<trade buyer="[0x1]" ware="advancedcomposites" price="53900" amount="3325" desired="3325" flags="1"><source class="production"/><reservation amount="1"/><event name="noise"/></trade>',
+      '<trade seller="[0x1]" ware="advancedcomposites" price="54000" amount="0"><source class="production"/></trade>',
+      '<construction><sequence><entry macro="noise"/></sequence></construction>',
+      '</production></offers></trade></component>',
+      '<component class="station" code="OTHER" owner="argon"><offset><position x="4" y="5" z="6"/></offset></component>',
+      '</component></universe></savegame>'
+    ].join('')
+
+    const result = extractFilteredSaveXmlFromString(xml, null, {
+      className: 'station',
+      codes: ['ROK-388']
+    })
+
+    expect(result.xml).toContain('code="ROK-388"')
+    expect(result.xml).toContain('buyer="[0x1]" ware="advancedcomposites" price="53900" amount="3325" desired="3325" flags="1"')
+    expect(result.xml).toContain('seller="[0x1]" ware="advancedcomposites" price="54000" amount="0"')
+    expect(result.xml).not.toContain('code="OTHER"')
+    expect(result.xml).not.toContain('<source')
+    expect(result.xml).not.toContain('<reservation')
+    expect(result.xml).not.toContain('<event')
+    expect(result.xml).not.toContain('<construction')
+  })
+
   it('keeps module details only for player-owned stations because those enter json', () => {
     const xml = [
       '<savegame><info><game guid="GUID-1" version="800"/><player name="pilot"/></info><universe><component class="sector" macro="sector_valid">',

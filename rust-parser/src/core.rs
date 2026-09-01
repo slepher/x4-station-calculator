@@ -1,12 +1,12 @@
+use crate::blueprints::BlueprintsParser;
+use crate::faction::FactionParser;
 use crate::model::{
     norm_ver, AbandonedShipEntry, AggregatedEquipment, AggregatedStationModule, ArchiveMeta,
     BuildProgress, BuildStorageEntry, DatavaultEntry, DatavaultWareEntry, FactionStationEntry,
-    Meta, NpcStationEntry, ParserError, PlayerStationConstruction, PlayerStationEntry, SaveArchive,
-    SectorData, StationBaseEntry, StationEquipment, StationTradeOverrides, Vector3, WareAmount,
-    WorkforceEntry,
+    Meta, NpcStationEntry, NpcTradeOffer, ParserError, PlayerStationConstruction,
+    PlayerStationEntry, SaveArchive, SectorData, StationBaseEntry, StationEquipment,
+    StationTradeOverrides, Vector3, WareAmount, WorkforceEntry,
 };
-use crate::blueprints::BlueprintsParser;
-use crate::faction::FactionParser;
 use crate::research::ResearchParser;
 use crate::terraforming::TerraformingParser;
 use std::collections::{HashMap, VecDeque};
@@ -35,6 +35,7 @@ struct ComponentCtx {
     build_constructions: Vec<PlayerStationConstruction>,
     build_progress: Option<BuildProgress>,
     workforces: Vec<WorkforceEntry>,
+    trade_offers: Vec<NpcTradeOffer>,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -206,6 +207,7 @@ impl SaveParserCore {
                 build_constructions: Vec::new(),
                 build_progress: None,
                 workforces: Vec::new(),
+                trade_offers: Vec::new(),
             });
 
             if cls == "sector" {
@@ -452,6 +454,32 @@ impl SaveParserCore {
                             *station.reservation_totals.entry(ware).or_insert(0) += amount;
                         }
                     }
+                }
+            }
+        }
+
+        if at_tags(
+            &self.path,
+            &["component", "trade", "offers", "production", "trade"],
+        ) {
+            let side = match (a.contains_key("buyer"), a.contains_key("seller")) {
+                (true, false) => Some("buy"),
+                (false, true) => Some("sell"),
+                _ => None,
+            };
+            if let (Some(ware), Some(side), Some(price), Some(amount)) = (
+                a.get("ware").cloned(),
+                side,
+                a.get("price").and_then(|value| value.parse::<i64>().ok()),
+                a.get("amount").and_then(|value| value.parse::<i64>().ok()),
+            ) {
+                if let Some(station) = self.current_station_ctx_mut() {
+                    station.trade_offers.push(NpcTradeOffer {
+                        ware,
+                        side: side.into(),
+                        price: price as f64 / 100.0,
+                        amount,
+                    });
                 }
             }
         }
@@ -737,6 +765,7 @@ impl SaveParserCore {
                                         base,
                                         modules,
                                         equipments,
+                                        trade_offers: ctx.trade_offers.clone(),
                                     };
                                     sd.npc_stations.insert(entry.base.code.clone(), entry);
                                 }
@@ -893,7 +922,7 @@ impl SaveParserCore {
                 player_name: self.meta.player_name.clone(),
                 version: self.meta.version.clone(),
                 filename: f,
-                parser_version: "v9".into(),
+                parser_version: "v10".into(),
                 post_processor_version: None,
                 source: "original".into(),
             },

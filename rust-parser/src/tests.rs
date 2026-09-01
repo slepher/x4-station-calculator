@@ -309,6 +309,46 @@ mod tests {
     }
 
     #[test]
+    fn imports_npc_trade_offers_without_filtering_or_aggregation() {
+        let xml = r#"<savegame><info><game guid="g" seed="1" time="2" version="8.0"/><player name="p"/></info><faction id="player"><relations><relation faction="argon" relation="-1"/></relations><licences><licence type="capitalship" factions="argon"/></licences></faction><component class="sector" macro="sec_alpha" knownto="player"><component class="station" macro="npc_station" owner="argon" code="NPC-1"><trade><offers><production><trade buyer="[0x1]" ware="hullparts" price="53900" amount="12"/><trade seller="[0x2]" ware="hullparts" price="54050" amount="0"/><trade seller="[0x3]" ware="hullparts" price="54100" amount="7"/></production></offers></trade></component><component class="station" macro="empty_station" owner="argon" code="EMPTY"/><component class="station" macro="xen_station" owner="xenon" code="XEN-1"><trade><offers><production><trade seller="[0x4]" ware="energycells" price="1000" amount="1"/></production></offers></trade></component><component class="station" macro="kha_station" owner="khaak" code="KHA-1"><trade><offers><production><trade buyer="[0x5]" ware="energycells" price="1000" amount="1"/></production></offers></trade></component></component></savegame>"#;
+
+        let mut parser = StreamingSaveParser::new(Some("8.0".to_string()));
+        parser.push_chunk(xml.as_bytes());
+        parser.finish_input();
+        while parser.pump(4096) {}
+
+        let archive = parser.finish_archive("offers.xml").expect("archive");
+        let sector = archive.sectors.get("sec_alpha").expect("sector");
+        let offers = &sector.npc_stations["NPC-1"].trade_offers;
+
+        assert_eq!(offers.len(), 3);
+        assert_eq!(
+            (
+                offers[0].ware.as_str(),
+                offers[0].side.as_str(),
+                offers[0].price,
+                offers[0].amount
+            ),
+            ("hullparts", "buy", 539.0, 12)
+        );
+        assert_eq!(
+            (offers[1].side.as_str(), offers[1].price, offers[1].amount),
+            ("sell", 540.5, 0)
+        );
+        assert_eq!(
+            (offers[2].side.as_str(), offers[2].price, offers[2].amount),
+            ("sell", 541.0, 7)
+        );
+        assert_eq!(archive.player_relations.get("argon"), Some(&-1.0));
+        assert_eq!(archive.player_licences["capitalship"], vec!["argon"]);
+        assert!(sector.xenon_stations.contains_key("XEN-1"));
+        assert!(sector.khaak_stations.contains_key("KHA-1"));
+
+        let empty = serde_json::to_value(&sector.npc_stations["EMPTY"]).expect("serialize");
+        assert!(empty.get("tradeOffers").is_none());
+    }
+
+    #[test]
     fn extracts_station_cargo_reservation_and_buildstorage_fields() {
         let xml = r#"<savegame><info><game guid="g" seed="1" time="2" version="8.0"/><player name="p"/></info><component class="sector" macro="sec_alpha" knownto="player"><component class="station" macro="station_macro" owner="player" code="AAA" id="[0xstation]"><connections><connection connection="modules"><component class="storage" macro="storage_macro" id="[0xstorage]"><cargo><ware ware="energycells" amount="12"/><ware ware="energycells" amount="8"/><ware ware="hullparts" amount="5"/></cargo></component></connection></connections><trade><reservations><reservation ware="energycells" amount="4"/><reservation ware="claytronics" amount="2"/></reservations></trade><construction><sequence><entry id="[0xentry1]" index="1" macro="dock_macro"><upgrades><groups><shields macro="shield_macro" group="g1" exact="2"/></groups></upgrades></entry></sequence></construction></component><component class="buildstorage" macro="buildstorage_macro" owner="player" code="FIX-1" id="[0xbuilder]"><trade><reservations><reservation ware="hullparts" amount="7"/></reservations></trade><cargo><ware ware="hullparts" amount="9"/></cargo><buildtasks><inprogress><build id="[0xbuild]" builder="[0xbuilder]" component="[0xstation]"><sequence><entry id="[0xentry1]" index="1" macro="dock_macro"><upgrades><groups><turrets macro="turret_macro" group="g2" exact="3"/></groups></upgrades></entry></sequence></build></inprogress></buildtasks><connections><connection connection="con_buildmodule01"><component class="buildmodule" macro="buildmodule_macro" id="[0xbuildmodule]"><connections><connection connection="buildprocessorconnection_01"><component class="buildprocessor" macro="buildprocessor_macro" id="[0xprocessor]"><build start="10" end="20" sequenceindex="1"/></component></connection></connections></component></connection></connections></component></component></savegame>"#;
 

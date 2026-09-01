@@ -253,6 +253,14 @@ pub(crate) struct AggregatedStationModule {
 }
 
 #[derive(Clone, Serialize, Deserialize)]
+pub(crate) struct NpcTradeOffer {
+    pub(crate) ware: String,
+    pub(crate) side: String,
+    pub(crate) price: f64,
+    pub(crate) amount: i64,
+}
+
+#[derive(Clone, Serialize, Deserialize)]
 pub(crate) struct NpcStationEntry {
     #[serde(flatten)]
     pub(crate) base: StationBaseEntry,
@@ -260,6 +268,8 @@ pub(crate) struct NpcStationEntry {
     pub(crate) modules: Vec<AggregatedStationModule>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub(crate) equipments: Vec<AggregatedEquipment>,
+    #[serde(rename = "tradeOffers", skip_serializing_if = "Vec::is_empty")]
+    pub(crate) trade_offers: Vec<NpcTradeOffer>,
 }
 
 #[derive(Clone, Serialize, Deserialize)]

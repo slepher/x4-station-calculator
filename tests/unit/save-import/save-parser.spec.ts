@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { createSaveParserRuntime } from '../../../src/workers/saveParser.worker'
 import {
+  CURRENT_PARSER_VERSION,
   CURRENT_POST_PROCESSOR_VERSION,
   postProcessRustSaveArchive
 } from '../../../src/workers/saveParser.post'
@@ -66,6 +67,10 @@ describe('save parser core (simplified)', () => {
 })
 
 describe('save parser (Rust WASM streaming)', () => {
+  it('uses the NPC trade offer parser schema version', () => {
+    expect(CURRENT_PARSER_VERSION).toBe('v10')
+  })
+
   it('parses xml with pump loop into archive data', async () => {
     const initWasm = (await import('../../../src/wasm/save_parser.js')).default
     const { SaveParser } = await import('../../../src/wasm/save_parser.js')
@@ -83,6 +88,9 @@ describe('save parser (Rust WASM streaming)', () => {
       <component class="sector" macro="test_sector_macro" known="1">
       <component class="station" macro="test_station_macro" code="TEST-001" owner="player">
       <offset><position x="100" y="200" z="300" /></offset>
+      </component>
+      <component class="station" macro="npc_station_macro" code="NPC-001" owner="argon">
+      <trade><offers><production><trade seller="[0x1]" ware="hullparts" price="53900" amount="0" /></production></offers></trade>
       </component>
       </component>
       </savegame>`
@@ -106,12 +114,15 @@ describe('save parser (Rust WASM streaming)', () => {
     expect(archive.meta.playerName).toBe('testplayer')
     expect(archive.meta.version).toBe('800')
     expect(archive.meta.filename).toBe('test')
-    expect(archive.meta.parser_version).toBe('v3')
+    expect(archive.meta.parser_version).toBe('v10')
     expect(archive.isCompatible).toBe(true)
     expect(values(archive.sectors.test_sector_macro?.player_stations)).toHaveLength(1)
     expect(archive.sectors.test_sector_macro?.player_stations?.['TEST-001']?.code).toBe('TEST-001')
     expect(archive.sectors.test_sector_macro?.player_stations?.['TEST-001']?.owner).toBe('player')
     expect(archive.sectors.test_sector_macro?.player_stations?.['TEST-001']?.relative_position).toEqual({ x: 100, y: 200, z: 300 })
+    expect(archive.sectors.test_sector_macro?.npc_stations?.['NPC-001']?.tradeOffers).toEqual([
+      { ware: 'hullparts', side: 'sell', price: 539, amount: 0 }
+    ])
   })
 
   it('parses gzip bytes directly in rust wasm parser', async () => {
@@ -163,7 +174,7 @@ describe('save parser rust worker enrichment', () => {
         playerName: 'p',
         version: '800',
         filename: 'f',
-        parser_version: 'v3',
+        parser_version: CURRENT_PARSER_VERSION,
         source: 'original'
       },
       isCompatible: true,
@@ -236,7 +247,7 @@ describe('save parser rust worker enrichment', () => {
         playerName: 'p',
         version: '800',
         filename: 'f',
-        parser_version: 'v3',
+        parser_version: CURRENT_PARSER_VERSION,
         source: 'original'
       },
       isCompatible: true,
@@ -372,7 +383,7 @@ describe('save parser rust worker enrichment', () => {
         playerName: 'p',
         version: '800',
         filename: 'f',
-        parser_version: 'v3',
+        parser_version: CURRENT_PARSER_VERSION,
         source: 'original'
       },
       isCompatible: true,
@@ -388,9 +399,9 @@ describe('save parser rust worker enrichment', () => {
               owner: 'player',
               is_headquarter: true,
               relative_position: { x: 0, y: 0, z: 0 },
-              modules: [
-                { ref: 'energy_macro', amount: 1 },
-                { ref: 'refined_macro', amount: 1 }
+              constructions: [
+                { index: 0, ref: 'energy_macro' },
+                { index: 1, ref: 'refined_macro' }
               ]
             }
           }
@@ -433,7 +444,7 @@ describe('save parser rust worker enrichment', () => {
         playerName: 'p',
         version: '800',
         filename: 'f',
-        parser_version: 'v3',
+        parser_version: CURRENT_PARSER_VERSION,
         source: 'original'
       },
       isCompatible: true,
@@ -508,7 +519,7 @@ describe('save parser rust worker enrichment', () => {
         playerName: 'p',
         version: '800',
         filename: 'f',
-        parser_version: 'v3',
+        parser_version: CURRENT_PARSER_VERSION,
         source: 'original'
       },
       isCompatible: true,
@@ -620,7 +631,7 @@ describe('save parser rust worker enrichment', () => {
         playerName: 'p',
         version: '800',
         filename: 'f',
-        parser_version: 'v3',
+        parser_version: CURRENT_PARSER_VERSION,
         source: 'original'
       },
       isCompatible: true,
@@ -692,7 +703,7 @@ describe('save parser rust worker enrichment', () => {
         playerName: 'p',
         version: '800',
         filename: 'f',
-        parser_version: 'v3',
+        parser_version: CURRENT_PARSER_VERSION,
         source: 'original'
       },
       isCompatible: true,
@@ -720,7 +731,7 @@ describe('save parser rust worker enrichment', () => {
         playerName: 'p',
         version: '800',
         filename: 'f',
-        parser_version: 'v3',
+        parser_version: CURRENT_PARSER_VERSION,
         source: 'original'
       },
       isCompatible: true,
@@ -736,6 +747,17 @@ describe('save parser rust worker enrichment', () => {
               owner: 'player',
               component_id: '0x4646c',
               relative_position: { x: 0, y: 0, z: 0 },
+              constructions: [{
+                id: '0xstation-dock',
+                index: 0,
+                ref: 'dock_macro',
+                equipments: [{
+                  type: 'shields',
+                  ref: 'shield_ter_m_standard_02_mk2_macro',
+                  group: 'group01',
+                  exact: 2
+                }]
+              }],
               modules: {
                 dock_macro: { ref: 'dock_macro', amount: 1 }
               },
@@ -820,40 +842,36 @@ describe('save parser rust worker enrichment', () => {
           exact: 2
         }]
       }],
-      modules: {
-        pier_macro: {
+      modules: [{
           ref: 'pier_macro',
           amount: 1,
-          module_id: 'module_pier'
-        }
-      },
-      equipments: {
-        turret_arg_m_flak_02_mk1_macro: {
+          module_id: 'module_pier',
+          type: 'dock',
+          group: 'dock'
+      }],
+      equipments: [{
           type: 'turrets',
           ref: 'turret_arg_m_flak_02_mk1_macro',
           amount: 2,
           equipment_id: 'turret_arg_m_flak_02_mk1'
-        }
-      },
+      }],
       progress: { start: 10, end: 20, sequenceindex: 1 }
     })
     expect(archive.sectors.sec.player_stations?.['XAJ-926']).toMatchObject({
       component_id: '0x4646c',
-      modules: {
-        dock_macro: {
+      modules: [{
           ref: 'dock_macro',
           amount: 1,
-          module_id: 'module_dock'
-        }
-      },
-      equipments: {
-        shield_ter_m_standard_02_mk2_macro: {
+          module_id: 'module_dock',
+          type: 'dock',
+          group: 'dock'
+      }],
+      equipments: [{
           type: 'shields',
           ref: 'shield_ter_m_standard_02_mk2_macro',
           amount: 2,
           equipment_id: 'shield_ter_m_standard_02_mk2'
-        }
-      },
+      }],
       cargo: [{ ware: 'energycells', amount: 1 }],
       reservation: [{ ware: 'hullparts', amount: 2 }],
       buildstorage_code: 'FIX-154'
@@ -869,7 +887,7 @@ describe('save parser rust worker enrichment', () => {
         playerName: 'p',
         version: '800',
         filename: 'f',
-        parser_version: 'v3',
+        parser_version: CURRENT_PARSER_VERSION,
         source: 'original'
       },
       isCompatible: true,
