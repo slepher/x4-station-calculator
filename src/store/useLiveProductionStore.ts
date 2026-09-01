@@ -170,7 +170,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       group.sectorMacro === sectorMacro || group.coverageSectorMacros.includes(sectorMacro)
     )
     if (hits.length !== 1) return null
-    return hits[0]!.id
+    return hits[0]!.sectorMacro || null
   }
 
   function recomputeVirtualStationDraftGroups(groups: GroupDraftInfo[] = autoGroupResult.value?.groups ?? []) {
@@ -935,6 +935,17 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     }
   })
 
+  const isNpcTradeMode = computed({
+    get: () => activeViewStore.activeBindingWorkbench === 'npc-trade',
+    set: (val: boolean) => {
+      if (val) {
+        activeViewStore.activeBindingWorkbench = 'npc-trade'
+      } else if (activeViewStore.activeBindingWorkbench === 'npc-trade') {
+        activeViewStore.activeBindingWorkbench = 'overview'
+      }
+    }
+  })
+
   const isAutoSectorGroupMode = computed({
     get: () => activeViewStore.activeBindingWorkbench === 'auto-sector-group',
     set: (val: boolean) => {
@@ -948,7 +959,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     }
   })
 
-  const workbenchMode = computed<'station' | 'transit' | 'overview' | 'terraforming' | 'tech-tree' | 'research' | 'blueprint-recipe' | 'auto-sector-group'>(() => {
+  const workbenchMode = computed<'station' | 'transit' | 'overview' | 'npc-trade' | 'terraforming' | 'tech-tree' | 'research' | 'blueprint-recipe' | 'auto-sector-group'>(() => {
+    if (isNpcTradeMode.value) return 'npc-trade'
     if (isTerraformingMode.value) return 'terraforming'
     if (isTechTreeMode.value) return 'tech-tree'
     if (isResearchMode.value) return 'research'
@@ -1911,6 +1923,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     isTechTreeMode.value = false
     isResearchMode.value = false
     isBlueprintRecipeMode.value = false
+    isNpcTradeMode.value = false
     isAutoSectorGroupMode.value = false
     activeStationId.value = stationId
   }
@@ -1920,6 +1933,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     isTechTreeMode.value = false
     isResearchMode.value = false
     isBlueprintRecipeMode.value = false
+    isNpcTradeMode.value = false
     isAutoSectorGroupMode.value = false
     if (!sectorId) {
       activeStationId.value = null
@@ -1948,6 +1962,11 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
 
   function selectBlueprintRecipe() {
     isBlueprintRecipeMode.value = true
+    activeStationId.value = null
+  }
+
+  function selectNpcTrade() {
+    isNpcTradeMode.value = true
     activeStationId.value = null
   }
 
@@ -2580,6 +2599,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     allocationVolumeGroups,
     allocationCargoOnlyItems,
     capabilities,
+    supportsNpcTrade: true,
     settingActions,
     wareRuleActions,
     moduleActions,
@@ -2594,6 +2614,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     selectTerraforming,
     selectTechTree,
     selectResearch,
+    selectNpcTrade,
     selectBlueprintRecipe,
     selectAutoSectorGroup,
     terraformingHqStationCode,

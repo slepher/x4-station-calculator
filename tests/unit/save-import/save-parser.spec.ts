@@ -67,77 +67,62 @@ describe('save parser core (simplified)', () => {
 })
 
 describe('save parser (Rust WASM streaming)', () => {
-  it('uses NPC buildstorage archive v12 without changing post-process v13', () => {
-    expect(CURRENT_PARSER_VERSION).toBe('v12')
+  it('uses zero-offer-filtered archive v15 without changing post-process v13', () => {
+    expect(CURRENT_PARSER_VERSION).toBe('v15')
     expect(CURRENT_POST_PROCESSOR_VERSION).toBe('v13')
   })
 
-  it('parses xml with pump loop into archive data', async () => {
+  it('invalidates pre-filter v14 archives', () => {
+    const archive = postProcessRustSaveArchive({
+      meta: {
+        guid: 'old', seed: 1, time: 2, playerName: 'p', version: '900', filename: 'save_009',
+        parser_version: 'v14', source: 'original'
+      },
+      sectors: {},
+      isCompatible: true,
+      isValid: true
+    })
+
+    expect(archive.isValid).toBe(false)
+    expect(archive.meta.parser_version).toBe('v14')
+  })
+
+  it('parses real save trade and player ship fixtures', async () => {
     const initWasm = (await import('../../../src/wasm/save_parser.js')).default
     const { SaveParser } = await import('../../../src/wasm/save_parser.js')
-    
+
     const wasmPath = new URL('../../../src/wasm/save_parser_bg.wasm', import.meta.url)
     const wasmBinary = await readFile(wasmPath)
     await initWasm({ module_or_path: wasmBinary })
-    
-    const parser = new SaveParser()
-    
-    const xml = `<savegame><info>
-      <game guid="GUID-2" seed="100" time="456.7" version="800" />
-      <player name="testplayer" />
-      </info>
-      <component class="sector" macro="test_sector_macro" known="1">
-      <component class="station" macro="test_station_macro" code="TEST-001" owner="player">
-      <offset><position x="100" y="200" z="300" /></offset>
-      </component>
-      <component class="station" macro="npc_station_macro" code="NPC-001" owner="argon">
-      <trade><offers><production><trade id="[0xt1]" seller="[0x1]" ware="hullparts" price="53900" amount="0" desired="3" flags="fixedprice" /></production></offers></trade>
-      </component>
-      <component class="ship_l" macro="ship_arg_l_trans_container_01_a_macro" name="Player Transport" code="SHIP-001" owner="player" id="[ship-1]">
-      <orders><order id="[wait-1]" default="1" order="Wait" state="started" /></orders>
-      <connections><connection connection="con_storage"><component class="storage" id="[storage-1]"><cargo><ware ware="energycells" amount="20" /></cargo></component></connection></connections>
-      </component>
-      </component>
-      </savegame>`
-    
-    const data = new TextEncoder().encode(xml)
-    parser.push_chunk(data)
-    parser.finish_input()
-    
-    while (true) {
-      const hasMore = parser.pump(1000)
-      if (!hasMore) break
+
+    const parseFixture = async (path: string) => {
+      const parser = new SaveParser()
+      const data = await readFile(new URL(path, import.meta.url))
+      parser.push_chunk(data)
+      parser.finish_input()
+      while (parser.pump(1000)) {}
+      return JSON.parse(parser.finish('save_009.xml'))
     }
-    
-    const progress = JSON.parse(parser.progress_json())
-    expect(progress.phase).toBe('done')
-    
-    const result = parser.finish('test.xml')
-    const archive = JSON.parse(result)
-    
-    expect(archive.meta.guid).toBe('GUID-2')
-    expect(archive.meta.playerName).toBe('testplayer')
-    expect(archive.meta.version).toBe('800')
-    expect(archive.meta.filename).toBe('test')
-    expect(archive.meta.parser_version).toBe('v12')
-    expect(archive.isCompatible).toBe(true)
-    expect(values(archive.sectors.test_sector_macro?.player_stations)).toHaveLength(1)
-    expect(archive.sectors.test_sector_macro?.player_stations?.['TEST-001']?.code).toBe('TEST-001')
-    expect(archive.sectors.test_sector_macro?.player_stations?.['TEST-001']?.owner).toBe('player')
-    expect(archive.sectors.test_sector_macro?.player_stations?.['TEST-001']?.relative_position).toEqual({ x: 100, y: 200, z: 300 })
-    expect(archive.sectors.test_sector_macro?.npc_stations?.['NPC-001']?.tradeOffers).toEqual([
-      { tradeId: '0xt1', ware: 'hullparts', side: 'sell', price: 539, amount: 0, desired: 3, flags: ['fixedprice'] }
-    ])
-    expect(archive.sectors.test_sector_macro?.player_ships?.['ship-1']).toMatchObject({
-      component_id: 'ship-1',
-      code: 'SHIP-001',
-      name: 'Player Transport',
-      macro: 'ship_arg_l_trans_container_01_a_macro',
-      class: 'ship_l',
-      cargo: [{ ware: 'energycells', amount: 20 }],
-      assignment: { state: 'none' },
-      default_order: { id: 'wait-1', order: 'Wait', state: 'started', failed: false },
-      is_repeat: false
+
+    const tradeArchive = await parseFixture('../../fixtures/save/save_009_npc_trade_offers.xml')
+    const tradeOffers = tradeArchive.sectors.cluster_409_sector001_macro.npc_stations['ZQE-568'].tradeOffers
+    expect(tradeOffers).toHaveLength(11)
+    expect(tradeOffers.find((offer: { tradeId: string }) => offer.tradeId === '0x546c')).toEqual({
+      tradeId: '0x546c', ware: 'antimatterconverters', side: 'sell', price: 254.66,
+      amount: 9053, flags: ['invertfactionrestriction']
+    })
+    expect(tradeOffers.find((offer: { tradeId: string }) => offer.tradeId === '0x546b')).toBeUndefined()
+    const zeroSellOffers = tradeArchive.sectors.cluster_43_sector001_macro.npc_stations['GSP-924'].tradeOffers
+    expect(zeroSellOffers).toHaveLength(4)
+    expect(zeroSellOffers.every((offer: { side: string }) => offer.side === 'buy')).toBe(true)
+
+    const suppliesArchive = await parseFixture('../../fixtures/save/save_009_npc_buy_supplies.xml')
+    expect(suppliesArchive.sectors.cluster_409_sector001_macro.npc_stations['EST-150'].tradeOffers).toBeUndefined()
+
+    const shipArchive = await parseFixture('../../fixtures/save/save_009_player_ship_cargo.xml')
+    expect(shipArchive.sectors.cluster_37_sector001_macro.player_ships['0xeb6b']).toMatchObject({
+      component_id: '0xeb6b', code: 'LNB-505', macro: 'ship_par_l_trans_container_03_a_macro',
+      class: 'ship_l', cargo: [{ ware: 'missilecomponents', amount: 281 }]
     })
   })
 

@@ -138,6 +138,7 @@ export interface PlayerShipEntry {
   name?: string
   macro: string
   class: string
+  relative_position: { x: number; y: number; z: number }
   cargo?: PlayerShipCargo[]
   assignment: PlayerShipAssignment
   default_order?: PlayerShipOrderSummary
@@ -253,7 +254,7 @@ export interface NpcTradeOffer {
   side: 'buy' | 'sell'
   price: number
   amount: number
-  desired: number
+  desired?: number
   flags: string[]
 }
 

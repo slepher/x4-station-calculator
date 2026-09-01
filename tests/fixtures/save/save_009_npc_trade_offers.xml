@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<savegame>
+  <universe>
+    <component class="galaxy" macro="xu_ep2_universe_macro" code="ZJF-039" id="[0x45a0]">
+      <connections>
+        <connection connection="cluster_409_connection">
+          <component class="cluster" macro="cluster_409_macro" connection="galaxy" code="GLB-701" knownto="player" known="1" id="[0x45a1]">
+            <connections>
+              <connection connection="cluster_409_sector001_connection">
+                <component class="sector" macro="cluster_409_sector001_macro" connection="cluster" code="LII-349" owner="freesplit" contested="1" knownto="player" known="1" id="[0x45a4]">
+                  <connections>
+                    <connection connection="zone004_cluster_409_sector001_connection">
+                      <component class="zone" macro="zone004_cluster_409_sector001_macro" connection="sector" code="HBC-105" knownto="player" id="[0x45a6]">
+                        <connections>
+                          <connection connection="stations">
+                            <component class="station" macro="station_gen_factory_base_01_macro" connection="space" attackmethod="lowattentionattack" attacktime="1334466.634" shipattacktime="1334466.634" intentionalattacktime="1334466.634" code="ZQE-568" owner="freesplit" knownto="player" transportdronemode="trade" pendingtransportdronemode="trade" usertransportdronemode="trade" spawntime="0" nameindex="1" modulelevel="0.2" id="[0x46f2]">
+                              <offset>
+                                <position x="-9953.377" y="2191.141" z="6049.562"/>
+                              </offset>
+                              <trade>
+                                <offers>
+                                  <production>
+                                    <trade id="[0x546b]" buyer="[0x46f2]" ware="advancedcomposites" price="44939" amount="0" flags="invertfactionrestriction"/>
+                                    <trade id="[0x546c]" seller="[0x46f2]" ware="antimatterconverters" price="25466" amount="9053" flags="invertfactionrestriction"/>
+                                    <trade id="[0x546d]" buyer="[0x46f2]" ware="energycells" price="1470" amount="1606" desired="1606" flags="invertfactionrestriction"/>
+                                    <trade id="[0x546e]" buyer="[0x46f2]" ware="medicalsupplies" price="6180" amount="2406" desired="2406" flags="invertfactionrestriction"/>
+                                    <trade id="[0x546f]" buyer="[0x46f2]" ware="microchips" price="92851" amount="666" desired="666" flags="invertfactionrestriction"/>
+                                    <trade id="[0x5470]" buyer="[0x46f2]" ware="smartchips" price="6300" amount="350" desired="350" flags="supplies|invertfactionrestriction"/>
+                                    <trade id="[0x5471]" buyer="[0x46f2]" ware="cheltmeat" price="3240" amount="158" desired="158" flags="invertfactionrestriction"/>
+                                    <trade id="[0x5472]" buyer="[0x46f2]" ware="scruffinfruits" price="2058" amount="658" desired="658" flags="invertfactionrestriction"/>
+                                    <trade id="[0x5473]" buyer="[0x46f2]" ware="majadust" price="39875" amount="282" desired="282" flags="buyercargovirtual|buyermoneyvirtual|invertfactionrestriction|shady"/>
+                                    <trade id="[0x5474]" buyer="[0x46f2]" ware="spacefuel" price="25543" amount="332" desired="332" flags="buyercargovirtual|buyermoneyvirtual|invertfactionrestriction|shady"/>
+                                    <trade id="[0x5475]" buyer="[0x46f2]" ware="spaceweed" price="31745" amount="382" desired="382" flags="buyercargovirtual|buyermoneyvirtual|invertfactionrestriction|shady"/>
+                                    <trade id="[0x5476]" buyer="[0x46f2]" ware="stimulants" price="65082" amount="232" desired="232" flags="buyercargovirtual|buyermoneyvirtual|invertfactionrestriction|shady"/>
+                                  </production>
+                                </offers>
+                              </trade>
+                            </component>
+                          </connection>
+                        </connections>
+                      </component>
+                    </connection>
+                  </connections>
+                </component>
+              </connection>
+            </connections>
+          </component>
+        </connection>
+        <connection connection="cluster_43_connection">
+          <component class="cluster" macro="cluster_43_macro" connection="galaxy" code="LWJ-979" knownto="player" read="1" id="[0x59a4]">
+            <connections>
+              <connection connection="cluster_43_sector001_connection">
+                <component class="sector" macro="cluster_43_sector001_macro" connection="cluster" code="ENQ-188" owner="teladi" knownto="player" read="1" id="[0x59a9]">
+                  <connections>
+                    <connection connection="zones">
+                      <component class="zone" macro="tempzone" connection="sector" code="PTP-647" id="[0x62af]">
+                        <connections>
+                          <connection connection="stations">
+                            <component class="station" macro="station_gen_piratebase_base_01_macro" connection="space" description="{20102,3222}" code="GSP-924" owner="buccaneers" basename="{20102,3221}" level="0" variation="0" spawntime="0" id="[0x62f6]">
+                              <trade wares="majadust spacefuel spaceweed">
+                                <offers>
+                                  <production>
+                                    <trade id="[0x55a1]" buyer="[0x62f6]" ware="majadust" price="20700" amount="7224" desired="7224" flags="invertfactionrestriction">
+                                    </trade>
+                                    <trade id="[0x55a2]" seller="[0x62f6]" ware="majadust" price="20800" amount="0" flags="invertfactionrestriction">
+                                    </trade>
+                                    <trade id="[0x55a3]" buyer="[0x62f6]" ware="sojahusk" price="2166" amount="123" desired="123" flags="invertfactionrestriction">
+                                    </trade>
+                                    <trade id="[0x55a4]" buyer="[0x62f6]" ware="spacefuel" price="13200" amount="21674" desired="21674" flags="invertfactionrestriction">
+                                    </trade>
+                                    <trade id="[0x55a5]" seller="[0x62f6]" ware="spacefuel" price="13300" amount="0" flags="invertfactionrestriction">
+                                    </trade>
+                                    <trade id="[0x55a6]" buyer="[0x62f6]" ware="spaceweed" price="16500" amount="14450" desired="14450" flags="invertfactionrestriction">
+                                    </trade>
+                                    <trade id="[0x55a7]" seller="[0x62f6]" ware="spaceweed" price="16600" amount="0" flags="invertfactionrestriction">
+                                    </trade>
+                                  </production>
+                                </offers>
+                              </trade>
+                            </component>
+                          </connection>
+                        </connections>
+                      </component>
+                    </connection>
+                  </connections>
+                </component>
+              </connection>
+            </connections>
+          </component>
+        </connection>
+      </connections>
+    </component>
+  </universe>
+</savegame>

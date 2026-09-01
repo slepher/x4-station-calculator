@@ -12,6 +12,8 @@ function ship(patch: Partial<PlayerShipEntry> = {}): PlayerShipEntry {
     code: 'ABC-123',
     macro: 'ship_arg_l_trans_container_01_a_macro',
     class: 'ship_l',
+    relative_position: { x: 1, y: 2, z: 3 },
+    cargo: [{ ware: 'energycells', amount: 20 }],
     assignment: { state: 'none' },
     default_order: order('Wait'),
     orders: [],
@@ -131,6 +133,7 @@ describe('player ship availability', () => {
 
     expect(result.sectorMacro).toBe('sector-a')
     expect(result.class).toBe('ship_l')
+    expect(result.position).toEqual({ x: 1, y: 2, z: 3 })
     expect(result.availability).toBe('immediatelyAvailable')
   })
 })

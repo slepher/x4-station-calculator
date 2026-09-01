@@ -4,15 +4,19 @@
 
 - [x] 1.1 在 Rust model 与 `src/types/saveArchive.ts` 中新增 NPC station `tradeOffers` 的 ware、side、price、amount 基础 contract
 - [x] 1.2 捕获空间站直属 production buyer/seller trade，完成 buyer→buy、seller→sell、price/100 和 amount 映射
-- [x] 1.3 保留零数量与重复 station+ware+side 记录，不执行覆盖、求和或 fallback
+- [x] 1.3 保留重复 station+ware+side 记录，不执行覆盖、求和或 fallback
 - [x] 1.4 将基础报价 schema 纳入 archive parser version 与 WASM 产物
 - [x] 1.5 扩展按 station code 的 XML 剪裁，使直属 production offers 可用于小范围调查
 
 ## 2. 扩展完整报价 contract
 
 - [x] 2.1 扩展 Rust `NpcTradeOffer` 与 `src/types/saveArchive.ts`，新增 `tradeId`、`desired` 和 token 化 `flags`
-- [x] 2.2 保证缺失 `desired` 不以 `amount` fallback，缺失必要订单身份的节点不生成伪造报价
+- [x] 2.2 将 `amount` 保存为有效报价必填事实、`desired` 保存为可选事实，且不在 parser 中互相 fallback
 - [x] 2.3 保持 station 直属报价数组顺序，使普通需求、`supplies` 需求和异常重复 seller 均可检测
+- [x] 2.4 使用从 `save_009.xml` 裁剪的真实完整 buy、缺 `desired` buy、缺 `amount` supplies buy 与 seller fixture 覆盖 Rust/WASM parser
+- [x] 2.5 将最终 Rust archive schema 提升到 v15，使仍含零数量报价的旧 v14 archive 强制重新导入
+- [x] 2.6 在 Rust parser 边界过滤缺少 `amount` 或显式 `amount=0` 的 buyer 与 seller
+- [x] 2.7 使用 `save_009.xml` 中真实零数量 buyer 与 seller 片段覆盖 Rust/WASM parser
 
 ## 3. 捕获同级 buildstorage
 

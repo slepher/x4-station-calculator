@@ -7,6 +7,7 @@ The real `save_009.xml` evidence establishes three constraints:
 - a commander reference must be resolved to a component kind before calling it a station assignment;
 - default `Wait` is the normal hold-position baseline and is not itself work;
 - physical docking is incidental for transport selection, while sector and ship size are useful facts.
+- real ship cargo is recorded as `<economylog><cargo ware="..." v="..."/></economylog>`; the parser must read `v` from the cargo node rather than a manufactured nested `<cargo><ware amount="..."/></cargo>` shape.
 
 ## Goals / Non-Goals
 

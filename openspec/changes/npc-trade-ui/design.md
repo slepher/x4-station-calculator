@@ -48,6 +48,8 @@ src/components/empire/NpcTradeWorkbench.vue
 
 页面筛选为 presenter 内的 session refs：方向、选中玩家空间站、搜索词、ware targets、主商品、排序指标和 sector 分组开关。离开当前工作台后无需持久化，因此不修改 `SaveBindingPlan` 或 `normalizeState()`。
 
+三列 section 在模板上同时声明基础 `col-span-12` 和响应式 `lg:col-span-3/5/4`；`.panel-card` scoped 样式不再声明 `col-span-12`，避免 scoped selector specificity 覆盖响应式 utility。
+
 ### 2. live-only 导航使用现有 workbench mode
 
 在现有 mode unions 中增加 `npc-trade`，并由 live sidebar presenter 暴露固定入口。blueprint/empire sidebar 不暴露该 capability。
@@ -60,16 +62,27 @@ overview → npc-trade → blueprint-recipe → research → terraforming
 
 `LiveProductionWorkbenchView.vue` 只根据 presenter 提供的 mode 渲染 `NpcTradeWorkbench`；新 SFC 内部不直接调用 store。
 
-### 3. 玩家空间站 selector 从 binding 层级直接组装
+live workbench 挂载时立即激活 binding archive，保证从地图 archive 预览返回后恢复 binding 选择。Presenter 还会校验 `selectedArchive.meta.guid/time` 与 `binding.gameGuid/selectedArchiveTime` 精确一致；`selectedArchiveTime=null` 时以该 binding 最新 archive meta 为期望值。校验失败期间显示 context unavailable，不读取预览 archive。
 
-Presenter 读取 active binding：
+### 3. 玩家空间站 selector 复用左侧分组结果
+
+Presenter 读取 active binding 与 live production store 已供左侧使用的 `orderedStationsBySector`：
 
 1. 按 `groups.order` 排序 groups。
-2. 将 `stationPlans.groupId` 归入对应 group。
-3. 将 group 的 `tradeStation` 作为同组可选 station entry。
-4. entry sector 精确来自自身 `sectorMacro` 或其明确所属 group anchor；无法确定时禁用。
+2. 按 station 的 `sectorId === group.sectorMacro` 复用左侧同 group 的玩家空间站。
+3. 实际存档站使用对应 `playerStationRecord` 的精确 sector 与当前 binding archive position；station plan 使用自身明确绑定。
+4. group 的虚拟 `tradeStation` 作为同组可选 entry；已绑定到同一实际站时按 `saveStationCode` 去重。
+5. entry sector 无法确定时禁用。
 
-不读取 archive `player_stations` 来补齐遗漏 entry，也不把未整理的 archive station 加入 selector。
+archive `player_stations` 只通过左侧既有的 binding anchor/coverage 分组结果进入二级菜单，不跨 group 平铺。
+
+Vue 使用两个原生 select：一级选 sector group，二级只渲染该 group 的 options；不再使用单个 select 的 `<optgroup>` 伪装二级菜单。切换一级 group 时清空旧 station selection。Presenter 将二级 option 固定组装为 `<sector>-<station>`。选择完成后不再渲染占位 option。
+
+binding 的 canonical group key 是 `group.sectorMacro`。`resolveVirtualStationGroupId` 写入 `stationPlan.groupId` 时返回命中 group 的 `sectorMacro`，不返回 auto-group 临时 `id`。这样 presenter 无需兼容错误关联键。
+
+实际 station entry 的 position 按 `saveStationCode + sectorMacro` 从当前 binding archive 的对应玩家站精确解析；虚拟 station entry 使用 `getSectorZoneBoundingCenter()` 解析的星区中心。map sector 无法解析时保持 position unknown，绝不以 `(0,0,0)` 冒充中心。两种来源为互斥业务分支，不形成 fallback 链。
+
+station option 同时保留其精确 `sectorMacro` 与 `position` 供相对位置计算。binding 或 options 改变后，presenter 校验 session 中的 selected ID；entry 不存在或被禁用时直接清空，不让旧选择继续驱动结果。
 
 ### 4. 报价先归一为领域候选，再由 presenter 本地化
 
@@ -88,24 +101,23 @@ interface DemandOffer {
   source: DemandSource
   price: number
   amount: number
-  desired: number
+  desired?: number
 }
 ```
 
-空间站直属 buy 根据 `flags.includes('supplies')` 分类；buildStorage buy 的 source 固定为 `buildStorage`。seller 只从 station 直属 offers 读取。
+空间站直属 buy 根据 `flags.includes('supplies')` 分类；buildStorage buy 的 source 固定为 `buildStorage`。seller 只从 station 直属 offers 读取。parser 已排除缺少或零 `amount` 的买卖单，展示和排序直接使用原始 `amount`；`desired` 仅作为可选附加事实，不作为数量 fallback。
 
 Presenter 再关联 maps/factions/locales/wares，生成 station card、source label、sector header 和空状态。Store 不输出组件专用 DTO。
 
-### 5. station 身份使用明确静态映射
+### 5. station 身份复用地图 tooltip 语义
 
 候选 station card 组合：
 
 - sector：`maps.json` sector nameId → 当前游戏 locale。
-- station 名称/类型：优先使用 archive 已解析的 profile/name contract；没有时显示本地化通用“NPC 空间站”，但 code 仍单独显示。
+- station 名称/类型：直接复用 `components/map/savePoiLabel.ts` 的 station label helper，使 factory profile、module group 与 station tag 的名称和地图 tooltip 完全一致。
 - faction：station owner → `factions.json` nameId → 当前游戏 locale。
-- race：使用 `npcTradeOffers.ts` 内一张明确的 faction→race ID 常量表，再用已有 race locale 数据显示。
 
-不能映射的 faction 返回 `null`，presenter 显示“未知”；不得用 faction 名、station code 或图标 fallback 推导。
+不能映射的 faction 显示“未知”。页面不显示 race，也不保留 faction→race 映射。
 
 ### 6. 单 ware comparator 是全部排序的唯一基础
 
@@ -172,7 +184,7 @@ interface CompositeScore {
 
 不计算第二套 sector 分数，因此切换分组不会改变 station 排名语义。
 
-### 9. 船只分组复用既有可用性与 sector scope
+### 9. 船只分组复用既有可用性、静态船型与 sector scope
 
 Presenter 从 `selectedArchivePlayerShips` 过滤：
 
@@ -180,26 +192,58 @@ Presenter 从 `selectedArchivePlayerShips` 过滤：
 immediatelyAvailable | reclaimable
 ```
 
+再用存档 `macro` 关联游戏静态 `X4Ship`，只保留：
+
+```text
+ship_l + freighter
+ship_m + transporter
+```
+
 随后按 `sectorMacro` 分组并本地化 sector。对每个 sector，遍历 active binding groups，使用现有 anchor/coverage 判断收集全部命中 group 名称；不只取第一项。
 
-船只条目显示 name/code、class 和 availability。当前 contract 没有可靠 remaining cargo capacity，因此不关联 ware volume 或宣称可装载数量。
+船只身份分开组装：
 
-### 10. 空状态和异常保持可区分
+- `shipName`：静态飞船本地化名称，例如“苍鹭”。
+- `shipType`：静态 `X4Ship.type` 对应的本地化型号，例如“运输船”。
+- `size`：由 `ship_l/ship_m` 明确映射为 L/M。
+- `customName`：存档 `name` trim 后非空且不匹配 `/^\{\d+,\d+\}$/` 才显示。
+- 不输出 component ID 或 code。
+
+容量取静态飞船的 container cargo capacity。对每个已选 ware，若 transport 为 container 且 volume 为正，则最大可装数量为 `floor(capacity / volume)`；否则为 0。该值不读取 targetQty 或当前 archive cargo。
+
+为支持同 sector 距离，既有 player ship archive contract 增加存档坐标，并由 `selectedArchivePlayerShips` 原样携带，不新增 UI adapter。
+
+### 10. NPC 与船只相对所选空间站的位置
+
+选中 station option 后，presenter 同时解析其 `sectorMacro` 与 `position`。选择变化或 binding/station options 变化时，若旧 ID 已不存在或禁用则清空选择。
+
+- exact same `sectorMacro`：使用目标与玩家空间站的存档三维坐标计算直线距离，单位转换为 km。
+- different `sectorMacro`：复用 `mapSectorGraph.ts` 已有 `buildSectorGraph()` 与 `breadthFirstReachable()`，以当前 `jumpLimit` 动态计算地图跳数；同 cluster 不同 sector 的值可为 0。
+- 坐标、地图节点或路径缺失：输出 unknown，不使用其他 archive 或字段 fallback。
+
+选择 station 后显示 session-only `jumpLimit`，使用现有 `X4NumberInput` 且不设置业务最大值。候选 NPC 与船只进入展示分组前均要求存在于本次动态距离表；same-sector 的过滤距离为 0，路径缺失时不进入结果。`sector_reachability.json` 的 5 跳上限只属于静态缓存生成，不参与本页面计算。
+
+商品 targetQty 同样改用现有 `X4NumberInput`，0 仍表示目标数量缺失，不改变既有排序约束。
+
+NPC 与船只复用同一 presenter 内的最小格式化函数，不新增中间层。
+
+### 11. 空状态和异常保持可区分
 
 Presenter 输出互斥状态：
 
 - context unavailable：binding/archive/schema 不可用。
 - station not selected：尚未选择玩家空间站。
 - wares empty：尚未选择商品。
-- target missing：当前排序需要正目标数量。
+- target missing：当前排序需要正目标数量，并列出缺失数量的 ware；依赖目标的选项在无效时禁用。
 - no matches：数据可用但没有匹配报价。
 - results：存在候选。
 
-`amount=0` 属于 results，不进入 no matches 或 unknown。
+`amount=0` 的买卖单已在 parser 边界过滤，不进入 presenter results。
 
 ## Files and Responsibilities
 
-- `src/store/logic/npcTradeOffers.ts`：方向化报价分类、单 ware comparator、综合评分、sector 排序和 faction→race 映射。
+- `rust-parser/src/model.rs`、`rust-parser/src/core.rs`、`src/types/saveArchive.ts`：为 player ship archive contract 保留存档坐标。
+- `src/store/logic/npcTradeOffers.ts`：方向化报价分类、单 ware comparator、综合评分和 sector 排序。
 - `src/components/empire/presenters/useNpcTradePresenter.ts`：读取 stores，持有筛选状态，复用 ware search，组装三列 DTO。
 - `src/components/empire/NpcTradeWorkbench.vue`：3/5/4 布局与事件转发。
 - `src/types/production-ui.ts`、`src/types/production-workbench-contract.ts`、`src/store/useActiveViewStore.ts`：新增 live workbench mode。
@@ -210,7 +254,7 @@ Presenter 输出互斥状态：
 
 - [前置 archive schema 尚未完成] → 页面依赖明确版本，不以旧四字段报价降级运行。
 - [多 ware 数量单位不可直接比较价值] → 先用 fulfilled count 和 fill ratio 归一，再使用用户明确要求的总数量与金额作为后续 tie-breaker。
-- [faction 没有通用 race 字段] → 使用单一显式映射，未知保持未知，不散落猜测逻辑。
+- [玩家船只没有坐标] → 在既有 parser/player ship contract 增加解析时已知的 world position，不在 UI 推测。
 - [单 SFC 可能增长] → 首版保持最少文件；仅在出现独立复用或清晰职责边界后拆分。
 
 ## Dependencies and Rollout

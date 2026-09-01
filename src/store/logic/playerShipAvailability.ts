@@ -44,6 +44,7 @@ export interface PlayerShipAvailabilityState {
   macro: string
   class: string
   sectorMacro: string
+  position: { x: number; y: number; z: number }
   assignment: PlayerShipAssignmentClass
   activity: PlayerShipActivity
   repeatStatus: PlayerShipRepeatStatus
@@ -120,6 +121,7 @@ export function classifyPlayerShip(
     macro: ship.macro,
     class: ship.class,
     sectorMacro,
+    position: ship.relative_position,
     assignment,
     activity,
     repeatStatus,

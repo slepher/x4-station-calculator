@@ -1,7 +1,7 @@
 ## 1. Rust archive facts
 
 - [x] 1.1 Extend `rust-parser/src/model.rs` with player ship, cargo, assignment, and order-summary archive types plus `SectorData.player_ships`, set Rust archive schema to v11, and verify Rust serialization tests cover the new fields.
-- [x] 1.2 Extend `rust-parser/src/core.rs` to collect every `owner=player` `ship_*` component with identity, macro/class, sector, and cargo, and verify `rust-parser/src/tests.rs` covers inclusion, sector placement, cargo, and non-player exclusion.
+- [x] 1.2 Extend `rust-parser/src/core.rs` to collect every `owner=player` `ship_*` component with identity, macro/class, sector, and real `<cargo ware="..." v="..."/>` facts, and verify the Rust/WASM parser with a fixture cut from `save_009.xml`.
 - [x] 1.3 Collect subordinate groups and connection references, resolve commander kind/id/role at archive finalization, and verify Rust tests distinguish station assignment, ship assignment, no assignment, and an unresolved reference.
 - [x] 1.4 Parse default order separately from ordered non-default commands with available state/failure/target facts, and verify Rust tests cover default `Wait`, dock/fly wait queues, and economic orders.
 

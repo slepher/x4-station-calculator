@@ -260,7 +260,8 @@ pub(crate) struct NpcTradeOffer {
     pub(crate) side: String,
     pub(crate) price: f64,
     pub(crate) amount: i64,
-    pub(crate) desired: i64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) desired: Option<i64>,
     pub(crate) flags: Vec<String>,
 }
 
@@ -384,6 +385,7 @@ pub(crate) struct PlayerShipEntry {
     #[serde(rename = "macro")]
     pub(crate) macro_field: String,
     pub(crate) class: String,
+    pub(crate) relative_position: Vector3,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub(crate) cargo: Vec<PlayerShipCargo>,
     pub(crate) assignment: PlayerShipAssignment,

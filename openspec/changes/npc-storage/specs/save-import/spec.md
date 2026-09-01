@@ -2,7 +2,7 @@
 
 ## Purpose
 
-定义 NPC 空间站及其所属建材仓库报价的无损导入、分类事实、唯一归属和 archive 兼容契约。
+定义 NPC 空间站及其所属建材仓库有效报价的导入、分类事实、唯一归属和 archive 兼容契约。
 
 ## ADDED Requirements
 
@@ -15,7 +15,9 @@
 **前提** NPC station 或已唯一关联的 buildstorage 中存在带 buyer 的 production trade
 **当** parser 导入该 trade
 **那么** 对应报价的 `side` MUST 为 `buy`
-**并且** 报价 MUST 保存 `tradeId`、ware ID、price、amount、desired 和 flags
+**并且** 报价 MUST 保存 `tradeId`、ware ID、price、amount 和 flags
+**并且** `desired` MUST 按 XML 是否存在保存
+**并且** parser MUST NOT 使用 `desired` fallback `amount`
 
 #### Scenario: 导入 NPC 卖单
 
@@ -30,12 +32,11 @@
 **当** parser 写入 archive
 **那么** 对应报价的 `price` MUST 为 `539`
 
-#### Scenario: 保留零数量与缺省差异
+#### Scenario: 过滤不存在或零数量的报价
 
-**前提** 报价包含 `amount="0"`
+**前提** 报价缺少 `amount` 或包含 `amount="0"`
 **当** parser 导入该报价
-**那么** 系统 MUST 保留 `amount=0`
-**并且** 系统 MUST NOT 将零解释为缺失字段
+**那么** 系统 MUST NOT 将该 buyer 或 seller 写入 archive
 
 #### Scenario: 保留同站同商品多条报价
 
@@ -166,5 +167,5 @@ XML 剪裁 CLI SHALL 继续支持按 station code 输出包含直属 live offers
 
 **前提** trade offer 下包含 source、reservation、event 或其他非订单字段
 **当** CLI 生成剪裁结果
-**那么** 输出 SHALL 保留 buyer/seller、ware、price、amount、desired 和 flags 属性
+**那么** 输出 SHALL 保留 buyer/seller、ware、price、flags，以及原节点中实际存在的 amount、desired 属性
 **并且** 输出 MUST NOT 因保留 offer 而保留无关完整状态

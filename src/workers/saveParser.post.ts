@@ -66,7 +66,7 @@ interface SectorStaticHighwayLookup {
   [sectorId: string]: SaveSectorHighwayEntry[]
 }
 
-export const CURRENT_PARSER_VERSION = 'v12' as const
+export const CURRENT_PARSER_VERSION = 'v15' as const
 export const CURRENT_POST_PROCESSOR_VERSION = 'v13' as const
 const SECTOR_CENTER_GRID = 64000
 const DEFAULT_HEX_INNER_RATIO = Math.sqrt(3) / 2

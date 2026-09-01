@@ -6,6 +6,7 @@ The save import SHALL include every component owned by the player whose class is
 #### Scenario: Player ship is stored in its sector
 - **WHEN** the imported save contains a player-owned `ship_*` component in a known sector
 - **THEN** the archive contains one player ship record under that sector with its identity, macro, class, and cargo facts
+- **AND** a real `<cargo ware="missilecomponents" v="281"/>` node is archived as ware `missilecomponents` with amount `281`
 
 #### Scenario: Non-player ship is excluded
 - **WHEN** the imported save contains a ship not owned by the player
@@ -47,4 +48,3 @@ Archives containing player ship facts SHALL use Rust archive parser schema versi
 #### Scenario: Version 10 archive requires re-import
 - **WHEN** a stored archive still uses Rust archive parser schema version 10
 - **THEN** current-version validation rejects it and requires re-import from the source save
-

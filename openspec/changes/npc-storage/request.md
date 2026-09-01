@@ -10,11 +10,12 @@
 
 ### 1. 报价原始事实
 
-1. 每条报价保存 `tradeId`、`ware`、`side`、`price`、`amount`、`desired` 和 `flags`。
+1. 每条有效报价保存 `tradeId`、`ware`、`side`、`price`、`amount` 和 `flags`；`desired` 按 XML 是否存在保存为可选原始事实。
 2. XML `buyer` 映射为 `side="buy"`，表示 NPC 收购；XML `seller` 映射为 `side="sell"`，表示 NPC 出售。
 3. 存档整数价格在 parser 边界除以 100，与静态 ware 价格使用同一单位。
-4. `amount=0` 是有效快照；不得按 truthy 过滤。
+4. 缺少 `amount` 或明确包含 `amount=0` 的 buyer 与 seller 均不进入 archive。
 5. parser 保留原始报价数组，不按 ware 覆盖、求和或选择第一条/最后一条 fallback。
+6. seller 或普通 buy 缺少 `desired` 不得导致整条报价被丢弃；parser 不使用 `desired` 补充 `amount`。
 
 ### 2. 空间站需求分类
 
@@ -53,7 +54,7 @@
 - 扩展 NPC trade offer archive 字段
 - 分类空间站自身需求与补给需求所需的 `flags`
 - 导入并唯一关联 NPC 建材仓库报价
-- 保持零数量、重复需求和异常卖单事实
+- 过滤缺少数量或零数量的买卖单，保留重复需求和非零异常卖单事实
 - 更新 parser schema version 与 archive 类型
 - 保留既有小范围 XML 剪裁能力
 
@@ -73,7 +74,7 @@
 4. `TQC-894` 和 `PRN-974` 分别归入 `OXQ-033` 和 `OGE-538`，不会归入 WUX-704。
 5. 任一 NPC 空间站输出的 `buildStorage` 基数为 0 或 1。
 6. 建材仓库报价不会因其与 station 同级而被现有 component stack 逻辑漏掉。
-7. 零数量和同站同商品多条需求均无损保留。
+7. 缺少数量或零数量的买卖单不会进入 archive，同站同商品的非零多条需求仍无损保留。
 8. 旧 archive 因 parser schema 不匹配而要求重新导入。
 9. 生产构建通过，且未引入市场 UI。
 

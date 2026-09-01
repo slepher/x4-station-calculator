@@ -8,6 +8,7 @@
 
 - 空间站直属 NPC 买单存在 80 组同站同商品多报价；这些组合均为同一 buyer，但普通需求与 `flags="supplies"` 补给需求并存。
 - 空间站直属 seller offer 在该快照中没有同站同商品重复。
+- 报价数量字段不是统一必填：真实 seller 只有 `amount`，部分 buy 缺少 `desired`，`supplies` buy 可能只有 `desired` 而没有 `amount`；最后一类不代表当前存在需求，parser 将其过滤。
 - `WUX-704` 的当前建材仓库是 `WDU-404`；同 zone 出现的 `TQC-894`、`PRN-974` 实际分别属于 `OXQ-033`、`OGE-538`。
 - 全存档中，具备可匹配字段的 buildstorage 有 838 个按 listener 与相同 spawntime 唯一匹配 station，未发现一站多仓。
 
@@ -15,7 +16,7 @@
 
 **Goals:**
 
-- 无损保存需求分类和后续排序所需的报价事实。
+- 保存当前存在的需求分类和后续排序所需的报价事实。
 - 捕获与 station 同级的 NPC buildstorage 报价。
 - 以唯一、可验证的跨组件关系将 buildstorage 归入 station。
 - 保证一个 station 的 archive 输出最多一个 buildStorage。
@@ -40,12 +41,12 @@ interface NpcTradeOffer {
   side: 'buy' | 'sell'
   price: number
   amount: number
-  desired: number
+  desired?: number
   flags: string[]
 }
 ```
 
-`flags` 使用拆分后的稳定 token 数组，避免每个消费者重复解析 `supplies|invertfactionrestriction`。空 flags 输出空数组；`desired` 按存档原值保存，不能用 `amount` fallback。
+`flags` 使用拆分后的稳定 token 数组，避免每个消费者重复解析 `supplies|invertfactionrestriction`。空 flags 输出空数组；缺少 `amount` 或明确包含 `amount=0` 时 parser 直接跳过该 buyer 或 seller。保留报价的 `amount` 使用存档原值，`desired` 缺失时保持缺失；两者不能互相 fallback。
 
 该结构只表达 archive 事实。空间站自身需求与补给需求由直属 buy offer 是否包含 `supplies` 判定；parser 不生成 UI 专用的排序分数或展示标签。
 
@@ -99,13 +100,13 @@ AND station.spawntime == buildstorage.spawntime
 
 同站同商品 seller offer 的当前数据不重复，但 parser 仍使用数组保持无损；不得通过 map 覆盖来强造“只有一条”。
 
-### 5. 价格、零值与资格边界保持不变
+### 5. 价格、零值与资格边界
 
-price 在 parser 边界除以 100。`amount=0` 保留。报价存在性不等同于玩家可成交性；声望、许可和 faction 静态信息继续由消费阶段处理。
+price 在 parser 边界除以 100。缺少 `amount` 或 `amount=0` 的买卖单在同一 parser 边界过滤。报价存在性不等同于玩家可成交性；声望、许可和 faction 静态信息继续由消费阶段处理。
 
 ### 6. Schema 升级与并行 change 协调
 
-完整报价和 buildStorage 都改变 Rust archive schema，因此实现时将 `CURRENT_PARSER_VERSION` 提升到下一版本。若 `save-player-ships` 已先提升版本，本 change 基于合并后的当前版本只再提升一次，不回退或复用旧版本号。
+完整报价、buildStorage 与零数量过滤都改变 Rust archive 语义；`CURRENT_PARSER_VERSION` 最终提升为 `v15`。旧的 `v14` archive 必须失效并从源存档重新导入，不能复用旧版本号保留零数量报价。
 
 旧 archive 必须重新导入；不得通过 `desired=amount`、`flags=[]` 或 `buildStorage=undefined` fallback 冒充新 contract。
 

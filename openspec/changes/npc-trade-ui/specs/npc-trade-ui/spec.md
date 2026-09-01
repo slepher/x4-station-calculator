@@ -18,6 +18,14 @@
 **那么** 系统 MUST 使用该 binding 的 groups、stationPlans、当前 NPC offers 和 player ships
 **并且** 系统 MUST NOT 回退到其他 archive
 
+#### Scenario: 地图预览不改变 binding archive
+
+**前提** 用户在地图预览了其他 archive，且预览没有改变 binding 的 `selectedArchiveTime`
+**当** 用户进入市场报价页面
+**那么** 系统 MUST 仍使用 `gameGuid + selectedArchiveTime` 精确解析当前 binding archive
+**并且** `selectedArchiveTime=null` 时 MUST 使用该 binding 最新有效 archive
+**并且** 系统 MUST NOT 使用仍留在全局预览状态中的其他 archive
+
 #### Scenario: 数据上下文不可用
 
 **前提** active binding 缺失、archive 不兼容或必要 schema 不可用
@@ -56,11 +64,26 @@
 
 #### Scenario: 按 sector group 展示 station
 
-**前提** active binding 包含 groups、stationPlans 和可选 tradeStation
+**前提** active binding 包含 groups，且左侧导航已按 binding scope 生成玩家空间站
 **当** presenter 构造玩家空间站选择器
-**那么** 选择器 MUST 按 group order 展示 sector group
-**并且** 每个 group 下 MUST 展示其 stationPlans 和已绑定 tradeStation
-**并且** 选择器 MUST NOT 平铺 archive 原始 player_stations
+**那么** 一级菜单 MUST 按 group order 展示 sector group
+**并且** 二级菜单 MUST 展示左侧归入当前一级 group 的玩家空间站
+**并且** 二级菜单 MUST 加入当前 group 未绑定实际站的虚拟 tradeStation
+**并且** 选择器 MUST NOT 跨 group 平铺 archive 原始 player_stations
+
+#### Scenario: 二级菜单标签与占位
+
+**前提** 用户已选择 sector group
+**当** 用户展开玩家空间站二级菜单
+**那么** 每个 option MUST 使用 `<sector>-<station>` 格式显示本地化星区名和空间站名称
+**并且** 用户选中空间站后，“选择空间站”占位 MUST NOT 继续作为 option 显示
+
+#### Scenario: 使用稳定 group 关联键
+
+**前提** virtual station draft 被写入 save binding
+**当** 系统设置 `stationPlan.groupId`
+**那么** groupId MUST 使用 binding group 的稳定 `sectorMacro`
+**并且** 系统 MUST NOT 保存 auto-group 临时 `group.id`
 
 #### Scenario: station 缺少 sector
 
@@ -97,13 +120,15 @@
 **前提** 某 ware 尚未被选择
 **当** 用户点击该搜索结果
 **那么** 页面 MUST 添加一个唯一 ware 药丸
-**并且** 药丸 MUST 提供目标数量和移除操作
+**并且** 药丸 MUST 使用现有 `X4NumberInput` 提供目标数量
+**并且** 药丸 MUST 提供移除操作
 
 #### Scenario: 数量指标缺少目标数量
 
 **前提** 某 ware 的目标数量不是正数
 **当** 用户选择依赖目标数量的排序
-**那么** 页面 MUST 提示该 ware 需要目标数量
+**那么** 对应排序选项 MUST 被禁用
+**并且** 页面 MUST 指出缺少正目标数量的 ware
 **并且** 系统 MUST NOT 自动使用 0、1 或 offer amount fallback
 
 ### Requirement: Complete NPC Station Identity
@@ -114,14 +139,15 @@
 
 **前提** NPC station 存在匹配报价
 **当** presenter 生成 station card
-**那么** card MUST 显示本地化 sector、可解析的本地化 station 名称或类型、station code、本地化 faction 和派生 race
+**那么** card MUST 显示本地化 sector、与地图 station tooltip 同源的本地化 station 名称、station code 和本地化 faction
+**并且** card MUST NOT 显示 race
 
-#### Scenario: race 无法推导
+#### Scenario: 复用地图 station label
 
-**前提** station owner faction 没有显式 race 映射
+**前提** station 具有 factory profile、station tag 或其他地图 tooltip 已支持的身份
 **当** presenter 生成 station card
-**那么** race MUST 显示未知状态
-**并且** 系统 MUST NOT 根据 station code 或外观猜测 race
+**那么** station 名称 MUST 复用地图 tooltip 的 station label helper
+**并且** 系统 MUST NOT 在市场报价 presenter 内建立另一套名称 fallback 链
 
 ### Requirement: Station Offer Hierarchy
 
@@ -132,7 +158,8 @@
 **前提** 同一 station/ware 同时存在普通直属 buy、`supplies` buy 和 buildStorage buy
 **当** 页面处于玩家卖出方向
 **那么** station card MUST 分别显示空间站自身、空间站补给和建材仓库需求
-**并且** 三条需求 MUST 保持各自 price、amount 和 desired
+**并且** 三条需求 MUST 保持各自 price、amount 与原始可选 desired
+**并且** 排序和展示 MUST NOT 使用 desired fallback amount
 
 #### Scenario: 建材仓库归入空间站
 
@@ -148,12 +175,11 @@
 **那么** 系统 MUST 使用 station 直属 seller offer
 **并且** 系统 MUST NOT 将 buildStorage buy 或 supplies buy 当作卖单
 
-#### Scenario: 零数量报价
+#### Scenario: 零数量报价已过滤
 
-**前提** 匹配 offer 的 amount 为 0
-**当** 页面显示该 offer
-**那么** 页面 MUST 显示数量 0
-**并且** 页面 MUST NOT 显示“数据缺失”替代该数值
+**前提** 原始存档 offer 缺少 `amount` 或 `amount` 为 0
+**当** 页面读取 parser archive
+**那么** 页面 MUST NOT 显示该买单或卖单
 
 ### Requirement: Direction Aware Single Ware Sorting
 
@@ -245,7 +271,7 @@
 
 ### Requirement: Available Player Ships By Sector
 
-系统 SHALL 在右列按 sector 展示可立即调用或可收回的玩家船只，并显示命中的玩家 sector groups。
+系统 SHALL 在右列按 sector 展示符合用途和尺寸约束、可立即调用或可收回的玩家运输船，并显示其身份、容量、所选 ware 最大可装数量和命中的玩家 sector groups。
 
 #### Scenario: 过滤可展示船只
 
@@ -254,6 +280,14 @@
 **那么** 列表 MUST 只包含 `immediatelyAvailable` 和 `reclaimable`
 **并且** `unavailable` 与 `unknown` MUST NOT 被伪装为可用
 
+#### Scenario: 按用途和尺寸过滤船只
+
+**前提** 当前 archive 包含多种玩家船只
+**当** presenter 生成船只列表
+**那么** 列表 MUST 只包含 class 为 L 的 `freighter`
+**并且** 列表 MUST 只包含 class 为 M 的 `transporter`
+**并且** 其他用途或尺寸的船只 MUST NOT 显示
+
 #### Scenario: sector 命中多个 group
 
 **前提** 某 ship sector 同时命中多个 binding group 的 anchor 或 coverage
@@ -261,12 +295,79 @@
 **那么** header MUST 显示本地化 sector 名
 **并且** header MUST 显示所有命中的 group 名称
 
-#### Scenario: 不推导剩余货舱容量
+#### Scenario: 展示飞船身份
 
-**前提** 当前 archive 没有可靠的 remaining cargo capacity contract
+**前提** 船只 macro 可关联游戏静态飞船数据
 **当** 页面显示船只
-**那么** 页面 MUST NOT 声称船只可装载某个目标数量
-**并且** 页面 MUST NOT 按推测容量过滤船只
+**那么** 页面 MUST 显示本地化飞船名、本地化型号、L/M 尺寸和可用性
+**并且** 页面 MUST NOT 显示 component ID 或船只代码
+
+#### Scenario: 展示有效自定义名称
+
+**前提** 存档船只存在 `name`
+**当** 页面判断是否额外显示自定义名称
+**那么** 非空且不匹配 `{数字,数字}` 的名称 MUST 显示
+**并且** `{30226,204}` 这类未解析本地化 token MUST NOT 作为自定义名称显示
+
+#### Scenario: 展示容量与最大可装数量
+
+**前提** 页面已选择一个或多个目标 ware
+**当** 页面显示船只
+**那么** 页面 MUST 显示静态飞船货舱容量
+**并且** 页面 MUST 逐一显示所有所选 ware 在空货舱下的最大可装数量
+**并且** transport 匹配且 `ware.volume > 0` 时数量 MUST 为 `floor(cargoCapacity / ware.volume)`
+**并且** transport 不匹配或 volume 无效时数量 MUST 为 0
+**并且** 左侧 targetQty 与存档当前 cargo MUST NOT 影响该数量
+
+### Requirement: Relative Position To Selected Player Station
+
+系统 SHALL 在选择玩家空间站后为 NPC station 与玩家船只显示相对位置。
+
+#### Scenario: 按最大跳数过滤
+
+**前提** 用户已选择玩家空间站
+**当** 用户通过现有 `X4NumberInput` 设置最大跳数
+**那么** NPC station 与玩家船只 MUST 同时只保留跳数小于等于该值的对象
+**并且** 同 sector MUST 按 0 跳参与过滤
+**并且** 不同 sector MUST 使用当前地图图动态计算
+**并且** 计算 MUST NOT 受静态 reachability 缓存的 5 跳生成范围限制
+**并且** 跳数未知的对象 MUST 被排除
+
+#### Scenario: 同 sector 显示距离
+
+**前提** 目标 NPC station 或玩家船只与所选玩家空间站具有相同 `sectorMacro`
+**并且** 两端均具有有效存档坐标
+**当** 页面显示目标对象
+**那么** 页面 MUST 显示两端三维坐标的直线距离
+**并且** 页面 MUST NOT 显示 0 跳替代距离
+
+#### Scenario: 解析已绑定实际站坐标
+
+**前提** 所选 station entry 具有 `saveStationCode` 但 binding 中未保存 position
+**当** 系统需要计算相对位置
+**那么** presenter MUST 从当前 binding archive 的对应玩家 station 精确解析 position
+
+#### Scenario: 虚拟站使用星区中心
+
+**前提** 所选 station entry 是虚拟站且具有有效 `sectorMacro`
+**当** 系统需要计算相对位置
+**那么** presenter MUST 使用地图数据中该 sector 的 zone bounding center
+**并且** presenter MUST NOT 将 `(0,0,0)` 作为星区中心 fallback
+**并且** sector 无法解析时 MUST 保持 position unknown
+
+#### Scenario: 不同 sector 显示跳数
+
+**前提** 目标对象与所选玩家空间站的 `sectorMacro` 不同
+**当** 当前地图图存在两 sector 之间的路径
+**那么** 页面 MUST 显示跳数
+**并且** 同一 cluster 的不同 sector MAY 显示 0 跳
+
+#### Scenario: 相对位置数据缺失
+
+**前提** 同 sector 坐标缺失，或不同 sector 的地图节点/路径缺失
+**当** 页面显示目标对象
+**那么** 页面 MUST 显示距离未知
+**并且** 系统 MUST NOT 从其他 archive、sector 或坐标 fallback
 
 ### Requirement: Store Presenter Vue Boundary
 

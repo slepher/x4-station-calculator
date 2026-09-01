@@ -19,6 +19,7 @@ const props = defineProps<{
   hasSectors: boolean
   showTerraforming: boolean
   showResearch: boolean
+  showNpcTrade?: boolean
   showTechTree: boolean
   showBlueprintRecipe: boolean
   showAutoSectorGroup?: boolean
@@ -37,6 +38,7 @@ const emit = defineEmits<{
   selectTerraforming: []
   selectTechTree: []
   selectResearch: []
+  selectNpcTrade: []
   selectBlueprintRecipe: []
   selectAutoSectorGroup: []
   selectTerraformingCluster: [clusterId: string]
@@ -150,6 +152,9 @@ watch([() => props.activeTabId, () => props.tabs.length], ([tabId]) => {
 
 const fixedItems = computed<ProductionTabItem[]>(() => {
   const result = props.tabs.filter(t => t.type === 'overview')
+  if (props.showNpcTrade) {
+    result.push({ id: 'npc-trade', type: 'npc-trade', name: t('npc_trade.label') })
+  }
   if (props.showBlueprintRecipe) {
     result.push({ id: 'blueprint-recipe', type: 'blueprint-recipe' as const, name: t('blueprint_recipe.label') })
   }
@@ -221,6 +226,7 @@ const getTabIcon = (tab: ProductionTabItem): string => {
   if (tab.type === 'terraforming') return terraformingIconUrl
   if (tab.id === 'tech-tree') return terraformingIconUrl
   if (tab.id === 'research') return researchIconUrl
+  if (tab.id === 'npc-trade') return tradestationIconUrl
   if (tab.id === 'blueprint-recipe') return blueprintIconUrl
   if (tab.id === 'auto-sector-group') return sectorGroupEditIconUrl
   if (tab.type === 'transit') return tradestationIconUrl
@@ -240,6 +246,8 @@ const handleTabClick = (tab: ProductionTabItem) => {
     emit('selectTechTree')
   } else if (tab.id === 'research') {
     emit('selectResearch')
+  } else if (tab.id === 'npc-trade') {
+    emit('selectNpcTrade')
   } else if (tab.id === 'blueprint-recipe') {
     emit('selectBlueprintRecipe')
   } else if (tab.id === 'auto-sector-group') {
@@ -283,6 +291,7 @@ const getFixedTestId = (item: ProductionTabItem): string => {
   if (item.id === 'terraforming') return 'sidebar-terraforming'
   if (item.id === 'blueprint-recipe') return 'sidebar-blueprint-recipe'
   if (item.id === 'research') return 'sidebar-research'
+  if (item.id === 'npc-trade') return 'sidebar-npc-trade'
   if (item.id === 'tech-tree') return 'sidebar-tech-tree'
   if (item.id === 'auto-sector-group') return 'sidebar-auto-sector-group'
   return `sidebar-${item.id}`
@@ -387,7 +396,11 @@ onUnmounted(() => {
             class="sidebar-item"
             :class="{ active: isTabActive(item.id) }"
             :data-testid="getFixedTestId(item)"
+            role="button"
+            tabindex="0"
             @click="handleFixedClick(item)"
+            @keydown.enter="handleFixedClick(item)"
+            @keydown.space.prevent="handleFixedClick(item)"
           >
             <div class="sidebar-item-active-bar"></div>
             <span

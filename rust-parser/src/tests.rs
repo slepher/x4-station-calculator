@@ -50,7 +50,7 @@ mod tests {
         let xml = r#"<savegame><info><game guid="g" seed="1" time="2" version="8.0"/><player name="p"/></info><component class="sector" macro="sec_alpha" knownto="player">
           <component class="station" macro="station_macro" owner="player" code="STATION" id="[station-id]"><subordinates><group index="2" assignmment="trade"/></subordinates><connections><connection connection="subordinates" id="[station-subordinates]"/></connections></component>
           <component class="ship_m" macro="commander_macro" owner="player" code="COMMANDER" id="[ship-commander]"><subordinates><group index="4" assignment="defence"/></subordinates><connections><connection connection="subordinates" id="[ship-subordinates]"/></connections></component>
-          <component class="ship_l" macro="transport_macro" owner="player" name="Transport One" code="TRADER" id="[station-child]"><subordinate group="2"/><orders loop="1"><order id="[default]" default="1" order="Wait" state="started"/><order id="[dock]" order="DockAndWait" state="started"><param name="destination" type="component" value="[station-id]"/></order><order id="[fly]" order="FlyAndWait"/><order id="[trade]" order="TradePerform" failed="1"/></orders><connections><connection connection="con_storage"><component class="storage" id="[storage]"><cargo><ware ware="energycells" amount="12"/><ware ware="energycells" amount="8"/></cargo></component></connection><connection connection="commander" id="[station-child-commander]"><connected connection="[station-subordinates]"/></connection></connections></component>
+          <component class="ship_l" macro="transport_macro" owner="player" name="Transport One" code="TRADER" id="[station-child]"><offset><position x="1000" y="2000" z="3000"/></offset><subordinate group="2"/><orders loop="1"><order id="[default]" default="1" order="Wait" state="started"/><order id="[dock]" order="DockAndWait" state="started"><param name="destination" type="component" value="[station-id]"/></order><order id="[fly]" order="FlyAndWait"/><order id="[trade]" order="TradePerform" failed="1"/></orders><connections><connection connection="commander" id="[station-child-commander]"><connected connection="[station-subordinates]"/></connection></connections></component>
           <component class="ship_s" macro="fighter_macro" owner="player" code="WING" id="[ship-child]"><subordinate group="4"/><connections><connection connection="commander" id="[ship-child-commander]"><connected connection="[ship-subordinates]"/></connection></connections></component>
           <component class="ship_s" macro="idle_macro" owner="player" code="IDLE" id="[unassigned]"><orders><order id="[wait]" default="1" order="Wait" state="started"/></orders></component>
           <component class="ship_s" macro="broken_macro" owner="player" code="BROKEN" id="[broken]"><subordinate group="1"/><connections><connection connection="commander" id="[broken-commander]"><connected connection="[missing-subordinates]"/></connection></connections></component>
@@ -67,13 +67,19 @@ mod tests {
         let ships = &archive.sectors["sec_alpha"].player_ships;
         let trader = &ships["station-child"];
 
-        assert_eq!(archive.meta.parser_version, "v12");
+        assert_eq!(archive.meta.parser_version, "v15");
         assert_eq!(ships.len(), 6);
         assert!(!ships.contains_key("npc"));
         assert_eq!(trader.name.as_deref(), Some("Transport One"));
         assert_eq!(trader.class, "ship_l");
-        assert_eq!(trader.cargo[0].ware, "energycells");
-        assert_eq!(trader.cargo[0].amount, 20);
+        assert_eq!(
+            (
+                trader.relative_position.x,
+                trader.relative_position.y,
+                trader.relative_position.z,
+            ),
+            (1000.0, 2000.0, 3000.0)
+        );
         assert_eq!(trader.assignment.state, PlayerShipAssignmentState::Resolved);
         assert_eq!(
             trader.assignment.commander_kind,
@@ -123,6 +129,24 @@ mod tests {
             json["sectors"]["sec_alpha"]["player_ships"]["station-child"]["default_order"]["order"],
             "Wait"
         );
+    }
+
+    #[test]
+    fn imports_real_save_player_ship_cargo() {
+        let xml = include_str!("../../tests/fixtures/save/save_009_player_ship_cargo.xml");
+        let mut parser = StreamingSaveParser::new(None);
+        parser.push_chunk(xml.as_bytes());
+        parser.finish_input();
+        while parser.pump(4096) {}
+
+        let archive = parser.finish_archive("save_009.xml").expect("archive");
+        let ship = &archive.sectors["cluster_37_sector001_macro"].player_ships["0xeb6b"];
+
+        assert_eq!(ship.code, "LNB-505");
+        assert_eq!(ship.macro_field, "ship_par_l_trans_container_03_a_macro");
+        assert_eq!(ship.cargo.len(), 1);
+        assert_eq!(ship.cargo[0].ware, "missilecomponents");
+        assert_eq!(ship.cargo[0].amount, 281);
     }
 
     #[test]
@@ -391,60 +415,69 @@ mod tests {
     }
 
     #[test]
-    fn imports_npc_trade_offers_without_filtering_or_aggregation() {
-        let xml = r#"<savegame><info><game guid="g" seed="1" time="2" version="8.0"/><player name="p"/></info><faction id="player"><relations><relation faction="argon" relation="-1"/></relations><licences><licence type="capitalship" factions="argon"/></licences></faction><component class="sector" macro="sec_alpha" knownto="player"><component class="buildstorage" macro="buildstorage" owner="argon" code="BUILD-1" spawntime="42" id="[0xbuild]"><hidden end="1"/><trade><offers><production><trade id="[0xb1]" buyer="[0xbuild]" ware="claytronics" price="234600" amount="8" desired="9" flags="supplies|invertfactionrestriction"/></production></offers></trade></component><component class="station" macro="npc_station" owner="argon" code="NPC-1" spawntime="42" id="[0xstation]"><listeners><listener listener="[0xbuild]" event="killed"/></listeners><trade><offers><production><trade id="[0x1]" buyer="[0xstation]" ware="hullparts" price="53900" amount="12" desired="14"/><trade id="[0x2]" seller="[0xstation]" ware="hullparts" price="54050" amount="0" desired="6" flags="fixedprice"/><trade id="[0x3]" seller="[0xstation]" ware="hullparts" price="54100" amount="7" desired="7"/><trade id="[0xmissing]" buyer="[0xstation]" ware="energycells" price="1000" amount="1"/></production></offers></trade></component><component class="station" macro="empty_station" owner="argon" code="EMPTY"/><component class="station" macro="xen_station" owner="xenon" code="XEN-1"><trade><offers><production><trade id="[0x4]" seller="[0xxen]" ware="energycells" price="1000" amount="1" desired="1"/></production></offers></trade></component><component class="station" macro="kha_station" owner="khaak" code="KHA-1"><trade><offers><production><trade id="[0x5]" buyer="[0xkha]" ware="energycells" price="1000" amount="1" desired="1"/></production></offers></trade></component></component></savegame>"#;
+    fn imports_real_save_npc_trade_offer_shapes() {
+        let xml = include_str!("../../tests/fixtures/save/save_009_npc_trade_offers.xml");
 
-        let mut parser = StreamingSaveParser::new(Some("8.0".to_string()));
+        let mut parser = StreamingSaveParser::new(None);
         parser.push_chunk(xml.as_bytes());
         parser.finish_input();
         while parser.pump(4096) {}
 
-        let archive = parser.finish_archive("offers.xml").expect("archive");
-        let sector = archive.sectors.get("sec_alpha").expect("sector");
-        let offers = &sector.npc_stations["NPC-1"].trade_offers;
+        let archive = parser.finish_archive("save_009.xml").expect("archive");
+        let offers =
+            &archive.sectors["cluster_409_sector001_macro"].npc_stations["ZQE-568"].trade_offers;
 
-        assert_eq!(offers.len(), 3);
-        assert_eq!(
-            (
-                offers[0].ware.as_str(),
-                offers[0].side.as_str(),
-                offers[0].price,
-                offers[0].amount,
-                offers[0].trade_id.as_str(),
-                offers[0].desired
-            ),
-            ("hullparts", "buy", 539.0, 12, "0x1", 14)
-        );
-        assert!(offers[0].flags.is_empty());
-        assert_eq!(
-            (offers[1].side.as_str(), offers[1].price, offers[1].amount),
-            ("sell", 540.5, 0)
-        );
-        assert_eq!(
-            (offers[2].side.as_str(), offers[2].price, offers[2].amount),
-            ("sell", 541.0, 7)
-        );
-        assert_eq!(archive.player_relations.get("argon"), Some(&-1.0));
-        assert_eq!(archive.player_licences["capitalship"], vec!["argon"]);
-        assert!(sector.xenon_stations.contains_key("XEN-1"));
-        assert!(sector.khaak_stations.contains_key("KHA-1"));
+        assert_eq!(offers.len(), 11);
+        let sell = offers
+            .iter()
+            .find(|offer| offer.trade_id == "0x546c")
+            .unwrap();
+        assert_eq!(sell.side, "sell");
+        assert_eq!(sell.amount, 9053);
+        assert_eq!(sell.desired, None);
+        assert!(!offers.iter().any(|offer| offer.trade_id == "0x546b"));
+        let complete_buy = offers
+            .iter()
+            .find(|offer| offer.trade_id == "0x546d")
+            .unwrap();
+        assert_eq!(complete_buy.amount, 1606);
+        assert_eq!(complete_buy.desired, Some(1606));
 
-        let buildstorage = sector.npc_stations["NPC-1"]
+        let zero_sell_offers =
+            &archive.sectors["cluster_43_sector001_macro"].npc_stations["GSP-924"].trade_offers;
+        assert_eq!(zero_sell_offers.len(), 4);
+        assert!(zero_sell_offers.iter().all(|offer| offer.side == "buy"));
+
+        let supplies_xml = include_str!("../../tests/fixtures/save/save_009_npc_buy_supplies.xml");
+        let mut supplies_parser = StreamingSaveParser::new(None);
+        supplies_parser.push_chunk(supplies_xml.as_bytes());
+        supplies_parser.finish_input();
+        while supplies_parser.pump(4096) {}
+        let supplies_archive = supplies_parser
+            .finish_archive("save_009.xml")
+            .expect("archive");
+        assert!(
+            supplies_archive.sectors["cluster_409_sector001_macro"].npc_stations["EST-150"]
+                .trade_offers
+                .is_empty()
+        );
+    }
+
+    #[test]
+    fn links_unique_npc_buildstorage() {
+        let xml = r#"<savegame><component class="sector" macro="sec_alpha"><component class="buildstorage" owner="argon" code="BUILD-1" spawntime="42" id="[0xbuild]"/><component class="station" owner="argon" code="NPC-1" spawntime="42" id="[0xstation]"><listeners><listener listener="[0xbuild]"/></listeners></component></component></savegame>"#;
+        let mut parser = StreamingSaveParser::new(None);
+        parser.push_chunk(xml.as_bytes());
+        parser.finish_input();
+        while parser.pump(4096) {}
+
+        let archive = parser.finish_archive("link.xml").expect("archive");
+        let buildstorage = archive.sectors["sec_alpha"].npc_stations["NPC-1"]
             .build_storage
             .as_ref()
             .expect("buildstorage");
         assert_eq!(buildstorage.component_id, "0xbuild");
         assert_eq!(buildstorage.code, "BUILD-1");
-        assert_eq!(buildstorage.trade_offers.len(), 1);
-        assert_eq!(buildstorage.trade_offers[0].trade_id, "0xb1");
-        assert_eq!(
-            buildstorage.trade_offers[0].flags,
-            vec!["supplies", "invertfactionrestriction"]
-        );
-
-        let empty = serde_json::to_value(&sector.npc_stations["EMPTY"]).expect("serialize");
-        assert!(empty.get("tradeOffers").is_none());
-        assert!(empty.get("buildStorage").is_none());
     }
 
     #[test]

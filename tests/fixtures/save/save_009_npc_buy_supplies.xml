@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<savegame>
+  <universe>
+    <component class="galaxy" macro="xu_ep2_universe_macro" code="ZJF-039" id="[0x45a0]">
+      <connections>
+        <connection connection="cluster_409_connection">
+          <component class="cluster" macro="cluster_409_macro" connection="galaxy" code="GLB-701" knownto="player" known="1" id="[0x45a1]">
+            <connections>
+              <connection connection="cluster_409_sector001_connection">
+                <component class="sector" macro="cluster_409_sector001_macro" connection="cluster" code="LII-349" owner="freesplit" contested="1" knownto="player" known="1" id="[0x45a4]">
+                  <connections>
+                    <connection connection="zones">
+                      <component class="zone" macro="tempzone" connection="sector" code="FEC-079" knownto="player" id="[0x5302]">
+                        <connections>
+                          <connection connection="stations">
+                            <component class="station" macro="station_gen_factory_base_01_macro" connection="space" code="EST-150" owner="freesplit" knownto="player" transportdronemode="trade" pendingtransportdronemode="trade" usertransportdronemode="trade" spawntime="0" nameindex="1" modulelevel="0.2" id="[0x5451]">
+                              <trade>
+                                <offers>
+                                  <production>
+                                    <trade id="[0x9a1f]" buyer="[0x5451]" ware="dronecomponents" price="102800" desired="1" flags="supplies|invertfactionrestriction">
+                                      <source class="production"/>
+                                    </trade>
+                                  </production>
+                                </offers>
+                              </trade>
+                            </component>
+                          </connection>
+                        </connections>
+                      </component>
+                    </connection>
+                  </connections>
+                </component>
+              </connection>
+            </connections>
+          </component>
+        </connection>
+      </connections>
+    </component>
+  </universe>
+</savegame>

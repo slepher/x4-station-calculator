@@ -1493,5 +1493,70 @@
   "licence.station_venture": "Venture Module Licence",
   "licence.hyperion_access": "Hyperion Sale Contract",
   "licence.envoy_access": "Envoy Sales Contract",
-  "licence.story_paranid_palace_module": "Palace Module Licence"
+  "licence.story_paranid_palace_module": "Palace Module Licence",
+  "npc_trade": {
+    "label": "Market Offers",
+    "conditions": "Trade Conditions",
+    "direction": {
+      "label": "Player direction",
+      "sell": "Player sells",
+      "buy": "Player buys"
+    },
+    "player_station": "Player station",
+    "player_station_group": "Sector group",
+    "select_station_group": "Select a sector group",
+    "select_station": "Select a station",
+    "station_option": "{sector}-{station}",
+    "max_jumps": "Maximum jumps",
+    "station_sector_missing": "Sector unavailable",
+    "ware_search": "Wares",
+    "ware_search_placeholder": "Search name, English name, or ware ID...",
+    "target_qty": "Target",
+    "remove_ware": "Remove {ware}",
+    "candidates": "NPC Candidates",
+    "rank_mode": {
+      "label": "Ranking",
+      "primary": "Primary ware",
+      "composite": "Combined"
+    },
+    "sort": {
+      "label": "Metric",
+      "quantity": "Quantity",
+      "price": "Price",
+      "fillable_price": "Price with full target",
+      "total_revenue": "Target revenue",
+      "total_cost": "Target cost"
+    },
+    "primary_ware": "Primary ware",
+    "group_by_sector": "Group by sector",
+    "source": {
+      "station": "Station demand",
+      "supplies": "Station supplies",
+      "buildStorage": "Build storage"
+    },
+    "unknown": "Unknown",
+    "relative": {
+      "distance": "{distance} km away",
+      "jumps": "{count} jumps",
+      "unknown": "Distance unknown"
+    },
+    "amount": "Amount",
+    "desired": "Desired",
+    "price": "Price",
+    "ships": "Available Player Ships",
+    "no_ships": "No available L freighters or M transporters",
+    "ship": {
+      "immediatelyAvailable": "Available now",
+      "reclaimable": "Reclaimable",
+      "capacity": "Capacity"
+    },
+    "state": {
+      "contextUnavailable": "The active binding or compatible archive is unavailable.",
+      "stationNotSelected": "Select a player station.",
+      "waresEmpty": "Add at least one ware.",
+      "targetMissing": "Enter a positive target quantity for: {wares}.",
+      "noMatches": "No matching NPC offers.",
+      "results": "Results"
+    }
+  }
 }

@@ -1494,5 +1494,70 @@
   "licence.station_venture": "远征模块执照",
   "licence.hyperion_access": "亥伯龙销售合约",
   "licence.envoy_access": "特使销售合同",
-  "licence.story_paranid_palace_module": "宫殿模块许可证"
+  "licence.story_paranid_palace_module": "宫殿模块许可证",
+  "npc_trade": {
+    "label": "市场报价",
+    "conditions": "交易条件",
+    "direction": {
+      "label": "玩家方向",
+      "sell": "玩家卖出",
+      "buy": "玩家买入"
+    },
+    "player_station": "玩家空间站",
+    "player_station_group": "星区组",
+    "select_station_group": "选择星区组",
+    "select_station": "选择空间站",
+    "station_option": "{sector}-{station}",
+    "max_jumps": "最大跳数",
+    "station_sector_missing": "星区不可用",
+    "ware_search": "商品",
+    "ware_search_placeholder": "搜索名称、英文名或商品 ID...",
+    "target_qty": "目标数量",
+    "remove_ware": "移除 {ware}",
+    "candidates": "NPC 候选",
+    "rank_mode": {
+      "label": "排名方式",
+      "primary": "主商品",
+      "composite": "综合排名"
+    },
+    "sort": {
+      "label": "排序指标",
+      "quantity": "数量",
+      "price": "价格",
+      "fillable_price": "足量价格",
+      "total_revenue": "目标总收入",
+      "total_cost": "目标总成本"
+    },
+    "primary_ware": "主商品",
+    "group_by_sector": "按星区分组",
+    "source": {
+      "station": "空间站自身需求",
+      "supplies": "空间站补给需求",
+      "buildStorage": "建材仓库需求"
+    },
+    "unknown": "未知",
+    "relative": {
+      "distance": "距离 {distance} km",
+      "jumps": "{count} 跳",
+      "unknown": "距离未知"
+    },
+    "amount": "数量",
+    "desired": "目标",
+    "price": "价格",
+    "ships": "可用玩家船只",
+    "no_ships": "没有可用的 L 货船或 M 运输船",
+    "ship": {
+      "immediatelyAvailable": "立即可用",
+      "reclaimable": "可收回",
+      "capacity": "容量"
+    },
+    "state": {
+      "contextUnavailable": "当前绑定或兼容存档不可用。",
+      "stationNotSelected": "请选择玩家空间站。",
+      "waresEmpty": "请至少添加一种商品。",
+      "targetMissing": "以下商品需要正数目标数量：{wares}。",
+      "noMatches": "没有匹配的 NPC 报价。",
+      "results": "结果"
+    }
+  }
 }

@@ -101,17 +101,25 @@ function normalizeGroupRefsToSectorMacros(
     .map((plan) => {
       const rawGroupId = plan.groupId as string | null | undefined
       const migratedGroupId = rawGroupId ? (oldIdToSectorMacro.get(rawGroupId) || rawGroupId) : rawGroupId
+      const sectorMacro = plan.sectorMacro as string | undefined
+      let groupId = migratedGroupId && validGroupKeys.has(migratedGroupId) ? migratedGroupId : null
+      if (groupId === null && sectorMacro) {
+        const hits = groups.filter((group) =>
+          group.sectorMacro === sectorMacro || group.coverageSectorMacros.some((entry) => entry.ref === sectorMacro)
+        )
+        if (hits.length === 1) groupId = getGroupKey(hits[0]!)
+      }
       return {
         id: (plan.id as string) || crypto.randomUUID(),
         saveStationCode: plan.saveStationCode as string | undefined,
-        groupId: migratedGroupId && validGroupKeys.has(migratedGroupId) ? migratedGroupId : null,
+        groupId,
         name: (plan.name as string) || (plan.saveStationCode ? String(plan.saveStationCode) : 'Virtual Station'),
         type: (plan.type as StationType) || 'industrial',
         modules: Array.isArray(plan.modules) ? plan.modules : [],
         settings: { ...DEFAULT_STATION_SETTINGS, ...(plan.settings as Partial<StationSettings> || {}) },
         lockedWares: Array.isArray(plan.lockedWares) ? deepClone(plan.lockedWares as string[]) : [],
         warePriority: (plan.warePriority && typeof plan.warePriority === 'object') ? deepClone(plan.warePriority as Record<string, number>) : {},
-        sectorMacro: plan.sectorMacro as string | undefined,
+        sectorMacro,
         position: plan.position as { x: number; y: number; z: number } | undefined
       }
     })

@@ -546,6 +546,19 @@ impl SaveParserCore {
             }
         }
 
+        if name == "cargo" {
+            if let (Some(ware), Some(amount)) = (
+                a.get("ware").cloned(),
+                a.get("v").and_then(|value| value.parse::<i64>().ok()),
+            ) {
+                if let Some(ship) = self.comp_stack.back_mut() {
+                    if ship.class.starts_with("ship_") && ship.owner.as_deref() == Some("player") {
+                        *ship.cargo_totals.entry(ware).or_insert(0) += amount;
+                    }
+                }
+            }
+        }
+
         if name == "ware" {
             if let Some(vault) = self.current_collectable_vault_ctx_mut() {
                 if let Some(ware) = a.get("ware").cloned() {
@@ -587,20 +600,7 @@ impl SaveParserCore {
                 .map(|tag| tag.as_str())
                 == Some("cargo");
             if parent_is_cargo {
-                let enclosing_ship_index = self
-                    .comp_stack
-                    .iter()
-                    .rposition(|ctx| ctx.class.starts_with("ship_"));
-                if let Some(index) = enclosing_ship_index {
-                    if let Some(ship) = self.comp_stack.get_mut(index) {
-                        if ship.owner.as_deref() == Some("player") {
-                            if let Some(ware) = a.get("ware").cloned() {
-                                let amount = to_int(a.get("amount"), 1);
-                                *ship.cargo_totals.entry(ware).or_insert(0) += amount;
-                            }
-                        }
-                    }
-                } else if let Some(component) = self.comp_stack.back() {
+                if let Some(component) = self.comp_stack.back() {
                     if component.class == "buildstorage" {
                         if let Some(buildstorage) = self.current_buildstorage_ctx_mut() {
                             if let Some(ware) = a.get("ware").cloned() {
@@ -654,35 +654,29 @@ impl SaveParserCore {
             &self.path,
             &["component", "trade", "offers", "production", "trade"],
         ) {
+            let amount = a.get("amount").and_then(|value| value.parse::<i64>().ok());
             let side = match (a.contains_key("buyer"), a.contains_key("seller")) {
                 (true, false) => Some("buy"),
                 (false, true) => Some("sell"),
                 _ => None,
             };
-            if let (
-                Some(trade_id),
-                Some(ware),
-                Some(side),
-                Some(price),
-                Some(amount),
-                Some(desired),
-            ) = (
+            if let (Some(trade_id), Some(ware), Some(side), Some(price), Some(amount)) = (
                 normalize_component_id(a.get("id")),
                 a.get("ware").cloned(),
                 side,
                 a.get("price").and_then(|value| value.parse::<i64>().ok()),
-                a.get("amount").and_then(|value| value.parse::<i64>().ok()),
-                a.get("desired").and_then(|value| value.parse::<i64>().ok()),
+                amount,
             ) {
                 if let Some(holder) = self.comp_stack.back_mut() {
-                    if holder.class == "station" || holder.class == "buildstorage" {
+                    if amount != 0 && (holder.class == "station" || holder.class == "buildstorage")
+                    {
                         holder.trade_offers.push(NpcTradeOffer {
                             trade_id,
                             ware,
                             side: side.into(),
                             price: price as f64 / 100.0,
                             amount,
-                            desired,
+                            desired: a.get("desired").and_then(|value| value.parse::<i64>().ok()),
                             flags: a
                                 .get("flags")
                                 .map(|flags| {
@@ -1098,6 +1092,11 @@ impl SaveParserCore {
                                         name: ctx.name.clone(),
                                         macro_field: ctx.macro_field.clone().unwrap_or_default(),
                                         class: ctx.class.clone(),
+                                        relative_position: Vector3 {
+                                            x: pos.x,
+                                            y: pos.y,
+                                            z: pos.z,
+                                        },
                                         cargo: player_ship_cargo(&ctx.cargo_totals),
                                         assignment: PlayerShipAssignment {
                                             state: PlayerShipAssignmentState::None,
@@ -1267,7 +1266,7 @@ impl SaveParserCore {
                 player_name: self.meta.player_name.clone(),
                 version: self.meta.version.clone(),
                 filename: f,
-                parser_version: "v12".into(),
+                parser_version: "v15".into(),
                 post_processor_version: None,
                 source: "original".into(),
             },

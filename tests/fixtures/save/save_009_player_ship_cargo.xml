@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<savegame>
+  <universe>
+    <component class="galaxy" macro="xu_ep2_universe_macro" code="ZJF-039" id="[0x45a0]">
+      <connections>
+        <connection connection="cluster_37_connection">
+          <component class="cluster" macro="cluster_37_macro" connection="galaxy" code="PEV-564" knownto="player" known="1" read="0" id="[0xd1ba]">
+            <connections>
+              <connection connection="cluster_37_sector001_connection">
+                <component class="sector" macro="cluster_37_sector001_macro" connection="cluster" code="XYS-975" owner="paranid" knownto="player" known="1" read="0" id="[0xd1c3]">
+                  <connections>
+                    <connection connection="zone005_cluster_37_sector001_connection">
+                      <component class="zone" macro="zone005_cluster_37_sector001_macro" connection="sector" code="AGQ-303" knownto="player" id="[0xd9cd]">
+                        <connections>
+                          <connection connection="stations">
+                            <component class="station" macro="station_gen_factory_base_01_macro" connection="space" attacker="[0xd73f]" attackmethod="lowattentionattack" attacktime="1342899.294" attackership="[0xd73f]" shipattacktime="1342899.294" intentionalattacktime="1342899.294" name="驻_废弃_虔诚之雾" code="WPP-412" owner="player" knownto="player" variation="0" transportdronemode="trade" pendingtransportdronemode="trade" usertransportdronemode="trade" spawntime="406939.544" nameindex="1" modulelevel="1" modulevariation="0" overviewgraphs="" id="[0xdaf2]">
+                              <connections>
+                                <connection connection="modules">
+                                  <component class="pier" macro="pier_arg_harbor_03_macro" connection="space" attackmethod="lowattentionattack" attacktime="1283804.578" shipattacktime="1283804.578" intentionalattacktime="1283804.578" construction="[0x4f9e]" id="[0xdb2e]">
+                                    <connections>
+                                      <connection connection="connectionfor_dockingbay_gen_xl_pier_01_macro2" macro="connectionfor_dockingbay_gen_xl_pier_01_macro2">
+                                        <component class="dockingbay" macro="dockingbay_gen_xl_pier_01_macro" connection="position" seed="4525131758028554647" dockstate="docking" id="[0xdb31]">
+                                          <connections>
+                                            <connection connection="dock">
+                                              <component class="ship_l" macro="ship_par_l_trans_container_03_a_macro" connection="dock" attackmethod="lowattentionattack" attacktime="1334294.575" shipattacktime="1334294.575" intentionalattacktime="1334294.575" code="LNB-505" owner="player" knownto="player" variation="0" transportdronemode="trade" pendingtransportdronemode="trade" usertransportdronemode="trade" spawntime="83523.163" thruster="thruster_gen_l_allround_01_mk1_macro" id="[0xeb6b]">
+                                                <economylog cargo="84268.491" offer="84268.491">
+                                                  <cargo ware="missilecomponents" v="281"/>
+                                                </economylog>
+                                              </component>
+                                            </connection>
+                                          </connections>
+                                        </component>
+                                      </connection>
+                                    </connections>
+                                  </component>
+                                </connection>
+                              </connections>
+                            </component>
+                          </connection>
+                        </connections>
+                      </component>
+                    </connection>
+                  </connections>
+                </component>
+              </connection>
+            </connections>
+          </component>
+        </connection>
+      </connections>
+    </component>
+  </universe>
+</savegame>
