@@ -2,12 +2,12 @@ import { expect } from '@playwright/test';
 import { test } from '../../test-setup';
 
 async function addModule(page: any, name: string) {
-  const searchInput = page.locator('[data-testid="station-module-search-input"]').first();
+  const searchInput = page.locator('[data-testid="candidate-search-input"]').first();
   await searchInput.click();
   await searchInput.fill('');
   await page.keyboard.type(name, { delay: 30 });
   await page.waitForTimeout(800);
-  const candidate = page.locator('[data-testid^="station-module-candidate-"]').first();
+  const candidate = page.locator('[data-testid^="grouped-candidate-item-"]').first();
   await expect(candidate).toBeVisible({ timeout: 5000 });
   await candidate.click();
   await page.waitForTimeout(300);

@@ -43,17 +43,17 @@ test.beforeEach(async ({ page }) => {
 test.describe('DLC Tag 显示 - 搜索候选列表', () => {
   test('搜索候选模块显示 DLC 标签', async ({ page }) => {
     // 聚焦搜索框以打开候选列表
-    const searchInput = page.getByTestId('station-module-search-input')
+    const searchInput = page.getByTestId('candidate-search-input')
     await searchInput.click()
     await page.waitForTimeout(300)
 
     // 等待候选列表出现
-    const popover = page.getByTestId('station-module-candidate-popover')
+    const popover = page.getByTestId('grouped-candidate-popover')
     await expect(popover).toBeVisible()
 
     // 检查是否有 DLC 标签（可能有也可能没有，取决于数据）
     // 至少验证候选列表正常渲染
-    const groups = page.locator('[data-testid^="station-module-candidate-group-"]')
+    const groups = page.locator('[data-testid^="grouped-candidate-group-"]')
     await expect(groups.first()).toBeVisible()
   })
 
@@ -65,13 +65,13 @@ test.describe('DLC Tag 显示 - 搜索候选列表', () => {
     await page.waitForTimeout(200)
 
     // 打开搜索
-    const searchInput = page.getByTestId('station-module-search-input')
+    const searchInput = page.getByTestId('candidate-search-input')
     await searchInput.click()
     await page.waitForTimeout(300)
 
     // 查找 DLC 标签（激活状态应为绿色）
-    const popover = page.getByTestId('station-module-candidate-popover')
-    const activeTags = popover.locator('.dlc-tag--active')
+    const popover = page.getByTestId('grouped-candidate-popover')
+    const activeTags = popover.locator('.item-tag--active')
 
     // 至少验证标签存在且样式正确
     const count = await activeTags.count()
@@ -79,7 +79,7 @@ test.describe('DLC Tag 显示 - 搜索候选列表', () => {
       const firstTag = activeTags.first()
       await expect(firstTag).toBeVisible()
       // 验证样式类
-      await expect(firstTag).toHaveClass(/dlc-tag--active/)
+      await expect(firstTag).toHaveClass(/item-tag--active/)
     }
   })
 })
@@ -87,13 +87,13 @@ test.describe('DLC Tag 显示 - 搜索候选列表', () => {
 test.describe('DLC Tag 显示 - 已添加模块列表', () => {
   test('已添加模块显示 DLC 标签', async ({ page }) => {
     // 添加一个模块
-    const searchInput = page.getByTestId('station-module-search-input')
+    const searchInput = page.getByTestId('candidate-search-input')
     await searchInput.click()
     await page.waitForTimeout(300)
 
     // 选择第一个候选模块
-    const popover = page.getByTestId('station-module-candidate-popover')
-    const firstModule = popover.locator('[data-testid^="station-module-candidate-"]').first()
+    const popover = page.getByTestId('grouped-candidate-popover')
+    const firstModule = popover.locator('[data-testid^="grouped-candidate-item-"]').first()
     await firstModule.click()
     await page.waitForTimeout(200)
 
@@ -121,12 +121,12 @@ test.describe('DLC Tag 显示 - 已添加模块列表', () => {
     await page.waitForTimeout(200)
 
     // 添加一个模块（可能是 base 或 DLC 模块）
-    const searchInput = page.getByTestId('station-module-search-input')
+    const searchInput = page.getByTestId('candidate-search-input')
     await searchInput.click()
     await page.waitForTimeout(300)
 
-    const popover = page.getByTestId('station-module-candidate-popover')
-    const modules = popover.locator('[data-testid^="station-module-candidate-"]')
+    const popover = page.getByTestId('grouped-candidate-popover')
+    const modules = popover.locator('[data-testid^="grouped-candidate-item-"]')
     const count = await modules.count()
 
     // 寻找非 base 模块
@@ -167,15 +167,15 @@ test.describe('enforceDlcActivation - 搜索过滤', () => {
     await page.waitForTimeout(200)
 
     // 打开搜索
-    const searchInput = page.getByTestId('station-module-search-input')
+    const searchInput = page.getByTestId('candidate-search-input')
     await searchInput.click()
     await page.waitForTimeout(300)
 
     // 候选列表应该显示所有模块（包括未激活 DLC）
-    const popover = page.getByTestId('station-module-candidate-popover')
+    const popover = page.getByTestId('grouped-candidate-popover')
     await expect(popover).toBeVisible()
 
-    const modules = popover.locator('[data-testid^="station-module-candidate-"]')
+    const modules = popover.locator('[data-testid^="grouped-candidate-item-"]')
     const count = await modules.count()
     expect(count).toBeGreaterThan(0)
   })
@@ -189,15 +189,15 @@ test.describe('enforceDlcActivation - 搜索过滤', () => {
     await page.waitForTimeout(200)
 
     // 打开搜索
-    const searchInput = page.getByTestId('station-module-search-input')
+    const searchInput = page.getByTestId('candidate-search-input')
     await searchInput.click()
     await page.waitForTimeout(300)
 
-    const popover = page.getByTestId('station-module-candidate-popover')
+    const popover = page.getByTestId('grouped-candidate-popover')
     await expect(popover).toBeVisible()
 
     // 检查未激活 DLC 标签的数量
-    const inactiveTags = popover.locator('.dlc-tag--inactive')
+    const inactiveTags = popover.locator('.item-tag--inactive')
     const inactiveCount = await inactiveTags.count()
 
     // 开启限制后，不应该看到未激活的 DLC 标签
@@ -208,12 +208,12 @@ test.describe('enforceDlcActivation - 搜索过滤', () => {
 test.describe('DLC 设置变化触发重算', () => {
   test('DLC 设置保存后触发重算', async ({ page }) => {
     // 添加一些模块
-    const searchInput = page.getByTestId('station-module-search-input')
+    const searchInput = page.getByTestId('candidate-search-input')
     await searchInput.click()
     await page.waitForTimeout(300)
 
-    const popover = page.getByTestId('station-module-candidate-popover')
-    const firstModule = popover.locator('[data-testid^="station-module-candidate-"]').first()
+    const popover = page.getByTestId('grouped-candidate-popover')
+    const firstModule = popover.locator('[data-testid^="grouped-candidate-item-"]').first()
     await firstModule.click()
     await page.waitForTimeout(200)
 

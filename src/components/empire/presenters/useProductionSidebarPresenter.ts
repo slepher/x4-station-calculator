@@ -12,6 +12,7 @@ export interface SidebarPresenterProps {
   showTerraforming: boolean
   showTechTree: boolean
   showResearch: boolean
+  showNpcTrade: boolean
   showBlueprintRecipe: boolean
   showAutoSectorGroup: boolean
   autoSectorGroupDisabled: ComputedRef<boolean>
@@ -29,6 +30,7 @@ export interface SidebarPresenterEmits {
   selectTerraforming: () => void
   selectTechTree: () => void
   selectResearch: () => void
+  selectNpcTrade: () => void
   selectBlueprintRecipe: () => void
   selectAutoSectorGroup: () => void
   selectTransit: (sectorId: string) => void
@@ -49,11 +51,12 @@ export interface UseProductionSidebarPresenterReturn {
 
 export interface SidebarPresenterStore {
   session: {
-    workbenchMode: 'overview' | 'station' | 'transit' | 'terraforming' | 'tech-tree' | 'research' | 'blueprint-recipe' | 'auto-sector-group'
+    workbenchMode: 'overview' | 'station' | 'transit' | 'npc-trade' | 'terraforming' | 'tech-tree' | 'research' | 'blueprint-recipe' | 'auto-sector-group'
     activeStationId: string | null
     activeTransitSectorId: string | null
   }
   capabilities: ProductionWorkbenchCapabilities
+  supportsNpcTrade?: boolean
   archiveStation?: unknown | null
   orderedStations?: Array<{
     id: string
@@ -81,6 +84,7 @@ export interface SidebarPresenterStore {
   selectTerraforming?(): void
   selectTechTree?(): void
   selectResearch?(): void
+  selectNpcTrade?(): void
   selectBlueprintRecipe?(): void
   selectAutoSectorGroup?(): void
   selectTransitSector?(sectorId: string | null): void
@@ -175,6 +179,7 @@ export function useProductionSidebarPresenter(store: SidebarPresenterStore): Use
   const showTerraforming = true
   const showTechTree = false
   const showResearch = true
+  const showNpcTrade = store.supportsNpcTrade === true
   const showBlueprintRecipe = true
   const showAutoSectorGroup = store.capabilities.hasSectors
 
@@ -184,6 +189,7 @@ export function useProductionSidebarPresenter(store: SidebarPresenterStore): Use
       if (store.session.workbenchMode === 'terraforming') return 'terraforming'
       if (store.session.workbenchMode === 'tech-tree') return 'tech-tree'
       if (store.session.workbenchMode === 'research') return 'research'
+      if (store.session.workbenchMode === 'npc-trade') return 'npc-trade'
       if (store.session.workbenchMode === 'blueprint-recipe') return 'blueprint-recipe'
       if (store.session.workbenchMode === 'auto-sector-group') return 'auto-sector-group'
       if (store.session.workbenchMode === 'transit' && store.session.activeTransitSectorId) {
@@ -197,6 +203,7 @@ export function useProductionSidebarPresenter(store: SidebarPresenterStore): Use
     showTerraforming,
     showTechTree,
     showResearch,
+    showNpcTrade,
     showBlueprintRecipe,
     showAutoSectorGroup,
     autoSectorGroupDisabled: computed(() => store.autoGroupResult == null),
@@ -214,6 +221,7 @@ export function useProductionSidebarPresenter(store: SidebarPresenterStore): Use
     selectTerraforming: () => (store.selectTerraforming || (() => {}))(),
     selectTechTree: () => (store.selectTechTree || (() => {}))(),
     selectResearch: () => (store.selectResearch || (() => {}))(),
+    selectNpcTrade: () => (store.selectNpcTrade || (() => {}))(),
     selectBlueprintRecipe: () => (store.selectBlueprintRecipe || (() => {}))(),
     selectAutoSectorGroup: () => (store.selectAutoSectorGroup || (() => {}))(),
     selectTerraformingCluster: () => {},

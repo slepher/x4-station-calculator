@@ -253,6 +253,28 @@ pub(crate) struct AggregatedStationModule {
 }
 
 #[derive(Clone, Serialize, Deserialize)]
+pub(crate) struct NpcTradeOffer {
+    #[serde(rename = "tradeId")]
+    pub(crate) trade_id: String,
+    pub(crate) ware: String,
+    pub(crate) side: String,
+    pub(crate) price: f64,
+    pub(crate) amount: i64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) desired: Option<i64>,
+    pub(crate) flags: Vec<String>,
+}
+
+#[derive(Clone, Serialize, Deserialize)]
+pub(crate) struct NpcBuildStorageEntry {
+    #[serde(rename = "componentId")]
+    pub(crate) component_id: String,
+    pub(crate) code: String,
+    #[serde(rename = "tradeOffers", skip_serializing_if = "Vec::is_empty")]
+    pub(crate) trade_offers: Vec<NpcTradeOffer>,
+}
+
+#[derive(Clone, Serialize, Deserialize)]
 pub(crate) struct NpcStationEntry {
     #[serde(flatten)]
     pub(crate) base: StationBaseEntry,
@@ -260,6 +282,10 @@ pub(crate) struct NpcStationEntry {
     pub(crate) modules: Vec<AggregatedStationModule>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub(crate) equipments: Vec<AggregatedEquipment>,
+    #[serde(rename = "tradeOffers", skip_serializing_if = "Vec::is_empty")]
+    pub(crate) trade_offers: Vec<NpcTradeOffer>,
+    #[serde(rename = "buildStorage", skip_serializing_if = "Option::is_none")]
+    pub(crate) build_storage: Option<NpcBuildStorageEntry>,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -299,6 +325,77 @@ pub(crate) struct AbandonedShipEntry {
     pub(crate) zone_id: Option<String>,
 }
 
+#[derive(Clone, Serialize, Deserialize)]
+pub(crate) struct PlayerShipCargo {
+    pub(crate) ware: String,
+    pub(crate) amount: i64,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "lowercase")]
+pub(crate) enum PlayerShipAssignmentState {
+    None,
+    Resolved,
+    Unresolved,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "lowercase")]
+pub(crate) enum PlayerShipCommanderKind {
+    Station,
+    Ship,
+}
+
+#[derive(Clone, Serialize, Deserialize)]
+pub(crate) struct PlayerShipAssignment {
+    pub(crate) state: PlayerShipAssignmentState,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) commander_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) commander_kind: Option<PlayerShipCommanderKind>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) commander_ref: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) role: Option<String>,
+}
+
+#[derive(Clone, Serialize, Deserialize)]
+pub(crate) struct PlayerShipOrderTarget {
+    pub(crate) name: String,
+    pub(crate) value: String,
+}
+
+#[derive(Clone, Serialize, Deserialize)]
+pub(crate) struct PlayerShipOrderSummary {
+    pub(crate) id: String,
+    pub(crate) order: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) state: Option<String>,
+    pub(crate) failed: bool,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub(crate) targets: Vec<PlayerShipOrderTarget>,
+}
+
+#[derive(Clone, Serialize, Deserialize)]
+pub(crate) struct PlayerShipEntry {
+    pub(crate) component_id: String,
+    pub(crate) code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) name: Option<String>,
+    #[serde(rename = "macro")]
+    pub(crate) macro_field: String,
+    pub(crate) class: String,
+    pub(crate) relative_position: Vector3,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub(crate) cargo: Vec<PlayerShipCargo>,
+    pub(crate) assignment: PlayerShipAssignment,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) default_order: Option<PlayerShipOrderSummary>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub(crate) orders: Vec<PlayerShipOrderSummary>,
+    pub(crate) is_repeat: bool,
+}
+
 #[derive(Clone, Serialize, Default)]
 pub(crate) struct SectorData {
     pub(crate) name: String,
@@ -321,6 +418,8 @@ pub(crate) struct SectorData {
     pub(crate) erlking_vaults: HashMap<String, DatavaultEntry>,
     #[serde(skip_serializing_if = "HashMap::is_empty")]
     pub(crate) abandoned_ships: HashMap<String, AbandonedShipEntry>,
+    #[serde(skip_serializing_if = "HashMap::is_empty")]
+    pub(crate) player_ships: HashMap<String, PlayerShipEntry>,
 }
 
 #[derive(Clone, Serialize, Default)]

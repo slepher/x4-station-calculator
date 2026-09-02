@@ -25,9 +25,9 @@ test.describe('build-plan-preview', () => {
   })
 
   async function addProductionGoal(page: Page, name = 'energycells') {
-    await page.locator('[data-testid="goal-search-input"]').fill(name)
-    await page.locator('[data-testid="goal-search-popover"]').waitFor({ state: 'visible', timeout: 5000 })
-    await page.locator('[data-testid^="goal-result-"]').first().click()
+    await page.locator('[data-testid="candidate-search-input"]').fill(name)
+    await page.locator('[data-testid="grouped-candidate-popover"]').waitFor({ state: 'visible', timeout: 5000 })
+    await page.locator('[data-testid^="grouped-candidate-item-"]').first().click()
   }
 
   async function buildPreviewState(page: Page) {

@@ -44,6 +44,112 @@ mod tests {
     }
 
     #[test]
+    fn archives_player_ship_facts_assignments_and_orders() {
+        use crate::model::{PlayerShipAssignmentState, PlayerShipCommanderKind};
+
+        let xml = r#"<savegame><info><game guid="g" seed="1" time="2" version="8.0"/><player name="p"/></info><component class="sector" macro="sec_alpha" knownto="player">
+          <component class="station" macro="station_macro" owner="player" code="STATION" id="[station-id]"><subordinates><group index="2" assignmment="trade"/></subordinates><connections><connection connection="subordinates" id="[station-subordinates]"/></connections></component>
+          <component class="ship_m" macro="commander_macro" owner="player" code="COMMANDER" id="[ship-commander]"><subordinates><group index="4" assignment="defence"/></subordinates><connections><connection connection="subordinates" id="[ship-subordinates]"/></connections></component>
+          <component class="ship_l" macro="transport_macro" owner="player" name="Transport One" code="TRADER" id="[station-child]"><offset><position x="1000" y="2000" z="3000"/></offset><subordinate group="2"/><orders loop="1"><order id="[default]" default="1" order="Wait" state="started"/><order id="[dock]" order="DockAndWait" state="started"><param name="destination" type="component" value="[station-id]"/></order><order id="[fly]" order="FlyAndWait"/><order id="[trade]" order="TradePerform" failed="1"/></orders><connections><connection connection="commander" id="[station-child-commander]"><connected connection="[station-subordinates]"/></connection></connections></component>
+          <component class="ship_s" macro="fighter_macro" owner="player" code="WING" id="[ship-child]"><subordinate group="4"/><connections><connection connection="commander" id="[ship-child-commander]"><connected connection="[ship-subordinates]"/></connection></connections></component>
+          <component class="ship_s" macro="idle_macro" owner="player" code="IDLE" id="[unassigned]"><orders><order id="[wait]" default="1" order="Wait" state="started"/></orders></component>
+          <component class="ship_s" macro="broken_macro" owner="player" code="BROKEN" id="[broken]"><subordinate group="1"/><connections><connection connection="commander" id="[broken-commander]"><connected connection="[missing-subordinates]"/></connection></connections></component>
+          <component class="ship_s" macro="incomplete_macro" owner="player" code="INCOMPLETE" id="[incomplete]"><subordinate group="1"/></component>
+          <component class="ship_l" macro="npc_macro" owner="argon" code="NPC" id="[npc]"/>
+        </component></savegame>"#;
+
+        let mut parser = StreamingSaveParser::new(Some("8.0".to_string()));
+        parser.push_chunk(xml.as_bytes());
+        parser.finish_input();
+        while parser.pump(4096) {}
+
+        let archive = parser.finish_archive("ships.xml").expect("archive");
+        let ships = &archive.sectors["sec_alpha"].player_ships;
+        let trader = &ships["station-child"];
+
+        assert_eq!(archive.meta.parser_version, "v15");
+        assert_eq!(ships.len(), 6);
+        assert!(!ships.contains_key("npc"));
+        assert_eq!(trader.name.as_deref(), Some("Transport One"));
+        assert_eq!(trader.class, "ship_l");
+        assert_eq!(
+            (
+                trader.relative_position.x,
+                trader.relative_position.y,
+                trader.relative_position.z,
+            ),
+            (1000.0, 2000.0, 3000.0)
+        );
+        assert_eq!(trader.assignment.state, PlayerShipAssignmentState::Resolved);
+        assert_eq!(
+            trader.assignment.commander_kind,
+            Some(PlayerShipCommanderKind::Station)
+        );
+        assert_eq!(
+            trader.assignment.commander_id.as_deref(),
+            Some("station-id")
+        );
+        assert_eq!(trader.assignment.role.as_deref(), Some("trade"));
+        assert_eq!(
+            trader
+                .default_order
+                .as_ref()
+                .map(|order| order.order.as_str()),
+            Some("Wait")
+        );
+        assert_eq!(trader.orders.len(), 3);
+        assert_eq!(trader.orders[0].order, "DockAndWait");
+        assert_eq!(trader.orders[0].targets[0].value, "station-id");
+        assert_eq!(trader.orders[1].order, "FlyAndWait");
+        assert_eq!(trader.orders[2].order, "TradePerform");
+        assert!(trader.orders[2].failed);
+        assert!(trader.is_repeat);
+
+        let fleet_ship = &ships["ship-child"];
+        assert_eq!(
+            fleet_ship.assignment.commander_kind,
+            Some(PlayerShipCommanderKind::Ship)
+        );
+        assert_eq!(fleet_ship.assignment.role.as_deref(), Some("defence"));
+        assert_eq!(
+            ships["unassigned"].assignment.state,
+            PlayerShipAssignmentState::None
+        );
+        assert_eq!(
+            ships["broken"].assignment.state,
+            PlayerShipAssignmentState::Unresolved
+        );
+        assert_eq!(
+            ships["incomplete"].assignment.state,
+            PlayerShipAssignmentState::Unresolved
+        );
+
+        let json = serde_json::to_value(&archive).expect("serialize archive");
+        assert_eq!(
+            json["sectors"]["sec_alpha"]["player_ships"]["station-child"]["default_order"]["order"],
+            "Wait"
+        );
+    }
+
+    #[test]
+    fn imports_real_save_player_ship_cargo() {
+        let xml = include_str!("../../tests/fixtures/save/save_009_player_ship_cargo.xml");
+        let mut parser = StreamingSaveParser::new(None);
+        parser.push_chunk(xml.as_bytes());
+        parser.finish_input();
+        while parser.pump(4096) {}
+
+        let archive = parser.finish_archive("save_009.xml").expect("archive");
+        let ship = &archive.sectors["cluster_37_sector001_macro"].player_ships["0xeb6b"];
+
+        assert_eq!(ship.code, "LNB-505");
+        assert_eq!(ship.macro_field, "ship_par_l_trans_container_03_a_macro");
+        assert_eq!(ship.cargo.len(), 1);
+        assert_eq!(ship.cargo[0].ware, "missilecomponents");
+        assert_eq!(ship.cargo[0].amount, 281);
+    }
+
+    #[test]
     fn parses_across_small_chunks() {
         let xml = r#"<savegame><info><game guid="g" seed="1" time="2" version="8.0"/><player name="p"/></info><component class="sector" macro="sec_alpha" knownto="player"><component class="station" macro="station_macro" owner="player" code="AAA"><offset><position x="4" y="5" z="6"/></offset><construction><sequence><entry index="1" macro="mod_macro"><upgrades><groups><shields macro="shield_macro" group="g1" exact="2"/></groups></upgrades></entry></sequence></construction></component></component></savegame>"#;
 
@@ -306,6 +412,88 @@ mod tests {
             Some("turret_macro")
         );
         assert_eq!(turret_equip.map(|e| e.amount), Some(5));
+    }
+
+    #[test]
+    fn imports_real_save_npc_trade_offer_shapes() {
+        let xml = include_str!("../../tests/fixtures/save/save_009_npc_trade_offers.xml");
+
+        let mut parser = StreamingSaveParser::new(None);
+        parser.push_chunk(xml.as_bytes());
+        parser.finish_input();
+        while parser.pump(4096) {}
+
+        let archive = parser.finish_archive("save_009.xml").expect("archive");
+        let offers =
+            &archive.sectors["cluster_409_sector001_macro"].npc_stations["ZQE-568"].trade_offers;
+
+        assert_eq!(offers.len(), 11);
+        let sell = offers
+            .iter()
+            .find(|offer| offer.trade_id == "0x546c")
+            .unwrap();
+        assert_eq!(sell.side, "sell");
+        assert_eq!(sell.amount, 9053);
+        assert_eq!(sell.desired, None);
+        assert!(!offers.iter().any(|offer| offer.trade_id == "0x546b"));
+        let complete_buy = offers
+            .iter()
+            .find(|offer| offer.trade_id == "0x546d")
+            .unwrap();
+        assert_eq!(complete_buy.amount, 1606);
+        assert_eq!(complete_buy.desired, Some(1606));
+
+        let zero_sell_offers =
+            &archive.sectors["cluster_43_sector001_macro"].npc_stations["GSP-924"].trade_offers;
+        assert_eq!(zero_sell_offers.len(), 4);
+        assert!(zero_sell_offers.iter().all(|offer| offer.side == "buy"));
+
+        let supplies_xml = include_str!("../../tests/fixtures/save/save_009_npc_buy_supplies.xml");
+        let mut supplies_parser = StreamingSaveParser::new(None);
+        supplies_parser.push_chunk(supplies_xml.as_bytes());
+        supplies_parser.finish_input();
+        while supplies_parser.pump(4096) {}
+        let supplies_archive = supplies_parser
+            .finish_archive("save_009.xml")
+            .expect("archive");
+        assert!(
+            supplies_archive.sectors["cluster_409_sector001_macro"].npc_stations["EST-150"]
+                .trade_offers
+                .is_empty()
+        );
+    }
+
+    #[test]
+    fn links_unique_npc_buildstorage() {
+        let xml = r#"<savegame><component class="sector" macro="sec_alpha"><component class="buildstorage" owner="argon" code="BUILD-1" spawntime="42" id="[0xbuild]"/><component class="station" owner="argon" code="NPC-1" spawntime="42" id="[0xstation]"><listeners><listener listener="[0xbuild]"/></listeners></component></component></savegame>"#;
+        let mut parser = StreamingSaveParser::new(None);
+        parser.push_chunk(xml.as_bytes());
+        parser.finish_input();
+        while parser.pump(4096) {}
+
+        let archive = parser.finish_archive("link.xml").expect("archive");
+        let buildstorage = archive.sectors["sec_alpha"].npc_stations["NPC-1"]
+            .build_storage
+            .as_ref()
+            .expect("buildstorage");
+        assert_eq!(buildstorage.component_id, "0xbuild");
+        assert_eq!(buildstorage.code, "BUILD-1");
+    }
+
+    #[test]
+    fn leaves_ambiguous_npc_buildstorage_unlinked() {
+        let xml = r#"<savegame><info><game guid="g" seed="1" time="2" version="8.0"/><player name="p"/></info><component class="sector" macro="sec_alpha"><component class="buildstorage" code="BUILD-1" owner="argon" spawntime="42" id="[0xb1]"/><component class="buildstorage" code="BUILD-2" owner="argon" spawntime="42" id="[0xb2]"/><component class="buildstorage" code="SHARED" owner="argon" spawntime="43" id="[0xshared]"/><component class="station" code="MULTI" owner="argon" spawntime="42" id="[0xs1]"><listeners><listener listener="[0xb1]"/><listener listener="[0xb2]"/></listeners></component><component class="station" code="SHARED-1" owner="argon" spawntime="43" id="[0xs2]"><listeners><listener listener="[0xshared]"/></listeners></component><component class="station" code="SHARED-2" owner="argon" spawntime="43" id="[0xs3]"><listeners><listener listener="[0xshared]"/></listeners></component></component></savegame>"#;
+
+        let mut parser = StreamingSaveParser::new(Some("8.0".to_string()));
+        parser.push_chunk(xml.as_bytes());
+        parser.finish_input();
+        while parser.pump(4096) {}
+
+        let archive = parser.finish_archive("ambiguous.xml").expect("archive");
+        let stations = &archive.sectors["sec_alpha"].npc_stations;
+        assert!(stations["MULTI"].build_storage.is_none());
+        assert!(stations["SHARED-1"].build_storage.is_none());
+        assert!(stations["SHARED-2"].build_storage.is_none());
     }
 
     #[test]

@@ -66,7 +66,7 @@ interface SectorStaticHighwayLookup {
   [sectorId: string]: SaveSectorHighwayEntry[]
 }
 
-export const CURRENT_PARSER_VERSION = 'v9' as const
+export const CURRENT_PARSER_VERSION = 'v15' as const
 export const CURRENT_POST_PROCESSOR_VERSION = 'v13' as const
 const SECTOR_CENTER_GRID = 64000
 const DEFAULT_HEX_INNER_RATIO = Math.sqrt(3) / 2
@@ -884,6 +884,7 @@ function stripEmptySectorCollections(sector: SectorData): SectorData {
   if (hasEntries(sector.datavaults)) nextSector.datavaults = sector.datavaults
   if (hasEntries(sector.erlking_vaults)) nextSector.erlking_vaults = sector.erlking_vaults
   if (hasEntries(sector.abandoned_ships)) nextSector.abandoned_ships = sector.abandoned_ships
+  if (hasEntries(sector.player_ships)) nextSector.player_ships = sector.player_ships
   
   return nextSector
 }

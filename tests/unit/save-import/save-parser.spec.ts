@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { createSaveParserRuntime } from '../../../src/workers/saveParser.worker'
 import {
+  CURRENT_PARSER_VERSION,
   CURRENT_POST_PROCESSOR_VERSION,
   postProcessRustSaveArchive
 } from '../../../src/workers/saveParser.post'
@@ -66,52 +67,63 @@ describe('save parser core (simplified)', () => {
 })
 
 describe('save parser (Rust WASM streaming)', () => {
-  it('parses xml with pump loop into archive data', async () => {
+  it('uses zero-offer-filtered archive v15 without changing post-process v13', () => {
+    expect(CURRENT_PARSER_VERSION).toBe('v15')
+    expect(CURRENT_POST_PROCESSOR_VERSION).toBe('v13')
+  })
+
+  it('invalidates pre-filter v14 archives', () => {
+    const archive = postProcessRustSaveArchive({
+      meta: {
+        guid: 'old', seed: 1, time: 2, playerName: 'p', version: '900', filename: 'save_009',
+        parser_version: 'v14', source: 'original'
+      },
+      sectors: {},
+      isCompatible: true,
+      isValid: true
+    })
+
+    expect(archive.isValid).toBe(false)
+    expect(archive.meta.parser_version).toBe('v14')
+  })
+
+  it('parses real save trade and player ship fixtures', async () => {
     const initWasm = (await import('../../../src/wasm/save_parser.js')).default
     const { SaveParser } = await import('../../../src/wasm/save_parser.js')
-    
+
     const wasmPath = new URL('../../../src/wasm/save_parser_bg.wasm', import.meta.url)
     const wasmBinary = await readFile(wasmPath)
     await initWasm({ module_or_path: wasmBinary })
-    
-    const parser = new SaveParser()
-    
-    const xml = `<savegame><info>
-      <game guid="GUID-2" seed="100" time="456.7" version="800" />
-      <player name="testplayer" />
-      </info>
-      <component class="sector" macro="test_sector_macro" known="1">
-      <component class="station" macro="test_station_macro" code="TEST-001" owner="player">
-      <offset><position x="100" y="200" z="300" /></offset>
-      </component>
-      </component>
-      </savegame>`
-    
-    const data = new TextEncoder().encode(xml)
-    parser.push_chunk(data)
-    parser.finish_input()
-    
-    while (true) {
-      const hasMore = parser.pump(1000)
-      if (!hasMore) break
+
+    const parseFixture = async (path: string) => {
+      const parser = new SaveParser()
+      const data = await readFile(new URL(path, import.meta.url))
+      parser.push_chunk(data)
+      parser.finish_input()
+      while (parser.pump(1000)) {}
+      return JSON.parse(parser.finish('save_009.xml'))
     }
-    
-    const progress = JSON.parse(parser.progress_json())
-    expect(progress.phase).toBe('done')
-    
-    const result = parser.finish('test.xml')
-    const archive = JSON.parse(result)
-    
-    expect(archive.meta.guid).toBe('GUID-2')
-    expect(archive.meta.playerName).toBe('testplayer')
-    expect(archive.meta.version).toBe('800')
-    expect(archive.meta.filename).toBe('test')
-    expect(archive.meta.parser_version).toBe('v3')
-    expect(archive.isCompatible).toBe(true)
-    expect(values(archive.sectors.test_sector_macro?.player_stations)).toHaveLength(1)
-    expect(archive.sectors.test_sector_macro?.player_stations?.['TEST-001']?.code).toBe('TEST-001')
-    expect(archive.sectors.test_sector_macro?.player_stations?.['TEST-001']?.owner).toBe('player')
-    expect(archive.sectors.test_sector_macro?.player_stations?.['TEST-001']?.relative_position).toEqual({ x: 100, y: 200, z: 300 })
+
+    const tradeArchive = await parseFixture('../../fixtures/save/save_009_npc_trade_offers.xml')
+    const tradeOffers = tradeArchive.sectors.cluster_409_sector001_macro.npc_stations['ZQE-568'].tradeOffers
+    expect(tradeOffers).toHaveLength(11)
+    expect(tradeOffers.find((offer: { tradeId: string }) => offer.tradeId === '0x546c')).toEqual({
+      tradeId: '0x546c', ware: 'antimatterconverters', side: 'sell', price: 254.66,
+      amount: 9053, flags: ['invertfactionrestriction']
+    })
+    expect(tradeOffers.find((offer: { tradeId: string }) => offer.tradeId === '0x546b')).toBeUndefined()
+    const zeroSellOffers = tradeArchive.sectors.cluster_43_sector001_macro.npc_stations['GSP-924'].tradeOffers
+    expect(zeroSellOffers).toHaveLength(4)
+    expect(zeroSellOffers.every((offer: { side: string }) => offer.side === 'buy')).toBe(true)
+
+    const suppliesArchive = await parseFixture('../../fixtures/save/save_009_npc_buy_supplies.xml')
+    expect(suppliesArchive.sectors.cluster_409_sector001_macro.npc_stations['EST-150'].tradeOffers).toBeUndefined()
+
+    const shipArchive = await parseFixture('../../fixtures/save/save_009_player_ship_cargo.xml')
+    expect(shipArchive.sectors.cluster_37_sector001_macro.player_ships['0xeb6b']).toMatchObject({
+      component_id: '0xeb6b', code: 'LNB-505', macro: 'ship_par_l_trans_container_03_a_macro',
+      class: 'ship_l', cargo: [{ ware: 'missilecomponents', amount: 281 }]
+    })
   })
 
   it('parses gzip bytes directly in rust wasm parser', async () => {
@@ -154,6 +166,42 @@ describe('save parser (Rust WASM streaming)', () => {
 })
 
 describe('save parser rust worker enrichment', () => {
+  it('preserves player ship collections through post-processing', () => {
+    const playerShip = {
+      component_id: 'ship-1',
+      code: 'SHIP-001',
+      macro: 'ship_arg_l_trans_container_01_a_macro',
+      class: 'ship_l',
+      assignment: { state: 'none' as const },
+      default_order: { id: 'wait', order: 'Wait', failed: false },
+      orders: [],
+      is_repeat: false
+    }
+    const archive = postProcessRustSaveArchive({
+      meta: {
+        guid: 'g',
+        seed: 1,
+        time: 2,
+        playerName: 'p',
+        version: '800',
+        filename: 'f',
+        parser_version: CURRENT_PARSER_VERSION,
+        source: 'original'
+      },
+      sectors: {
+        sector_alpha: {
+          name: 'Alpha',
+          is_known: true,
+          player_ships: { 'ship-1': playerShip }
+        }
+      },
+      isCompatible: true,
+      isValid: true
+    })
+
+    expect(archive.sectors.sector_alpha?.player_ships).toEqual({ 'ship-1': playerShip })
+  })
+
   it('resolves zone-relative positions from zone dictionaries', () => {
     const archive = postProcessRustSaveArchive({
       meta: {
@@ -163,7 +211,7 @@ describe('save parser rust worker enrichment', () => {
         playerName: 'p',
         version: '800',
         filename: 'f',
-        parser_version: 'v3',
+        parser_version: CURRENT_PARSER_VERSION,
         source: 'original'
       },
       isCompatible: true,
@@ -236,7 +284,7 @@ describe('save parser rust worker enrichment', () => {
         playerName: 'p',
         version: '800',
         filename: 'f',
-        parser_version: 'v3',
+        parser_version: CURRENT_PARSER_VERSION,
         source: 'original'
       },
       isCompatible: true,
@@ -372,7 +420,7 @@ describe('save parser rust worker enrichment', () => {
         playerName: 'p',
         version: '800',
         filename: 'f',
-        parser_version: 'v3',
+        parser_version: CURRENT_PARSER_VERSION,
         source: 'original'
       },
       isCompatible: true,
@@ -388,9 +436,9 @@ describe('save parser rust worker enrichment', () => {
               owner: 'player',
               is_headquarter: true,
               relative_position: { x: 0, y: 0, z: 0 },
-              modules: [
-                { ref: 'energy_macro', amount: 1 },
-                { ref: 'refined_macro', amount: 1 }
+              constructions: [
+                { index: 0, ref: 'energy_macro' },
+                { index: 1, ref: 'refined_macro' }
               ]
             }
           }
@@ -433,7 +481,7 @@ describe('save parser rust worker enrichment', () => {
         playerName: 'p',
         version: '800',
         filename: 'f',
-        parser_version: 'v3',
+        parser_version: CURRENT_PARSER_VERSION,
         source: 'original'
       },
       isCompatible: true,
@@ -508,7 +556,7 @@ describe('save parser rust worker enrichment', () => {
         playerName: 'p',
         version: '800',
         filename: 'f',
-        parser_version: 'v3',
+        parser_version: CURRENT_PARSER_VERSION,
         source: 'original'
       },
       isCompatible: true,
@@ -620,7 +668,7 @@ describe('save parser rust worker enrichment', () => {
         playerName: 'p',
         version: '800',
         filename: 'f',
-        parser_version: 'v3',
+        parser_version: CURRENT_PARSER_VERSION,
         source: 'original'
       },
       isCompatible: true,
@@ -692,7 +740,7 @@ describe('save parser rust worker enrichment', () => {
         playerName: 'p',
         version: '800',
         filename: 'f',
-        parser_version: 'v3',
+        parser_version: CURRENT_PARSER_VERSION,
         source: 'original'
       },
       isCompatible: true,
@@ -720,7 +768,7 @@ describe('save parser rust worker enrichment', () => {
         playerName: 'p',
         version: '800',
         filename: 'f',
-        parser_version: 'v3',
+        parser_version: CURRENT_PARSER_VERSION,
         source: 'original'
       },
       isCompatible: true,
@@ -736,6 +784,17 @@ describe('save parser rust worker enrichment', () => {
               owner: 'player',
               component_id: '0x4646c',
               relative_position: { x: 0, y: 0, z: 0 },
+              constructions: [{
+                id: '0xstation-dock',
+                index: 0,
+                ref: 'dock_macro',
+                equipments: [{
+                  type: 'shields',
+                  ref: 'shield_ter_m_standard_02_mk2_macro',
+                  group: 'group01',
+                  exact: 2
+                }]
+              }],
               modules: {
                 dock_macro: { ref: 'dock_macro', amount: 1 }
               },
@@ -820,40 +879,36 @@ describe('save parser rust worker enrichment', () => {
           exact: 2
         }]
       }],
-      modules: {
-        pier_macro: {
+      modules: [{
           ref: 'pier_macro',
           amount: 1,
-          module_id: 'module_pier'
-        }
-      },
-      equipments: {
-        turret_arg_m_flak_02_mk1_macro: {
+          module_id: 'module_pier',
+          type: 'dock',
+          group: 'dock'
+      }],
+      equipments: [{
           type: 'turrets',
           ref: 'turret_arg_m_flak_02_mk1_macro',
           amount: 2,
           equipment_id: 'turret_arg_m_flak_02_mk1'
-        }
-      },
+      }],
       progress: { start: 10, end: 20, sequenceindex: 1 }
     })
     expect(archive.sectors.sec.player_stations?.['XAJ-926']).toMatchObject({
       component_id: '0x4646c',
-      modules: {
-        dock_macro: {
+      modules: [{
           ref: 'dock_macro',
           amount: 1,
-          module_id: 'module_dock'
-        }
-      },
-      equipments: {
-        shield_ter_m_standard_02_mk2_macro: {
+          module_id: 'module_dock',
+          type: 'dock',
+          group: 'dock'
+      }],
+      equipments: [{
           type: 'shields',
           ref: 'shield_ter_m_standard_02_mk2_macro',
           amount: 2,
           equipment_id: 'shield_ter_m_standard_02_mk2'
-        }
-      },
+      }],
       cargo: [{ ware: 'energycells', amount: 1 }],
       reservation: [{ ware: 'hullparts', amount: 2 }],
       buildstorage_code: 'FIX-154'
@@ -869,7 +924,7 @@ describe('save parser rust worker enrichment', () => {
         playerName: 'p',
         version: '800',
         filename: 'f',
-        parser_version: 'v3',
+        parser_version: CURRENT_PARSER_VERSION,
         source: 'original'
       },
       isCompatible: true,

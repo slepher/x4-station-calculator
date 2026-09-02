@@ -3,13 +3,13 @@ import type { Page } from '@playwright/test'
 
 async function buildPanelLoaded(page: Page) {
   await expect(page.locator('[data-testid="build-plan-plan-menu-trigger"]')).toBeVisible()
-  await expect(page.locator('[data-testid="goal-search-input"]')).toBeVisible()
+  await expect(page.locator('[data-testid="candidate-search-input"]')).toBeVisible()
 }
 
 async function addProductionRateGoal(page: Page, name = 'energycells') {
-  await page.locator('[data-testid="goal-search-input"]').fill(name)
-  await page.locator('[data-testid="goal-search-popover"]').waitFor({ state: 'visible', timeout: 5000 })
-  await page.locator('[data-testid^="goal-result-"]').first().click()
+  await page.locator('[data-testid="candidate-search-input"]').fill(name)
+  await page.locator('[data-testid="grouped-candidate-popover"]').waitFor({ state: 'visible', timeout: 5000 })
+  await page.locator('[data-testid^="grouped-candidate-item-"]').first().click()
 }
 
 async function addFleetEntry(page: Page) {
@@ -164,9 +164,9 @@ test.describe('build-plan-goal', () => {
     const name = await page.locator('[data-testid="build-plan-plan-menu-trigger"]').textContent()
     expect(name).toBeTruthy()
     // 3.1.4 再次添加目标
-    await page.locator('[data-testid="goal-search-input"]').fill('hullparts')
-    await page.locator('[data-testid="goal-search-popover"]').waitFor({ state: 'visible', timeout: 5000 })
-    await page.locator('[data-testid^="goal-result-"]').first().click()
+    await page.locator('[data-testid="candidate-search-input"]').fill('hullparts')
+    await page.locator('[data-testid="grouped-candidate-popover"]').waitFor({ state: 'visible', timeout: 5000 })
+    await page.locator('[data-testid^="grouped-candidate-item-"]').first().click()
     // 3.1.5 断言方案名存在（表示目标已添加）
     const triggerName = await page.locator('[data-testid="build-plan-plan-menu-trigger"]').textContent()
     expect(triggerName).toBeTruthy()

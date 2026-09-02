@@ -27,7 +27,7 @@ const postProcessMocks = vi.hoisted(() => ({
     ...archive,
     meta: {
       ...archive.meta,
-      parser_version: 'v3',
+      parser_version: 'v11',
       post_processor_version: 'v2'
     },
     isValid: true
@@ -35,7 +35,7 @@ const postProcessMocks = vi.hoisted(() => ({
 }))
 
 vi.mock('@/workers/saveParser.post', () => ({
-  CURRENT_PARSER_VERSION: 'v3',
+  CURRENT_PARSER_VERSION: 'v11',
   CURRENT_POST_PROCESSOR_VERSION: 'v2',
   postProcessRustSaveArchive: postProcessMocks.postProcessRustSaveArchive
 }))
@@ -72,7 +72,7 @@ describe('save store versioning', () => {
     postProcessMocks.postProcessRustSaveArchive.mockClear()
   })
 
-  it('marks archives invalid when parser_version mismatches current parser version', async () => {
+  it('marks v10 archives invalid when parser_version mismatches current parser version', async () => {
     setSavedState({
       version: 1,
       activeArchiveId: null,
@@ -84,7 +84,7 @@ describe('save store versioning', () => {
           playerName: 'Tester',
           version: '8.0',
           filename: 'save.xml',
-          parser_version: 'v1',
+          parser_version: 'v10',
           post_processor_version: 'v1',
           source: 'original',
           isCompatible: true,
@@ -126,7 +126,7 @@ describe('save store versioning', () => {
           playerName: 'Tester',
           version: '8.0',
           filename: 'save.xml',
-          parser_version: 'v3',
+          parser_version: 'v11',
           post_processor_version: 'v1',
           source: 'original',
           isCompatible: true,
@@ -155,7 +155,7 @@ describe('save store versioning', () => {
         playerName: 'Tester',
         version: '8.0',
         filename: 'save.xml',
-        parser_version: 'v3',
+        parser_version: 'v11',
         post_processor_version: 'v1',
         source: 'original'
       },
@@ -172,7 +172,10 @@ describe('save store versioning', () => {
     const saveStore = useSaveStore()
     await saveStore.initialize()
 
-    expect(dbMocks.loadArchiveDetailFromDB).toHaveBeenCalledWith('x4_save_archives', 'g_1')
+    expect(dbMocks.loadArchiveDetailFromDB).toHaveBeenCalledWith(
+      expect.objectContaining({ currentVersion: '8.0' }),
+      'g_1'
+    )
     expect(postProcessMocks.postProcessRustSaveArchive).toHaveBeenCalledTimes(1)
     expect(dbMocks.saveArchiveToDB).toHaveBeenCalledTimes(1)
     expect(saveStore.selectedArchive?.meta.post_processor_version).toBe('v2')
@@ -199,7 +202,7 @@ describe('save store versioning', () => {
           playerName: 'Tester',
           version: '8.0',
           filename: 'save.xml',
-          parser_version: 'v3',
+          parser_version: 'v11',
           post_processor_version: 'v2',
           source: 'original',
           isCompatible: true,
@@ -243,7 +246,7 @@ describe('save store versioning', () => {
           playerName: 'Tester',
           version: '8.0',
           filename: 'save_010.xml',
-          parser_version: 'v3',
+          parser_version: 'v11',
           post_processor_version: 'v2',
           source: 'original',
           isCompatible: true,
@@ -258,7 +261,7 @@ describe('save store versioning', () => {
           playerName: 'Tester',
           version: '8.0',
           filename: 'save_020.xml',
-          parser_version: 'v3',
+          parser_version: 'v11',
           post_processor_version: 'v2',
           source: 'original',
           isCompatible: true,
@@ -287,7 +290,7 @@ describe('save store versioning', () => {
         playerName: 'Tester',
         version: '8.0',
         filename: 'save_020.xml',
-        parser_version: 'v3',
+        parser_version: 'v11',
         post_processor_version: 'v2',
         source: 'original'
       },
@@ -304,7 +307,10 @@ describe('save store versioning', () => {
     const saveStore = useSaveStore()
     await saveStore.initialize()
 
-    expect(dbMocks.loadArchiveDetailFromDB).toHaveBeenCalledWith('x4_save_archives', 'g_20')
+    expect(dbMocks.loadArchiveDetailFromDB).toHaveBeenCalledWith(
+      expect.objectContaining({ currentVersion: '8.0' }),
+      'g_20'
+    )
     expect(saveStore.savedArchivesState.activeArchiveId).toBe('g')
     expect(saveStore.selectedArchive?.meta.time).toBe(20)
   })
@@ -321,7 +327,7 @@ describe('save store versioning', () => {
           playerName: 'Tester',
           version: '8.0',
           filename: 'save_010.xml',
-          parser_version: 'v3',
+          parser_version: 'v11',
           post_processor_version: 'v2',
           source: 'original',
           isCompatible: true,
@@ -336,7 +342,7 @@ describe('save store versioning', () => {
           playerName: 'Tester',
           version: '8.0',
           filename: 'save_020.xml',
-          parser_version: 'v3',
+          parser_version: 'v11',
           post_processor_version: 'v2',
           source: 'original',
           isCompatible: true,
@@ -367,7 +373,7 @@ describe('save store versioning', () => {
           playerName: 'Tester',
           version: '8.0',
           filename: 'save_020.xml',
-          parser_version: 'v3',
+          parser_version: 'v11',
           post_processor_version: 'v2',
           source: 'original'
         },
@@ -388,7 +394,7 @@ describe('save store versioning', () => {
           playerName: 'Tester',
           version: '8.0',
           filename: 'save_010.xml',
-          parser_version: 'v3',
+          parser_version: 'v11',
           post_processor_version: 'v2',
           source: 'original'
         },
@@ -422,7 +428,7 @@ describe('save store versioning', () => {
           playerName: 'Tester',
           version: '8.0',
           filename: 'save_010.xml',
-          parser_version: 'v3',
+          parser_version: 'v11',
           post_processor_version: 'v2',
           source: 'original',
           isCompatible: true,
@@ -437,7 +443,7 @@ describe('save store versioning', () => {
           playerName: 'Tester',
           version: '8.0',
           filename: 'save_020.xml',
-          parser_version: 'v3',
+          parser_version: 'v11',
           post_processor_version: 'v2',
           source: 'original',
           isCompatible: true,
@@ -483,7 +489,7 @@ describe('save store versioning', () => {
         playerName: 'Tester',
         version: '8.0',
         filename: 'save_020.xml',
-        parser_version: 'v3',
+        parser_version: 'v11',
         post_processor_version: 'v2',
         source: 'original'
       },
@@ -506,7 +512,7 @@ describe('save store versioning', () => {
         playerName: 'Tester',
         version: '8.0',
         filename: 'save_010.xml',
-        parser_version: 'v3',
+        parser_version: 'v11',
         post_processor_version: 'v2',
         source: 'original'
       },
@@ -535,19 +541,84 @@ describe('save store versioning', () => {
     const saveStore = useSaveStore()
     await saveStore.initialize()
 
-    expect(saveStore.savedArchivesState.settings.visibility.playerStation).toBe(false)
+    expect(saveStore.savedArchivesState.settings.visibility.playerStation).toBe(true)
 
     saveStore.updateSettings({
       visibility: {
         ...saveStore.savedArchivesState.settings.visibility,
-        playerStation: true,
+        playerStation: false,
         datavault: true
       }
     })
 
     const persisted = JSON.parse(localStorage.getItem('x4_save_archives') || '{}') as SavedSaveArchivesState
-    expect(persisted.settings.visibility.playerStation).toBe(true)
+    expect(persisted.settings.visibility.playerStation).toBe(false)
     expect(persisted.settings.visibility.datavault).toBe(true)
     expect(persisted.activeArchiveId).toBeNull()
+  })
+
+  it('persists, restores, and derives player ships from the selected archive', async () => {
+    const archive = {
+      meta: {
+        guid: 'ships',
+        seed: 1,
+        time: 12,
+        playerName: 'Tester',
+        version: '8.0',
+        filename: 'ships.xml',
+        parser_version: 'v11',
+        post_processor_version: 'v2',
+        source: 'original'
+      },
+      sectors: {
+        sector_alpha: {
+          name: 'Alpha',
+          is_known: true,
+          player_ships: {
+            'ship-l': {
+              component_id: 'ship-l',
+              code: 'L-001',
+              macro: 'ship_arg_l_trans_container_01_a_macro',
+              class: 'ship_l',
+              assignment: { state: 'none' },
+              default_order: { id: 'wait', order: 'Wait', failed: false },
+              orders: [],
+              is_repeat: false
+            }
+          }
+        }
+      },
+      isCompatible: true,
+      isValid: true
+    } satisfies SaveArchive
+    const saveStore = useSaveStore()
+
+    await saveStore.addArchive(archive)
+    expect(dbMocks.saveArchiveToDB).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        sectors: expect.objectContaining({
+          sector_alpha: expect.objectContaining({
+            player_ships: archive.sectors.sector_alpha.player_ships
+          })
+        })
+      })
+    )
+
+    saveStore.clearSelection()
+    dbMocks.loadArchiveDetailFromDB.mockResolvedValue(archive)
+    await saveStore.selectArchive('ships', 12)
+
+    expect(saveStore.selectedArchive?.sectors.sector_alpha?.player_ships).toEqual(
+      archive.sectors.sector_alpha.player_ships
+    )
+    expect(saveStore.selectedArchivePlayerShips).toEqual([
+      expect.objectContaining({
+        componentId: 'ship-l',
+        sectorMacro: 'sector_alpha',
+        class: 'ship_l',
+        availability: 'immediatelyAvailable'
+      })
+    ])
   })
 })

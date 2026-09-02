@@ -33,6 +33,7 @@ import ImportPlanModal from '@/components/empire/ImportPlanModal.vue'
 import TechTreePlaceholder from '@/components/empire/TechTreePlaceholder.vue'
 import ResearchWorkbench from '@/components/empire/ResearchWorkbench.vue'
 import BlueprintRecipeWorkbench from '@/components/empire/BlueprintRecipeWorkbench.vue'
+import NpcTradeWorkbench from '@/components/empire/NpcTradeWorkbench.vue'
 import SectorOverviewPanel from '@/components/empire/sector-overview/SectorOverviewPanel.vue'
 import AutoSectorGroupPanel from '@/components/map/AutoSectorGroupPanel.vue'
 
@@ -64,7 +65,7 @@ watch(() => activeViewStore.activeBinding, (newGuid) => {
     liveStore.activateBinding(newGuid)
     terraformingStore.ensurePlanForContext('live', newGuid)
   }
-})
+}, { immediate: true })
 
 const sidebarPresenter = useProductionSidebarPresenter(liveStore)
 const toolbarPresenter = useProductionToolbarPresenter(liveStore)
@@ -194,6 +195,7 @@ function openShipBuildForTransportSelection() {
       :show-terraforming="sidebarPresenter.props.showTerraforming"
       :show-tech-tree="sidebarPresenter.props.showTechTree"
       :show-research="sidebarPresenter.props.showResearch"
+      :show-npc-trade="sidebarPresenter.props.showNpcTrade"
       :show-blueprint-recipe="sidebarPresenter.props.showBlueprintRecipe"
       :show-auto-sector-group="sidebarPresenter.props.showAutoSectorGroup"
       :auto-sector-group-disabled="sidebarPresenter.props.autoSectorGroupDisabled.value"
@@ -208,6 +210,7 @@ function openShipBuildForTransportSelection() {
       @select-terraforming="sidebarPresenter.emits.selectTerraforming"
       @select-tech-tree="sidebarPresenter.emits.selectTechTree"
       @select-research="sidebarPresenter.emits.selectResearch"
+      @select-npc-trade="sidebarPresenter.emits.selectNpcTrade"
       @select-blueprint-recipe="sidebarPresenter.emits.selectBlueprintRecipe"
       @select-auto-sector-group="sidebarPresenter.emits.selectAutoSectorGroup"
       @select-terraforming-cluster="(clusterId: string) => {
@@ -309,6 +312,8 @@ function openShipBuildForTransportSelection() {
   <ResearchWorkbench v-else-if="toolbarPresenter.props.workbenchMode.value === 'research'" />
 
   <BlueprintRecipeWorkbench v-else-if="toolbarPresenter.props.workbenchMode.value === 'blueprint-recipe'" :playerData="playerBindingData" />
+
+  <NpcTradeWorkbench v-else-if="toolbarPresenter.props.workbenchMode.value === 'npc-trade'" />
 
   <AutoSectorGroupPanel
     v-else-if="toolbarPresenter.props.workbenchMode.value === 'auto-sector-group'"

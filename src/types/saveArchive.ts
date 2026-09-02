@@ -103,6 +103,49 @@ export interface WareAmount {
   amount: number
 }
 
+export interface PlayerShipCargo {
+  ware: string
+  amount: number
+}
+
+export type PlayerShipAssignmentState = 'none' | 'resolved' | 'unresolved'
+export type PlayerShipCommanderKind = 'station' | 'ship'
+
+export interface PlayerShipAssignment {
+  state: PlayerShipAssignmentState
+  commander_id?: string
+  commander_kind?: PlayerShipCommanderKind
+  commander_ref?: string
+  role?: string
+}
+
+export interface PlayerShipOrderTarget {
+  name: string
+  value: string
+}
+
+export interface PlayerShipOrderSummary {
+  id: string
+  order: string
+  state?: string
+  failed: boolean
+  targets?: PlayerShipOrderTarget[]
+}
+
+export interface PlayerShipEntry {
+  component_id: string
+  code: string
+  name?: string
+  macro: string
+  class: string
+  relative_position: { x: number; y: number; z: number }
+  cargo?: PlayerShipCargo[]
+  assignment: PlayerShipAssignment
+  default_order?: PlayerShipOrderSummary
+  orders?: PlayerShipOrderSummary[]
+  is_repeat: boolean
+}
+
 export interface StationTradeOverrides {
   max?: WareAmount[]
   buy?: WareAmount[]
@@ -189,6 +232,8 @@ export interface PlayerStationEntry extends StationBaseEntry {
 export interface NpcStationEntry extends StationBaseEntry {
   modules?: AggregatedStationModule[]
   equipments?: AggregatedEquipment[]
+  tradeOffers?: NpcTradeOffer[]
+  buildStorage?: NpcBuildStorageEntry
   isShipyard?: boolean
   isWharf?: boolean
   isEquipmentdock?: boolean
@@ -201,6 +246,22 @@ export interface NpcStationEntry extends StationBaseEntry {
   isDefencemodule?: boolean
   isNest?: boolean
   isHive?: boolean
+}
+
+export interface NpcTradeOffer {
+  tradeId: string
+  ware: string
+  side: 'buy' | 'sell'
+  price: number
+  amount: number
+  desired?: number
+  flags: string[]
+}
+
+export interface NpcBuildStorageEntry {
+  componentId: string
+  code: string
+  tradeOffers?: NpcTradeOffer[]
 }
 
 export interface FactionStationEntry extends StationBaseEntry {
@@ -349,6 +410,7 @@ export interface SectorData {
   datavaults?: CodeMap<DatavaultEntry>
   erlking_vaults?: CodeMap<DatavaultEntry>
   abandoned_ships?: CodeMap<AbandonedShipEntry>
+  player_ships?: CodeMap<PlayerShipEntry>
 }
 
 export interface SaveArchive {

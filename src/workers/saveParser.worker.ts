@@ -489,6 +489,10 @@ class X4SaveParser {
       return true
     }
 
+    if (this.isAtTags('component', 'trade', 'offers', 'production', 'trade')) {
+      return true
+    }
+
     return false
   }
 }
@@ -665,6 +669,7 @@ export function createComponentXmlFilterRuntime(options: {
 
 export function createSaveXmlFilterRuntime(options: {
   currentVersion?: string | null
+  componentFilter?: { className: string; codes: string[] } | null
   write: (chunk: string) => void
 }): SaveXmlFilterRuntime {
   const currentVersion = options.currentVersion ?? null
@@ -730,7 +735,14 @@ export function createSaveXmlFilterRuntime(options: {
     }
 
     const captureKind = parser.getCurrentXmlCaptureKind()
-    const isCaptureRoot = !insideCapture && captureKind !== null
+    const filter = options.componentFilter
+    const matchesFilter = !filter
+      || captureKind === 'game'
+      || captureKind === 'player'
+      || (node.name === 'component'
+        && (!filter.className || node.attributes.class === filter.className)
+        && filter.codes.includes(String(node.attributes.code || '')))
+    const isCaptureRoot = !insideCapture && captureKind !== null && matchesFilter
     if (isCaptureRoot) {
       for (const ancestor of pathStack.slice(1, -1)) {
         const key = `${ancestor.depth}:${ancestor.name}:${ancestor.attrStr}`

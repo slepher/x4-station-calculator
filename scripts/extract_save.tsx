@@ -20,6 +20,7 @@ interface FilteredXmlRuntime {
 
 interface FilteredXmlRuntimeOptions {
   expectedVersion: string | null
+  componentFilter?: ComponentFilterOptions | null
   write: (chunk: string) => void
 }
 
@@ -109,6 +110,7 @@ function printHelp(): void {
   console.log('  vite-node scripts/extract_save.tsx save_009.xml.gz --wasm')
   console.log('  vite-node scripts/extract_save.tsx save_009.xml out.json --version 8.0')
   console.log('  vite-node scripts/extract_save.tsx save_009.xml --xml')
+  console.log('  vite-node scripts/extract_save.tsx save_009.xml out.xml --xml --class station --code ROK-388')
   console.log('  vite-node scripts/extract_save.tsx save_009.xml --query-xml \'<component class="station"/>\'')
   console.log('  vite-node scripts/extract_save.tsx save_009.xml --class station --code XAJ-926,FIX-154')
   console.log('  vite-node scripts/extract_save.tsx save_009.xml --terraforming')
@@ -425,14 +427,20 @@ function isWasmParserDone(parser: { progress_json: () => string }): boolean {
 export function createFilteredSaveXmlRuntime(options: FilteredXmlRuntimeOptions): FilteredXmlRuntime {
   return createSaveXmlFilterRuntime({
     currentVersion: options.expectedVersion,
+    componentFilter: options.componentFilter,
     write: options.write
   })
 }
 
-export function extractFilteredSaveXmlFromString(xml: string, expectedVersion: string | null): FilteredXmlResult {
+export function extractFilteredSaveXmlFromString(
+  xml: string,
+  expectedVersion: string | null,
+  componentFilter?: ComponentFilterOptions | null
+): FilteredXmlResult {
   const output: string[] = []
   const runtime = createFilteredSaveXmlRuntime({
     expectedVersion,
+    componentFilter,
     write: (chunk) => output.push(chunk)
   })
   runtime.feed(xml)
@@ -959,7 +967,12 @@ async function extractSaveSaxJs(inputPath: string, outputPath: string, expectedV
   return archive
 }
 
-async function extractSaveToXml(inputPath: string, outputPath: string, expectedVersion: string | null): Promise<void> {
+async function extractSaveToXml(
+  inputPath: string,
+  outputPath: string,
+  expectedVersion: string | null,
+  componentFilter?: ComponentFilterOptions | null
+): Promise<void> {
   const absoluteInput = path.resolve(process.cwd(), inputPath)
   const absoluteOutput = path.resolve(process.cwd(), outputPath)
   const gzip = isGzipFile(absoluteInput)
@@ -985,6 +998,7 @@ async function extractSaveToXml(inputPath: string, outputPath: string, expectedV
   const outputFd = fs.openSync(absoluteOutput, 'w')
   const runtime = createFilteredSaveXmlRuntime({
     expectedVersion,
+    componentFilter,
     write: (chunk) => {
       fs.writeSync(outputFd, chunk)
     }
@@ -1178,7 +1192,7 @@ async function main(): Promise<void> {
         })
       }
       await extractSaveRawBlocks(input, targets)
-    } else if (componentFilter) {
+    } else if (componentFilter && !outputXml) {
       const outputPath = output || defaultComponentOutputPath(input, componentFilter.className, componentFilter.codes)
       await extractSaveComponentXml(input, outputPath, componentFilter)
     } else if (queryXml) {
@@ -1187,7 +1201,7 @@ async function main(): Promise<void> {
       if (useWasm) {
         console.error('[extract_save] --xml mode does not support --wasm, using JS parser')
       }
-      await extractSaveToXml(input, output || defaultOutputPath(input, true), expectedVersion)
+      await extractSaveToXml(input, output || defaultOutputPath(input, true), expectedVersion, componentFilter)
     } else if (useWasm) {
       await extractSaveWasm(input, output || defaultOutputPath(input, false), expectedVersion, skipPost)
     } else {
