@@ -521,7 +521,11 @@ export function buildStationProductsFromFlows(input: {
     if (flow.netRate <= 0 || priority <= 0) continue
 
     const ware = input.waresMap[flow.wareId]
-    const tier = ware ? ware.tier : flow.tier
+    let tier = flow.tier
+    if (ware) {
+      if (ware.tier === null) continue
+      tier = ware.tier
+    }
     const existing = byWare.get(flow.wareId)
     if (existing) {
       existing.netRate += flow.netRate

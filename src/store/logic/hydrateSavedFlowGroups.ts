@@ -103,7 +103,10 @@ export function hydrateSavedFlowGroups(
     for (const savedNode of savedGroup.nodes) {
       if (!savedNode.isolated) continue
       const ware = deps.waresMap[savedNode.isolated]
-      if (!ware) continue
+      if (!ware || ware.tier === null) {
+        console.warn('[hydrateSavedFlowGroups] Skip isolated saved node with missing or unranked ware:', savedNode)
+        continue
+      }
       const lineage = newGroup.isLocked ? (newGroup.lockedLineage || 'default') : (newGroup.subCategory || 'default')
       const isolatedNode: FlowNode = {
         id: crypto.randomUUID(),
@@ -128,7 +131,10 @@ export function hydrateSavedFlowGroups(
       const wareId = resolveModuleOutputWareId(savedNode.module, deps.modulesMap)
       if (!wareId) continue
       const ware = deps.waresMap[wareId]
-      if (!ware) continue
+      if (!ware || ware.tier === null) {
+        console.warn('[hydrateSavedFlowGroups] Skip saved module node with missing or unranked output ware:', savedNode)
+        continue
+      }
 
       const lineage = newGroup.isLocked
         ? (newGroup.lockedLineage || 'default')

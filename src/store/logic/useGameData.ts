@@ -750,10 +750,10 @@ export function precomputeCandidateWares(
       if (visited.has(wareId)) return
       visited.add(wareId)
 
-      resultSet.add(wareId)
-
       const ware = waresMap[wareId]
-      if (ware && !((modulesByOutputMap[wareId]?.length ?? 0) > 0)) return
+      if (!ware || ware.tier === null) return
+      resultSet.add(wareId)
+      if (!((modulesByOutputMap[wareId]?.length ?? 0) > 0)) return
 
       const module = findModuleForWare(wareId, raceKey, modulesByOutputMap)
       if (module && module.inputs) {
@@ -781,10 +781,10 @@ export function precomputeCandidateWares(
       if (visited.has(wareId)) return
       visited.add(wareId)
 
-      resultSet.add(wareId)
-
       const ware = waresMap[wareId]
-      if (ware && !((modulesByOutputMap[wareId]?.length ?? 0) > 0)) return
+      if (!ware || ware.tier === null) return
+      resultSet.add(wareId)
+      if (!((modulesByOutputMap[wareId]?.length ?? 0) > 0)) return
 
       const module = findModuleForWare(wareId, race, modulesByOutputMap)
       if (module && module.inputs) {

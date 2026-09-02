@@ -55,7 +55,7 @@ const filteredWares = computed(() => {
     })
     .sort((a, b) => {
       // 1. 按 Tier 升序 (0, 1, 2, 3)
-      if (a.tier !== b.tier) return a.tier - b.tier
+      if (a.tier !== b.tier) return a.tier! - b.tier!
       
       if (a.tier === 0) {
         const aRaw = gameData.isRawMaterialWare(a.id)
@@ -92,7 +92,7 @@ const isWarePlanned = (wareId: string) => {
 const waresByTier = computed(() => {
   const groups: Record<number, any[]> = { 0: [], 1: [], 2: [], 3: [] }
   filteredWares.value.forEach(w => {
-    const list = groups[w.tier]
+    const list = groups[w.tier!]
     if (list) {
       list.push(w)
     }

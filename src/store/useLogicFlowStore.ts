@@ -116,7 +116,8 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
   // 同步到 state 以便持久化（可选，但目前主要用于测试注入）
   const startDragging = (wareId: string, lineage?: string) => {
     const gameDataStore = useGameDataStore()
-    if (gameDataStore.isRawMaterialWare(wareId)) {
+    const ware = gameDataStore.waresMap[wareId]
+    if (!ware || ware.tier === null || gameDataStore.isRawMaterialWare(wareId)) {
       return
     }
     isDragging.value = true
@@ -157,7 +158,7 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     // 生成预览节点
     const lineage = draggingLineage.value || 'default'
     const ware = gameData.waresMap[draggingWareId.value]
-    if (!ware) return
+    if (!ware || ware.tier === null) return
     
     const previewNode: FlowNode = {
       id: `preview-${draggingWareId.value}`,
@@ -203,7 +204,7 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     if (targetGroupId === 'new') {
       // 创建新产线组
       const ware = gameData.waresMap[draggingWareId.value]
-      if (ware) {
+      if (ware && ware.tier !== null) {
         const isAgricultural = ['agricultural', 'food', 'pharmaceutical', 'water', 'ice'].includes(ware.group)
         const category = isAgricultural ? 'agricultural' : 'industrial'
         const subCategory = lineage || (category === 'industrial' ? 'default' : 'argon')
@@ -925,6 +926,9 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     const group = groups.value.find(g => g.id === groupId)
     if (!group) return 'available'
 
+    const ware = gameData.waresMap[wareId]
+    if (!ware || ware.tier === null) return 'rejected'
+
     if (gameData.isRawMaterialWare(wareId)) {
       return 'available'
     }
@@ -1157,6 +1161,10 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
           console.warn('[LogicFlowStore] Skip isolated saved node with unknown ware:', savedNode)
           continue
         }
+        if (ware.tier === null) {
+          console.warn('[LogicFlowStore] Skip isolated saved node with unranked ware:', savedNode)
+          continue
+        }
         const lineage = newGroup.isLocked ? (newGroup.lockedLineage || 'default') : (newGroup.subCategory || 'default')
         const isolatedNode: FlowNode = {
           id: crypto.randomUUID(),
@@ -1190,6 +1198,10 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
         const ware = gameData.waresMap[wareId]
         if (!ware) {
           console.warn('[LogicFlowStore] Skip saved module node with unknown output ware:', savedNode)
+          continue
+        }
+        if (ware.tier === null) {
+          console.warn('[LogicFlowStore] Skip saved module node with unranked output ware:', savedNode)
           continue
         }
 

@@ -14,7 +14,8 @@ export interface X4Ware {
   price: number;      // 平均价格
   minPrice: number;   // 最低价格
   maxPrice: number;   // 最高价格
-  tier: number;       // 物品层级
+  tier: number | null; // 物品层级，null 表示不属于生产网络
+  transmutable: boolean;
   group: string;      // 物品分组 (hightech, shiptech, refined, food, etc.)
 }
 
