@@ -340,7 +340,7 @@ class X4PrecisionLoader:
                         self.race_consumption[method][state] = consumables
 
                 # A. 商品
-                if transport in {'container', 'solid', 'liquid'} and 'module' not in tags:
+                if transport in {'container', 'solid', 'liquid', 'condensate'} and 'module' not in tags:
                     p_node = ware.find('price')
                     volume = int(ware.get('volume') or 0)
                     if p_node is not None:

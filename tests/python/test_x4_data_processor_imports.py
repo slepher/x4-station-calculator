@@ -26,6 +26,21 @@ class X4DataProcessorImportTests(unittest.TestCase):
 
         self.assertEqual(module.process_map_for_version.__module__, "processor.step1_map.service")
 
+    def test_includes_condensate_ware(self):
+        module = load_module()
+        config = module.merge_version_config(module._config, module._config["versions"][0])
+        loader = module.X4PrecisionLoader(
+            REPO_ROOT / "x4raw_assets" / config["folder_name"],
+            REPO_ROOT / "src" / "assets" / "x4_game_data" / config["folder_name"],
+            config,
+        )
+
+        loader.build_database()
+
+        condensate = next((ware for ware in loader.wares_data if ware["id"] == "condensate"), None)
+        self.assertIsNotNone(condensate)
+        self.assertEqual(condensate["transport"], "condensate")
+
 
 if __name__ == "__main__":
     unittest.main()
