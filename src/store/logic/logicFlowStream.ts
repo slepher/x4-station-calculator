@@ -41,7 +41,7 @@ export function computeExpandUpstream(
   }
 
   const ware = ctx.waresMap[wareId]
-  if (!ware) return result
+  if (!ware || ware.tier === null) return result
 
   const isRawMaterial = isRawMaterialWare(wareId, ctx.modulesByOutputMap || {})
   if (isRawMaterial) {
@@ -144,7 +144,7 @@ export function traceWareDependencies(
     visitedTraces.add(traceKey)
 
     const ware = ctx.waresMap[wareId]
-    if (!ware) return
+    if (!ware || ware.tier === null) return
 
     collectedWares.add(wareId)
 

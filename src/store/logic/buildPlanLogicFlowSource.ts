@@ -112,7 +112,10 @@ function rebuildGroupsFromSavedPlan(
     for (const savedNode of savedGroup.nodes) {
       if (!savedNode.isolated) continue
       const ware = ctx.waresMap[savedNode.isolated]
-      if (!ware) continue
+      if (!ware || ware.tier === null) {
+        console.warn('[BuildPlan] Skip isolated saved node with missing or unranked ware:', savedNode)
+        continue
+      }
       const lineage = group.isLocked ? (group.lockedLineage || 'default') : (group.subCategory || 'default')
       insertNodeSorted(group, {
         id: crypto.randomUUID(),
@@ -136,7 +139,10 @@ function rebuildGroupsFromSavedPlan(
       const wareId = resolveModuleOutputWareId(savedNode.module, ctx.modulesMap)
       if (!wareId) continue
       const ware = ctx.waresMap[wareId]
-      if (!ware) continue
+      if (!ware || ware.tier === null) {
+        console.warn('[BuildPlan] Skip saved module node with missing or unranked output ware:', savedNode)
+        continue
+      }
 
       const lineage = group.isLocked
         ? (group.lockedLineage || 'default')

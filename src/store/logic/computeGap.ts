@@ -11,11 +11,10 @@ function addInputConsumption(
   for (const m of modules) {
     const mod = modulesMap[m.id]
     if (!mod || !mod.inputs) continue
-    const cycleHourly = 3600 / (mod.cycleTime || 60)
     for (const w of requiredWares) {
-      const inputPerCycle = mod.inputs[w]
-      if (inputPerCycle) {
-        gap[w] = (gap[w] || 0) + inputPerCycle * m.count * cycleHourly
+      const inputPerHour = mod.inputs[w]
+      if (inputPerHour) {
+        gap[w] = (gap[w] || 0) + inputPerHour * m.count
       }
     }
   }

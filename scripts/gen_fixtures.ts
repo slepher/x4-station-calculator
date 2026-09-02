@@ -269,7 +269,7 @@ function generateWareFixtures(wareIds: Set<string>, waresMap: Record<string, X4W
 
   wareIds.forEach((wareId) => {
     const ware = waresMap[wareId]
-    if (ware) {
+    if (ware && ware.tier !== null) {
       fixtures.push({
         id: ware.id,
         name: ware.name,

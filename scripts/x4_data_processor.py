@@ -345,7 +345,7 @@ class X4PrecisionLoader:
                     volume = int(ware.get('volume') or 0)
                     if p_node is not None:
                         is_valid = True
-                        self.wares_data.append({
+                        ware_data = {
                             "id": w_id, 
                             "nameId": raw_name, # 原始引用 Key
                             "group": group,
@@ -355,8 +355,11 @@ class X4PrecisionLoader:
                             "price": int(p_node.get('average') or 0),
                             "volume": volume,
                             "minPrice": int(p_node.get('min') or 0),
-                            "maxPrice": int(p_node.get('max') or 0)
-                        })
+                            "maxPrice": int(p_node.get('max') or 0),
+                            "transmutable": "transmutable" in self._split_tags(tags)
+                        }
+                        if w_id != 'nividiumgems':
+                            self.wares_data.append(ware_data)
 
                 # B. 模块
                 if 'module' in tags:
@@ -383,7 +386,7 @@ class X4PrecisionLoader:
             self._calculate_tiers()
             # 注入 Tier 到 wares_data 
             for item in self.wares_data:
-                item['tier'] = self.ware_tier_map.get(item['id'], 0)
+                item['tier'] = self.ware_tier_map.get(item['id'])
                 
             print(f"   ℹ️  发现生产方式: {sorted(list(self.all_methods))}")
 
@@ -393,6 +396,15 @@ class X4PrecisionLoader:
     # 1.1 计算物品生产层级 (Tier)
     # =======================================================
     def _calculate_tiers(self):
+        produced_ware_ids = set(self.recipes)
+        consumed_ware_ids = {
+            input_id
+            for recipe_group in self.recipes.values()
+            for recipe in recipe_group.values()
+            for input_id in recipe['inputs']
+        }
+        network_ware_ids = produced_ware_ids | consumed_ware_ids
+
         def get_tier(ware_id, visited=None):
             if visited is None: visited = set()
             if ware_id in self.ware_tier_map: return self.ware_tier_map[ware_id]
@@ -414,7 +426,8 @@ class X4PrecisionLoader:
             return tier
 
         for ware in self.wares_data:
-            get_tier(ware['id'])
+            if ware['id'] in network_ware_ids:
+                get_tier(ware['id'])
 
     # =======================================================
     # 1.2 加载颜色库
@@ -719,6 +732,7 @@ class X4PrecisionLoader:
                             if p_wares:
                                 production_configs.append((p_wares, prod_tag.get('method', 'default')))
                         
+                        queue_recipes = []
                         for p_id, p_method in production_configs:
                             macro_method_set.add(p_method)
                             module_data['method'] = p_method
@@ -732,8 +746,13 @@ class X4PrecisionLoader:
                             if not recipe:
                                 recipe = self.recipes.get(p_id, {}).get('default')
                             if recipe:
-                                factor = 3600 / recipe['time']
-                                module_data["cycleTime"] = recipe['time']
+                                queue_recipes.append((p_id, recipe))
+
+                        sequence_time = sum(recipe['time'] for _, recipe in queue_recipes)
+                        if sequence_time > 0:
+                            factor = 3600 / sequence_time
+                            module_data["cycleTime"] = sequence_time
+                            for p_id, recipe in queue_recipes:
                                 module_data["outputs"][p_id] = module_data["outputs"].get(p_id, 0) + round(recipe['amount'] * factor, 2)
                                 for k, v in recipe['inputs'].items():
                                     module_data["inputs"][k] = module_data["inputs"].get(k, 0) + round(v * factor, 2)

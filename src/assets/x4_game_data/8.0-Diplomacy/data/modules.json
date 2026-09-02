@@ -5579,19 +5579,19 @@
       "hullparts": 1100
     },
     "tier": 3,
-    "cycleTime": 300.0,
+    "cycleTime": 600.0,
     "workforce": {
       "capacity": 0,
       "needed": 1250,
       "maxBonus": 0.37
     },
     "outputs": {
-      "claytronics": 720.0,
-      "hullparts": 2400.0
+      "claytronics": 360.0,
+      "hullparts": 1200.0
     },
     "inputs": {
-      "energycells": 186000.0,
-      "scrapmetal": 4500.0
+      "energycells": 93000.0,
+      "scrapmetal": 2250.0
     },
     "dockingCount": 0,
     "buildProcessorCount": 0,
@@ -6856,19 +6856,19 @@
       "siliconcarbide": 21
     },
     "tier": 2,
-    "cycleTime": 300.0,
+    "cycleTime": 600.0,
     "workforce": {
       "capacity": 0,
       "needed": 1250,
       "maxBonus": 0.2
     },
     "outputs": {
-      "computronicsubstrate": 600.0,
-      "siliconcarbide": 720.0
+      "computronicsubstrate": 300.0,
+      "siliconcarbide": 360.0
     },
     "inputs": {
-      "energycells": 198000.0,
-      "scrapmetal": 15000.0
+      "energycells": 99000.0,
+      "scrapmetal": 7500.0
     },
     "dockingCount": 0,
     "buildProcessorCount": 0,

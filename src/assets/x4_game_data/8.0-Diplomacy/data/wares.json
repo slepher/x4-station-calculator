@@ -10,6 +10,7 @@
     "volume": 32,
     "minPrice": 432,
     "maxPrice": 648,
+    "transmutable": false,
     "tier": 2
   },
   {
@@ -23,6 +24,7 @@
     "volume": 30,
     "minPrice": 710,
     "maxPrice": 1318,
+    "transmutable": false,
     "tier": 3
   },
   {
@@ -36,6 +38,7 @@
     "volume": 18,
     "minPrice": 121,
     "maxPrice": 282,
+    "transmutable": false,
     "tier": 1
   },
   {
@@ -49,6 +52,7 @@
     "volume": 10,
     "minPrice": 248,
     "maxPrice": 461,
+    "transmutable": false,
     "tier": 3
   },
   {
@@ -62,6 +66,7 @@
     "volume": 24,
     "minPrice": 1734,
     "maxPrice": 2346,
+    "transmutable": false,
     "tier": 3
   },
   {
@@ -75,6 +80,7 @@
     "volume": 30,
     "minPrice": 685,
     "maxPrice": 1142,
+    "transmutable": false,
     "tier": 3
   },
   {
@@ -88,6 +94,7 @@
     "volume": 1,
     "minPrice": 10,
     "maxPrice": 22,
+    "transmutable": false,
     "tier": 0
   },
   {
@@ -101,6 +108,7 @@
     "volume": 15,
     "minPrice": 128,
     "maxPrice": 237,
+    "transmutable": false,
     "tier": 2
   },
   {
@@ -114,6 +122,7 @@
     "volume": 15,
     "minPrice": 247,
     "maxPrice": 576,
+    "transmutable": false,
     "tier": 3
   },
   {
@@ -127,6 +136,7 @@
     "volume": 1,
     "minPrice": 12,
     "maxPrice": 29,
+    "transmutable": false,
     "tier": 3
   },
   {
@@ -140,6 +150,7 @@
     "volume": 20,
     "minPrice": 100,
     "maxPrice": 233,
+    "transmutable": false,
     "tier": 1
   },
   {
@@ -153,6 +164,7 @@
     "volume": 6,
     "minPrice": 37,
     "maxPrice": 51,
+    "transmutable": false,
     "tier": 0
   },
   {
@@ -166,6 +178,7 @@
     "volume": 12,
     "minPrice": 146,
     "maxPrice": 272,
+    "transmutable": false,
     "tier": 2
   },
   {
@@ -179,6 +192,7 @@
     "volume": 6,
     "minPrice": 49,
     "maxPrice": 67,
+    "transmutable": false,
     "tier": 0
   },
   {
@@ -192,6 +206,7 @@
     "volume": 8,
     "minPrice": 26,
     "maxPrice": 35,
+    "transmutable": false,
     "tier": 0
   },
   {
@@ -205,6 +220,7 @@
     "volume": 6,
     "minPrice": 94,
     "maxPrice": 323,
+    "transmutable": false,
     "tier": 3
   },
   {
@@ -218,6 +234,7 @@
     "volume": 6,
     "minPrice": 35,
     "maxPrice": 81,
+    "transmutable": false,
     "tier": 2
   },
   {
@@ -231,6 +248,7 @@
     "volume": 6,
     "minPrice": 29,
     "maxPrice": 68,
+    "transmutable": false,
     "tier": 2
   },
   {
@@ -244,6 +262,7 @@
     "volume": 2,
     "minPrice": 43,
     "maxPrice": 89,
+    "transmutable": false,
     "tier": 3
   },
   {
@@ -257,6 +276,7 @@
     "volume": 6,
     "minPrice": 41,
     "maxPrice": 55,
+    "transmutable": false,
     "tier": 0
   },
   {
@@ -270,6 +290,7 @@
     "volume": 22,
     "minPrice": 805,
     "maxPrice": 1090,
+    "transmutable": false,
     "tier": 2
   },
   {
@@ -283,6 +304,7 @@
     "volume": 2,
     "minPrice": 6,
     "maxPrice": 13,
+    "transmutable": false,
     "tier": 3
   },
   {
@@ -296,20 +318,8 @@
     "volume": 10,
     "minPrice": 434,
     "maxPrice": 587,
+    "transmutable": false,
     "tier": 0
-  },
-  {
-    "id": "nividiumgems",
-    "nameId": "(TEMP)nividiumgems",
-    "group": "",
-    "name": "(TEMP)nividiumgems",
-    "dlc_tag": "base",
-    "transport": "container",
-    "price": 1077,
-    "volume": 2,
-    "minPrice": 646,
-    "maxPrice": 1507,
-    "tier": 1
   },
   {
     "id": "nostropoil",
@@ -322,6 +332,7 @@
     "volume": 1,
     "minPrice": 20,
     "maxPrice": 47,
+    "transmutable": false,
     "tier": 3
   },
   {
@@ -335,6 +346,7 @@
     "volume": 10,
     "minPrice": 43,
     "maxPrice": 58,
+    "transmutable": false,
     "tier": 0
   },
   {
@@ -348,6 +360,7 @@
     "volume": 32,
     "minPrice": 769,
     "maxPrice": 1282,
+    "transmutable": false,
     "tier": 2
   },
   {
@@ -361,6 +374,7 @@
     "volume": 22,
     "minPrice": 225,
     "maxPrice": 375,
+    "transmutable": false,
     "tier": 2
   },
   {
@@ -374,6 +388,7 @@
     "volume": 10,
     "minPrice": 153,
     "maxPrice": 207,
+    "transmutable": false,
     "tier": 0
   },
   {
@@ -387,6 +402,7 @@
     "volume": 14,
     "minPrice": 89,
     "maxPrice": 207,
+    "transmutable": false,
     "tier": 1
   },
   {
@@ -400,6 +416,7 @@
     "volume": 38,
     "minPrice": 842,
     "maxPrice": 1264,
+    "transmutable": false,
     "tier": 2
   },
   {
@@ -413,6 +430,7 @@
     "volume": 10,
     "minPrice": 318,
     "maxPrice": 431,
+    "transmutable": false,
     "tier": 1
   },
   {
@@ -426,6 +444,7 @@
     "volume": 10,
     "minPrice": 113,
     "maxPrice": 264,
+    "transmutable": false,
     "tier": 3
   },
   {
@@ -439,6 +458,7 @@
     "volume": 10,
     "minPrice": 111,
     "maxPrice": 150,
+    "transmutable": false,
     "tier": 0
   },
   {
@@ -452,6 +472,7 @@
     "volume": 18,
     "minPrice": 180,
     "maxPrice": 419,
+    "transmutable": false,
     "tier": 1
   },
   {
@@ -465,6 +486,7 @@
     "volume": 2,
     "minPrice": 46,
     "maxPrice": 69,
+    "transmutable": false,
     "tier": 2
   },
   {
@@ -478,6 +500,7 @@
     "volume": 5,
     "minPrice": 40,
     "maxPrice": 93,
+    "transmutable": false,
     "tier": 2
   },
   {
@@ -491,6 +514,7 @@
     "volume": 1,
     "minPrice": 19,
     "maxPrice": 45,
+    "transmutable": false,
     "tier": 3
   },
   {
@@ -504,6 +528,7 @@
     "volume": 2,
     "minPrice": 60,
     "maxPrice": 207,
+    "transmutable": false,
     "tier": 3
   },
   {
@@ -517,6 +542,7 @@
     "volume": 3,
     "minPrice": 75,
     "maxPrice": 257,
+    "transmutable": false,
     "tier": 3
   },
   {
@@ -530,6 +556,7 @@
     "volume": 3,
     "minPrice": 12,
     "maxPrice": 28,
+    "transmutable": false,
     "tier": 2
   },
   {
@@ -543,6 +570,7 @@
     "volume": 5,
     "minPrice": 48,
     "maxPrice": 112,
+    "transmutable": false,
     "tier": 2
   },
   {
@@ -556,6 +584,7 @@
     "volume": 16,
     "minPrice": 90,
     "maxPrice": 211,
+    "transmutable": false,
     "tier": 1
   },
   {
@@ -569,6 +598,7 @@
     "volume": 6,
     "minPrice": 50,
     "maxPrice": 117,
+    "transmutable": false,
     "tier": 2
   },
   {
@@ -582,6 +612,7 @@
     "volume": 16,
     "minPrice": 121,
     "maxPrice": 283,
+    "transmutable": false,
     "tier": 1
   },
   {
@@ -595,6 +626,7 @@
     "volume": 20,
     "minPrice": 164,
     "maxPrice": 383,
+    "transmutable": false,
     "tier": 3
   },
   {
@@ -608,6 +640,7 @@
     "volume": 6,
     "minPrice": 32,
     "maxPrice": 74,
+    "transmutable": false,
     "tier": 1
   },
   {
@@ -621,6 +654,7 @@
     "volume": 20,
     "minPrice": 171,
     "maxPrice": 399,
+    "transmutable": false,
     "tier": 3
   },
   {
@@ -634,6 +668,7 @@
     "volume": 4,
     "minPrice": 19,
     "maxPrice": 44,
+    "transmutable": false,
     "tier": 2
   },
   {
@@ -647,6 +682,7 @@
     "volume": 7,
     "minPrice": 31,
     "maxPrice": 72,
+    "transmutable": false,
     "tier": 2
   },
   {
@@ -660,6 +696,7 @@
     "volume": 6,
     "minPrice": 17,
     "maxPrice": 40,
+    "transmutable": false,
     "tier": 2
   },
   {
@@ -673,6 +710,7 @@
     "volume": 50,
     "minPrice": 7452,
     "maxPrice": 9108,
+    "transmutable": false,
     "tier": 2
   },
   {
@@ -686,6 +724,7 @@
     "volume": 1,
     "minPrice": 42,
     "maxPrice": 57,
+    "transmutable": false,
     "tier": 1
   },
   {
@@ -699,6 +738,7 @@
     "volume": 4,
     "minPrice": 57,
     "maxPrice": 134,
+    "transmutable": false,
     "tier": 1
   },
   {
@@ -712,6 +752,7 @@
     "volume": 20,
     "minPrice": 1202,
     "maxPrice": 1627,
+    "transmutable": false,
     "tier": 2
   },
   {
@@ -725,6 +766,7 @@
     "volume": 12,
     "minPrice": 153,
     "maxPrice": 527,
+    "transmutable": false,
     "tier": 1
   },
   {
@@ -738,6 +780,7 @@
     "volume": 2,
     "minPrice": 32,
     "maxPrice": 75,
+    "transmutable": false,
     "tier": 2
   },
   {
@@ -751,7 +794,8 @@
     "volume": 10,
     "minPrice": 22500,
     "maxPrice": 27500,
-    "tier": 0
+    "transmutable": false,
+    "tier": null
   },
   {
     "id": "bofu",
@@ -764,6 +808,7 @@
     "volume": 4,
     "minPrice": 61,
     "maxPrice": 142,
+    "transmutable": false,
     "tier": 3
   },
   {
@@ -777,6 +822,7 @@
     "volume": 4,
     "minPrice": 44,
     "maxPrice": 102,
+    "transmutable": false,
     "tier": 2
   },
   {
@@ -790,6 +836,7 @@
     "volume": 1,
     "minPrice": 11,
     "maxPrice": 25,
+    "transmutable": false,
     "tier": 2
   }
 ]

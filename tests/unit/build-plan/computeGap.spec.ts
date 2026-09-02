@@ -37,7 +37,7 @@ describe('computeGap', () => {
     const { computeGap } = await import('@/store/logic/computeGap')
     const gap = computeGap(allocations, modulesMap)
 
-    // 2 modules × 8 quantumtubes/cycle ÷ 60s × 3600s/h = 960/h
-    expect(gap.quantumtubes).toBeCloseTo(960)
+    // Module inputs are already hourly rates.
+    expect(gap.quantumtubes).toBeCloseTo(16)
   })
 })
