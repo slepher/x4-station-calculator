@@ -244,6 +244,8 @@ export function buildAllocationVolumeGroups(params: BuildAllocationVolumeGroupsP
   ])
 
   for (const flow of derivedProductionFlows) {
+    // ponytail: allocations model production cargo; add a condensate group if Protectyon gains production flows.
+    if (flow.transportType === 'condensate') continue
     const ware = gameData.waresMap[flow.wareId]
     const localizedWare = gameData.localizedWaresMap[flow.wareId]
     const recommendedCount = Math.round(flow.totalOccupiedCount)

@@ -780,6 +780,19 @@
     "tier": 2
   },
   {
+    "id": "condensate",
+    "nameId": "{20201,6701}",
+    "group": "",
+    "name": "Protectyon",
+    "dlc_tag": "dlc_pirate",
+    "transport": "condensate",
+    "price": 25000,
+    "volume": 10,
+    "minPrice": 22500,
+    "maxPrice": 27500,
+    "tier": 0
+  },
+  {
     "id": "bofu",
     "nameId": "{20201,7101}",
     "group": "food",

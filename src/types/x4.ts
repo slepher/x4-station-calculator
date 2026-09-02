@@ -1,6 +1,6 @@
 import type { FlowContribution } from './production-flow'
 
-export type TransportType = 'container' | 'solid' | 'liquid';
+export type TransportType = 'container' | 'solid' | 'liquid' | 'condensate';
 /**
  * 基础商品接口 - 对应 wares.json
  */
