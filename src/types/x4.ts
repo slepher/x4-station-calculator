@@ -710,7 +710,7 @@ export interface ProductionLineGroup {
   id: string
   name: string // 用户自定义标题，为空时显示默认名称（最高 tier 的 manual 产线名称）
   category: 'industrial' | 'agricultural'
-  subCategory: string // 始终代表 race (工业: default/terran/teladi, 农业: 具体种族)
+  subCategory: string // UI subtype：工业可为 default/terran/teladi/recycling，农业为具体种族；recycling 不是 race
   isLocked: boolean // [新增] 组是否锁定血统
   lockedLineage: string // [新增] 锁定的血统
   nodes: FlowNode[]
@@ -727,7 +727,7 @@ export interface SavedFlowGroup {
   id: string
   name: string // 用户自定义标题，为空时显示默认名称
   category: 'industrial' | 'agricultural'
-  subCategory: string
+  subCategory: string // 持久化 UI subtype；recycling 不作为 lineage
   isLocked: boolean
   lockedLineage: string
   nodes: SavedFlowNode[]

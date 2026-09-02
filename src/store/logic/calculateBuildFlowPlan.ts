@@ -261,11 +261,7 @@ export function expandGoalDependencies(
     const countNeeded = Math.ceil(targetRate / outputRate)
     addModule(producer.id, countNeeded)
     for (const [inputWare, inputRate] of Object.entries(producer.inputs)) {
-      const isResource = waresMap[inputWare]?.transport === 'solid' || waresMap[inputWare]?.transport === 'liquid'
-      const hasProducer = Object.values(modulesMap).some(m => m.outputs[inputWare] && m.type === 'production')
-      if (!isResource && hasProducer) {
-        expandWareUpstream(inputWare, inputRate * countNeeded, visited)
-      }
+      expandWareUpstream(inputWare, inputRate * countNeeded, visited)
     }
   }
 

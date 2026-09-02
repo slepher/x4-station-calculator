@@ -149,7 +149,7 @@ export function useProductionPlanningPresenter(store: PlanningPresenterStore): U
   const effectiveAutoIndustryDisplayModules = computed(() =>
     buildEffectiveAutoDisplayModules(
       rawAutoIndustry.value,
-      (info) => info.type === 'production' && info.method !== 'recycling',
+      (info) => (info.type === 'production' || info.type === 'processingmodule') && info.method !== 'recycling',
       { excludeRecommended: true }
     )
   )

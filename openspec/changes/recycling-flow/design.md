@@ -56,7 +56,7 @@ Processor 保持原始 `type="processingmodule"` 与现有 `method="none"`，业
 - 新增 `findRecyclingModuleForWare(wareId, modulesByOutputMap)`：只接受 `method="recycling"` 且实际产出目标 Ware 的模块。
 - recycling outputs 在当前数据中可以唯一定位 Generic、Terran 或 Kha'ak Recycler；不新增 module picker。
 
-`precomputeCandidateWares` 为 `wareSetsByIndustrialRace.recycling` 建立独立集合，仅收集 recycling 模块全部 outputs，不把 Recycler 混入 default/terran/teladi 普通种子。
+`precomputeCandidateWares` 为 `wareSetsByIndustrialRace.recycling` 建立独立集合：先收集 recycling 模块全部 outputs，再从 Recycler inputs 开始使用普通生产者规则递归收集 Processor 产物和 Tier 0 输入；不把 Recycler 混入 default/terran/teladi 普通种子。
 
 ### D3: 根节点与自动上游使用不同选择规则
 
@@ -65,10 +65,10 @@ Processor 保持原始 `type="processingmodule"` 与现有 `method="none"`，业
 `computeExpandUpstream` 使用明确业务状态选择模块：
 
 ```text
-source == manual AND group.subCategory == recycling
+source == manual AND group.subCategory == recycling AND ware has recycling producer
   -> findRecyclingModuleForWare
 
-其他情况
+其他情况（包括 recycling 中手动添加 Tier 1 Processor 产物）
   -> findModuleForWare（普通生产者）
 ```
 
@@ -116,6 +116,8 @@ AND module.method != recycling
 
 Live Production 与 Blueprint Production 复用 `StationDerivedMap`、production actions 和共享选择器，不分别增加 processor 分支。
 
+生产界面的 planning presenter 将非 recycling 的 `production` 与 `processingmodule` 一并作为自动工业模块展示；自动补全结果本身不增加 UI 专用副本。
+
 ### D7: Build Plan 删除重复的资源启发式
 
 位置：
@@ -155,6 +157,7 @@ presenter 负责：
 
 - industrial/agricultural/recycling 子类型列表与标签；
 - 当前候选 Ware 的展示结构和排序；
+- recycling Tier 1 的可添加状态与 Tier 0 的只读状态；
 - quick add、拖拽、加入现有组等 UI 动作；
 - 根据 moduleId 组装多产出高亮信息。
 

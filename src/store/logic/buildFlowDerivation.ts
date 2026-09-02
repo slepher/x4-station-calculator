@@ -208,13 +208,14 @@ export function deriveBuildFlowView(
   archivedLineCards: BuildFlowLineCard[]
   buildFlowGroups: BuildFlowGroup[]
 } {
-  const demandMaterialSet = computeDemandMaterialSet(groups, modulesMap, archivedGroupIds)
+  const eligibleGroups = groups.filter(group => group.subCategory !== 'recycling')
+  const demandMaterialSet = computeDemandMaterialSet(eligibleGroups, modulesMap, archivedGroupIds)
   const archivedSet = new Set(archivedGroupIds || [])
 
   const activeItems: Array<{ group: ProductionLineGroup; sourceTags: BuildFlowTag[] }> = []
   const archivedItems: Array<{ group: ProductionLineGroup; sourceTags: BuildFlowTag[] }> = []
   
-  for (const group of groups) {
+  for (const group of eligibleGroups) {
     if (!isGroupInBuildFlow(group, demandMaterialSet)) continue
     const sourceTags = computeSourceTags(group, demandMaterialSet, getWareLabel)
     if (archivedSet.has(group.id)) {
@@ -262,6 +263,7 @@ export function computeVirtualEdges(
 
   const archivedSourceWareIds = new Map<string, string[]>()
   for (const group of allGroups) {
+    if (group.subCategory === 'recycling') continue
     if (!archivedSet.has(group.id)) continue
     const wares = getManualProductNodes(group).map(n => n.wareId)
     if (wares.length > 0) archivedSourceWareIds.set(group.id, wares)
@@ -362,11 +364,12 @@ export function cleanupStaleAssignments(
   modulesMap: Record<string, X4Module>,
   buildFlowGroups: BuildFlowGroup[]
 ): BuildFlowAssignment[] {
-  const groupIdSet = new Set(groups.map(g => g.id))
+  const eligibleGroups = groups.filter(group => group.subCategory !== 'recycling')
+  const groupIdSet = new Set(eligibleGroups.map(g => g.id))
   const buildFlowGroupIds = new Set<string>()
   const sourceTagWareIdsByGroup = new Map<string, Set<string>>()
 
-  for (const group of groups) {
+  for (const group of eligibleGroups) {
     if (!isGroupInBuildFlow(group, demandMaterialSet)) continue
     buildFlowGroupIds.add(group.id)
 
@@ -386,7 +389,7 @@ export function cleanupStaleAssignments(
 
   const buildMaterialTagWareIdsByGroup = new Map<string, Set<string>>()
   for (const groupId of buildFlowGroupIds) {
-    const group = groups.find(g => g.id === groupId)
+    const group = eligibleGroups.find(g => g.id === groupId)
     if (!group) continue
     const buildMatWares = new Set<string>()
     for (const node of getModuleScopeNodes(group, modulesMap)) {

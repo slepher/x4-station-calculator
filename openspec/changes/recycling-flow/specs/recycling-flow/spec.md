@@ -60,7 +60,14 @@
 
 ### Requirement: Recycling Logic Flow Expansion
 
-工业候选区 SHALL 提供 `recycling` 子类型，并从 recycling 模块全部 outputs 建立候选；Recycler 的自动上游 SHALL 使用普通生产者规则。
+工业候选区 SHALL 提供 `recycling` 子类型，并从 recycling 模块全部 outputs 及其普通上游链建立候选；Recycler 的自动上游 SHALL 使用普通生产者规则。
+
+#### Scenario: Recycling upstream candidates
+
+**前提** recycling 候选链包含 Scrap Processor 与其 Tier 0 输入
+**当** 用户查看或操作 recycling 子类型
+**那么** Tier 1 SHALL 显示 Scrap Metal，并允许添加对应 Scrap Processor
+**并且** Tier 0 SHALL 显示 Energy Cells 与 Raw Scrap 类输入，但不可添加
 
 #### Scenario: Generic recycler expansion
 
@@ -210,3 +217,13 @@ Build Plan 所有 Ware 生产者查找和依赖递归 SHALL 使用与 Station �
 **当** Vue 渲染 recycling 子类型并处理用户操作
 **那么** Vue SHALL 只通过 presenter 取数和触发行为
 **并且** SHALL NOT 新增对 store 或其他业务组装逻辑的直接访问
+
+### Requirement: Processing Modules In Auto Industry Display
+
+自动工业区 SHALL 显示自动补全结果中的非 recycling `processingmodule`，不得只显示 `production` 类型。
+
+#### Scenario: Scrap processor is auto-filled
+
+**前提** Recycler 的 Scrap Metal 缺口已使自动补全生成 Scrap Processor
+**当** 生产界面渲染自动工业区
+**那么** 自动工业区 SHALL 显示对应 Scrap Processor 及数量

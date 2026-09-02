@@ -49,6 +49,7 @@ import {
   buildLocalizedWaresMap,
   buildLocalizedShipsMap,
   findModuleForWare as findModuleForWareFn,
+  findRecyclingModuleForWare as findRecyclingModuleForWareFn,
   precomputeCandidateWares
 } from './logic/useGameData'
 import { isRawMaterialWare as isRawMaterialWareFn } from './logic/logicFlowStream'
@@ -290,6 +291,10 @@ export const useGameDataStore = defineStore('gameData', () => {
 
   function findModuleForWare(wareId: string, lineage: string): X4Module | null {
     return findModuleForWareFn(wareId, lineage, modulesByOutputMap.value)
+  }
+
+  function findRecyclingModuleForWare(wareId: string): X4Module | null {
+    return findRecyclingModuleForWareFn(wareId, modulesByOutputMap.value)
   }
 
   function isRawMaterialWare(wareId: string): boolean {
@@ -616,6 +621,7 @@ export const useGameDataStore = defineStore('gameData', () => {
     initialize,
     changeLanguage,
     findModuleForWare,
+    findRecyclingModuleForWare,
     isRawMaterialWare,
     getModuleDisplayName,
     getWareDisplayName,

@@ -9,6 +9,7 @@ vi.mock('@/store/useGameDataStore', () => ({
       orphan_mod: { id: 'orphan_mod', type: 'production', method: 'default' },
       support_mod: { id: 'support_mod', type: 'production', method: 'default' },
       energy_mod: { id: 'energy_mod', type: 'production', method: 'default' },
+      processor_mod: { id: 'processor_mod', type: 'processingmodule', method: 'none' },
       sol_terran: { id: 'sol_terran', type: 'production', method: 'default' },
       habitat_mod: { id: 'habitat_mod', type: 'habitation', method: 'default' },
       storage_mod: { id: 'storage_mod', type: 'storage', method: 'default' },
@@ -143,6 +144,29 @@ describe('useProductionPlanningPresenter', () => {
     ])
     expect(presenter.props.effectiveAutoIndustryModules.value).toEqual([
       { id: 'sol_terran', count: 2 }
+    ])
+  })
+
+  it('shows processing modules in auto industry', () => {
+    const store = reactive({
+      session: { workbenchMode: 'station', visualMode: 'planning' },
+      context: {},
+      stationState: {
+        plannedModules: [],
+        recommendedModules: [],
+        autoIndustryModules: [{ id: 'processor_mod', count: 1 }],
+        autoHabitationModules: [],
+        autoInfrastructureModules: [],
+        enforceDlcActivation: false
+      },
+      archiveStation: null,
+      moduleActions: { updatePlannedModules: vi.fn() }
+    })
+
+    const presenter = useProductionPlanningPresenter(store as any)
+
+    expect(presenter.props.effectiveAutoIndustryModules.value).toEqual([
+      { id: 'processor_mod', count: 1 }
     ])
   })
 

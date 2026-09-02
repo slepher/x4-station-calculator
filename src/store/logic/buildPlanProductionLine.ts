@@ -1284,12 +1284,7 @@ function expandGoalsRespectingLockedWares(
 
     for (const [inputWare, inputRate] of Object.entries(producer.inputs)) {
       if (lockedWares.has(inputWare)) continue
-      const ware = waresMap[inputWare]
-      const isResource = ware?.transport === 'solid' || ware?.transport === 'liquid'
-      const hasProducer = Object.values(modulesMap).some(module => module.outputs[inputWare] && module.type === 'production')
-      if (!isResource && hasProducer) {
-        expandWareUpstream(inputWare, inputRate * countNeeded, visited)
-      }
+      expandWareUpstream(inputWare, inputRate * countNeeded, visited)
     }
   }
 

@@ -4534,15 +4534,20 @@
       "energycells": 162,
       "hullparts": 733
     },
-    "tier": 0,
-    "cycleTime": 0,
+    "tier": 1,
+    "cycleTime": 60.0,
     "workforce": {
       "capacity": 0,
       "needed": 0,
       "maxBonus": 0
     },
-    "outputs": {},
-    "inputs": {},
+    "outputs": {
+      "scrapmetal": 9000.0
+    },
+    "inputs": {
+      "energycells": 90000.0,
+      "rawscrap": 9000.0
+    },
     "dockingCount": 0,
     "buildProcessorCount": 0,
     "buildShipClasses": [],

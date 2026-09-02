@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { computeExpandUpstream } from '@/store/logic/logicFlowStream'
+import { computeExpandUpstream, selectModuleForFlow } from '@/store/logic/logicFlowStream'
 import { precomputeCandidateWares } from '@/store/logic/useGameData'
 import { rebuildLogicFlowSnapshotFromPlan } from '@/store/logic/buildPlanLogicFlowSource'
 import type { LogicFlowPlan, X4Module, X4Ware } from '@/types/x4'
@@ -58,5 +58,45 @@ describe('Logic Flow tier boundary', () => {
 
     expect(snapshot.groups[0]?.nodes).toEqual([])
     expect(warn).toHaveBeenCalledOnce()
+  })
+
+  it('includes the recycling upstream chain and selects a processor for a manual tier 1 root', () => {
+    const waresMap = Object.fromEntries([
+      ['hullparts', 2],
+      ['scrapmetal', 1],
+      ['rawscrap', 0],
+      ['energycells', 0],
+    ].map(([id, tier]) => [id, { id, tier, transmutable: false } as X4Ware]))
+    const recycler = {
+      id: 'recycler', type: 'production', method: 'recycling', race: 'default', group: 'shiptech',
+      outputs: { hullparts: 1200 }, inputs: { scrapmetal: 2250, energycells: 93000 },
+    } as X4Module
+    const processor = {
+      id: 'processor', type: 'processingmodule', method: 'none', race: 'default', group: 'refined',
+      outputs: { scrapmetal: 9000 }, inputs: { rawscrap: 9000, energycells: 90000 },
+    } as X4Module
+    const solar = {
+      id: 'solar', type: 'production', method: 'default', race: 'default', group: 'energy',
+      outputs: { energycells: 1000 }, inputs: {},
+    } as X4Module
+    const modulesMap = { recycler, processor, solar }
+    const modulesByOutputMap = {
+      hullparts: [recycler],
+      scrapmetal: [processor],
+      energycells: [solar],
+    }
+
+    const candidates = precomputeCandidateWares(modulesMap, waresMap, modulesByOutputMap)
+    expect(candidates.wareSetsByIndustrialRace.recycling).toEqual(
+      new Set(['hullparts', 'scrapmetal', 'rawscrap', 'energycells'])
+    )
+
+    const group = { id: 'group', nodes: [], isLocked: false, subCategory: 'recycling' }
+    expect(selectModuleForFlow(
+      { waresMap, modulesMap, modulesByOutputMap }, group, 'scrapmetal', 'manual',
+    )).toEqual({ module: processor, lineage: 'default' })
+    expect(selectModuleForFlow(
+      { waresMap, modulesMap, modulesByOutputMap }, group, 'hullparts', 'manual',
+    )).toEqual({ module: recycler, lineage: 'default' })
   })
 })

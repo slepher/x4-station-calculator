@@ -58,11 +58,12 @@ function findConnection(
  */
 export function computeProductionLineAllocation(
   goals: BuildGoal[],
-  flowGroups: ProductionLineGroup[],
+  allFlowGroups: ProductionLineGroup[],
   buildFlowView: BuildFlowView | null,
   modulesMap: Record<string, X4Module>,
   modulesByOutputMap: Record<string, X4Module[]>,
 ): ProductionLineAllocation[] {
+  const flowGroups = allFlowGroups.filter(group => group.subCategory !== 'recycling')
   const groupMap = new Map<string, BuildGoal[]>()
   const unmatchedGoals: BuildGoal[] = []
 

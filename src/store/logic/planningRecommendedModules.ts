@@ -121,7 +121,11 @@ export function getReferenceProductionFloorModules(
   return mergeSavedModules(
     referenceModules.filter((module) => {
       const info = modulesMap[module.id]
-      return Boolean(info && info.type === 'production' && info.method !== 'recycling')
+      return Boolean(
+        info
+        && (info.type === 'production' || info.type === 'processingmodule')
+        && info.method !== 'recycling'
+      )
     })
   )
 }

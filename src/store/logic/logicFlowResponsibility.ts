@@ -114,11 +114,13 @@ function findModuleForWare(
   wareId: string,
   modulesByOutputMap: Record<string, X4Module[]>,
 ): X4Module | undefined {
-  const modules = modulesByOutputMap[wareId]
-  if (modules && modules.length > 0) {
-    return modules[0]
-  }
-  return undefined
+  return modulesByOutputMap[wareId]?.find(module => {
+    const hourlyRate = module.outputs[wareId]
+    return hourlyRate !== undefined
+      && hourlyRate > 0
+      && (module.type === 'production' || module.type === 'processingmodule')
+      && module.method !== 'recycling'
+  })
 }
 
 export function resolveGoalOwnerGroupId(
@@ -243,7 +245,8 @@ export function generateDerivedGoalsFromLogicFlow(
   modulesMap: Record<string, X4Module>,
   modulesByOutputMap: Record<string, X4Module[]>,
 ): { derivedGoals: BuildGoal[]; requiredMap: Map<string, string[]> } {
-  const covered = buildCoveredSet(userGoals, flowGroups, modulesMap)
+  const eligibleFlowGroups = flowGroups.filter(group => group.subCategory !== 'recycling')
+  const covered = buildCoveredSet(userGoals, eligibleFlowGroups, modulesMap)
   const seenIsolatedWares = new Set<string>()
   const allDerived: BuildGoal[] = []
   const requiredMap = new Map<string, string[]>()
@@ -256,10 +259,10 @@ export function generateDerivedGoalsFromLogicFlow(
       mod = modulesMap[goal.moduleId]
     }
     if (!mod) continue
-    const ownerGroupId = resolveGoalOwnerGroupId(goal, flowGroups, buildFlowView, modulesMap)
+    const ownerGroupId = resolveGoalOwnerGroupId(goal, eligibleFlowGroups, buildFlowView, modulesMap)
 
     const beforeSize = seenIsolatedWares.size
-    const derived = walkUpstream(mod, covered, flowGroups, modulesByOutputMap, seenIsolatedWares, ownerGroupId)
+    const derived = walkUpstream(mod, covered, eligibleFlowGroups, modulesByOutputMap, seenIsolatedWares, ownerGroupId)
     if (seenIsolatedWares.size > beforeSize) {
       const wares: string[] = []
       for (const item of derived) {

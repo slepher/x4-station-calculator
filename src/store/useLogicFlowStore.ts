@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed, watch } from 'vue'
 import { useGameDataStore } from './useGameDataStore'
-import { computeExpandUpstream, type ExpandContext, type GroupSnapshot } from './logic/logicFlowStream'
+import { computeExpandUpstream, selectModuleForFlow, type ExpandContext, type GroupSnapshot } from './logic/logicFlowStream'
 import { migrateFlowStateToCurrent } from './logic/stateMigrations'
 import { CURRENT_FLOW_VERSION } from './logic/storageVersions'
 import { getLogicFlowGroupDisplayName } from './logic/logicFlowGroupName'
@@ -37,6 +37,31 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
   const buildFlowAssignments = ref<BuildFlowAssignment[]>([])
   const isBuildFlowDragging = ref(false)
   const archivedBuildFlowGroupIds = ref<string[]>([])
+
+  function getExpandContext(): ExpandContext {
+    return {
+      waresMap: gameData.waresMap,
+      modulesMap: gameData.modulesMap,
+      modulesByOutputMap: gameData.modulesByOutputMap,
+      findModuleForWare: gameData.findModuleForWare,
+      findRecyclingModuleForWare: gameData.findRecyclingModuleForWare,
+    }
+  }
+
+  function getGroupSnapshot(group: ProductionLineGroup): GroupSnapshot {
+    return {
+      id: group.id,
+      nodes: group.nodes,
+      isLocked: group.isLocked,
+      lockedLineage: group.lockedLineage,
+      subCategory: group.subCategory,
+    }
+  }
+
+  function nodeProducesWare(node: FlowNode, wareId: string): boolean {
+    if (!node.moduleId) return node.wareId === wareId
+    return gameData.modulesMap[node.moduleId]?.outputs[wareId] !== undefined
+  }
 
   function buildSnapshot() {
     return JSON.stringify({ planName: currentPlanName.value, groups: groups.value, settings: settings.value, buildFlowAssignments: buildFlowAssignments.value })
@@ -298,7 +323,7 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
             if (inputWareId === 'energycells') return
             
             // 找到组内提供该输入的所有节点（包括 isolated 节点）
-            const sourceNodes = hoveredGroup!.nodes.filter(n => n.wareId === inputWareId)
+            const sourceNodes = hoveredGroup!.nodes.filter(node => nodeProducesWare(node, inputWareId))
             sourceNodes.forEach(sourceNode => {
               result.add(sourceNode.id)
               // 只有非隔离节点才继续递归追踪
@@ -321,7 +346,12 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
         if (!consumerNode.moduleId) return
 
         const module = gameData.modulesMap[consumerNode.moduleId]
-        if (module?.inputs && module.inputs[node.wareId] !== undefined) {
+        let outputWareIds = [node.wareId]
+        if (node.moduleId) {
+          const producer = gameData.modulesMap[node.moduleId]
+          if (producer) outputWareIds = Object.keys(producer.outputs)
+        }
+        if (module?.inputs && outputWareIds.some(outputWareId => module.inputs[outputWareId] !== undefined)) {
           result.add(consumerNode.id)
           // 只有非隔离节点才继续递归追踪
           if (!consumerNode.isIsolated) {
@@ -370,7 +400,7 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
         if (inputWareId === 'energycells') return
 
         // 找到提供该输入的节点
-        const sourceNodes = hoveredGroup!.nodes.filter(n => n.wareId === inputWareId)
+        const sourceNodes = hoveredGroup!.nodes.filter(sourceNode => nodeProducesWare(sourceNode, inputWareId))
         sourceNodes.forEach(sourceNode => {
           // 只有当两个节点都在高亮集合中时，才高亮连线
           if (highlightedNodeIds.value.has(sourceNode.id) && highlightedNodeIds.value.has(node.id)) {
@@ -387,11 +417,22 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
   /**
    * 计算指定 WareId 所需的所有 T0 资源（不含能量电池）
    */
-  function calculateRequiredRawMaterials(wareId: string, race: string = 'default'): Record<string, number> {
+  function calculateRequiredRawMaterials(
+    wareId: string,
+    lineage: string = 'default',
+    subCategory: string = lineage,
+  ): Record<string, number> {
     const res: Record<string, number> = {}
     const visited = new Set<string>()
+    const group: GroupSnapshot = {
+      id: '__candidate__',
+      nodes: [],
+      isLocked: false,
+      lockedLineage: '',
+      subCategory,
+    }
 
-    const trace = (id: string, amount: number) => {
+    const trace = (id: string, amount: number, source: 'manual' | 'auto', currentLineage: string) => {
       const ware = gameData.waresMap[id]
       if (!ware) {
         return
@@ -405,15 +446,21 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
       if (visited.has(id)) return
       visited.add(id)
 
-      const module = gameData.findModuleForWare(id, race)
+      const { module, lineage: nextLineage } = selectModuleForFlow(
+        getExpandContext(),
+        group,
+        id,
+        source,
+        currentLineage,
+      )
       if (module && module.inputs) {
         Object.entries(module.inputs).forEach(([inputId, inputAmount]) => {
-          trace(inputId, inputAmount * amount)
+          trace(inputId, inputAmount * amount, 'auto', nextLineage)
         })
       }
     }
 
-    trace(wareId, 1)
+    trace(wareId, 1, 'manual', lineage)
     return res
   }
 
@@ -424,7 +471,7 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     const total: Record<string, number> = {}
     
     group.nodes.filter(n => n.source === 'manual' && !n.isIsolated).forEach(node => {
-      const resources = calculateRequiredRawMaterials(node.wareId, node.race)
+      const resources = calculateRequiredRawMaterials(node.wareId, node.lineage, group.subCategory)
       Object.entries(resources).forEach(([id, amount]) => {
         total[id] = (total[id] || 0) + amount
       })
@@ -434,7 +481,7 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
       const isDup = group.nodes.some(n => n.wareId === draggingWareId.value)
       if (!isDup) {
         const race = group.category === 'industrial' ? group.subCategory : 'default'
-        const resources = calculateRequiredRawMaterials(draggingWareId.value, race)
+        const resources = calculateRequiredRawMaterials(draggingWareId.value, race, group.subCategory)
         Object.entries(resources).forEach(([id, amount]) => {
           total[id] = (total[id] || 0) + amount
         })
@@ -456,7 +503,10 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     const seen = new Set<string>()
 
     nodes.forEach(node => {
-      const resources = calculateRequiredRawMaterials(node.wareId, node.race)
+      const group = groups.value.find(candidate => candidate.nodes.some(candidateNode => candidateNode.id === node.id))
+      let subCategory = node.lineage
+      if (group) subCategory = group.subCategory
+      const resources = calculateRequiredRawMaterials(node.wareId, node.lineage, subCategory)
       
       const nodeResources = Object.keys(resources).sort()
       
@@ -505,8 +555,8 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
       name: name || '',
       category,
       subCategory,
-      isLocked,
-      lockedLineage: subCategory,
+      isLocked: subCategory === 'recycling' ? false : isLocked,
+      lockedLineage: subCategory === 'recycling' ? '' : subCategory,
       nodes: []
     }
     groups.value.push(newGroup)
@@ -592,12 +642,14 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
       node.isIsolated = false
       // 保持 Auto 状态，用户需要手动转正
       // 尝试展开上游
-      const module = gameData.findModuleForWare(node.wareId, node.lineage || group.subCategory)
+      const selection = selectModuleForFlow(getExpandContext(), getGroupSnapshot(group), node.wareId, 'manual', node.lineage)
+      const module = selection.module
       if (module) {
         node.moduleId = module.id
+        node.lineage = selection.lineage
         if (module.inputs) {
           Object.keys(module.inputs).forEach(inputWareId => {
-            expandUpstream(groupId, inputWareId, 'auto', node.lineage)
+            expandUpstream(groupId, inputWareId, 'auto', selection.lineage)
           })
         }
       }
@@ -690,22 +742,7 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     const group = groups.value.find(g => g.id === groupId)
     if (!group) return
 
-    const ctx: ExpandContext = {
-      waresMap: gameData.waresMap,
-      modulesMap: gameData.modulesMap,
-      modulesByOutputMap: gameData.modulesByOutputMap || {},
-      findModuleForWare: gameData.findModuleForWare
-    }
-
-    const groupSnapshot: GroupSnapshot = {
-      id: group.id,
-      nodes: group.nodes,
-      isLocked: group.isLocked,
-      lockedLineage: group.lockedLineage,
-      subCategory: group.subCategory
-    }
-
-    const result = computeExpandUpstream(ctx, groupSnapshot, wareId, source, overrideLineage)
+    const result = computeExpandUpstream(getExpandContext(), getGroupSnapshot(group), wareId, source, overrideLineage)
 
     result.newNodes.forEach(node => {
       insertNodeSorted(group, node)
@@ -787,7 +824,10 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
    * 检查产物是否已在任何组中规划（忽略锁定的节点）
    */
   function isWareInAnyGroup(wareId: string) {
-    return groups.value.some(g => g.nodes.some(n => n.wareId === wareId && !n.isIsolated))
+    return groups.value.some(group => group.nodes.some(node => {
+      if (node.isIsolated) return false
+      return nodeProducesWare(node, wareId)
+    }))
   }
 
   /**
@@ -828,17 +868,18 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
       isolatedNode.isRoot = true
       
       // 更新 moduleId 为正确的模块
-      const effectiveLineage = lineage || group.subCategory
-      const module = gameData.findModuleForWare(wareId, effectiveLineage)
+      const effectiveLineage = lineage === undefined ? group.subCategory : lineage
+      const selection = selectModuleForFlow(getExpandContext(), getGroupSnapshot(group), wareId, 'manual', effectiveLineage)
+      const module = selection.module
       if (module) {
         isolatedNode.moduleId = module.id
         isolatedNode.race = module.race
-        isolatedNode.lineage = effectiveLineage
+        isolatedNode.lineage = selection.lineage
         
         // 直接扩展上游（绕过 expandUpstream 的 moduleId 检查）
         if (module.inputs) {
           Object.keys(module.inputs).forEach(inputWareId => {
-            expandUpstream(groupId, inputWareId, 'auto', effectiveLineage)
+            expandUpstream(groupId, inputWareId, 'auto', selection.lineage)
           })
         }
       }
@@ -869,12 +910,13 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     const node = group.nodes.find(n => n.wareId === wareId)
     if (!node) return
 
-    const newModule = gameData.findModuleForWare(wareId, newLineage)
+    const selection = selectModuleForFlow(getExpandContext(), getGroupSnapshot(group), wareId, 'manual', newLineage)
+    const newModule = selection.module
     if (!newModule) return
 
     // 更新节点信息
     node.moduleId = newModule.id
-    node.lineage = newLineage
+    node.lineage = selection.lineage
     node.race = newModule.race
     node.source = 'manual'
     node.isAuto = false
@@ -886,7 +928,7 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     // 扩展新的上游
     if (newModule.inputs) {
       Object.keys(newModule.inputs).forEach(inputWareId => {
-        expandUpstream(groupId, inputWareId, 'auto', newLineage)
+        expandUpstream(groupId, inputWareId, 'auto', selection.lineage)
       })
     }
 
@@ -935,9 +977,14 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
 
     // 1. 检查锁定冲突与血统兼容性（仅对锁定的规划区）
     if (group.isLocked) {
-      const backtraceSet = group.category === 'industrial' 
-        ? gameData.wareSetsByIndustrialRace[group.lockedLineage]
-        : gameData.wareSetsByRace[group.lockedLineage]
+      let backtraceSet: Set<string> | undefined
+      if (group.subCategory === 'recycling') {
+        backtraceSet = gameData.wareSetsByIndustrialRace.recycling
+      } else if (group.category === 'industrial') {
+        backtraceSet = gameData.wareSetsByIndustrialRace[group.lockedLineage]
+      } else {
+        backtraceSet = gameData.wareSetsByRace[group.lockedLineage]
+      }
       
       if (!backtraceSet?.has(wareId)) {
         return 'rejected'
@@ -956,7 +1003,13 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
       }
       
       // 2.2 检查新模块是否与现有节点的模块相同
-      const newModule = gameData.findModuleForWare(wareId, effectiveLineage)
+      const newModule = selectModuleForFlow(
+        getExpandContext(),
+        getGroupSnapshot(group),
+        wareId,
+        'manual',
+        effectiveLineage,
+      ).module
       
       // 2.3 如果模块相同，根据节点类型返回状态
       if (newModule && existingNode.moduleId === newModule.id) {
@@ -974,7 +1027,13 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     }
 
     // 3. 检查重复（基于 moduleId，用于不同 wareId 但相同 module 的情况）
-    const module = gameData.findModuleForWare(wareId, lineage)
+    const module = selectModuleForFlow(
+      getExpandContext(),
+      getGroupSnapshot(group),
+      wareId,
+      'manual',
+      lineage,
+    ).module
     if (module && group.nodes.some(n => n.moduleId === module.id)) {
       return 'duplicated'
     }

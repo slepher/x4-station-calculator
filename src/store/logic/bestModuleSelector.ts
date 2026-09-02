@@ -152,10 +152,15 @@ export function findBestProducer(
   wares: Record<string, X4Ware>
 ): X4Module | undefined {
   const ware = wares[wareId]
-  if (!ware || ware.transport === 'solid' || ware.transport === 'liquid') return undefined
+  if (!ware) return undefined
 
-  const isValidProducer = (m: X4Module) =>
-    m.outputs[wareId] && (m.type === 'production') && (m.method != "recycling")
+  const isValidProducer = (m: X4Module) => {
+    const hourlyRate = m.outputs[wareId]
+    return hourlyRate !== undefined
+      && hourlyRate > 0
+      && (m.type === 'production' || m.type === 'processingmodule')
+      && m.method !== 'recycling'
+  }
 
   const existingCandidates = existingModules.flatMap(item => {
     const m = modules[item.id]

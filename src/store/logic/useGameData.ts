@@ -678,7 +678,15 @@ export function findModuleForWare(
   lineage: string,
   modulesByOutputMap: Record<string, X4Module[]>
 ): X4Module | null {
-  const producers = (modulesByOutputMap[wareId] || []).filter(m => m.method !== 'recycling')
+  const candidates = modulesByOutputMap[wareId]
+  if (!candidates) return null
+  const producers = candidates.filter(m => {
+    const hourlyRate = m.outputs[wareId]
+    return hourlyRate !== undefined
+      && hourlyRate > 0
+      && (m.type === 'production' || m.type === 'processingmodule')
+      && m.method !== 'recycling'
+  })
   if (producers.length === 0) return null
 
   let found = producers.find(m => m.race === lineage)
@@ -701,7 +709,20 @@ export function findModuleForWare(
     if (found) return found
   }
 
-  return producers[0] || null
+  return producers[0]!
+}
+
+export function findRecyclingModuleForWare(
+  wareId: string,
+  modulesByOutputMap: Record<string, X4Module[]>
+): X4Module | null {
+  const candidates = modulesByOutputMap[wareId]
+  if (!candidates) return null
+  const found = candidates.find(m => {
+    const hourlyRate = m.outputs[wareId]
+    return m.method === 'recycling' && hourlyRate !== undefined && hourlyRate > 0
+  })
+  return found === undefined ? null : found
 }
 
 export function precomputeCandidateWares(
@@ -726,7 +747,7 @@ export function precomputeCandidateWares(
     const seeds = new Set<string>()
 
     Object.values(modulesMap).forEach(m => {
-      if (m.race === raceKey && INDUSTRIAL_GROUPS.includes(m.group)) {
+      if (m.race === raceKey && m.method !== 'recycling' && INDUSTRIAL_GROUPS.includes(m.group)) {
         Object.keys(m.outputs).forEach(id => {
           seeds.add(id)
         })
@@ -735,7 +756,7 @@ export function precomputeCandidateWares(
 
     if (raceKey === 'teladi') {
       Object.values(modulesMap).forEach(m => {
-        if (m.race === 'default' && INDUSTRIAL_GROUPS.includes(m.group)) {
+        if (m.race === 'default' && m.method !== 'recycling' && INDUSTRIAL_GROUPS.includes(m.group)) {
           Object.keys(m.outputs).forEach(id => {
             if (waresMap[id]?.tier === 3) {
               seeds.add(id)
@@ -764,12 +785,32 @@ export function precomputeCandidateWares(
     wareSetsByIndustrialRace[raceKey] = resultSet
   })
 
+  const recyclingWares = new Set<string>()
+  const traceRecyclingUpstream = (wareId: string, lineage: string) => {
+    const ware = waresMap[wareId]
+    if (!ware || ware.tier === null || recyclingWares.has(wareId)) return
+    recyclingWares.add(wareId)
+    const producer = findModuleForWare(wareId, lineage, modulesByOutputMap)
+    if (producer?.inputs) {
+      Object.keys(producer.inputs).forEach(inputId => traceRecyclingUpstream(inputId, producer.race))
+    }
+  }
+  Object.values(modulesMap).forEach(module => {
+    if (module.method !== 'recycling') return
+    Object.entries(module.outputs).forEach(([wareId, hourlyRate]) => {
+      const ware = waresMap[wareId]
+      if (hourlyRate > 0 && ware && ware.tier !== null) recyclingWares.add(wareId)
+    })
+    Object.keys(module.inputs).forEach(inputId => traceRecyclingUpstream(inputId, module.race))
+  })
+  wareSetsByIndustrialRace.recycling = recyclingWares
+
   agriRaces.forEach(race => {
     const resultSet = new Set<string>()
     const seeds = new Set<string>()
 
     Object.values(modulesMap).forEach(m => {
-      if (m.race === race && AGRICULTURAL_GROUPS.includes(m.group)) {
+      if (m.race === race && m.method !== 'recycling' && AGRICULTURAL_GROUPS.includes(m.group)) {
         Object.keys(m.outputs).forEach(id => {
           seeds.add(id)
         })

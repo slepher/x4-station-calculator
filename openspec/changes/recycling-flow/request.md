@@ -25,7 +25,7 @@
 
 ### Logic Flow 回收子类型
 
-- 工业候选区新增 `recycling` 子类型，候选 Ware 来自 `method="recycling"` 模块的全部 outputs。
+- 工业候选区新增 `recycling` 子类型，候选 Ware 包含 `method="recycling"` 模块的全部 outputs 及其普通上游链；Tier 1 Processor 产物允许添加，Tier 0 只展示且不可添加。
 - 普通生产者选择 SHALL 接受非 recycling 的 `production` 与 `processingmodule`，并排除所有 `method="recycling"` 模块。
 - recycling 手动根节点 SHALL 使用回收模块选择规则：`recycling + output wareId` 定位唯一 Recycler，无需额外 module selector 或 recipe 信息。
 - Recycler 的自动上游 SHALL 回到普通生产者规则，形成：
@@ -85,7 +85,7 @@
 ## 验收标准（DoD）
 
 1. 两个 Scrap Processor 在 8.0/9.0 生成数据中包含正确 cycleTime、outputs 与 inputs 小时率。
-2. 工业候选区存在 recycling 子类型，并能通过任意 Recycler output 添加正确的唯一 Recycler moduleId。
+2. 工业候选区存在 recycling 子类型，显示 Recycler outputs、Tier 1 Processor 产物与 Tier 0 输入；任意 Recycler output 添加唯一 Recycler，Tier 1 添加 Processor，Tier 0 不可添加。
 3. 普通 Hull Parts 等产线始终选择普通生产模块，不误选 Recycler。
 4. Generic/Terran Recycler 的 Logic Flow 上游包含 Generic Scrap Processor；Kha'ak Recycler 上游包含 Kha'ak Scrap Processor。
 5. Raw Scrap 类资源停在资源边界，Energy Cells 正常添加能源模块。

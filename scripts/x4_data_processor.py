@@ -630,6 +630,13 @@ class X4PrecisionLoader:
         try:
             tree = ET.parse(macros_path)
             root = tree.getroot()
+            defaults_tree = ET.parse(get_library_xml(self.raw_path, "defaults"))
+            processing_defaults = defaults_tree.getroot().find("./dataset[@class='processingmodule']/properties")
+            default_processing_products = []
+            if processing_defaults is not None:
+                default_processing_products = processing_defaults.findall('products/ware')
+                if len(default_processing_products) == 0:
+                    default_processing_products = processing_defaults.findall('product')
             
             # Distiller 生成的 macros_final.xml 根节点为 <macros>，子节点为 <macro>
             # 不再需要 glob 扫描文件，直接遍历 XML 树
@@ -760,6 +767,29 @@ class X4PrecisionLoader:
                         
                         # 计算模块 Tier: 取所有产物中最高的 Tier 
                         module_data['tier'] = max([self.ware_tier_map.get(p_id, 0) for p_id, _ in production_configs] or [0])
+
+                if m_class == 'processingmodule':
+                    product_ids = []
+                    processing_products = macro.findall('properties/products/ware')
+                    if len(processing_products) == 0:
+                        processing_products = default_processing_products
+                    for product in processing_products:
+                        product_id = product.get('ware')
+                        recipe = self.recipes.get(product_id, {}).get('processing')
+                        if not recipe:
+                            print(f"   ⚠️ 警告: Processing module {fname} product {product_id} has no processing recipe.")
+                            continue
+
+                        product_amount = float(product.get('amount', 0))
+                        cycles_per_hour = 3600 / recipe['time']
+                        batch_scale = product_amount / recipe['amount']
+                        module_data['cycleTime'] = recipe['time']
+                        module_data['outputs'][product_id] = round(product_amount * cycles_per_hour, 2)
+                        for input_id, input_amount in recipe['inputs'].items():
+                            module_data['inputs'][input_id] = round(input_amount * batch_scale * cycles_per_hour, 2)
+                        product_ids.append(product_id)
+
+                    module_data['tier'] = max([self.ware_tier_map.get(product_id, 0) for product_id in product_ids] or [0])
                     
                 if m_class == 'storage':
                     cargo = macro.find('properties/cargo')

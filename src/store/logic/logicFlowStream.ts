@@ -1,11 +1,12 @@
 import type { FlowNode, X4Module, X4Ware } from '@/types/x4'
-import { findModuleForWare } from './useGameData'
+import { findModuleForWare, findRecyclingModuleForWare } from './useGameData'
 
 export interface ExpandContext {
   waresMap: Record<string, X4Ware>
   modulesMap: Record<string, X4Module>
   modulesByOutputMap?: Record<string, X4Module[]>
   findModuleForWare?: (wareId: string, lineage: string) => X4Module | null
+  findRecyclingModuleForWare?: (wareId: string) => X4Module | null
 }
 
 export interface GroupSnapshot {
@@ -19,6 +20,47 @@ export interface GroupSnapshot {
 interface ExpandResult {
   newNodes: FlowNode[]
   updatedNodes: Array<{ nodeId: string; updates: Partial<FlowNode> }>
+}
+
+export function selectModuleForFlow(
+  ctx: ExpandContext,
+  group: GroupSnapshot,
+  wareId: string,
+  source: 'manual' | 'auto',
+  overrideLineage?: string,
+): { module: X4Module | null; lineage: string } {
+  let requestedLineage = group.subCategory
+  if (group.isLocked) {
+    if (group.lockedLineage === undefined) return { module: null, lineage: requestedLineage }
+    requestedLineage = group.lockedLineage
+  } else if (overrideLineage !== undefined) {
+    requestedLineage = overrideLineage
+  }
+  const isManualRecycling = source === 'manual' && group.subCategory === 'recycling'
+  const mappedOutputModules = ctx.modulesByOutputMap?.[wareId]
+  const outputModules = mappedOutputModules === undefined
+    ? Object.values(ctx.modulesMap).filter(candidate => candidate.outputs[wareId] !== undefined)
+    : mappedOutputModules
+  const useRecyclingProducer = isManualRecycling && outputModules.some(candidate => {
+    const hourlyRate = candidate.outputs[wareId]
+    return candidate.method === 'recycling' && hourlyRate !== undefined && hourlyRate > 0
+  })
+  let module: X4Module | null = null
+
+  if (ctx.modulesByOutputMap && Object.keys(ctx.modulesByOutputMap).length > 0) {
+    module = useRecyclingProducer
+      ? findRecyclingModuleForWare(wareId, ctx.modulesByOutputMap)
+      : findModuleForWare(wareId, requestedLineage, ctx.modulesByOutputMap)
+  } else if (useRecyclingProducer) {
+    if (ctx.findRecyclingModuleForWare) module = ctx.findRecyclingModuleForWare(wareId)
+  } else if (ctx.findModuleForWare) {
+    module = ctx.findModuleForWare(wareId, requestedLineage)
+  }
+
+  const lineage = !group.isLocked && isManualRecycling && module
+    ? module.race
+    : requestedLineage
+  return { module, lineage }
 }
 
 export function isRawMaterialWare(
@@ -68,15 +110,7 @@ export function computeExpandUpstream(
     return result
   }
 
-  const effectiveLineage = group.isLocked 
-    ? (group.lockedLineage || 'default') 
-    : (overrideLineage || group.subCategory || 'default')
-  let module: X4Module | null = null
-  if (ctx.modulesByOutputMap && Object.keys(ctx.modulesByOutputMap).length > 0) {
-    module = findModuleForWare(wareId, effectiveLineage, ctx.modulesByOutputMap)
-  } else if (ctx.findModuleForWare) {
-    module = ctx.findModuleForWare(wareId, effectiveLineage)
-  }
+  const { module, lineage } = selectModuleForFlow(ctx, group, wareId, source, overrideLineage)
 
   if (!module) {
     return result
@@ -102,7 +136,7 @@ export function computeExpandUpstream(
     wareId,
     moduleId: module.id,
     race: module.race,
-    lineage: effectiveLineage,
+    lineage,
     isIsolated: false,
     isAuto: source === 'auto',
     isRoot: source === 'manual',
