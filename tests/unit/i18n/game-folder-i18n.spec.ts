@@ -17,5 +17,9 @@ describe('i18n game folder loading', () => {
 
     expect(mod.default.global.t('{20201,7601}')).toBe('Allographyne')
     expect(mod.default.global.t('{20104,120201}')).toBe('Allographyne Scrap Processor')
+    expect(mod.default.global.t('common.others')).toBe('Others')
+
+    await mod.loadLanguageAsync('zh-CN')
+    expect(mod.default.global.t('common.others')).toBe('其他')
   })
 })

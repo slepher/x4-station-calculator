@@ -70,3 +70,14 @@
 - [x] 7.10 二级菜单空间站名称只显示一次，选择完成后隐藏“选择空间站”占位 option
 - [x] 7.11 市场报价复用 `mapSectorGraph` 动态计算当前最大跳数范围，移除 5 跳静态缓存限制与 99 的 UI 上限
 - [x] 7.12 玩家空间站二级菜单按 `<sector>-<station>` 显示本地化星区与空间站名称
+
+## 8. 共用分组候选控件
+
+- [x] 8.1 提取无 store 依赖的 `CandidateSearchBox`，统一 query、focus/blur、清空、Escape 和右侧锚点定位
+- [x] 8.2 提取无 store 依赖的 `GroupedCandidatePopover`，统一 Teleport、分组标题、颜色、DLC 标签和候选选择事件
+- [x] 8.3 市场报价聚焦空查询时显示当前 `wares.json` 中全部未选择商品，并继续复用 `generateFilteredWaresGrouped` 分组和多语言搜索
+- [x] 8.4 市场报价不得按当前 archive 实际报价、production module 或 transport 缩减商品候选；TEMP 商品过滤留在游戏数据生成阶段
+- [x] 8.5 为 BuildPlan 商品/模块与空间站模块选择增加 presenter 候选组装并复用两个 common 控件，保持既有领域筛选和选择行为
+- [x] 8.6 保持 BuildPlan 舰队入口继续使用 `FleetGoalSearchBox`，不纳入商品/模块候选 DTO
+- [x] 8.7 运行 `npm run build`，修复共用候选控件改动引入的编译错误直至通过或形成明确 blocker
+- [x] 8.8 在应用中英文 locale 增加 `common.others`，并由商品候选 presenter 本地化 `others` 分组标题，不修改游戏文本 locale

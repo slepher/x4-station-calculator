@@ -54,7 +54,12 @@ export interface NpcTradeStationOptionGroup {
 export interface NpcTradeWareSearchGroup {
   id: string
   label: string
-  items: Array<{ id: string; label: string }>
+  items: Array<{
+    id: string
+    label: string
+    color: string
+    tag?: { label: string; active: boolean }
+  }>
 }
 
 export interface NpcTradeWareTargetView extends WareTarget {
@@ -326,7 +331,6 @@ export function useNpcTradePresenter(): { props: NpcTradePresenterProps; emits: 
   }, { immediate: true })
 
   const searchGroups = computed<NpcTradeWareSearchGroup[]>(() => {
-    if (searchQuery.value.trim().length === 0) return []
     const selectedIds = new Set(targets.value.map((target) => target.wareId))
     return generateFilteredWaresGrouped(
       searchQuery.value,
@@ -336,8 +340,18 @@ export function useNpcTradePresenter(): { props: NpcTradePresenterProps; emits: 
       (ware) => !selectedIds.has(ware.id)
     ).map((group) => ({
       id: group.group,
-      label: group.displayLabel,
-      items: group.wares.map((ware) => ({ id: ware.id, label: ware.displayLabel }))
+      label: group.group === 'others' ? i18n.global.t('common.others') : group.displayLabel,
+      items: group.wares.map((ware) => {
+        const groupColor = ware.moduleGroup?.color_rgb
+        const color = typeof groupColor === 'string' && groupColor.length > 0 ? groupColor : '#0ea5e9'
+        const tag = ware.dlc_tag === 'base'
+          ? undefined
+          : {
+              label: gameDataStore.getDlcDisplayName(ware.dlc_tag),
+              active: gameDataStore.isDlcActive(ware.dlc_tag)
+            }
+        return { id: ware.id, label: ware.displayLabel, color, tag }
+      })
     }))
   })
 

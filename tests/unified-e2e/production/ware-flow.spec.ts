@@ -2,7 +2,7 @@ import { expect } from '@playwright/test';
 import { test } from '../../test-setup';
 
 async function addModule(page: any, name: string) {
-  const searchInput = page.locator('[data-testid="station-module-search-input"]').first();
+  const searchInput = page.locator('[data-testid="candidate-search-input"]').first();
   await searchInput.click();
   await page.waitForTimeout(50);
   await searchInput.fill('');
@@ -11,7 +11,7 @@ async function addModule(page: any, name: string) {
   await page.waitForTimeout(50);
   await page.keyboard.type(name, { delay: 30 });
   await page.waitForTimeout(800);
-  const candidate = page.locator('[data-testid^="station-module-candidate-"]').first();
+  const candidate = page.locator('[data-testid^="grouped-candidate-item-"]').first();
   await expect(candidate).toBeVisible({ timeout: 5000 });
   await candidate.click();
   await page.waitForTimeout(200);
@@ -133,7 +133,7 @@ await addModule(page, 'claytronics');
   });
 
   test('3.4 Layout and interaction', async ({ page }) => {
-    const searchInput = page.locator('[data-testid="station-module-search-input"]').first();
+    const searchInput = page.locator('[data-testid="candidate-search-input"]').first();
     await expect(searchInput).toBeVisible();
     const moduleList = page.locator('.module-list-container');
     await expect(moduleList).toBeVisible();
@@ -376,11 +376,11 @@ test.describe('Favorite Button & Priority', () => {
   });
 
   test('1.1 FavoriteButton 3-state icon render', async ({ page }) => {
-    const searchInput = page.locator('[data-testid="station-module-search-input"]').first();
+    const searchInput = page.locator('[data-testid="candidate-search-input"]').first();
     await searchInput.fill('plasma');
     await page.waitForTimeout(800);
 
-    const firstModule = page.locator('[data-testid^="station-module-candidate-"]').first();
+    const firstModule = page.locator('[data-testid^="grouped-candidate-item-"]').first();
     await expect(firstModule).toBeVisible();
     await firstModule.click();
     await page.waitForTimeout(1500);
@@ -409,11 +409,11 @@ test.describe('Favorite Button & Priority', () => {
   });
 
   test('1.2 FavoriteButton state cycle', async ({ page }) => {
-    const searchInput = page.locator('[data-testid="station-module-search-input"]').first();
+    const searchInput = page.locator('[data-testid="candidate-search-input"]').first();
     await searchInput.fill('plasma');
     await page.waitForTimeout(800);
 
-    const firstModule = page.locator('[data-testid^="station-module-candidate-"]').first();
+    const firstModule = page.locator('[data-testid^="grouped-candidate-item-"]').first();
     await expect(firstModule).toBeVisible();
     await firstModule.click();
     await page.waitForTimeout(1500);
@@ -439,11 +439,11 @@ test.describe('Favorite Button & Priority', () => {
   });
 
   test('1.3 FavoriteButton across view modes', async ({ page }) => {
-    const searchInput = page.locator('[data-testid="station-module-search-input"]').first();
+    const searchInput = page.locator('[data-testid="candidate-search-input"]').first();
     await searchInput.fill('plasma');
     await page.waitForTimeout(800);
 
-    const firstModule = page.locator('[data-testid^="station-module-candidate-"]').first();
+    const firstModule = page.locator('[data-testid^="grouped-candidate-item-"]').first();
     await expect(firstModule).toBeVisible();
     await firstModule.click();
     await page.waitForTimeout(1500);
@@ -479,11 +479,11 @@ test.describe('Favorite Button & Priority', () => {
   });
 
   test('Button visible but disabled for pure input solid wares (Ore)', async ({ page }) => {
-    const searchInput = page.locator('[data-testid="station-module-search-input"]').first();
+    const searchInput = page.locator('[data-testid="candidate-search-input"]').first();
     await searchInput.fill('Refined Metal Production');
     await page.waitForTimeout(1000);
 
-    const firstModule = page.locator('[data-testid^="station-module-candidate-"]').first();
+    const firstModule = page.locator('[data-testid^="grouped-candidate-item-"]').first();
     await expect(firstModule).toBeVisible();
     await firstModule.click();
     await page.waitForTimeout(1000);
@@ -513,11 +513,11 @@ test.describe('Favorite Button & Priority', () => {
   });
 
   test('Button visible for produced wares (Energy Cells)', async ({ page }) => {
-    const searchInput = page.locator('[data-testid="station-module-search-input"]').first();
+    const searchInput = page.locator('[data-testid="candidate-search-input"]').first();
     await searchInput.fill('Energy Cell Production');
     await page.waitForTimeout(1000);
 
-    const firstModule = page.locator('[data-testid^="station-module-candidate-"]').first();
+    const firstModule = page.locator('[data-testid^="grouped-candidate-item-"]').first();
     await expect(firstModule).toBeVisible();
     await firstModule.click();
     await page.waitForTimeout(1000);
@@ -535,11 +535,11 @@ test.describe('Favorite Button & Priority', () => {
   });
 
   test('2.1 Product identity detection', async ({ page }) => {
-    const searchInput = page.locator('[data-testid="station-module-search-input"]').first();
+    const searchInput = page.locator('[data-testid="candidate-search-input"]').first();
     await searchInput.fill('plasma');
     await page.waitForTimeout(500);
 
-    const firstModule = page.locator('[data-testid^="station-module-candidate-"]').first();
+    const firstModule = page.locator('[data-testid^="grouped-candidate-item-"]').first();
     await firstModule.click();
     await page.waitForTimeout(1000);
 
@@ -560,11 +560,11 @@ test.describe('Favorite Button & Priority', () => {
   });
 
   test('2.2 Priority state persistence', async ({ page }) => {
-    const searchInput = page.locator('[data-testid="station-module-search-input"]').first();
+    const searchInput = page.locator('[data-testid="candidate-search-input"]').first();
     await searchInput.fill('plasma');
     await page.waitForTimeout(500);
 
-    const firstModule = page.locator('[data-testid^="station-module-candidate-"]').first();
+    const firstModule = page.locator('[data-testid^="grouped-candidate-item-"]').first();
     await firstModule.click();
     await page.waitForTimeout(1000);
 
@@ -586,11 +586,11 @@ test.describe('Favorite Button & Priority', () => {
   });
 
   test('4.1 Integration workflow', async ({ page }) => {
-    const searchInput = page.locator('[data-testid="station-module-search-input"]').first();
+    const searchInput = page.locator('[data-testid="candidate-search-input"]').first();
     await searchInput.fill('plasma');
     await page.waitForTimeout(500);
 
-    const firstModule = page.locator('[data-testid^="station-module-candidate-"]').first();
+    const firstModule = page.locator('[data-testid^="grouped-candidate-item-"]').first();
     await firstModule.click();
     await page.waitForTimeout(1000);
 
@@ -604,11 +604,11 @@ test.describe('Favorite Button & Priority', () => {
   });
 
   test('FavoriteButton availability in economy and volume views', async ({ page }) => {
-    const searchInput = page.locator('[data-testid="station-module-search-input"]').first();
+    const searchInput = page.locator('[data-testid="candidate-search-input"]').first();
     await searchInput.fill('plasma');
     await page.waitForTimeout(500);
 
-    const firstModule = page.locator('[data-testid^="station-module-candidate-"]').first();
+    const firstModule = page.locator('[data-testid^="grouped-candidate-item-"]').first();
     await firstModule.click();
     await page.waitForTimeout(1000);
 
@@ -909,7 +909,7 @@ test.describe.skip('Volume Analysis', () => {
       await page.waitForTimeout(500);
     }
 
-    const searchInput = page.locator('input[type="text"], [data-testid="station-module-search-input"]').first();
+    const searchInput = page.locator('input[type="text"], [data-testid="candidate-search-input"]').first();
     if (await searchInput.isVisible()) {
       await searchInput.fill('等离子');
       await page.waitForTimeout(500);
@@ -1041,11 +1041,11 @@ test.describe.skip('Tooltip & i18n', () => {
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(2000);
 
-    const searchInput = page.locator('[data-testid="station-module-search-input"]').first();
+    const searchInput = page.locator('[data-testid="candidate-search-input"]').first();
     await searchInput.fill('plasma');
     await page.waitForTimeout(500);
 
-    const firstModule = page.locator('[data-testid^="station-module-candidate-"]').first();
+    const firstModule = page.locator('[data-testid^="grouped-candidate-item-"]').first();
     await firstModule.click();
     await page.waitForTimeout(1000);
 

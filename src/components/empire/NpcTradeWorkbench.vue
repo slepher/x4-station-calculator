@@ -1,10 +1,17 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import { useNpcTradePresenter } from '@/components/empire/presenters/useNpcTradePresenter'
+import CandidateSearchBox from '@/components/common/CandidateSearchBox.vue'
+import GroupedCandidatePopover from '@/components/common/GroupedCandidatePopover.vue'
 import X4NumberInput from '@/components/common/X4NumberInput.vue'
 
 const { t } = useI18n()
 const presenter = useNpcTradePresenter()
+
+const selectWare = (wareId: string, close: () => void) => {
+  presenter.emits.addWare(wareId)
+  close()
+}
 </script>
 
 <template>
@@ -83,30 +90,23 @@ const presenter = useNpcTradePresenter()
 
         <div class="field-group ware-search">
           <label class="field-label" for="npc-trade-ware-search">{{ t('npc_trade.ware_search') }}</label>
-          <input
-            id="npc-trade-ware-search"
-            class="field-control"
-            type="search"
-            :value="presenter.props.searchQuery.value"
+          <CandidateSearchBox
+            input-id="npc-trade-ware-search"
+            :query="presenter.props.searchQuery.value"
             :placeholder="t('npc_trade.ware_search_placeholder')"
-            data-testid="npc-trade-ware-search"
-            @input="presenter.emits.setSearchQuery(($event.target as HTMLInputElement).value)"
+            anchor-selector=".panel-card"
+            :has-results="presenter.props.searchGroups.value.length > 0"
+            @update-query="presenter.emits.setSearchQuery"
           >
-          <div v-if="presenter.props.searchGroups.value.length" class="search-results custom-scrollbar">
-            <div v-for="group in presenter.props.searchGroups.value" :key="group.id">
-              <div class="search-group-label">{{ group.label }}</div>
-              <button
-                v-for="item in group.items"
-                :key="item.id"
-                type="button"
-                class="search-result"
-                :data-testid="`npc-trade-ware-result-${item.id}`"
-                @click="presenter.emits.addWare(item.id)"
-              >
-                {{ item.label }}
-              </button>
-            </div>
-          </div>
+            <template #default="{ open, position, close }">
+              <GroupedCandidatePopover
+                :open="open"
+                :position="position"
+                :groups="presenter.props.searchGroups.value"
+                @select="selectWare($event, close)"
+              />
+            </template>
+          </CandidateSearchBox>
         </div>
 
         <div class="ware-pills" aria-live="polite">
@@ -267,10 +267,6 @@ const presenter = useNpcTradePresenter()
 .segmented-control { @apply grid grid-cols-2 rounded border border-slate-700 overflow-hidden; }
 .segmented-control button { @apply px-3 py-2 text-sm text-slate-400 bg-slate-950/50 hover:text-slate-200; }
 .segmented-control button.active { @apply bg-sky-500/20 text-sky-300; }
-.ware-search { @apply relative; }
-.search-results { @apply max-h-64 overflow-y-auto rounded border border-slate-700 bg-slate-950; }
-.search-group-label { @apply sticky top-0 px-3 py-1.5 text-xs font-semibold text-slate-500 bg-slate-900; }
-.search-result { @apply block w-full px-3 py-2 text-left text-sm text-slate-300 hover:bg-sky-500/10 hover:text-sky-300; }
 .ware-pills { @apply flex flex-col gap-2; }
 .ware-pill { @apply flex items-center gap-2 rounded border border-slate-700 bg-slate-800/40 p-2; }
 .ware-pill-name { @apply flex-1 min-w-0 text-sm text-slate-200 truncate; }

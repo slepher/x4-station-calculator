@@ -10,6 +10,7 @@
 现有代码已经提供：
 
 - `generateFilteredWaresGrouped` 多语言商品搜索。
+- `BuildGoalSearchBox` 与 `StationModulePicker` 已有向右弹出的分组候选交互，可提取共同边界。
 - `SaveBindingPlan.groups/stationPlans/tradeStation` 玩家整理结构。
 - `saveBindingSectorScope` 的 anchor/coverage sector 语义。
 - `LiveProductionWorkbenchView.vue` 的 `grid-cols-12`、`3/5/4` 布局。
@@ -34,7 +35,7 @@ store/logic/npcTradeOffers ─┘
 
 ## Decisions
 
-### 1. 只增加一个领域逻辑模块、一个 presenter 和一个 workbench SFC
+### 1. 页面领域逻辑保持集中，重复候选交互提取为 common 控件
 
 最小新增结构：
 
@@ -42,9 +43,11 @@ store/logic/npcTradeOffers ─┘
 src/store/logic/npcTradeOffers.ts
 src/components/empire/presenters/useNpcTradePresenter.ts
 src/components/empire/NpcTradeWorkbench.vue
+src/components/common/CandidateSearchBox.vue
+src/components/common/GroupedCandidatePopover.vue
 ```
 
-`NpcTradeWorkbench.vue` 内直接组成三个语义 section。只有在实现中出现可独立复用的真实组件边界时才拆分子组件；不预先创建 filters/candidates/ships 三套 facade。
+`NpcTradeWorkbench.vue` 内直接组成三个语义 section，不预先创建 filters/candidates/ships 三套 facade。商品和模块选择已经在市场报价、BuildPlan 与空间站模块选择中形成相同的搜索/右弹层交互，因此只提取两个职责明确的 common 控件，不增加 adapter、view model 或 facade。
 
 页面筛选为 presenter 内的 session refs：方向、选中玩家空间站、搜索词、ware targets、主商品、排序指标和 sector 分组开关。离开当前工作台后无需持久化，因此不修改 `SaveBindingPlan` 或 `normalizeState()`。
 
@@ -240,12 +243,40 @@ Presenter 输出互斥状态：
 
 `amount=0` 的买卖单已在 parser 边界过滤，不进入 presenter results。
 
+### 12. 商品全集与共用候选控件边界
+
+市场报价的商品候选直接来自当前游戏版本 `localizedWaresMap`，其集合与 `wares.json` 一致。Presenter 仅排除已经加入目标药丸的 ware，再复用 `generateFilteredWaresGrouped` 完成多语言匹配和分组：
+
+```text
+candidate wares = wares.json - selected wares
+```
+
+该集合不读取当前 archive 的 buy/sell offers，也不要求 ware 存在 production module。TEMP/内部商品的排除属于游戏数据生成阶段；UI 不维护 TEMP ID、名称模式或报价白名单。合法商品一旦进入 `wares.json`（包括 `condensate`），就自动成为候选。ware 的 `group` 为空时沿用既有 grouped search 语义归入 `others`。
+
+`others` 是应用界面结构，不是 X4 游戏数据分组。英文 `Others` 和中文“其他”定义在应用 `src/locales/en.json`、`src/locales/zh-CN.json` 的 `common.others`，由 presenter 在组装候选 DTO 时替换原始 `others` label；不得向游戏文本 locale 或 `module_groups.json` 注入该标题。
+
+候选交互拆为两个联动控件：
+
+- `CandidateSearchBox`：query 输入、focus/blur、清空、Escape、焦点快照和基于所属 panel/list 的右侧定位。
+- `GroupedCandidatePopover`：Teleport、过渡、分组标题、颜色、DLC 标签和候选选择事件。
+
+两个 common 控件只接收展示 props 并发出交互事件，不直接访问 store。各功能 presenter 负责组装 group/item DTO：
+
+- `useNpcTradePresenter`：全部未选择 ware。
+- `useBuildGoalSearchPresenter`：可生产商品或玩家生产模块，保持原 BuildPlan 选择语义。
+- `useStationModulePickerPresenter`：父级已过滤的空间站模块。
+
+BuildPlan 的舰队入口继续使用 `FleetGoalSearchBox`，不为表面统一而塞入商品/模块候选 DTO。聚焦商品或模块搜索时，空 query 也显示全部当前候选；选择候选后由调用方执行领域动作并关闭弹出框。
+
 ## Files and Responsibilities
 
 - `rust-parser/src/model.rs`、`rust-parser/src/core.rs`、`src/types/saveArchive.ts`：为 player ship archive contract 保留存档坐标。
 - `src/store/logic/npcTradeOffers.ts`：方向化报价分类、单 ware comparator、综合评分和 sector 排序。
 - `src/components/empire/presenters/useNpcTradePresenter.ts`：读取 stores，持有筛选状态，复用 ware search，组装三列 DTO。
 - `src/components/empire/NpcTradeWorkbench.vue`：3/5/4 布局与事件转发。
+- `src/components/common/CandidateSearchBox.vue`、`src/components/common/GroupedCandidatePopover.vue`：无 store 依赖的搜索交互与右侧分组弹出框。
+- `src/components/empire/presenters/useBuildGoalSearchPresenter.ts`、`src/components/empire/presenters/useStationModulePickerPresenter.ts`：为既有 BuildPlan 商品/模块和空间站模块入口组装共用候选 DTO。
+- `src/components/empire/BuildGoalSearchBox.vue`、`src/components/empire/StationModulePicker.vue`：复用 common 控件并保持既有领域事件；舰队搜索仍使用 `FleetGoalSearchBox`。
 - `src/types/production-ui.ts`、`src/types/production-workbench-contract.ts`、`src/store/useActiveViewStore.ts`：新增 live workbench mode。
 - `src/components/empire/presenters/useProductionSidebarPresenter.ts`、`src/components/empire/ProductionSidebar.vue`、`src/components/empire/LiveProductionWorkbenchView.vue`：入口和页面切换。
 - `src/locales/en.json`、`src/locales/zh-CN.json`：市场报价、方向、来源、排序与空状态文案。
@@ -256,6 +287,8 @@ Presenter 输出互斥状态：
 - [多 ware 数量单位不可直接比较价值] → 先用 fulfilled count 和 fill ratio 归一，再使用用户明确要求的总数量与金额作为后续 tie-breaker。
 - [玩家船只没有坐标] → 在既有 parser/player ship contract 增加解析时已知的 world position，不在 UI 推测。
 - [单 SFC 可能增长] → 首版保持最少文件；仅在出现独立复用或清晰职责边界后拆分。
+- [`wares.json` 暂时仍含 TEMP 商品] → 不在市场报价建立第二套过滤；由数据生成 change 在源头剔除，合并后所有消费者同时收敛。
+- [合法 ware 缺少 group] → 沿用 `generateFilteredWaresGrouped` 的 `others` 分组，不在 UI 猜测业务分类。
 
 ## Dependencies and Rollout
 

@@ -1,7 +1,7 @@
 /**
  * @vitest-environment jsdom
  */
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import NpcTradeWorkbench from '@/components/empire/NpcTradeWorkbench.vue'
 
@@ -27,7 +27,7 @@ const presenter = vi.hoisted(() => ({
         position: { x: 1, y: 0, z: 2 }
       }]
     },
-    searchGroups: { value: [] },
+    searchGroups: { value: [{ id: 'energy', label: 'Energy', items: [{ id: 'energycells', label: 'Energy Cells', color: '#0ea5e9' }] }] },
     wareTargets: { value: [] },
     candidateSections: { value: [] },
     shipGroups: { value: [] },
@@ -65,6 +65,11 @@ vi.mock('vue-i18n', async (importOriginal) => {
 })
 
 describe('NpcTradeWorkbench station selector', () => {
+  afterEach(() => {
+    presenter.props.searchGroups.value = []
+    vi.clearAllMocks()
+  })
+
   it('hides the placeholder after selection and renders sector-station', () => {
     const wrapper = mount(NpcTradeWorkbench, {
       global: { stubs: { X4NumberInput: true } }
@@ -73,5 +78,26 @@ describe('NpcTradeWorkbench station selector', () => {
     const options = wrapper.get('[data-testid="npc-trade-player-station"]').findAll('option')
     expect(options).toHaveLength(1)
     expect(options[0]!.text()).toBe('希望之歌的选择 I-希望之歌的选择 I')
+  })
+
+  it('opens grouped ware candidates and closes after selecting one', async () => {
+    presenter.props.searchGroups.value = [{
+      id: 'energy',
+      label: 'Energy',
+      items: [{ id: 'energycells', label: 'Energy Cells', color: '#0ea5e9' }]
+    }]
+    const wrapper = mount(NpcTradeWorkbench, {
+      global: { stubs: { X4NumberInput: true } }
+    })
+
+    await wrapper.get('[data-testid="candidate-search-input"]').trigger('focus')
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    const popover = document.body.querySelector('[data-testid="grouped-candidate-popover"]')
+    expect(popover).not.toBeNull()
+    expect(popover?.querySelector('[data-testid="grouped-candidate-group-energy"]')).not.toBeNull()
+
+    await popover?.querySelector<HTMLElement>('[data-testid="grouped-candidate-item-energycells"]')?.click()
+    expect(presenter.emits.addWare).toHaveBeenCalledWith('energycells')
+    expect(document.body.querySelector('[data-testid="grouped-candidate-popover"]')).toBeNull()
   })
 })

@@ -115,6 +115,40 @@
 **那么** 系统 MUST 复用既有 grouped ware search
 **并且** 搜索 MUST 匹配当前语言名称、英文原名和 ware ID
 
+#### Scenario: 空查询展示全部未选商品
+
+**前提** 市场报价商品搜索框获得焦点
+**并且** 搜索文本为空
+**当** 系统生成候选
+**那么** 系统 MUST 从当前游戏版本 `wares.json` 对应的本地化 ware map 读取全部商品
+**并且** 系统 MUST 只排除已经加入目标药丸的 ware
+**并且** 候选 MUST 按 ware 的现有 group 分组
+**并且** group 为空的合法 ware MUST 归入 `others`
+**并且** `others` 标题 MUST 使用应用 UI locale 的 `common.others`
+**并且** 系统 MUST NOT 从 X4 游戏文本 locale 或 `module_groups.json` 读取该标题
+
+#### Scenario: 商品候选不依赖报价或生产能力
+
+**前提** 某 ware 存在于当前游戏版本 `wares.json`
+**并且** 当前 archive 没有该 ware 的 NPC 报价，或该 ware 没有 production module
+**当** 市场报价生成商品候选
+**那么** 该 ware MUST 仍可进入候选
+**并且** presenter MUST NOT 使用实际报价集合或生产模块集合缩减候选
+
+#### Scenario: TEMP 商品由数据生成阶段排除
+
+**前提** 游戏数据生成阶段已将 TEMP/内部 ware 排除出 `wares.json`
+**当** 市场报价生成商品候选
+**那么** 被排除的 ware MUST NOT 出现在候选中
+**并且** 市场报价 presenter 与 Vue MUST NOT 维护 TEMP ID、名称模式或报价白名单
+
+#### Scenario: 候选框向右弹出
+
+**前提** 商品搜索框具有一个或多个候选
+**当** 搜索框获得焦点
+**那么** 分组候选框 MUST 锚定条件 panel 并向右弹出
+**并且** 候选框 MUST 通过 Teleport 避免被左列裁剪
+
 #### Scenario: 点击结果添加药丸
 
 **前提** 某 ware 尚未被选择
@@ -122,6 +156,7 @@
 **那么** 页面 MUST 添加一个唯一 ware 药丸
 **并且** 药丸 MUST 使用现有 `X4NumberInput` 提供目标数量
 **并且** 药丸 MUST 提供移除操作
+**并且** 候选框 MUST 在选择完成后关闭
 
 #### Scenario: 数量指标缺少目标数量
 
@@ -130,6 +165,39 @@
 **那么** 对应排序选项 MUST 被禁用
 **并且** 页面 MUST 指出缺少正目标数量的 ware
 **并且** 系统 MUST NOT 自动使用 0、1 或 offer amount fallback
+
+### Requirement: Reusable Grouped Candidate Controls
+
+系统 SHALL 使用两个无 store 依赖的联动 common 控件承载商品和模块的搜索输入与右侧分组候选框。
+
+#### Scenario: 搜索框与弹出框职责分离
+
+**前提** 某功能需要搜索并选择分组候选
+**当** Vue 组合共用控件
+**那么** 搜索框 MUST 负责 query、focus/blur、清空、Escape 和右侧锚点定位
+**并且** 弹出框 MUST 负责 Teleport、分组标题、候选行、颜色和可选 DLC 标签
+**并且** 两个控件 MUST NOT 直接读取 store
+
+#### Scenario: Presenter 组装候选展示数据
+
+**前提** 市场报价、BuildPlan 或空间站模块选择需要渲染候选
+**当** 系统生成 common 控件的 groups/items
+**那么** 对应 presenter MUST 组装标签、颜色、DLC 状态和候选 ID
+**并且** Vue MUST 只消费 presenter 输出并转发选择事件
+
+#### Scenario: 复用商品与模块候选交互
+
+**前提** 用户使用市场报价商品、BuildPlan 商品/模块或空间站模块选择
+**当** 用户聚焦相应搜索框
+**那么** 这些入口 MUST 复用同一搜索框和分组弹出框控件
+**并且** 每个入口 MUST 保持自身既有候选过滤与选择后的领域动作
+
+#### Scenario: 舰队搜索保持独立
+
+**前提** BuildPlan 类别切换为舰队
+**当** 用户搜索舰船与蓝图
+**那么** 系统 MUST 继续使用 `FleetGoalSearchBox`
+**并且** 系统 MUST NOT 将舰队候选强制转换为商品/模块分组 DTO
 
 ### Requirement: Complete NPC Station Identity
 

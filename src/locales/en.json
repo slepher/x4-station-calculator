@@ -1021,6 +1021,7 @@
     "average": "AVERAGE",
     "no_active_production": "No Active Production",
     "add_modules_hint": "Please add production modules to see data",
+    "others": "Others",
     "cancel": "Cancel",
     "save": "Save"
   },

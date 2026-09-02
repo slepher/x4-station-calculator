@@ -16,14 +16,14 @@ test.describe('Module Management - Storage Auto-Fill', () => {
   test('Case 1: Basic Storage Auto-Fill', async ({ page }) => {
     await page.waitForSelector('.module-list-container', { state: 'visible' })
 
-    const searchInput = page.locator('[data-testid="station-module-search-input"]').first()
+    const searchInput = page.locator('[data-testid="candidate-search-input"]').first()
     await expect(searchInput).toBeVisible()
     await searchInput.click()
 
     await page.keyboard.type('Energy Cell', { delay: 30 })
     await page.waitForTimeout(500)
 
-    const resultItem = page.locator('[data-testid^="station-module-candidate-"]').first()
+    const resultItem = page.locator('[data-testid^="grouped-candidate-item-"]').first()
     await expect(resultItem).toBeVisible({ timeout: 500 })
 
     await resultItem.click()
@@ -38,13 +38,13 @@ test.describe('Module Management - Storage Auto-Fill', () => {
   test('Case 2: Race Preference Change', async ({ page }) => {
     await page.waitForSelector('.module-list-container', { state: 'visible' })
 
-    const searchInput = page.locator('[data-testid="station-module-search-input"]').first()
+    const searchInput = page.locator('[data-testid="candidate-search-input"]').first()
     await searchInput.click()
     await searchInput.fill('')
     await page.keyboard.type('Energy Cell', { delay: 30 })
     await page.waitForTimeout(500)
 
-    const resultItem = page.locator('[data-testid^="station-module-candidate-"]').first()
+    const resultItem = page.locator('[data-testid^="grouped-candidate-item-"]').first()
     await expect(resultItem).toBeVisible({ timeout: 3000 })
     await resultItem.click()
 
@@ -58,12 +58,12 @@ test.describe('Module Management - Storage Auto-Fill', () => {
   test.skip('Case 3: Incremental Fill', async ({ page }) => {
     await page.waitForSelector('.module-list-container', { state: 'visible' })
 
-    const searchInput = page.locator('[data-testid="station-module-search-input"]').first()
+    const searchInput = page.locator('[data-testid="candidate-search-input"]').first()
     await searchInput.click()
     await searchInput.fill('')
     await page.keyboard.type('Energy Cell', { delay: 30 })
     await page.waitForTimeout(500)
-    const resultItem = page.locator('[data-testid^="station-module-candidate-"]').first()
+    const resultItem = page.locator('[data-testid^="grouped-candidate-item-"]').first()
     await expect(resultItem).toBeVisible({ timeout: 3000 })
     await resultItem.click()
 
@@ -89,7 +89,7 @@ test.describe('Module Management - Storage Auto-Fill', () => {
     await page.keyboard.type('Storage', { delay: 30 })
     await page.waitForTimeout(500)
 
-    const storageResult = page.locator('[data-testid^="station-module-candidate-"]').first()
+    const storageResult = page.locator('[data-testid^="grouped-candidate-item-"]').first()
     await expect(storageResult).toBeVisible({ timeout: 3000 })
     await storageResult.click()
 
@@ -106,13 +106,13 @@ test.describe('Module Management - Storage Auto-Fill', () => {
   test.skip('Case 4: Buffer Response', async ({ page }) => {
     await page.waitForSelector('.module-list-container', { state: 'visible' })
 
-    const searchInput = page.locator('[data-testid="station-module-search-input"]').first()
+    const searchInput = page.locator('[data-testid="candidate-search-input"]').first()
     await searchInput.click()
     await searchInput.fill('')
     await page.keyboard.type('Energy Cell', { delay: 30 })
     await page.waitForTimeout(500)
 
-    const resultItem = page.locator('[data-testid^="station-module-candidate-"]').first()
+    const resultItem = page.locator('[data-testid^="grouped-candidate-item-"]').first()
     await expect(resultItem).toBeVisible({ timeout: 1000 })
     await resultItem.click()
 
@@ -153,13 +153,13 @@ test.describe('Module Management - Storage Auto-Fill', () => {
   test.skip('Case 5: AutoSupply Storage', async ({ page }) => {
     await page.waitForSelector('.module-list-container', { state: 'visible' })
 
-    const searchInput = page.locator('[data-testid="station-module-search-input"]').first()
+    const searchInput = page.locator('[data-testid="candidate-search-input"]').first()
     await searchInput.click()
     await searchInput.fill('')
     await page.keyboard.type('Hull', { delay: 30 })
     await page.waitForTimeout(500)
 
-    const resultItem = page.locator('[data-testid^="station-module-candidate-"]').first()
+    const resultItem = page.locator('[data-testid^="grouped-candidate-item-"]').first()
     await expect(resultItem).toBeVisible({ timeout: 1000 })
     await resultItem.click()
 
@@ -172,7 +172,7 @@ test.describe('Module Management - Storage Auto-Fill', () => {
     await page.keyboard.type('Refined', { delay: 30 })
     await page.waitForTimeout(500)
 
-    const supplyItem = page.locator('[data-testid^="station-module-candidate-"]').first()
+    const supplyItem = page.locator('[data-testid^="grouped-candidate-item-"]').first()
     await expect(supplyItem).toBeVisible({ timeout: 3000 })
     await supplyItem.click()
 
