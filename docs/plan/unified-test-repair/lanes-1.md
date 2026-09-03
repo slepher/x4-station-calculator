@@ -11,7 +11,7 @@
 - Name: `x4-station-calculator`
 - Path: `/home/slepher/project/x4-station-calculator`
 - Target branch: `develop`
-- Target base: `af17710661c1e5c8a23a01b83c00be641fa96ede`
+- Target base: `b62034868643b9d2a9af48ab0f634b067e80880d`
 
 ## Lane coding
 
@@ -55,7 +55,7 @@
 - Lane: `coding`
 - Depends on: `none`
 - Covers: `none`
-- Base: `af17710661c1e5c8a23a01b83c00be641fa96ede`
+- Base: `b62034868643b9d2a9af48ab0f634b067e80880d`
 
 ## Phase task-coding-2
 
@@ -68,19 +68,19 @@
 - Lane: `coding`
 - Depends on: `task-coding-1`
 - Covers: `none`
-- Base: `af17710661c1e5c8a23a01b83c00be641fa96ede`
+- Base: `b62034868643b9d2a9af48ab0f634b067e80880d`
 
 ## Phase task-test-1
 
 - Kind: `test`
 - Mode: `hard`
-- Mode basis: 108 个 unified 与 83 个 legacy unit spec 的分类、迁移、去重和 mock 修正共享同一收集/fixture 不变量，单一高能力 owner 更安全。
+- Mode basis: 108 个 unified 与 85 个 legacy unit spec 的分类、迁移、去重和 mock 修正共享同一收集/fixture 不变量，单一高能力 owner 更安全。
 - Execution strategy: `single-sup`
 - Worker role: `sup_coding_worker`
 - Lane: `integrate`
 - Depends on: `none`
 - Covers: `task-coding-1, task-coding-2`
-- Base: `af17710661c1e5c8a23a01b83c00be641fa96ede`
+- Base: `b62034868643b9d2a9af48ab0f634b067e80880d`
 
 ## Phase task-test-2
 
@@ -92,7 +92,7 @@
 - Lane: `integrate`
 - Depends on: `task-test-1`
 - Covers: `task-coding-1, task-coding-2`
-- Base: `af17710661c1e5c8a23a01b83c00be641fa96ede`
+- Base: `b62034868643b9d2a9af48ab0f634b067e80880d`
 
 ## FIFO 与 fix 路由
 

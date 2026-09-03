@@ -6,7 +6,7 @@
 - Plan: `plan-1.md`
 - Lane manifest: `lanes-1.md`
 - Context: `context-1.md`
-- Evidence target: `af17710661c1e5c8a23a01b83c00be641fa96ede`
+- Evidence target: `b62034868643b9d2a9af48ab0f634b067e80880d`
 - Task kind: `coding`
 - Mode: `normal`
 - Mode basis: Sidebar 行为/锚点与相邻规范文档有清晰、无重叠的 owned paths，可串行交付。
@@ -15,7 +15,7 @@
 - Lane: `coding`
 - Worktree: `/home/slepher/project/x4-station-calculator/.worktree/coding`
 - Branch: `codex/unified-test-repair-g1-coding`
-- Base: `af17710661c1e5c8a23a01b83c00be641fa96ede`
+- Base: `b62034868643b9d2a9af48ab0f634b067e80880d`
 - Depends on: `none`
 - Covers: `none`
 

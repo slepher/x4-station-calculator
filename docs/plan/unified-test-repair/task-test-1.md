@@ -9,7 +9,7 @@
 - Evidence target: accepted `task-coding-2` merge on target branch `develop`, containing `task-coding-1`
 - Task kind: `test`
 - Mode: `hard`
-- Mode basis: 191 个现/旧 unit spec 的需求分类、迁移、去重、mock/fixture 修正共享同一 collection 和 public-boundary 判断，拆给多个 owner 易产生重复与相反删除结论。
+- Mode basis: 193 个现/旧 unit spec 的需求分类、迁移、去重、mock/fixture 修正共享同一 collection 和 public-boundary 判断，拆给多个 owner 易产生重复与相反删除结论。
 - Execution strategy: `single-sup`
 - Worker role: `sup_coding_worker`
 - Lane: `integrate`
@@ -46,6 +46,7 @@
 3. 处理共享 mock/fixture 根因：i18n default export、active Pinia、fixture path、cluster shape、`getStorageKey` 等；能由 coding-2 公共 setup 解决的 spec 不再自带替代实现。
 4. 处理 assertion failures：以当前 OpenSpec/guide/public API 为准；固定旧版本或私有结构的断言迁移或删除。
 5. 扫描 `tests/unit/`，只迁移 unified 缺失的现行行为测试；同场景保留断言最强、依赖最少的一份。
+   - 必须纳入当前 `npc-trade-ui` 的 presenter、store 与 workbench 测试；以 NPC Trade 当前公开行为判断迁移/去重，不因其刚合并或当前已通过而跳过 legacy 收敛。
 6. 为 coding-1 的 stable test-id/presenter/reorder 补最小 unit coverage，不复制 E2E 用户链。
 7. 运行完整 canonical unit 与 skills unit，确认默认配置不再采集 legacy 路径。
 
