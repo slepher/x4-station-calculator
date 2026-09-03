@@ -4,7 +4,7 @@
 
 - Name: `coding`
 - State: `working`
-- Active task: `task-coding-2.1`
+- Active task: `task-coding-2.2`
 - Candidate: `none`
-- Next action: `worker executing task-coding-2.1`
+- Next action: `worker executing task-coding-2.2`
 - Blocker: `none`
