@@ -116,6 +116,7 @@ const buildPlanPresenter = useBuildPlanPresenter({
       :can-open-context-menu="sidebarPresenter.props.canOpenContextMenu"
       :context-menu-mode="sidebarPresenter.props.contextMenuMode"
       :can-delete-station="sidebarPresenter.props.canDeleteStation"
+      :can-reorder-stations="sidebarPresenter.props.canReorderStations"
       @select-overview="sidebarPresenter.emits.selectOverview"
       @select-station="sidebarPresenter.emits.selectStation"
       @create-station="sidebarPresenter.emits.createStation"
@@ -133,6 +134,7 @@ const buildPlanPresenter = useBuildPlanPresenter({
       @select-transit="() => {}"
       @expand-sector="() => {}"
       @jump-to-binding="() => {}"
+      @reorder-stations="sidebarPresenter.emits.reorderStations"
     />
     <div class="production-content custom-scrollbar">
       <BlueprintContextToolbar

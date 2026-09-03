@@ -23,6 +23,7 @@ export interface SidebarPresenterProps {
   canOpenContextMenu: boolean
   contextMenuMode: 'full' | 'delete-only'
   canDeleteStation: (stationId: string) => boolean
+  canReorderStations: boolean
 }
 
 export interface SidebarPresenterEmits {
@@ -42,6 +43,7 @@ export interface SidebarPresenterEmits {
   deleteStation: (stationId: string) => void
   expandSector: (sectorId: string | null) => void
   jumpToBinding: (tabId: string, tabType: 'station' | 'transit') => void
+  reorderStations: (stationIds: string[]) => boolean
 }
 
 export interface UseProductionSidebarPresenterReturn {
@@ -95,6 +97,7 @@ export interface SidebarPresenterStore {
   setExpandedSector?(sectorId: string | null): void
   jumpToMapBinding?(tabId: string, tabType: 'station' | 'transit'): void
   canDeleteStation?(stationId: string): boolean
+  reorderStations?(stations: Array<{ id: string }>): boolean
   autoGroupResult?: unknown | null
   needsAutoGroupRecalc?: boolean
 }
@@ -212,6 +215,7 @@ export function useProductionSidebarPresenter(store: SidebarPresenterStore): Use
     canOpenContextMenu: !store.capabilities.uniqueStation || (store.capabilities.uniqueStation && !store.archiveStation),
     contextMenuMode: store.capabilities.uniqueStation ? 'delete-only' : 'full',
     canDeleteStation: (stationId: string) => store.canDeleteStation?.(stationId) ?? !store.capabilities.uniqueStation,
+    canReorderStations: store.capabilities.hasSectors === false && store.reorderStations !== undefined,
     terraformingClusters: computed(() => []),
     activeTerraformingClusterId: computed(() => null),
   }
@@ -234,6 +238,10 @@ export function useProductionSidebarPresenter(store: SidebarPresenterStore): Use
     expandSector: (sectorId: string | null) => (store.setExpandedSector || (() => {}))(sectorId),
     jumpToBinding: (tabId: string, tabType: 'station' | 'transit') => {
       ;(store.jumpToMapBinding || (() => {}))(tabId, tabType)
+    },
+    reorderStations: (stationIds: string[]) => {
+      const stations = stationIds.map((id) => ({ id }))
+      return store.reorderStations?.(stations) === true
     }
   }
 

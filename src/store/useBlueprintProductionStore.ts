@@ -535,6 +535,14 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     return empireDataStore.renameStationInEmpire(activeEmpire.value, stationId, newName)
   }
 
+  function reorderStations(reorderedStations: Array<{ id: string }>): boolean {
+    if (!activeEmpire.value || reorderedStations.length !== activeEmpire.value.stations.length) return false
+    const stationsById = new Map(activeEmpire.value.stations.map((station) => [station.id, station]))
+    const reordered = reorderedStations.map((station) => stationsById.get(station.id))
+    if (reordered.some((station) => station === undefined)) return false
+    return empireDataStore.reorderStationsInEmpire(activeEmpire.value, reordered as StationPlan[])
+  }
+
   function selectStation(stationId: string | null) {
     activeViewStore.activeEmpireWorkbench = stationId ? 'station' : 'overview'
     activeStationId.value = stationId
@@ -1059,6 +1067,7 @@ function updateStationModules(stationId: string, modules: SavedModule[]) {
     deleteStation,
     duplicateStation: duplicateStationFromUi,
     renameStation,
+    reorderStations,
     selectStation,
     selectTransitSector: (_sectorId: string | null) => {},
     setExpandedSector: (_sectorId: string | null) => {},
