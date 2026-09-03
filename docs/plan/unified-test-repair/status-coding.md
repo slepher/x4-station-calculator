@@ -3,8 +3,8 @@
 ## Lane
 
 - Name: `coding`
-- State: `unprovisioned`
+- State: `idle`
 - Active task: `none`
-- Candidate: `none`
-- Next action: `reconcile against the current lane manifest and Git state`
+- Candidate: `57465b5eddba080e84d98d8eb1138e42cc941283`
+- Next action: `dispatch task-coding-1.2`
 - Blocker: `none`

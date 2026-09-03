@@ -47,6 +47,7 @@
 - `openspec/specs/station-tabs/spec.md`
 - `openspec/changes/tab-2-sidebar/specs/sidebar-navigation/spec.md`（仅在消除与主规范矛盾所必需时）
 - `guide/empire/tabbar/`
+- `guide/functions.md`
 - `guide/empire/index.md`
 - `guide/index.md`
 - `sitemap.md`
