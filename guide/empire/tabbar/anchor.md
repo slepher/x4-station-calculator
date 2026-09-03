@@ -1,41 +1,38 @@
-# Empire Tabbar Anchor
+# Empire Sidebar Anchor
 
-## 第一章：定位总览（最简）
+当前目录路径保留 `tabbar` 作为历史 guide 路径；当前 UI 名称与 anchor 均为 Sidebar。
 
-### Tabbar（站点标签栏）
-- `guide.empire.tab.overview` -> 第一个标签为帝国概览，定位 `.station-tab-bar-container .overview-tab`
-- `guide.empire.tab.station` -> 后续标签为空间站，定位 `.station-tab-bar-container .station-tab`
-- `guide.empire.tab.add-station` -> 最后一个标签后的加号按钮用于添加空间站，定位 `.station-tab-bar-container .add-btn`
-- `guide.empire.station.module-input` -> 空间站页模块添加输入框，定位 `data-testid="station-module-search-input"`
-- `guide.empire.station.module-candidate-popover` -> 模块候选框容器，定位 `data-testid="station-module-candidate-popover"`
-- `guide.empire.station.module-candidate-item` -> 模块候选项，定位 `data-testid="station-module-candidate-<moduleId>"`
+## 稳定锚点
 
-## 第二章：锚点定义（详细）
+- `guide.empire.sidebar.root` -> `src/components/empire/ProductionSidebar.vue` 的 `data-testid="production-sidebar"`
+- `guide.empire.sidebar.toggle` -> `data-testid="sidebar-toggle"`
+- `guide.empire.sidebar.overview` -> `data-testid="sidebar-overview"`
+- `guide.empire.sidebar.station-list` -> `data-testid="sidebar-station-list"`
+- `guide.empire.sidebar.station` -> `data-testid="sidebar-station"` + `data-station-id="<stationId>"`
+- `guide.empire.sidebar.add-station` -> `data-testid="sidebar-add-station"`
+- `guide.empire.sidebar.sector` -> `data-testid="sidebar-sector"` + `data-sector-id="<sectorId>"`
+- `guide.empire.sidebar.sector-toggle` -> `data-testid="sidebar-sector-toggle"` + `data-sector-id="<sectorId>"`
+- `guide.empire.sidebar.context-menu` -> `data-testid="sidebar-context-menu"`
+- `guide.empire.sidebar.menu-jump-binding` -> `data-testid="sidebar-menu-jump-binding"`
+- `guide.empire.sidebar.menu-rename` -> `data-testid="sidebar-menu-rename"`
+- `guide.empire.sidebar.menu-duplicate` -> `data-testid="sidebar-menu-duplicate"`
+- `guide.empire.sidebar.menu-delete` -> `data-testid="sidebar-menu-delete"`
+- `guide.empire.sidebar.delete-dialog` -> `data-testid="sidebar-delete-dialog"`
+- `guide.empire.sidebar.delete-confirm` -> `data-testid="sidebar-delete-confirm"`
+- `guide.empire.sidebar.delete-cancel` -> `data-testid="sidebar-delete-cancel"`
+- `guide.empire.station.module-input` -> `data-testid="station-module-search-input"`
+- `guide.empire.station.module-candidate-popover` -> `data-testid="station-module-candidate-popover"`
+- `guide.empire.station.module-candidate-item` -> `data-testid="station-module-candidate-<moduleId>"`
 
-- `guide.empire.tab.overview`
-  - `type`: `tab`
-  - `locator`: `.station-tab-bar-container .overview-tab`
-  - `note`: `StationTabBar` 中固定第一个标签，表示帝国概览。
-- `guide.empire.tab.station`
-  - `type`: `tab`
-  - `locator`: `.station-tab-bar-container .station-tab`
-  - `note`: 概览标签之后的标签项均为空间站标签（按站点列表渲染）。
-- `guide.empire.tab.add-station`
-  - `type`: `button`
-  - `locator`: `.station-tab-bar-container .add-btn`
-  - `note`: 位于最后一个标签后方的加号按钮，用于新建空间站标签。
-- `guide.empire.station.module-input`
-  - `type`: `input`
-  - `locator`: `data-testid="station-module-search-input"`
-  - `note`: 仅在选中空间站（非概览）时可见，用于搜索并添加模块到规划区。
-- `guide.empire.station.module-candidate-popover`
-  - `type`: `popover`
-  - `locator`: `data-testid="station-module-candidate-popover"`
-  - `note`: 输入框聚焦后显示；失焦或按 `Esc` 后关闭。
-- `guide.empire.station.module-candidate-item`
-  - `type`: `item`
-  - `locator`: `data-testid="station-module-candidate-<moduleId>"`
-  - `note`: 候选项按模块 id 生成；点击后向规划区添加对应模块。
+固定入口仍使用 `sidebar-overview`、`sidebar-terraforming`、`sidebar-research`、`sidebar-npc-trade`、`sidebar-blueprint-recipe`、`sidebar-tech-tree`、`sidebar-auto-sector-group`。
+
+## Owner trace
+
+`ProductionSidebar.vue` 只负责交互表现；`useProductionSidebarPresenter.ts` 负责 tabs、active entry、能力和 emit 组装；blueprint 重排经 `useBlueprintProductionStore.reorderStations()` 到 `useEmpireDataStore.reorderStationsInEmpire()`。workbench 入口为 `BlueprintProductionWorkbenchView.vue` 与 `LiveProductionWorkbenchView.vue`。
+
+## 迁移边界
+
+历史 `StationTabBar`、`SectorStationTabBar`、`.overview-tab`、`.station-tab` 只属于迁移语境；当前 anchor 不依赖旧 component/class 或可变文本。
 
 ## Pending
 

@@ -33,6 +33,8 @@ index.html
 | 飞船建造 | [`ShipBuildView.vue`](src/components/ship-build/ShipBuildView.vue) | [`ship-build/presenters/`](src/components/ship-build/presenters/) | [`useShipBuildStore.ts`](src/store/useShipBuildStore.ts) |
 | 地图 | [`MapWorkbenchView.vue`](src/components/map/MapWorkbenchView.vue) | 尚无统一 presenter | [`useMapStore.ts`](src/store/useMapStore.ts)、[`useSaveStore.ts`](src/store/useSaveStore.ts) |
 
+生产蓝图与实时生产的当前导航均为 [`ProductionSidebar.vue`](src/components/empire/ProductionSidebar.vue)，其 UI 数据和事件由 [`useProductionSidebarPresenter.ts`](src/components/empire/presenters/useProductionSidebarPresenter.ts) 组装。blueprint reorder 经 [`useBlueprintProductionStore.ts`](src/store/useBlueprintProductionStore.ts) 写入 [`useEmpireDataStore.reorderStationsInEmpire()`](src/store/useEmpireDataStore.ts)。稳定锚点见 [`guide/empire/tabbar/`](guide/empire/tabbar/)；该目录名是历史路径，不是当前 UI 名称。
+
 共享 UI 位于 [`src/components/common/`](src/components/common/)，其余功能组件按 [`empire/`](src/components/empire/)、[`logic-flow/`](src/components/logic-flow/)、[`ship-build/`](src/components/ship-build/)、[`map/`](src/components/map/) 和 [`save/`](src/components/save/) 分组。
 
 ## 状态与领域计算
@@ -60,7 +62,7 @@ index.html
 
 - 当前统一单元测试：[`tests/unified-unit/`](tests/unified-unit/)
 - 当前统一 E2E：[`tests/unified-e2e/`](tests/unified-e2e/)
-- 旧测试集：[`tests/unit/`](tests/unit/)、[`tests/e2e/`](tests/e2e/)
+- 旧测试集（legacy migration source）：[`tests/unit/`](tests/unit/)、[`tests/e2e/`](tests/e2e/)
 - 测试数据：[`tests/fixtures/`](tests/fixtures/)、[`tests/seeds/`](tests/seeds/)
 - 测试装配：[`tests/test-setup.ts`](tests/test-setup.ts)
 - Live Binding fixture helper：[`loadLiveBindingFixture.ts`](tests/unified-e2e/live/helpers/loadLiveBindingFixture.ts)

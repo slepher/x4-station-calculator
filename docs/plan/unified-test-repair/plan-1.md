@@ -9,6 +9,7 @@
 
 - `2026-09-04`：以当前 `develop` 的 `npc-storage` 合并提交 `b6203486` 作为新的 immutable evidence target；目标、范围、泳道拓扑和任务所有权不变。
 - `task-test-1` 的 legacy unit 输入由 83 个调整为 85 个，新增/更新的 NPC Trade 测试必须纳入迁移、去重或删除证据清单。
+- `task-coding-1.2` 补列其已明确要求同步的 `guide/functions.md` owned path；责任人、文档范围与泳道拓扑不变。
 
 ## 目标
 

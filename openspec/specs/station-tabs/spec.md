@@ -1,157 +1,94 @@
-# Station Tabs Module Specification
+# Station Sidebar Navigation Specification
 
 ## Purpose
-描述标签栏模块的组件结构和交互能力，包括标签切换、右键菜单功能。
 
-## Current Implementation
+定义生产工作区导航的用户可观察行为。Sidebar 是原导航行为的新表现；行为权威是选中状态、工作区模式、菜单动作和站点顺序，不是某个历史 DOM 组件或 CSS class。
 
-当前实现为单一组件 `StationTabBar.vue`，包含所有标签栏功能。
+## Implementation boundary
 
-**文件位置**: `src/components/StationTabBar.vue`
-
-## Future Module Structure (规划中)
-
-```
-StationTabBar/
-├── StationTabBar.vue          # 主组件 - 标签栏容器
-├── StationTab.vue             # 单标签组件
-├── StationContextMenu.vue     # 右键菜单组件
-└── types.ts                   # 类型定义
-```
-
-## Components
-
-### StationTabBar.vue (当前实现)
-
-**职责**: 标签栏容器，管理标签列表、选中状态和右键菜单
-
-**内部状态**:
-- `showMenu: boolean` - 右键菜单显示状态
-- `menuStationId: string | null` - 右键菜单目标分站 ID
-- `showDeleteConfirm: boolean` - 删除确认对话框状态
-- `stationToDelete: string | null` - 待删除的分站 ID
-
-**Store 依赖**:
-- `useEmpireStore` - 获取分站列表、选中状态、执行 CRUD 操作
-
-### StationTab.vue (规划中)
-
-**职责**: 渲染单个标签，处理点击和右键事件
-
-**Props**:
-- `id: string | null` - 分站 ID（null 表示帝国总览）
-- `name: string` - 标签名称
-- `type: StationType | 'overview'` - 分站类型
-- `active: boolean` - 是否选中
-
-**Emits**:
-- `click()` - 点击标签
-- `contextmenu(event: MouseEvent)` - 右键点击
-
-### StationContextMenu.vue (规划中)
-
-**职责**: 显示分站操作菜单
-
-**Props**:
-- `stationId: string` - 目标分站 ID
-- `position: { x: number, y: number }` - 菜单位置
-
-**Emits**:
-- `rename(stationId: string)` - 重命名
-- `duplicate(stationId: string)` - 复制
-- `delete(stationId: string)` - 删除
-- `close()` - 关闭菜单
+- Vue：`src/components/empire/ProductionSidebar.vue`
+- Presenter：`src/components/empire/presenters/useProductionSidebarPresenter.ts`
+- Blueprint store：`src/store/useBlueprintProductionStore.ts`
+- 最终站点顺序 owner：`src/store/useEmpireDataStore.ts` 的 `reorderStationsInEmpire()`
+- Blueprint 与 live 入口：`src/components/empire/BlueprintProductionWorkbenchView.vue`、`src/components/empire/LiveProductionWorkbenchView.vue`
 
 ## Requirements
 
-### Requirement: 标签栏布局 (Tab Bar Layout)
-标签栏 SHALL 采用水平布局，从左到右排列：
-- **固定标签**: 第一个标签永远是"帝国总览"
-- **动态标签**: 后续跟随用户创建的各个分站
-- **[+] 按钮**: 新建工业站
+### Requirement: Sidebar layout
 
-#### Scenario: 标签栏初始状态
-- **前提** 帝国中无分站
-- **当** 用户查看标签栏时
-- **那么** 标签栏 SHALL 仅显示"帝国总览"标签和 [+] 按钮
+Sidebar SHALL 垂直展示固定入口与动态站点入口。Blueprint 动态区平铺站点；live 动态区按星区展示 Transit 与站点树。Sidebar SHALL 支持折叠/展开，折叠只改变表现，不改变当前工作区或选中站点。
 
-### Requirement: 帝国总览标签 (Empire Overview Tab)
-帝国总览标签 SHALL 作为固定标签：
-- 始终显示在标签栏第一位
-- 点击后 activeStationId 设为 null
-- 显示帝国总览视图
+#### Scenario: Sidebar 表现
 
-#### Scenario: 切换到帝国总览
-- **前提** 用户正在查看某个分站
-- **当** 用户点击"帝国总览"标签
-- **那么** activeStationId SHALL 设为 null
-- **并且** 内容区域 SHALL 显示帝国总览视图
+- **WHEN** 用户进入 blueprint 或 live 生产工作区
+- **THEN** 页面显示 Sidebar 导航
+- **AND** 折叠/展开不改变当前工作区或选中站点
 
-### Requirement: 分站标签 (Station Tabs)
-每个分站 SHALL 对应一个动态标签：
-- 显示分站名称和类型图标
-- 选中状态有明显的背景色区分
-- 支持右键菜单操作
-- 支持拖拽重排空间站标签顺序
+### Requirement: Overview navigation
 
-#### Scenario: 分站标签显示
-- **前提** 帝国中存在分站
-- **当** 用户查看标签栏时
-- **那么** 每个分站 SHALL 显示为一个标签
-- **并且** 标签 SHALL 显示分站名称和类型图标（如 🏭 工业、📦 补给）
+Sidebar SHALL 提供固定概览入口。点击概览后，`activeStationId` SHALL 为 `null`，工作区 SHALL 显示帝国概览；live 与 blueprint 的概览内容保持各自现有语义。
 
-#### Scenario: 切换分站
-- **前提** 用户正在查看帝国总览或其他分站
-- **当** 用户点击某个分站标签
-- **那么** activeStationId SHALL 设为该分站 ID
-- **并且** 内容区域 SHALL 显示该分站的三列布局视图
+#### Scenario: 切换概览
 
-#### Scenario: 拖拽重排分站标签
-- **前提** 帝国中存在多个分站
-- **当** 用户将分站 A 标签拖拽到分站 B 标签之后
-- **那么** 标签栏 SHALL 按新顺序展示分站标签
-- **并且** 分站 A 与分站 B 在 `stations` 中的顺序 SHALL 同步更新
-- **并且** activeStationId SHALL 继续指向拖拽前已激活的分站 ID
+- **WHEN** 用户点击 Sidebar 概览入口
+- **THEN** `activeStationId` 为 `null`
+- **AND** 工作区显示帝国概览
 
-### Requirement: 新建分站按钮 (Add Station Button)
-[+] 按钮 SHALL 用于新建工业站：
-- 点击后创建新的工业站
-- 新分站自动激活
+### Requirement: Station navigation
 
-#### Scenario: 新建工业站
-- **前提** 用户点击 [+] 按钮
-- **当** 系统创建新分站时
-- **那么** 新分站 type SHALL 为 'industrial'
-- **并且** 新分站 SHALL 自动激活
-- **并且** 标签栏 SHALL 显示新分站标签
+每个站点 SHALL 显示名称和类型图标。点击站点后 SHALL 选中其 ID，并显示该站点工作区；当前 active station ID 在导航表现变化中保持不变。
 
-### Requirement: 分站菜单 (Station Menu)
-StationContextMenu 组件 SHALL 提供以下菜单项：
-- **重命名**: 编辑分站名称
-- **复制分站**: 创建分站副本
-- **导入蓝图**: 导入模块配置
-- **删除分站**: 删除该分站（最后一项）
+#### Scenario: 切换站点
 
-#### Scenario: 删除分站确认
-- **前提** 用户在分站菜单中点击删除
-- **当** 系统执行删除操作时
-- **那么** 系统 SHALL 显示确认对话框
-- **并且** 确认后才执行删除
+- **WHEN** 用户点击某个 Sidebar 站点入口
+- **THEN** 该站点 ID 成为 active station ID
+- **AND** 工作区显示该站点
 
-#### Scenario: 删除当前激活分站
-- **前提** 用户删除当前激活的分站
-- **当** 删除完成后
-- **那么** activeStationId SHALL 切换到 null
-- **并且** 视图 SHALL 切换到帝国总览
+### Requirement: Blueprint station reorder
 
-### Requirement: 标签选中状态 (Tab Selected State)
-选中的标签 SHALL 有明显的视觉区分：
-- 选中标签使用亮色背景
-- 未选中标签使用暗色背景
-- 悬停时有过渡动画
+Blueprint Sidebar SHALL 支持站点拖拽重排。重排后 Sidebar 顺序与 `stations` 顺序 SHALL 同步，`activeStationId` SHALL 保持原值。排序请求必须是当前站点 ID 的完整排列；非法集合 SHALL 被拒绝。唯一领域写入 owner 是 `useEmpireDataStore.reorderStationsInEmpire()`，不得创建第二份排序状态。
 
-#### Scenario: 标签选中视觉反馈
-- **前提** 用户切换标签
-- **当** 新标签被选中时
-- **那么** 新标签 SHALL 显示亮色背景
-- **并且** 之前选中的标签 SHALL 显示暗色背景
+Live SHALL 保持现有星区/站点顺序语义，不新增跨星区持久化重排语义。
+
+#### Scenario: 重排 blueprint 站点
+
+- **WHEN** 用户在 blueprint Sidebar 中拖拽站点
+- **THEN** `stations` 按新顺序更新
+- **AND** active station ID 不变
+
+### Requirement: Station menu
+
+站点上下文菜单 SHALL 保留：跳转 binding、重命名、复制和删除。删除 SHALL 先显示确认对话框；确认后移除站点。唯一站点场景 SHALL 保留其现有 delete-only 语义。
+
+#### Scenario: 删除站点
+
+- **WHEN** 用户从站点上下文菜单选择删除
+- **THEN** 系统先显示删除确认对话框
+- **AND** 仅在确认后移除站点
+
+### Requirement: Other navigation entries
+
+live Sidebar SHALL 保留概览、terraforming、research、NPC trade、blueprint recipe、auto-sector-group、Transit 与 station 入口的现有模式切换语义。固定入口的显示由 presenter 能力决定；Sidebar 不直接组装 store 数据。
+
+#### Scenario: 切换固定入口
+
+- **WHEN** 用户点击 live Sidebar 的固定入口
+- **THEN** workbench 按入口切换到对应现有模式
+
+## Stable UI contract
+
+以下 `data-testid` 是行为锚点，实体身份放在 `data-station-id` 或 `data-sector-id`，不得把名称、翻译或序号编码进 ID：
+
+| 行为 | 锚点 |
+| --- | --- |
+| Sidebar 根/折叠 | `production-sidebar` / `sidebar-toggle` |
+| 固定入口 | `sidebar-overview`、`sidebar-terraforming`、`sidebar-research`、`sidebar-npc-trade`、`sidebar-blueprint-recipe`、`sidebar-tech-tree`、`sidebar-auto-sector-group` |
+| 星区/星区折叠 | `sidebar-sector` + `data-sector-id` / `sidebar-sector-toggle` + `data-sector-id` |
+| 站点列表/站点 | `sidebar-station-list` / `sidebar-station` + `data-station-id` |
+| 新建站点 | `sidebar-add-station` |
+| 上下文菜单 | `sidebar-context-menu`、`sidebar-menu-jump-binding`、`sidebar-menu-rename`、`sidebar-menu-duplicate`、`sidebar-menu-delete` |
+| 删除确认 | `sidebar-delete-dialog`、`sidebar-delete-confirm`、`sidebar-delete-cancel` |
+
+## Compatibility and migration
+
+历史实现名称 `StationTabBar`、`SectorStationTabBar` 仅用于描述从水平 TabBar 到 Sidebar 的迁移背景；当前规范、guide anchor 和行为断言不得依赖这些名称或旧 `.overview-tab`、`.station-tab` class。测试目录以 `tests/unified-unit/`、`tests/unified-e2e/` 为 current；`tests/unit/`、`tests/e2e/` 仅作为 legacy migration source。

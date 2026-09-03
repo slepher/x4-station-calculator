@@ -2,6 +2,20 @@
 
 ## Functions
 
+- `useProductionSidebarPresenter`
+  - `file: src/components/empire/presenters/useProductionSidebarPresenter.ts`
+  - `usage: 组装 blueprint/live Sidebar 的导航数据与事件`
+  - `signature: useProductionSidebarPresenter(store)`
+  - `returns: props（tabs、activeTabId、能力与稳定入口数据）与 emits（导航、菜单、重排事件）`
+  - `constraints: Vue 通过 presenter 消费 store；blueprint reorder 只提交完整 station ID 排列`
+
+- `reorderStationsInEmpire`
+  - `file: src/store/useEmpireDataStore.ts`
+  - `usage: 写入 blueprint empire 的站点顺序`
+  - `signature: reorderStationsInEmpire(empire, reorderedStations)`
+  - `returns: boolean`
+  - `constraints: 仅接受与当前 stations 等长且 ID 集合完全一致的排列；失败返回 false`
+
 - `getShipCandidates`
   - `file: src/domain-data/ship-build-queries.ts`
   - `ref: extractShipCandidates`
