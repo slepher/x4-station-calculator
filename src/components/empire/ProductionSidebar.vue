@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import type { ProductionTabItem } from '@/types/production-ui'
 import { SAVE_POI_ICON_MAP } from '@/components/map/utils/style'
 import { getPoiIconTag } from '@/store/logic/stationPoiSemantics'
+import draggable from 'vuedraggable'
 import playerhqIconUrl from '@/components/icons/playerhq.svg'
 import tradestationIconUrl from '@/components/icons/tradestation.svg'
 import factoryIconUrl from '@/components/icons/factory.svg'
@@ -31,6 +32,7 @@ const props = defineProps<{
   canOpenContextMenu: boolean
   contextMenuMode: 'full' | 'delete-only'
   canDeleteStation: (stationId: string) => boolean
+  canReorderStations?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -50,6 +52,7 @@ const emit = defineEmits<{
   deleteStation: [stationId: string]
   expandSector: [sectorId: string | null]
   jumpToBinding: [tabId: string, tabType: 'station' | 'transit']
+  reorderStations: [stationIds: string[]]
 }>()
 
 const { t } = useI18n()
@@ -360,6 +363,10 @@ const addNewStation = () => {
   emit('createStation')
 }
 
+const handleStationReorder = (items: ProductionTabItem[]) => {
+  emit('reorderStations', items.map((item) => item.id))
+}
+
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
 })
@@ -369,9 +376,10 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="production-sidebar" :class="{ collapsed }">
+  <div class="production-sidebar" :class="{ collapsed }" data-testid="production-sidebar">
     <button
       class="sidebar-toggle"
+      data-testid="sidebar-toggle"
       :title="collapsed ? '展开侧栏' : '收起侧栏'"
       @click="collapsed = !collapsed"
     >
@@ -471,8 +479,34 @@ onUnmounted(() => {
 
         <div class="sidebar-divider"></div>
 
-        <div v-if="!hasSectors" class="sidebar-section sidebar-dynamic">
+        <div v-if="!hasSectors" class="sidebar-section sidebar-dynamic" data-testid="sidebar-station-list">
+          <draggable
+            v-if="props.canReorderStations"
+            :model-value="dynamicItems"
+            item-key="id"
+            :component-data="{ class: 'sidebar-station-list' }"
+            @update:model-value="handleStationReorder"
+          >
+            <template #item="{ element: item }">
+              <div
+                class="sidebar-item station-item"
+                :class="{ active: isTabActive(item.id) }"
+                data-testid="sidebar-station"
+                :data-station-id="item.id"
+                tabindex="0"
+                @click="handleTabClick(item)"
+                @keydown.enter="handleTabClick(item)"
+                @keydown.space.prevent="handleTabClick(item)"
+                @contextmenu.stop="openMenu(item.id, 'station', $event)"
+              >
+                <div class="sidebar-item-active-bar"></div>
+                <img class="sidebar-item-icon" :class="getTabIconClass(item)" :src="getTabIcon(item)" alt="" />
+                <span class="sidebar-item-label">{{ item.name }}</span>
+              </div>
+            </template>
+          </draggable>
           <div
+            v-else
             v-for="item in dynamicItems"
             :key="item.id"
             class="sidebar-item station-item"
@@ -501,11 +535,18 @@ onUnmounted(() => {
             <div
               class="sidebar-item sector-header"
               :class="{ expanded: isSectorExpanded(sector.id), active: isSectorActive(sector.id) }"
-              @click="handleSectorClick(sector.id)"
+            data-testid="sidebar-sector"
+            :data-sector-id="sector.id"
+            tabindex="0"
+            @click="handleSectorClick(sector.id)"
+            @keydown.enter="handleSectorClick(sector.id)"
+            @keydown.space.prevent="handleSectorClick(sector.id)"
             >
               <div class="sidebar-item-active-bar"></div>
               <button
                 class="sector-chevron-btn"
+                data-testid="sidebar-sector-toggle"
+                :data-sector-id="sector.id"
                 @click.stop="toggleSectorCollapse(sector.id)"
               >
                 <svg
@@ -530,13 +571,20 @@ onUnmounted(() => {
 
             <template v-if="isSectorExpanded(sector.id)">
               <div
+                data-testid="sidebar-station-list"
+                class="sidebar-station-list"
+              >
+              <div
                 v-for="item in dynamicItems.filter(d => d.sectorId === sector.id && d.type === 'station')"
                 :key="item.id"
                 class="sidebar-item station-item pl-8"
                 :class="{ active: isTabActive(item.id) }"
                 data-testid="sidebar-station"
                 :data-station-id="item.id"
+                tabindex="0"
                 @click="handleFixedClick(item)"
+                @keydown.enter="handleFixedClick(item)"
+                @keydown.space.prevent="handleFixedClick(item)"
                 @contextmenu.stop="openMenu(item.id, item.type, $event)"
               >
                 <div class="sidebar-item-active-bar"></div>
@@ -544,6 +592,7 @@ onUnmounted(() => {
               <img v-if="item.id !== 'terraforming'" class="sidebar-item-icon" :class="getTabIconClass(item)" :src="getTabIcon(item)" alt="" />
                   <span class="sidebar-item-label">{{ item.name }}</span>
                 </span>
+              </div>
               </div>
             </template>
           </template>
@@ -560,49 +609,50 @@ onUnmounted(() => {
     </div>
 
     <Teleport to="body">
-      <div
-        v-if="showMenu"
-        class="sidebar-context-menu"
+        <div
+          v-if="showMenu"
+          class="sidebar-context-menu"
+          data-testid="sidebar-context-menu"
         :style="{ top: `${menuPosition.y}px`, left: `${menuPosition.x}px` }"
         @click.stop
       >
         <div class="menu-header">{{ t('sector.menu_operations') }}</div>
 
-        <div class="menu-item" @click="jumpToBinding">
+        <button class="menu-item" data-testid="sidebar-menu-jump-binding" @click="jumpToBinding">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M10.5 13.5L13.5 10.5" />
             <path d="M8.25 15.75a3.182 3.182 0 0 1-4.5 0 3.182 3.182 0 0 1 0-4.5l3-3a3.182 3.182 0 0 1 4.5 0" />
             <path d="M15.75 8.25a3.182 3.182 0 0 1 4.5 0 3.182 3.182 0 0 1 0 4.5l-3 3a3.182 3.182 0 0 1-4.5 0" />
           </svg>
           <span>{{ t('sector.jump_to_binding') }}</span>
-        </div>
+        </button>
 
         <template v-if="menuTabType === 'station'">
           <template v-if="contextMenuMode === 'full'">
             <div class="menu-divider"></div>
-            <div class="menu-item" @click="doRename">
+            <button class="menu-item" data-testid="sidebar-menu-rename" @click="doRename">
               <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
               <span>{{ t('sector.rename_station') }}</span>
-            </div>
+            </button>
 
-            <div class="menu-item" @click="duplicateStation">
+            <button class="menu-item" data-testid="sidebar-menu-duplicate" @click="duplicateStation">
               <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
               <span>{{ t('sector.duplicate_station') }}</span>
-            </div>
+            </button>
 
             <div class="menu-divider"></div>
           </template>
 
-          <div v-if="!props.canDeleteStation || props.canDeleteStation(menuTabId!)" class="menu-item danger" @click="confirmDelete">
+          <button v-if="!props.canDeleteStation || props.canDeleteStation(menuTabId!)" class="menu-item danger" data-testid="sidebar-menu-delete" @click="confirmDelete">
             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
             <span>{{ t('sector.delete_station') }}</span>
-          </div>
+          </button>
         </template>
       </div>
     </Teleport>
 
     <Transition name="fade">
-      <div v-if="showDeleteConfirm" class="modal-backdrop" @click="cancelDelete">
+      <div v-if="showDeleteConfirm" class="modal-backdrop" data-testid="sidebar-delete-dialog" @click="cancelDelete">
         <div class="modal-card" @click.stop>
           <div class="modal-header">
             <span class="text-amber-400 text-lg">⚠</span>
@@ -610,8 +660,8 @@ onUnmounted(() => {
           </div>
           <p class="text-slate-400 text-sm mb-6 ml-1">{{ t('sector.delete_warning') }}</p>
           <div class="flex justify-end gap-3">
-            <button class="btn-cancel" @click="cancelDelete">{{ t('ui.cancel') }}</button>
-            <button class="btn-danger" @click="deleteStation">{{ t('ui.delete') }}</button>
+            <button class="btn-cancel" data-testid="sidebar-delete-cancel" @click="cancelDelete">{{ t('ui.cancel') }}</button>
+            <button class="btn-danger" data-testid="sidebar-delete-confirm" @click="deleteStation">{{ t('ui.delete') }}</button>
           </div>
         </div>
       </div>
