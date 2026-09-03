@@ -531,6 +531,55 @@ describe('save store versioning', () => {
     expect(saveStore.selectedArchive?.meta.time).toBe(20)
   })
 
+  it('keeps the active selection rule when archives are added', async () => {
+    const makeArchive = (guid: string, time: number): SaveArchive => ({
+      meta: {
+        guid,
+        seed: 1,
+        time,
+        playerName: 'Tester',
+        version: '8.0',
+        filename: `save_${time}.xml`,
+        parser_version: 'v11',
+        post_processor_version: 'v2',
+        source: 'original'
+      },
+      sectors: {},
+      isCompatible: true,
+      isValid: true
+    })
+    const newer = makeArchive('g', 20)
+    const older = makeArchive('g', 10)
+    const otherGuid = makeArchive('other', 30)
+    const newest = makeArchive('g', 30)
+    const saveStore = useSaveStore()
+
+    await saveStore.addArchive(newer)
+    dbMocks.loadArchiveDetailFromDB.mockResolvedValue(newer)
+    await saveStore.selectArchiveGroup('g')
+
+    await saveStore.addArchive(older)
+    expect(saveStore.savedArchivesState.activeArchiveId).toBe('g')
+    expect(saveStore.selectedArchive?.meta.time).toBe(20)
+
+    await saveStore.addArchive(otherGuid)
+    expect(saveStore.savedArchivesState.activeArchiveId).toBe('g')
+    expect(saveStore.selectedArchive?.meta.guid).toBe('g')
+
+    dbMocks.loadArchiveDetailFromDB.mockResolvedValue(older)
+    await saveStore.selectArchive('g', 10)
+    await saveStore.addArchive(newest)
+    expect(saveStore.savedArchivesState.activeArchiveId).toBe('g_10')
+    expect(saveStore.selectedArchive?.meta.time).toBe(10)
+
+    saveStore.clearSelection()
+    dbMocks.loadArchiveDetailFromDB.mockResolvedValue(newer)
+    await saveStore.previewArchive('g', 20)
+    await saveStore.addArchive(otherGuid)
+    expect(saveStore.savedArchivesState.activeArchiveId).toBeNull()
+    expect(saveStore.selectedArchive?.meta.guid).toBe('g')
+  })
+
   it('migrates missing settings to defaults and persists updated settings separately from archive selection', async () => {
     localStorage.setItem('x4_save_archives', JSON.stringify({
       version: 1,

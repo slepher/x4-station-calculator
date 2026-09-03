@@ -578,7 +578,9 @@ export const useSaveStore = defineStore('save', () => {
     const existingMeta = savedArchivesState.value.list.find((item) => item.id === archiveId)
     const nextMeta = buildArchiveMeta(archive, existingMeta?.createdAt)
     savedArchivesState.value.list = upsertArchiveMeta(savedArchivesState.value.list, nextMeta)
-    savedArchivesState.value.activeArchiveId = archiveId
+    if (savedArchivesState.value.activeArchiveId === null && selectedArchive.value === null) {
+      savedArchivesState.value.activeArchiveId = archiveId
+    }
     writeSavedState()
     rebuildArchivesFromState()
 
@@ -588,7 +590,16 @@ export const useSaveStore = defineStore('save', () => {
       console.error('[saveStore] failed to persist archive:', error)
     }
 
-    selectedArchive.value = archive
+    const activeArchiveId = savedArchivesState.value.activeArchiveId
+    if (activeArchiveId === null) {
+      if (selectedArchive.value?.meta.guid === archive.meta.guid && selectedArchive.value.meta.time === archive.meta.time) {
+        selectedArchive.value = archive
+      }
+    } else if (activeArchiveId === archiveId) {
+      selectedArchive.value = archive
+    } else {
+      await restoreSelectedArchive(activeArchiveId)
+    }
   }
 
   async function selectArchive(guid: string, time: number): Promise<void> {

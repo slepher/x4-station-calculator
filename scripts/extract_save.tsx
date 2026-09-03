@@ -96,6 +96,7 @@ function printHelp(): void {
   console.log('Options:')
   console.log('  -h, --help         Show this help message and exit')
   console.log('  --wasm             Use Rust WASM parser (3.25x faster, experimental)')
+  console.log('  --universe         Keep save metadata and the complete raw <universe> section (Rust WASM)')
   console.log('  --xml              Output as XML instead of JSON (extracts only relevant data)')
   console.log('  --class <c>        Filter by component class (e.g., station, sector, ship_l)')
   console.log('  --code <c>         Filter by component code (comma-separated, e.g., XAJ-926,FIX-154)')
@@ -108,6 +109,7 @@ function printHelp(): void {
   console.log('Examples:')
   console.log('  vite-node scripts/extract_save.tsx save_009.xml')
   console.log('  vite-node scripts/extract_save.tsx save_009.xml.gz --wasm')
+  console.log('  vite-node scripts/extract_save.tsx save_009.xml --universe')
   console.log('  vite-node scripts/extract_save.tsx save_009.xml out.json --version 8.0')
   console.log('  vite-node scripts/extract_save.tsx save_009.xml --xml')
   console.log('  vite-node scripts/extract_save.tsx save_009.xml out.xml --xml --class station --code ROK-388')
@@ -126,6 +128,7 @@ interface ParsedArgs {
   componentFilter: ComponentFilterOptions | null
   extractTerraforming: boolean
   extractResearch: boolean
+  extractUniverse: boolean
   expectedVersion: string | null
   skipPost: boolean
 }
@@ -137,7 +140,7 @@ function parseArgs(): ParsedArgs & { help: boolean } {
     alias: {
       h: 'help',
     },
-    boolean: ['help', 'wasm', 'xml', 'skip-post', 'terraforming', 'research'],
+    boolean: ['help', 'wasm', 'xml', 'skip-post', 'terraforming', 'research', 'universe'],
     string: ['class', 'code', 'query-xml', 'version'],
   })
 
@@ -147,6 +150,7 @@ function parseArgs(): ParsedArgs & { help: boolean } {
   const skipPost = opts['skip-post'] as boolean
   const extractTerraforming = opts.terraforming as boolean
   const extractResearch = opts.research as boolean
+  const extractUniverse = opts.universe as boolean
   const queryXml = (opts['query-xml'] as string) || null
   const expectedVersion = (opts.version as string) || null
 
@@ -170,6 +174,7 @@ function parseArgs(): ParsedArgs & { help: boolean } {
     componentFilter,
     extractTerraforming,
     extractResearch,
+    extractUniverse,
     expectedVersion,
     skipPost,
     help
@@ -201,6 +206,10 @@ function defaultQueryOutputPath(inputPath: string): string {
   if (inputPath.toLowerCase().endsWith('.gz')) return inputPath.slice(0, -3) + '.query.xml'
   if (inputPath.toLowerCase().endsWith('.xml')) return inputPath.slice(0, -4) + '.query.xml'
   return inputPath + '.query.xml'
+}
+
+function defaultUniverseOutputPath(inputPath: string): string {
+  return inputPath.replace(/\.xml$/i, '') + '.universe.xml'
 }
 
 function defaultComponentOutputPath(inputPath: string, className: string, codes: string[]): string {
@@ -1142,6 +1151,51 @@ async function extractSaveWasm(inputPath: string, outputPath: string, expectedVe
   return archive
 }
 
+async function extractUniverseXml(inputPath: string, outputPath: string): Promise<void> {
+  const absoluteInput = path.resolve(process.cwd(), inputPath)
+  const absoluteOutput = path.resolve(process.cwd(), outputPath)
+  if (absoluteInput === absoluteOutput) throw new Error('input and output paths must differ')
+  if (isGzipFile(absoluteInput)) throw new Error('--universe accepts uncompressed .xml input only')
+
+  const initWasm = (await import('../src/wasm/save_parser.js')).default
+  const { UniverseXmlCutter } = await import('../src/wasm/save_parser.js')
+  const wasmBinary = fs.readFileSync(path.resolve(process.cwd(), 'src/wasm/save_parser_bg.wasm'))
+  await initWasm({ module_or_path: wasmBinary })
+
+  const cutter = new UniverseXmlCutter()
+  const temporaryOutput = `${absoluteOutput}.${process.pid}.tmp`
+  const outputFd = fs.openSync(temporaryOutput, 'w')
+  let sourceBytesRead = 0
+  let outputBytesWritten = 0
+
+  console.log('[extract_save] mode: Rust WASM universe cutter')
+  console.log(`[extract_save] input: ${absoluteInput}`)
+  console.log(`[extract_save] output: ${absoluteOutput}`)
+
+  try {
+    for await (const chunk of fs.createReadStream(absoluteInput)) {
+      const bytes = chunk as Buffer
+      sourceBytesRead += bytes.length
+      const output = cutter.push_chunk(new Uint8Array(bytes))
+      if (output.length > 0) {
+        fs.writeFileSync(outputFd, output)
+        outputBytesWritten += output.length
+      }
+      if (cutter.is_done()) break
+    }
+    cutter.finish()
+    fs.closeSync(outputFd)
+    fs.renameSync(temporaryOutput, absoluteOutput)
+  } catch (error) {
+    try { fs.closeSync(outputFd) } catch {}
+    try { fs.unlinkSync(temporaryOutput) } catch {}
+    throw error
+  }
+
+  console.log(`[extract_save] done: read ${formatMB(sourceBytesRead)} MB, wrote ${formatMB(outputBytesWritten)} MB`)
+  console.log(`[extract_save] universe xml written: ${absoluteOutput}`)
+}
+
 async function main(): Promise<void> {
   const {
     input,
@@ -1152,6 +1206,7 @@ async function main(): Promise<void> {
     componentFilter,
     extractTerraforming,
     extractResearch,
+    extractUniverse,
     expectedVersion,
     skipPost,
     help
@@ -1169,7 +1224,9 @@ async function main(): Promise<void> {
   }
 
   try {
-    if (extractTerraforming || extractResearch) {
+    if (extractUniverse) {
+      await extractUniverseXml(input, output || defaultUniverseOutputPath(input))
+    } else if (extractTerraforming || extractResearch) {
       if (useWasm) {
         console.error('[extract_save] --terraforming/--research mode does not support --wasm, using JS streaming extractor')
       }

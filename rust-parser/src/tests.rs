@@ -2,9 +2,28 @@
 mod tests {
     use crate::core::SaveParserCore;
     use crate::stream::StreamingSaveParser;
+    use crate::UniverseXmlCutter;
     use flate2::write::GzEncoder;
     use flate2::Compression;
     use std::io::Write;
+
+    #[test]
+    fn cuts_universe_xml_across_chunk_boundaries() {
+        let input = b"<?xml version=\"1.0\"?><savegame><universejunk/><info><game version=\"900\"/><player name=\"pilot\"/></info><universe><component class=\"sector\"/></universe><economylog/></savegame>";
+        let mut cutter = UniverseXmlCutter::new();
+        let mut output = Vec::new();
+
+        for chunk in input.chunks(7) {
+            output.extend(cutter.push_chunk(chunk));
+        }
+
+        assert!(cutter.is_done());
+        cutter.finish().expect("complete universe");
+        assert_eq!(
+            output,
+            b"<?xml version=\"1.0\"?><savegame><universejunk/><info><game version=\"900\"/><player name=\"pilot\"/></info><universe><component class=\"sector\"/></universe>\n</savegame>\n"
+        );
+    }
 
     #[test]
     fn parses_uppercase_station_attributes_like_js_parser() {

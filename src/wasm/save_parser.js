@@ -113,6 +113,51 @@ export class SaveParser {
 }
 if (Symbol.dispose) SaveParser.prototype[Symbol.dispose] = SaveParser.prototype.free;
 
+export class UniverseXmlCutter {
+    __destroy_into_raw() {
+        const ptr = this.__wbg_ptr;
+        this.__wbg_ptr = 0;
+        UniverseXmlCutterFinalization.unregister(this);
+        return ptr;
+    }
+    free() {
+        const ptr = this.__destroy_into_raw();
+        wasm.__wbg_universexmlcutter_free(ptr, 0);
+    }
+    finish() {
+        const ret = wasm.universexmlcutter_finish(this.__wbg_ptr);
+        if (ret[1]) {
+            throw takeFromExternrefTable0(ret[0]);
+        }
+    }
+    /**
+     * @returns {boolean}
+     */
+    is_done() {
+        const ret = wasm.universexmlcutter_is_done(this.__wbg_ptr);
+        return ret !== 0;
+    }
+    constructor() {
+        const ret = wasm.universexmlcutter_new();
+        this.__wbg_ptr = ret >>> 0;
+        UniverseXmlCutterFinalization.register(this, this.__wbg_ptr, this);
+        return this;
+    }
+    /**
+     * @param {Uint8Array} chunk
+     * @returns {Uint8Array}
+     */
+    push_chunk(chunk) {
+        const ptr0 = passArray8ToWasm0(chunk, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.universexmlcutter_push_chunk(this.__wbg_ptr, ptr0, len0);
+        var v2 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
+        wasm.__wbindgen_free(ret[0], ret[1] * 1, 1);
+        return v2;
+    }
+}
+if (Symbol.dispose) UniverseXmlCutter.prototype[Symbol.dispose] = UniverseXmlCutter.prototype.free;
+
 function __wbg_get_imports() {
     const import0 = {
         __proto__: null,
@@ -147,6 +192,14 @@ function __wbg_get_imports() {
 const SaveParserFinalization = (typeof FinalizationRegistry === 'undefined')
     ? { register: () => {}, unregister: () => {} }
     : new FinalizationRegistry(ptr => wasm.__wbg_saveparser_free(ptr >>> 0, 1));
+const UniverseXmlCutterFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_universexmlcutter_free(ptr >>> 0, 1));
+
+function getArrayU8FromWasm0(ptr, len) {
+    ptr = ptr >>> 0;
+    return getUint8ArrayMemory0().subarray(ptr / 1, ptr / 1 + len);
+}
 
 function getStringFromWasm0(ptr, len) {
     ptr = ptr >>> 0;
