@@ -2,13 +2,12 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { createPinia, setActivePinia } from 'pinia';
 
-if (typeof globalThis.beforeEach === 'function') {
-  globalThis.beforeEach(() => setActivePinia(createPinia()));
-}
-
 export let test: typeof import('@playwright/test')['test'];
 
-if (process.env.VITEST !== 'true') {
+if (process.env.VITEST === 'true') {
+  const { beforeEach } = await import('vitest');
+  beforeEach(() => setActivePinia(createPinia()));
+} else {
   const { test: base } = await import('@playwright/test');
   test = base.extend({
   page: async ({ page }, use, testInfo) => {
