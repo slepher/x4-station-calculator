@@ -1530,9 +1530,18 @@
       "total_cost": "Target cost"
     },
     "primary_ware": "Primary ware",
-    "group_by_sector": "Group by sector",
+    "insufficient_relations": "Insufficient reputation",
+    "reputation": "Reputation: {value}",
+    "pagination": {
+      "label": "Candidate pages",
+      "ship_label": "Available ship pages",
+      "previous": "Previous page",
+      "next": "Next page",
+      "status": "{current} / {total}"
+    },
     "source": {
       "station": "Station demand",
+      "stationSell": "Station selling",
       "supplies": "Station supplies",
       "buildStorage": "Build storage"
     },
@@ -1543,7 +1552,6 @@
       "unknown": "Distance unknown"
     },
     "amount": "Amount",
-    "desired": "Desired",
     "price": "Price",
     "ships": "Available Player Ships",
     "no_ships": "No available L freighters or M transporters",

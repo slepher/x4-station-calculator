@@ -25,7 +25,7 @@
 ## 3. 市场报价 presenter
 
 - [x] 3.1 新增 `src/components/empire/presenters/useNpcTradePresenter.ts`，只通过 presenter 读取 save、binding、game data 与 active-view stores
-- [x] 3.2 在 presenter 中维护方向、玩家空间站、搜索词、ware targets、主商品、排序指标和 sector 分组开关等会话状态
+- [x] 3.2 在 presenter 中维护方向、玩家空间站、搜索词、ware targets、主商品和排序指标等会话状态
 - [x] 3.3 从 active binding 的 groups、stationPlans 和 tradeStation 组装玩家空间站 selector；缺失 sector 的 entry 明确禁用
 - [x] 3.4 复用 `generateFilteredWaresGrouped` 生成多语言商品搜索结果，并实现唯一药丸的添加、数量更新和移除事件
 - [x] 3.5 复用地图 tooltip station label helper，组装包含 sector、同源 station 名称、code 和 faction 的候选 cards
@@ -81,3 +81,33 @@
 - [x] 8.6 保持 BuildPlan 舰队入口继续使用 `FleetGoalSearchBox`，不纳入商品/模块候选 DTO
 - [x] 8.7 运行 `npm run build`，修复共用候选控件改动引入的编译错误直至通过或形成明确 blocker
 - [x] 8.8 在应用中英文 locale 增加 `common.others`，并由商品候选 presenter 本地化 `others` 分组标题，不修改游戏文本 locale
+
+## 9. 页面会话状态边界
+
+- [x] 9.1 新增薄 `useNpcTradeStore`，在当前应用会话保存方向、跳数、ware targets、主商品、排名/排序和 binding 上下文选择，不写入持久化 schema
+- [x] 9.2 由 presenter 读取薄 store，并使用 `bindingGameGuid` 隔离不同 binding 的 group/station；保留既有 immediate station option 失效校验
+- [x] 9.3 搜索文字和候选弹窗继续作为临时交互状态，NPC/船只候选、距离、页面状态与展示分组继续从当前依赖派生，不写入薄 store
+- [x] 9.4 报价展示 DTO 和 Vue 行只保留来源、amount 与 price，不展示 archive 的 desired
+- [x] 9.5 完成代码后运行 `npm run build`，修复本轮引入的编译错误直至通过或形成明确 blocker
+
+## 10. NPC 交易资格与固定分组
+
+- [x] 10.1 在报价领域逻辑中按 `notradeoffer`、raw relation `-0.01` 边界将 station candidates 分为硬排除、声望合格和声望不足，继续复用既有 comparator 与 sector grouping
+- [x] 10.2 从薄 `useNpcTradeStore` 与 presenter contract 删除 `groupBySector`，固定生成正常 sector 分组和底部声望不足 faction→sector 分组
+- [x] 10.3 在 presenter 中将 sector/faction/跳数组装到 sector 标题，将 display 声望组装到声望不足 faction 标题，并从 station card 删除重复共享字段
+- [x] 10.4 在 `NpcTradeWorkbench` 删除 sector checkbox，渲染正常 sector 列表与默认折叠的底部 faction→sector 列表，并保持 same-sector 精确距离为 station 自身信息
+- [x] 10.5 同步中英文声望不足分组与 display 声望文案，删除不再使用的 sector checkbox 文案
+- [x] 10.6 运行 `npm run build`，修复本轮引入的编译错误直至通过或形成明确 blocker
+- [x] 10.7 将 station 来源文案按玩家方向映射：买入显示“空间站出售”，卖出继续显示“空间站自身需求”，并同步中英文 locale
+- [x] 10.8 在 presenter 中从 map sector 独立解析可空 sector owner；正常 station card 仅在 station owner 与 sector owner 不同时输出 station owner，sector owner 为空时必须输出 station owner
+- [x] 10.9 在正常与声望不足 sector 标题显示非空 sector owner；声望不足列表继续按 station owner 判断声望、折叠和显示 display 声望，且 card 不重复父级 station owner
+- [x] 10.10 运行 `npm run build`，修复本轮引入的编译错误直至通过或形成明确 blocker
+
+## 11. 候选分页与延迟挂载
+
+- [x] 11.1 在 presenter 中先完成正常候选排序与 sector grouping，再以每页 10 个完整 sector 切片并只构造当前页 station card DTO
+- [x] 11.2 声望不足 faction 折叠时输出空 sectors；展开后在 faction 内按每页 10 个完整 sector 分页并只构造当前页 cards
+- [x] 11.3 在 presenter 保存临时 normal/faction/ship 页码与 faction 展开集合，候选或船只依赖变化时重置，不写入薄 store
+- [x] 11.4 在 Vue 中增加可访问的上一页/下一页控件，以受控 `<details>` 和 `v-if` 避免挂载折叠 faction 内容
+- [x] 11.5 保留玩家船只现有 sector 分组，并复用每页 10 个完整 sector 的分页规则；船只集合变化时重置页码
+- [x] 11.6 同步中英文候选与船只分页文案，并运行 `npm run build` 修复编译错误直至通过或形成明确 blocker

@@ -30,7 +30,12 @@ const presenter = vi.hoisted(() => ({
     searchGroups: { value: [{ id: 'energy', label: 'Energy', items: [{ id: 'energycells', label: 'Energy Cells', color: '#0ea5e9' }] }] },
     wareTargets: { value: [] },
     candidateSections: { value: [] },
+    candidatePage: { value: 1 },
+    candidatePageCount: { value: 1 },
+    ineligibleFactionGroups: { value: [] },
     shipGroups: { value: [] },
+    shipPage: { value: 1 },
+    shipPageCount: { value: 1 },
     pageState: { value: 'stationNotSelected' },
     pageStateLabel: { value: '' },
     canUseComposite: { value: false },
@@ -48,7 +53,10 @@ const presenter = vi.hoisted(() => ({
     setRankMode: vi.fn(),
     setSortMetric: vi.fn(),
     setPrimaryWare: vi.fn(),
-    setGroupBySector: vi.fn()
+    setCandidatePage: vi.fn(),
+    setIneligibleFactionExpanded: vi.fn(),
+    setIneligibleFactionPage: vi.fn(),
+    setShipPage: vi.fn()
   }
 }))
 
@@ -67,6 +75,13 @@ vi.mock('vue-i18n', async (importOriginal) => {
 describe('NpcTradeWorkbench station selector', () => {
   afterEach(() => {
     presenter.props.searchGroups.value = []
+    presenter.props.candidateSections.value = []
+    presenter.props.candidatePage.value = 1
+    presenter.props.candidatePageCount.value = 1
+    presenter.props.ineligibleFactionGroups.value = []
+    presenter.props.shipPage.value = 1
+    presenter.props.shipPageCount.value = 1
+    presenter.props.pageState.value = 'stationNotSelected'
     vi.clearAllMocks()
   })
 
@@ -99,5 +114,49 @@ describe('NpcTradeWorkbench station selector', () => {
     await popover?.querySelector<HTMLElement>('[data-testid="grouped-candidate-item-energycells"]')?.click()
     expect(presenter.emits.addWare).toHaveBeenCalledWith('energycells')
     expect(document.body.querySelector('[data-testid="grouped-candidate-popover"]')).toBeNull()
+  })
+
+  it('pages sector groups and does not mount a collapsed reputation group', async () => {
+    const sector = {
+      key: 'sector-a',
+      sectorLabel: 'Sector A',
+      sectorOwnerLabel: null,
+      jumpLabel: '1 jump',
+      stations: []
+    }
+    presenter.props.pageState.value = 'results'
+    presenter.props.candidateSections.value = [sector]
+    presenter.props.candidatePageCount.value = 2
+    presenter.props.ineligibleFactionGroups.value = [{
+      key: 'faction-a',
+      factionLabel: 'Faction A',
+      reputationLabel: '-10',
+      expanded: false,
+      page: 1,
+      pageCount: 2,
+      sectors: [sector]
+    }]
+    const wrapper = mount(NpcTradeWorkbench, {
+      global: { stubs: { X4NumberInput: true } }
+    })
+
+    expect(wrapper.find('[data-testid="npc-trade-ineligible-sectors-faction-a"]').exists()).toBe(false)
+    await wrapper.get('[data-testid="npc-trade-page-next"]').trigger('click')
+    expect(presenter.emits.setCandidatePage).toHaveBeenCalledWith(2)
+
+    const details = wrapper.get('[data-testid="npc-trade-ineligible-faction-faction-a"]')
+    ;(details.element as HTMLDetailsElement).open = true
+    await details.trigger('toggle')
+    expect(presenter.emits.setIneligibleFactionExpanded).toHaveBeenCalledWith('faction-a', true)
+  })
+
+  it('pages available ships by complete sector groups', async () => {
+    presenter.props.shipPageCount.value = 2
+    const wrapper = mount(NpcTradeWorkbench, {
+      global: { stubs: { X4NumberInput: true } }
+    })
+
+    await wrapper.get('[data-testid="npc-trade-ship-page-next"]').trigger('click')
+    expect(presenter.emits.setShipPage).toHaveBeenCalledWith(2)
   })
 })

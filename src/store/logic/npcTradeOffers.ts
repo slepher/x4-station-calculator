@@ -5,6 +5,9 @@ export type PlayerTradeDirection = 'buy' | 'sell'
 export type NpcTradeDemandSource = 'station' | 'supplies' | 'buildStorage'
 export type NpcTradeSortMetric = 'quantity' | 'price' | 'fillablePrice' | 'targetTotal'
 export type NpcTradeRankMode = 'primary' | 'composite'
+export type NpcTradeEligibility = 'eligible' | 'insufficientRelation' | 'excluded'
+
+const MIN_ORDINARY_TRADE_RELATION = -0.01
 
 export interface WareTarget {
   wareId: string
@@ -40,6 +43,17 @@ export interface NpcTradeComparatorOptions {
   metric: NpcTradeSortMetric
   targets: WareTarget[]
   primaryWareId: string | null
+}
+
+export function classifyNpcTradeEligibility(
+  factionTags: string[] | undefined,
+  rawRelation: number | undefined
+): NpcTradeEligibility {
+  if (factionTags?.includes('notradeoffer')) return 'excluded'
+  if (rawRelation !== undefined && rawRelation <= MIN_ORDINARY_TRADE_RELATION) {
+    return 'insufficientRelation'
+  }
+  return 'eligible'
 }
 
 export function calculateContainerWareMaxLoad(
