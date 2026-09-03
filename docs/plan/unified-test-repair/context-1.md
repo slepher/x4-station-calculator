@@ -1,10 +1,15 @@
 # unified-test-repair 上下文（第 1 代）
 
 - Context status: `draft`
-- Evidence target: `af17710661c1e5c8a23a01b83c00be641fa96ede`
+- Evidence target: `b62034868643b9d2a9af48ab0f634b067e80880d`
 - Repository: `/home/slepher/project/x4-station-calculator`
 - Branch: `develop`
-- Collected: `2026-09-04`（Asia/Shanghai）
+- Collected: `2026-09-04T00:26:15+08:00`（Asia/Shanghai）
+
+## 合并后修订
+
+- 当前 `develop` 已合并 `npc-storage`（`b6203486`）；本次合并没有改变本计划的目标、泳道拓扑或任务所有权。
+- 合并新增/更新了 NPC Trade 当前行为及其 unit 覆盖；这些测试属于 `task-test-1` 的 legacy 迁移/去重输入，不得继续作为第二套权威测试保留。
 
 ## 用户目标与已确认语义
 
@@ -23,7 +28,7 @@
 - 共用数据：`tests/fixtures/`、`tests/seeds/`
 - Live helper：`tests/unified-e2e/live/helpers/loadLiveBindingFixture.ts`
 
-当前数量：`unified-unit` 108 个 spec，`unified-e2e` 60 个 spec，旧 `unit` 83 个 spec，旧 `e2e` 18 个 spec。实施时保持 unified 目录为唯一权威；旧目录只迁移仍有独立行为价值且 unified 缺失的用例，随后删除已迁移、重复或过期文件，禁止继续双写。
+当前数量：`unified-unit` 108 个 spec，`unified-e2e` 60 个 spec，旧 `unit` 85 个 spec，旧 `e2e` 18 个 spec。实施时保持 unified 目录为唯一权威；旧目录只迁移仍有独立行为价值且 unified 缺失的用例，随后删除已迁移、重复或过期文件，禁止继续双写。
 
 ## 已执行证据
 
@@ -37,11 +42,16 @@
 - 至少 88 个 assertion failure 属于测试装配问题：缺失 `@/i18n` default export 41 个、错误 fixture 路径 13 个、无 active Pinia 12 个、错误 `cluster.sectors` shape 7 个、缺少 `gameData.getStorageKey` mock 7 个及同类 API mock 8 个。
 - 4 个 ship storage 用例固定期待 schema v2，而当前 `CURRENT_SHIP_BLUEPRINT_VERSION` 为 5，属于过时预期。
 
-对照命令：`npm run test:unit -- tests/unit`
+合并前对照命令（旧 evidence target）：`npm run test:unit -- tests/unit`
 
 - 83 个文件：67 pass、16 fail。
 - 489 个测试：460 pass、29 fail。
 - 旧目录并非全都过时，包含 unified 尚未吸收的较新行为测试；因此不能整目录盲删，须按行为价值迁移和去重。
+
+合并后增量证据：`npm run test:unit -- --run tests/unit/npc-trade-ui`
+
+- 当前旧 unit 为 85 个文件；NPC Trade 目录定向运行 5 个文件、13 个测试全部通过。
+- 本次合并实际新增 `npc-trade-presenter.spec.ts`、`npc-trade-store.spec.ts`，并更新 `npc-trade-workbench.spec.ts`；`task-test-1` 必须逐项判断其是否迁移到 `tests/unified-unit/`，随后删除 legacy 源文件或按删除门记录证据。
 
 ### Unified E2E
 
