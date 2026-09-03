@@ -10,6 +10,14 @@ const FIXTURES_DIR = resolve(__dirname, '../../../fixtures')
 const SAVE_DIR = join(FIXTURES_DIR, 'save')
 const GAME_GUID = 'CB8837FE-98C1-42F8-9D6A-ED0ADC539111'
 const CURRENT_PARSER_VERSION = 'v9'
+const CURRENT_SAVE_ARCHIVES_KEY = 'x4_save_archives_v9'
+const CURRENT_SAVE_BINDINGS_KEY = 'x4_save_bindings_v9'
+const FIXTURE_KEY_MIGRATIONS: Record<string, string> = {
+  x4_empire_data: 'x4_empire_data_v9',
+  x4_logic_flow_plans: 'x4_logic_flow_plans_v9',
+  x4_ship_blueprints: 'x4_ship_blueprints_v9',
+  'x4-setting': 'x4-setting_v9'
+}
 
 interface SaveData {
   meta: {
@@ -70,14 +78,6 @@ function buildSaveArchivesState(saves: SaveData[]) {
   }
 }
 
-const localStorageFixture = (() => {
-  const snapshot = JSON.parse(JSON.stringify(dbFixture))
-  delete snapshot.vsn
-  const saves = loadAllSaves()
-  snapshot.x4_save_archives = buildSaveArchivesState(saves)
-  return snapshot as Record<string, unknown>
-})()
-
 async function waitForAppReady(page: Page): Promise<void> {
   await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 2000 })
 }
@@ -101,7 +101,13 @@ export async function loadLiveBindingFixture(
   const archiveState = buildSaveArchivesState(transformed)
   const snapshot = JSON.parse(JSON.stringify(dbFixture))
   delete snapshot.vsn
-  snapshot.x4_save_archives = archiveState
+  for (const [legacyKey, currentKey] of Object.entries(FIXTURE_KEY_MIGRATIONS)) {
+    snapshot[currentKey] = snapshot[legacyKey]
+    delete snapshot[legacyKey]
+  }
+  snapshot[CURRENT_SAVE_ARCHIVES_KEY] = archiveState
+  snapshot[CURRENT_SAVE_BINDINGS_KEY] = snapshot.x4_save_bindings
+  delete snapshot.x4_save_bindings
 
   await page.addInitScript(() => {
     localStorage.setItem('isTestEnv', 'true')
@@ -123,51 +129,14 @@ export async function loadLiveBindingFixture(
 
   await page.evaluate(async ({ archives }) => {
     const w = window as any
-    if (w.saveArchiveDB) {
-      for (const archive of archives) {
-        await w.saveArchiveDB.saveArchiveToDB(w.gameDataStore, archive)
-      }
-      return
-    }
-    const dbName = w.gameDataStore?.getIndexedDBName?.() ?? 'x4_save_archive_db'
-    const openDb = () => new Promise<IDBDatabase>((resolve, reject) => {
-      const req = indexedDB.open(dbName)
-      req.onupgradeneeded = () => {
-        const db = req.result
-        if (!db.objectStoreNames.contains('archive_data')) db.createObjectStore('archive_data', { keyPath: 'id' })
-        if (!db.objectStoreNames.contains('player_stations')) db.createObjectStore('player_stations', { keyPath: 'id' })
-      }
-      req.onsuccess = () => resolve(req.result)
-      req.onerror = () => reject(req.error)
-    })
-    const db = await openDb()
     for (const archive of archives) {
-      const archiveId = `${archive.meta.guid}_${archive.meta.time}`
-      const sectorsNoStations: Record<string, any> = {}
-      const psMap: Record<string, any> = {}
-      const pbsMap: Record<string, any> = {}
-      for (const [macro, sector] of Object.entries(archive.sectors as Record<string, any>)) {
-        if (sector.player_stations && Object.keys(sector.player_stations).length > 0) {
-          psMap[macro] = sector.player_stations
-        }
-        if (sector.player_buildstorages && Object.keys(sector.player_buildstorages).length > 0) {
-          pbsMap[macro] = sector.player_buildstorages
-        }
-        sectorsNoStations[macro] = { ...sector, player_stations: undefined, player_buildstorages: undefined }
-      }
-      await new Promise<void>((resolve, reject) => {
-        const tx = db.transaction(['archive_data', 'player_stations'], 'readwrite')
-        tx.objectStore('archive_data').put({ id: archiveId, archiveId, guid: archive.meta.guid, data: { ...archive, sectors: sectorsNoStations } })
-        tx.objectStore('player_stations').put({ id: archiveId, archiveId, guid: archive.meta.guid, data: { player_stations: psMap, player_buildstorages: pbsMap } })
-        tx.oncomplete = () => resolve()
-        tx.onerror = () => reject(tx.error)
-      })
+      await w.saveArchiveDB.saveArchiveToDB(w.gameDataStore, archive)
     }
-    db.close()
   }, { archives: transformed })
 
   await page.reload()
   await waitForAppReady(page)
   await page.getByTestId('top-view-btn-live-production').click()
+  await setLanguage(page, 'zh-CN')
   await page.waitForTimeout(200)
 }
