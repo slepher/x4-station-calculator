@@ -16,7 +16,7 @@
 - `LiveProductionWorkbenchView.vue` 的 `grid-cols-12`、`3/5/4` 布局。
 - `useProductionSidebarPresenter` 与 `ProductionSidebar.vue` 固定入口模式。
 
-本 change 不新增数据适配层，也不新建只为页面筛选服务的 Pinia store。
+本 change 不新增数据适配层；新增一个只保存市场报价用户输入的薄 Pinia store，不保存展示 DTO 或派生候选。
 
 ## Architecture
 
@@ -25,12 +25,13 @@ useSaveStore ───────────────┐
 useSaveBindingStore ────────┤
 useGameDataStore ───────────┼─> useNpcTradePresenter ─> NpcTradeWorkbench.vue
 useActiveViewStore ─────────┤
+useNpcTradeStore ───────────┤
 store/logic/npcTradeOffers ─┘
 ```
 
-- Store：继续提供 archive、binding、game data 和 active workbench state。
+- Store：继续提供 archive、binding、game data 和 active workbench state；薄 `useNpcTradeStore` 保存当前应用会话的用户输入。
 - `store/logic`：提供与 UI 无关的报价分类、目标数量计算和 comparator。
-- Presenter：持有页面会话筛选并组装三列展示数据。
+- Presenter：持有搜索文字等临时交互，读取薄 store，校验上下文并组装三列展示数据。
 - Vue：渲染 presenter props，转发 presenter emits。
 
 ## Decisions
@@ -41,6 +42,7 @@ store/logic/npcTradeOffers ─┘
 
 ```text
 src/store/logic/npcTradeOffers.ts
+src/store/useNpcTradeStore.ts
 src/components/empire/presenters/useNpcTradePresenter.ts
 src/components/empire/NpcTradeWorkbench.vue
 src/components/common/CandidateSearchBox.vue
@@ -49,7 +51,7 @@ src/components/common/GroupedCandidatePopover.vue
 
 `NpcTradeWorkbench.vue` 内直接组成三个语义 section，不预先创建 filters/candidates/ships 三套 facade。商品和模块选择已经在市场报价、BuildPlan 与空间站模块选择中形成相同的搜索/右弹层交互，因此只提取两个职责明确的 common 控件，不增加 adapter、view model 或 facade。
 
-页面筛选为 presenter 内的 session refs：方向、选中玩家空间站、搜索词、ware targets、主商品、排序指标和 sector 分组开关。离开当前工作台后无需持久化，因此不修改 `SaveBindingPlan` 或 `normalizeState()`。
+方向、最大跳数、ware targets、主商品、排名方式、排序指标和玩家空间站选择进入薄 `useNpcTradeStore`，因此切换工作台页面不会丢失。sector 分组改为固定展示结构，不再需要开关或 store 状态。搜索词、正常候选页码、各 faction 页码、船只页码和声望不足 faction 展开集合仍是 presenter 内的临时状态。薄 store 只存在于当前应用会话，不修改 `SaveBindingPlan`、`normalizeState()` 或 `localStorage` schema。
 
 三列 section 在模板上同时声明基础 `col-span-12` 和响应式 `lg:col-span-3/5/4`；`.panel-card` scoped 样式不再声明 `col-span-12`，避免 scoped selector specificity 覆盖响应式 utility。
 
@@ -108,19 +110,20 @@ interface DemandOffer {
 }
 ```
 
-空间站直属 buy 根据 `flags.includes('supplies')` 分类；buildStorage buy 的 source 固定为 `buildStorage`。seller 只从 station 直属 offers 读取。parser 已排除缺少或零 `amount` 的买卖单，展示和排序直接使用原始 `amount`；`desired` 仅作为可选附加事实，不作为数量 fallback。
+空间站直属 buy 根据 `flags.includes('supplies')` 分类；buildStorage buy 的 source 固定为 `buildStorage`。seller 只从 station 直属 offers 读取。Presenter 使用 `direction + source` 选择方向化文案：玩家买入的 station seller 显示“空间站出售”/“Station selling”，玩家卖出的 station buy 保持“空间站自身需求”/“Station demand”。parser 已排除缺少或零 `amount` 的买卖单，展示和排序直接使用原始 `amount`；`desired` 仅保留在 archive/领域事实中，不作为数量 fallback，也不进入 presenter 报价展示 DTO。
 
 Presenter 再关联 maps/factions/locales/wares，生成 station card、source label、sector header 和空状态。Store 不输出组件专用 DTO。
 
 ### 5. station 身份复用地图 tooltip 语义
 
-候选 station card 组合：
+候选身份组合：
 
 - sector：`maps.json` sector nameId → 当前游戏 locale。
 - station 名称/类型：直接复用 `components/map/savePoiLabel.ts` 的 station label helper，使 factory profile、module group 与 station tag 的名称和地图 tooltip 完全一致。
-- faction：station owner → `factions.json` nameId → 当前游戏 locale。
+- sector owner：直接读取解析后的 map sector owner；owner 为空时 sector 标题省略该项。
+- station owner：读取 NPC station owner；仅在 station owner 与 sector owner 不同时显示在正常 station card，sector owner 为空时必须显示 station owner。
 
-不能映射的 faction 显示“未知”。页面不显示 race，也不保留 faction→race 映射。
+非空但不能本地化的 owner 显示“未知”。页面不显示 race，也不保留 faction→race 映射。
 
 ### 6. 单 ware comparator 是全部排序的唯一基础
 
@@ -174,18 +177,21 @@ interface CompositeScore {
 
 缺失 ware 明确贡献 0 fill，不从同 station 的其他 ware 替代。
 
-### 8. sector 分组只包裹 station 排序结果
+### 8. 交易资格先分流，再固定生成 sector 层级
 
-关闭分组时直接显示排序后的 station cards。
+Presenter 使用当前游戏版本 faction `tags` 与当前 archive `playerRelations` 对已构建 station candidates 做一次明确分流：
 
-开启分组时：
+1. owner faction 带 `notradeoffer`：在排序和展示前直接丢弃，不进入任一列表。
+2. 普通 faction 且 raw relation `<= -0.01`：进入声望不足列表。
+3. 其他普通 faction：进入正常列表。
 
-1. 使用 station 的真实 `sectorMacro` 分组。
-2. 每组内部使用当前 station comparator。
-3. sector 的代表 station 为组内第一名。
-4. sector 按代表 station comparator 排序。
+`rawRelation > -0.01` 是普通交易资格；display `-9/-10` 仅为 raw relation 的非线性显示结果。Presenter 复用 `formatDisplayRelation` 组装 faction 标题，不使用 display 整数反向决定资格。
 
-不计算第二套 sector 分数，因此切换分组不会改变 station 排名语义。
+正常列表固定按真实 `sectorMacro` 分组，不再提供关闭路径。每组内部使用当前 station comparator，sector 以组内第一名为代表排序。sector 标题承载本地化 sector、非空的 sector owner 和跳数；station owner 不从组内 station 推断为 sector owner，仅在不同于 sector owner 时显示在正常 station card，sector owner 为空时必须显示 station owner。same-sector 的精确直线距离仍可留在对应 station，因为它不是 sector 共享值。
+
+声望不足列表放在正常列表之后，保持原排序结果的首次出现顺序按 station owner 分组。资格比较、分组键和 display 声望都读取 station owner，不读取 sector owner。Vue 使用原生 `<details>`/`<summary>` 渲染 station owner，但由 presenter 临时展开集合控制 `open`。折叠时 presenter 输出空 `sectors`，Vue 通过 `v-if` 不挂载内部节点；展开后才复用同一个 sector grouping，将 station 组织为 station-owner→sector→station。内部 sector 标题显示 sector、非空的 sector owner 与跳数，station card 不重复父级已显示的 station owner、sector 或跳数。
+
+两条展示路径都复用现有 station comparator 与 sector grouping；不计算第二套分数，也不将分页或折叠状态写入 store。Presenter 在 grouping 后以 10 个完整 sector 为一页切片，再调用 `toStationCard` 构造当前页 DTO，因此同一 sector 不会跨页，未显示页和折叠 faction 也不会产生卡片 DTO。候选依赖变化时，normal page、faction pages 和展开集合一起重置。
 
 ### 9. 船只分组复用既有可用性、静态船型与 sector scope
 
@@ -215,6 +221,8 @@ ship_m + transporter
 容量取静态飞船的 container cargo capacity。对每个已选 ware，若 transport 为 container 且 volume 为正，则最大可装数量为 `floor(capacity / volume)`；否则为 0。该值不读取 targetQty 或当前 archive cargo。
 
 为支持同 sector 距离，既有 player ship archive contract 增加存档坐标，并由 `selectedArchivePlayerShips` 原样携带，不新增 UI adapter。
+
+船只继续先按真实 `sectorMacro` 生成现有 sector groups，再复用候选列表的分页边界，每页显示 10 个完整 sector groups。分页只限制当前 Vue 挂载的 group，不改变 sector 内船只过滤、排序或 group 命中语义；船只集合变化时 presenter 将临时船只页码重置为第一页。
 
 ### 10. NPC 与船只相对所选空间站的位置
 
@@ -268,11 +276,23 @@ candidate wares = wares.json - selected wares
 
 BuildPlan 的舰队入口继续使用 `FleetGoalSearchBox`，不为表面统一而塞入商品/模块候选 DTO。聚焦商品或模块搜索时，空 query 也显示全部当前候选；选择候选后由调用方执行领域动作并关闭弹出框。
 
+### 13. 薄 store 只保存用户意图
+
+`useNpcTradeStore` 保存两类输入：
+
+- 通用查询输入：direction、jumpLimit、targets、primaryWareId、rankMode、sortMetric。
+- binding 上下文选择：bindingGameGuid、selectedPlayerStationGroupId、selectedPlayerStationId。
+
+Presenter 每次进入页面时比较当前 `activeBinding.gameGuid` 与 store 的 `bindingGameGuid`。首次进入记录当前 GUID；GUID 改变时只清除 group/station，继续保留通用查询输入。相同 binding 的 groups、stationPlans、tradeStation 或 archive 改变时，既有 `stationGroups` immediate watch 继续验证 group/station：group 消失时清除两级选择，station 消失、移动到其他 group 或禁用时只清除 station。
+
+以下内容不进入薄 store：searchQuery、候选弹窗状态、normal/faction/ship 页码、faction 展开集合、stationGroups、jumpDistances、sortedCandidates、candidateSections、ineligibleFactionGroups、shipGroups 和 pageState。NPC 与船只候选继续由 presenter 的 reactive computed 从当前 archive、binding、地图数据和 store 输入派生。这样新 archive、玩家声望、星区结构、空间站位置或 coverage 变化会自然生成新结果，不需要维护不完整的缓存失效键。
+
 ## Files and Responsibilities
 
 - `rust-parser/src/model.rs`、`rust-parser/src/core.rs`、`src/types/saveArchive.ts`：为 player ship archive contract 保留存档坐标。
-- `src/store/logic/npcTradeOffers.ts`：方向化报价分类、单 ware comparator、综合评分和 sector 排序。
-- `src/components/empire/presenters/useNpcTradePresenter.ts`：读取 stores，持有筛选状态，复用 ware search，组装三列 DTO。
+- `src/store/logic/npcTradeOffers.ts`：方向化报价分类、单 ware comparator、综合评分、普通交易资格分流和 sector 排序。
+- `src/store/useNpcTradeStore.ts`：保存当前应用会话的市场报价用户输入和 binding 归属，不持久化派生候选。
+- `src/components/empire/presenters/useNpcTradePresenter.ts`：读取 stores，持有临时搜索、候选/船只分页和 faction 展开状态，校验 binding/空间站选择，复用 ware search，并输出当前页正常 sector、已展开声望不足 faction→sector 与 ship sector groups。
 - `src/components/empire/NpcTradeWorkbench.vue`：3/5/4 布局与事件转发。
 - `src/components/common/CandidateSearchBox.vue`、`src/components/common/GroupedCandidatePopover.vue`：无 store 依赖的搜索交互与右侧分组弹出框。
 - `src/components/empire/presenters/useBuildGoalSearchPresenter.ts`、`src/components/empire/presenters/useStationModulePickerPresenter.ts`：为既有 BuildPlan 商品/模块和空间站模块入口组装共用候选 DTO。
@@ -289,6 +309,10 @@ BuildPlan 的舰队入口继续使用 `FleetGoalSearchBox`，不为表面统一�
 - [单 SFC 可能增长] → 首版保持最少文件；仅在出现独立复用或清晰职责边界后拆分。
 - [`wares.json` 暂时仍含 TEMP 商品] → 不在市场报价建立第二套过滤；由数据生成 change 在源头剔除，合并后所有消费者同时收敛。
 - [合法 ware 缺少 group] → 沿用 `generateFilteredWaresGrouped` 的 `others` 分组，不在 UI 猜测业务分类。
+- [保存派生候选会在 archive 或 binding 编辑后过期] → 薄 store 只保存输入，候选始终从当前依赖重新派生；若未来实测存在性能问题，再为领域计算增加完整依赖键缓存。
+- [特殊 faction 的内部 NPC 交易事件被误认为玩家报价] → 先按 `notradeoffer` 硬排除 owner faction；`moneyvirtual` 不作为货币类型或可交易资格。
+- [display 声望的整数边界掩盖 raw relation] → 资格直接比较 raw relation `> -0.01`，仅在 faction 标题格式化 display 声望。
+- [常用商品和较大跳数导致候选卡片成百上千] → 在 sector grouping 后按每页 10 个完整 sector 切片，并在切片后才构造 station card；折叠 faction 输出空 sectors。若单个 sector 自身成为实测瓶颈，再评估虚拟列表，不提前拆分 sector。
 
 ## Dependencies and Rollout
 

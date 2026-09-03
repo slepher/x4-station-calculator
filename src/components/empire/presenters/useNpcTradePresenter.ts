@@ -4,6 +4,7 @@ import i18n from '@/i18n'
 import { useActiveViewStore } from '@/store/useActiveViewStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useLiveProductionStore } from '@/store/useLiveProductionStore'
+import { useNpcTradeStore } from '@/store/useNpcTradeStore'
 import { useSaveBindingStore } from '@/store/useSaveBindingStore'
 import { createOverlayItem, useSaveStore } from '@/store/useSaveStore'
 import { generateFilteredWaresGrouped } from '@/store/logic/searchWare'
@@ -12,6 +13,7 @@ import { breadthFirstReachable, buildSectorGraph } from '@/store/logic/mapSector
 import {
   buildNpcTradeCandidates,
   calculateContainerWareMaxLoad,
+  classifyNpcTradeEligibility,
   createNpcTradeStationComparator,
   groupNpcTradeStations,
   npcTradeSortNeedsTargets,
@@ -26,6 +28,7 @@ import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
 import { getSectorZoneBoundingCenter } from '@/components/map/utils/coordinates'
 import { getStationPoiLabel } from '@/components/map/savePoiLabel'
 import { useX4I18n } from '@/utils/UseX4I18n'
+import { formatDisplayRelation } from '@/utils/reputation'
 import type { BindingSectorGroup, BindingStationPlan, TradeStationBinding } from '@/types/x4'
 
 export type NpcTradePageState =
@@ -72,17 +75,14 @@ export interface NpcTradeOfferView {
   sourceLabel: string
   price: number
   amount: number
-  desired?: number
 }
 
 export interface NpcTradeStationCard {
   key: string
-  sectorMacro: string
-  sectorLabel: string
   stationName: string
   code: string
-  factionLabel: string
-  relativeLabel: string
+  ownerLabel: string | null
+  distanceLabel: string | null
   wareOffers: Array<{
     wareId: string
     wareLabel: string
@@ -92,8 +92,20 @@ export interface NpcTradeStationCard {
 
 export interface NpcTradeCandidateSection {
   key: string
-  sectorLabel: string | null
+  sectorLabel: string
+  sectorOwnerLabel: string | null
+  jumpLabel: string
   stations: NpcTradeStationCard[]
+}
+
+export interface NpcTradeIneligibleFactionGroup {
+  key: string
+  factionLabel: string
+  reputationLabel: string
+  expanded: boolean
+  page: number
+  pageCount: number
+  sectors: NpcTradeCandidateSection[]
 }
 
 export interface NpcTradeShipGroup {
@@ -123,13 +135,17 @@ export interface NpcTradePresenterProps {
   rankMode: Ref<NpcTradeRankMode>
   sortMetric: Ref<NpcTradeSortMetric>
   primaryWareId: Ref<string | null>
-  groupBySector: Ref<boolean>
   stationGroups: ComputedRef<NpcTradeStationOptionGroup[]>
   selectedStationOptions: ComputedRef<NpcTradeStationOption[]>
   searchGroups: ComputedRef<NpcTradeWareSearchGroup[]>
   wareTargets: ComputedRef<NpcTradeWareTargetView[]>
   candidateSections: ComputedRef<NpcTradeCandidateSection[]>
+  candidatePage: Ref<number>
+  candidatePageCount: ComputedRef<number>
+  ineligibleFactionGroups: ComputedRef<NpcTradeIneligibleFactionGroup[]>
   shipGroups: ComputedRef<NpcTradeShipGroup[]>
+  shipPage: Ref<number>
+  shipPageCount: ComputedRef<number>
   pageState: ComputedRef<NpcTradePageState>
   pageStateLabel: ComputedRef<string>
   canUseComposite: ComputedRef<boolean>
@@ -148,7 +164,30 @@ export interface NpcTradePresenterEmits {
   setRankMode: (mode: NpcTradeRankMode) => void
   setSortMetric: (metric: NpcTradeSortMetric) => void
   setPrimaryWare: (wareId: string) => void
-  setGroupBySector: (enabled: boolean) => void
+  setCandidatePage: (page: number) => void
+  setIneligibleFactionExpanded: (factionId: string, expanded: boolean) => void
+  setIneligibleFactionPage: (factionId: string, page: number) => void
+  setShipPage: (page: number) => void
+}
+
+const NPC_TRADE_SECTORS_PER_PAGE = 10
+
+export function paginateNpcTradeSectorGroups<T>(groups: T[], page: number): T[] {
+  const start = (Math.max(1, page) - 1) * NPC_TRADE_SECTORS_PER_PAGE
+  return groups.slice(start, start + NPC_TRADE_SECTORS_PER_PAGE)
+}
+
+export function npcTradeSourceLabelKey(
+  direction: PlayerTradeDirection,
+  source: NpcTradeDemandSource
+): string {
+  if (direction === 'buy' && source === 'station') return 'npc_trade.source.stationSell'
+  return `npc_trade.source.${source}`
+}
+
+export function normalizeNpcTradeSectorOwner(owner: string): string | null {
+  const normalized = owner.trim()
+  return normalized.length === 0 || normalized === 'ownerless' ? null : normalized
 }
 
 function resolveEntrySector(
@@ -165,23 +204,35 @@ export function useNpcTradePresenter(): { props: NpcTradePresenterProps; emits: 
   const activeViewStore = useActiveViewStore()
   const bindingStore = useSaveBindingStore()
   const liveProductionStore = useLiveProductionStore()
+  const npcTradeStore = useNpcTradeStore()
   const saveStore = useSaveStore()
   const gameDataStore = useGameDataStore()
   const { activeBinding } = storeToRefs(bindingStore)
   const { orderedStationsBySector, playerStationRecords } = storeToRefs(liveProductionStore)
+  const {
+    direction,
+    selectedPlayerStationGroupId,
+    selectedPlayerStationId,
+    jumpLimit,
+    targets,
+    primaryWareId,
+    rankMode,
+    sortMetric
+  } = storeToRefs(npcTradeStore)
   const { selectedArchive, selectedArchivePlayerShips, archives } = storeToRefs(saveStore)
   const { translateFaction, translateSector, translateShipType } = useX4I18n()
 
-  const direction = ref<PlayerTradeDirection>('sell')
-  const selectedPlayerStationGroupId = ref<string | null>(null)
-  const selectedPlayerStationId = ref<string | null>(null)
-  const jumpLimit = ref(5)
   const searchQuery = ref('')
-  const targets = ref<WareTarget[]>([])
-  const primaryWareId = ref<string | null>(null)
-  const rankMode = ref<NpcTradeRankMode>('primary')
-  const sortMetric = ref<NpcTradeSortMetric>('quantity')
-  const groupBySector = ref(false)
+  const candidatePage = ref(1)
+  const shipPage = ref(1)
+  const expandedIneligibleFactionKeys = ref<Set<string>>(new Set())
+  const ineligibleFactionPages = ref<Record<string, number>>({})
+
+  watch(
+    () => activeBinding.value === null ? null : activeBinding.value.gameGuid,
+    (gameGuid) => { npcTradeStore.setBindingGameGuid(gameGuid) },
+    { immediate: true }
+  )
 
   const bindingArchive = computed(() => {
     const binding = activeBinding.value
@@ -411,9 +462,11 @@ export function useNpcTradePresenter(): { props: NpcTradePresenterProps; emits: 
     return jumps !== null && jumps <= jumpLimit.value
   }
 
-  const sortedCandidates = computed(() => {
+  const candidateBuckets = computed(() => {
     const archive = bindingArchive.value
-    if (!contextAvailable.value || archive === null || targets.value.length === 0) return []
+    if (!contextAvailable.value || archive === null || targets.value.length === 0) {
+      return { eligible: [], insufficientRelation: [] }
+    }
     const candidates = buildNpcTradeCandidates(
       archive,
       direction.value,
@@ -426,10 +479,27 @@ export function useNpcTradePresenter(): { props: NpcTradePresenterProps; emits: 
       targets: targets.value,
       primaryWareId: primaryWareId.value
     })
-    return candidates.filter((candidate) => passesJumpFilter(candidate.sectorMacro)).sort(comparator)
+    const eligible: typeof candidates = []
+    const insufficientRelation: typeof candidates = []
+    const classified = candidates.flatMap((candidate) => {
+      if (!passesJumpFilter(candidate.sectorMacro)) return []
+      const faction = gameDataStore.factions.find((item) => item.id === candidate.owner)
+      const eligibility = classifyNpcTradeEligibility(
+        faction?.tags,
+        archive.playerRelations?.[candidate.owner]
+      )
+      return eligibility === 'excluded' ? [] : [{ candidate, eligibility }]
+    }).sort((a, b) => comparator(a.candidate, b.candidate))
+    for (const { candidate, eligibility } of classified) {
+      if (eligibility === 'eligible') eligible.push(candidate)
+      if (eligibility === 'insufficientRelation') insufficientRelation.push(candidate)
+    }
+    return { eligible, insufficientRelation }
   })
 
-  const sourceLabel = (source: NpcTradeDemandSource): string => i18n.global.t(`npc_trade.source.${source}`)
+  const sourceLabel = (source: NpcTradeDemandSource): string => i18n.global.t(
+    npcTradeSourceLabelKey(direction.value, source)
+  )
 
   const relativeLabel = (
     sectorMacro: string,
@@ -451,8 +521,28 @@ export function useNpcTradePresenter(): { props: NpcTradePresenterProps; emits: 
     return i18n.global.t('npc_trade.relative.distance', { distance: distanceKm.toFixed(1) })
   }
 
-  const toStationCard = (candidate: ReturnType<typeof buildNpcTradeCandidates>[number]): NpcTradeStationCard => {
-    const faction = gameDataStore.factions.find((item) => item.id === candidate.owner)
+  const jumpLabel = (sectorMacro: string): string => {
+    const jumps = jumpDistanceTo(sectorMacro)
+    return jumps === null
+      ? i18n.global.t('npc_trade.relative.unknown')
+      : i18n.global.t('npc_trade.relative.jumps', { count: jumps })
+  }
+
+  const factionLabel = (factionId: string): string => {
+    const faction = gameDataStore.factions.find((item) => item.id === factionId)
+    return faction === undefined ? i18n.global.t('npc_trade.unknown') : translateFaction(faction)
+  }
+
+  const sectorOwner = (sectorMacro: string): string | null => {
+    const resolved = resolveMapSectorByMacro(gameDataStore.maps, sectorMacro)
+    if (resolved === null) return null
+    return normalizeNpcTradeSectorOwner(resolved.sector.owner)
+  }
+
+  const toStationCard = (
+    candidate: ReturnType<typeof buildNpcTradeCandidates>[number],
+    ownerLabel: string | null
+  ): NpcTradeStationCard => {
     const stationName = getStationPoiLabel(
       createOverlayItem('npcStation', candidate.sectorMacro, sectorLabel(candidate.sectorMacro), candidate.station),
       {
@@ -463,12 +553,12 @@ export function useNpcTradePresenter(): { props: NpcTradePresenterProps; emits: 
     )
     return {
       key: candidate.key,
-      sectorMacro: candidate.sectorMacro,
-      sectorLabel: sectorLabel(candidate.sectorMacro),
       stationName,
       code: candidate.code,
-      factionLabel: faction === undefined ? i18n.global.t('npc_trade.unknown') : translateFaction(faction),
-      relativeLabel: relativeLabel(candidate.sectorMacro, candidate.station.position),
+      ownerLabel,
+      distanceLabel: selectedPlayerStation.value?.sectorMacro === candidate.sectorMacro
+        ? relativeLabel(candidate.sectorMacro, candidate.station.position)
+        : null,
       wareOffers: targets.value.flatMap((target) => {
         const offers = candidate.offersByWare[target.wareId]
         if (offers === undefined) return []
@@ -481,21 +571,14 @@ export function useNpcTradePresenter(): { props: NpcTradePresenterProps; emits: 
             source: offer.source,
             sourceLabel: sourceLabel(offer.source),
             price: offer.price,
-            amount: offer.amount,
-            desired: offer.desired
+            amount: offer.amount
           }))
         }]
       })
     }
   }
 
-  const candidateSections = computed<NpcTradeCandidateSection[]>(() => {
-    const candidates = sortedCandidates.value
-    if (!groupBySector.value) {
-      return candidates.length === 0
-        ? []
-        : [{ key: 'all', sectorLabel: null, stations: candidates.map(toStationCard) }]
-    }
+  const eligibleSectorGroups = computed(() => {
     const comparator = createNpcTradeStationComparator({
       direction: direction.value,
       rankMode: rankMode.value,
@@ -503,14 +586,83 @@ export function useNpcTradePresenter(): { props: NpcTradePresenterProps; emits: 
       targets: targets.value,
       primaryWareId: primaryWareId.value
     })
-    return groupNpcTradeStations(candidates, comparator).map((group) => ({
-      key: group.sectorMacro,
-      sectorLabel: sectorLabel(group.sectorMacro),
-      stations: group.stations.map(toStationCard)
-    }))
+    return groupNpcTradeStations(candidateBuckets.value.eligible, comparator)
   })
 
-  const shipGroups = computed<NpcTradeShipGroup[]>(() => {
+  const candidatePageCount = computed(() => Math.max(
+    1,
+    Math.ceil(eligibleSectorGroups.value.length / NPC_TRADE_SECTORS_PER_PAGE)
+  ))
+
+  const candidateSections = computed<NpcTradeCandidateSection[]>(() => {
+    const page = Math.min(candidatePage.value, candidatePageCount.value)
+    return paginateNpcTradeSectorGroups(eligibleSectorGroups.value, page).map((group) => {
+      const owner = sectorOwner(group.sectorMacro)
+      return {
+        key: group.sectorMacro,
+        sectorLabel: sectorLabel(group.sectorMacro),
+        sectorOwnerLabel: owner === null ? null : factionLabel(owner),
+        jumpLabel: jumpLabel(group.sectorMacro),
+        stations: group.stations.map((station) => toStationCard(
+          station,
+          station.owner === owner ? null : factionLabel(station.owner)
+        ))
+      }
+    })
+  })
+
+  const ineligibleFactionGroups = computed<NpcTradeIneligibleFactionGroup[]>(() => {
+    const archive = bindingArchive.value
+    if (archive === null) return []
+    const comparator = createNpcTradeStationComparator({
+      direction: direction.value,
+      rankMode: rankMode.value,
+      metric: sortMetric.value,
+      targets: targets.value,
+      primaryWareId: primaryWareId.value
+    })
+    const byFaction = new Map<string, typeof candidateBuckets.value.insufficientRelation>()
+    for (const candidate of candidateBuckets.value.insufficientRelation) {
+      const existing = byFaction.get(candidate.owner)
+      if (existing === undefined) byFaction.set(candidate.owner, [candidate])
+      else existing.push(candidate)
+    }
+    return Array.from(byFaction, ([factionId, stations]) => {
+      const sectorGroups = groupNpcTradeStations(stations, comparator)
+      const pageCount = Math.max(1, Math.ceil(sectorGroups.length / NPC_TRADE_SECTORS_PER_PAGE))
+      const storedPage = ineligibleFactionPages.value[factionId]
+      const page = typeof storedPage === 'number' ? Math.min(storedPage, pageCount) : 1
+      const expanded = expandedIneligibleFactionKeys.value.has(factionId)
+      return {
+        key: factionId,
+        factionLabel: factionLabel(factionId),
+        reputationLabel: formatDisplayRelation(archive.playerRelations?.[factionId]),
+        expanded,
+        page,
+        pageCount,
+        sectors: expanded
+          ? paginateNpcTradeSectorGroups(sectorGroups, page).map((group) => ({
+              key: `${factionId}:${group.sectorMacro}`,
+              sectorLabel: sectorLabel(group.sectorMacro),
+              sectorOwnerLabel: (() => {
+                const owner = sectorOwner(group.sectorMacro)
+                return owner === null ? null : factionLabel(owner)
+              })(),
+              jumpLabel: jumpLabel(group.sectorMacro),
+              stations: group.stations.map((station) => toStationCard(station, null))
+            }))
+          : []
+      }
+    })
+  })
+
+  watch(candidateBuckets, () => {
+    candidatePage.value = 1
+    expandedIneligibleFactionKeys.value = new Set()
+    ineligibleFactionPages.value = {}
+  })
+
+  const allShipGroups = computed<NpcTradeShipGroup[]>(() => {
     const binding = activeBinding.value
     if (!contextAvailable.value || binding === null) return []
     const grouped = new Map<string, NpcTradeShipGroup['ships']>()
@@ -570,6 +722,18 @@ export function useNpcTradePresenter(): { props: NpcTradePresenterProps; emits: 
     })).sort((a, b) => a.sectorLabel.localeCompare(b.sectorLabel))
   })
 
+  const shipPageCount = computed(() => Math.max(
+    1,
+    Math.ceil(allShipGroups.value.length / NPC_TRADE_SECTORS_PER_PAGE)
+  ))
+
+  const shipGroups = computed(() => paginateNpcTradeSectorGroups(
+    allShipGroups.value,
+    Math.min(shipPage.value, shipPageCount.value)
+  ))
+
+  watch(allShipGroups, () => { shipPage.value = 1 })
+
   const pageState = computed<NpcTradePageState>(() => {
     if (!contextAvailable.value) return 'contextUnavailable'
     if (selectedPlayerStationId.value === null) return 'stationNotSelected'
@@ -577,7 +741,9 @@ export function useNpcTradePresenter(): { props: NpcTradePresenterProps; emits: 
     if (npcTradeSortNeedsTargets(rankMode.value, sortMetric.value, targets.value, primaryWareId.value)) {
       return 'targetMissing'
     }
-    if (sortedCandidates.value.length === 0) return 'noMatches'
+    if (candidateBuckets.value.eligible.length === 0 && candidateBuckets.value.insufficientRelation.length === 0) {
+      return 'noMatches'
+    }
     return 'results'
   })
 
@@ -613,7 +779,26 @@ export function useNpcTradePresenter(): { props: NpcTradePresenterProps; emits: 
     setRankMode: (value) => { rankMode.value = value },
     setSortMetric: (value) => { sortMetric.value = value },
     setPrimaryWare: (wareId) => { primaryWareId.value = wareId },
-    setGroupBySector: (value) => { groupBySector.value = value }
+    setCandidatePage: (page) => {
+      candidatePage.value = Math.min(Math.max(1, Math.trunc(page)), candidatePageCount.value)
+    },
+    setIneligibleFactionExpanded: (factionId, expanded) => {
+      const next = new Set(expandedIneligibleFactionKeys.value)
+      if (expanded) next.add(factionId)
+      else next.delete(factionId)
+      expandedIneligibleFactionKeys.value = next
+    },
+    setIneligibleFactionPage: (factionId, page) => {
+      const group = ineligibleFactionGroups.value.find((item) => item.key === factionId)
+      if (group === undefined) return
+      ineligibleFactionPages.value = {
+        ...ineligibleFactionPages.value,
+        [factionId]: Math.min(Math.max(1, Math.trunc(page)), group.pageCount)
+      }
+    },
+    setShipPage: (page) => {
+      shipPage.value = Math.min(Math.max(1, Math.trunc(page)), shipPageCount.value)
+    }
   }
 
   return {
@@ -626,13 +811,17 @@ export function useNpcTradePresenter(): { props: NpcTradePresenterProps; emits: 
       rankMode,
       sortMetric,
       primaryWareId,
-      groupBySector,
       stationGroups,
       selectedStationOptions,
       searchGroups,
       wareTargets,
       candidateSections,
+      candidatePage,
+      candidatePageCount,
+      ineligibleFactionGroups,
       shipGroups,
+      shipPage,
+      shipPageCount,
       pageState,
       pageStateLabel,
       canUseComposite,

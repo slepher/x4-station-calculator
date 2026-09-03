@@ -207,7 +207,12 @@
 
 **前提** NPC station 存在匹配报价
 **当** presenter 生成 station card
-**那么** card MUST 显示本地化 sector、与地图 station tooltip 同源的本地化 station 名称、station code 和本地化 faction
+**那么** 所属 sector header MUST 显示本地化 sector、非空的本地化 sector owner 和相对所选玩家站的跳数
+**并且** card MUST 显示与地图 station tooltip 同源的本地化 station 名称和 station code
+**并且** station owner 与 sector owner 不同时，card MUST 显示本地化 station owner
+**并且** sector owner 为空时，card MUST 显示本地化 station owner
+**并且** station owner 与 sector owner 相同时，card MUST NOT 重复 owner
+**并且** card MUST NOT 重复 sector 或跳数
 **并且** card MUST NOT 显示 race
 
 #### Scenario: 复用地图 station label
@@ -226,7 +231,8 @@
 **前提** 同一 station/ware 同时存在普通直属 buy、`supplies` buy 和 buildStorage buy
 **当** 页面处于玩家卖出方向
 **那么** station card MUST 分别显示空间站自身、空间站补给和建材仓库需求
-**并且** 三条需求 MUST 保持各自 price、amount 与原始可选 desired
+**并且** 三条需求 MUST 保持各自 price 与 amount
+**并且** archive 中原始可选 desired MUST NOT 进入报价行展示
 **并且** 排序和展示 MUST NOT 使用 desired fallback amount
 
 #### Scenario: 建材仓库归入空间站
@@ -242,6 +248,8 @@
 **当** 系统读取某 station/ware 报价
 **那么** 系统 MUST 使用 station 直属 seller offer
 **并且** 系统 MUST NOT 将 buildStorage buy 或 supplies buy 当作卖单
+**并且** 报价来源 MUST 显示“空间站出售”或当前 locale 对应的 `Station selling`
+**并且** 报价来源 MUST NOT 显示玩家卖出方向的“空间站自身需求”或 `Station demand`
 
 #### Scenario: 零数量报价已过滤
 
@@ -319,23 +327,106 @@
 **那么** 该 ware 的满足比例和可成交数量 MUST 为 0
 **并且** 系统 MUST NOT 使用其他 ware 的 offer fallback
 
-### Requirement: Sector Grouped Candidate Ranking
+### Requirement: Fixed Sector Grouped Candidate Ranking
 
-系统 SHALL 允许在全局 station 列表与 sector 分组列表之间切换，并以 sector 内最高 station 排序 sector。
+系统 SHALL 固定按 sector 展示声望合格的普通市场候选，并以 sector 内最高 station 排序 sector。
 
-#### Scenario: 关闭 sector 分组
+#### Scenario: 固定启用 sector 分组
 
-**前提** sector 分组开关关闭
+**前提** 页面存在声望合格的普通市场候选
 **当** 页面显示候选
-**那么** 页面 MUST 按当前 comparator 显示全局 station 列表
-
-#### Scenario: 开启 sector 分组
-
-**前提** sector 分组开关开启
-**当** 页面显示候选
-**那么** 每个 sector 的排名 MUST 取该 sector 内最高 station 的排名
+**那么** 页面 MUST 按真实 `sectorMacro` 分组
+**并且** 页面 MUST NOT 提供 sector 分组 checkbox 或全局 station 平铺模式
+**并且** 每个 sector 的排名 MUST 取该 sector 内最高 station 的排名
 **并且** sector 内 station MUST 使用同一 comparator
 **并且** 分组 MUST NOT 改写 station 的业务分数
+
+#### Scenario: sector 标题承载共享身份
+
+**前提** 某 sector 分组包含一个或多个 station
+**当** 页面渲染该分组
+**那么** sector 标题 MUST 显示本地化 sector、非空的本地化 sector owner 和跳数
+**并且** sector owner 为空时标题 MUST 省略 owner
+**并且** station owner 与 sector owner 不同时，station card MUST 显示本地化 station owner
+**并且** sector owner 为空时，station card MUST 显示本地化 station owner
+**并且** station owner 与 sector owner 相同时，station card MUST NOT 重复 owner
+**并且** station card MUST NOT 重复 sector 或跳数
+**并且** same-sector 的精确直线距离 MAY 继续显示在 station card，因为它不是 sector 共享值
+
+#### Scenario: 按完整 sector 分页
+
+**前提** 声望合格候选超过 10 个 sector
+**当** presenter 生成当前候选页
+**那么** 每页 MUST 最多包含 10 个完整 sector groups
+**并且** 同一 sector 的 station MUST NOT 被拆到不同页
+**并且** presenter MUST 在 sector grouping 和分页切片之后才构造当前页 station card DTO
+**并且** Vue MUST NOT 挂载其他页的 station cards
+
+### Requirement: NPC Ordinary Trade Eligibility
+
+系统 SHALL 在展示分组前区分不支持普通货币交易、声望不足和声望合格的 station candidates。
+
+#### Scenario: 硬排除无普通报价 faction
+
+**前提** station owner faction 带 `notradeoffer`
+**当** 系统生成普通市场候选
+**那么** station MUST 被直接排除
+**并且** station MUST NOT 进入正常 sector 分组
+**并且** station MUST NOT 进入声望不足分组
+**并且** barter 或 `moneyvirtual` MUST NOT 被解释为普通货币报价
+
+#### Scenario: 使用 raw relation 判断普通交易资格
+
+**前提** station owner faction 支持普通货币交易
+**当** 系统判断当前玩家是否具有普通交易资格
+**那么** 系统 MUST 直接比较当前 archive 的 raw relation
+**并且** `rawRelation > -0.01` MUST 视为声望合格
+**并且** `rawRelation <= -0.01` MUST 视为声望不足
+**并且** 系统 MUST NOT 使用 display 整数反向判断资格
+
+#### Scenario: 声望不足 station 置底分组
+
+**前提** 一个或多个普通市场 station 的 owner faction 声望不足
+**当** 页面显示全部候选
+**那么** 这些 station MUST 统一位于正常 sector 分组之后
+**并且** 它们 MUST 按 station owner 分组
+**并且** station owner 分组 MUST 默认折叠
+**并且** 分组标题 MUST 显示本地化 station owner 与由该 owner raw relation 转换的 display 声望
+**并且** sector owner MUST NOT 用于声望判断或该层分组
+
+#### Scenario: 声望不足 faction 内继续按 sector 分组
+
+**前提** 用户展开一个声望不足 faction
+**当** 页面显示其 station
+**那么** station MUST 继续按 sector 分组
+**并且** sector 标题 MUST 显示本地化 sector、非空的本地化 sector owner 和跳数
+**并且** sector owner 为空时标题 MUST 省略 owner
+**并且** station card MUST NOT 重复父级已显示的 station owner、sector 或跳数
+**并且** station owner、sector 与 station 顺序 MUST 继续沿用当前 station comparator
+
+#### Scenario: 折叠 faction 延迟生成卡片
+
+**前提** 一个声望不足 faction 处于折叠状态
+**当** presenter 和 Vue 生成候选区
+**那么** faction 摘要 MUST 保持可见
+**并且** presenter MUST 为该 faction 输出空 sector card 集合
+**并且** Vue MUST NOT 挂载该 faction 的 sector 或 station cards
+
+#### Scenario: 展开 faction 按完整 sector 分页
+
+**前提** 一个已展开的声望不足 faction 超过 10 个 sector
+**当** 页面显示该 faction 的当前页
+**那么** 当前页 MUST 最多包含 10 个完整 sector groups
+**并且** 同一 sector 的 station MUST NOT 被拆到不同页
+**并且** presenter MUST 只构造该 faction 当前页的 station card DTO
+
+#### Scenario: 候选变化重置临时导航状态
+
+**前提** 用户已切换正常候选页、faction 页或展开声望不足 faction
+**当** 交易方向、玩家空间站、最大跳数、目标商品、排名、排序、archive 或其他候选依赖变化
+**那么** 正常候选页 MUST 回到第一页
+**并且** faction 页码 MUST 回到第一页
+**并且** 已展开 faction MUST 关闭
 
 ### Requirement: Available Player Ships By Sector
 
@@ -386,6 +477,15 @@
 **并且** transport 匹配且 `ware.volume > 0` 时数量 MUST 为 `floor(cargoCapacity / ware.volume)`
 **并且** transport 不匹配或 volume 无效时数量 MUST 为 0
 **并且** 左侧 targetQty 与存档当前 cargo MUST NOT 影响该数量
+
+#### Scenario: 可用船只按完整 sector 分页
+
+**前提** 可用玩家船只分布在超过 10 个 sector groups
+**当** 页面显示右列船只
+**那么** 每页 MUST 最多包含 10 个完整 sector groups
+**并且** 同一 sector 的船只 MUST NOT 被拆到不同页
+**并且** 分页 MUST NOT 改变 sector 内船只过滤、排序或 binding group 命中语义
+**并且** 船只集合变化后页码 MUST 回到第一页
 
 ### Requirement: Relative Position To Selected Player Station
 
@@ -455,3 +555,27 @@
 **那么** 组装 MUST 位于 presenter
 **并且** Vue MUST 只消费 presenter props 和 emits
 **并且** Vue MUST NOT 直接访问 store 或新增中间层
+
+#### Scenario: 工作台切换保留用户输入
+
+**前提** 用户已在某 active binding 的市场报价页面选择方向、最大跳数、ware targets、主商品、排名方式、排序指标和玩家空间站
+**当** 用户切换到其他工作台页面后再返回市场报价
+**那么** 薄 store MUST 保留上述仍有效的用户输入
+**并且** 搜索文字与候选弹窗状态 MUST NOT 作为薄 store 状态保存
+**并且** 固定 sector 分组、normal/faction/ship 页码与 faction 折叠状态 MUST NOT 作为薄 store 状态保存
+**并且** 系统 MUST NOT 将这些状态写入 SaveBindingPlan 或 localStorage
+
+#### Scenario: binding 归属隔离
+
+**前提** 薄 store 中存在属于 binding A 的 group/station 选择
+**当** active binding 切换为 binding B
+**那么** presenter MUST 清除 binding A 的 group/station 选择
+**并且** presenter MAY 保留方向、跳数、商品目标、主商品和排序等通用查询输入
+
+#### Scenario: 派生候选不进入薄 store
+
+**前提** 市场报价已经生成 NPC 候选、船只候选、距离和展示分组
+**当** 用户上传或选择新 archive，或修改 binding group、station、位置或 coverage
+**那么** presenter MUST 从当前依赖重新派生结果
+**并且** 薄 store MUST NOT 固定保存 NPC 候选、船只候选或其他展示 DTO
+**并且** 已失效的 group/station 选择 MUST 被清除

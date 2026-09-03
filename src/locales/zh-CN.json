@@ -1531,9 +1531,18 @@
       "total_cost": "目标总成本"
     },
     "primary_ware": "主商品",
-    "group_by_sector": "按星区分组",
+    "insufficient_relations": "声望不足",
+    "reputation": "声望：{value}",
+    "pagination": {
+      "label": "候选分页",
+      "ship_label": "可用船只分页",
+      "previous": "上一页",
+      "next": "下一页",
+      "status": "{current} / {total}"
+    },
     "source": {
       "station": "空间站自身需求",
+      "stationSell": "空间站出售",
       "supplies": "空间站补给需求",
       "buildStorage": "建材仓库需求"
     },
@@ -1544,7 +1553,6 @@
       "unknown": "距离未知"
     },
     "amount": "数量",
-    "desired": "目标",
     "price": "价格",
     "ships": "可用玩家船只",
     "no_ships": "没有可用的 L 货船或 M 运输船",

@@ -181,15 +181,6 @@ const selectWare = (wareId: string, close: () => void) => {
               </option>
             </select>
           </label>
-          <label class="checkbox-row">
-            <input
-              type="checkbox"
-              :checked="presenter.props.groupBySector.value"
-              data-testid="npc-trade-group-sector"
-              @change="presenter.emits.setGroupBySector(($event.target as HTMLInputElement).checked)"
-            >
-            <span>{{ t('npc_trade.group_by_sector') }}</span>
-          </label>
         </div>
 
         <div v-if="presenter.props.pageState.value !== 'results'" class="empty-state" :data-testid="`npc-trade-state-${presenter.props.pageState.value}`">
@@ -197,29 +188,126 @@ const selectWare = (wareId: string, close: () => void) => {
         </div>
         <div v-else class="candidate-list" data-testid="npc-trade-results">
           <section v-for="section in presenter.props.candidateSections.value" :key="section.key" class="candidate-section">
-            <h3 v-if="section.sectorLabel" class="sector-header">{{ section.sectorLabel }}</h3>
+            <header class="sector-header">
+              <span>{{ section.sectorLabel }}</span>
+              <span class="sector-meta">
+                <span v-if="section.sectorOwnerLabel">{{ section.sectorOwnerLabel }}</span>
+                <span>{{ section.jumpLabel }}</span>
+              </span>
+            </header>
             <article v-for="station in section.stations" :key="station.key" class="station-card">
               <header class="station-header">
                 <div>
                   <div class="station-title">{{ station.stationName }}</div>
                   <div class="station-code">{{ station.code }}</div>
+                  <div v-if="station.ownerLabel" class="station-owner">{{ station.ownerLabel }}</div>
                 </div>
-                <div class="station-identity">
-                  <span>{{ station.sectorLabel }}</span>
-                  <span>{{ station.factionLabel }}</span>
-                  <span>{{ station.relativeLabel }}</span>
-                </div>
+                <span v-if="station.distanceLabel" class="station-distance">{{ station.distanceLabel }}</span>
               </header>
               <div v-for="ware in station.wareOffers" :key="ware.wareId" class="ware-offers">
                 <h4>{{ ware.wareLabel }}</h4>
                 <div v-for="offer in ware.offers" :key="offer.tradeId" class="offer-row">
                   <span class="source-badge">{{ offer.sourceLabel }}</span>
                   <span>{{ t('npc_trade.amount') }}: {{ offer.amount }}</span>
-                  <span v-if="offer.desired !== undefined">{{ t('npc_trade.desired') }}: {{ offer.desired }}</span>
                   <span>{{ t('npc_trade.price') }}: {{ offer.price }}</span>
                 </div>
               </div>
             </article>
+          </section>
+          <nav
+            v-if="presenter.props.candidatePageCount.value > 1"
+            class="pagination"
+            :aria-label="t('npc_trade.pagination.label')"
+          >
+            <button
+              type="button"
+              :disabled="presenter.props.candidatePage.value <= 1"
+              :aria-label="t('npc_trade.pagination.previous')"
+              data-testid="npc-trade-page-prev"
+              @click="presenter.emits.setCandidatePage(presenter.props.candidatePage.value - 1)"
+            >‹</button>
+            <span>{{ t('npc_trade.pagination.status', { current: presenter.props.candidatePage.value, total: presenter.props.candidatePageCount.value }) }}</span>
+            <button
+              type="button"
+              :disabled="presenter.props.candidatePage.value >= presenter.props.candidatePageCount.value"
+              :aria-label="t('npc_trade.pagination.next')"
+              data-testid="npc-trade-page-next"
+              @click="presenter.emits.setCandidatePage(presenter.props.candidatePage.value + 1)"
+            >›</button>
+          </nav>
+
+          <section
+            v-if="presenter.props.ineligibleFactionGroups.value.length > 0"
+            class="ineligible-candidates"
+            data-testid="npc-trade-insufficient-relations"
+          >
+            <h3 class="ineligible-title">{{ t('npc_trade.insufficient_relations') }}</h3>
+            <details
+              v-for="faction in presenter.props.ineligibleFactionGroups.value"
+              :key="faction.key"
+              :open="faction.expanded"
+              class="faction-group"
+              :data-testid="`npc-trade-ineligible-faction-${faction.key}`"
+              @toggle="presenter.emits.setIneligibleFactionExpanded(faction.key, ($event.currentTarget as HTMLDetailsElement).open)"
+            >
+              <summary class="faction-summary">
+                <span>{{ faction.factionLabel }}</span>
+                <span>{{ t('npc_trade.reputation', { value: faction.reputationLabel }) }}</span>
+              </summary>
+              <div
+                v-if="faction.expanded"
+                class="faction-sectors"
+                :data-testid="`npc-trade-ineligible-sectors-${faction.key}`"
+              >
+                <section v-for="section in faction.sectors" :key="section.key" class="candidate-section">
+                  <header class="sector-header">
+                    <span>{{ section.sectorLabel }}</span>
+                    <span class="sector-meta">
+                      <span v-if="section.sectorOwnerLabel">{{ section.sectorOwnerLabel }}</span>
+                      <span>{{ section.jumpLabel }}</span>
+                    </span>
+                  </header>
+                  <article v-for="station in section.stations" :key="station.key" class="station-card">
+                    <header class="station-header">
+                      <div>
+                        <div class="station-title">{{ station.stationName }}</div>
+                        <div class="station-code">{{ station.code }}</div>
+                      </div>
+                      <span v-if="station.distanceLabel" class="station-distance">{{ station.distanceLabel }}</span>
+                    </header>
+                    <div v-for="ware in station.wareOffers" :key="ware.wareId" class="ware-offers">
+                      <h4>{{ ware.wareLabel }}</h4>
+                      <div v-for="offer in ware.offers" :key="offer.tradeId" class="offer-row">
+                        <span class="source-badge">{{ offer.sourceLabel }}</span>
+                        <span>{{ t('npc_trade.amount') }}: {{ offer.amount }}</span>
+                        <span>{{ t('npc_trade.price') }}: {{ offer.price }}</span>
+                      </div>
+                    </div>
+                  </article>
+                </section>
+                <nav
+                  v-if="faction.pageCount > 1"
+                  class="pagination"
+                  :aria-label="t('npc_trade.pagination.label')"
+                >
+                  <button
+                    type="button"
+                    :disabled="faction.page <= 1"
+                    :aria-label="t('npc_trade.pagination.previous')"
+                    :data-testid="`npc-trade-ineligible-page-prev-${faction.key}`"
+                    @click="presenter.emits.setIneligibleFactionPage(faction.key, faction.page - 1)"
+                  >‹</button>
+                  <span>{{ t('npc_trade.pagination.status', { current: faction.page, total: faction.pageCount }) }}</span>
+                  <button
+                    type="button"
+                    :disabled="faction.page >= faction.pageCount"
+                    :aria-label="t('npc_trade.pagination.next')"
+                    :data-testid="`npc-trade-ineligible-page-next-${faction.key}`"
+                    @click="presenter.emits.setIneligibleFactionPage(faction.key, faction.page + 1)"
+                  >›</button>
+                </nav>
+              </div>
+            </details>
           </section>
         </div>
       </div>
@@ -251,6 +339,27 @@ const selectWare = (wareId: string, close: () => void) => {
             <span class="availability-badge" :class="ship.availability">{{ ship.availabilityLabel }}</span>
           </div>
         </section>
+        <nav
+          v-if="presenter.props.shipPageCount.value > 1"
+          class="pagination"
+          :aria-label="t('npc_trade.pagination.ship_label')"
+        >
+          <button
+            type="button"
+            :disabled="presenter.props.shipPage.value <= 1"
+            :aria-label="t('npc_trade.pagination.previous')"
+            data-testid="npc-trade-ship-page-prev"
+            @click="presenter.emits.setShipPage(presenter.props.shipPage.value - 1)"
+          >‹</button>
+          <span>{{ t('npc_trade.pagination.status', { current: presenter.props.shipPage.value, total: presenter.props.shipPageCount.value }) }}</span>
+          <button
+            type="button"
+            :disabled="presenter.props.shipPage.value >= presenter.props.shipPageCount.value"
+            :aria-label="t('npc_trade.pagination.next')"
+            data-testid="npc-trade-ship-page-next"
+            @click="presenter.emits.setShipPage(presenter.props.shipPage.value + 1)"
+          >›</button>
+        </nav>
       </div>
     </section>
   </main>
@@ -274,19 +383,26 @@ const selectWare = (wareId: string, close: () => void) => {
 .jump-filter-row { @apply flex items-center justify-between gap-3; }
 .remove-button { @apply h-7 w-7 rounded text-slate-500 hover:bg-red-500/10 hover:text-red-300; }
 .sort-grid { @apply grid grid-cols-1 sm:grid-cols-2 gap-3; }
-.checkbox-row { @apply flex items-center gap-2 text-sm text-slate-300 self-end pb-2; }
 .empty-state { @apply rounded border border-dashed border-slate-700 p-6 text-center text-sm text-slate-500; }
 .candidate-list, .candidate-section { @apply flex flex-col gap-3; }
 .sector-header { @apply flex flex-wrap items-center justify-between gap-2 text-sm font-semibold text-sky-300; }
+.sector-meta { @apply flex flex-wrap items-center justify-end gap-x-3 gap-y-1 text-xs font-normal text-slate-400; }
 .station-card { @apply rounded border border-slate-700/80 bg-slate-950/40 p-3; }
 .station-header { @apply flex flex-wrap items-start justify-between gap-3 pb-3 border-b border-slate-800; }
 .station-title { @apply text-sm font-semibold text-slate-100; }
-.station-code { @apply text-xs text-slate-500; }
-.station-identity { @apply flex flex-wrap justify-end gap-x-3 gap-y-1 text-xs text-slate-400; }
+.station-code, .station-owner { @apply text-xs text-slate-500; }
+.station-distance { @apply text-xs text-slate-400; }
 .ware-offers { @apply mt-3 flex flex-col gap-2; }
 .ware-offers h4 { @apply text-sm font-medium text-slate-200; }
 .offer-row { @apply grid grid-cols-2 gap-2 rounded bg-slate-800/40 px-2 py-2 text-xs text-slate-400 sm:grid-cols-4; }
 .source-badge { @apply text-sky-300; }
+.ineligible-candidates { @apply mt-3 flex flex-col gap-3 border-t border-slate-700/60 pt-4; }
+.ineligible-title { @apply text-sm font-semibold text-amber-300; }
+.faction-group { @apply rounded border border-amber-800/50 bg-amber-950/10; }
+.faction-summary { @apply flex cursor-pointer items-center justify-between gap-3 px-3 py-2 text-sm text-amber-200; }
+.faction-sectors { @apply flex flex-col gap-4 border-t border-amber-800/30 p-3; }
+.pagination { @apply flex items-center justify-center gap-3 text-xs text-slate-400; }
+.pagination button { @apply h-8 min-w-8 rounded border border-slate-700 bg-slate-950/50 text-slate-300 hover:border-sky-500 hover:text-sky-300 disabled:cursor-not-allowed disabled:opacity-40; }
 .ship-sector { @apply flex flex-col gap-2; }
 .binding-groups { @apply text-xs font-normal text-slate-500; }
 .ship-row { @apply flex items-center justify-between gap-3 rounded border border-slate-800 bg-slate-950/40 p-3; }
