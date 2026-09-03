@@ -1,8 +1,16 @@
-import { test as base } from '@playwright/test';
 import * as fs from 'fs';
 import * as path from 'path';
+import { createPinia, setActivePinia } from 'pinia';
 
-export const test = base.extend({
+if (typeof globalThis.beforeEach === 'function') {
+  globalThis.beforeEach(() => setActivePinia(createPinia()));
+}
+
+export let test: typeof import('@playwright/test')['test'];
+
+if (process.env.VITEST !== 'true') {
+  const { test: base } = await import('@playwright/test');
+  test = base.extend({
   page: async ({ page }, use, testInfo) => {
     const errors: Error[] = [];
 
@@ -55,4 +63,5 @@ export const test = base.extend({
       throw new Error(`检测到网页 JS 异常，测试已强制停止。日志已导出至: ${logPath}\n${errorList}`);
     }
   },
-});
+  });
+}

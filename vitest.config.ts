@@ -11,7 +11,9 @@ export default defineConfig({
     }
   },
   test: {
-    include: ['tests/unified-unit/**/*.spec.ts', 'tests/unit/**/*.spec.ts', 'tests/skills/unit/**/*.spec.ts', 'tests/e2e-skills/unit/**/*.spec.ts'],
+    include: ['tests/unified-unit/**/*.spec.ts', 'tests/skills/unit/**/*.spec.ts', 'tests/e2e-skills/unit/**/*.spec.ts'],
+    exclude: ['tests/unit/**'],
+    setupFiles: ['./tests/test-setup.ts'],
     globals: true,
     environment: 'node',
   }
