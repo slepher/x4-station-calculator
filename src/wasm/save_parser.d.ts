@@ -16,11 +16,21 @@ export class SaveParser {
     take_cli_progress_json(): string;
 }
 
+export class UniverseXmlCutter {
+    free(): void;
+    [Symbol.dispose](): void;
+    finish(): void;
+    is_done(): boolean;
+    constructor();
+    push_chunk(chunk: Uint8Array): Uint8Array;
+}
+
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
 export interface InitOutput {
     readonly memory: WebAssembly.Memory;
     readonly __wbg_saveparser_free: (a: number, b: number) => void;
+    readonly __wbg_universexmlcutter_free: (a: number, b: number) => void;
     readonly saveparser_finish: (a: number, b: number, c: number) => [number, number, number, number];
     readonly saveparser_finish_input: (a: number) => void;
     readonly saveparser_new: () => number;
@@ -31,6 +41,10 @@ export interface InitOutput {
     readonly saveparser_set_expected_total_sectors: (a: number, b: number) => void;
     readonly saveparser_set_expected_version: (a: number, b: number, c: number) => void;
     readonly saveparser_take_cli_progress_json: (a: number) => [number, number];
+    readonly universexmlcutter_finish: (a: number) => [number, number];
+    readonly universexmlcutter_is_done: (a: number) => number;
+    readonly universexmlcutter_new: () => number;
+    readonly universexmlcutter_push_chunk: (a: number, b: number, c: number) => [number, number];
     readonly __wbindgen_externrefs: WebAssembly.Table;
     readonly __wbindgen_malloc: (a: number, b: number) => number;
     readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
