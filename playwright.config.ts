@@ -1,14 +1,5 @@
 import { defineConfig, devices } from '@playwright/test';
-import crypto from 'node:crypto';
-import fs from 'node:fs';
-import { execSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-
-// 1. 防呆：Agent 忘了 build 时自动补救
-if (!fs.existsSync('./dist')) {
-  console.log('🚧 未检测到 dist 目录，正在自动构建...');
-  execSync('npm run build', { stdio: 'inherit' });
-}
 
 // 2. 核心魔法：根据当前工作区绝对路径，生成专属固定端口 (10000 ~ 50000 之间)
 function getDirectoryPort(): number {
@@ -24,8 +15,7 @@ const port = process.env.PORT ? parseInt(process.env.PORT, 10) : getDirectoryPor
 
 // 4. Playwright 最终配置
 export default defineConfig({
-  testDir: './tests',
-  testIgnore: '**/unit/**',
+  testDir: './tests/unified-e2e',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
@@ -49,9 +39,8 @@ export default defineConfig({
   ],
 
   webServer: {
-    // 💡 修复点 1：放弃 npm run，直接使用 npm exec 唤起底层 vite，确保参数 100% 传达！
-    command: `vite preview --port ${port} --host 127.0.0.1 --strictPort`,
-    reuseExistingServer: true,
+    command: `npm run build && vite preview --port ${port} --host 127.0.0.1 --strictPort`,
+    reuseExistingServer: false,
     timeout: 30000,
     
     // 💡 修复点 2：火力全开，把 Vite 的所有日志直接打印到你的终端里
