@@ -38,14 +38,14 @@ Phase isolation:
 3. If trailing bug text is provided:
    - if the bug already exists, use existing bug id
    - if no matching bug exists, first route to `/x4:bug` to register bug in `bugs.md`
-   - if browser reproduction docs are missing/stale, route to `x4-e2e-test-*`
+   - if browser reproduction docs are missing/stale, route to `/x4:e2e-test`
 
 ## Scope Limitation Principle (fix-local)
 
 - Only modify code and docs required to fix the target bug.
 - Do not broaden refactors outside bug impact area.
 - Do not directly edit active E2E planning artifacts in this skill.
-- For browser documentation updates, route to `x4-e2e-test-*`.
+- For browser documentation updates, route to `/x4:e2e-test`.
 
 ## Single Source Rule (MANDATORY)
 
@@ -58,10 +58,10 @@ Phase isolation:
 1. **Resolve bug-case pair**:
    - locate target bug in `bugs.md` and its corresponding canonical Unit or active E2E case
    - keep Unit reproduction in `tests/unit/**`
-   - route browser reproduction through `x4-e2e-test-*` in `tests/e2e/**`
+   - route browser reproduction through `/x4:e2e-test` in `tests/e2e/**`
 2. **Write reproduction test (MANDATORY)** at the selected Unit or active E2E boundary.
 3. Run reproduction test (**evidence-only**, no result-apply):
-   - Execute the bug reproduction file directly (e.g., `npm exec playwright test tests/e2e/<change-name>/bug-<change-name>.spec.ts`)
+   - For browser cases, hand off reproduction execution to `/x4:e2e-test` and consume its evidence.
    - Reproduction file MUST assert `修复前` expectations only; if it asserts `修复后`, treat test as invalid and fix test first
    - This step is for existence confirmation only; do **not** apply legacy checklist updates
    - Test passes → bug exists (reproduced), NOT "already fixed" → Continue to step 6
@@ -80,6 +80,7 @@ Phase isolation:
 7. **Pre-browser build rule (MANDATORY)**: If source code changed and the
    selected boundary is browser, execute `npm run build` before verification.
 8. Run fix verification at the selected Unit or active E2E boundary:
+   - For browser cases, use `/x4:e2e-test` and consume its canonical result.
    - Test passes → bug fixed → Continue to step 9
    - Test fails → fix failed → Return to step 6
 9. Update `bugs.md` status note to `Fixed` (reference only, non-gating).

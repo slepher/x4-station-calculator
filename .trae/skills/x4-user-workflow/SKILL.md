@@ -17,6 +17,7 @@ It does not arrange concrete execution work inside phase skills.
 - `/x4:apply`
 - `/x4:bug`
 - `/x4:bug-fix`
+- `/x4:e2e-test`
 - `/x4:e2e-test-doc`
 - `/x4:e2e-test-doc-details`
 - `/x4:e2e-test-doc-viewer`
@@ -50,6 +51,7 @@ Deprecated and out of active workflow scope:
 - `/x4:apply` -> `x4-apply`
 - `/x4:bug` -> `x4-bug`
 - `/x4:bug-fix` -> `x4-bug-fix`
+- `/x4:e2e-test` -> `x4-e2e-test`
 - `/x4:e2e-test-doc` -> `x4-e2e-test-doc`
 - `/x4:e2e-test-doc-details` -> `x4-e2e-test-doc-details`
 - `/x4:e2e-test-doc-viewer` -> `x4-e2e-test-doc-viewer`

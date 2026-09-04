@@ -20,8 +20,12 @@ routing:
     pipeline: [workflow_orchestrator, implementer, bug_tracker]
   "/x4:bug":
     pipeline: [workflow_orchestrator, bug_tracker]
+  "/x4:bug-fix":
+    pipeline: [workflow_orchestrator, bug_fixer]
   "/x4:verify":
     pipeline: [workflow_orchestrator, verifier, e2e_engineer]
+  "/x4:e2e-test":
+    pipeline: [workflow_orchestrator, e2e_engineer]
   "/x4:e2e-test-doc":
     pipeline: [workflow_orchestrator, e2e_engineer]
   "/x4:e2e-test-doc-details":
@@ -109,11 +113,19 @@ agents:
       - "Focused Unit evidence under tests/unit/** for behavior changes"
 
   bug_tracker:
-    role: "Bug lifecycle owner during implementation"
+    role: "Bug report owner"
     use_skills:
       - x4-bug
     responsibilities:
-      - "When bug discovered: record in bugs.md, add reproduction test, verify fail, fix, verify pass."
+      - "Record bug metadata and route implementation to /x4:bug-fix; do not fix or verify bugs."
+
+  bug_fixer:
+    role: "Tracked bug implementation owner"
+    use_skills:
+      - x4-bug-fix
+    constraints:
+      - "Unit fixes use focused tests/unit/** evidence."
+      - "Browser fixes hand off to /x4:e2e-test and consume its evidence."
 
   verifier:
     role: "Spec/task/code coherence verification"
@@ -126,6 +138,7 @@ agents:
   e2e_engineer:
     role: "Active browser E2E workflow owner"
     use_skills:
+      - x4-e2e-test
       - x4-e2e-test-doc
       - x4-e2e-test-doc-details
       - x4-e2e-test-doc-viewer
@@ -175,7 +188,7 @@ quality_gates:
     when: ["/x4:apply"]
     rule: "Reject behavior changes without focused tests/unit/** evidence; allow implementation and Unit edits only, reject tests/e2e/** edits."
   - name: active_e2e_separation
-    when: ["/x4:e2e-test-doc", "/x4:e2e-test-doc-details", "/x4:e2e-test-doc-viewer", "/x4:e2e-test-impl", "/x4:e2e-test-run"]
+    when: ["/x4:e2e-test", "/x4:e2e-test-doc", "/x4:e2e-test-doc-details", "/x4:e2e-test-doc-viewer", "/x4:e2e-test-impl", "/x4:e2e-test-run"]
     rule: "Allow active E2E workflow and tests/e2e/**; reject Unit ownership changes and any legacy route."
   - name: owned_path_blocker
     when: ["all"]

@@ -78,9 +78,8 @@ If a discovered bug is out of current change scope:
   - do not add/remove comments unless explicitly requested
   - do not reformat unrelated code
 - Do not execute full test suites (`npm run test:unit` without path, `npm run test:e2e`) or `playwright` in `/x4:apply`.
-- Do not create or modify `tests/e2e/**`; route E2E work through
-  `x4-e2e-test-doc`, `x4-e2e-test-doc-details`, `x4-e2e-test-impl`, and
-  `x4-e2e-test-run`.
+- Do not create or modify `tests/e2e/**`; route E2E work through the canonical
+  `x4-e2e-test` orchestrator.
 - TDD unit tests are allowed: `npm run test:unit -- tests/unit/<specific-file>`.
 
 ## Output
