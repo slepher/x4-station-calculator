@@ -116,7 +116,6 @@ export async function loadLiveBindingFixture(
       empire: w.gameDataStore.getStorageKey('empire'),
       logicFlow: w.gameDataStore.getStorageKey('logic_flow'),
       shipBlueprints: w.gameDataStore.getStorageKey('ship_blueprints'),
-      setting: w.gameDataStore.getStorageKey('setting'),
       saveArchives: w.gameDataStore.getStorageKey('save_archives')
     }
     if (!keys.saveArchives.includes('save_archives')) {
@@ -127,7 +126,6 @@ export async function loadLiveBindingFixture(
       ['x4_empire_data', keys.empire],
       ['x4_logic_flow_plans', keys.logicFlow],
       ['x4_ship_blueprints', keys.shipBlueprints],
-      ['x4-setting', keys.setting],
       ['x4_save_bindings', saveBindings]
     ] as const
     for (const [source, current] of fixtureKeys) {
