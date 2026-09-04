@@ -133,6 +133,15 @@ const lineage = group.isLocked
 
 对于 unmatched：仍按 `settings.racePreference` 确认 moduleId，UI 分组名保持"待规划产线"。
 
+#### 5.4 BUG-001 correction
+
+unmatched line 可以使用 `__preview_unmatched__:<index>` 作为稳定身份，但 synthetic `groupId` 不代表真实 logic-flow lineage。module 选择必须显式区分：
+
+- `isUnmatched = true`：使用 `settings.racePreference`
+- 真实 logic-flow 产线：使用该产线的 lineage
+
+compute 继续使用 preview 已确认的 moduleId，不重新选择 producer。
+
 #### 5.3 Compute 不再重复生成 moduleId
 
 preview 为 derived 项一旦选定 moduleId，compute 只允许读取，不允许重选。

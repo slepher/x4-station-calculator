@@ -14,5 +14,5 @@
 - Plan: `plan-2.md`
 - Lanes: `lanes-2.md`
 - Base: `1c9fab8809fd8e31f8679a2f27a7021cc3f46e02`
-- Next action: `route the build-plan race-preference regression to product-code owner, then resume task-test-3 and task-test-4`
-- Blocker: `task-test-3 correction e710011f intentionally fails one historical regression test; accepting it requires a src/ product fix outside the test-owned lane`
+- Next action: `dispatch generation-2 task-coding-4 on coding from target 85255b1ed076ffe7704367959753dc01450bdf89; after reviewer pass merge to target, refresh integrate, then resume task-test-3`
+- Blocker: `BUG-001 must pass task-coding-4 source review and target-visible canonical Unit before task-test-3 can be accepted`

@@ -5,7 +5,8 @@
 - Plan: `plan-2.md`
 - Context: `context-2.md`
 - Kind: `test`
-- Depends on: `task-coding-3`
+- Depends on: `task-coding-3, task-coding-4`
+- Covers: `task-coding-3, task-coding-4`
 
 ## Bounded goal
 
@@ -34,6 +35,7 @@
 
 ## Blocking validation
 
+- integrate 必须先从包含已接受 `task-coding-4` candidate 的 target HEAD 刷新，并运行 canonical BUG-001 focused case。
 - `npm run test:unit`
 - focused Unit collections/runs needed by failure clusters
 - 确认默认 collection 无 `tests/legacy/**`、`tests/e2e-skills/**`
@@ -44,10 +46,11 @@
 
 ## Blocking self-validation
 
-- Commands: `npm run test:unit`; focused Unit runs; default collection check; legacy count check; `git diff --check`
+- Commands: `npm run test:unit -- tests/unit/current/build-flow-plan/buildPlanProductionLine.spec.ts -t "uses settings.racePreference for unmatched derived module selection"`; `npm run test:unit`; default collection check; legacy count check; `git diff --check`
 
 ## Completion
 
 - `tests/unit/**` 是唯一默认产品 Unit suite 并通过。
 - 旧 Unit 与旧 mixed skill tests 全部可在 `tests/legacy/**` 找到。
 - 没有通过删除失败测试、跳过 canonical case 或建立兼容 include 来通过。
+- `BUG-001` focused regression 在 target-visible source correction 上通过；该证据与完整 Unit/build evidence 交给 target owner 完成 bug closure。

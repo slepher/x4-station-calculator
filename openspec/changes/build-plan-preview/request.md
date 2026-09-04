@@ -70,6 +70,7 @@
   - 第一轮优先 manual，manual 有多个时先服从 lineage，仍有多个取第一个
   - 第二轮 auto，auto 只服从 lineage，仍有多个取第一个
 - preview 一旦为 derived 项确认 moduleId，compute 必须直接读取，不得重新生成
+- unmatched 产线的 synthetic `groupId` 只用于稳定身份，不得改变其 lineage 来源；unmatched derived 仍必须按 `settings.racePreference` 选择 module
 
 ### Preview 建材范围
 
@@ -126,7 +127,7 @@
 - Steps 生成
 - 修改 build-flow 数据模型
 - 修改 build-flow 连线编辑交互
-- 编写测试代码
+- 除 BUG-001 correction 所需的 focused Unit 外，不新增与本 change 无关的测试场景
 
 ## 验收标准（DoD）
 
@@ -142,3 +143,4 @@
 10. preview 建材范围来自完整展开产线，不使用 autoFill 结果
 11. compute 不再重新生成 preview 项 moduleId
 12. 文档一致：request / design / spec / tasks
+13. BUG-001：带 synthetic `groupId` 的 unmatched derived 仍按 `settings.racePreference` 选择 module
