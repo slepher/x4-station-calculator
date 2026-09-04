@@ -209,7 +209,7 @@ test.beforeEach(async ({ page }) => {
 - `tests/fixtures/save.json` 承载 save 明细
 - `loadLiveBindingFixture(page)` 会负责：
   1. 注入 `db.json` 到 localStorage
-  2. 基于 `tests/fixtures/save/*.json` 构造当前版本 `x4_save_archives_v9` state
+  2. 基于 `tests/fixtures/save/*.json` 构造当前版本 save archives state
   3. 通过 `saveArchiveDB.saveArchiveToDB` 写入当前版本 IndexedDB
   4. reload 后切到 `live-production`
   5. 通过 UI 设置语言

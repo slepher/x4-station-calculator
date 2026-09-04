@@ -9,14 +9,12 @@ const __dirname = dirname(__filename)
 const FIXTURES_DIR = resolve(__dirname, '../../../fixtures')
 const SAVE_DIR = join(FIXTURES_DIR, 'save')
 const GAME_GUID = 'CB8837FE-98C1-42F8-9D6A-ED0ADC539111'
-const CURRENT_PARSER_VERSION = 'v9'
-const CURRENT_SAVE_ARCHIVES_KEY = 'x4_save_archives_v9'
-const CURRENT_SAVE_BINDINGS_KEY = 'x4_save_bindings_v9'
-const FIXTURE_KEY_MIGRATIONS: Record<string, string> = {
-  x4_empire_data: 'x4_empire_data_v9',
-  x4_logic_flow_plans: 'x4_logic_flow_plans_v9',
-  x4_ship_blueprints: 'x4_ship_blueprints_v9',
-  'x4-setting': 'x4-setting_v9'
+const PARSER_SOURCE = resolve(__dirname, '../../../../src/workers/saveParser.post.ts')
+const CURRENT_PARSER_VERSION = readFileSync(PARSER_SOURCE, 'utf-8').match(
+  /export const CURRENT_PARSER_VERSION = ['"]([^'"]+)['"]/
+)?.[1]
+if (!CURRENT_PARSER_VERSION) {
+  throw new Error(`Unable to read CURRENT_PARSER_VERSION from ${PARSER_SOURCE}`)
 }
 
 interface SaveData {
@@ -101,13 +99,6 @@ export async function loadLiveBindingFixture(
   const archiveState = buildSaveArchivesState(transformed)
   const snapshot = JSON.parse(JSON.stringify(dbFixture))
   delete snapshot.vsn
-  for (const [legacyKey, currentKey] of Object.entries(FIXTURE_KEY_MIGRATIONS)) {
-    snapshot[currentKey] = snapshot[legacyKey]
-    delete snapshot[legacyKey]
-  }
-  snapshot[CURRENT_SAVE_ARCHIVES_KEY] = archiveState
-  snapshot[CURRENT_SAVE_BINDINGS_KEY] = snapshot.x4_save_bindings
-  delete snapshot.x4_save_bindings
 
   await page.addInitScript(() => {
     localStorage.setItem('isTestEnv', 'true')
@@ -116,7 +107,34 @@ export async function loadLiveBindingFixture(
   await page.goto('/')
   await waitForAppReady(page)
 
-  await page.evaluate(({ data, gameGuid }) => {
+  await page.evaluate(({ data, archives, gameGuid }) => {
+    const w = window as any
+    if (!w.gameDataStore || typeof w.gameDataStore.getStorageKey !== 'function') {
+      throw new Error('gameDataStore.getStorageKey is required for live fixture setup')
+    }
+    const keys = {
+      empire: w.gameDataStore.getStorageKey('empire'),
+      logicFlow: w.gameDataStore.getStorageKey('logic_flow'),
+      shipBlueprints: w.gameDataStore.getStorageKey('ship_blueprints'),
+      setting: w.gameDataStore.getStorageKey('setting'),
+      saveArchives: w.gameDataStore.getStorageKey('save_archives')
+    }
+    if (!keys.saveArchives.includes('save_archives')) {
+      throw new Error(`Invalid save archives storage key: ${keys.saveArchives}`)
+    }
+    const saveBindings = keys.saveArchives.replace('save_archives', 'save_bindings')
+    const fixtureKeys = [
+      ['x4_empire_data', keys.empire],
+      ['x4_logic_flow_plans', keys.logicFlow],
+      ['x4_ship_blueprints', keys.shipBlueprints],
+      ['x4-setting', keys.setting],
+      ['x4_save_bindings', saveBindings]
+    ] as const
+    for (const [source, current] of fixtureKeys) {
+      data[current] = data[source]
+      if (source !== current) delete data[source]
+    }
+    data[keys.saveArchives] = archives
     Object.entries(data).forEach(([key, value]) => {
       localStorage.setItem(key, JSON.stringify(value))
     })
@@ -125,7 +143,7 @@ export async function loadLiveBindingFixture(
       activeView: 'live-production'
     }))
     localStorage.setItem('isTestEnv', 'true')
-  }, { data: snapshot, gameGuid: GAME_GUID })
+  }, { data: snapshot, archives: archiveState, gameGuid: GAME_GUID })
 
   await page.evaluate(async ({ archives }) => {
     const w = window as any
