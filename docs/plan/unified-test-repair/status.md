@@ -9,7 +9,7 @@
 ## Resume
 
 - Profile: `light`
-- Phase: `running`
+- Phase: `execution`
 - Context: `context-2.md`
 - Plan: `plan-2.md`
 - Lanes: `lanes-2.md`
