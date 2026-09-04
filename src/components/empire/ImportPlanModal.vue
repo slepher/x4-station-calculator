@@ -111,6 +111,12 @@ const handleClose = () => {
   emit('close')
 }
 
+const finishImport = (warnings: LogicFlowImportWarning[]) => {
+  warningSummary.value = warnings
+  showWarningModal.value = warnings.length > 0
+  if (!showWarningModal.value) handleClose()
+}
+
 const handleImportX4StationString = () => {
   if (!x4StationContent.value.trim()) return
 
@@ -208,13 +214,11 @@ const executeStationImport = (mode: 'new' | 'overwrite', payload?: StationImport
     applyImportPayloadToStation(newStation.id, importPayload)
   }
 
-  warningSummary.value = importPayload.warnings
-  showWarningModal.value = importPayload.warnings.length > 0
   showStationImportConfirm.value = false
   showBlueprintStrategyDialog.value = false
   pendingImportSelection.value = null
   pendingLogicFlowModules.value = null
-  handleClose()
+  finishImport(importPayload.warnings)
 }
 
 const executeEmpireImport = () => {
@@ -233,8 +237,7 @@ const executeEmpireImport = () => {
     applyImportPayloadToStation(station.id, target)
   })
 
-  warningSummary.value = result.warnings
-  showWarningModal.value = result.warnings.length > 0
+  finishImport(result.warnings)
   pendingImportSelection.value = null
 }
 
@@ -295,7 +298,7 @@ const handleEmpireImportSubmit = (payload: { choice: 'SAVE_AND_IMPORT' | 'DISCAR
 const handleEmpireImportDialogClose = () => {
   if (empireImportSubmitted.value) {
     empireImportSubmitted.value = false
-    handleClose()
+    if (!showWarningModal.value) handleClose()
     return
   }
   showEmpireImportConfirm.value = false
@@ -426,12 +429,11 @@ const handleBlueprintActionOverwrite = () => {
 
   if (pendingLogicFlowModules.value) {
     applyImportPayloadToStation(stationId, pendingLogicFlowModules.value)
-    warningSummary.value = pendingLogicFlowModules.value.warnings
-    showWarningModal.value = pendingLogicFlowModules.value.warnings?.length > 0
+    const warnings = pendingLogicFlowModules.value.warnings
     pendingLogicFlowModules.value = null
     pendingImportSelection.value = null
     showBlueprintStrategyDialog.value = false
-    handleClose()
+    finishImport(warnings)
     return
   }
 
@@ -456,12 +458,11 @@ const handleBlueprintActionAdd = () => {
 
   if (pendingLogicFlowModules.value) {
     applyImportPayloadToStation(stationId, pendingLogicFlowModules.value)
-    warningSummary.value = pendingLogicFlowModules.value.warnings
-    showWarningModal.value = pendingLogicFlowModules.value.warnings?.length > 0
+    const warnings = pendingLogicFlowModules.value.warnings
     pendingLogicFlowModules.value = null
     pendingImportSelection.value = null
     showBlueprintStrategyDialog.value = false
-    handleClose()
+    finishImport(warnings)
     return
   }
 
@@ -485,13 +486,13 @@ const handleBlueprintActionNew = () => {
     const newStation = props.createStation(pendingStationGroupName.value || t('sector.new_station_name'))
     if (newStation) {
       applyImportPayloadToStation(newStation.id, pendingLogicFlowModules.value)
-      warningSummary.value = pendingLogicFlowModules.value.warnings
-      showWarningModal.value = pendingLogicFlowModules.value.warnings?.length > 0
+      const warnings = pendingLogicFlowModules.value.warnings
+      finishImport(warnings)
     }
     pendingLogicFlowModules.value = null
     pendingImportSelection.value = null
     showBlueprintStrategyDialog.value = false
-    handleClose()
+    if (!showWarningModal.value) handleClose()
     return
   }
 

@@ -250,12 +250,12 @@ export function useToolbarWorkflowController({ t, translateShip }: UseToolbarWor
 
   const importHandlers: Record<ToolbarStoreType, ImportHandler> = {
     'blueprint-production': {
-      run: ({ choice, defaultEmpireName, importData }) => {
+      run: ({ choice, defaultEmpireName: _defaultEmpireName, importData }) => {
         if (choice === 'SAVE_AND_IMPORT') {
           executeSave('blueprint-production')
           pushSaveSuccess()
         }
-        executeNew('blueprint-production', defaultEmpireName)
+        blueprintStore.createEmpire('')
         importData({ storeType: 'blueprint-production' })
         return { ok: true }
       }
