@@ -68,7 +68,8 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
 
   test('locked incompatible drops show rejected feedback and no preview', async ({ page }) => {
     await dragWareToTarget(page, 'energycells')
-    await page.locator('.tab-btn').nth(1).click()
+    await page.locator('.tab-btn').filter({ hasText: /农业|Agricultural/i }).click()
+    await page.locator('.race-btn').filter({ hasText: /泰拉迪|Teladi/i }).click()
     await dragWareToTarget(page, 'spaceweed', 0, { expectedStatus: 'rejected' })
   })
 
@@ -158,7 +159,8 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
   test('leaving a locked target clears identity but preserves its base lock style', async ({ page }) => {
     await dragWareToTarget(page, 'energycells')
     const target = page.locator('.compact-group').first()
-    await page.locator('.tab-btn').nth(1).click()
+    await page.locator('.tab-btn').filter({ hasText: /农业|Agricultural/i }).click()
+    await page.locator('.race-btn').filter({ hasText: /泰拉迪|Teladi/i }).click()
     await dragWareToTarget(page, 'spaceweed', 0, { drop: false, expectedStatus: 'rejected' })
     await page.mouse.move(50, 50, { steps: 10 })
     await expect.poll(() => page.evaluate(() => (window as any).logicFlowStore.hoveredGroupId)).toBeNull()
