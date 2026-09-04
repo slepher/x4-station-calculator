@@ -20,15 +20,14 @@ test.describe('Live Overview', () => {
     await expect(dashboard).toBeVisible({ timeout: 5000 })
   })
 
-  test('overview toolbar shows binding name', async ({ page }) => {
+  test('overview shows binding name in the save sync panel', async ({ page }) => {
     const overviewTab = page.locator('[data-testid="sidebar-overview"]')
     await overviewTab.click()
     await page.waitForTimeout(300)
 
-    const nameInput = page.locator('.live-toolbar').getByRole('textbox')
-    await expect(nameInput).toBeVisible({ timeout: 5000 })
-    const name = await nameInput.inputValue()
-    expect(name.length).toBeGreaterThan(0)
+    const bindingEntry = page.locator('.overview-left-panel').filter({ hasText: 'slepher' })
+    await expect(bindingEntry).toBeVisible({ timeout: 5000 })
+    await expect(bindingEntry).toContainText('slepher')
   })
 
   test('save upload panel and save list are visible in overview', async ({ page }) => {

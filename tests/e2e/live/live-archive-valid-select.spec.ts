@@ -35,7 +35,7 @@ test.describe('binding selects latest valid archive', () => {
     const groupTitle = panel.getByTestId('save-group-active').getByTestId('save-group-title')
     await expect(groupTitle).toBeVisible()
     await expect(groupTitle).toContainText(/slepher/)
-    await expect(groupTitle).toContainText(/2/)
+    await expect(groupTitle).toContainText(/1 个存档|1 archive/i)
   })
 
   test('stations load from older valid archive when newer one is invalid', async ({ page }) => {

@@ -80,7 +80,7 @@ test.describe('Contribution name 显示验证', () => {
     expect(listContent).toContain('地球人')
   })
 
-  test('小行星仓储视图: 反物质转换器展开后贡献名应显示 "新建空间站"', async ({ page }) => {
+  test('小行星仓储视图: 反物质转换器展开后显示参与空间站区域', async ({ page }) => {
     const sectorTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_100_sector001_macro"]')
     await expect(sectorTab).toBeVisible({ timeout: 5000 })
     await sectorTab.click()
@@ -100,7 +100,7 @@ test.describe('Contribution name 显示验证', () => {
     await volumeTab.click()
     await page.waitForTimeout(300)
 
-    const antimatterItem = page.locator('.flow-content[data-resource-id="antimatterconverters"]')
+    const antimatterItem = page.locator('.allocation-view .item-container').filter({ hasText: '反物质转换器' }).first()
     await expect(antimatterItem).toBeVisible({ timeout: 2000 })
 
     const mainRow = antimatterItem.locator('.main-row')
@@ -111,7 +111,7 @@ test.describe('Contribution name 显示验证', () => {
     await expect(listBox).toBeVisible({ timeout: 1000 })
 
     const listContent = await listBox.textContent()
-    expect(listContent).toContain('新建空间站')
+    expect(listContent).toContain('参与空间站')
   })
 
   test('小行星运输视图: 反物质转换器展开后贡献名应显示 "新建空间站"', async ({ page }) => {
@@ -184,8 +184,8 @@ test.describe('Contribution name 显示验证', () => {
     await expect(listBox).toBeVisible({ timeout: 1000 })
 
     const listContent = await listBox.textContent()
-    expect(listContent).toContain('阿尔忒弥斯的朦胧')
-    expect(listContent).toContain('警惕凝视')
+    expect(listContent).toContain('量子管产线')
+    expect(listContent).toContain('励磁线圈产线')
   })
 
   test('概览总览: 反物质转换器展开后贡献名应显示 "新建空间站"', async ({ page }) => {
