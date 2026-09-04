@@ -153,23 +153,35 @@ const ensureStationContext = async (page: any) => {
 }
 
 const ensureEmpireOverview = async (page: any) => {
-  await page.locator('[data-testid="sidebar-overview"]').click({ force: true })
+  const productionView = page.getByTestId('top-view-btn-blueprint-production')
+  await productionView.click()
+  await expect(productionView).toHaveClass(/bg-blue-600/)
+  const overview = page.getByTestId('sidebar-overview')
+  await overview.click()
+  await expect(overview).toHaveClass(/active/)
   await expect(page.locator('[data-testid="logicflow-import-entry-empire"]')).toBeVisible()
 }
 
 const openImportModal = async (page: any, mode: 'station' | 'empire') => {
   if (mode === 'station') {
     await ensureStationContext(page)
-    await page.locator('[data-testid="logicflow-import-entry-station"]').click({ force: true })
+    await page.locator('[data-testid="logicflow-import-entry-station"]').click()
   } else {
     await ensureEmpireOverview(page)
-    await page.locator('[data-testid="logicflow-import-entry-empire"]').click({ force: true })
+    await page.locator('[data-testid="logicflow-import-entry-empire"]').click()
   }
   await expect(page.locator('[data-testid="import-view-modal"]')).toBeVisible()
 }
 
 const getLoadFlowModal = (page: any) =>
   page.locator('.fixed.inset-0').filter({ hasText: /planning\.load_flow_plan|Load Flow Plan|载入流程方案|加载流程方案|加载逻辑组网方案/i }).first()
+
+const closeImportViewModal = async (page: any) => {
+  const modal = page.locator('[data-testid="import-view-modal"]')
+  await expect(modal).toBeVisible()
+  await modal.getByRole('button', { name: /Cancel|取消/i }).first().click()
+  await expect(modal).toHaveCount(0)
+}
 
 const choosePlanAndContinue = async (page: any, planId: string, groupId?: string) => {
   await page.locator('[data-testid="logicflow-import-plan-select"]').selectOption(planId)
@@ -295,12 +307,15 @@ test.describe('import-logic-flow e2e (test implementation)', () => {
   })
 
   test('2.1 Logic-Flow 主界面数据可用性：通过载入流程方案入口可见并加载 2 个方案', async ({ page }) => {
-    await page.getByTestId('top-view-btn-flow').click({ force: true })
+    const flowView = page.getByTestId('top-view-btn-flow')
+    await flowView.click()
+    await expect(flowView).toHaveClass(/bg-purple-600/)
 
     const openLoadModal = async () => {
-      const loadBtn = page.locator('button').filter({ hasText: /menu\.load|Load|加载/i }).first()
-      await loadBtn.click({ force: true })
-      await expect(getLoadFlowModal(page)).toBeVisible()
+      await page.getByTestId('toolbar-load-btn').click()
+      const modal = getLoadFlowModal(page)
+      await expect(modal).toBeVisible()
+      await expect(modal).toContainText(/planning\.load_flow_plan|Load Flow Plan|载入流程方案|加载流程方案|加载逻辑组网方案/i)
     }
 
     await openLoadModal()
@@ -741,7 +756,10 @@ test.describe('import-logic-flow e2e (test implementation)', () => {
     // 导入也不弹框（直接执行）
     await openImportModal(page, 'empire')
     await page.locator('[data-testid="logicflow-import-plan-direct-ilf_valid_single_group"]').click({ force: true })
-    // 无 SmartSaveDialog，直接完成导入
+    await expect(getImportSmartSaveDialog(page)).toHaveCount(0)
+    await expect.poll(() => page.evaluate(() => (window as any).blueprintStore.activeStation.modules))
+      .toEqual([{ id: 'module_gen_prod_hullparts_01', count: 1 }])
+    await page.keyboard.press('Escape')
     await expect(page.locator('[data-testid="import-view-modal"]')).toHaveCount(0)
 
     // 场景 B：新建弹框 -> 导入也弹框（通过 UI 构造需要保存的状态）
@@ -751,7 +769,7 @@ test.describe('import-logic-flow e2e (test implementation)', () => {
     // 通过新建按钮验证是否出现保存确认弹框
     await page.getByRole('button', { name: /New|新建/i }).first().click({ force: true })
     await expect(page.getByText(/Discard and New|丢弃并新建/i)).toBeVisible()
-    await page.keyboard.press('Escape')
+    await closeSmartSaveDialogByCloseButton(page)
 
     await ensureEmpireOverview(page)
     await openImportModal(page, 'empire')
@@ -807,12 +825,14 @@ test.describe('import-logic-flow e2e (test implementation)', () => {
     await expect(page.getByRole('button', { name: /Save and Import|保存并导入/i })).toBeVisible()
     await expect(page.getByRole('button', { name: /Discard and Import|放弃并导入/i })).toBeVisible()
     await closeImportSmartSaveDialogByCloseButton(page)
+    await closeImportViewModal(page)
 
     await makeEmpireSavedBaseline(page)
     await ensureEmpireOverview(page)
     await openImportModal(page, 'empire')
     await page.locator('[data-testid="logicflow-import-plan-direct-ilf_valid_single_group"]').click({ force: true })
     await expect(getImportSmartSaveDialog(page)).toHaveCount(0)
+    await closeImportViewModal(page)
   })
 
   test('3.4 空方案阻止导入', async ({ page }) => {
@@ -832,6 +852,8 @@ test.describe('import-logic-flow e2e (test implementation)', () => {
     await openImportModal(page, 'empire')
     await page.locator('[data-testid="logicflow-import-plan-direct-ilf_valid_single_group"]').click({ force: true })
     await expect(getImportSmartSaveDialog(page)).toHaveCount(0)
+    await page.keyboard.press('Escape')
+    await expect(page.locator('[data-testid="import-view-modal"]')).toHaveCount(0)
 
     await makeEmpireSavedBaseline(page)
     await makeEmpireDirtyWithoutSave(page)
@@ -846,6 +868,7 @@ test.describe('import-logic-flow e2e (test implementation)', () => {
     await expect(page.getByRole('button', { name: /Save and Import|保存并导入/i })).toBeVisible()
     await expect(page.getByRole('button', { name: /Discard and Import|放弃并导入/i })).toBeVisible()
     await closeImportSmartSaveDialogByCloseButton(page)
+    await closeImportViewModal(page)
   })
 
   test('3.19 Bug #3: 新建/帝国导入不应把空帝国写入已保存列表', async ({ page }) => {
