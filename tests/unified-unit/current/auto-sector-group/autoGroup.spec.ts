@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import fixture from '../../fixtures/auto-group/save_009_minimal.json'
+import fixture from '../../../fixtures/auto-group/save_009_minimal.json'
 import { groupCleanSlate, groupIncremental, applyAbsorbToResult, applyStandaloneToResult, applyBridgePlanToDraft, buildBridgePlanOptions, collectConnectedComponents, type AutoGroupResult, type GroupDraftInfo } from '@/store/logic/autoGroup'
 import { buildSectorGraphFromMaps } from '@/store/logic/saveBindingUtils'
 import type { SaveArchive, PlayerStationEntry } from '@/types/saveArchive'

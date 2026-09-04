@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { getStationPoiLabel } from '../../../src/components/map/savePoiLabel'
-import type { SavePoiOverlayItem } from '../../../src/types/saveArchive'
+import { getStationPoiLabel } from '../../../../src/components/map/savePoiLabel'
+import type { SavePoiOverlayItem } from '../../../../src/types/saveArchive'
 
 const basePoi: SavePoiOverlayItem = {
   key: 'npcStation:AAA',

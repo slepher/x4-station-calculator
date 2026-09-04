@@ -5,7 +5,7 @@ import type { SaveArchive, PlayerStationEntry } from '@/types/saveArchive'
 import type { X4Module } from '@/types/x4'
 import mapsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/maps.json'
 import modulesRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/modules.json'
-import nopileosOnlyFixture from '../../fixtures/auto-group/save_009_fallback_nopileos_only.json'
+import nopileosOnlyFixture from '../../../fixtures/auto-group/save_009_fallback_nopileos_only.json'
 
 type StationData = { m: Array<[string, number]>; c: Array<[string, number]> }
 type CompactFixture = {

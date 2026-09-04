@@ -2,7 +2,7 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { nextTick, ref } from 'vue'
-import SaveUploadPanel from '../../../src/components/save/SaveUploadPanel.vue'
+import SaveUploadPanel from '../../../../src/components/save/SaveUploadPanel.vue'
 
 const isParsing = ref(false)
 const parseProgress = ref('')

@@ -4,7 +4,7 @@ import {
   extractFilteredSaveXmlFromString,
   extractQueryXmlFromString,
   parseQueryTag
-} from '../../../scripts/extract_save'
+} from '../../../../scripts/extract_save'
 
 describe('extract save xml filtering', () => {
   it('keeps valid subtrees, preserves ancestors to root, and excludes empty sectors', () => {

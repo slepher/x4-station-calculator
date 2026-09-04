@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { streamFileToSaveParserWorker } from '../../../src/components/save/saveUploadStreaming'
+import { streamFileToSaveParserWorker } from '../../../../src/components/save/saveUploadStreaming'
 
 async function flushAsyncTurns(count = 1) {
   for (let i = 0; i < count; i += 1) {

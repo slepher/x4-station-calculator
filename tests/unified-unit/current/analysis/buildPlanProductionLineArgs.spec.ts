@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   parseBuildPlanProductionLineArgs,
   renderBuildPlanProductionLineHelp,
-} from '../../../analysis/scripts/build-plan/buildPlanProductionLineArgs'
+} from '../../../../analysis/scripts/build-plan/buildPlanProductionLineArgs'
 
 describe('buildPlanProductionLineArgs', () => {
   it('keeps json disabled by default', () => {

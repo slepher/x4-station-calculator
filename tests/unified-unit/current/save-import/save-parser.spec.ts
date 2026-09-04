@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { createSaveParserRuntime } from '../../../src/workers/saveParser.worker'
+import { createSaveParserRuntime } from '../../../../src/workers/saveParser.worker'
 import {
   CURRENT_PARSER_VERSION,
   CURRENT_POST_PROCESSOR_VERSION,
   postProcessRustSaveArchive
-} from '../../../src/workers/saveParser.post'
+} from '../../../../src/workers/saveParser.post'
 import { readFile } from 'node:fs/promises'
 import zlib from 'node:zlib'
 
@@ -91,7 +91,7 @@ describe('save parser (Rust WASM streaming)', () => {
     const initWasm = (await import('../../../src/wasm/save_parser.js')).default
     const { SaveParser } = await import('../../../src/wasm/save_parser.js')
 
-    const wasmPath = new URL('../../../src/wasm/save_parser_bg.wasm', import.meta.url)
+    const wasmPath = new URL('../../../../src/wasm/save_parser_bg.wasm', import.meta.url)
     const wasmBinary = await readFile(wasmPath)
     await initWasm({ module_or_path: wasmBinary })
 
@@ -130,7 +130,7 @@ describe('save parser (Rust WASM streaming)', () => {
     const initWasm = (await import('../../../src/wasm/save_parser.js')).default
     const { SaveParser } = await import('../../../src/wasm/save_parser.js')
 
-    const wasmPath = new URL('../../../src/wasm/save_parser_bg.wasm', import.meta.url)
+    const wasmPath = new URL('../../../../src/wasm/save_parser_bg.wasm', import.meta.url)
     const wasmBinary = await readFile(wasmPath)
     await initWasm({ module_or_path: wasmBinary })
 

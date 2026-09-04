@@ -6,7 +6,7 @@ import { mount } from '@vue/test-utils'
 import { createI18n } from 'vue-i18n'
 import { createPinia, setActivePinia } from 'pinia'
 import TopViewSwitch from '@/components/common/TopViewSwitch.vue'
-import ImportPlanModal from '@/components/ImportPlanModal.vue'
+import ImportPlanModal from '@/components/empire/ImportPlanModal.vue'
 
 const i18n = createI18n({
   legacy: false,

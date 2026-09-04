@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 
 const readRepoFile = (relativePath: string) => {
-  const url = new URL(`../../../${relativePath}`, import.meta.url)
+  const url = new URL(`../../../../${relativePath}`, import.meta.url)
   return readFileSync(fileURLToPath(url), 'utf8')
 }
 
