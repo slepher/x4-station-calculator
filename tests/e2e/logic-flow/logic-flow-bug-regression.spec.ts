@@ -24,10 +24,22 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
     await isolated.locator('button[title*="隔离"], button[title*="Isolate"]').click()
     await expect.poll(() => page.evaluate(() => (window as any).logicFlowStore.groups[0].nodes.find((n: any) => n.wareId === 'hullparts')?.isIsolated)).toBe(true)
 
-    await dragWareToTarget(page, 'microchips', 0, { drop: false })
-    await expect(page.locator('.compact-group').first().locator('[data-ware-id="advancedcomposites"]')).toHaveCount(0)
+    const beforeRefinedMetals = await page.evaluate(() => (window as any).logicFlowStore.groups[0].nodes
+      .filter((node: any) => node.wareId === 'refinedmetals').length)
+    await dragWareToTarget(page, 'refinedmetals', 0, { drop: false, expectedStatus: 'locked' })
+    await expect(page.locator('.compact-group').first().locator('[data-ware-id="ore"]')).toBeVisible()
+    await expect(page.locator('.compact-group').first().locator('[data-ware-id="graphene"]')).toHaveCount(0)
     await page.mouse.up()
     await expect.poll(() => page.evaluate(() => (window as any).logicFlowStore.groups[0].nodes.find((n: any) => n.wareId === 'hullparts')?.isIsolated)).toBe(true)
+    await expect.poll(() => page.evaluate(() => (window as any).logicFlowStore.groups[0].nodes
+      .filter((node: any) => node.wareId === 'refinedmetals').length)).toBe(beforeRefinedMetals + 1)
+    await expect.poll(() => page.evaluate(() => (window as any).logicFlowStore.groups[0].nodes
+      .find((node: any) => node.wareId === 'refinedmetals' && node.source === 'manual'))).toMatchObject({
+      wareId: 'refinedmetals',
+      source: 'manual',
+      lineage: 'default',
+      moduleId: 'module_gen_prod_refinedmetals_01',
+    })
   })
 
   test('duplicate drops are rejected without adding a second node', async ({ page }) => {
@@ -82,15 +94,28 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
     await expect(page.locator('.compact-group').first().locator('.compact-node[data-ware-id="hullparts"]')).toHaveCount(2)
     const connections = await page.evaluate(() => {
       const group = (window as any).logicFlowStore.groups[0]
-      const hull = group.nodes.filter((n: any) => n.wareId === 'hullparts').map((n: any) => document.getElementById(`node-${n.id}`)?.getBoundingClientRect())
+      const svg = document.querySelector<SVGSVGElement>('.production-group svg.absolute')
+      const svgRect = svg?.getBoundingClientRect()
+      const hull = group.nodes.filter((n: any) => n.wareId === 'hullparts').map((n: any) => {
+        const rect = document.getElementById(`node-${n.id}`)?.getBoundingClientRect()
+        return rect && svgRect ? { right: rect.right - svgRect.left, centerY: rect.top + rect.height / 2 - svgRect.top } : null
+      })
       const weapon = group.nodes.find((n: any) => n.wareId === 'weaponcomponents')
-      const target = weapon && document.getElementById(`node-${weapon.id}`)?.getBoundingClientRect()
-      return Array.from(document.querySelectorAll<SVGPathElement>('.connection-line')).filter(path => {
+      const targetRect = weapon && document.getElementById(`node-${weapon.id}`)?.getBoundingClientRect()
+      const target = targetRect && svgRect
+        ? { left: targetRect.left - svgRect.left, centerY: targetRect.top + targetRect.height / 2 - svgRect.top }
+        : null
+      const paths = Array.from(svg?.querySelectorAll<SVGPathElement>('.connection-line') ?? [])
+      return hull.map((source) => paths.some(path => {
         const numbers = path.getAttribute('d')?.match(/[-\d.]+/g)?.map(Number) ?? []
-        return hull.some((box: any) => box && Math.abs(numbers[0] - box.right) < 2 && target && Math.abs(numbers[numbers.length - 2] - target.left) < 2)
-      }).length
+        return source && target && numbers.length >= 4
+          && Math.abs(numbers[0] - source.right) < 2
+          && Math.abs(numbers[1] - source.centerY) < 2
+          && Math.abs(numbers[numbers.length - 2] - target.left) < 2
+          && Math.abs(numbers[numbers.length - 1] - target.centerY) < 2
+      }))
     })
-    expect(connections).toBe(2)
+    expect(connections).toEqual([true, true])
   })
 
   test('default hullparts auto node promotes through a real drop', async ({ page }) => {
@@ -106,12 +131,12 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
   test('Teladi hullparts replaces a default auto node', async ({ page }) => {
     await page.locator('input[type="checkbox"]').first().uncheck({ force: true })
     await dragWareToTarget(page, 'weaponcomponents')
-    await dragWareToTarget(page, 'hullparts', 0, { expectedStatus: 'auto' })
     await page.getByRole('button', { name: /Teladi|泰拉迪/i }).first().click()
     await dragWareToTarget(page, 'hullparts', 0, { expectedStatus: 'replace' })
     const node = await page.evaluate(() => (window as any).logicFlowStore.groups[0].nodes
       .find((item: any) => item.wareId === 'hullparts'))
     expect(node).toMatchObject({ source: 'manual', lineage: 'teladi', moduleId: 'module_tel_prod_hullparts_01' })
+    expect(await page.locator('.flow-node[data-ware-id="hullparts"]').count()).toBe(1)
     await expect(page.locator('.flow-node[data-ware-id="hullparts"]')).toContainText(/Teladi 船体部件产线|Teladi Hull Part Production/)
   })
 
