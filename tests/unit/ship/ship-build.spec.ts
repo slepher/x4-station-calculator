@@ -171,7 +171,8 @@ vi.mock('vue-i18n', () => ({
       return map[key] || key
     },
     locale: { value: 'zh-CN' }
-  })
+  }),
+  createI18n: () => ({ global: { locale: { value: 'en' }, t: (key: string) => key, te: () => false } })
 }))
 
 vi.mock('@/utils/UseX4I18n', () => ({

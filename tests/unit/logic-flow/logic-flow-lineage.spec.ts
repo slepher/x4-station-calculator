@@ -11,7 +11,7 @@ import { fileURLToPath } from 'url'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
-const DATA_PATH = path.join(__dirname, '../../src/assets/x4_game_data/8.0-Diplomacy/data')
+const DATA_PATH = path.join(__dirname, '../../../src/assets/x4_game_data/8.0-Diplomacy/data')
 
 // Mock crypto
 if (typeof crypto === 'undefined') {
@@ -48,7 +48,8 @@ vi.mock('@/utils/UseX4I18n', () => ({
 // Mock i18n
 vi.mock('@/i18n', () => ({
   default: { global: { locale: { value: 'en' }, t: (key: string) => key, te: () => false } },
-  loadLanguageAsync: vi.fn().mockResolvedValue(true)
+  loadLanguageAsync: vi.fn().mockResolvedValue(true),
+  setGameFolderName: vi.fn()
 }))
 
 describe('LogicFlow Lineage & PK Verification', () => {

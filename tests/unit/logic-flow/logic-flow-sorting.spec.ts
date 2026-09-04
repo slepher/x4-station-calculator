@@ -18,7 +18,8 @@ vi.mock('vue-i18n', () => ({
 
 vi.mock('@/i18n', () => ({
   default: { global: { locale: { value: 'en' }, t: (key: string) => key, te: () => false } },
-  loadLanguageAsync: vi.fn().mockResolvedValue(true)
+  loadLanguageAsync: vi.fn().mockResolvedValue(true),
+  setGameFolderName: vi.fn()
 }))
 
 // Mock useX4I18n (if it's a separatecomposable)
@@ -78,6 +79,7 @@ describe('useLogicFlowStore Sorting', () => {
       }
       return null
     }
+    gameData.isRawMaterialWare = (wareId: string) => gameData.waresMap[wareId].tier === 0
   })
 
   it('sorts T0 resources based on node order (Dependency-Follow)', () => {
@@ -89,9 +91,9 @@ describe('useLogicFlowStore Sorting', () => {
       { id: '2', wareId: 'siliconwafers', race: 'default', source: 'manual', column: 1, isLocked: false }
     ] as any[]
 
-    const resultA = store.getSortedGroupT0Resources(nodesA)
+    const resultA = store.getSortedGroupRawMaterials(nodesA)
     // Ore comes from Refined Metals (1st), Silicon comes from Silicon Wafers (2nd)
-    expect(resultA).toEqual(['ore', 'silicon'])
+    expect(resultA).toEqual(['energycells', 'ore', 'silicon'])
 
     // Scenario: Reverse order
     const nodesB = [
@@ -99,8 +101,8 @@ describe('useLogicFlowStore Sorting', () => {
       { id: '1', wareId: 'refinedmetals', race: 'default', source: 'manual', column: 1, isLocked: false }
     ] as any[]
 
-    const resultB = store.getSortedGroupT0Resources(nodesB)
-    expect(resultB).toEqual(['silicon', 'ore'])
+    const resultB = store.getSortedGroupRawMaterials(nodesB)
+    expect(resultB).toEqual(['energycells', 'silicon', 'ore'])
   })
 
   it('deduplicates resources while preserving first appearance order', () => {
@@ -117,8 +119,8 @@ describe('useLogicFlowStore Sorting', () => {
       { id: '3', wareId: 'siliconwafers', race: 'default', source: 'manual', column: 1 }
     ] as any[]
 
-    const result = store.getSortedGroupT0Resources(nodes)
-    expect(result).toEqual(['ore', 'silicon'])
+    const result = store.getSortedGroupRawMaterials(nodes)
+    expect(result).toEqual(['energycells', 'ore', 'silicon'])
   })
 
   it('handles complex dependencies (T2 -> T1 -> T0)', () => {
@@ -143,7 +145,7 @@ describe('useLogicFlowStore Sorting', () => {
       { id: '1', wareId: 'antimatterconverters', race: 'default', source: 'manual', column: 2 }
     ] as any[]
 
-    const result = store.getSortedGroupT0Resources(nodes)
+    const result = store.getSortedGroupRawMaterials(nodes)
     // Should find Hydrogen (direct T0) and Silicon (indirect T0 via Microchips)
     // Order depends on implementation of recursive traversal in `calculateRequiredT0Wares`
     // Usually Object.entries order. If 'hydrogen' key comes before 'microchips', it might be processed first?
@@ -157,6 +159,6 @@ describe('useLogicFlowStore Sorting', () => {
     // So for AMC, it needs Hydrogen and Silicon. 'hydrogen' < 'silicon'.
     // So result should be ['hydrogen', 'silicon'].
     
-    expect(result).toEqual(['hydrogen', 'silicon'])
+    expect(result).toEqual(['energycells', 'hydrogen', 'silicon'])
   })
 })

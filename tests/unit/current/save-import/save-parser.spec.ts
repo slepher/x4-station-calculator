@@ -88,8 +88,8 @@ describe('save parser (Rust WASM streaming)', () => {
   })
 
   it('parses real save trade and player ship fixtures', async () => {
-    const initWasm = (await import('../../../src/wasm/save_parser.js')).default
-    const { SaveParser } = await import('../../../src/wasm/save_parser.js')
+    const initWasm = (await import('../../../../src/wasm/save_parser.js')).default
+    const { SaveParser } = await import('../../../../src/wasm/save_parser.js')
 
     const wasmPath = new URL('../../../../src/wasm/save_parser_bg.wasm', import.meta.url)
     const wasmBinary = await readFile(wasmPath)
@@ -104,7 +104,7 @@ describe('save parser (Rust WASM streaming)', () => {
       return JSON.parse(parser.finish('save_009.xml'))
     }
 
-    const tradeArchive = await parseFixture('../../fixtures/save/save_009_npc_trade_offers.xml')
+    const tradeArchive = await parseFixture('../../../fixtures/save/save_009_npc_trade_offers.xml')
     const tradeOffers = tradeArchive.sectors.cluster_409_sector001_macro.npc_stations['ZQE-568'].tradeOffers
     expect(tradeOffers).toHaveLength(11)
     expect(tradeOffers.find((offer: { tradeId: string }) => offer.tradeId === '0x546c')).toEqual({
@@ -116,10 +116,10 @@ describe('save parser (Rust WASM streaming)', () => {
     expect(zeroSellOffers).toHaveLength(4)
     expect(zeroSellOffers.every((offer: { side: string }) => offer.side === 'buy')).toBe(true)
 
-    const suppliesArchive = await parseFixture('../../fixtures/save/save_009_npc_buy_supplies.xml')
+    const suppliesArchive = await parseFixture('../../../fixtures/save/save_009_npc_buy_supplies.xml')
     expect(suppliesArchive.sectors.cluster_409_sector001_macro.npc_stations['EST-150'].tradeOffers).toBeUndefined()
 
-    const shipArchive = await parseFixture('../../fixtures/save/save_009_player_ship_cargo.xml')
+    const shipArchive = await parseFixture('../../../fixtures/save/save_009_player_ship_cargo.xml')
     expect(shipArchive.sectors.cluster_37_sector001_macro.player_ships['0xeb6b']).toMatchObject({
       component_id: '0xeb6b', code: 'LNB-505', macro: 'ship_par_l_trans_container_03_a_macro',
       class: 'ship_l', cargo: [{ ware: 'missilecomponents', amount: 281 }]
@@ -127,8 +127,8 @@ describe('save parser (Rust WASM streaming)', () => {
   })
 
   it('parses gzip bytes directly in rust wasm parser', async () => {
-    const initWasm = (await import('../../../src/wasm/save_parser.js')).default
-    const { SaveParser } = await import('../../../src/wasm/save_parser.js')
+    const initWasm = (await import('../../../../src/wasm/save_parser.js')).default
+    const { SaveParser } = await import('../../../../src/wasm/save_parser.js')
 
     const wasmPath = new URL('../../../../src/wasm/save_parser_bg.wasm', import.meta.url)
     const wasmBinary = await readFile(wasmPath)

@@ -34,7 +34,10 @@ vi.mock('@/store/useShipBuildStore', () => ({
   })
 }))
 
-vi.mock('vue-i18n', () => ({ useI18n: () => ({ t: (key: string) => key }) }))
+vi.mock('vue-i18n', () => ({
+  useI18n: () => ({ t: (key: string) => key }),
+  createI18n: () => ({ global: { locale: { value: 'en' }, t: (key: string) => key, te: () => false } })
+}))
 
 describe('ShipBuildPanelStats', () => {
   beforeEach(() => { setActivePinia(createPinia()) })

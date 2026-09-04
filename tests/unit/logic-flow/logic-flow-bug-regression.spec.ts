@@ -37,7 +37,8 @@ vi.mock('@/utils/UseX4I18n', () => ({
 
 vi.mock('@/i18n', () => ({
   default: { global: { locale: { value: 'en' }, t: (key: string) => key, te: () => false } },
-  loadLanguageAsync: vi.fn().mockResolvedValue(true)
+  loadLanguageAsync: vi.fn().mockResolvedValue(true),
+  setGameFolderName: vi.fn()
 }))
 
 describe('LogicFlow Bug Regression Tests', () => {

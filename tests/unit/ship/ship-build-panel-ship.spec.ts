@@ -10,7 +10,8 @@ import ShipBuildSelector from '@/components/ship-build/ShipBuildSelectorView.vue
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
     t: (k: string) => k
-  })
+  }),
+  createI18n: () => ({ global: { locale: { value: 'en' }, t: (k: string) => k, te: () => false } })
 }))
 
 vi.mock('@/utils/UseX4I18n', () => ({

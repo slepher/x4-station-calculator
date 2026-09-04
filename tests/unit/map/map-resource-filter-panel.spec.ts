@@ -87,6 +87,7 @@ vi.mock('vue-i18n', () => ({
 import MapResourceFilterPanel from '@/components/map/MapResourceFilterPanel.vue'
 
 vi.mock('@/i18n', () => ({
+  default: { global: { locale: { value: 'en' }, t: (key: string) => key } },
   loadLanguageAsync: vi.fn(async () => {})
 }))
 
