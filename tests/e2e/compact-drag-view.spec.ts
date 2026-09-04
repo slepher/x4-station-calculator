@@ -1,26 +1,24 @@
-import { test, expect } from '@playwright/test';
+import { test } from '../test-setup';
+import { expect } from '@playwright/test';
 
 test.describe('Compact Drag View Integration', () => {
   test.beforeEach(async ({ page }) => {
     page.on('console', msg => {
       console.log(`PAGE LOG: ${msg.text()}`);
     });
-    await page.addInitScript(() => {
-      window.localStorage.setItem('x4_station_active_view', 'flow');
-      (window as any).isTestEnv = true;
-    });
     await page.goto('/');
-    
-    // Explicitly set activeView via store to be sure
-    await page.evaluate(() => {
-      if ((window as any).stationStore) {
-        (window as any).stationStore.activeView = 'flow';
-      }
-    });
-
-    // Wait for store to be ready and candidate zone to be visible
-    await page.waitForSelector('.station-workbench', { timeout: 15000 });
-    await page.waitForSelector('.candidate-zone', { state: 'visible', timeout: 15000 });
+    const dbFixture = await import('../fixtures/db.json', { with: { type: 'json' } });
+    const dbData = JSON.parse(JSON.stringify(dbFixture.default));
+    delete dbData.vsn;
+    await page.evaluate((data) => {
+      Object.entries(data).forEach(([key, value]) => localStorage.setItem(key, JSON.stringify(value)));
+      localStorage.setItem('isTestEnv', 'true');
+    }, dbData);
+    await page.reload();
+    await page.locator('select').filter({ hasText: /简体中文|English/ }).selectOption('zh-CN');
+    await page.getByTestId('top-view-btn-flow').click();
+    await expect(page.locator('.flow-layout')).toBeVisible();
+    await expect(page.locator('.candidate-zone')).toBeVisible();
   });
 
   test('Compact view toggles on drag start and end', async ({ page }) => {

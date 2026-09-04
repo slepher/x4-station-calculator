@@ -1,4 +1,5 @@
-import { test, expect } from '@playwright/test';
+import { test } from '../../test-setup';
+import { expect } from '@playwright/test';
 
 test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
   test.beforeEach(async ({ page }) => {
@@ -6,21 +7,19 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
       console.error(`Page Error: ${err.message}`);
     });
 
-    await page.addInitScript(() => {
-      (window as any).isTestEnv = true;
-      window.localStorage.setItem('isTestEnv', 'true');
-      window.localStorage.setItem('x4_station_active_view', 'flow');
-    });
-
-    await page.goto('./?test=true');
-    
-    await page.waitForFunction(() => {
-      const logicFlow = (window as any).logicFlowStore;
-      const gameData = (window as any).gameDataStore;
-      return logicFlow && gameData && gameData.isReady;
-    }, { timeout: 20000 });
-
-    await expect(page.locator('.candidate-zone')).toBeVisible({ timeout: 15000 });
+    await page.goto('/');
+    const dbFixture = await import('../../fixtures/db.json', { with: { type: 'json' } });
+    const dbData = JSON.parse(JSON.stringify(dbFixture.default));
+    delete dbData.vsn;
+    await page.evaluate((data) => {
+      Object.entries(data).forEach(([key, value]) => localStorage.setItem(key, JSON.stringify(value)));
+      localStorage.setItem('isTestEnv', 'true');
+    }, dbData);
+    await page.reload();
+    await page.locator('select').filter({ hasText: /简体中文|English/ }).selectOption('zh-CN');
+    await page.getByTestId('top-view-btn-flow').click();
+    await expect(page.locator('.flow-layout')).toBeVisible();
+    await expect(page.locator('.candidate-zone')).toBeVisible();
   });
 
   const dragWareToTarget = async (
@@ -735,21 +734,19 @@ test.describe('Module Name Display Tests (E2E)', () => {
       console.error(`Page Error: ${err.message}`);
     });
 
-    await page.addInitScript(() => {
-      (window as any).isTestEnv = true;
-      window.localStorage.setItem('isTestEnv', 'true');
-      window.localStorage.setItem('x4_station_active_view', 'flow');
-    });
-
-    await page.goto('./?test=true');
-    
-    await page.waitForFunction(() => {
-      const logicFlow = (window as any).logicFlowStore;
-      const gameData = (window as any).gameDataStore;
-      return logicFlow && gameData && gameData.isReady;
-    }, { timeout: 20000 });
-
-    await expect(page.locator('.candidate-zone')).toBeVisible({ timeout: 15000 });
+    await page.goto('/');
+    const dbFixture = await import('../../fixtures/db.json', { with: { type: 'json' } });
+    const dbData = JSON.parse(JSON.stringify(dbFixture.default));
+    delete dbData.vsn;
+    await page.evaluate((data) => {
+      Object.entries(data).forEach(([key, value]) => localStorage.setItem(key, JSON.stringify(value)));
+      localStorage.setItem('isTestEnv', 'true');
+    }, dbData);
+    await page.reload();
+    await page.locator('select').filter({ hasText: /简体中文|English/ }).selectOption('zh-CN');
+    await page.getByTestId('top-view-btn-flow').click();
+    await expect(page.locator('.flow-layout')).toBeVisible();
+    await expect(page.locator('.candidate-zone')).toBeVisible();
     
     await page.evaluate(() => {
       const logicFlow = (window as any).logicFlowStore;

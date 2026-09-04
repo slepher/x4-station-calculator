@@ -3,21 +3,19 @@ import { expect } from '@playwright/test';
 
 test.describe('Logic Flow UI Adjust', () => {
   test.beforeEach(async ({ page }) => {
-    await page.addInitScript(() => {
-      (window as any).isTestEnv = true;
-      window.localStorage.setItem('isTestEnv', 'true');
-      window.localStorage.setItem('x4_station_active_view', 'flow');
-    });
-
-    await page.goto('./?test=true');
-    
-    await page.waitForFunction(() => {
-      const logicFlow = (window as any).logicFlowStore;
-      const gameData = (window as any).gameDataStore;
-      return logicFlow && gameData && gameData.isReady;
-    }, { timeout: 20000 });
-
-    await expect(page.locator('.candidate-zone')).toBeVisible({ timeout: 15000 });
+    await page.goto('/');
+    const dbFixture = await import('../../fixtures/db.json', { with: { type: 'json' } });
+    const dbData = JSON.parse(JSON.stringify(dbFixture.default));
+    delete dbData.vsn;
+    await page.evaluate((data) => {
+      Object.entries(data).forEach(([key, value]) => localStorage.setItem(key, JSON.stringify(value)));
+      localStorage.setItem('isTestEnv', 'true');
+    }, dbData);
+    await page.reload();
+    await page.locator('select').filter({ hasText: /简体中文|English/ }).selectOption('zh-CN');
+    await page.getByTestId('top-view-btn-flow').click();
+    await expect(page.locator('.flow-layout')).toBeVisible();
+    await expect(page.locator('.candidate-zone')).toBeVisible();
   });
 
   const dragWareToNewZone = async (page: any, wareId: string) => {
