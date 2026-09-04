@@ -1,6 +1,6 @@
 ---
 name: x4-e2e-test-run
-description: "Run change-scoped X4 Playwright E2E tests and validate implementation coverage against `e2e_test_tasks.md`. Trigger with /x4:e2e-test-run <change-name>."
+description: "Run change-scoped X4 Playwright E2E tests and validate coverage against `e2e_test_tasks.md`."
 ---
 
 # X4 E2E Test Run

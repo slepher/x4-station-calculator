@@ -50,7 +50,7 @@ x4-e2e-test-run
 
 1. 主要数据来源：`tests/fixtures/save.json`
 2. 只有必要时才使用：`tests/fixtures/db.json`
-3. 参考同类测试：`tests/e2e/**/fixtures/`、`tests/unified-e2e/**`
+3. 参考同类测试：`tests/e2e/**/fixtures/`、`tests/e2e/**`
 4. 需要构造数据时再查：`tests/seeds/*.yaml`
 
 找不到可复用基础文件时停止并说明 blocker，不凭空创建完整 fixture。

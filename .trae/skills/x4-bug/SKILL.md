@@ -10,8 +10,7 @@ It records bug artifacts and owns bug tracking state.
 
 Status note:
 - `bugs.md` status is informational metadata for human readability.
-- Execution/closure decisions are driven by the selected canonical Unit or
-  active E2E case and its result, not by bug status text.
+- Execution/closure decisions are driven by current-run evidence from the owning Unit task and/or `e2e_test_tasks.md`, not by bug status text.
 
 ## Input
 
@@ -39,7 +38,7 @@ Status note:
   - record or update bug entries in `bugs.md`
   - maintain bug id and test linkage metadata
 - `/x4:bug` MUST NOT:
-  - directly edit canonical test plans or E2E knowledge artifacts
+  - directly edit `tasks.md`, `e2e_test_tasks.md`, or `knowledge.md`
   - redefine test documentation formats
   - implement source-code fixes in `src/**`
   - run bug-fix verification as if code has changed
@@ -50,9 +49,8 @@ Single-phase execution rule:
 - If user asks to "继续修复" in the same message, finish report artifacts first, then stop and instruct next command: `/x4:bug-fix`.
 
 Documentation ownership rule:
-- Unit reproduction belongs to the implementation task in `tests/unit/**`.
-- Browser reproduction belongs to the active `x4-e2e-test-*` workflow in
-  `tests/e2e/**`.
+- Unit-reproducible bugs are handed to `/x4:doc` so implementation and focused Unit coverage stay together in `tasks.md`.
+- Browser-only reproduction or UI test knowledge is handed to `/x4:e2e-test-doc` and `/x4:e2e-test-doc-details`.
 
 ## Target Resolution Priority (MANDATORY)
 
@@ -77,7 +75,7 @@ When target descriptions are ambiguous or conflicting:
 - **Expected Behavior**: [What should happen]
 - **Actual Behavior**: [What actually happens]
 - **Status**: [New | Confirmed | Fixed | Verified | Rejected]
-- **Related Test**: [Link to canonical Unit or active E2E case]
+- **Related Verification**: [Link to tasks.md Unit item or e2e_test_tasks.md item]
 ```
 
 ## Workflow (MANDATORY)
@@ -88,16 +86,16 @@ When target descriptions are ambiguous or conflicting:
 2. Assign a unique ID (BUG-001, BUG-002, etc.)
 3. Set status to `New` unless already in a later state
 
-### Step 2: Generate Reproduction Task
+### Step 2: Route Reproduction Ownership
 
-1. Request/update the reproduction case at its canonical Unit or active E2E boundary
-2. Link bug entry to target test id in `bugs.md` via `**Related Test**`
-3. Keep bug-side reproduction description in `bugs.md` only
+1. For a Unit boundary, request/update the owning implementation task via `/x4:doc`.
+2. For a browser boundary, request/update E2E artifacts via `/x4:e2e-test-doc` and `/x4:e2e-test-doc-details`.
+3. Link the bug entry through `**Related Verification**`.
+4. Keep bug-side reproduction description in `bugs.md` only.
 
 ### Step 3: Sync UI Knowledge (Web Integration only)
 
-If the reproduction is browser-bound, route its documentation through
-`x4-e2e-test-*`.
+If the reproduction requires browser knowledge, delegate `knowledge.md` updates to `/x4:e2e-test-doc-details`.
 
 ### Step 4: Handoff to Fix Phase
 
@@ -106,22 +104,7 @@ If the reproduction is browser-bound, route its documentation through
 
 ### Step 5: Compliance Gate (MANDATORY)
 
-Run a final scope check before responding (delta-only, not whole dirty tree):
-
-```bash
-# At start of /x4:bug invocation
-git status --porcelain > /tmp/x4_bug_before.txt
-
-# Before final response
-git status --porcelain > /tmp/x4_bug_after.txt
-python3 - <<'PY'
-from pathlib import Path
-before = set(Path('/tmp/x4_bug_before.txt').read_text().splitlines())
-after = set(Path('/tmp/x4_bug_after.txt').read_text().splitlines())
-delta = sorted(after - before)
-print('\n'.join(delta))
-PY
-```
+Track the files written by the current invocation and list them before responding. Do not use the whole dirty tree as the invocation delta.
 
 Pass condition:
 - Delta files are limited to bug-report artifacts for current change (for example: `openspec/changes/<change-name>/bugs.md`).
@@ -137,7 +120,7 @@ If a reported bug is unrelated to any existing change:
 1. Stop and ask whether to create a new change: `fix-<bug-name>`.
 2. Only create the new change after user confirmation.
 3. If confirmed, create initial bug artifact `bugs.md` under that change.
-4. If browser test docs are needed, route to `x4-e2e-test-*`.
+4. Route Unit task updates to `/x4:doc`; route browser test docs to the `x4-e2e-test-*` chain.
 5. Continue using standard workflow.
 
 ## Constraints
@@ -146,15 +129,15 @@ If a reported bug is unrelated to any existing change:
 - Keep `bugs.md` as bug catalog/reference; avoid using its status as execution gate.
 - Do not run fix verification loops in this skill.
 - Do not include language implying fix completion such as "已修复" in `/x4:bug` output.
-- If `Related Test` is unknown after report step, mark as `PENDING (canonical Unit or active E2E case)` instead of vague placeholders like `待添加`.
+- If `Related Verification` is unknown after report step, mark it as `PENDING (/x4:doc or /x4:e2e-test-doc)`.
 
 ## Output (MANDATORY)
 
 - Must print `Resolved change: <change-name>`.
 - Must list updated bug IDs and their status.
-- Must include `Related Test` linkage result per bug:
+- Must include `Related Verification` linkage result per bug:
   - linked test id; or
-  - `PENDING (canonical Unit or active E2E case)` when not yet linked.
+  - `PENDING (/x4:doc or /x4:e2e-test-doc)` when not yet linked.
 - Must include next-step routing:
-  - canonical Unit or `x4-e2e-test-*` for reproduction linkage
+  - `/x4:doc` for implementation + Unit linkage, or `x4-e2e-test-*` for browser-only linkage
   - `/x4:bug-fix` for implementation phase

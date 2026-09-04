@@ -201,7 +201,8 @@ test.beforeEach(async ({ page }) => {
 - 手动向 `liveStore.playerStationRecords` 回填 records
 
 统一使用：
-- `tests/unified-e2e/live/helpers/loadLiveBindingFixture.ts`
+- 权威目标：`tests/e2e/live/helpers/loadLiveBindingFixture.ts`
+- 迁移完成前的现有位置：`tests/unified-e2e/live/helpers/loadLiveBindingFixture.ts`
 - 入口函数：`loadLiveBindingFixture(page)`
 
 原因：
@@ -231,11 +232,13 @@ test.beforeEach(async ({ page }) => {
 ### Skills & Workflow
 
 The `.trae/skills/` directory contains markdown skill definitions for the Trae IDE:
-- `x4-test` - Test execution workflow
+- `x4-e2e-test` - E2E documentation, implementation, and execution workflow
 - `x4-ff` / `x4-new` / `x4-bug` - Feature workflows
 - `x4-verify` - Verification pipeline
 
 These define the development workflow patterns used in this codebase.
+
+Retained legacy test skills live under `.trae/skills-legacy/`; they are not active routes and must not be automatically selected.
 
 ### Skill Resolution Priority
 
