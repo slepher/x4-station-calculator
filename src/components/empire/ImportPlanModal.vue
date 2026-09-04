@@ -114,7 +114,7 @@ const handleClose = () => {
 const finishImport = (warnings: LogicFlowImportWarning[]) => {
   warningSummary.value = warnings
   showWarningModal.value = warnings.length > 0
-  if (!showWarningModal.value) handleClose()
+  if (warnings.length === 0) handleClose()
 }
 
 const handleImportX4StationString = () => {
@@ -298,7 +298,6 @@ const handleEmpireImportSubmit = (payload: { choice: 'SAVE_AND_IMPORT' | 'DISCAR
 const handleEmpireImportDialogClose = () => {
   if (empireImportSubmitted.value) {
     empireImportSubmitted.value = false
-    if (!showWarningModal.value) handleClose()
     return
   }
   showEmpireImportConfirm.value = false
@@ -492,7 +491,6 @@ const handleBlueprintActionNew = () => {
     pendingLogicFlowModules.value = null
     pendingImportSelection.value = null
     showBlueprintStrategyDialog.value = false
-    if (!showWarningModal.value) handleClose()
     return
   }
 
@@ -649,7 +647,7 @@ const handleBlueprintActionNew = () => {
     <LogicFlowImportWarningModal
       :isOpen="showWarningModal"
       :warnings="warningSummary"
-      @close="showWarningModal = false"
+      @close="handleClose"
     />
 
     <div v-if="showBlueprintStrategyDialog" class="fixed inset-0 z-[130] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" data-testid="blueprint-import-strategy-modal">
