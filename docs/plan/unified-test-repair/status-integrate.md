@@ -6,5 +6,5 @@
 - State: `working`
 - Active task: `task-test-4`
 - Candidate: `5e530b63`
-- Next action: `await task-test-4 reviewer verdict; route correction or merge accepted candidate`
+- Next action: `task-test-4 correction worker addresses reviewer findings F1-F3, then reviewer recheck`
 - Blocker: `none`
