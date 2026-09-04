@@ -8,41 +8,39 @@ test.describe('Gap 按钮响应性验证', () => {
       content: '*, *::before, *::after { transition: none !important; animation: none !important; }'
     })
     await loadLiveBindingFixture(page)
-
-    await page.evaluate(() => {
-      const gameDataStore = (window as any).gameDataStore
-      const saveArchivesKey = gameDataStore.getStorageKey('save_archives')
-      const bindingsKey = saveArchivesKey.replace('save_archives', 'save_bindings')
-      const bindings = JSON.parse(localStorage.getItem(bindingsKey) || '{}')
-      const stationPlans = bindings.list[0].stationPlans
-      const stationA = stationPlans.find((station: { id: string }) => station.id === 'MGO-010')
-      stationA.modules = [{ id: 'module_gen_prod_claytronics_01', count: 1 }]
-      stationA.lockedWares = ['quantumtubes']
-      localStorage.setItem(bindingsKey, JSON.stringify(bindings))
-    })
-    await page.reload()
-    await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 2000 })
-    await page.waitForTimeout(300)
-
-    const langSelect = page.locator('select').filter({ hasText: /简体中文|English/ })
-    await langSelect.selectOption('zh-CN')
-    await page.waitForTimeout(200)
   })
 
   test('新建空间站缺口: 点击量子管 + 按钮后数据应变化', async ({ page }) => {
-    const sectorTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_100_sector001_macro"]')
-    await expect(sectorTab).toBeVisible({ timeout: 5000 })
-    await sectorTab.click()
+    const sourceSectorTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_715_sector001_macro"]')
+    await expect(sourceSectorTab).toBeVisible({ timeout: 5000 })
+    await sourceSectorTab.click()
     await page.waitForTimeout(500)
+
+    const sourceStationTab = page.locator('[data-testid="sidebar-station"][data-station-id="RWC-785"]')
+    await expect(sourceStationTab).toBeVisible({ timeout: 5000 })
+    await sourceStationTab.click()
+    await page.waitForTimeout(300)
 
     const modeBtn = page.locator('.mode-toggle-chip')
     await expect(modeBtn).toBeVisible({ timeout: 2000 })
-    const modeClass = await modeBtn.getAttribute('class')
-    if (modeClass && modeClass.includes('active-live')) {
+    if ((await modeBtn.getAttribute('class'))?.includes('active-live')) {
       await modeBtn.click()
       await page.waitForTimeout(500)
     }
     await expect(modeBtn).toHaveClass(/active-planning/)
+
+    const claytronicsRow = page.locator('.module-row').filter({ hasText: /电子黏土|Claytronics/ }).first()
+    await expect(claytronicsRow).toBeVisible({ timeout: 2000 })
+    const claytronicsCount = claytronicsRow.locator('input[type="number"]')
+    await claytronicsCount.fill('10')
+    await claytronicsCount.press('Tab')
+    await expect(claytronicsCount).toHaveValue('10')
+    await page.waitForTimeout(500)
+
+    const sectorTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_100_sector001_macro"]')
+    await expect(sectorTab).toBeVisible({ timeout: 5000 })
+    await sectorTab.click()
+    await page.waitForTimeout(500)
 
     const stationTab = page.locator('[data-testid="sidebar-station"][data-station-id="f36126e5-7798-ed14-3c03-938b961efa0b"]')
     await expect(stationTab).toBeVisible({ timeout: 5000 })
@@ -62,6 +60,7 @@ test.describe('Gap 按钮响应性验证', () => {
 
     const beforeText = await quantumTubes.locator('.value').textContent()
     const beforeValue = parseFloat(beforeText?.replace(/[+\s,]/g, '') || '0')
+    expect(beforeValue).toBeLessThan(0)
 
     const addBtn = quantumTubes.locator('[data-testid="add-btn"]')
     await expect(addBtn).toBeVisible({ timeout: 2000 })
