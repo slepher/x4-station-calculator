@@ -25,7 +25,7 @@ test.describe('Live Overview', () => {
     await overviewTab.click()
     await page.waitForTimeout(300)
 
-    const nameInput = page.locator('.ghost-input.w-64.text-lg').first()
+    const nameInput = page.locator('.live-toolbar').getByRole('textbox')
     await expect(nameInput).toBeVisible({ timeout: 5000 })
     const name = await nameInput.inputValue()
     expect(name.length).toBeGreaterThan(0)

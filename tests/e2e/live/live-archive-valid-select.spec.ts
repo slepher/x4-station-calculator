@@ -32,7 +32,7 @@ test.describe('binding selects latest valid archive', () => {
     await expect(invalidWarning).toBeVisible()
     await expect(invalidWarning).toContainText(/无效|Invalid/)
 
-    const groupTitle = panel.locator('[data-testid="save-group-title"]')
+    const groupTitle = panel.getByTestId('save-group-active').getByTestId('save-group-title')
     await expect(groupTitle).toBeVisible()
     await expect(groupTitle).toContainText(/slepher/)
     await expect(groupTitle).toContainText(/2/)

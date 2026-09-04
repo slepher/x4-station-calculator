@@ -100,7 +100,7 @@ test.describe('Contribution name 显示验证', () => {
     await volumeTab.click()
     await page.waitForTimeout(300)
 
-    const antimatterItem = page.locator('.flow-content').filter({ hasText: '反物质转换器' }).first()
+    const antimatterItem = page.locator('.flow-content[data-resource-id="antimatterconverters"]')
     await expect(antimatterItem).toBeVisible({ timeout: 2000 })
 
     const mainRow = antimatterItem.locator('.main-row')
@@ -173,10 +173,7 @@ test.describe('Contribution name 显示验证', () => {
     await gapToggle.click()
     await page.waitForTimeout(300)
 
-    const sectorOpsSection = page.locator('.empire-gap-group').filter({ hasText: /星区运营|Sector Operations/i })
-    await expect(sectorOpsSection).toBeVisible({ timeout: 2000 })
-
-    const quantumTubes = sectorOpsSection.locator('.flow-wrapper').filter({ hasText: '量子管' })
+    const quantumTubes = page.locator('[data-testid="flow-wrapper"][data-resource-id="quantumtubes"]')
     await expect(quantumTubes).toBeVisible({ timeout: 2000 })
 
     const mainRow = quantumTubes.locator('.main-row')

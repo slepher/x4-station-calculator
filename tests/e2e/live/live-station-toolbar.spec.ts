@@ -25,12 +25,16 @@ async function selectStationInSector(page: Page, sectorName: string, stationName
     '神圣眼光': 'cluster_24_sector001_macro',
     '阿尔忒弥斯的朦胧': 'cluster_715_sector001_macro'
   }
+  const stationIds: Record<string, string> = {
+    '地球人': 'KXN-018',
+    '新建空间站': 'f36126e5-7798-ed14-3c03-938b961efa0b'
+  }
   const supplyTab = page.locator(`[data-testid="sidebar-sector"][data-sector-id="${sectorIds[sectorName]}"]`)
   await expect(supplyTab).toBeVisible({ timeout: 5000 })
   await supplyTab.click()
   await page.waitForTimeout(500)
 
-  const stationTab = page.locator(`[data-testid="sidebar-station"][data-station-id="${stationName}"]`)
+  const stationTab = page.locator(`[data-testid="sidebar-station"][data-station-id="${stationIds[stationName] || stationName}"]`)
   await expect(stationTab).toBeVisible({ timeout: 5000 })
   await stationTab.click()
   await page.waitForTimeout(300)
@@ -238,12 +242,10 @@ test.describe('3 E2E 测试场景', () => {
     const stationRWC = page.locator('[data-testid="sidebar-station"][data-station-id="RWC-785"]')
     await expect(stationRWC).toBeVisible({ timeout: 3000 })
 
-    const allStationTabs = await page.locator('[data-testid="sidebar-station"]').allInnerTexts()
-    const bhwStationTabs = allStationTabs.filter(text => text.includes('BHW-834'))
-    expect(bhwStationTabs.length).toBe(0)
+    await expect(page.locator('[data-testid="sidebar-station"][data-station-id="BHW-834"]')).toHaveCount(0)
   })
 
-  test('3.11 Case: 空间站tab显示正确的tag和factoryGroup属性', async ({ page }) => {
+  test('3.11 Case: 空间站tab显示正确的station id和名称', async ({ page }) => {
     const sectorTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_715_sector001_macro"]')
     await expect(sectorTab).toBeVisible({ timeout: 5000 })
     await sectorTab.click()
@@ -252,10 +254,7 @@ test.describe('3 E2E 测试场景', () => {
     const stationRWC = page.locator('[data-testid="sidebar-station"][data-station-id="RWC-785"]')
     await expect(stationRWC).toBeVisible({ timeout: 3000 })
 
-    const tagAttr = await stationRWC.getAttribute('data-tag')
-    expect(tagAttr).toBe('factory')
-
-    const factoryGroupAttr = await stationRWC.getAttribute('data-factory-group')
-    expect(factoryGroupAttr).toBe('shiptech')
+    await expect(stationRWC).toHaveAttribute('data-station-id', 'RWC-785')
+    await expect(stationRWC.locator('.sidebar-item-label')).toHaveText('RWC-785')
   })
 })

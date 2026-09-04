@@ -40,10 +40,7 @@ test.describe('Gap 按钮响应性验证', () => {
     await gapToggle.click()
     await page.waitForTimeout(300)
 
-    const opsSection = page.locator('.empire-gap-group').filter({ hasText: /星区运营|Sector Operations/i })
-    await expect(opsSection).toBeVisible({ timeout: 2000 })
-
-    const quantumTubes = opsSection.locator('[data-testid="flow-wrapper"]').filter({ hasText: '量子管' })
+    const quantumTubes = page.locator('[data-testid="flow-wrapper"][data-resource-id="quantumtubes"]')
     await expect(quantumTubes).toBeVisible({ timeout: 2000 })
 
     const beforeText = await quantumTubes.locator('.value').textContent()
