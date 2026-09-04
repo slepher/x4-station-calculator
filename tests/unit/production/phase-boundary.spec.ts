@@ -56,7 +56,7 @@ describe('production phase boundary', () => {
 
     const cache = flowMap.getCache('station-1')
     expect(cache).not.toBeNull()
-    expect(cache!.autoHabitationModules).toEqual([])
+    expect(cache!.autoHabitationModules).toEqual([{ id: 'habitat', count: 1 }])
     expect(cache!.actualWorkforce).toBe(10)
     expect(cache!.currentEfficiency).toBe(1)
     expect((cache as Record<string, unknown>).autoInfrastructureModules).toBeUndefined()

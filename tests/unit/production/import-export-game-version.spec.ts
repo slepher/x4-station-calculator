@@ -187,7 +187,7 @@ function buildStores() {
     loadData: vi.fn((data: SavedEmpiresState) => {
       empireStore.savedEmpires = data
     }),
-    initializeAllStationCaches: vi.fn(),
+    initializeAllStationDerived: vi.fn(),
     saveToStorage: vi.fn()
   }
 
@@ -389,6 +389,7 @@ describe('import-export game version pipeline', () => {
       currentView: 'production',
       payload,
       gameDataStore,
+      blueprintStore: empireStore,
       empireStore,
       logicFlowStore,
       shipBuildStore
@@ -432,6 +433,7 @@ describe('import-export game version pipeline', () => {
         }
       }),
       gameDataStore,
+      blueprintStore: empireStore,
       empireStore,
       logicFlowStore,
       shipBuildStore

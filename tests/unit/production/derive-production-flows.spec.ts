@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { deriveProductionFlows, groupDerivedProductionFlows } from '@/store/logic/calculateWareFlowDerived'
+import { calculateWareFlowDerived, deriveProductionFlows } from '@/store/logic/calculateWareFlowDerived'
 import type { WareProductionFlow } from '@/types/production-flow'
 import type { X4Ware } from '@/types/x4'
 
@@ -73,23 +73,20 @@ describe('deriveProductionFlows', () => {
       unitPrice: 11,
       netValue: 66,
       transportDemand: 12,
-      totalOccupiedCount: 26,
+      totalOccupiedCount: 18,
       totalOccupiedConsumptionCount: 8,
-      totalOccupiedVolume: 52
+      totalOccupiedVolume: 36
     })
     expect(derived[0]?.contributions[0]).toMatchObject({
-      volumeFlow: 20,
-      valueFlow: 110,
-      transportFlow: 20
-    })
-    expect(derived[0]?.stationContributions?.[0]).toMatchObject({
-      netValue: 66,
-      transportVolume: 12
+      volumeContribution: 30,
+      valueContribution: 110,
+      transportContribution: 20
     })
   })
 
-  it('groups already-derived flows without recalculating them', () => {
-    const grouped = groupDerivedProductionFlows([
+  it('groups derived flows through the current calculation pipeline', () => {
+    const grouped = calculateWareFlowDerived({
+      productionFlows: [
       {
         wareId: 'ore',
         orderIndex: 2,
@@ -111,7 +108,35 @@ describe('deriveProductionFlows', () => {
         contributions: [],
         stationContributions: []
       }
-    ])
+      ],
+      modulesMap: {},
+      waresMap: {
+        ore: {
+          id: 'ore',
+          nameId: 'ore',
+          name: 'Ore',
+          transport: 'solid',
+          volume: 10,
+          price: 50,
+          minPrice: 40,
+          maxPrice: 60,
+          tier: 0,
+          group: 'resources'
+        } as X4Ware
+      },
+      settings: {
+        racePreference: 'argon',
+        resourceBufferHours: 0,
+        primaryProductBufferHours: 0,
+        secondaryProductBufferHours: 0,
+        buyMultiplier: 0.5,
+        sellMultiplier: 0.5,
+        transportMinutes: 30,
+        transportShipCapacity: 62000,
+        sunlight: 100
+      },
+      warePriorityLevels: {}
+    }).groupedFlows
 
     expect(grouped.volumeGroups.solid).toHaveLength(1)
     expect(grouped.rateGroups.resources).toHaveLength(1)

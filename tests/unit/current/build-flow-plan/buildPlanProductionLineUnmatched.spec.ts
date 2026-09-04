@@ -88,7 +88,7 @@ function loadPlanData(index: number): {
 
 describe('buildPlanProductionLine unmatched preview group', () => {
   it('treats unmatched target lines as valid preview groups for build-material demand', () => {
-    const { goals, groups, buildFlowView } = loadPlanData(2)
+    const { goals, groups, buildFlowView } = loadPlanData(1)
     const preview = createBuildFlowPlanPreview(
       goals,
       groups,

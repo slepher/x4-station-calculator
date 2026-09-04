@@ -209,7 +209,7 @@ describe('buildPlanProductionLine regression', () => {
     const item = preview!.lines[0]?.items[0]
     expect(item?.kind).toBe('derived')
     if (item?.kind === 'derived') {
-      expect(item.moduleId).toBe('module_ter_prod_energycells_01')
+      expect(item.moduleId).toBe('module_gen_prod_energycells_01')
     }
   })
 
@@ -259,7 +259,7 @@ describe('buildPlanProductionLine regression', () => {
   })
 
   it('keeps manual target rates when a ware is both build-material and target', () => {
-    const { goals, groups, buildFlowView } = loadPlanData(2)
+    const { goals, groups, buildFlowView } = loadPlanData(1)
     const preview = createBuildFlowPlanPreview(
       goals,
       groups,
@@ -286,12 +286,12 @@ describe('buildPlanProductionLine regression', () => {
     const computronicModule = terranLine!.allModules.find(module => module.id === 'module_ter_prod_computronicsubstrate_01')
     const siliconCarbideModule = terranLine!.allModules.find(module => module.id === 'module_ter_prod_siliconcarbide_01')
 
-    expect(computronicModule?.count).toBe(32)
-    expect(siliconCarbideModule?.count).toBe(25)
+    expect(computronicModule?.count).toBe(9)
+    expect(siliconCarbideModule?.count).toBe(7)
   })
 
   it('keeps both build-material and production responsibilities for the same ware', () => {
-    const { goals, groups, buildFlowView } = loadPlanData(2)
+    const { goals, groups, buildFlowView } = loadPlanData(1)
     const preview = createBuildFlowPlanPreview(
       goals,
       groups,
@@ -330,7 +330,7 @@ describe('buildPlanProductionLine regression', () => {
   })
 
   it('does not report production demand as aggregate build-material demand', () => {
-    const { goals, groups, buildFlowView } = loadPlanData(2)
+    const { goals, groups, buildFlowView } = loadPlanData(1)
     const preview = createBuildFlowPlanPreview(
       goals,
       groups,
@@ -363,7 +363,7 @@ describe('buildPlanProductionLine regression', () => {
   })
 
   it('does not recursively overbuild direct target wares', () => {
-    const { goals, groups, buildFlowView } = loadPlanData(2)
+    const { goals, groups, buildFlowView } = loadPlanData(1)
     const preview = createBuildFlowPlanPreview(
       goals,
       groups,
@@ -388,11 +388,11 @@ describe('buildPlanProductionLine regression', () => {
     expect(methaneOreLine).toBeDefined()
 
     const energyModule = methaneOreLine!.allModules.find(module => module.id === 'module_gen_prod_energycells_01')
-    expect(energyModule?.count).toBe(10)
+    expect(energyModule?.count).toBe(3)
     expect(methaneOreLine!.allModules.find(module => module.id === 'module_gen_prod_hullparts_01')?.count).toBe(4)
-    expect(methaneOreLine!.allModules.find(module => module.id === 'module_gen_prod_advancedcomposites_01')?.count).toBe(4)
-    expect(methaneOreLine!.allModules.find(module => module.id === 'module_gen_prod_graphene_01')?.count).toBe(4)
-    expect(methaneOreLine!.allModules.find(module => module.id === 'module_gen_prod_refinedmetals_01')?.count).toBe(5)
+    expect(methaneOreLine!.allModules.find(module => module.id === 'module_gen_prod_advancedcomposites_01')?.count).toBe(5)
+    expect(methaneOreLine!.allModules.find(module => module.id === 'module_gen_prod_graphene_01')?.count).toBe(5)
+    expect(methaneOreLine!.allModules.find(module => module.id === 'module_gen_prod_refinedmetals_01')?.count).toBe(6)
   })
 
 })

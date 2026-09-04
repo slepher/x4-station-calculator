@@ -28,6 +28,7 @@ describe('useGameData bundled loader', () => {
       [buildGameDataLoaderKey('8.0-Diplomacy', 'missiles.json')]: makeLoader([]),
       [buildGameDataLoaderKey('8.0-Diplomacy', 'bullets.json')]: makeLoader([]),
       [buildGameDataLoaderKey('8.0-Diplomacy', 'maps.json')]: makeLoader({ clusters: {}, sectors: {} }),
+      [buildGameDataLoaderKey('8.0-Diplomacy', 'sector_reachability.json')]: makeLoader({}),
       [buildGameDataLoaderKey('8.0-Diplomacy', 'map_resources.json')]: makeLoader({ version: '8.0', resource_model: 'regions', sectors: {}, regionyield_definitions: [] }),
       [buildGameDataLoaderKey('8.0-Diplomacy', 'regionyields.json')]: makeLoader([]),
       [buildGameDataLoaderKey('8.0-Diplomacy', 'res.json')]: makeLoader([]),
@@ -42,7 +43,7 @@ describe('useGameData bundled loader', () => {
     })
 
     expect(data.wares).toEqual([{ id: 'energycells' }])
-    expect(data.maps).toEqual({ clusters: {}, sectors: {}, highwayRings: [] })
+    expect(data.maps).toEqual({ clusters: {}, sectors: {}, highwayRings: [], highwayRingChains: [] })
     expect(data.mapResources.resource_model).toBe('regions')
   })
 

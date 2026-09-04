@@ -147,6 +147,7 @@ describe('makeSchemes', () => {
       moduleIds: ['module_hullparts'],
       isSelfBootstrap: false,
       netProduction: { hullparts: 500 },
+      isolatedWares: new Set(),
     }
 
     const cModules: SavedModule[] = [{ id: 'module_claytronics', count: 1 }]

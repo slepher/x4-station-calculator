@@ -8,13 +8,13 @@ vi.mock('@/store/logic/calculateProductionFlows', async () => {
 
   return {
     ...actual,
-    calculateProductionFlows: vi.fn(actual.calculateProductionFlows)
+    calculateProductionFlowsCore: vi.fn(actual.calculateProductionFlowsCore)
   }
 })
 
 import { StationDerivedMap } from '@/store/state/StationDerivedMap'
 import {
-  calculateProductionFlows
+  calculateProductionFlowsCore
 } from '@/store/logic/calculateProductionFlows'
 
 function makeModule(overrides: Partial<X4Module> & { id: string }): X4Module {
@@ -123,7 +123,7 @@ describe('StationDerivedMap autoFill dedup', () => {
       warePriority: {}
     })
 
-    expect(calculateProductionFlows).toHaveBeenCalledTimes(1)
+    expect(calculateProductionFlowsCore).toHaveBeenCalledTimes(1)
   })
 
   it('keeps cache outputs and fullModules consistent for plan stations', () => {

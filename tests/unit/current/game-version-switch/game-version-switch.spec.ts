@@ -144,6 +144,7 @@ vi.mock('@/store/useEmpireStore', () => ({
 
 vi.mock('@/store/useLogicFlowStore', () => ({
   useLogicFlowStore: vi.fn(() => ({
+    savedPlans: { list: [], activeId: null },
     get isDirty() {
       return logicFlowState.isDirty
     },

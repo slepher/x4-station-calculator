@@ -79,6 +79,15 @@ function presenterFor(
     terraformingSelectedCluster: computed(() => cluster),
     terraformingRuntimeProjectIds: computed(() => projects.map(item => item.id)),
     terraformingExecutionLog: computed(() => log.value),
+    terraformingArchiveRuntimeBaseState: computed(() => null),
+    terraformingSyncedExecutedBaseline: computed(() => null),
+    terraformingExecutedDelta: computed(() => ({ completedProjects: new Map(), completedOneTimeEvents: new Map(), hasArchiveAdvance: false, hasArchiveRollbackRisk: false, hasRuntimeStateChange: false })),
+    terraformingDeductedExecution: computed(() => ({
+      remainingLog: log.value,
+      currentQueueDisplayEntries: log.value.map(entry => ({ ...entry, status: 'pending' as const, source: 'remaining-queue' as const })),
+      deductedEntries: [], archiveOnlyEntries: [],
+      consumedProjects: new Map(), consumedOneTimeEvents: new Map()
+    })),
     terraformingHqStationName: computed(() => ''),
     terraformingHqArchiveStation: computed(() => null),
     terraformingHqEffectiveModules: computed(() => []),

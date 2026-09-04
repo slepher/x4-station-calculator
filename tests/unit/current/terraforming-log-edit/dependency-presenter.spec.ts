@@ -57,6 +57,13 @@ function presenterFor(projects: TerraformingProject[]) {
     terraformingSelectedCluster: computed(() => data.clusters[0] ?? null),
     terraformingRuntimeProjectIds: computed(() => projects.map(item => item.id)),
     terraformingExecutionLog: computed(() => []),
+    terraformingArchiveRuntimeBaseState: computed(() => null),
+    terraformingSyncedExecutedBaseline: computed(() => null),
+    terraformingExecutedDelta: computed(() => ({ completedProjects: new Map(), completedOneTimeEvents: new Map(), hasArchiveAdvance: false, hasArchiveRollbackRisk: false, hasRuntimeStateChange: false })),
+    terraformingDeductedExecution: computed(() => ({
+      remainingLog: [], currentQueueDisplayEntries: [], deductedEntries: [], archiveOnlyEntries: [],
+      consumedProjects: new Map(), consumedOneTimeEvents: new Map()
+    })),
     terraformingHqStationName: computed(() => ''),
     terraformingHqArchiveStation: computed(() => null),
     terraformingHqEffectiveModules: computed(() => []),

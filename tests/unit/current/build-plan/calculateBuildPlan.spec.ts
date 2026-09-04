@@ -215,8 +215,8 @@ describe('BootstrapMode.Joint', () => {
     }))
 
     expect(result.schemes.length).toBe(2)
-    expect(result.schemes[0]!.label).toBe('D 联合自举')
-    expect(result.schemes[1]!.label).toBe('目标产线')
+    expect(result.schemes[0]!.label).toBe('scheme_joint')
+    expect(result.schemes[1]!.label).toBe('scheme_production_line')
   })
 
   it('produces 1 scheme when no goals (bootstrap only)', () => {
@@ -261,7 +261,7 @@ describe('BootstrapMode.Joint', () => {
 })
 
 describe('BootstrapMode.IsolatedSpecialized', () => {
-  it('produces 3 schemes with production-rate goal', () => {
+  it('produces the feasible schemes with production-rate goal', () => {
     const goal: BuildGoal = {
       type: 'production-rate',
       wareId: 'missilecomponents',
@@ -274,10 +274,9 @@ describe('BootstrapMode.IsolatedSpecialized', () => {
       currentNetProduction: {}
     }))
 
-    expect(result.schemes.length).toBe(3)
-    expect(result.schemes[0]!.label).toBe('B 特种孤岛')
-    expect(result.schemes[1]!.label).toBe('A 建材自举')
-    expect(result.schemes[2]!.label).toBe('目标产线')
+    expect(result.schemes.length).toBe(2)
+    expect(result.schemes[0]!.label).toBe('scheme_materials')
+    expect(result.schemes[1]!.label).toBe('scheme_production_line')
   })
 
   it('produces 1 scheme when no goals', () => {
@@ -306,9 +305,9 @@ describe('BootstrapMode.CoupledIterative', () => {
     }))
 
     expect(result.schemes.length).toBe(3)
-    expect(result.schemes[0]!.label).toBe('A 建材自举')
-    expect(result.schemes[1]!.label).toBe('B 特种产线')
-    expect(result.schemes[2]!.label).toBe('目标产线')
+    expect(result.schemes[0]!.label).toBe('scheme_materials')
+    expect(result.schemes[1]!.label).toBe('scheme_specialized')
+    expect(result.schemes[2]!.label).toBe('scheme_production_line')
   })
 
   it('produces 1 scheme when no goals', () => {
@@ -371,7 +370,7 @@ describe('BootstrapMode.None', () => {
     }))
 
     expect(result.schemes.length).toBe(1)
-    expect(result.schemes[0]!.label).toBe('目标产线')
+    expect(result.schemes[0]!.label).toBe('scheme_production_line')
   })
 
   it('outputs bootstrapMode in BuildPlan result', () => {

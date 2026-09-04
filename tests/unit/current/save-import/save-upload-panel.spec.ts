@@ -23,7 +23,9 @@ const saveStoreMock = {
 
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
-    t: (key: string) => key
+    t: (key: string, params?: { percent?: number; count?: number }) => key === 'save_import.parsing_progress'
+      ? `${params?.percent}% - ${params?.count} sectors`
+      : key
   })
 }))
 
@@ -37,7 +39,7 @@ vi.mock('@/store/useGameDataStore', () => ({
   })
 }))
 
-vi.mock('../../../src/components/save/saveUploadStreaming', () => ({
+vi.mock('../../../../src/components/save/saveUploadStreaming', () => ({
   streamFileToSaveParserWorker: vi.fn(async ({ worker }: { worker: Worker }) => {
     worker.onmessage?.({
       data: {

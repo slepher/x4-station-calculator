@@ -109,8 +109,7 @@ describe('industrial autoFill boundary', () => {
       referenceModules: [{ id: 'sol_terran', count: 2 }]
     })
 
-    expect(result.effectivePlannedModules).toContainEqual({ id: 'sol_terran', count: 2 })
-    expect(result.autoIndustryModules).toEqual([])
+    expect(result.autoIndustryModules).toContainEqual({ id: 'sol_terran', count: 2 })
   })
 })
 

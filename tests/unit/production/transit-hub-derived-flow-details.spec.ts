@@ -4,7 +4,7 @@ import type { WareProductionFlow } from '@/types/production-flow'
 import type { X4Ware } from '@/types/x4'
 
 describe('deriveProductionFlows transit hub details', () => {
-  it('uses stationContributions as output detail source when present', () => {
+  it('keeps unified module contributions as output detail source', () => {
     const flows: WareProductionFlow[] = [
       {
         wareId: 'energycells',
@@ -73,10 +73,12 @@ describe('deriveProductionFlows transit hub details', () => {
     })
 
     expect(derived[0]?.contributions[0]).toMatchObject({
-      stationId: 'station-a',
-      stationName: 'Alpha',
-      stationCount: 2,
-      netRate: 6
+      moduleId: 'module_solar',
+      type: 'production',
+      amount: 10,
+      valueContribution: 100,
+      volumeContribution: 120,
+      transportContribution: 10
     })
   })
 })

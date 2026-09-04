@@ -111,7 +111,8 @@ describe('stationGapViewModel', () => {
     // External sector contribution should be synthesized for B.
     const w3 = result.supply.find((item) => item.wareId === 'w3')
     expect(w3).toBeTruthy()
-    expect(w3?.contributions[0]?.stationId).toBe('sector:B')
+    expect(w3?.contributions[0]?.id).toBe('B')
+    expect(w3?.contributions[0]?.class).toBe('sector')
   })
 
   it('returns empty when current sector is empty or not connected', () => {
