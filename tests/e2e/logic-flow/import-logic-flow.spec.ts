@@ -249,7 +249,7 @@ const getNewSmartSaveDialog = (page: any) =>
 const closeSmartSaveDialogByCloseButton = async (page: any) => {
   const dialog = page.locator('[data-testid="dialog-backdrop"]')
   await expect(dialog).toBeVisible()
-  await dialog.locator('button').first().click({ force: true })
+  await dialog.locator('button').first().click()
   await expect(dialog).toHaveCount(0)
 }
 
@@ -259,7 +259,7 @@ const getImportSmartSaveDialog = (page: any) =>
 const closeImportSmartSaveDialogByCloseButton = async (page: any) => {
   const dialog = page.locator('[data-testid="dialog-backdrop"]')
   await expect(dialog).toBeVisible()
-  await dialog.locator('button').first().click({ force: true })
+  await dialog.locator('button').first().click()
   await expect(dialog).toHaveCount(0)
 }
 
@@ -537,8 +537,12 @@ test.describe('import-logic-flow e2e (test implementation)', () => {
     await page.locator('[data-testid="logicflow-import-plan-direct-ilf_mixed_groups"]').click({ force: true })
     await page.getByRole('button', { name: /Discard and Import|放弃并导入/i }).click({ force: true })
 
-    await expect(page.locator('[data-testid="logicflow-import-warning-modal"]')).toBeVisible()
-    await expect(page.getByText(/skipped|跳过|warning_empty_group_skipped/i)).toBeVisible()
+    const warningModal = page.locator('[data-testid="logicflow-import-warning-modal"]')
+    await expect(warningModal).toBeVisible()
+    await expect(warningModal.getByText(/skipped|跳过|warning_empty_group_skipped/i)).toBeVisible()
+    await warningModal.getByRole('button', { name: /Acknowledge|知道了|确认/i }).click()
+    await expect(warningModal).toHaveCount(0)
+    await expect(page.locator('[data-testid="import-view-modal"]')).toHaveCount(0)
   })
 
   test('2.8 非 container isolated 忽略 + warning 汇总', async ({ page }) => {
@@ -832,7 +836,6 @@ test.describe('import-logic-flow e2e (test implementation)', () => {
     await openImportModal(page, 'empire')
     await page.locator('[data-testid="logicflow-import-plan-direct-ilf_valid_single_group"]').click({ force: true })
     await expect(getImportSmartSaveDialog(page)).toHaveCount(0)
-    await closeImportViewModal(page)
   })
 
   test('3.4 空方案阻止导入', async ({ page }) => {
@@ -852,23 +855,36 @@ test.describe('import-logic-flow e2e (test implementation)', () => {
     await openImportModal(page, 'empire')
     await page.locator('[data-testid="logicflow-import-plan-direct-ilf_valid_single_group"]').click({ force: true })
     await expect(getImportSmartSaveDialog(page)).toHaveCount(0)
-    await page.keyboard.press('Escape')
-    await expect(page.locator('[data-testid="import-view-modal"]')).toHaveCount(0)
+    await expect.poll(() => page.evaluate(() => (window as any).blueprintStore.activeStation.modules))
+      .toEqual([{ id: 'module_gen_prod_hullparts_01', count: 1 }])
+
+    await page.reload()
+    await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 10000 })
+    await page.getByTestId('language-select').selectOption('zh-CN')
 
     await makeEmpireSavedBaseline(page)
     await makeEmpireDirtyWithoutSave(page)
     await ensureEmpireOverview(page)
 
     await page.getByRole('button', { name: /New|新建/i }).first().click({ force: true })
-    await expect(getNewSmartSaveDialog(page)).toBeVisible()
-    await closeSmartSaveDialogByCloseButton(page)
+    const newSmartSaveDialog = getNewSmartSaveDialog(page)
+    await expect(newSmartSaveDialog).toBeVisible()
+    await newSmartSaveDialog.locator('button').first().click()
+    await expect(newSmartSaveDialog).toHaveCount(0)
 
     await openImportModal(page, 'empire')
     await page.locator('[data-testid="logicflow-import-plan-direct-ilf_mixed_groups"]').click({ force: true })
-    await expect(page.getByRole('button', { name: /Save and Import|保存并导入/i })).toBeVisible()
-    await expect(page.getByRole('button', { name: /Discard and Import|放弃并导入/i })).toBeVisible()
-    await closeImportSmartSaveDialogByCloseButton(page)
-    await closeImportViewModal(page)
+    const importSmartSaveDialog = getImportSmartSaveDialog(page)
+    await expect(importSmartSaveDialog.getByRole('button', { name: /Save and Import|保存并导入/i })).toBeVisible()
+    await expect(importSmartSaveDialog.getByRole('button', { name: /Discard and Import|放弃并导入/i })).toBeVisible()
+    await page.getByRole('button', { name: /Discard and Import|放弃并导入/i }).click()
+    await expect(page.getByRole('button', { name: /Discard and Import|放弃并导入/i })).toHaveCount(0)
+    const warningModal = page.locator('[data-testid="logicflow-import-warning-modal"]')
+    await expect(warningModal).toBeVisible()
+    await expect(warningModal.getByText(/skipped|跳过|warning_empty_group_skipped/i)).toBeVisible()
+    await warningModal.getByRole('button', { name: /Acknowledge|知道了|确认/i }).click()
+    await expect(warningModal).toHaveCount(0)
+    await expect(page.locator('[data-testid="import-view-modal"]')).toHaveCount(0)
   })
 
   test('3.19 Bug #3: 新建/帝国导入不应把空帝国写入已保存列表', async ({ page }) => {
