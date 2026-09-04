@@ -1,5 +1,5 @@
 import { expect, type Page } from '@playwright/test'
-import { test } from '../../test-setup'
+import { test } from '../../../test-setup'
 
 const discardAndNewBtn = (page: Page) => page.getByRole('button', { name: /丢弃并新建|Discard\s*&\s*New/i }).first()
 const pickNonEmptyCandidate = async (page: Page) => {
@@ -61,7 +61,7 @@ async function prepareDirtyStateWithDialog(page: Page) {
 test.beforeEach(async ({ page }) => {
   await page.goto('/')
 
-  const dbFixture = await import('../../fixtures/db.json', { with: { type: 'json' } })
+  const dbFixture = await import('../../../fixtures/db.json', { with: { type: 'json' } })
   const dbData = JSON.parse(JSON.stringify(dbFixture.default))
   delete dbData.vsn
 

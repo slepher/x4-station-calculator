@@ -1,5 +1,5 @@
 import { expect, type Page } from '@playwright/test'
-import { test } from '../../test-setup'
+import { test } from '../../../test-setup'
 
 const loadModalTitleRe = /Load Ship Blueprint|载入飞船配装|载入蓝图|加载飞船配装/i
 
@@ -36,7 +36,7 @@ async function gotoNoSelectedShipState(page: Page) {
 test.beforeEach(async ({ page }) => {
   await page.goto('/')
 
-  const dbFixture = await import('../../fixtures/db.json', { with: { type: 'json' } })
+  const dbFixture = await import('../../../fixtures/db.json', { with: { type: 'json' } })
   const dbData = JSON.parse(JSON.stringify(dbFixture.default))
   delete dbData.vsn
 

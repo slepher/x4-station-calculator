@@ -9,7 +9,7 @@ import { test, expect, type Page } from '@playwright/test'
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/')
-  const dbFixture = await import('../../fixtures/db.json', { with: { type: 'json' } })
+  const dbFixture = await import('../../../fixtures/db.json', { with: { type: 'json' } })
   const dbData = JSON.parse(JSON.stringify(dbFixture.default))
   delete dbData.vsn
   await page.evaluate((data) => {

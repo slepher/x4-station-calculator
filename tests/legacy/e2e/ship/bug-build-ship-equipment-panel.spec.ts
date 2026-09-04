@@ -1,5 +1,5 @@
 import { expect } from '@playwright/test'
-import { test } from '../../test-setup'
+import { test } from '../../../test-setup'
 
 // Helper: 点击空候选槽
 const clickEmptyCandidate = async (page: any) => {
@@ -85,7 +85,7 @@ test.beforeEach(async ({ page }) => {
   await page.goto('/')
 
   // 1. 加载 fixture
-  const dbFixture = await import('../../fixtures/db.json', { with: { type: 'json' } })
+  const dbFixture = await import('../../../fixtures/db.json', { with: { type: 'json' } })
   const dbData = JSON.parse(JSON.stringify(dbFixture.default))
   delete dbData.vsn
   await page.evaluate((data) => {

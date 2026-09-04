@@ -1,5 +1,5 @@
 import { expect } from '@playwright/test'
-import { test } from '../../test-setup'
+import { test } from '../../../test-setup'
 
 const enterOdachiEmpty = async (page: any) => {
   await page.getByRole('button', { name: /Ship Build|船只建造/ }).click()
@@ -49,7 +49,7 @@ const clickFirstTurretCandidateInCurrentPicker = async (page: any) => {
 test.beforeEach(async ({ page }) => {
   await page.goto('/')
 
-  const dbFixture = await import('../../fixtures/db.json', { with: { type: 'json' } })
+  const dbFixture = await import('../../../fixtures/db.json', { with: { type: 'json' } })
   const dbData = JSON.parse(JSON.stringify(dbFixture.default))
   delete dbData.vsn
 

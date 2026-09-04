@@ -1,5 +1,5 @@
 import { expect, type Page } from '@playwright/test'
-import { test } from '../../test-setup'
+import { test } from '../../../test-setup'
 
 const openSelectorCurrentState = async (page: Page) => {
   await page.getByRole('button', { name: /Ship Build|船只建造/ }).click()
@@ -11,7 +11,7 @@ const openSelectorCurrentState = async (page: Page) => {
 test.beforeEach(async ({ page }) => {
   await page.goto('/')
 
-  const dbFixture = await import('../../fixtures/db.json', { with: { type: 'json' } })
+  const dbFixture = await import('../../../fixtures/db.json', { with: { type: 'json' } })
   const dbData = JSON.parse(JSON.stringify(dbFixture.default))
   delete dbData.vsn
 
