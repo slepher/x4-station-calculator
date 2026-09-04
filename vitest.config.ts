@@ -3,6 +3,8 @@ import { defineConfig } from 'vitest/config';
 import vue from '@vitejs/plugin-vue';
 import path from 'path';
 
+const isSkillSuite = process.env.VITEST_SUITE === 'skills';
+
 export default defineConfig({
   plugins: [vue()],
   resolve: {
@@ -11,8 +13,8 @@ export default defineConfig({
     }
   },
   test: {
-    include: ['tests/unified-unit/**/*.spec.ts', 'tests/skills/unit/**/*.spec.ts', 'tests/e2e-skills/unit/**/*.spec.ts'],
-    exclude: ['tests/unit/**'],
+    include: [isSkillSuite ? 'tests/e2e-skills/unit/**/*.spec.ts' : 'tests/unit/**/*.spec.ts'],
+    exclude: ['tests/legacy/**', isSkillSuite ? 'tests/unit/**' : 'tests/e2e-skills/**'],
     setupFiles: ['./tests/test-setup.ts'],
     globals: true,
     environment: 'node',
