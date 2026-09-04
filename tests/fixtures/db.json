@@ -912,7 +912,7 @@
     ]
   },
   "x4_ship_blueprints": {
-    "version": 2,
+    "version": 5,
     "activeShipId": "ship_ter_m_corvette_01_a",
     "activeBlueprintId": "d111f259-6c0d-f519-aa82-10829f684cbb",
     "ships": [

@@ -3,8 +3,8 @@
 ## Lane
 
 - Name: `integrate`
-- State: `unprovisioned`
-- Active task: `none`
-- Candidate: `none`
-- Next action: `reconcile against the current lane manifest and Git state`
-- Blocker: `none`
+- State: `ready_for_user_validation`
+- Active task: `task-coding-2`
+- Candidate: `dfd0d022`
+- Next action: `user validates candidate; then merge to develop`
+- Blocker: `Live focused assertions still fail at unchanged legacy .supply-tab locator; not merged`
