@@ -5,6 +5,6 @@
 - Name: `integrate`
 - State: `working`
 - Active task: `task-test-4`
-- Candidate: `0643345c`
-- Next action: `coding worker replaces gap localStorage patch with reviewer-approved UI precondition, then final focused gate and reviewer`
+- Candidate: `2085b88f`
+- Next action: `final reviewer runs bounded gap focused gate; accept only with real pass, otherwise keep task-test-4 blocked`
 - Blocker: `none`
