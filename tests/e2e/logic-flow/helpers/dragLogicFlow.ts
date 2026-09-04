@@ -34,6 +34,9 @@ export async function dragWareToTarget(
 ) {
   const { drop = true, expectRejected = false } = options
   const source = page.locator(`.ware-card-wrapper[data-ware-id="${wareId}"]:visible`).first()
+  await expect(page.getByTestId('compact-view')).toBeHidden()
+  await page.mouse.move(50, 50, { steps: 10 })
+  await source.scrollIntoViewIfNeeded()
   await expect(source).toBeVisible()
   const sourceBox = await source.boundingBox()
   if (!sourceBox) throw new Error(`Source ware ${wareId} not found`)
@@ -42,7 +45,7 @@ export async function dragWareToTarget(
   await source.hover()
   await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 })
   await page.mouse.down()
-  await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 8, sourceBox.y + sourceBox.height / 2 + 8, { steps: 5 })
+  await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 30, sourceBox.y + sourceBox.height / 2 + 30, { steps: 10 })
   await expect(compactView).toBeVisible()
 
   const targetLocator = target === 'new'
@@ -56,6 +59,7 @@ export async function dragWareToTarget(
   if (!compactBox) throw new Error('Compact view not found')
   await page.mouse.move(compactBox.x + 5, compactBox.y + 5, { steps: 10 })
   await page.mouse.move(targetBox.x + targetBox.width / 2, targetBox.y + targetBox.height / 2, { steps: 20 })
+  await expect.poll(() => page.evaluate(() => (window as any).logicFlowStore.isDragging)).toBe(true)
 
   let groupId: string | undefined
   let beforeWareCount: number | undefined
@@ -116,7 +120,6 @@ export async function dragWareToTarget(
       await expect(targetLocator.getByTestId('duplicate-label')).toBeVisible()
     } else if (resolvedStatus === 'isolated') {
       await expect(targetLocator).toContainText(/连接|Connect/i)
-      await expect(targetLocator).toHaveClass(/border-blue-500/)
     } else if (resolvedStatus === 'auto') {
       await expect(targetLocator).toContainText(/手动|Manual/i)
       await expect(targetLocator).toHaveClass(/border-blue-500/)

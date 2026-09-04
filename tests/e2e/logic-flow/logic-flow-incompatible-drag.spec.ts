@@ -13,6 +13,7 @@ test.describe('Logic Flow Incompatible Drag Feedback', () => {
     await defaultLock.uncheck({ force: true })
     await dragWareToTarget(page, 'energycells');
 
+    await page.locator('.tab-btn').nth(1).click()
     const spaceweedSource = page.locator('.ware-card-wrapper[data-ware-id="spaceweed"]').first();
     await spaceweedSource.scrollIntoViewIfNeeded();
     await expect(spaceweedSource).toBeVisible();
@@ -26,6 +27,7 @@ test.describe('Logic Flow Incompatible Drag Feedback', () => {
     await page.locator('input[type="checkbox"]').first().check({ force: true })
     await dragWareToTarget(page, 'energycells');
 
+    await page.locator('.tab-btn').nth(1).click()
     const beforeNodes = await page.locator('.flow-node').count();
     await dragWareToTarget(page, 'spaceweed', 0, { expectedStatus: 'rejected' });
     await expect(page.locator('.flow-node')).toHaveCount(beforeNodes);

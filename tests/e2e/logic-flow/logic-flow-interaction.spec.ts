@@ -194,6 +194,27 @@ test.describe('Logical Flow Integration Verification', () => {
       expect(isDraggingAfterUp).toBe(false);
     });
 
+    test('5.1b Release outside target leaves groups and nodes unchanged', async ({ page }) => {
+      await dragWareToTarget(page, 'hullparts');
+      const before = await page.evaluate(() => (window as any).logicFlowStore.groups.map((g: any) => g.nodes.map((n: any) => n.wareId)));
+      await startWareDrag(page, 'weaponcomponents');
+      await page.mouse.move(50, 50, { steps: 10 });
+      await expect.poll(() => page.evaluate(() => (window as any).logicFlowStore.hoveredGroupId)).toBeNull();
+      await page.mouse.up();
+      await expect(page.getByTestId('compact-view')).toBeHidden();
+      await expect.poll(() => page.evaluate(() => (window as any).logicFlowStore.groups.map((g: any) => g.nodes.map((n: any) => n.wareId)))).toEqual(before);
+    });
+
+    test('5.3 Empty group routes first nodes to the selected target', async ({ page }) => {
+      await page.locator('.groups-list .drop-target').last().click();
+      await page.locator('.groups-list .drop-target').last().click();
+      await expect(page.locator('.production-group')).toHaveCount(2);
+      await dragWareToTarget(page, 'hullparts', 1);
+      await dragWareToTarget(page, 'weaponcomponents', 0);
+      await expect(page.locator('.production-group').nth(1).locator('.flow-node[data-ware-id="hullparts"]')).toHaveCount(1);
+      await expect(page.locator('.production-group').nth(0).locator('.flow-node[data-ware-id="weaponcomponents"]')).toHaveCount(1);
+    });
+
     test('5.2 Drop on New Zone Creates Group', async ({ page }) => {
       await dragWareToTarget(page, 'hullparts');
 
