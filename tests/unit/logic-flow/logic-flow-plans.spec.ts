@@ -17,17 +17,26 @@ vi.mock('@/store/useGameDataStore', () => ({
       'module-hullparts': {
         id: 'module-hullparts',
         race: 'argon',
-        inputs: { siliconwafers: 2, energycells: 1 }
+        inputs: { siliconwafers: 2, energycells: 1 },
+        outputs: { hullparts: 1 },
+        buildCost: {},
+        tier: 2
       },
       'module-weaponcomponents': {
         id: 'module-weaponcomponents',
         race: 'argon',
-        inputs: { hullparts: 2, energycells: 1 }
+        inputs: { hullparts: 2, energycells: 1 },
+        outputs: { weaponcomponents: 1 },
+        buildCost: {},
+        tier: 3
       },
       'module-siliconwafers': {
         id: 'module-siliconwafers',
         race: 'argon',
-        inputs: { ore: 2, energycells: 1 }
+        inputs: { ore: 2, energycells: 1 },
+        outputs: { siliconwafers: 1 },
+        buildCost: {},
+        tier: 1
       },
     },
     localizedWaresMap: {
@@ -45,6 +54,8 @@ vi.mock('@/store/useGameDataStore', () => ({
     }),
     wareSetsByIndustrialRace: { default: new Set(['hullparts', 'weaponcomponents', 'siliconwafers', 'ore', 'energycells']) },
     wareSetsByRace: { default: new Set(['hullparts', 'weaponcomponents', 'siliconwafers', 'ore', 'energycells']) },
+    getStorageKey: (key: string) => key,
+    getWareDisplayName: (wareId: string) => wareId,
     initialize: vi.fn(),
   }))
 }))

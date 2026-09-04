@@ -3,7 +3,7 @@
  */
 import { mount } from '@vue/test-utils'
 import { describe, it, expect, vi } from 'vitest'
-import LogicFlowCandidateZone from '@/components/LogicFlowCandidateZone.vue'
+import LogicFlowCandidateZone from '@/components/logic-flow/LogicFlowCandidateZone.vue'
 import { createTestingPinia } from '@pinia/testing'
 
 // Mock vuedraggable

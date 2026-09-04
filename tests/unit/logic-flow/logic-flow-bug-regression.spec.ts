@@ -36,6 +36,7 @@ vi.mock('@/utils/UseX4I18n', () => ({
 }))
 
 vi.mock('@/i18n', () => ({
+  default: { global: { locale: { value: 'en' }, t: (key: string) => key, te: () => false } },
   loadLanguageAsync: vi.fn().mockResolvedValue(true)
 }))
 

@@ -182,7 +182,7 @@ vi.mock('@/utils/UseX4I18n', () => ({
   })
 }))
 
-import ShipBuildView from '@/components/ShipBuildView.vue'
+import ShipBuildView from '@/components/ship-build/ShipBuildView.vue'
 
 const mountView = () => {
   const pinia = createPinia()

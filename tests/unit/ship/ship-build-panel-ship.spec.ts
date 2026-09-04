@@ -5,7 +5,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
-import ShipBuildSelector from '@/components/ship-build/ShipBuildSelector.vue'
+import ShipBuildSelector from '@/components/ship-build/ShipBuildSelectorView.vue'
 
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({

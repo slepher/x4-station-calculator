@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getLocalizedSectorQueryMatch, matchesLocalizedSectorQuery } from '@/components/empire/savePoiSearch'
+import { getLocalizedSectorQueryMatch, matchesLocalizedSectorQuery } from '@/components/map/savePoiSearch'
 
 describe('user-save-map localized save poi search', () => {
   it('matches both raw english name and localized display name in non-english locale', () => {

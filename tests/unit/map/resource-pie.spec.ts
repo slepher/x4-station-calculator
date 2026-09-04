@@ -72,8 +72,8 @@ vi.mock('@/utils/UseX4I18n', () => ({
   })
 }))
 
-import MapResourceFilterPanel from '@/components/empire/MapResourceFilterPanel.vue'
-import MapSvgCanvas from '@/components/empire/MapSvgCanvas.vue'
+import MapResourceFilterPanel from '@/components/map/MapResourceFilterPanel.vue'
+import MapSvgCanvas from '@/components/map/MapSvgCanvas.vue'
 
 // ============================================================
 // Test Data

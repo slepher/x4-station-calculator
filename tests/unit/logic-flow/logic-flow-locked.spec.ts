@@ -24,11 +24,19 @@ describe('LogicFlow Isolated Node Behavior', () => {
         'refinedmetals': { id: 'refinedmetals', tier: 1, name: 'Refined Metals' },
         'ore': { id: 'ore', tier: 0, name: 'Ore' }
       },
+      modulesMap: {
+        prod_hullparts: { id: 'prod_hullparts', tier: 2, outputs: { hullparts: 1 }, buildCost: {}, inputs: { refinedmetals: 1 } },
+        prod_refinedmetals: { id: 'prod_refinedmetals', tier: 1, outputs: { refinedmetals: 1 }, buildCost: {}, inputs: { ore: 1 } }
+      },
+      modulesByOutputMap: {},
       findModuleForWare: vi.fn((wareId) => {
         if (wareId === 'hullparts') return { id: 'prod_hullparts', race: 'default', inputs: { 'refinedmetals': 1 } }
         if (wareId === 'refinedmetals') return { id: 'prod_refinedmetals', race: 'default', inputs: { 'ore': 1 } }
         return null
       }),
+      getStorageKey: (key: string) => key,
+      getWareDisplayName: (wareId: string) => wareId,
+      isRawMaterialWare: (wareId: string) => wareId === 'ore',
       initialize: vi.fn(),
        isReady: true,
        localizedWaresMap: {

@@ -12,7 +12,7 @@ import { fileURLToPath } from 'url'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
-const DATA_PATH = path.join(__dirname, '../../src/assets/x4_game_data/8.0-Diplomacy/data')
+const DATA_PATH = path.join(__dirname, '../../../src/assets/x4_game_data/8.0-Diplomacy/data')
 
 // Mock crypto
 if (typeof crypto === 'undefined') {

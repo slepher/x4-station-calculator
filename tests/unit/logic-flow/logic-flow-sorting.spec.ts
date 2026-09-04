@@ -16,8 +16,13 @@ vi.mock('vue-i18n', () => ({
   })
 }))
 
+vi.mock('@/i18n', () => ({
+  default: { global: { locale: { value: 'en' }, t: (key: string) => key, te: () => false } },
+  loadLanguageAsync: vi.fn().mockResolvedValue(true)
+}))
+
 // Mock useX4I18n (if it's a separatecomposable)
-vi.mock('@/composables/useX4I18n', () => ({
+vi.mock('@/utils/UseX4I18n', () => ({
   useX4I18n: () => ({
     translateModule: (id: string) => id,
     translateModuleGroup: (id: string) => id,

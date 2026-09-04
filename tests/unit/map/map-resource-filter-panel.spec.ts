@@ -84,7 +84,7 @@ vi.mock('vue-i18n', () => ({
   })
 }))
 
-import MapResourceFilterPanel from '@/components/empire/MapResourceFilterPanel.vue'
+import MapResourceFilterPanel from '@/components/map/MapResourceFilterPanel.vue'
 
 vi.mock('@/i18n', () => ({
   loadLanguageAsync: vi.fn(async () => {})

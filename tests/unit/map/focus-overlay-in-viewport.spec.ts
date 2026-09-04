@@ -2,7 +2,7 @@
  * @vitest-environment jsdom
  */
 import { describe, expect, it, vi } from 'vitest'
-import { focusOverlayInViewport } from '@/components/empire/focusOverlayInViewport'
+import { focusOverlayInViewport } from '@/components/map/focusOverlayInViewport'
 
 describe('focusOverlayInViewport', () => {
   it('centers the viewport on a matching overlay element', () => {

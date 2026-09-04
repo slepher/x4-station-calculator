@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getEffectiveVisibleSavePoiCategories } from '@/components/empire/savePoiVisibility'
+import { getEffectiveVisibleSavePoiCategories } from '@/components/map/savePoiVisibility'
 import type { SavePoiVisibility } from '@/types/saveArchive'
 
 const baseVisibility: SavePoiVisibility = {

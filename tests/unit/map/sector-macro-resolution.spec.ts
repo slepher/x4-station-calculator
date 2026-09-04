@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { resolveMapSectorByMacro } from '@/components/empire/mapSectorMacro'
+import { resolveMapSectorByMacro } from '@/components/map/mapSectorMacro'
 
 describe('user-save-map sector macro resolution', () => {
   it('matches save archive sector macros against map sector ids case-insensitively', () => {
