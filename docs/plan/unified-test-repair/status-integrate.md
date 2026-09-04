@@ -3,8 +3,8 @@
 ## Lane
 
 - Name: `integrate`
-- State: `ready_for_user_validation`
-- Active task: `task-coding-2`
-- Candidate: `dfd0d022`
-- Next action: `user validates candidate; then merge to develop`
-- Blocker: `Live focused assertions still fail at unchanged legacy .supply-tab locator; not merged`
+- State: `blocked`
+- Active task: `task-test-1`
+- Candidate: `29a55e80` (checkpoint; not accepted)
+- Next action: route missing skills assets/scripts to their owning workflow scope
+- Blocker: `task-test-1 cannot_resolve`: mandatory skills tests reference missing out-of-scope e2eSpec/script/data assets; canonical unit and retired-symbol gates also remain failing
