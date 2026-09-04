@@ -209,7 +209,7 @@ describe('buildPlanProductionLine regression', () => {
     const item = preview!.lines[0]?.items[0]
     expect(item?.kind).toBe('derived')
     if (item?.kind === 'derived') {
-      expect(item.moduleId).toBe('module_gen_prod_energycells_01')
+      expect(item.moduleId).toBe('module_ter_prod_energycells_01')
     }
   })
 
