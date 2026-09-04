@@ -5,6 +5,6 @@
 - Name: `coding`
 - State: `complete`
 - Active task: `none`
-- Candidate: `af6c5423`
-- Next action: `merge reviewed candidate into target develop, then refresh integrate`
+- Candidate: `0dec3fd2`
+- Next action: `task-coding-4 merged to target; no active coding task`
 - Blocker: `none`
