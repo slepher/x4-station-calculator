@@ -4,7 +4,7 @@ type DropTarget = 'new' | number
 type DropStatus = 'normal' | 'duplicated' | 'auto' | 'isolated' | 'replace' | 'locked' | 'rejected'
 
 export async function attemptWareDrag(page: Page, wareId: string): Promise<void> {
-  const source = page.locator(`.ware-card-wrapper[data-ware-id="${wareId}"]:visible`).first()
+  const source = page.locator(`.ware-card-wrapper[data-ware-id="${wareId}"]`).first()
   await expect(source).toBeVisible()
   const box = await source.boundingBox()
   if (!box) throw new Error(`Source ware ${wareId} not found`)
@@ -16,7 +16,7 @@ export async function attemptWareDrag(page: Page, wareId: string): Promise<void>
 }
 
 export async function startWareDrag(page: Page, wareId: string): Promise<void> {
-  const source = page.locator(`.ware-card-wrapper[data-ware-id="${wareId}"]:visible`).first()
+  const source = page.locator(`.ware-card-wrapper[data-ware-id="${wareId}"]`).first()
   await expect(source).toBeVisible()
   const box = await source.boundingBox()
   if (!box) throw new Error(`Source ware ${wareId} not found`)
@@ -33,13 +33,12 @@ export async function dragWareToTarget(
   options: { drop?: boolean; expectRejected?: boolean; expectedStatus?: DropStatus } = {}
 ) {
   const { drop = true, expectRejected = false } = options
-  const source = page.locator(`.ware-card-wrapper[data-ware-id="${wareId}"]:visible`).first()
+  const source = page.locator(`.ware-card-wrapper[data-ware-id="${wareId}"]`).first()
   await expect(source).toBeVisible()
   const sourceBox = await source.boundingBox()
   if (!sourceBox) throw new Error(`Source ware ${wareId} not found`)
 
   const compactView = page.getByTestId('compact-view')
-  await source.hover()
   await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 })
   await page.mouse.down()
   await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 8, sourceBox.y + sourceBox.height / 2 + 8, { steps: 5 })

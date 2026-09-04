@@ -8,13 +8,16 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
 
   test('isolating a node removes its candidate preview', async ({ page }) => {
     await dragWareToTarget(page, 'hullparts')
-    const node = page.locator('.flow-node[data-ware-id="hullparts"]').first()
+    const node = page.locator('.flow-node:visible').filter({ has: page.locator('button') }).first()
+    const wareId = await node.getAttribute('data-ware-id')
+    if (!wareId) throw new Error('Isolatable node not found')
     await node.hover()
     await node.locator('button[title*="隔离"], button[title*="Isolate"]').click()
-    await dragWareToTarget(page, 'hullparts', 0, { drop: false, expectedStatus: 'isolate' })
-    await expect(page.locator('.preview-node')).toHaveCount(0)
-    await expect(page.locator('.flow-node[data-ware-id="hullparts"]')).toHaveCount(1)
+    await dragWareToTarget(page, wareId, 0, { drop: false, expectedStatus: 'isolated' })
+    await expect(page.locator(`.compact-node[data-ware-id="${wareId}"]`)).toHaveCount(0)
+    await expect(page.locator(`.flow-node[data-ware-id="${wareId}"]`)).toHaveCount(1)
     await page.mouse.up()
+    await expect(page.locator(`.flow-node[data-ware-id="${wareId}"]`)).toHaveClass(/isolated/)
   })
 
   test('duplicate drops are rejected without adding a second node', async ({ page }) => {
@@ -51,12 +54,15 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
 
   test('isolated target changes its label to Connect while hovered', async ({ page }) => {
     await dragWareToTarget(page, 'hullparts')
-    const node = page.locator('.flow-node[data-ware-id="hullparts"]').first()
+    const node = page.locator('.flow-node:visible').filter({ has: page.locator('button') }).first()
+    const wareId = await node.getAttribute('data-ware-id')
+    if (!wareId) throw new Error('Isolatable node not found')
     await node.hover()
     await node.locator('button[title*="隔离"], button[title*="Isolate"]').click()
-    await dragWareToTarget(page, 'hullparts', 0, { drop: false, expectedStatus: 'isolate' })
+    await dragWareToTarget(page, wareId, 0, { drop: false, expectedStatus: 'isolated' })
     await expect(page.locator('[data-testid="isolated-label"]')).toContainText(/连接|Connect/i)
     await page.mouse.up()
+    await expect(page.locator(`.flow-node[data-ware-id="${wareId}"]`)).not.toHaveClass(/isolated/)
   })
 
   test('the same ware can coexist across two selected lineages', async ({ page }) => {

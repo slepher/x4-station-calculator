@@ -18,6 +18,7 @@ test.describe('Logic Flow Incompatible Drag Feedback', () => {
     await expect(spaceweedSource).toBeVisible();
 
     await dragWareToTarget(page, 'spaceweed', 0, { expectedStatus: 'normal' });
+    await expect(page.locator('.flow-node[data-ware-id="spaceweed"]')).toBeVisible();
     await expect(page.locator('.compact-group').first()).not.toHaveClass(/border-red-600/);
   });
 
@@ -33,7 +34,7 @@ test.describe('Logic Flow Incompatible Drag Feedback', () => {
     await expect(hullpartsSource).toBeVisible();
 
     const beforeNodes = await page.locator('.flow-node').count();
-    await dragWareToTarget(page, 'hullparts', 0, { drop: false, expectedStatus: 'rejected' });
+    await dragWareToTarget(page, 'spaceweed', 0, { drop: false, expectedStatus: 'rejected' });
     await expect(group).toHaveClass(/bg-red-900\/10/);
 
     await expect(group).not.toHaveClass(/opacity-20/);

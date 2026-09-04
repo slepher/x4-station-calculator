@@ -53,8 +53,9 @@ test.describe('Logic Flow Plans - E2E Tests', () => {
       await page.getByTestId('toolbar-load-btn').click();
       const plans = page.locator('[data-testid="dialog-backdrop"]');
       await expect(plans).toBeVisible();
-      await expect(plans.locator('.group').filter({ hasText: /新建方案|New Plan/i })).toHaveCount(1);
-      await expect(plans).toContainText(/船体部件|Hull Parts/i);
+      const savedPlan = plans.locator('.group').filter({ hasText: /我的逻辑组网|My Logic Flow/i })
+      await expect(savedPlan).toHaveCount(1);
+      await expect(savedPlan).toContainText(/船体部件|Hull Parts/i);
     });
   });
 
@@ -205,7 +206,7 @@ test.describe('Logic Flow Plans - E2E Tests', () => {
       await expect(groupTitle).toContainText(/Hull Parts|船体部件|hullparts/i);
       await dragWareToTarget(page, 'weaponcomponents', 0);
       await expect(groupTitle).not.toHaveText(initialTitle || '');
-      await expect(groupTitle).toContainText(/Weapon Components|武器组件|weaponcomponents/i);
+      await expect(groupTitle).toContainText(/Weapon Components|武器组件|武器部件|weaponcomponents/i);
     });
   });
 });

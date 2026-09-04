@@ -1,7 +1,7 @@
 import { test } from '../../../../test-setup';
 import { expect } from '@playwright/test';
-import { setupLogicFlow } from '../../../../e2e/logic-flow/helpers/setupLogicFlow';
-import { dragWareToTarget } from '../../../../e2e/logic-flow/helpers/dragLogicFlow';
+import { setupLogicFlow } from './helpers/setupLogicFlow';
+import { dragWareToTarget } from './helpers/dragLogicFlow';
 
 test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
   test.beforeEach(async ({ page }) => {
@@ -41,11 +41,11 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
 
       const previewNodes = page.locator('.preview-node');
       await expect(previewNodes).toHaveCount(0);
-      
+
       const flowNodes = page.locator('.flow-node');
       const hullPartsNodes = flowNodes.filter({ hasText: /船体部件|Hull Parts/i });
       await expect(hullPartsNodes).toHaveCount(1);
-      
+
       await page.mouse.up();
     });
   });
@@ -58,7 +58,7 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
         const group = logicFlow.addGroup('industrial', 'teladi', 'Locked Group', true);
         group.lockedLineage = 'teladi';
         logicFlow.expandUpstream(group.id, 'weaponcomponents', 'manual', 'teladi');
-        
+
         const node = group.nodes.find((n: any) => n.wareId === 'weaponcomponents');
         logicFlow.toggleNodeIsolation(group.id, node.id);
       });
@@ -109,7 +109,7 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
         return logicFlow.getWareGroupStatus(group.id, 'hullparts', 'teladi');
       });
       expect(status).toBe('available');
-      
+
       await page.mouse.up();
     });
 
@@ -193,7 +193,7 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
           nodeLineage: grapheneNode?.lineage
         };
       });
-      
+
       expect(status.nodeSource).toBe('auto');
       expect(status.wareStatus).toBe('auto');
 
@@ -257,7 +257,7 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
         logicFlow.clearAllGroups();
         const group = logicFlow.addGroup('industrial', 'default');
         logicFlow.expandUpstream(group.id, 'hullparts', 'manual', 'teladi');
-        
+
         const node = group.nodes.find((n: any) => n.wareId === 'hullparts');
         logicFlow.toggleNodeIsolation(group.id, node.id);
       });
@@ -326,7 +326,7 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
           source: node?.source
         };
       });
-      
+
       expect(result.count).toBe(1);
       expect(result.isIsolated).toBe(false);
       expect(result.source).toBe('manual');
@@ -341,7 +341,7 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
         logicFlow.clearAllGroups();
         const group = logicFlow.addGroup('industrial', 'terran', 'Locked', true);
         group.lockedLineage = 'terran';
-        
+
         const status = logicFlow.getWareGroupStatus(group.id, 'hullparts', 'default');
         (window as any).testStatus = status;
       });
@@ -356,7 +356,7 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
         logicFlow.clearAllGroups();
         const group = logicFlow.addGroup('industrial', 'default');
         logicFlow.expandUpstream(group.id, 'hullparts', 'manual', 'default');
-        
+
         const status = logicFlow.getWareGroupStatus(group.id, 'hullparts', 'default');
         (window as any).testStatus = status;
       });
@@ -450,7 +450,7 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
         const group = logicFlow.addGroup('industrial', 'default');
         logicFlow.expandUpstream(group.id, 'hullparts', 'manual', 'default');
         logicFlow.expandUpstream(group.id, 'weaponcomponents', 'manual', 'default');
-        
+
         const hullpartsNode = group.nodes.find((n: any) => n.wareId === 'hullparts');
         logicFlow.toggleNodeIsolation(group.id, hullpartsNode.id);
       });
@@ -462,7 +462,7 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
         const group = logicFlow.groups[0];
         const hullpartsNodes = group.nodes.filter((n: any) => n.wareId === 'hullparts');
         const grapheneNodes = group.nodes.filter((n: any) => n.wareId === 'graphene');
-        
+
         return {
           hullpartsCount: hullpartsNodes.length,
           hullpartsIsIsolated: hullpartsNodes[0]?.isIsolated,
@@ -677,7 +677,7 @@ test.describe('Module Name Display Tests (E2E)', () => {
     });
 
     await setupLogicFlow(page, 'clean');
-    
+
     await page.evaluate(() => {
       const logicFlow = (window as any).logicFlowStore;
       logicFlow.clearAllGroups();
@@ -722,35 +722,35 @@ test.describe('Module Name Display Tests (E2E)', () => {
 
     const nodeInfo = await page.evaluate(() => {
       const nodes = document.querySelectorAll('.compact-node');
-      
+
       const result = Array.from(nodes).map(n => {
         const wareId = n.getAttribute('data-ware-id') || '';
-        
+
         return {
           text: n.textContent?.trim() || '',
           wareId,
           isPreview: n.classList.contains('bg-blue-500/20')
         };
       });
-      
+
       return { nodes: result };
     });
-    
+
     console.log('Compact nodes:', JSON.stringify(nodeInfo.nodes, null, 2));
-    
+
     const existingNode = nodeInfo.nodes.find((n: any) => n.wareId === 'hullparts');
     const previewNode = nodeInfo.nodes.find((n: any) => n.wareId === 'weaponcomponents');
-    
+
     if (existingNode) {
       console.log('Existing node text:', existingNode.text);
       expect(existingNode.text.toLowerCase()).toContain('production');
     }
-    
+
     if (previewNode) {
       console.log('Preview node text:', previewNode.text);
       expect(previewNode.text.toLowerCase()).toContain('production');
     }
-    
+
     expect(nodeInfo.nodes.length).toBeGreaterThan(0);
 
     await page.mouse.up();
@@ -792,8 +792,8 @@ test.describe('Module Name Display Tests (E2E)', () => {
     });
 
     console.log('New line header text:', headerText);
-    
-    const hasModuleName = headerText.toLowerCase().includes('hull') || 
+
+    const hasModuleName = headerText.toLowerCase().includes('hull') ||
                           headerText.toLowerCase().includes('plant');
     expect(hasModuleName).toBe(true);
 
@@ -815,31 +815,31 @@ test.describe('Module Name Display Tests (E2E)', () => {
     const dragDisplayName = await page.evaluate(() => {
       const gameData = (window as any).gameDataStore;
       if (!gameData) return { error: 'gameData not found' };
-      
+
       const wareId = 'hullparts';
       const lineage = 'default';
-      
+
       const ware = gameData.waresMap[wareId];
       if (!ware) return { error: 'ware not found' };
-      
+
       if (ware.tier === 0) {
         return { displayName: gameData.getWareDisplayName(wareId), isT0: true };
       }
-      
+
       const module = gameData.findModuleForWare(wareId, lineage);
       if (module) {
-        return { 
+        return {
           displayName: gameData.getModuleDisplayName(module.id) || gameData.getWareDisplayName(wareId),
           moduleId: module.id,
           moduleName: module.name
         };
       }
-      
+
       return { displayName: gameData.getWareDisplayName(wareId), fallback: true };
     });
-    
+
     console.log('Drag display name:', JSON.stringify(dragDisplayName, null, 2));
-    
+
     expect(dragDisplayName.displayName.toLowerCase()).toContain('production');
   });
 
@@ -855,7 +855,7 @@ test.describe('Module Name Display Tests (E2E)', () => {
     const hullpartsCard = page.locator('.ware-card-wrapper[data-ware-id="hullparts"]').first();
     await expect(hullpartsCard).toBeVisible({ timeout: 5000 });
     await hullpartsCard.hover();
-    
+
     const addButton = hullpartsCard.locator('.ware-card-add-btn');
     await addButton.click();
     await page.waitForTimeout(200);
@@ -867,18 +867,18 @@ test.describe('Module Name Display Tests (E2E)', () => {
     const isolatedStateBefore = await page.evaluate(() => {
       const logicFlow = (window as any).logicFlowStore;
       if (!logicFlow) return { error: 'logicFlow not found' };
-      
+
       const group = logicFlow.groups[0];
       const oreNode = group?.nodes.find((n: any) => n.wareId === 'ore');
       if (oreNode) {
         oreNode.isIsolated = true;
       }
-      
+
       return {
         oreIsIsolated: oreNode?.isIsolated || false
       };
     });
-    
+
     console.log('Isolated state before:', JSON.stringify(isolatedStateBefore, null, 2));
     expect(isolatedStateBefore.oreIsIsolated).toBe(true);
 
@@ -895,16 +895,16 @@ test.describe('Module Name Display Tests (E2E)', () => {
     const isolatedStateAfter = await page.evaluate(() => {
       const logicFlow = (window as any).logicFlowStore;
       if (!logicFlow) return { error: 'logicFlow not found' };
-      
+
       const group = logicFlow.groups[0];
       const oreNode = group?.nodes.find((n: any) => n.wareId === 'ore');
       return {
         oreIsIsolated: oreNode?.isIsolated || false
       };
     });
-    
+
     console.log('Isolated state after:', JSON.stringify(isolatedStateAfter, null, 2));
-    
+
     expect(isolatedStateAfter.oreIsIsolated).toBe(true);
   });
 
@@ -920,7 +920,7 @@ test.describe('Module Name Display Tests (E2E)', () => {
     const hullpartsCard = page.locator('.ware-card-wrapper[data-ware-id="hullparts"]').first();
     await expect(hullpartsCard).toBeVisible({ timeout: 5000 });
     await hullpartsCard.hover();
-    
+
     const addButton = hullpartsCard.locator('.ware-card-add-btn');
     await addButton.click();
     await page.waitForTimeout(200);
@@ -932,7 +932,7 @@ test.describe('Module Name Display Tests (E2E)', () => {
     await page.evaluate(() => {
       const logicFlow = (window as any).logicFlowStore;
       if (!logicFlow) return;
-      
+
       const group = logicFlow.groups[0];
       const oreNode = group?.nodes.find((n: any) => n.wareId === 'ore');
       if (oreNode) {
@@ -944,18 +944,18 @@ test.describe('Module Name Display Tests (E2E)', () => {
     const t0Resources = await page.evaluate(() => {
       const logicFlow = (window as any).logicFlowStore;
       if (!logicFlow) return { error: 'logicFlow not found' };
-      
+
       const group = logicFlow.groups[0];
       const t0Nodes = group?.nodes.filter((n: any) => n.column === 0 && !n.isIsolated) || [];
-      
+
       return {
         t0WareIds: t0Nodes.map((n: any) => n.wareId),
         hasOre: t0Nodes.some((n: any) => n.wareId === 'ore')
       };
     });
-    
+
     console.log('T0 resources after isolation:', JSON.stringify(t0Resources, null, 2));
-    
+
     expect(t0Resources.hasOre).toBe(false);
   });
 
@@ -971,7 +971,7 @@ test.describe('Module Name Display Tests (E2E)', () => {
     const hullpartsCard = page.locator('.ware-card-wrapper[data-ware-id="hullparts"]').first();
     await expect(hullpartsCard).toBeVisible({ timeout: 5000 });
     await hullpartsCard.hover();
-    
+
     const addButton = hullpartsCard.locator('.ware-card-add-btn');
     await addButton.click();
     await page.waitForTimeout(200);
@@ -983,7 +983,7 @@ test.describe('Module Name Display Tests (E2E)', () => {
     await page.evaluate(() => {
       const logicFlow = (window as any).logicFlowStore;
       if (!logicFlow) return;
-      
+
       const group = logicFlow.groups[0];
       const hullpartsNode = group?.nodes.find((n: any) => n.wareId === 'hullparts');
       if (hullpartsNode) {
@@ -995,7 +995,7 @@ test.describe('Module Name Display Tests (E2E)', () => {
     const groupState = await page.evaluate(() => {
       const logicFlow = (window as any).logicFlowStore;
       if (!logicFlow) return { error: 'logicFlow not found' };
-      
+
       const group = logicFlow.groups[0];
       return {
         hullpartsIsIsolated: group?.nodes.find((n: any) => n.wareId === 'hullparts')?.isIsolated || false,
@@ -1003,7 +1003,7 @@ test.describe('Module Name Display Tests (E2E)', () => {
         hasOre: group?.nodes.some((n: any) => n.wareId === 'ore') || false
       };
     });
-    
+
     console.log('Group state:', JSON.stringify(groupState, null, 2));
     expect(groupState.hullpartsIsIsolated).toBe(true);
 
@@ -1011,48 +1011,48 @@ test.describe('Module Name Display Tests (E2E)', () => {
       const logicFlow = (window as any).logicFlowStore;
       const gameData = (window as any).gameDataStore;
       if (!logicFlow || !gameData) return { error: 'stores not found' };
-      
+
       const group = logicFlow.groups[0];
       const isolatedWareIds = new Set(
         group.nodes
           .filter((n: any) => n.isIsolated)
           .map((n: any) => n.wareId)
       );
-      
+
       const traceT0 = (wareId: string, visited: Set<string>): string[] => {
         if (wareId === 'energycells') return [];
-        
+
         const ware = gameData.waresMap[wareId];
         if (!ware) return [];
-        
+
         if (ware.tier === 0) return [wareId];
-        
+
         if (visited.has(wareId)) return [];
         visited.add(wareId);
-        
+
         if (isolatedWareIds.has(wareId)) return [];
-        
+
         const module = gameData.findModuleForWare(wareId, 'default');
         if (!module || !module.inputs) return [];
-        
+
         const result: string[] = [];
         Object.keys(module.inputs).forEach((inputId: string) => {
           result.push(...traceT0(inputId, visited));
         });
-        
+
         return result;
       };
-      
+
       const requiredT0 = traceT0('weaponcomponents', new Set());
-      
+
       return {
         isolatedWareIds: [...isolatedWareIds],
         requiredT0: [...new Set(requiredT0)]
       };
     });
-    
+
     console.log('T0 preview for weaponcomponents:', JSON.stringify(t0Preview, null, 2));
-    
+
     expect(t0Preview.requiredT0).not.toContain('ore');
     expect(t0Preview.requiredT0).not.toContain('silicon');
     expect(t0Preview.requiredT0).toContain('methane');
@@ -1062,7 +1062,7 @@ test.describe('Module Name Display Tests (E2E)', () => {
   test('34. 语言切换时 ware 文本自动更新', async ({ page }) => {
     const wareCard = page.locator('.ware-card-wrapper[data-ware-id="hullparts"]').first();
     await expect(wareCard).toBeVisible({ timeout: 5000 });
-    
+
     const wareTextBefore = await wareCard.locator('.ware-name, .name').first().textContent();
     console.log('Ware text before language switch:', wareTextBefore);
 
@@ -1070,7 +1070,7 @@ test.describe('Module Name Display Tests (E2E)', () => {
     if (await languageSelector.isVisible()) {
       await languageSelector.click();
       await page.waitForTimeout(200);
-      
+
       const englishOption = page.locator('option:has-text("English"), [data-value="en"], [value="en"]').first();
       if (await englishOption.isVisible()) {
         await englishOption.click();
@@ -1095,11 +1095,11 @@ test.describe('Module Name Display Tests (E2E)', () => {
 
   test('35. 候选区锁定开关影响新建规划区', async ({ page }) => {
     const lockCheckbox = page.locator('.lock-control input[type="checkbox"]').first();
-    
+
     await expect(lockCheckbox).toBeVisible();
     {
       const isCheckedBefore = await lockCheckbox.isChecked();
-      
+
       if (!isCheckedBefore) {
         await lockCheckbox.check({ force: true });
         await page.waitForTimeout(200);
@@ -1116,7 +1116,7 @@ test.describe('Module Name Display Tests (E2E)', () => {
       const hullpartsCard = page.locator('.ware-card-wrapper[data-ware-id="hullparts"]').first();
       await expect(hullpartsCard).toBeVisible({ timeout: 5000 });
       await hullpartsCard.hover();
-      
+
       const addButton = hullpartsCard.locator('.ware-card-add-btn');
       await addButton.click();
       await page.waitForTimeout(200);
@@ -1128,7 +1128,7 @@ test.describe('Module Name Display Tests (E2E)', () => {
       const groupState = await page.evaluate(() => {
         const logicFlow = (window as any).logicFlowStore;
         if (!logicFlow) return { error: 'logicFlow not found' };
-        
+
         const group = logicFlow.groups[0];
         return {
           isLocked: group?.isLocked || false,
@@ -1213,7 +1213,7 @@ test.describe('Module Name Display Tests (E2E)', () => {
       const industrialButton = page.getByRole('button', { name: /工业链|Industrial/ }).first();
       await industrialButton.click();
       await page.waitForTimeout(200);
-      
+
       const defaultButton = page.getByRole('button', { name: /默认|Default/ }).first();
       await defaultButton.click();
       await page.waitForTimeout(200);
@@ -1221,7 +1221,7 @@ test.describe('Module Name Display Tests (E2E)', () => {
       // 拖拽精炼金属(refinedmetals)到锁定的 Teladi 规划区
       const refinedmetalsCard = page.locator('.ware-card-wrapper[data-ware-id="refinedmetals"]').first();
       await expect(refinedmetalsCard).toBeVisible({ timeout: 5000 });
-      
+
       const sourceBox = await refinedmetalsCard.boundingBox();
       if (!sourceBox) throw new Error('Source not found');
 
@@ -1246,12 +1246,12 @@ test.describe('Module Name Display Tests (E2E)', () => {
         return elements.filter(el => {
           const classList = el.className;
           // isNew 的样式：border-blue-500 bg-blue-500/20 animate-pulse scale-110
-          return classList.includes('border-blue-500') && 
+          return classList.includes('border-blue-500') &&
                  classList.includes('animate-pulse');
         }).map(el => el.getAttribute('data-ware-id'));
       });
       console.log('New T0 preview in UI (should be empty):', newT0PreviewInUI);
-      
+
       // 由于血统不匹配被拒绝，UI 上不应有任何新增的 T0 资源预览
       expect(newT0PreviewInUI.length).toBe(0);
 
@@ -1293,7 +1293,7 @@ test.describe('Module Name Display Tests (E2E)', () => {
       const agriculturalButton = page.locator('button:has-text("Agri/Life")').first();
       await agriculturalButton.click();
       await page.waitForTimeout(200);
-      
+
       const terranButton = page.locator('button:has-text("Terran")').first();
       await terranButton.click();
       await page.waitForTimeout(200);
@@ -1301,7 +1301,7 @@ test.describe('Module Name Display Tests (E2E)', () => {
       // 拖拽医疗产线到新建区域
       const medicalsuppliesCard = page.locator('.ware-card-wrapper[data-ware-id="medicalsupplies"]').first();
       await expect(medicalsuppliesCard).toBeVisible({ timeout: 5000 });
-      
+
       const sourceBox = await medicalsuppliesCard.boundingBox();
       if (!sourceBox) throw new Error('Source not found');
 
@@ -1335,7 +1335,7 @@ test.describe('Module Name Display Tests (E2E)', () => {
       const industrialButton = page.getByRole('button', { name: /工业链|Industrial/ }).first();
       await industrialButton.click();
       await page.waitForTimeout(200);
-      
+
       const defaultButton = page.getByRole('button', { name: /默认|Default/ }).first();
       await defaultButton.click();
       await page.waitForTimeout(200);
@@ -1343,7 +1343,7 @@ test.describe('Module Name Display Tests (E2E)', () => {
       // 拖拽石墨烯到未锁定的规划区
       const grapheneCard = page.locator('.ware-card-wrapper[data-ware-id="graphene"]').first();
       await expect(grapheneCard).toBeVisible({ timeout: 5000 });
-      
+
       const grapheneSourceBox = await grapheneCard.boundingBox();
       if (!grapheneSourceBox) throw new Error('Graphene source not found');
 
