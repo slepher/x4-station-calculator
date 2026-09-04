@@ -46,6 +46,7 @@ test.describe('Logic Flow Plans - E2E Tests', () => {
 
       const dialog = page.locator('[data-testid="dialog-backdrop"]');
       await expect(dialog).toBeVisible();
+      await dialog.locator('input').fill('E2E-3 Plan');
       await dialog.getByRole('button', { name: /保存|Save/i }).last().click();
 
       const groupCount = await page.evaluate(() => (window as any).logicFlowStore.groups.length);
@@ -53,7 +54,7 @@ test.describe('Logic Flow Plans - E2E Tests', () => {
       await page.getByTestId('toolbar-load-btn').click();
       const plans = page.locator('[data-testid="dialog-backdrop"]');
       await expect(plans).toBeVisible();
-      const savedPlan = plans.locator('.group').filter({ hasText: /我的逻辑组网|My Logic Flow/i })
+      const savedPlan = plans.locator('.group').filter({ hasText: 'E2E-3 Plan' })
       await expect(savedPlan).toHaveCount(1);
       await expect(savedPlan).toContainText(/船体部件|Hull Parts/i);
     });

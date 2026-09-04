@@ -16,6 +16,7 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
     await dragWareToTarget(page, wareId, 0, { drop: false, expectedStatus: 'isolated' })
     await expect(page.locator(`.compact-node[data-ware-id="${wareId}"]`)).toHaveCount(0)
     await expect(page.locator(`.flow-node[data-ware-id="${wareId}"]`)).toHaveCount(1)
+    await page.mouse.move(50, 50, { steps: 10 })
     await page.mouse.up()
     await expect(page.locator(`.flow-node[data-ware-id="${wareId}"]`)).toHaveClass(/isolated/)
   })
@@ -24,6 +25,7 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
     await dragWareToTarget(page, 'hullparts')
     await dragWareToTarget(page, 'hullparts', 0, { drop: false })
     await expect(page.locator('.flow-node[data-ware-id="hullparts"]')).toHaveCount(1)
+    await page.mouse.move(50, 50, { steps: 10 })
     await page.mouse.up()
   })
 
@@ -40,6 +42,7 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
     await page.mouse.move(50, 50, { steps: 10 })
     await expect.poll(() => page.evaluate(() => (window as any).logicFlowStore.hoveredGroupId)).toBeNull()
     await expect(page.locator('.compact-group').first()).toHaveClass(/border-amber-500\/50/)
+    await page.mouse.move(50, 50, { steps: 10 })
     await page.mouse.up()
     await expect(page.locator('.flow-node')).toHaveCount(before)
   })
@@ -49,6 +52,7 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
     await dragWareToTarget(page, 'spaceweed', 0, { drop: false, expectedStatus: 'rejected' })
     await expect(page.locator('.compact-group [data-testid="rejected-label"]')).toBeVisible()
     await expect(page.locator('.compact-group .animate-pulse')).toHaveCount(0)
+    await page.mouse.move(50, 50, { steps: 10 })
     await page.mouse.up()
   })
 

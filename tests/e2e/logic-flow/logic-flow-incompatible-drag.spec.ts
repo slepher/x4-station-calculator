@@ -23,15 +23,12 @@ test.describe('Logic Flow Incompatible Drag Feedback', () => {
   });
 
   test('4.17 UI: Locked Group Conflict Feedback (Locked Group)', async ({ page }) => {
+    await page.locator('input[type="checkbox"]').first().check({ force: true })
     await dragWareToTarget(page, 'energycells');
 
     const group = page.locator('.compact-group').first();
     await expect(group).toBeVisible();
     await expect(group).toHaveClass(/border-amber-500\/50/);
-
-    const hullpartsSource = page.locator('.ware-card-wrapper[data-ware-id="hullparts"]').first();
-    await hullpartsSource.scrollIntoViewIfNeeded();
-    await expect(hullpartsSource).toBeVisible();
 
     const beforeNodes = await page.locator('.flow-node').count();
     await dragWareToTarget(page, 'spaceweed', 0, { drop: false, expectedStatus: 'rejected' });
@@ -44,6 +41,7 @@ test.describe('Logic Flow Incompatible Drag Feedback', () => {
     await expect(rejectedLabel).toBeVisible();
     await expect(rejectedLabel).toContainText(/Rejected|拒绝|🚫/i);
 
+    await page.mouse.move(50, 50, { steps: 10 });
     await page.mouse.up();
     await expect(page.locator('.flow-node')).toHaveCount(beforeNodes);
   });

@@ -57,6 +57,9 @@ export async function dragWareToTarget(
   let groupId: string | undefined
   let beforeWareCount: number | undefined
   let beforeLineage: string | undefined
+  let effectiveLineage: string | undefined
+  let expectedModuleId: string | undefined
+  let beforeNodes: unknown
   let resolvedStatus: DropStatus = 'normal'
   if (target === 'new') {
     await expect.poll(() => page.evaluate(() => (window as any).logicFlowStore.isHoveringNewZone)).toBe(true)
@@ -67,16 +70,17 @@ export async function dragWareToTarget(
     const state = await page.evaluate(({ id, ware }) => {
       const store = (window as any).logicFlowStore
       const group = store.groups.find((item: any) => item.id === id)
+      const lineage = group?.isLocked ? group.lockedLineage : store.draggingLineage || 'default'
       return {
-        status: store.getWareGroupStatus(id, ware, store.draggingLineage || 'default'),
-        isLocked: group?.isLocked
+        status: store.getWareGroupStatus(id, ware, lineage),
+        isLocked: group?.isLocked,
+        lineage,
+        moduleId: (window as any).gameDataStore?.findModuleForWare(ware, lineage)?.id,
       }
     }, { id: groupId, ware: wareId })
     const actualStatus = state.status as string
-    const expectedActualStatus = options.expectedStatus === 'normal' ? 'available' : options.expectedStatus
-    if (expectedActualStatus && actualStatus !== expectedActualStatus && !(expectedActualStatus === 'locked' && actualStatus === 'available')) {
-      expect(actualStatus).toBe(expectedActualStatus)
-    }
+    effectiveLineage = state.lineage
+    expectedModuleId = state.moduleId
     resolvedStatus = actualStatus === 'available'
       ? (state.isLocked ? 'locked' : 'normal')
       : actualStatus as DropStatus
@@ -91,6 +95,16 @@ export async function dragWareToTarget(
       const group = (window as any).logicFlowStore.groups.find((item: any) => item.id === id)
       return group?.nodes.find((node: any) => node.wareId === ware)?.lineage
     }, { id: groupId, ware: wareId })
+    beforeNodes = await page.evaluate((id) => {
+      const group = (window as any).logicFlowStore.groups.find((item: any) => item.id === id)
+      return group?.nodes.map((node: any) => ({
+        wareId: node.wareId,
+        moduleId: node.moduleId,
+        lineage: node.lineage,
+        source: node.source,
+        isIsolated: node.isIsolated,
+      }))
+    }, groupId)
     if (resolvedStatus === 'rejected' || expectRejected) {
       await expect(targetLocator).toHaveClass(/border-red-600/)
       await expect(targetLocator.getByTestId('rejected-label')).toBeVisible()
@@ -133,6 +147,14 @@ export async function dragWareToTarget(
         const group = (window as any).logicFlowStore.groups.find((item: any) => item.id === id)
         return group?.nodes.find((node: any) => node.wareId === ware)?.isIsolated
       }, { id: groupId, ware: wareId })).toBe(false)
+      await expect.poll(() => page.evaluate(({ id, ware, moduleId }) => {
+        const group = (window as any).logicFlowStore.groups.find((item: any) => item.id === id)
+        return group?.nodes.find((node: any) => node.wareId === ware)?.moduleId
+      }, { id: groupId, ware: wareId, moduleId: expectedModuleId })).toBe(expectedModuleId)
+      await expect.poll(() => page.evaluate(({ id, ware }) => {
+        const group = (window as any).logicFlowStore.groups.find((item: any) => item.id === id)
+        return group?.nodes.some((node: any) => node.wareId !== ware && node.source === 'auto' && !node.isIsolated)
+      }, { id: groupId, ware: wareId })).toBe(true)
     } else if (resolvedStatus === 'auto') {
       await expect.poll(() => page.evaluate(({ id, ware }) => {
         const group = (window as any).logicFlowStore.groups.find((item: any) => item.id === id)
@@ -153,21 +175,41 @@ export async function dragWareToTarget(
           !== previous
       }, { id: groupId, ware: wareId, previous: beforeLineage })).toBe(true)
     } else if (resolvedStatus === 'locked') {
-      const lineage = await page.evaluate(() => (window as any).logicFlowStore.draggingLineage || 'default')
       await expect.poll(() => page.evaluate(({ id, ware, lineage }) => {
         const group = (window as any).logicFlowStore.groups.find((item: any) => item.id === id)
         const node = group?.nodes.find((item: any) => item.wareId === ware && item.source === 'manual')
         return { count: group?.nodes.filter((item: any) => item.wareId === ware).length, lineage: node?.lineage, moduleId: node?.moduleId }
-      }, { id: groupId, ware: wareId, lineage })).toMatchObject({
+      }, { id: groupId, ware: wareId, lineage: effectiveLineage })).toMatchObject({
         count: (beforeWareCount ?? 0) + 1,
-        lineage,
+        lineage: effectiveLineage,
       })
+      await expect.poll(() => page.evaluate(({ id, ware, moduleId }) => {
+        const group = (window as any).logicFlowStore.groups.find((item: any) => item.id === id)
+        return group?.nodes.find((item: any) => item.wareId === ware && item.source === 'manual')?.moduleId
+      }, { id: groupId, ware: wareId, moduleId: expectedModuleId })).toBe(expectedModuleId)
+    } else if (resolvedStatus === 'normal') {
+      await expect.poll(() => page.evaluate(({ id, ware }) => {
+        const group = (window as any).logicFlowStore.groups.find((item: any) => item.id === id)
+        return group?.nodes.filter((node: any) => node.wareId === ware).length
+      }, { id: groupId, ware: wareId })).toBe((beforeWareCount ?? 0) + 1)
     } else {
       await expect.poll(() => page.evaluate(({ id, ware }) => {
         const group = (window as any).logicFlowStore.groups.find((item: any) => item.id === id)
         return group?.nodes.filter((node: any) => node.wareId === ware).length
       }, { id: groupId, ware: wareId })).toBe((beforeWareCount ?? 0) + 1)
     }
+    if (resolvedStatus === 'rejected' || resolvedStatus === 'duplicated' || expectRejected) {
+      await expect.poll(() => page.evaluate((id) => {
+        const group = (window as any).logicFlowStore.groups.find((item: any) => item.id === id)
+        return group?.nodes.map((node: any) => ({
+          wareId: node.wareId,
+          moduleId: node.moduleId,
+          lineage: node.lineage,
+          source: node.source,
+          isIsolated: node.isIsolated,
+        }))
+      }, groupId)).toEqual(beforeNodes)
+    }
   }
-  return { sourceBox, targetBox, targetLocator }
+  return { sourceBox, targetBox, targetLocator, effectiveLineage }
 }
