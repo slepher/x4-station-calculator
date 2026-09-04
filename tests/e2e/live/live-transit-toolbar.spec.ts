@@ -18,7 +18,7 @@ test.describe('Live Transit Toolbar - Group Name Binding', () => {
   test('transit toolbar displays bindingGroup.name instead of binding.name', async ({ page }) => {
     await setLanguage(page, 'zh-CN')
 
-    const sectorTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="186727eb-7c4a-c0e0-b20d-f17405fd3aa3"]')
+    const sectorTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_100_sector001_macro"]')
     await expect(sectorTab).toBeVisible({ timeout: 5000 })
     await sectorTab.click()
     await page.waitForTimeout(500)
@@ -46,7 +46,7 @@ test.describe('Live Transit Toolbar - Group Name Binding', () => {
     const fillValue = await nameInput.inputValue()
     expect(fillValue).toBe('测试名称')
 
-    const renamedTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="186727eb-7c4a-c0e0-b20d-f17405fd3aa3"]')
+    const renamedTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_100_sector001_macro"]')
     await expect(renamedTab).toBeVisible({ timeout: 3000 })
 
     const overviewTab = page.locator('[data-testid="sidebar-overview"]')

@@ -11,7 +11,7 @@ test.describe('Live Overview', () => {
   })
 
   test('overview tab is visible and shows empire wareflow dashboard', async ({ page }) => {
-    const overviewTab = page.locator('[data-testid="overview-tab"]')
+    const overviewTab = page.locator('[data-testid="sidebar-overview"]')
     await expect(overviewTab).toBeVisible({ timeout: 5000 })
     await overviewTab.click()
     await page.waitForTimeout(300)
@@ -21,7 +21,7 @@ test.describe('Live Overview', () => {
   })
 
   test('overview toolbar shows binding name', async ({ page }) => {
-    const overviewTab = page.locator('[data-testid="overview-tab"]')
+    const overviewTab = page.locator('[data-testid="sidebar-overview"]')
     await overviewTab.click()
     await page.waitForTimeout(300)
 
@@ -32,7 +32,7 @@ test.describe('Live Overview', () => {
   })
 
   test('save upload panel and save list are visible in overview', async ({ page }) => {
-    const overviewTab = page.locator('[data-testid="overview-tab"]')
+    const overviewTab = page.locator('[data-testid="sidebar-overview"]')
     await overviewTab.click()
     await page.waitForTimeout(300)
 
@@ -41,7 +41,7 @@ test.describe('Live Overview', () => {
   })
 
   test('live overview transit tab shows sector tab bar', async ({ page }) => {
-    const sectorTab = page.locator('[data-testid^="supply-tab"]').first()
+    const sectorTab = page.locator('[data-testid="sidebar-sector"]').first()
     await expect(sectorTab).toBeVisible({ timeout: 5000 })
   })
 })

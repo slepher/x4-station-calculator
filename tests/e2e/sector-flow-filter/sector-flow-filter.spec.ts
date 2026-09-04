@@ -13,7 +13,7 @@ test.describe('Sector Flow Filter', () => {
   test('小行星星区聚合 flows 应只显示三个 station 的 planned ware 作为 surplus', async ({ page }) => {
     await page.waitForTimeout(1000)
     
-    const asteroidSupplyTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="186727eb-7c4a-c0e0-b20d-f17405fd3aa3"]')
+    const asteroidSupplyTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_100_sector001_macro"]')
     await expect(asteroidSupplyTab).toBeVisible({ timeout: 5000 })
     await asteroidSupplyTab.click()
     await page.waitForTimeout(500)
@@ -71,7 +71,7 @@ test.describe('Sector Flow Filter', () => {
   test('单个 station flows 显示原始数据（含 auto-industry surplus）', async ({ page }) => {
     await page.waitForTimeout(1000)
     
-    const asteroidSupplyTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="186727eb-7c4a-c0e0-b20d-f17405fd3aa3"]')
+    const asteroidSupplyTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_100_sector001_macro"]')
     await expect(asteroidSupplyTab).toBeVisible({ timeout: 5000 })
     await asteroidSupplyTab.click()
     await page.waitForTimeout(500)
@@ -105,7 +105,7 @@ test.describe('Sector Flow Filter', () => {
   test('小行星聚合 flows 详细快照（基准数据）', async ({ page }) => {
     await page.waitForTimeout(1000)
     
-    const asteroidSupplyTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="186727eb-7c4a-c0e0-b20d-f17405fd3aa3"]')
+    const asteroidSupplyTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_100_sector001_macro"]')
     await expect(asteroidSupplyTab).toBeVisible({ timeout: 5000 })
     await asteroidSupplyTab.click()
     await page.waitForTimeout(500)

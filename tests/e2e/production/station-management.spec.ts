@@ -321,9 +321,8 @@ test.describe.skip('多空间站帝国规划 - 标签拖拽重排', () => {
   test('标签拖拽后第一个标签是空间站', async ({ page }) => {
     await addStations(page, 2)
 
-    const firstTab = page.locator('.tabs-scroll-area > .tab-item').first()
+    const firstTab = page.locator('[data-testid="sidebar-station"]').first()
     await expect(firstTab).toBeVisible()
-    await expect(firstTab).toHaveClass(/station-tab/)
   })
 
   test('保存并刷新后顺序保持', async ({ page }) => {
@@ -414,9 +413,8 @@ test.describe.skip('station-tab-drag web integration', () => {
 
   test('W2: 空间站标签首位', async ({ page }) => {
     await createNamedStations(page, ['Alpha', 'Beta'])
-    const firstTab = page.locator('.tabs-scroll-area .tab-item').first()
+    const firstTab = page.locator('[data-testid="sidebar-station"]').first()
     await expect(firstTab).toBeVisible()
-    await expect(firstTab).toHaveClass(/station-tab/)
   })
 
   test('W3: 保存并刷新后顺序保持', async ({ page }) => {

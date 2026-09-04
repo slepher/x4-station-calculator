@@ -16,7 +16,7 @@ test.describe('Gap 按钮响应性验证', () => {
   })
 
   test('新建空间站缺口: 点击量子管 + 按钮后数据应变化', async ({ page }) => {
-    const sectorTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="186727eb-7c4a-c0e0-b20d-f17405fd3aa3"]')
+    const sectorTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_100_sector001_macro"]')
     await expect(sectorTab).toBeVisible({ timeout: 5000 })
     await sectorTab.click()
     await page.waitForTimeout(500)
