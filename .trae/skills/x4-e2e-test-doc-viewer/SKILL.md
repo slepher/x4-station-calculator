@@ -1,6 +1,6 @@
 ---
 name: x4-e2e-test-doc-viewer
-description: "Review X4 E2E test documentation draft and gate x4-e2e-test-doc completion. Must run in a dedicated isolated subagent. Trigger with /x4:e2e-test-doc-viewer <change-name>."
+description: "Review X4 E2E test documentation and gate x4-e2e-test-doc completion in a dedicated isolated subagent."
 ---
 
 # X4 E2E Test Documentation Viewer

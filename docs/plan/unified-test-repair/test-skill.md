@@ -1,59 +1,38 @@
-# Test Skill 问题记录
+# Test Skill 问题与边界
 
-## unified-test-repair blocker
+## 结论
 
-### 问题归属
+旧 X4 test skill 的自测资产不完整是独立问题，不再阻塞产品 Unit/E2E 目录重构。
 
-这是 X4 测试技能自身的脚本/测试资产不完整问题，不是产品代码问题，也不是 `db.json` fixture 问题。
+- 产品测试权威目录：`tests/unit/**`、`tests/e2e/**`
+- 历史产品测试：迁移到 `tests/legacy/**`，保留但不进入默认验证
+- 活跃 E2E skill 自测：独立命令/配置验证，不混入 `npm run test:unit`
+- 旧 `x4-test-*` skill 与其自测：保留为 legacy，不参与 active routing 或产品验证 gate
 
-### 问题一：E2E 配对资产缺失
+## 已知旧技能缺口
 
-`tests/skills/unit/validate-test-impl-assets.spec.ts` 要求每个 `test_tasks-XX-*.md` 都有四个同名配对 spec：
+旧校验仍缺少 7 个 `test-e2e-20..26-*.spec.ts` 配对资产，以及 `skill-scripts/validate_test_results.py`。这些缺口属于旧 skill 资产 owner，不属于产品测试迁移任务。
 
-- `test-unit-XX-*.spec.ts`
-- `test-e2e-XX-*.spec.ts`
-- `test-bug-XX-*.spec.ts`
-- `test-bug-fix-XX-*.spec.ts`
-
-当前缺少以下 task 对应的 E2E spec：
-
-- `test-e2e-20-top-level-numbering.spec.ts`
-- `test-e2e-21-missing-comment.spec.ts`
-- `test-e2e-22-l2-content-missing.spec.ts`
-- `test-e2e-23-l3-content-missing.spec.ts`
-- `test-e2e-24-bug-before-after-same-number.spec.ts`
-- `test-e2e-25-transition-step-and-reference-threshold.spec.ts`
-- `test-e2e-26-consecutive-state-refs.spec.ts`
-
-因此配对资产校验失败 7 项。
-
-### 问题二：结果校验脚本缺失
-
-`tests/skills/unit/validate-test-results-run.spec.ts` 期望存在：
-
-```text
-skill-scripts/validate_test_results.py
-```
-
-该脚本当前不存在，因此 5 个 test-result run case 无法执行。`tests/skills/data/runs/` 目录及其 run 数据当前存在；缺失的是 validator 脚本。
-
-### 验证结果
+历史证据：
 
 ```text
 npm run test:unit -- tests/skills/unit tests/e2e-skills/unit
+8 files: 6 passed / 2 failed
+73 tests: 66 passed / 7 failed
 ```
 
-- 8 files：6 passed / 2 failed
-- 73 tests：66 passed / 7 failed
+## Gate 规则
 
-### 对 unified-test-repair 的影响
+产品测试任务只被以下问题阻塞：
 
-`task-test-1` 只拥有 `tests/unified-unit/` 和 `tests/unit/`，不拥有：
+1. 失败来自该任务 owned paths 内的改动或验证目标；
+2. `tests/unit/**` 或 `tests/e2e/**` 的权威套件不满足任务合同；
+3. 旧测试被删除而不是迁移到 `tests/legacy/**`。
 
-- `tests/skills/**`
-- `tests/e2e-skills/**`
-- `skill-scripts/**`
+以下问题必须记录并路由给对应 owner，但不得阻塞产品测试重构：
 
-所以当前任务不能通过迁移 unit spec、删除失败测试或修改 `db.json` 来解决此问题。应由 X4 test skill / `x4-test-skill-verify` 的资产与脚本 owner 补齐后，再重新运行 `task-test-1`。
+- `tests/skills/**`、`tests/e2e-skills/**`、`skill-scripts/**` 中的既有失败；
+- `tests/legacy/**` 中的失败；
+- 当前任务无权修改的其他既有失败。
 
-不得通过跳过 skills suite、删除校验用例或伪造 validator 输出绕过 gate。
+独立的 workflow/skill 任务在修改活跃 skill 资产时，仍必须运行并负责其 own-path skill validation；“不阻塞产品重构”不等于忽略该 owner 自己引入的失败。

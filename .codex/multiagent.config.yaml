@@ -1,14 +1,16 @@
 version: 1
 name: x4-station-calculator-multiagent
-description: Multi-agent orchestration aligned with current /x4 workflow and OpenSpec skills.
+description: Multi-agent routing for implementation-owned Unit tests and the E2E-only x4-e2e-test workflow.
 
 defaults:
   language: follow_user
   planning_write_scope: "openspec/**"
-  implement_write_scope: "src/**,tests/**,openspec/**"
-  must_update_together:
-    - "openspec/changes/<change>/test_tasks.md"
-    - "openspec/changes/<change>/ui_knowledge.md"
+  implement_write_scope: "src/**,tests/unit/**,openspec/**"
+  e2e_write_scope: "tests/e2e/**,openspec/**"
+  canonical_product_tests:
+    unit: "tests/unit/**"
+    e2e: "tests/e2e/**"
+  legacy_tests: "tests/legacy/**"
 
 routing:
   "/x4:discuss":
@@ -20,15 +22,25 @@ routing:
   "/x4:ff":
     pipeline: [workflow_orchestrator, fast_forward_creator]
   "/x4:apply":
-    pipeline: [workflow_orchestrator, implementer, bug_tracker]
+    pipeline: [workflow_orchestrator, implementer]
   "/x4:bug":
     pipeline: [workflow_orchestrator, bug_tracker]
+  "/x4:bug-fix":
+    pipeline: [workflow_orchestrator, bug_fixer]
+  "/x4:e2e-test-doc":
+    pipeline: [workflow_orchestrator, e2e_test_engineer]
+  "/x4:e2e-test-doc-details":
+    pipeline: [workflow_orchestrator, e2e_test_engineer]
+  "/x4:e2e-test-doc-viewer":
+    pipeline: [workflow_orchestrator, e2e_test_engineer]
+  "/x4:e2e-test-impl":
+    pipeline: [workflow_orchestrator, e2e_test_engineer]
+  "/x4:e2e-test":
+    pipeline: [workflow_orchestrator, e2e_test_engineer]
+  "/x4:e2e-test-run":
+    pipeline: [workflow_orchestrator, e2e_test_engineer]
   "/x4:verify":
-    pipeline: [workflow_orchestrator, verifier, test_engineer]
-  "/x4:test-impl":
-    pipeline: [workflow_orchestrator, test_engineer]
-  "/x4:test":
-    pipeline: [workflow_orchestrator, test_engineer]
+    pipeline: [workflow_orchestrator, verifier]
   "/x4:archive":
     pipeline: [workflow_orchestrator, archiver]
   default:
@@ -37,147 +49,124 @@ routing:
 agents:
   workflow_orchestrator:
     role: "Phase router and guardrail enforcer"
-    use_skills:
-      - x4-user-workflow
+    use_skills: [x4-user-workflow]
     responsibilities:
-      - "Parse command phase and choose agent pipeline."
-      - "Enforce zero-code policy before /x4:apply."
-      - "Require request.md as source of truth when entering /x4:new or /x4:ff from discuss."
-      - "Ensure responses follow user language inferred from conversation context by default; do not default to English when user input is empty."
-      - "If command includes language tag (e.g. #zh/#en), use tag language for that request."
-      - "Ensure immutable spec headers remain English."
+      - "Route only commands listed by x4-user-workflow."
+      - "Do not route to retained x4-test, x4-test-doc, x4-test-doc-viewer, x4-test-impl, or x4-test-run skills."
+      - "Enforce canonical product-test and owned-path gates."
+      - "Follow the user's language; preserve required English spec headers."
 
   discuss_analyst:
     role: "Discussion and requirement clarification"
-    use_skills:
-      - x4-discuss
-    inputs:
-      - "User problem statement"
-      - "Existing specs/code for analysis"
-    outputs:
-      - "Implementation-ready plan"
-      - "request.md draft checklist"
+    use_skills: [x4-discuss]
     constraints:
-      - "No source-code edits."
-      - "No docs edits unless explicitly requested."
+      - "No source or test edits."
+      - "No document edits unless requested."
 
   doc_editor:
-    role: "Documentation/spec updater"
-    use_skills:
-      - x4-doc
-      - openspec-sync-specs
+    role: "OpenSpec planning editor"
+    use_skills: [x4-doc, openspec-sync-specs]
     outputs:
-      - "Updated spec/test docs under openspec/"
+      - "request/spec/design/tasks artifacts"
+      - "Focused Unit coverage attached to behavior-changing tasks"
     constraints:
-      - "Do not edit src/ or tests/."
+      - "Do not edit src/** or tests/**."
+      - "Do not put E2E tasks in tasks.md."
 
   change_creator:
-    role: "Step-by-step artifact creation"
-    use_skills:
-      - x4-new
-    required_inputs:
-      - "change_name"
-      - "request.md (if from discuss)"
-    required_outputs:
-      - "proposal/spec/design/tasks/test_tasks"
+    role: "Step-by-step artifact creator"
+    use_skills: [x4-new, x4-doc]
 
   fast_forward_creator:
-    role: "One-pass artifact creation"
-    use_skills:
-      - x4-ff
-      - x4-doc
-    required_outputs:
-      - "request.md"
-      - "proposal.md"
-      - "design.md"
-      - "tasks.md"
-      - "test_tasks.md"
-      - "ui_knowledge.md"
+    role: "One-pass artifact creator"
+    use_skills: [x4-ff, x4-doc]
 
   implementer:
-    role: "Code implementation"
-    use_skills:
-      - x4-apply
+    role: "Source and focused Unit-test owner"
+    use_skills: [x4-apply]
     required_inputs:
       - "openspec/changes/<change>/tasks.md"
       - "openspec/changes/<change>/design.md"
       - "openspec/changes/<change>/specs/**/spec.md"
     required_outputs:
-      - "Code changes"
+      - "Source changes"
+      - "Focused tests/unit/** changes for behavior-changing work"
+      - "Focused Unit run evidence"
       - "tasks.md checkbox updates"
+    constraints:
+      - "Do not author or run E2E tests."
 
   bug_tracker:
-    role: "Bug lifecycle owner during implementation"
+    role: "Report-only bug artifact owner"
+    use_skills: [x4-bug]
+
+  bug_fixer:
+    role: "Bug reproduction and fix router"
+    use_skills: [x4-bug-fix, x4-apply, x4-e2e-test]
+
+  e2e_test_engineer:
+    role: "E2E documentation, review, implementation, and run owner"
     use_skills:
-      - x4-bug
-    responsibilities:
-      - "When bug discovered: record in bugs.md, add reproduction test, verify fail, fix, verify pass."
+      - x4-e2e-test
+      - x4-e2e-test-doc
+      - x4-e2e-test-doc-details
+      - x4-e2e-test-doc-viewer
+      - x4-e2e-test-impl
+      - x4-e2e-test-run
+      - x4-drag-test
+    required_outputs:
+      - "openspec/changes/<change>/e2e_tests.md"
+      - "openspec/changes/<change>/e2e_test_tasks.md"
+      - "tests/e2e/<change>/**"
+    constraints:
+      - "Do not own Unit tests."
+      - "Do not use legacy test_tasks.md or x4-test-* routes."
 
   verifier:
-    role: "Spec/task/code coherence verification"
-    use_skills:
-      - x4-verify
-    required_outputs:
-      - "Static verification report"
-      - "Completion status across tasks/spec/design"
-
-  test_engineer:
-    role: "Unit + E2E test author/runner"
-    use_skills:
-      - x4-test-impl
-      - x4-test
-      - x4-drag-test
-    required_inputs:
-      - "openspec/changes/<change>/test_tasks.md"
-      - "openspec/test_experience.md"
-    required_outputs:
-      - "tests/unit/<change>/*.spec.ts"
-      - "tests/e2e/<change>/*.spec.ts"
-      - "Updated test_tasks.md"
-      - "Updated openspec/test_experience.md"
-      - "Updated ui_knowledge.md"
+    role: "Static, canonical Unit, and active E2E verifier"
+    use_skills: [x4-verify, openspec-verify-change, x4-e2e-test]
 
   archiver:
-    role: "Archive completed change and promote specs"
-    use_skills:
-      - x4-archive
-    required_inputs:
-      - "All test_tasks checklist items are [x]"
-    required_outputs:
-      - "Archived change"
-      - "Promoted/merged main specs"
+    role: "Archive verified changes"
+    use_skills: [x4-archive]
 
 handoff_contracts:
-  - from: discuss_analyst
-    to: change_creator
-    requires:
-      - "request.md complete and approved"
-  - from: change_creator
+  - from: doc_editor
     to: implementer
     requires:
-      - "tasks.md complete"
-      - "test_tasks.md complete"
+      - "Behavior-changing tasks include focused Unit coverage"
   - from: implementer
     to: verifier
     requires:
-      - "tasks.md updated with progress"
+      - "Implementation tasks and focused Unit evidence are complete"
   - from: verifier
-    to: test_engineer
-    requires:
-      - "No blocking static mismatch"
-  - from: test_engineer
     to: archiver
     requires:
-      - "All tests passed"
-      - "test_tasks.md all checked"
+      - "verify_status=pass"
+      - "unit_status=pass"
+      - "e2e_status=pass"
+      - "No unresolved blockers"
 
 quality_gates:
   - name: planning_zero_code
     when: ["/x4:discuss", "/x4:doc", "/x4:new", "/x4:ff"]
-    rule: "Reject any src/** or tests/** edits."
+    rule: "Reject src/** or tests/** edits during planning."
+  - name: canonical_product_test_paths
+    rule: "Reject new or modified product tests outside tests/unit/** and tests/e2e/**; tests/legacy/** is preservation-only."
+  - name: implementation_owns_unit
+    when: ["/x4:apply", "/x4:bug-fix"]
+    rule: "Reject a behavior-changing source task without focused tests/unit/** evidence, unless the task contract explicitly proves it is test-neutral."
+  - name: e2e_route_integrity
+    rule: "Reject E2E implementation or execution that bypasses e2e_tests.md, e2e_test_tasks.md, and the x4-e2e-test-* chain."
+  - name: no_legacy_test_routing
+    rule: "Reject active routing to x4-test, x4-test-doc, x4-test-doc-viewer, x4-test-impl, or x4-test-run."
+  - name: preserve_legacy_tests
+    rule: "Reject deletion of old product tests when migration to tests/legacy/** can preserve them."
+  - name: owned_blockers_only
+    rule: "Task-local blocking validation must target owned paths. Record and route pre-existing out-of-scope failures to their owner without forcing the current task to repair them."
   - name: verify_no_skip
     when: ["/x4:verify"]
-    rule: "Reject completion if x4-test-impl or x4-test stage not executed."
+    rule: "Reject completion unless static checks, canonical tests/unit/**, and the active E2E workflow have passed."
   - name: archive_no_skip
     when: ["/x4:archive"]
-    rule: "Reject archive if any test_tasks item is unchecked."
+    rule: "Reject archive unless the x4-verify output contract passes with no blockers."
