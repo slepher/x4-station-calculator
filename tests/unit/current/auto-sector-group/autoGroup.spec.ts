@@ -379,7 +379,7 @@ describe('autoGroup - interactive applyStandalone', () => {
     // cluster_26 (Atiya's Misfortune I) is uncertain_extend at distance 4 from Asteroid Belt
     const extend = result.assignments.find(a => a.sectorMacro === 'cluster_26_sector001_macro')!
     const updated = applyStandaloneToResult(result, extend.sectorMacro, sectorGraph, sectorClusterMap, 3, (m) => m)
-    
+
     // Any nearby auto sector that's closer to the new group should be moved to new group's coverage
     // Even if no sector qualifies, the new group should exist
     expect(updated.groups.length).toBe(result.groups.length + 1)
