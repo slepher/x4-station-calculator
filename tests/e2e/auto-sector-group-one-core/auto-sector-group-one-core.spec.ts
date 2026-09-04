@@ -130,10 +130,7 @@ test.describe('1 自动分组与连接', () => {
 
     await ensureAutoGroupResult(page)
 
-    if (!(await enterAutoSectorGroup(page))) {
-      test.skip()
-      return
-    }
+    expect(await enterAutoSectorGroup(page)).toBe(true)
 
     // 1.1.2 验证 Col 1 出现 SectorGroupList，包含 pure hub 生成的 group cards
     const groupCards = page.locator('.group-item')
@@ -156,10 +153,7 @@ test.describe('1 自动分组与连接', () => {
 
   test('1.2 Incremental 分组', async ({ page }) => {
     // 1.2.1 绑定已有 binding 的 save guid，触发增量分析
-    if (!(await enterAutoSectorGroup(page))) {
-      test.skip()
-      return
-    }
+    expect(await enterAutoSectorGroup(page)).toBe(true)
     const groupCards = page.locator('.group-item')
     await expect(groupCards.first()).toBeVisible({ timeout: 5000 })
 
@@ -177,10 +171,7 @@ test.describe('1 自动分组与连接', () => {
   })
 
   test('1.3 hub detection 结果', async ({ page }) => {
-    if (!(await enterAutoSectorGroup(page))) {
-      test.skip()
-      return
-    }
+    expect(await enterAutoSectorGroup(page)).toBe(true)
 
     // 1.3.1 验证 hub 容量仅统计 container cargo（不含 solid/liquid）
     const groupCards = page.locator('.group-item')
@@ -210,10 +201,7 @@ test.describe('1 自动分组与连接', () => {
 
   test('1.4 MST connections', async ({ page }) => {
     // 1.4.1 验证 distance <= bridgeSearchJumpRange 生成 connection
-    if (!(await enterAutoSectorGroup(page))) {
-      test.skip()
-      return
-    }
+    expect(await enterAutoSectorGroup(page)).toBe(true)
     const groupCards = page.locator('.group-item')
     await expect(groupCards.first()).toBeVisible({ timeout: 5000 })
 
@@ -239,10 +227,7 @@ test.describe('1 自动分组与连接', () => {
   })
 
   test('1.5 Bridge plan', async ({ page }) => {
-    if (!(await enterAutoSectorGroup(page))) {
-      test.skip()
-      return
-    }
+    expect(await enterAutoSectorGroup(page)).toBe(true)
     // 1.5.1 构建存在多个连通分量的测试场景
     const bridgeCards = page.locator('.bridge-plan-card')
     const bridgeCount = await bridgeCards.count()
@@ -270,10 +255,7 @@ test.describe('1 自动分组与连接', () => {
 // ================================================================
 test.describe('2 编辑态与 Assignment', () => {
   test('2.1 非编辑态 group card 展示', async ({ page }) => {
-    if (!(await enterAutoSectorGroup(page))) {
-      test.skip()
-      return
-    }
+    expect(await enterAutoSectorGroup(page)).toBe(true)
     const firstCard = page.locator('.group-item').first()
     await expect(firstCard).toBeVisible({ timeout: 5000 })
 
@@ -292,23 +274,20 @@ test.describe('2 编辑态与 Assignment', () => {
     // 2.1.5 显示 jump rows、覆盖星区数、uncertain 数量
     await expect(firstCard.locator('.group-stats')).toBeVisible()
 
-    // 2.1.6 result 模式显示 retain，不显示删除
-    await expect(firstCard.locator('.retain-chk')).toHaveCount(3)
+    // 2.1.6 preview/result 不显示 retain，也不显示独立 Exit
+    await expect(firstCard.locator('.retain-chk')).toHaveCount(0)
     await expect(firstCard.locator('.state-btn--delete')).toHaveCount(0)
+    await expect(page.getByRole('button', { name: /退出|Exit/ })).toHaveCount(0)
   })
 
   test('2.2 编辑态 group card 控件', async ({ page }) => {
-    if (!(await enterAutoSectorGroup(page))) {
-      test.skip()
-      return
-    }
+    expect(await enterAutoSectorGroup(page)).toBe(true)
 
     // 2.2.1 点击[编辑]进入编辑态
     await enterEditMode(page)
 
-    // 2.2.2 验证显示 retain checkbox
-    const retainChk = page.locator('.group-item').first().locator('.retain-chk')
-    await expect(retainChk.first()).toBeVisible({ timeout: 2000 })
+    // 2.2.2 edit 不显示 retain checkbox
+    await expect(page.locator('.group-item').first().locator('.retain-chk')).toHaveCount(0)
 
     // 2.2.3 验证 pin/unpin 按钮
     await expect(page.locator('.group-item').first().locator('.state-btn')).toBeVisible()
@@ -325,18 +304,15 @@ test.describe('2 编辑态与 Assignment', () => {
       await expect(baselineCards.first().locator('.state-btn--delete')).toHaveCount(0)
     }
 
-    // 2.2.6 [退出]编辑态切回 result 模式
-    const exitBtn = page.getByRole('button', { name: /退出|Exit/ })
-    await exitBtn.click()
+    // 2.2.6 [预览]编辑态切回 result 模式
+    const previewBtn = page.getByRole('button', { name: /查看|Preview/ })
+    await previewBtn.click()
     await page.waitForTimeout(200)
-    await expect(exitBtn).toBeHidden({ timeout: 2000 })
+    expect(await page.evaluate(() => (window as any).liveStore?.calculationMode)).toBe('result')
   })
 
   test('2.3 coverage 操作', async ({ page }) => {
-    if (!(await enterAutoSectorGroup(page))) {
-      test.skip()
-      return
-    }
+    expect(await enterAutoSectorGroup(page)).toBe(true)
     await enterEditMode(page)
 
     // 2.3.1 点击 coverage pill 的 ×，sector 从 active coverage 移出
@@ -386,10 +362,7 @@ test.describe('2 编辑态与 Assignment', () => {
   })
 
   test('2.4 jumpRange 操作', async ({ page }) => {
-    if (!(await enterAutoSectorGroup(page))) {
-      test.skip()
-      return
-    }
+    expect(await enterAutoSectorGroup(page)).toBe(true)
     await enterEditMode(page)
     const firstCard = page.locator('.group-item').first()
     await expect(firstCard).toBeVisible({ timeout: 3000 })
@@ -416,10 +389,7 @@ test.describe('2 编辑态与 Assignment', () => {
   })
 
   test('2.5 assignment options', async ({ page }) => {
-    if (!(await enterAutoSectorGroup(page))) {
-      test.skip()
-      return
-    }
+    expect(await enterAutoSectorGroup(page)).toBe(true)
     await page.waitForTimeout(500)
     const assignmentCards = page.locator('.allocation-card')
     const cardCount = await assignmentCards.count()
@@ -458,10 +428,7 @@ test.describe('2 编辑态与 Assignment', () => {
   })
 
   test('2.6 assignment 稳定性', async ({ page }) => {
-    if (!(await enterAutoSectorGroup(page))) {
-      test.skip()
-      return
-    }
+    expect(await enterAutoSectorGroup(page)).toBe(true)
     await page.waitForTimeout(500)
     const assignmentCards = page.locator('.allocation-card')
     const cardCount = await assignmentCards.count()
@@ -495,10 +462,7 @@ test.describe('2 编辑态与 Assignment', () => {
 // ================================================================
 test.describe('3 Hub 添加/删除', () => {
   test('3.1 already-anchor 禁止', async ({ page }) => {
-    if (!(await enterAutoSectorGroup(page))) {
-      test.skip()
-      return
-    }
+    expect(await enterAutoSectorGroup(page)).toBe(true)
     await enterEditMode(page)
 
     // 3.1.1 打开 hub 添加菜单，验证已是 anchor 的 sector 不可添加
@@ -518,10 +482,7 @@ test.describe('3 Hub 添加/删除', () => {
   })
 
   test('3.2 添加玩家 sector hub', async ({ page }) => {
-    if (!(await enterAutoSectorGroup(page))) {
-      test.skip()
-      return
-    }
+    expect(await enterAutoSectorGroup(page)).toBe(true)
     await enterEditMode(page)
     const beforeGroupCount = await page.locator('.group-item').count()
 
@@ -554,10 +515,7 @@ test.describe('3 Hub 添加/删除', () => {
   })
 
   test('3.3 添加非玩家 sector hub', async ({ page }) => {
-    if (!(await enterAutoSectorGroup(page))) {
-      test.skip()
-      return
-    }
+    expect(await enterAutoSectorGroup(page)).toBe(true)
     await enterEditMode(page)
 
     // 3.3.1 在 hub 添加菜单搜索无玩家站 sector
@@ -588,10 +546,7 @@ test.describe('3 Hub 添加/删除', () => {
   })
 
   test('3.4 删除新 hub', async ({ page }) => {
-    if (!(await enterAutoSectorGroup(page))) {
-      test.skip()
-      return
-    }
+    expect(await enterAutoSectorGroup(page)).toBe(true)
     await enterEditMode(page)
 
     // 确保有 new group
@@ -630,10 +585,7 @@ test.describe('3 Hub 添加/删除', () => {
   })
 
   test('3.5 orphan 清理', async ({ page }) => {
-    if (!(await enterAutoSectorGroup(page))) {
-      test.skip()
-      return
-    }
+    expect(await enterAutoSectorGroup(page)).toBe(true)
     await enterEditMode(page)
 
     // 3.5.1 验证无残余 assignment card 指向已删除 group
@@ -673,38 +625,69 @@ test.describe('3 Hub 添加/删除', () => {
 // ================================================================
 test.describe('4 Trade Station', () => {
   test('4.1 候选列表规则', async ({ page }) => {
-    if (!(await enterAutoSectorGroup(page))) {
-      test.skip()
-      return
-    }
+    expect(await enterAutoSectorGroup(page)).toBe(true)
     await page.waitForTimeout(500)
+    await enterEditMode(page)
+    const addBtn = page.getByRole('button', { name: /添加|^Add$/ })
+    await addBtn.click()
+    const menu = page.locator('.hub-add-menu')
+    await expect(menu).toBeVisible()
+    await menu.locator('.hub-add-menu-search-input').fill('Grand')
+    const availableItem = menu.locator('.hub-add-menu-item:not([disabled]):not(.orange):not(.disabled)').first()
+    await expect(availableItem).toBeVisible()
+    await availableItem.click()
+    await page.waitForTimeout(500)
+
+    const expected = await page.evaluate(() => {
+      const result = (window as any).liveStore?.autoGroupResult
+      return (result?.groups ?? []).map((group: any) => ({
+        id: group.id,
+        name: group.name,
+        sectorMacro: group.sectorMacro,
+        candidateNames: (result.sectorStationCandidates?.[group.sectorMacro] ?? [])
+          .slice(0, 5)
+          .map((candidate: any) => candidate.stationCode),
+        selected: group.selectedTradeStation ?? null
+      }))
+    })
+    expect(expected.length).toBeGreaterThan(0)
+    expect(new Set(expected.map((group: any) => group.id)).size).toBe(expected.length)
+
     const tradeStationCards = page.locator('.trade-station-card')
+    await expect(tradeStationCards).toHaveCount(expected.length)
+    for (let i = 0; i < expected.length; i++) {
+      const group = expected[i]
+      const card = tradeStationCards.nth(i)
+      await expect(card.locator('.card-group-name')).toHaveText(group.name)
+      const playerItems = card.locator('.candidate-item:not(.candidate-item--virtual)')
+      await expect(playerItems).toHaveCount(group.candidateNames.length)
+      await expect(playerItems.locator('.candidate-name')).toHaveText(group.candidateNames)
+      await expect(card.locator('.candidate-item--virtual')).toHaveCount(1)
+      const selectedItems = card.locator('.candidate-item--selected')
+      if (group.selected) {
+        await expect(selectedItems).toHaveCount(1)
+        if (group.selected.type === 'virtual') {
+          await expect(selectedItems).toHaveClass(/candidate-item--virtual/)
+        } else {
+          await expect(selectedItems.locator('.candidate-name')).toHaveText(group.selected.stationCode)
+        }
+      }
+    }
 
-    // 4.1.1 自动 hub 候选来自 anchor sector 玩家站，按 score 排序，top 5
-    await expect(tradeStationCards.first()).toBeVisible({ timeout: 3000 })
-    const firstCard = tradeStationCards.first()
-    const candidateItems = firstCard.locator('.candidate-item')
-    expect(await candidateItems.count()).toBeGreaterThan(0)
-
-    // 4.1.2 手动 hub 有 qualified 站时只列 qualified
-    await expect(candidateItems.first()).toBeVisible()
-    // 4.1.3 手动 hub 无 qualified 站时列全部玩家站
-    const candidateNames = await candidateItems.locator('.candidate-name').allInnerTexts()
-    expect(candidateNames.length).toBeGreaterThan(0)
-
-    // 4.1.4 bridge hub 候选规则与手动 hub 一致
-    const allCandidates = firstCard.locator('.candidate-item')
-    await expect(allCandidates.first()).toBeVisible()
-    // 4.1.5 无玩家站 hub 候选仅包含虚拟交易站
-    await expect(allCandidates.last()).toBeVisible()
+    const virtualOnly = expected.find((group: any) => group.candidateNames.length === 0)
+    expect(virtualOnly).toBeDefined()
+    const virtualCard = tradeStationCards.nth(expected.indexOf(virtualOnly))
+    await expect(virtualCard.locator('.candidate-item:not(.candidate-item--virtual)')).toHaveCount(0)
+    if (virtualOnly.selected?.type === 'virtual') {
+      await expect(virtualCard.locator('.candidate-item--virtual.candidate-item--selected')).toHaveCount(1)
+    } else {
+      await expect(virtualCard.locator('.candidate-item--selected')).toHaveCount(0)
+    }
   })
 
   test('4.2 默认值规则', async ({ page }) => {
     // 4.2.1 最高分 pure hub 时自动选中
-    if (!(await enterAutoSectorGroup(page))) {
-      test.skip()
-      return
-    }
+    expect(await enterAutoSectorGroup(page)).toBe(true)
     // 4.2.2 混合候选第一名不是 pure hub 时无默认值
     await page.waitForTimeout(500)
     // 4.2.3 全生产站第一名 score > 第二名 × 1.3 时自动选中
@@ -723,10 +706,7 @@ test.describe('4 Trade Station', () => {
   })
 
   test('4.3 retain 默认值', async ({ page }) => {
-    if (!(await enterAutoSectorGroup(page))) {
-      test.skip()
-      return
-    }
+    expect(await enterAutoSectorGroup(page)).toBe(true)
     await enterEditMode(page)
 
     // 4.3.1 启用 trade station retain 后首选使用 savedTradeStationCode
@@ -741,10 +721,7 @@ test.describe('4 Trade Station', () => {
   })
 
   test('4.4 confirm gate', async ({ page }) => {
-    if (!(await enterAutoSectorGroup(page))) {
-      test.skip()
-      return
-    }
+    expect(await enterAutoSectorGroup(page)).toBe(true)
     await page.waitForTimeout(500)
     const confirmBtn = page.getByRole('button', { name: /确定|Confirm/ })
     await expect(confirmBtn).toBeVisible({ timeout: 3000 })
@@ -768,10 +745,7 @@ test.describe('4 Trade Station', () => {
   })
 
   test('4.5 持久化', async ({ page }) => {
-    if (!(await enterAutoSectorGroup(page))) {
-      test.skip()
-      return
-    }
+    expect(await enterAutoSectorGroup(page)).toBe(true)
     await page.waitForTimeout(500)
     const confirmBtn = page.getByRole('button', { name: /确定|Confirm/ })
     await expect(confirmBtn).toBeVisible({ timeout: 5000 })
@@ -798,10 +772,7 @@ test.describe('4 Trade Station', () => {
 
   test('4.6 virtual trade station 位置', async ({ page }) => {
     // 4.6.1 virtual trade station sectorMacro 等于 group hub sectorMacro
-    if (!(await enterAutoSectorGroup(page))) {
-      test.skip()
-      return
-    }
+    expect(await enterAutoSectorGroup(page)).toBe(true)
     await page.waitForTimeout(500)
     const data = await page.evaluate(() => {
       const result = (window as any).liveStore?.autoGroupResult
@@ -828,10 +799,7 @@ test.describe('4 Trade Station', () => {
 // ================================================================
 test.describe('5 Confirm 写入', () => {
   test('5.1 group 匹配规则', async ({ page }) => {
-    if (!(await enterAutoSectorGroup(page))) {
-      test.skip()
-      return
-    }
+    expect(await enterAutoSectorGroup(page)).toBe(true)
     await page.waitForTimeout(500)
     // 5.1.1 先通过当前 assignment/trade-station gate，再验证 UUID/sectorMacro 映射
     const expectedSectors = await page.evaluate(() =>
@@ -849,10 +817,7 @@ test.describe('5 Confirm 写入', () => {
   })
 
   test('5.2 group 写入一致性', async ({ page }) => {
-    if (!(await enterAutoSectorGroup(page))) {
-      test.skip()
-      return
-    }
+    expect(await enterAutoSectorGroup(page)).toBe(true)
     await page.waitForTimeout(500)
     const before = await page.evaluate(() => {
       const result = (window as any).liveStore?.autoGroupResult
@@ -884,40 +849,92 @@ test.describe('5 Confirm 写入', () => {
   })
 
   test('5.3 station plan 归属重分配', async ({ page }) => {
-    if (!(await enterAutoSectorGroup(page))) {
-      test.skip()
-      return
-    }
+    expect(await enterAutoSectorGroup(page)).toBe(true)
     await page.waitForTimeout(500)
-    const expectedBySector = await page.evaluate(() => {
-      const result = (window as any).liveStore?.autoGroupResult
-      const mapping: Record<string, string> = {}
-      for (const group of result?.groups || []) {
-        if (group.sectorMacro) mapping[group.sectorMacro] = group.id
-        for (const sector of group.coverageSectorMacros || []) {
-          if (!(sector in mapping)) mapping[sector] = group.id
+    await page.locator('.auto-sector-bar .map-btn').click()
+    await page.getByRole('button', { name: /虚拟空间站|Virtual Station/ }).click()
+
+    const source = page.locator('.virtual-row').filter({ has: page.locator('.virtual-name', { hasText: '新建空间站' }) })
+    await expect(source).toHaveCount(1)
+    const sourceData = await page.evaluate(() => {
+      const plans = (window as any).saveBindingStore?.draftBinding?.stationPlans ?? []
+      const plan = plans.find((item: any) => item.id === 'f36126e5-7798-ed14-3c03-938b961efa0b')
+      return { id: plan?.id, groupId: plan?.groupId, sectorMacro: plan?.sectorMacro }
+    })
+    expect(sourceData).toEqual({
+      id: 'f36126e5-7798-ed14-3c03-938b961efa0b',
+      groupId: 'cluster_100_sector001_macro',
+      sectorMacro: 'cluster_100_sector001_macro'
+    })
+
+    const target = page.locator('.sector-hover-target[data-map-sector-id="cluster_26_sector001_macro"] .sector-polygon')
+    await expect(target).toBeVisible()
+    const sourceBox = await source.boundingBox()
+    const targetBox = await target.boundingBox()
+    expect(sourceBox).not.toBeNull()
+    expect(targetBox).not.toBeNull()
+    await page.mouse.move(0, 0, { steps: 5 })
+    const sourcePoint = {
+      x: sourceBox!.x + sourceBox!.width / 2,
+      y: sourceBox!.y + sourceBox!.height / 2
+    }
+    await page.mouse.move(sourcePoint.x, sourcePoint.y, { steps: 5 })
+    await page.mouse.down()
+    await page.mouse.move(sourcePoint.x + 10, sourcePoint.y + 10, { steps: 5 })
+    await expect(source).toHaveClass(/virtual-row--dragging/)
+
+    const targetPoint = await page.evaluate(() => {
+      const polygon = document.querySelector('.sector-hover-target[data-map-sector-id="cluster_26_sector001_macro"] .sector-polygon')
+      if (!(polygon instanceof SVGGraphicsElement)) return null
+      const box = polygon.getBoundingClientRect()
+      for (let row = 1; row < 10; row++) {
+        for (let col = 1; col < 10; col++) {
+          const x = box.left + (box.width * col) / 10
+          const y = box.top + (box.height * row) / 10
+          const hit = document.elementFromPoint(x, y)?.closest('.sector-hover-target[data-map-sector-id="cluster_26_sector001_macro"]')
+          if (hit) return { x, y }
         }
       }
-      return mapping
+      return null
+    })
+    expect(targetPoint).not.toBeNull()
+    await page.mouse.move(targetPoint.x, targetPoint.y, { steps: 20 })
+    const preview = page.locator('.placement-preview--binding')
+    await expect(preview).toBeVisible()
+    const previewBox = await preview.boundingBox()
+    expect(previewBox).not.toBeNull()
+    expect(Math.abs(previewBox!.x + previewBox!.width / 2 - targetPoint.x)).toBeLessThan(8)
+    expect(Math.abs(previewBox!.y + previewBox!.height / 2 - targetPoint.y)).toBeLessThan(8)
+    await expect(target).toBeVisible()
+    await page.mouse.up()
+    await page.waitForTimeout(500)
+
+    const draftPlan = await page.evaluate(() => {
+      const plans = (window as any).liveStore?.virtualStationDrafts ?? []
+      const plan = plans.find((item: any) => item.id === 'f36126e5-7798-ed14-3c03-938b961efa0b')
+      return { groupId: plan?.groupId, sectorMacro: plan?.sectorMacro }
+    })
+    expect(draftPlan).toEqual({
+      groupId: 'cluster_24_sector001_macro',
+      sectorMacro: 'cluster_24_sector001_macro'
     })
     await confirmAutoSector(page)
 
-    const plans = await page.evaluate(() =>
-      (window as any).saveBindingStore?.draftBinding?.stationPlans || []
-    )
-    expect(plans.length).toBeGreaterThan(0)
-    for (const plan of plans) {
-      if (plan.sectorMacro) expect(plan.groupId ?? null).toBe(expectedBySector[plan.sectorMacro] ?? null)
-    }
+    const persistedPlan = await page.evaluate(() => {
+      const plans = (window as any).saveBindingStore?.activeBinding?.stationPlans ?? []
+      const plan = plans.find((item: any) => item.id === 'f36126e5-7798-ed14-3c03-938b961efa0b')
+      return { groupId: plan?.groupId, sectorMacro: plan?.sectorMacro }
+    })
+    expect(persistedPlan).toEqual({
+      groupId: 'cluster_24_sector001_macro',
+      sectorMacro: 'cluster_24_sector001_macro'
+    })
     expect(await page.evaluate(() => (window as any).activeViewStore?.activeBindingWorkbench)).toBe('auto-sector-group')
     await expect(page.locator('[data-testid="empire-wareflow-dashboard"]')).toHaveCount(0)
   })
 
   test('5.4 virtual station plans 同步', async ({ page }) => {
-    if (!(await enterAutoSectorGroup(page))) {
-      test.skip()
-      return
-    }
+    expect(await enterAutoSectorGroup(page)).toBe(true)
     await page.waitForTimeout(500)
     const confirmBtn = page.getByRole('button', { name: /确定|Confirm/ })
     await expect(confirmBtn).toBeVisible({ timeout: 5000 })
@@ -939,10 +956,7 @@ test.describe('5 Confirm 写入', () => {
 
   test('5.5 save station 隔离', async ({ page }) => {
     // 5.5.1 带 saveStationCode 的 plans 不被虚拟站同步修改
-    if (!(await enterAutoSectorGroup(page))) {
-      test.skip()
-      return
-    }
+    expect(await enterAutoSectorGroup(page)).toBe(true)
     await page.waitForTimeout(500)
     const beforePlans = await page.evaluate(() =>
       (window as any).saveBindingStore?.draftBinding?.stationPlans
@@ -970,10 +984,7 @@ test.describe('5 Confirm 写入', () => {
 // ================================================================
 test.describe('6 回归风险', () => {
   test('6.1 solid/liquid cargo 不计入 hub 容量', async ({ page }) => {
-    if (!(await enterAutoSectorGroup(page))) {
-      test.skip()
-      return
-    }
+    expect(await enterAutoSectorGroup(page)).toBe(true)
 
     // 6.1.1 含 solid/liquid cargo 的 station，hub 容量只统计 container
     const hubScores = await page.evaluate(() => {
@@ -986,10 +997,7 @@ test.describe('6 回归风险', () => {
 
   test('6.2 单向 superhighway 不作为双向 MST 边', async ({ page }) => {
     // 6.2.1 含 lane_count=1 的单向 superhighway，不生成双向 MST 边
-    if (!(await enterAutoSectorGroup(page))) {
-      test.skip()
-      return
-    }
+    expect(await enterAutoSectorGroup(page)).toBe(true)
     const graphData = await page.evaluate(() => {
       return (window as any).liveStore?.autoGroupResult
         ?.groups?.map((g: any) => ({
@@ -1005,10 +1013,7 @@ test.describe('6 回归风险', () => {
   })
 
   test('6.3 standalone 不作为自动 fallback 默认值', async ({ page }) => {
-    if (!(await enterAutoSectorGroup(page))) {
-      test.skip()
-      return
-    }
+    expect(await enterAutoSectorGroup(page)).toBe(true)
     await page.waitForTimeout(500)
 
     // 6.3.1 无命中无扩展无 baseline 场景，standalone 不作为默认选中
@@ -1022,10 +1027,7 @@ test.describe('6 回归风险', () => {
   })
 
   test('6.4 baseline group unpin 后不被物理删除', async ({ page }) => {
-    if (!(await enterAutoSectorGroup(page))) {
-      test.skip()
-      return
-    }
+    expect(await enterAutoSectorGroup(page)).toBe(true)
     await enterEditMode(page)
 
     // 6.4.1 unpin baseline group 后保留展示且未被物理删除
@@ -1041,10 +1043,7 @@ test.describe('6 回归风险', () => {
   })
 
   test('6.5 connection retain 关闭后不作为 fixed edge', async ({ page }) => {
-    if (!(await enterAutoSectorGroup(page))) {
-      test.skip()
-      return
-    }
+    expect(await enterAutoSectorGroup(page)).toBe(true)
     await enterEditMode(page)
 
     // 6.5.1 connectionRetainEnabled=false 后[计算]，旧 link 不作为 fixed edge
@@ -1069,10 +1068,7 @@ test.describe('6 回归风险', () => {
   })
 
   test('6.6 __virtual__ 不写入持久化 saveStationCode', async ({ page }) => {
-    if (!(await enterAutoSectorGroup(page))) {
-      test.skip()
-      return
-    }
+    expect(await enterAutoSectorGroup(page)).toBe(true)
     await page.waitForTimeout(500)
     const confirmBtn = page.getByRole('button', { name: /确定|Confirm/ })
     await expect(confirmBtn).toBeVisible({ timeout: 5000 })
@@ -1095,10 +1091,7 @@ test.describe('6 回归风险', () => {
 
   test('6.7 旧逻辑不覆盖用户 trade station 选择', async ({ page }) => {
     // 6.7.1 用户手动选择 trade station 后确认，未被旧逻辑覆盖
-    if (!(await enterAutoSectorGroup(page))) {
-      test.skip()
-      return
-    }
+    expect(await enterAutoSectorGroup(page)).toBe(true)
     await page.waitForTimeout(500)
     const tradeStationCards = page.locator('.trade-station-card')
     await expect(tradeStationCards.first()).toBeVisible({ timeout: 3000 })
