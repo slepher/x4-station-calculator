@@ -397,7 +397,7 @@ const handleAddFromDrop = (event: any) => {
         @add="(event: any) => handleAddToExistingGroup(group.id, event)"
         class="compact-group drop-target bg-white/5 border rounded-2xl p-4 flex flex-col gap-3 transition-all cursor-pointer min-h-[160px]"
         :class="[
-          isRejected(group, null)
+          logicFlow.hoveredGroupId === group.id && isRejected(group, null)
             ? 'border-red-600 bg-red-900/10'
             : (isDuplicated(group, null)
               ? 'border-red-500 bg-red-500/5'
@@ -436,7 +436,7 @@ const handleAddFromDrop = (event: any) => {
                 </div>
               </div>
 
-              <div v-if="isRejected(group, { from: null, item: null })" class="ml-auto text-[10px] text-red-500 font-bold uppercase tracking-widest flex items-center gap-1" data-testid="rejected-label">
+              <div v-if="logicFlow.hoveredGroupId === group.id && isRejected(group, { from: null, item: null })" class="ml-auto text-[10px] text-red-500 font-bold uppercase tracking-widest flex items-center gap-1" data-testid="rejected-label">
                 <span>🚫</span>
                 <span>{{ t('logicFlow.rejected') }}</span>
               </div>

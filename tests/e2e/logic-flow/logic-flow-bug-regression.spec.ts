@@ -164,6 +164,7 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
     await dragWareToTarget(page, 'spaceweed', 0, { drop: false, expectedStatus: 'rejected' })
     await page.mouse.move(50, 50, { steps: 10 })
     await expect.poll(() => page.evaluate(() => (window as any).logicFlowStore.hoveredGroupId)).toBeNull()
+    await expect(target.getByTestId('rejected-label')).toHaveCount(0)
     await expect(target).toHaveClass(/border-amber-500\/50/)
     await page.mouse.up()
     await expect(page.locator('.flow-node[data-ware-id="spaceweed"]')).toHaveCount(0)

@@ -115,6 +115,7 @@ export async function dragWareToTarget(
     if (resolvedStatus === 'rejected' || expectRejected) {
       await expect(targetLocator).toHaveClass(/border-red-600/)
       await expect(targetLocator.getByTestId('rejected-label')).toBeVisible()
+      await expect(targetLocator.locator('.compact-node.animate-pulse')).toHaveCount(0)
     } else if (resolvedStatus === 'duplicated') {
       await expect(targetLocator).toHaveClass(/border-red-500/)
       await expect(targetLocator.getByTestId('duplicate-label')).toBeVisible()
