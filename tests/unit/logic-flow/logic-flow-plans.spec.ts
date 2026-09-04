@@ -106,6 +106,7 @@ describe('Logic Flow Plans - Unit Tests', () => {
 
     it('修改 settings 数据后 isDirty 变为 true', () => {
       store.lastSavedSnapshot = JSON.stringify({ groups: [], settings: { isDefaultLocked: true } })
+      store.addGroup('industrial', 'default', undefined, false)
       store.settings.isDefaultLocked = false
       expect(store.isDirty).toBe(true)
     })
@@ -157,20 +158,7 @@ describe('Logic Flow Plans - Unit Tests', () => {
     })
 
     it('lastSavedSnapshot 正确更新', () => {
-      store.addGroup('industrial', 'default', undefined, false)
-      store.groups[0]!.nodes.push({
-        id: 'node-1',
-        wareId: 'hullparts',
-        moduleId: 'module-hullparts',
-        race: 'argon',
-        lineage: 'default',
-        column: 2,
-        isIsolated: false,
-        isAuto: false,
-        isRoot: true,
-        source: 'manual',
-        order: 0,
-      })
+      store.expandUpstream(store.addGroup('industrial', 'default', undefined, false).id, 'hullparts', 'manual', 'default')
 
       store.saveCurrentPlan('test-plan')
       expect(store.lastSavedSnapshot).toContain('hullparts')
@@ -190,16 +178,7 @@ describe('Logic Flow Plans - Unit Tests', () => {
           isLocked: false,
           lockedLineage: 'default',
           nodes: [{
-            id: 'node-1',
-            wareId: 'hullparts',
-            moduleId: 'module-hullparts',
-            race: 'argon',
-            lineage: 'default',
-            column: 2,
-            isIsolated: false,
-            source: 'manual' as const,
-            isRoot: true,
-            order: 0,
+            module: 'module-hullparts',
           }]
         }],
         settings: { isDefaultLocked: true },
@@ -225,16 +204,7 @@ describe('Logic Flow Plans - Unit Tests', () => {
           isLocked: false,
           lockedLineage: 'default',
           nodes: [{
-            id: 'node-1',
-            wareId: 'hullparts',
-            moduleId: 'module-hullparts',
-            race: 'argon',
-            lineage: 'default',
-            column: 2,
-            isIsolated: false,
-            source: 'manual' as const,
-            isRoot: true,
-            order: 0,
+            module: 'module-hullparts',
           }]
         }],
         settings: { isDefaultLocked: true },
@@ -259,16 +229,7 @@ describe('Logic Flow Plans - Unit Tests', () => {
           isLocked: false,
           lockedLineage: 'default',
           nodes: [{
-            id: 'node-1',
-            wareId: 'hullparts',
-            moduleId: 'module-hullparts',
-            race: 'argon',
-            lineage: 'default',
-            column: 2,
-            isIsolated: false,
-            source: 'manual' as const,
-            isRoot: true,
-            order: 0,
+            module: 'module-hullparts',
           }]
         }],
         settings: { isDefaultLocked: true },
@@ -398,28 +359,10 @@ describe('Logic Flow Plans - Unit Tests', () => {
           lockedLineage: 'default',
           nodes: [
             {
-              id: 'node-isolated',
-              wareId: 'siliconwafers',
-              moduleId: undefined,
-              race: 'argon',
-              lineage: 'default',
-              column: 1,
-              isIsolated: true,
-              source: 'manual' as const,
-              isRoot: true,
-              order: 0,
+              isolated: 'siliconwafers',
             },
             {
-              id: 'node-manual',
-              wareId: 'hullparts',
-              moduleId: 'module-hullparts',
-              race: 'argon',
-              lineage: 'default',
-              column: 2,
-              isIsolated: false,
-              source: 'manual' as const,
-              isRoot: true,
-              order: 0,
+              module: 'module-hullparts',
             }
           ]
         }],

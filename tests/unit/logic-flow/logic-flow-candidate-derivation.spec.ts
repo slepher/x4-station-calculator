@@ -6,6 +6,38 @@ import { describe, it, expect, vi } from 'vitest'
 import LogicFlowCandidateZone from '@/components/logic-flow/LogicFlowCandidateZone.vue'
 import { createTestingPinia } from '@pinia/testing'
 
+vi.mock('@/store/useGameDataStore', () => ({
+  useGameDataStore: () => ({
+    waresMap: {
+      ore: { id: 'ore', name: 'Ore', tier: 0, group: 'minerals' },
+      silicon: { id: 'silicon', name: 'Silicon', tier: 0, group: 'minerals' },
+      nividium: { id: 'nividium', name: 'Nividium', tier: 0, group: 'minerals' },
+      energycells: { id: 'energycells', name: 'Energy Cells', tier: 0, group: 'energy' },
+      microchip: { id: 'microchip', name: 'Microchip', tier: 1, group: 'hightech' },
+    },
+    localizedWaresMap: {},
+    wareSetsByIndustrialRace: { default: new Set(['ore', 'silicon', 'energycells', 'microchip']) },
+    wareSetsByRace: { default: new Set(['ore', 'silicon', 'energycells', 'microchip']) },
+    searchQuery: '',
+    activeDlcs: [],
+    enforceDlcActivation: false,
+    isRawMaterialWare: (wareId: string) => ['ore', 'silicon', 'nividium'].includes(wareId),
+    findModuleForWare: () => null,
+    getModuleVolumeCompression: () => undefined,
+    getWareDisplayName: (wareId: string) => wareId,
+  }),
+}))
+
+vi.mock('@/store/useLogicFlowStore', () => ({
+  useLogicFlowStore: () => ({
+    groups: [],
+    currentPlanName: '',
+    isDefaultLocked: true,
+    isWareInAnyGroup: () => false,
+    calculateRequiredRawMaterials: () => ({}),
+  }),
+}))
+
 // Mock vuedraggable
 vi.mock('vuedraggable', () => ({
   default: {
@@ -23,6 +55,7 @@ vi.mock('vue-i18n', () => ({
   createI18n: () => ({
     global: {
       t: (key: string) => key,
+      te: () => false,
       locale: { value: 'en' }
     }
   })
@@ -56,12 +89,15 @@ describe('LogicFlowCandidateZone Derivation', () => {
       wareSetsByRace: { 
         'default': new Set(['ore', 'silicon', 'energycells', 'microchip']) 
       },
+      modulesByOutputMap: { energycells: [{}], microchip: [{}] },
+      activeDlcs: [],
+      dlcSetting: { activeDlcs: [], enforceDlcActivation: false },
       searchQuery: ''
     },
     logicFlow: {
       groups: [],
       isWareInAnyGroup: () => false,
-      calculateRequiredT0Wares: () => ({})
+      calculateRequiredRawMaterials: () => ({})
     }
   }
 
@@ -70,7 +106,8 @@ describe('LogicFlowCandidateZone Derivation', () => {
       global: {
         plugins: [createTestingPinia({
           createSpy: vi.fn,
-          initialState
+          initialState,
+          stubActions: false
         })],
         stubs: {
             Teleport: true

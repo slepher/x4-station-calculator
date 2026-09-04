@@ -191,23 +191,22 @@ describe('LogicFlow Fallback & Teladi Tracing Logic', () => {
   })
 
   describe('Bug Fixes & Race Logic Enhancements', () => {
-    it('should NOT add a node if no module is found and it is not a basic resource', () => {
+    it('should treat a ware without a producer as a raw material', () => {
       const group = logicFlow.addGroup('industrial', 'terran')
       
-      // Assume 'advancedelectronics' does not have a terran module (it doesn't in default data)
-      // And if we force a very specific check that fails findModuleForWare:
-      // We'll mock findModuleForWare to return null for a specific ware
       const originalFind = gameData.findModuleForWare
-      const originalMap = gameData.modulesByOutputMap
+      const originalProducers = gameData.modulesByOutputMap.advancedelectronics
       gameData.findModuleForWare = vi.fn().mockReturnValue(null)
-      gameData.modulesByOutputMap = {}
+      gameData.modulesByOutputMap.advancedelectronics = []
       
       logicFlow.expandUpstream(group.id, 'advancedelectronics', 'manual')
       
-      expect(group.nodes.length).toBe(0)
+      expect(group.nodes).toHaveLength(1)
+      expect(group.nodes[0].wareId).toBe('advancedelectronics')
+      expect(group.nodes[0].moduleId).toBeUndefined()
       
       gameData.findModuleForWare = originalFind
-      gameData.modulesByOutputMap = originalMap
+      gameData.modulesByOutputMap.advancedelectronics = originalProducers
     })
 
     it('should re-activate and connect a node if manually added again', () => {
@@ -315,7 +314,7 @@ describe('LogicFlow Fallback & Teladi Tracing Logic', () => {
       
       const missileNode = group.nodes.find((n: FlowNode) => n.wareId === 'missilecomponents')
       expect(missileNode).toBeDefined()
-      expect(missileNode.moduleId).toBe('prod_gen_missilecomponents_macro')
+      expect(missileNode.moduleId).toBe('module_gen_prod_missilecomponents_01')
 
       const hullPartsNode = group.nodes.find((n: FlowNode) => n.wareId === 'hullparts')
       expect(hullPartsNode).toBeDefined()

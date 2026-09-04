@@ -99,10 +99,10 @@ describe('LogicFlow Lineage & PK Verification', () => {
     // Add Terran Hull Parts (needs Energy Cells)
     logicFlow.expandUpstream(group.id, 'hullparts', 'manual', 'terran')
     
-    // Verify T0 Energy Cells is merged (only 1 node)
+    // Energy Cells is now a concrete production module, so each lineage has its own node.
     const energyCellsNodes = group.nodes.filter((n: any) => n.wareId === 'energycells')
-    expect(energyCellsNodes.length).toBe(1)
-    expect(energyCellsNodes[0].lineage).toBe('default') // T0 always default
+    expect(energyCellsNodes.length).toBe(2)
+    expect(energyCellsNodes.map((n: any) => n.lineage)).toEqual(expect.arrayContaining(['teladi', 'terran']))
   })
 
   it('should promote an auto node to manual', () => {

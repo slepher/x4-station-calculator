@@ -6,6 +6,37 @@ import { describe, it, expect, vi } from 'vitest'
 import LogicFlowCandidateZone from '@/components/logic-flow/LogicFlowCandidateZone.vue'
 import { createTestingPinia } from '@pinia/testing'
 
+vi.mock('@/store/useGameDataStore', () => ({
+  useGameDataStore: () => ({
+    waresMap: {
+      ore: { id: 'ore', name: 'Ore', tier: 0, group: 'minerals' },
+      silicon: { id: 'silicon', name: 'Silicon', tier: 0, group: 'minerals' },
+      energycells: { id: 'energycells', name: 'Energy Cells', tier: 0, group: 'energy' },
+      microchip: { id: 'microchip', name: 'Microchip', tier: 1, group: 'hightech' },
+    },
+    localizedWaresMap: {},
+    wareSetsByIndustrialRace: { default: new Set(['ore', 'silicon', 'energycells', 'microchip']) },
+    wareSetsByRace: { default: new Set(['ore', 'silicon', 'energycells', 'microchip']) },
+    searchQuery: '',
+    activeDlcs: [],
+    enforceDlcActivation: false,
+    isRawMaterialWare: (wareId: string) => ['ore', 'silicon'].includes(wareId),
+    findModuleForWare: () => null,
+    getModuleVolumeCompression: () => undefined,
+    getWareDisplayName: (wareId: string) => wareId,
+  }),
+}))
+
+vi.mock('@/store/useLogicFlowStore', () => ({
+  useLogicFlowStore: () => ({
+    groups: [],
+    currentPlanName: '',
+    isDefaultLocked: true,
+    isWareInAnyGroup: () => false,
+    calculateRequiredRawMaterials: () => ({}),
+  }),
+}))
+
 // Mock vuedraggable
 vi.mock('vuedraggable', () => ({
   default: {
@@ -23,6 +54,7 @@ vi.mock('vue-i18n', () => ({
   createI18n: () => ({
     global: {
       t: (key: string) => key,
+      te: () => false,
       locale: { value: 'en' }
     }
   })
@@ -49,12 +81,15 @@ describe('LogicFlowCandidateZone', () => {
       localizedWaresMap,
       wareSetsByIndustrialRace: { 'default': new Set(['ore', 'silicon', 'energycells', 'microchip']) },
       wareSetsByRace: { 'default': new Set(['ore', 'silicon', 'energycells', 'microchip']) },
+      modulesByOutputMap: { energycells: [{}], microchip: [{}] },
+      activeDlcs: [],
+      dlcSetting: { activeDlcs: [], enforceDlcActivation: false },
       searchQuery: ''
     },
     logicFlow: {
       groups: [],
       isWareInAnyGroup: () => false,
-      calculateRequiredT0Wares: () => ({})
+      calculateRequiredRawMaterials: () => ({})
     }
   }
 
@@ -63,7 +98,8 @@ describe('LogicFlowCandidateZone', () => {
       global: {
         plugins: [createTestingPinia({
           createSpy: vi.fn,
-          initialState
+          initialState,
+          stubActions: false
         })],
         stubs: {
             Teleport: true
@@ -83,7 +119,7 @@ describe('LogicFlowCandidateZone', () => {
     expect(siliconCard.find('.quick-add-container').exists()).toBe(false)
   })
 
-  it('should NOT show add button for Energy Cells', () => {
+  it('should show add button for Energy Cells', () => {
     const wrapper = mount(LogicFlowCandidateZone, {
       global: {
         plugins: [createTestingPinia({
@@ -98,7 +134,7 @@ describe('LogicFlowCandidateZone', () => {
 
     const ecCard = wrapper.find('[data-ware-id="energycells"]')
     expect(ecCard.exists()).toBe(true)
-    expect(ecCard.find('.ware-card-add-btn').exists()).toBe(false)
+    expect(ecCard.find('.ware-card-add-btn').exists()).toBe(true)
   })
 
   it('should show add button for Tier 1+ resources', () => {
