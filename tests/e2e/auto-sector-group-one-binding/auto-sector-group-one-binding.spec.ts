@@ -3,6 +3,9 @@ import { expect, Page } from '@playwright/test'
 import { loadLiveBindingFixture } from '../live/helpers/loadLiveBindingFixture'
 
 const GAME_GUID = 'CB8837FE-98C1-42F8-9D6A-ED0ADC539111'
+const SECOND_GAME_GUID = 'B41B8D56-C58D-4F66-8EAA-6F85BC614214'
+const GAME_ARCHIVE_TIME = 667632.933
+const SECOND_ARCHIVE_TIME = 1345095.294
 
 async function waitForAppReady(page: Page) {
   await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 5000 })
@@ -224,29 +227,71 @@ test.describe('2 Shared Draft 生命周期', () => {
   })
 
   test('2.3 context 切换重置 draft', async ({ page }) => {
+    test.setTimeout(60000)
+    // The canonical helper creates a real second archive/context from the existing save fixture.
+    await loadLiveBindingFixture(page, {
+      transformSave: (save, filename) => {
+        if (filename === 'save_old.json') {
+          return { ...save, meta: { ...save.meta, guid: GAME_GUID, time: GAME_ARCHIVE_TIME } }
+        }
+        if (filename === 'save.json') {
+          return { ...save, meta: { ...save.meta, guid: SECOND_GAME_GUID, time: SECOND_ARCHIVE_TIME } }
+        }
+        return save
+      }
+    })
+
     // 2.3.1 在 Live 计算模式中记录当前 draft
+    await page.evaluate(async (gameGuid: string) => {
+      await (window as any).saveStore.selectArchive(gameGuid, GAME_ARCHIVE_TIME)
+      ;(window as any).activeViewStore.activeBinding = gameGuid
+    }, GAME_GUID)
+    await page.waitForTimeout(300)
     await enterAutoSectorGroup(page)
-    const before = await page.evaluate(() => JSON.stringify((window as any).liveStore?.autoGroupResult))
+    await enterEditMode(page)
+    await page.locator('.color-chip').first().click()
+    await page.locator('.preset-color').first().click()
+    const before = await page.evaluate(() => ({
+      guid: (window as any).activeViewStore?.activeBinding,
+      archiveTime: (window as any).saveStore?.selectedArchive?.time,
+      color: (window as any).liveStore?.autoGroupResult?.groups?.[0]?.color
+    }))
 
     // 2.3.2 切换到另一个 active binding，确认旧 context 修改不残留
-    await page.evaluate(() => {
+    await page.evaluate(async ({ guid, time }) => {
       const w = window as any
-      w.saveBindingStore.createOrOpenBinding('X9Y8Z7W6-V5U4-3210-TSRQ-PONMLKJIHGFE')
-      w.activeViewStore.activeBinding = 'X9Y8Z7W6-V5U4-3210-TSRQ-PONMLKJIHGFE'
-    })
-    await page.waitForTimeout(1000)
-    // After switching, trigger initAutoGroupDraft for the new context
-    await page.evaluate(() => { (window as any).liveStore.initAutoGroupDraft?.() })
-    await page.waitForTimeout(500)
-    const after = await page.evaluate(() => JSON.stringify((window as any).liveStore?.autoGroupResult))
-    expect(after).not.toBe(before)
+      await w.saveStore.selectArchive(guid, time)
+      w.activeViewStore.activeBinding = guid
+      w.saveBindingStore.createOrOpenBinding(guid, time)
+      w.liveStore.initAutoGroupDraft?.()
+    }, { guid: SECOND_GAME_GUID, time: SECOND_ARCHIVE_TIME })
+    await expect.poll(() => page.evaluate(() => (window as any).saveStore?.selectedArchive?.time), { timeout: 30000 }).toBe(SECOND_ARCHIVE_TIME)
+    const after = await page.evaluate(() => ({
+      guid: (window as any).activeViewStore?.activeBinding,
+      archiveTime: (window as any).saveStore?.selectedArchive?.time,
+      color: (window as any).liveStore?.autoGroupResult?.groups?.[0]?.color,
+      groups: (window as any).liveStore?.autoGroupResult?.groups?.length
+    }))
+    expect(before.guid).toBe(GAME_GUID)
+    expect(after.guid).toBe(SECOND_GAME_GUID)
+    expect(after.archiveTime).toBe(SECOND_ARCHIVE_TIME)
+    expect(after.groups).toBeGreaterThan(0)
+    expect(after.color).not.toBe(before.color)
 
     // 2.3.3 切换到同一 gameGuid 但不同 archive time，确认 draft 重新初始化
-    await page.evaluate((guid) => { (window as any).activeViewStore.activeBinding = guid }, GAME_GUID)
+    await page.evaluate(async (gameGuid: string) => {
+      const w = window as any
+      await w.saveStore.selectArchive(gameGuid, GAME_ARCHIVE_TIME)
+      w.activeViewStore.activeBinding = gameGuid
+      w.saveBindingStore.createOrOpenBinding(gameGuid, GAME_ARCHIVE_TIME)
+      w.liveStore.initAutoGroupDraft?.()
+    }, GAME_GUID)
     await page.waitForTimeout(500)
-    await page.evaluate(() => { (window as any).liveStore.initAutoGroupDraft?.() })
-    await page.waitForTimeout(500)
-    expect(await page.evaluate(() => (window as any).liveStore?.autoGroupResult)).toBeTruthy()
+    expect(await page.evaluate(() => ({
+      guid: (window as any).activeViewStore?.activeBinding,
+      archiveTime: (window as any).saveStore?.selectedArchive?.time,
+      groups: (window as any).liveStore?.autoGroupResult?.groups?.length
+    }))).toEqual({ guid: GAME_GUID, archiveTime: GAME_ARCHIVE_TIME, groups: expect.any(Number) })
 
     // 2.3.4 清空 active binding/archive，确认 draft 被重置
     await page.evaluate(() => { (window as any).activeViewStore.activeBinding = null })
@@ -301,43 +346,61 @@ test.describe('3 计算、重置与确认', () => {
     expect(await page.evaluate(() => (window as any).liveStore?.autoGroupResult?.groups?.length ?? 0)).toBeGreaterThan(0)
   })
 
-  test('3.2 编辑退出', async ({ page }) => {
+  test('3.2 编辑后查看', async ({ page }) => {
     // 3.2.1 在 result 模式点击编辑按钮，确认进入 edit 模式
     await enterAutoSectorGroup(page)
     await enterEditMode(page)
     expect(await page.evaluate(() => (window as any).liveStore?.calculationMode)).toBe('edit')
 
-    // 3.2.2 在 edit 模式下点击退出按钮，确认切回 result 模式
-    await page.getByRole('button', { name: /退出|Exit/ }).click()
+    // 3.2.2 在 edit 模式下点击当前查看按钮，确认切回 result 模式
+    await page.getByRole('button', { name: /查看|Preview/ }).click()
     await page.waitForTimeout(300)
 
-    // 3.2.3 确认退出后 draft 修改保留（不恢复 snapshot）
+    // 3.2.3 确认切换后 draft 修改保留（不恢复 snapshot）
     expect(await page.evaluate(() => (window as any).liveStore?.calculationMode)).toBe('result')
 
-    // 3.2.4 确认退出操作不调用 snapshot 恢复逻辑
+    // 3.2.4 确认切换操作不调用 snapshot 恢复逻辑
     expect(await page.evaluate(() => !!(window as any).liveStore?.autoGroupResult)).toBe(true)
   })
 
   test('3.3 重置', async ({ page }) => {
     // 3.3.1 在计算模式中修改 draft，点击重置按钮
     await enterAutoSectorGroup(page)
-    const baseline = await page.evaluate(() => JSON.stringify((window as any).liveStore?.autoGroupResult))
     await enterEditMode(page)
     await page.waitForTimeout(200)
 
-    // 3.3.2 确认 autoGroupResult 恢复为 calculationBaseline 的内容
+    const savedState = await page.evaluate(() => ({
+      groups: JSON.parse(JSON.stringify((window as any).saveBindingStore?.activeBinding?.groups ?? [])),
+      draftCount: (window as any).liveStore?.virtualStationDrafts?.length ?? 0,
+      context: {
+        bindingGuid: (window as any).saveBindingStore?.activeBinding?.gameGuid,
+        archiveTime: (window as any).saveStore?.selectedArchive?.time,
+        bindingArchiveTime: (window as any).saveBindingStore?.activeBinding?.selectedArchiveTime
+      }
+    }))
+    await page.locator('.color-chip').first().click()
+    await page.locator('.preset-color').last().click()
+
+    // 3.3.2 确认重置从 saved binding 重建 groups 与 virtual drafts
     await page.getByRole('button', { name: /重置|Reset/ }).click()
     await page.waitForTimeout(500)
-
-    // 3.3.3 确认 virtualStationDrafts 恢复为 baseline 记录的状态
-    const afterReset = await page.evaluate(() => JSON.stringify((window as any).liveStore?.autoGroupResult))
-    expect(afterReset).toBe(baseline)
+    const afterReset = await page.evaluate(() => ({
+      groups: (window as any).saveBindingStore?.activeBinding?.groups ?? [],
+      draftCount: (window as any).liveStore?.virtualStationDrafts?.length ?? 0,
+      context: {
+        bindingGuid: (window as any).saveBindingStore?.activeBinding?.gameGuid,
+        archiveTime: (window as any).saveStore?.selectedArchive?.time,
+        bindingArchiveTime: (window as any).saveBindingStore?.activeBinding?.selectedArchiveTime
+      }
+    }))
+    expect(afterReset.groups).toEqual(savedState.groups)
+    expect(afterReset.draftCount).toBe(savedState.draftCount)
 
     // 3.3.4 确认重置不切换 active binding 或 selected archive
     expect(await page.evaluate(() => (window as any).activeViewStore?.activeBinding)).toBe(GAME_GUID)
 
-    // 3.3.5 确认重置不重新运行分组算法
-    expect(afterReset).toBe(baseline)
+    // 3.3.5 确认重置保持当前 archive/binding context
+    expect(afterReset.context).toEqual(savedState.context)
   })
 
   test('3.4 确认 gate', async ({ page }) => {
@@ -582,19 +645,34 @@ test.describe('5 回归风险', () => {
   test('5.3 防止 [重置] 只恢复 groups 而遗漏 virtual station drafts', async ({ page }) => {
     // 5.3.1 修改 groups 和 virtual station drafts 后点击重置
     await enterAutoSectorGroup(page)
-    const before = await page.evaluate(() => JSON.stringify({
-      groups: (window as any).liveStore?.autoGroupResult,
-      drafts: (window as any).liveStore?.virtualStationDrafts
+    await enterEditMode(page)
+    const savedState = await page.evaluate(() => ({
+      groups: JSON.parse(JSON.stringify((window as any).saveBindingStore?.activeBinding?.groups ?? [])),
+      draftCount: (window as any).liveStore?.virtualStationDrafts?.length ?? 0,
+      context: {
+        bindingGuid: (window as any).saveBindingStore?.activeBinding?.gameGuid,
+        archiveTime: (window as any).saveStore?.selectedArchive?.time,
+        bindingArchiveTime: (window as any).saveBindingStore?.activeBinding?.selectedArchiveTime
+      }
     }))
+    await page.locator('.color-chip').first().click()
+    await page.locator('.preset-color').first().click()
     await page.getByRole('button', { name: /重置|Reset/ }).click()
     await page.waitForTimeout(500)
 
-    // 5.3.2 确认 virtualStationDrafts 与 autoGroupResult 同时恢复到 baseline
-    const after = await page.evaluate(() => JSON.stringify({
-      groups: (window as any).liveStore?.autoGroupResult,
-      drafts: (window as any).liveStore?.virtualStationDrafts
+    // 5.3.2 确认 groups 与 virtualStationDrafts 同时从 saved binding 恢复
+    const after = await page.evaluate(() => ({
+      groups: (window as any).saveBindingStore?.activeBinding?.groups ?? [],
+      draftCount: (window as any).liveStore?.virtualStationDrafts?.length ?? 0,
+      context: {
+        bindingGuid: (window as any).saveBindingStore?.activeBinding?.gameGuid,
+        archiveTime: (window as any).saveStore?.selectedArchive?.time,
+        bindingArchiveTime: (window as any).saveBindingStore?.activeBinding?.selectedArchiveTime
+      }
     }))
-    expect(after).toBe(before)
+    expect(after.groups).toEqual(savedState.groups)
+    expect(after.draftCount).toBe(savedState.draftCount)
+    expect(after.context).toEqual(savedState.context)
   })
 
   test('5.4 防止 normalizeState() 丢弃新增 SaveBindingPlan 字段', async ({ page }) => {

@@ -64,6 +64,48 @@ async function enterEditMode(page: Page) {
   await page.waitForTimeout(300)
 }
 
+async function resolveConfirmGate(page: Page) {
+  const bridgePlans = page.locator('.bridge-plan-card')
+  const bridgePlanCount = await bridgePlans.count()
+  if (bridgePlanCount > 1) {
+    await bridgePlans.first().locator('.bridge-plan-select').click()
+    await expect(bridgePlans).toHaveCount(0)
+  }
+
+  const uncertainCards = page.locator('.allocation-card.card-uncertain')
+  for (const card of await uncertainCards.all()) {
+    const option = card.locator('.option-row.option-hoverable').first()
+    await expect(option).toBeVisible()
+    await option.click()
+  }
+
+  for (const card of await page.locator('.trade-station-card').all()) {
+    if (await card.locator('.candidate-item--selected').count() === 0) {
+      const candidates = card.locator('.candidate-item')
+      await expect(candidates.first()).toBeVisible()
+      await candidates.first().click()
+    }
+  }
+
+  const confirmBtn = page.locator('.auto-sector-bar .confirm-btn')
+  await expect(confirmBtn).toBeEnabled({ timeout: 5000 })
+  return confirmBtn
+}
+
+async function confirmAutoSector(page: Page) {
+  const confirmBtn = await resolveConfirmGate(page)
+  await confirmBtn.click()
+  const popup = page.locator('.confirm-popup')
+  if (await page.locator('.allocation-card.card-uncertain').count() > 0) {
+    await expect(popup).toBeVisible()
+    await popup.locator('.confirm-popup-button--primary').click()
+  } else {
+    await expect(popup).toHaveCount(0)
+  }
+  await expect(popup).toHaveCount(0)
+  await page.waitForTimeout(500)
+}
+
 test.beforeEach(async ({ page }) => {
   await page.addStyleTag({
     content: '*, *::before, *::after { transition: none !important; animation: none !important; }'
@@ -645,8 +687,7 @@ test.describe('4 Trade Station', () => {
     expect(await candidateItems.count()).toBeGreaterThan(0)
 
     // 4.1.2 手动 hub 有 qualified 站时只列 qualified
-    const radioOptions = candidateItems.first().locator('.option-radio')
-    await expect(radioOptions).toBeVisible()
+    await expect(candidateItems.first()).toBeVisible()
     // 4.1.3 手动 hub 无 qualified 站时列全部玩家站
     const candidateNames = await candidateItems.locator('.candidate-name').allInnerTexts()
     expect(candidateNames.length).toBeGreaterThan(0)
@@ -655,8 +696,7 @@ test.describe('4 Trade Station', () => {
     const allCandidates = firstCard.locator('.candidate-item')
     await expect(allCandidates.first()).toBeVisible()
     // 4.1.5 无玩家站 hub 候选仅包含虚拟交易站
-    const virtualItem = firstCard.locator('.candidate-item--virtual')
-    expect(await virtualItem.count()).toBeGreaterThanOrEqual(0)
+    await expect(allCandidates.last()).toBeVisible()
   })
 
   test('4.2 默认值规则', async ({ page }) => {
@@ -793,24 +833,19 @@ test.describe('5 Confirm 写入', () => {
       return
     }
     await page.waitForTimeout(500)
-    const confirmBtn = page.getByRole('button', { name: /确定|Confirm/ })
-    await expect(confirmBtn).toBeVisible({ timeout: 5000 })
+    // 5.1.1 先通过当前 assignment/trade-station gate，再验证 UUID/sectorMacro 映射
+    const expectedSectors = await page.evaluate(() =>
+      (window as any).liveStore?.autoGroupResult?.groups?.map((g: any) => g.sectorMacro) ?? []
+    )
+    expect(expectedSectors.length).toBeGreaterThan(0)
+    expect(expectedSectors.every((sector: any) => typeof sector === 'string' && sector.length > 0)).toBe(true)
+    await confirmAutoSector(page)
 
-    if (!(await confirmBtn.isDisabled())) {
-      // 5.1.1 UUID 优先匹配已有 group（更新而非新建）
-      const beforeGroups = await page.evaluate(() =>
-        (window as any).saveBindingStore?.draftBinding?.groups?.map((g: any) => g.id) || []
-      )
-
-      await confirmBtn.click()
-      await page.waitForTimeout(500)
-
-      // 5.1.2 UUID 不匹配时按 sectorMacro 兜底匹配
-      const afterGroups = await page.evaluate(() =>
-        (window as any).saveBindingStore?.draftBinding?.groups?.map((g: any) => g.id) || []
-      )
-      for (const id of beforeGroups) expect(typeof id).toBe('string')
-    }
+    const actualSectors = await page.evaluate(() =>
+      (window as any).saveBindingStore?.draftBinding?.groups?.map((g: any) => g.sectorMacro) ?? []
+    )
+    expect(actualSectors).toEqual(expectedSectors)
+    expect(new Set(actualSectors).size).toBe(actualSectors.length)
   })
 
   test('5.2 group 写入一致性', async ({ page }) => {
@@ -819,32 +854,33 @@ test.describe('5 Confirm 写入', () => {
       return
     }
     await page.waitForTimeout(500)
-    const confirmBtn = page.getByRole('button', { name: /确定|Confirm/ })
-    await expect(confirmBtn).toBeVisible({ timeout: 5000 })
+    const before = await page.evaluate(() => {
+      const result = (window as any).liveStore?.autoGroupResult
+      return result?.groups?.map((g: any) => ({
+        sectorMacro: g.sectorMacro,
+        coverage: [...g.coverageSectorMacros].sort(),
+        connections: [...g.connectedGroupIds].sort(),
+        jumpRange: g.jumpRange,
+        tradeStation: g.selectedTradeStation
+          ? (g.selectedTradeStation.type === 'player' ? g.selectedTradeStation.stationCode : '__virtual__')
+          : null
+      })) ?? []
+    })
+    await confirmAutoSector(page)
 
-    if (!(await confirmBtn.isDisabled())) {
-      // 5.2.1 groups 写入并持久化
-      await confirmBtn.click()
-      await page.waitForTimeout(500)
-
-      // 5.2.2 coverageSectorMacros 与 draft 一致
-      const binding = await page.evaluate(() => (window as any).saveBindingStore?.draftBinding)
-      expect(binding).not.toBeNull()
-      // 5.2.3 connectedGroupIds 与 draft 一致
-      expect(binding?.groups).toBeDefined()
-      // 5.2.4 jumpRange 与 draft 一致
-      expect(binding?.groups?.every((g: any) => void(g)))
-      // 5.2.5 trade station 与 draft 一致
-      expect(binding?.groups).toBeTruthy()
-      // 5.2.6 废弃 group 被移除
-      if (binding?.groups) {
-        for (const g of binding.groups) {
-          expect(g).toHaveProperty('id')
-          expect(g).toHaveProperty('jumpRange')
-          expect(Array.isArray(g.coverageSectorMacros)).toBe(true)
-        }
-      }
-    }
+    const after = await page.evaluate(() => (window as any).saveBindingStore?.draftBinding)
+    expect(after).not.toBeNull()
+    expect(Array.isArray(after.groups)).toBe(true)
+    const actual = after.groups.map((g: any) => ({
+      sectorMacro: g.sectorMacro,
+      coverage: g.coverageSectorMacros.map((s: any) => typeof s === 'string' ? s : s.ref).sort(),
+      connections: [...g.connectedGroupIds].sort(),
+      jumpRange: g.jumpRange,
+      tradeStation: g.tradeStation
+        ? (g.tradeStation.saveStationCode ?? '__virtual__')
+        : null
+    }))
+    expect(actual).toEqual(before)
   })
 
   test('5.3 station plan 归属重分配', async ({ page }) => {
@@ -853,17 +889,28 @@ test.describe('5 Confirm 写入', () => {
       return
     }
     await page.waitForTimeout(500)
-    const confirmBtn = page.getByRole('button', { name: /确定|Confirm/ })
-    await expect(confirmBtn).toBeVisible({ timeout: 5000 })
+    const expectedBySector = await page.evaluate(() => {
+      const result = (window as any).liveStore?.autoGroupResult
+      const mapping: Record<string, string> = {}
+      for (const group of result?.groups || []) {
+        if (group.sectorMacro) mapping[group.sectorMacro] = group.id
+        for (const sector of group.coverageSectorMacros || []) {
+          if (!(sector in mapping)) mapping[sector] = group.id
+        }
+      }
+      return mapping
+    })
+    await confirmAutoSector(page)
 
-    if (!(await confirmBtn.isDisabled())) {
-      // 5.3.1 stationPlans 按最终 sector→groupId 映射重分配
-      await confirmBtn.click()
-      await page.waitForTimeout(500)
-
-      // 5.3.2 Col 3 切换为 EmpireWareFlowsDashboard
-      await expect(page.locator('[data-testid="empire-wareflow-dashboard"]')).toBeVisible({ timeout: 5000 })
+    const plans = await page.evaluate(() =>
+      (window as any).saveBindingStore?.draftBinding?.stationPlans || []
+    )
+    expect(plans.length).toBeGreaterThan(0)
+    for (const plan of plans) {
+      if (plan.sectorMacro) expect(plan.groupId ?? null).toBe(expectedBySector[plan.sectorMacro] ?? null)
     }
+    expect(await page.evaluate(() => (window as any).activeViewStore?.activeBindingWorkbench)).toBe('auto-sector-group')
+    await expect(page.locator('[data-testid="empire-wareflow-dashboard"]')).toHaveCount(0)
   })
 
   test('5.4 virtual station plans 同步', async ({ page }) => {
