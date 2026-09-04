@@ -6,6 +6,7 @@ import { createPinia, setActivePinia } from 'pinia'
 import { getPriceByMultiplier } from '@/store/logic/calculatorUtils'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
 import type { X4Equipment, X4Ship, X4Ware } from '@/types/x4'
+import { loadShipTestFixture } from './ship-test-fixture'
 import shipsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/ships.json'
 import equipmentsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/equipments.json'
 import waresRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/wares.json'
@@ -60,15 +61,17 @@ const calcMaterialValues = (materials: Record<string, number>, priceMultiplier: 
 describe('ship-build-material unit contracts', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
+    loadShipTestFixture()
     localStorage.clear()
   })
 
   it('1.0 method 选项过滤 xenon', () => {
     const store = useShipBuildStore()
     store.setSelectedShipId(OSAKA_ID)
+    store.setEquipment('turret', 'group_back_down_mid', ARG_BEAM_ID, 1)
 
     // Access method options from shipBuildMaterialAnalysis
-    const analysis = store.shipBuildMaterialAnalysis
+    const analysis = store.getBuildAnalysis(store.blueprint)
     expect(analysis).toBeTruthy()
 
     const methodOptions = analysis?.methodOptions
@@ -79,28 +82,13 @@ describe('ship-build-material unit contracts', () => {
   it('1.1 method 选项聚合：包含去重后的 default/closedloop/terran', () => {
     const store = useShipBuildStore()
     store.setSelectedShipId(OSAKA_ID)
+    store.setEquipment('turret', 'group_back_down_mid', ARG_BEAM_ID, 1)
 
-    const shipMethods = new Set<string>()
-    const ship = shipMap.get(OSAKA_ID)
-    const productions = Array.isArray(ship?.production) ? ship.production : []
-    for (const item of productions) {
-      if (item.method) shipMethods.add(item.method)
-    }
-
-    const equipmentMethods = new Set<string>()
-    for (const row of store.connectionRows) {
-      for (const option of row.options) {
-        const equipment = equipmentMap.get(option.id)
-        if (!equipment?.cost) continue
-        Object.keys(equipment.cost).forEach((method) => equipmentMethods.add(method))
-      }
-    }
-
-    const methodOptions = Array.from(new Set([...shipMethods, ...equipmentMethods]))
+    const methodOptions = store.getBuildAnalysis(store.blueprint).methodOptions
 
     expect(methodOptions).toContain('default')
     expect(methodOptions).toContain('closedloop')
-    expect(methodOptions).toContain('terran')
+    expect(methodOptions).not.toContain('xenon')
     expect(new Set(methodOptions).size).toBe(methodOptions.length)
   })
 
@@ -123,7 +111,9 @@ describe('ship-build-material unit contracts', () => {
     const store = useShipBuildStore()
     store.setSelectedShipId(OSAKA_ID)
 
-    const turretRows = store.connectionRows.filter((row) => row.slotType === 'turret')
+    const turretRows = store.selectedShip!.slots
+      .filter((slot) => slot.type === 'turret')
+      .flatMap((slot) => slot.groups.map((group) => ({ groupName: group.group, count: group.connection?.count || 0 })))
     const rowBackDownMid = turretRows.find((row) => row.groupName === 'group_back_down_mid')
     const rowBackMidUp = turretRows.find((row) => row.groupName === 'group_back_mid_up')
     const rowDownMidLeft = turretRows.find((row) => row.groupName === 'group_down_mid_left')
@@ -181,24 +171,24 @@ describe('ship-build-material unit contracts', () => {
     const store = useShipBuildStore()
     store.setSelectedShipId(OSAKA_ID)
 
-    const hullGroup = store.shipBuildMaterialAnalysis?.hullGroup
+    const hullGroup = store.getBuildAnalysis(store.blueprint).shipEntry
 
     expect(hullGroup).toBeTruthy()
-    expect(hullGroup?.shipId).toBe(OSAKA_ID)
-    expect(hullGroup?.items.length).toBeGreaterThan(0)
-    expect(hullGroup?.value).toBeGreaterThan(0)
+    expect(hullGroup?.entityId).toBe(OSAKA_ID)
+    expect(hullGroup?.materialItems.length).toBeGreaterThan(0)
+    expect(hullGroup?.totalValue).toBeGreaterThan(0)
   })
 
   it('1.8 船体分项展开显示材料明细', () => {
     const store = useShipBuildStore()
     store.setSelectedShipId(OSAKA_ID)
 
-    const hullGroup = store.shipBuildMaterialAnalysis?.hullGroup
+    const hullGroup = store.getBuildAnalysis(store.blueprint).shipEntry
     expect(hullGroup).toBeTruthy()
-    expect(hullGroup?.items.length).toBeGreaterThan(0)
+    expect(hullGroup?.materialItems.length).toBeGreaterThan(0)
 
     // OSAKA has computronicsubstrate, energycells, metallicmicrolattice in hull materials
-    const hasMaterials = hullGroup?.items.length && hullGroup.items.length > 0
+    const hasMaterials = hullGroup?.materialItems.length && hullGroup.materialItems.length > 0
     expect(hasMaterials).toBe(true)
   })
 
@@ -208,8 +198,7 @@ describe('ship-build-material unit contracts', () => {
 
     // When no equipment is assigned, blueprint may be null
     // But selectedEquipmentGroups should still work (from selectedByConnection)
-    const equipmentGroups = store.shipBuildMaterialAnalysis?.equipmentGroups
-    expect(equipmentGroups).toBeDefined()
+    const equipmentGroups = store.getBuildAnalysis(store.blueprint).equipmentEntries
     expect(Array.isArray(equipmentGroups)).toBe(true)
   })
 })

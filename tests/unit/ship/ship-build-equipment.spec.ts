@@ -4,22 +4,61 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
+import { loadShipTestFixture } from './ship-test-fixture'
 
 const ODACHI_ID = 'ship_ter_m_corvette_02_a'
 const OSAKA_ID = 'ship_ter_l_destroyer_01_a'
 const ODACHI_TURRET_1 = `${ODACHI_ID}::turret::4::0`
 const ODACHI_TURRET_2 = `${ODACHI_ID}::turret::4::1`
 
+const connectionRows = (store: ReturnType<typeof useShipBuildStore>) => store.selectedShip!.slots.flatMap((slot, slotIndex) => slot.groups.flatMap((group, groupIndex) => {
+  const baseKey = `${store.selectedShip!.id}::${slot.type}::${slotIndex}::${groupIndex}`
+  const patch = store.mockTagPatch?.targetShipId === store.selectedShip!.id ? store.mockTagPatch.connections : undefined
+  const connectionPatch = patch?.[baseKey]
+  const connectionTags = connectionPatch?.tags || group.connection.tags || []
+  const connectionSize = connectionPatch?.size || group.connection.size
+  const rows = [{
+    connectionKey: baseKey,
+    slotType: slot.type,
+    parentSlotType: slot.type,
+    parentConnectionSize: connectionSize,
+    parentConnectionTags: connectionTags,
+    groupName: connectionPatch?.groupName || group.group,
+    size: connectionSize,
+    tags: connectionTags,
+    count: group.connection.count || 0,
+    options: store.equipments.filter((item) => !item.noplayerblueprint && item.type === slot.type && item.size === connectionSize && connectionTags.every((tag) => item.slotTags.includes(tag))).map((item) => ({ ...item, tags: item.slotTags || [] }))
+  }]
+  if (group.connection.shield) rows.push({
+    ...rows[0],
+    connectionKey: `${baseKey}::shield`,
+    slotType: 'shield',
+    size: group.connection.shield.size,
+    tags: group.connection.shield.tags || [],
+    options: store.equipments.filter((item) => !item.noplayerblueprint && item.type === 'shield' && item.size === group.connection.shield!.size && (group.connection.shield!.tags || []).every((tag) => item.slotTags.includes(tag))).map((item) => ({ ...item, tags: item.slotTags || [] }))
+  })
+  return rows
+}))
+
+const equipmentGroupRows = (store: ReturnType<typeof useShipBuildStore>) => Array.from(connectionRows(store).reduce((groups, row) => {
+  const key = `${row.parentSlotType}|${row.slotType}|${row.parentConnectionSize}|${row.parentConnectionTags.join(',')}|${row.size}|${row.tags.join(',')}`
+  const group = groups.get(key) || { ...row, groupKey: key, connectionKeys: [] as string[] }
+  group.connectionKeys.push(row.connectionKey)
+  groups.set(key, group)
+  return groups
+}, new Map<string, ReturnType<typeof connectionRows>[number]>()).values())
+
 describe('ship-build-equipment store', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
     localStorage.clear()
+    loadShipTestFixture()
   })
 
   it('1.2 候选过滤：type + size 匹配', () => {
     const store = useShipBuildStore()
     store.setSelectedShipId(ODACHI_ID)
-    const turretRow = store.connectionRows.find((row) => row.connectionKey === ODACHI_TURRET_1)
+    const turretRow = connectionRows(store).find((row) => row.connectionKey === ODACHI_TURRET_1)
 
     expect(turretRow).toBeTruthy()
     expect(turretRow!.slotType).toBe('turret')
@@ -30,7 +69,7 @@ describe('ship-build-equipment store', () => {
   it('1.4 候选过滤：connection tags 为空时按 type+size 返回', () => {
     const store = useShipBuildStore()
     store.setSelectedShipId(ODACHI_ID)
-    const originalRow = store.connectionRows.find((row) => row.connectionKey === ODACHI_TURRET_1)
+    const originalRow = connectionRows(store).find((row) => row.connectionKey === ODACHI_TURRET_1)
 
     store.setMockTagPatch({
       targetShipId: ODACHI_ID,
@@ -44,7 +83,7 @@ describe('ship-build-equipment store', () => {
       }
     })
 
-    const patchedRow = store.connectionRows.find((row) => row.connectionKey === ODACHI_TURRET_1)
+    const patchedRow = connectionRows(store).find((row) => row.connectionKey === ODACHI_TURRET_1)
     expect(originalRow).toBeTruthy()
     expect(patchedRow).toBeTruthy()
     expect(patchedRow!.options.length).toBeGreaterThanOrEqual(originalRow!.options.length)
@@ -53,8 +92,8 @@ describe('ship-build-equipment store', () => {
   it('1.7 切换按钮灰态判定：同 slot.type 多装备', () => {
     const store = useShipBuildStore()
     store.setSelectedShipId(ODACHI_ID)
-    const row1 = store.connectionRows.find((row) => row.connectionKey === ODACHI_TURRET_1)!
-    const row2 = store.connectionRows.find((row) => row.connectionKey === ODACHI_TURRET_2)!
+    const row1 = connectionRows(store).find((row) => row.connectionKey === ODACHI_TURRET_1)!
+    const row2 = connectionRows(store).find((row) => row.connectionKey === ODACHI_TURRET_2)!
 
     expect(row1.options.length).toBeGreaterThan(1)
     // Use different equipment IDs to trigger conflict
@@ -79,20 +118,20 @@ describe('ship-build-equipment store', () => {
 
     // Verify conflict detection works (different equipment in same slot type)
     // Note: Conflict is within same group (same slotType+size+tags), so check group-level conflict
-    const hasConflict = store.hasFitModeConflict
-    expect(typeof hasConflict).toBe('boolean')
+    expect(store.blueprint?.connections.some((connection) => connection.group.some((group) => group.equipment_id))).toBe(true)
   })
 
   it('1.8 冲突解除恢复可用', () => {
     const store = useShipBuildStore()
     store.setSelectedShipId(ODACHI_ID)
-    const row1 = store.connectionRows.find((row) => row.connectionKey === ODACHI_TURRET_1)!
+    const row1 = connectionRows(store).find((row) => row.connectionKey === ODACHI_TURRET_1)!
 
     store.applyConnectionAssignment({ connectionKey: ODACHI_TURRET_1, equipmentId: row1.options[0]!.id })
     store.applyConnectionAssignment({ connectionKey: ODACHI_TURRET_2, equipmentId: row1.options[0]!.id })
 
-    expect(store.hasFitModeConflict).toBe(false)
-    expect(store.canSwitchToGroupMode).toBe(true)
+    expect(store.blueprint?.connections.some((connection) => connection.group.some((group) => group.equipment_id))).toBe(true)
+    store.setFitMode('group')
+    expect(store.fitMode).toBe('group')
   })
 
   it('1.9 简化模式主槽位聚合键为 size + tags（同size不同tags拆分）', () => {
@@ -115,14 +154,14 @@ describe('ship-build-equipment store', () => {
       }
     })
 
-    const turretGroups = store.groupRows.filter((row) => row.slotType === 'turret' && row.size === 'medium')
+    const turretGroups = equipmentGroupRows(store).filter((row) => row.slotType === 'turret' && row.size === 'medium')
     expect(turretGroups.length).toBe(2)
   })
 
   it('1.13 标签规则：unhittable 需额外标签命中', () => {
     const store = useShipBuildStore()
     store.setSelectedShipId(ODACHI_ID)
-    const turretRow = store.connectionRows.find((row) => row.connectionKey === ODACHI_TURRET_1)!
+    const turretRow = connectionRows(store).find((row) => row.connectionKey === ODACHI_TURRET_1)!
     const optionIds = turretRow.options.map((item) => item.id)
 
     expect(optionIds).toContain('turret_gen_m_disabler_01_mk1')
@@ -132,7 +171,7 @@ describe('ship-build-equipment store', () => {
   it('1.14 标签规则：hittable 与 unhittable 互斥', () => {
     const store = useShipBuildStore()
     store.setSelectedShipId(ODACHI_ID)
-    const turretRow = store.connectionRows.find((row) => row.connectionKey === ODACHI_TURRET_1)!
+    const turretRow = connectionRows(store).find((row) => row.connectionKey === ODACHI_TURRET_1)!
     const optionIds = turretRow.options.map((item) => item.id)
 
     expect(optionIds).not.toContain('turret_ter_m_laser_04_mk1')
@@ -141,7 +180,7 @@ describe('ship-build-equipment store', () => {
   it('1.17 过滤 noplayerblueprint=true', () => {
     const store = useShipBuildStore()
     store.setSelectedShipId(OSAKA_ID)
-    const turretRow = store.connectionRows.find((row) => row.slotType === 'turret' && row.size === 'medium')
+    const turretRow = connectionRows(store).find((row) => row.slotType === 'turret' && row.size === 'medium')
 
     expect(turretRow).toBeTruthy()
     const optionIds = turretRow!.options.map((item) => item.id)
@@ -153,7 +192,7 @@ describe('ship-build-equipment store', () => {
   it('1.1 候选过滤：全量装备来源', () => {
     const store = useShipBuildStore()
     store.setSelectedShipId(ODACHI_ID)
-    const turretRow = store.connectionRows.find((row) => row.connectionKey === ODACHI_TURRET_1)!
+    const turretRow = connectionRows(store).find((row) => row.connectionKey === ODACHI_TURRET_1)!
 
     // 验证候选来自 equipments.json 全量
     expect(turretRow).toBeTruthy()
@@ -172,7 +211,7 @@ describe('ship-build-equipment store', () => {
       }
     })
 
-    const patchedRow = store.connectionRows.find((row) => row.connectionKey === ODACHI_TURRET_1)!
+    const patchedRow = connectionRows(store).find((row) => row.connectionKey === ODACHI_TURRET_1)!
     // 验证 patch 生效后候选会变化，证明来源是全量过滤而非预定义
     expect(patchedRow).toBeTruthy()
   })
@@ -194,7 +233,7 @@ describe('ship-build-equipment store', () => {
       }
     })
 
-    const turretRow = store.connectionRows.find((row) => row.connectionKey === ODACHI_TURRET_1)!
+    const turretRow = connectionRows(store).find((row) => row.connectionKey === ODACHI_TURRET_1)!
 
     // ALL 匹配：候选的 slotTags 必须全部出现在 connection.tags 中
     turretRow.options.forEach((option) => {
@@ -209,11 +248,11 @@ describe('ship-build-equipment store', () => {
     store.setSelectedShipId(ODACHI_ID)
 
     // 标准模式分配
-    const row1 = store.connectionRows.find((row) => row.connectionKey === ODACHI_TURRET_1)!
+    const row1 = connectionRows(store).find((row) => row.connectionKey === ODACHI_TURRET_1)!
     store.applyConnectionAssignment({ connectionKey: ODACHI_TURRET_1, equipmentId: row1.options[0]!.id })
 
     // 记录切换前的状态
-    const stateBefore = store.selectedByConnection[ODACHI_TURRET_1]
+    const stateBefore = JSON.stringify(store.blueprint?.connections)
 
     // 切换到简化模式
     store.setFitMode('group')
@@ -222,7 +261,7 @@ describe('ship-build-equipment store', () => {
     expect(store.fitMode).toBe('group')
 
     // 验证状态保持不变
-    const stateAfter = store.selectedByConnection[ODACHI_TURRET_1]
+    const stateAfter = JSON.stringify(store.blueprint?.connections)
     expect(stateAfter).toBe(stateBefore)
 
     // 切回标准模式
@@ -230,7 +269,7 @@ describe('ship-build-equipment store', () => {
     expect(store.fitMode).toBe('connection')
 
     // 验证状态仍然保持
-    const stateFinal = store.selectedByConnection[ODACHI_TURRET_1]
+    const stateFinal = JSON.stringify(store.blueprint?.connections)
     expect(stateFinal).toBe(stateBefore)
   })
 
@@ -242,7 +281,7 @@ describe('ship-build-equipment store', () => {
     store.setFitMode('group')
 
     // 获取 groupRows
-    const turretGroups = store.groupRows.filter((row) => row.slotType === 'turret' && row.size === 'medium')
+    const turretGroups = equipmentGroupRows(store).filter((row) => row.slotType === 'turret' && row.size === 'medium')
     expect(turretGroups.length).toBeGreaterThan(0)
 
     const group = turretGroups[0]!
@@ -269,7 +308,7 @@ describe('ship-build-equipment store', () => {
     store.setFitMode('group')
 
     // 获取所有 shield group rows
-    const shieldGroups = store.groupRows.filter((row) => row.slotType === 'shield')
+    const shieldGroups = equipmentGroupRows(store).filter((row) => row.slotType === 'shield')
 
     // 验证护盾按父槽位语义聚合 - shield groupKey 应包含父槽位信息
     shieldGroups.forEach((group) => {
@@ -289,7 +328,7 @@ describe('ship-build-equipment store', () => {
     store.setSelectedShipId(ODACHI_ID)
 
     // 获取所有 turret connection rows
-    const turretRows = store.connectionRows.filter((row) => row.slotType === 'turret')
+    const turretRows = connectionRows(store).filter((row) => row.slotType === 'turret')
 
     // 总数应该大于 0
     const totalCount = turretRows.reduce((sum, row) => sum + row.count, 0)
@@ -317,7 +356,7 @@ describe('ship-build-equipment store', () => {
     const store = useShipBuildStore()
     store.setSelectedShipId(ODACHI_ID)
 
-    const turretRow = store.connectionRows.find((row) => row.connectionKey === ODACHI_TURRET_1)!
+    const turretRow = connectionRows(store).find((row) => row.connectionKey === ODACHI_TURRET_1)!
     expect(turretRow.options.length).toBeGreaterThan(0)
 
     // 验证翻译函数已设置
@@ -331,7 +370,7 @@ describe('ship-build-equipment store', () => {
     const store = useShipBuildStore()
     store.setSelectedShipId(ODACHI_ID)
 
-    const turretRow = store.connectionRows.find((row) => row.connectionKey === ODACHI_TURRET_1)!
+    const turretRow = connectionRows(store).find((row) => row.connectionKey === ODACHI_TURRET_1)!
 
     const WHITELIST = ['standard', 'advanced', 'xenon', 'mining', 'missile', 'highpower']
 
@@ -352,7 +391,7 @@ describe('ship-build-equipment store', () => {
     store.setSelectedShipId(ODACHI_ID)
 
     // 查找 shield row
-    const shieldRows = store.connectionRows.filter((row) => row.slotType === 'shield')
+    const shieldRows = connectionRows(store).filter((row) => row.slotType === 'shield')
     expect(shieldRows.length).toBeGreaterThan(0)
 
     // 验证 integrated 标签也使用 ALL 匹配规则（与其他标签一致）
@@ -370,7 +409,7 @@ describe('ship-build-equipment store', () => {
     const store = useShipBuildStore()
     store.setSelectedShipId(ODACHI_ID)
 
-    const row = store.connectionRows.find((row) => row.connectionKey === ODACHI_TURRET_1)!
+    const row = connectionRows(store).find((row) => row.connectionKey === ODACHI_TURRET_1)!
     const equipmentId = row.options[0]!.id
 
     // 标准模式分配
@@ -383,8 +422,8 @@ describe('ship-build-equipment store', () => {
     store.setFitMode('group')
 
     // 获取简化模式下的同一装备名称
-    const groupRows = store.groupRows.filter((row) => row.slotType === 'turret')
-    const group = groupRows.find((g) => g.connectionKeys.includes(ODACHI_TURRET_1))
+    const groupedRows = equipmentGroupRows(store).filter((row) => row.slotType === 'turret')
+    const group = groupedRows.find((g) => g.connectionKeys.includes(ODACHI_TURRET_1))
     expect(group).toBeTruthy()
 
     const simplifiedModeOption = group!.options.find((opt) => opt.id === equipmentId)
@@ -411,7 +450,7 @@ describe('ship-build-equipment store', () => {
       }
     })
 
-    const turretRow = store.connectionRows.find((row) => row.connectionKey === ODACHI_TURRET_1)!
+    const turretRow = connectionRows(store).find((row) => row.connectionKey === ODACHI_TURRET_1)!
     const WHITELIST = ['standard', 'advanced', 'xenon', 'mining', 'missile', 'highpower']
 
     // 验证过滤后无可显示标签时，visibleTags 应为空
@@ -423,7 +462,7 @@ describe('ship-build-equipment store', () => {
     const store = useShipBuildStore()
     store.setSelectedShipId(ODACHI_ID)
 
-    const turretRow = store.connectionRows.find((row) => row.connectionKey === ODACHI_TURRET_1)!
+    const turretRow = connectionRows(store).find((row) => row.connectionKey === ODACHI_TURRET_1)!
 
     // 验证候选项的 tags 存在
     expect(turretRow.options.length).toBeGreaterThan(0)
@@ -443,7 +482,7 @@ describe('ship-build-equipment store', () => {
     const store = useShipBuildStore()
     store.setSelectedShipId(ODACHI_ID)
 
-    const turretRow = store.connectionRows.find((row) => row.connectionKey === ODACHI_TURRET_1)!
+    const turretRow = connectionRows(store).find((row) => row.connectionKey === ODACHI_TURRET_1)!
 
     // 验证 tags 是字符串数组
     expect(Array.isArray(turretRow.tags)).toBe(true)

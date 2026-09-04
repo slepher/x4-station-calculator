@@ -36,6 +36,17 @@ vi.mock('@/utils/UseX4I18n', () => ({
 
 import MapSvgCanvas from '@/components/map/MapSvgCanvas.vue'
 
+const normalizeMapFixture = () => {
+  const gameData = useGameDataStore()
+  const sectors = { ...gameData.maps.sectors }
+  Object.values(gameData.maps.clusters).forEach((cluster) => {
+    if (Array.isArray(cluster.sectors)) return
+    Object.assign(sectors, cluster.sectors)
+    cluster.sectors = Object.keys(cluster.sectors)
+  })
+  gameData.maps.sectors = sectors
+}
+
 describe('MapSvgCanvas resource pie fill', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
@@ -49,9 +60,21 @@ describe('MapSvgCanvas resource pie fill', () => {
           owner_color: '#8899aa',
           dlc_tag: 'base',
           normalized: { pixel_basis: { x: 0, y: 0 } },
-          sectors: {
-            sector_alpha: {
-              id: 'sector_alpha',
+          sectors: ['sector_alpha', 'sector_beta'],
+          sector_links: {
+            link_ab: {
+              id: 'link_ab',
+              sector_a_id: 'sector_alpha',
+              sector_b_id: 'sector_beta',
+              from_zone_id: 'zone_left',
+              to_zone_id: 'zone_right'
+            }
+          }
+        }
+      },
+      sectors: {
+        sector_alpha: {
+          id: 'sector_alpha',
               cluster_id: 'cluster_01',
               name: 'Alpha',
               owner: 'argon',
@@ -70,8 +93,8 @@ describe('MapSvgCanvas resource pie fill', () => {
                 }
               }
             },
-            sector_beta: {
-              id: 'sector_beta',
+        sector_beta: {
+          id: 'sector_beta',
               cluster_id: 'cluster_01',
               name: 'Beta',
               owner: 'argon',
@@ -90,22 +113,12 @@ describe('MapSvgCanvas resource pie fill', () => {
                 }
               }
             }
-          },
-          sector_links: {
-            link_ab: {
-              id: 'link_ab',
-              sector_a_id: 'sector_alpha',
-              sector_b_id: 'sector_beta',
-              from_zone_id: 'zone_left',
-              to_zone_id: 'zone_right'
-            }
           }
-        }
-      }
     } as never
   })
 
   it('renders bottom-center group badges only for resource-filled sectors', () => {
+    normalizeMapFixture()
     const wrapper = mount(MapSvgCanvas, {
       props: {
         resourceHighlightedSectorIds: ['sector_alpha'],
@@ -131,6 +144,7 @@ describe('MapSvgCanvas resource pie fill', () => {
   })
 
   it('renders sector links from zones without shcon_anchors', () => {
+    normalizeMapFixture()
     const wrapper = mount(MapSvgCanvas)
 
     const lines = wrapper.findAll('g.sector-links line')
@@ -176,6 +190,7 @@ describe('MapSvgCanvas resource pie fill', () => {
       }
     } as never
 
+    normalizeMapFixture()
     const wrapper = mount(MapSvgCanvas)
     const gate = wrapper.get('g.gates image.gate-circle')
     expect(gate.attributes('data-gate-id')).toContain('gate_1')
@@ -236,6 +251,7 @@ describe('MapSvgCanvas resource pie fill', () => {
       }
     } as never
 
+    normalizeMapFixture()
     const wrapper = mount(MapSvgCanvas)
     const line = wrapper.get('g.highways line')
     const sectorPolygon = wrapper.get('polygon.sector-polygon[data-sector-id="sector_alpha"]')
@@ -324,6 +340,7 @@ describe('MapSvgCanvas resource pie fill', () => {
       }
     } as never
 
+    normalizeMapFixture()
     const wrapper = mount(MapSvgCanvas)
     const lines = wrapper.findAll('g.sector-links line')
 
@@ -372,6 +389,7 @@ describe('MapSvgCanvas resource pie fill', () => {
       }
     } as never
 
+    normalizeMapFixture()
     const wrapper = mount(MapSvgCanvas, {
       props: {
         placementOverlays: [{

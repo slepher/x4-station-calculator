@@ -114,7 +114,7 @@ describe('MapSavePanel open behavior', () => {
     mockedSaveBindingStore = {
       activeBinding: {
         groups: [
-          { id: 'sector-1', name: 'Sector 1' }
+          { id: 'sector-1', sectorMacro: 'sector-1', name: 'Sector 1' }
         ]
       },
       bindings: [],

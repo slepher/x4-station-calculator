@@ -6,6 +6,7 @@ import { mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import ShipBuildPanelStats from '@/components/ship-build/ShipBuildPanelStats.vue'
 import { useEquipmentStats } from '@/composables/useEquipmentStats'
+import { useGameDataStore } from '@/store/useGameDataStore'
 import shipsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/ships.json'
 import equipmentsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/equipments.json'
 import bulletsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/bullets.json'
@@ -30,7 +31,8 @@ vi.mock('@/store/useShipBuildStore', () => ({
   useShipBuildStore: () => ({
     ships: [odachiShip],
     equipments: [odachiEngine, odachiThruster, odachiShield, odachiWeapon, odachiTurret, shotgunTurret, odachiMissileLauncher],
-    selectedShipId: 'ship_ter_m_corvette_02_a'
+    selectedShipId: 'ship_ter_m_corvette_02_a',
+    findShip: (id: string) => shipsRaw.find((ship: any) => ship.id === id)
   })
 }))
 
@@ -40,7 +42,12 @@ vi.mock('vue-i18n', () => ({
 }))
 
 describe('ShipBuildPanelStats', () => {
-  beforeEach(() => { setActivePinia(createPinia()) })
+  beforeEach(() => {
+    setActivePinia(createPinia())
+    const gameData = useGameDataStore()
+    gameData.bullets = bulletsRaw as never
+    gameData.missiles = missilesRaw as never
+  })
 
   // 1.1 档位默认状态
   it('1.1 档位默认状态', () => {

@@ -4,6 +4,7 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
+import { loadShipTestFixture } from './ship-test-fixture'
 
 const ODACHI_ID = 'ship_ter_m_corvette_02_a'
 const STORAGE_KEY = 'x4_ship_blueprints'
@@ -11,6 +12,7 @@ const STORAGE_KEY = 'x4_ship_blueprints'
 describe('ship-build-storage: data types', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
+    loadShipTestFixture()
     localStorage.clear()
   })
 
@@ -72,6 +74,7 @@ describe('ship-build-storage: data types', () => {
 describe('ship-build-storage: setEquipment', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
+    loadShipTestFixture()
     localStorage.clear()
   })
 
@@ -171,6 +174,7 @@ describe('ship-build-storage: setEquipment', () => {
 describe('ship-build-storage: setShield', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
+    loadShipTestFixture()
     localStorage.clear()
   })
 
@@ -211,6 +215,7 @@ describe('ship-build-storage: setShield', () => {
 describe('ship-build-storage: selectedByConnection', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
+    loadShipTestFixture()
     localStorage.clear()
   })
 
@@ -268,6 +273,7 @@ describe('ship-build-storage: selectedByConnection', () => {
 describe('ship-build-storage: persistence CRUD', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
+    loadShipTestFixture()
     localStorage.clear()
   })
 
@@ -352,7 +358,7 @@ describe('ship-build-storage: persistence CRUD', () => {
     expect(store.blueprint?.name).toBe('')
     expect(store.savedBlueprints.activeBlueprintId).toBeNull()
     expect(store.isDirty).toBe(true)
-    expect(store.activeBlueprintStatusLabel).toBe('自定义')
+    expect(store.activeBlueprintStatusLabel).toBe('Custom')
   })
 
   it('1.6.4 loadBlueprint 自动设置筛选', () => {
@@ -374,6 +380,7 @@ describe('ship-build-storage: persistence CRUD', () => {
     const store = useShipBuildStore()
 
     // 载入
+    store.loadBlueprintsFromStorage()
     store.loadBlueprint('test-id')
 
     // 验证自动设置 ship
@@ -384,6 +391,7 @@ describe('ship-build-storage: persistence CRUD', () => {
 describe('ship-build-storage: dirty state', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
+    loadShipTestFixture()
     localStorage.clear()
   })
 
@@ -455,6 +463,7 @@ describe('ship-build-storage: built-in default blueprints', () => {
 
   beforeEach(() => {
     setActivePinia(createPinia())
+    loadShipTestFixture()
     localStorage.clear()
   })
 
@@ -463,7 +472,7 @@ describe('ship-build-storage: built-in default blueprints', () => {
 
     const list = store.getLoadableBlueprintsForShip(ODACHI_ID)
     const names = list.map((bp) => bp.name)
-    expect(names.slice(0, 4)).toEqual(['空配', '低配', '中配', '高配'])
+    expect(names.slice(0, 4)).toEqual(['Empty', 'Low', 'Mid', 'High'])
 
     const data = localStorage.getItem(STORAGE_KEY)
     const parsed = JSON.parse(data || '{}')
@@ -477,13 +486,13 @@ describe('ship-build-storage: built-in default blueprints', () => {
     expect(store.isBuiltInBlueprintId(builtInId)).toBe(true)
 
     store.deleteBlueprint(builtInId)
-    expect(store.getLoadableBlueprintsForShip(ODACHI_ID).map((bp) => bp.name).slice(0, 4)).toEqual(['空配', '低配', '中配', '高配'])
+    expect(store.getLoadableBlueprintsForShip(ODACHI_ID).map((bp) => bp.name).slice(0, 4)).toEqual(['Empty', 'Low', 'Mid', 'High'])
   })
 
   it('1.8.3 载入高配(fight)时引擎优先 combat', () => {
     const store = useShipBuildStore()
     const list = store.getLoadableBlueprintsForShip(ARGON_M_BOMBER_ID)
-    const highPresetId = list.find((bp) => bp.name === '高配')!.id
+    const highPresetId = list.find((bp) => bp.name === 'High')!.id
 
     store.loadBlueprint(highPresetId)
 
@@ -495,7 +504,7 @@ describe('ship-build-storage: built-in default blueprints', () => {
   it('1.8.4 采矿舰高配优先采矿炮塔，且 L 采矿舰 U 槽为 1 运输 + 9 采矿', () => {
     const store = useShipBuildStore()
     const list = store.getLoadableBlueprintsForShip(ARGON_L_SOLID_MINER_ID)
-    const highPresetId = list.find((bp) => bp.name === '高配')!.id
+    const highPresetId = list.find((bp) => bp.name === 'High')!.id
 
     store.loadBlueprint(highPresetId)
 
@@ -520,7 +529,7 @@ describe('ship-build-storage: built-in default blueprints', () => {
   it('1.8.5 运输舰(U槽)默认全部使用运输无人机', () => {
     const store = useShipBuildStore()
     const list = store.getLoadableBlueprintsForShip(PARANID_L_FREIGHTER_ID)
-    const midPresetId = list.find((bp) => bp.name === '中配')!.id
+    const midPresetId = list.find((bp) => bp.name === 'Mid')!.id
 
     store.loadBlueprint(midPresetId)
 
@@ -535,7 +544,7 @@ describe('ship-build-storage: built-in default blueprints', () => {
   it('1.8.6 Osaka 高配默认蓝图应包含引擎与炮塔槽位装备', () => {
     const store = useShipBuildStore()
     const list = store.getLoadableBlueprintsForShip(TERRAN_L_DESTROYER_OSAKA_ID)
-    const highPreset = list.find((bp) => bp.name === '高配')
+    const highPreset = list.find((bp) => bp.name === 'High')
     expect(highPreset).toBeTruthy()
 
     const engineConn = highPreset!.connections.find((c) => c.slot_type === 'engine')
@@ -550,7 +559,7 @@ describe('ship-build-storage: built-in default blueprints', () => {
   it('1.8.7 载入内置预设后应为 dirty（便于保存）', () => {
     const store = useShipBuildStore()
     const list = store.getLoadableBlueprintsForShip(TERRAN_L_DESTROYER_OSAKA_ID)
-    const lowPreset = list.find((bp) => bp.name === '低配')
+    const lowPreset = list.find((bp) => bp.name === 'Low')
     expect(lowPreset).toBeTruthy()
 
     store.loadBlueprint(lowPreset!.id)
@@ -558,17 +567,17 @@ describe('ship-build-storage: built-in default blueprints', () => {
     expect(store.blueprint?.name).toBe('')
     expect(store.isDirty).toBe(true)
     expect(store.requiresSaveAsOnSave()).toBe(true)
-    expect(store.activeBlueprintStatusLabel).toBe('低配')
+    expect(store.activeBlueprintStatusLabel).toBe('Low')
   })
 
   it('1.8.8 预制载入后仅实际装备变更才显示为自定义', () => {
     const store = useShipBuildStore()
     const list = store.getLoadableBlueprintsForShip(TERRAN_L_DESTROYER_OSAKA_ID)
-    const lowPreset = list.find((bp) => bp.name === '低配')
+    const lowPreset = list.find((bp) => bp.name === 'Low')
     expect(lowPreset).toBeTruthy()
 
     store.loadBlueprint(lowPreset!.id)
-    expect(store.activeBlueprintStatusLabel).toBe('低配')
+    expect(store.activeBlueprintStatusLabel).toBe('Low')
 
     const firstConn = store.blueprint?.connections[0]
     const firstGroup = firstConn?.group[0]
@@ -577,11 +586,11 @@ describe('ship-build-storage: built-in default blueprints', () => {
 
     // 无实际变化：不应切换为自定义
     store.setEquipment(firstConn!.slot_type, firstGroup!.group, firstGroup!.equipment_id, firstGroup!.count)
-    expect(store.activeBlueprintStatusLabel).toBe('低配')
+    expect(store.activeBlueprintStatusLabel).toBe('Low')
 
     // 有实际变化：应切换为自定义
     store.setEquipment(firstConn!.slot_type, firstGroup!.group, firstGroup!.equipment_id, firstGroup!.count + 1)
-    expect(store.activeBlueprintStatusLabel).toBe('自定义')
+    expect(store.activeBlueprintStatusLabel).toBe('Custom')
   })
 
 })

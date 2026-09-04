@@ -15,7 +15,9 @@ vi.mock('@/store/useGameDataStore', () => ({
         name: 'Argon Federation',
         nameId: '{20201,101}'
       }
-    ]
+    ],
+    enforceDlcActivation: false,
+    activeDlcs: []
   })
 }))
 

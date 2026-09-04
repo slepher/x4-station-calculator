@@ -45,8 +45,11 @@ describe('MapSectorTooltip', () => {
           owner_color: '#8899aa',
           dlc_tag: 'base',
           normalized: { pixel_basis: { x: 0, y: 0 } },
-          sectors: {
-            sector_alpha: {
+          sectors: ['sector_alpha']
+        }
+      },
+      sectors: {
+        sector_alpha: {
               id: 'sector_alpha',
               cluster_id: 'cluster_01',
               name: 'Argon Prime',
@@ -55,10 +58,8 @@ describe('MapSectorTooltip', () => {
               area: { sunlight: 1.2 },
               raw_center_pos: { x: 64000, y: 0, z: -128000 },
               resources: []
-            }
           }
         }
-      }
     } as never
   })
 

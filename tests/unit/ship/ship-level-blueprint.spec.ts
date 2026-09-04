@@ -150,7 +150,7 @@ describe('ship-level-blueprint unit mapping', () => {
     const activeBlueprint = activeBucket?.blueprints.find((bp) => bp.id === activeBlueprintId)
 
     // 1.1.3 断言输出结构为 `version=2 + ships[]` 且激活 id 落在有效 bucket 中 #期望: [2, 'active ids mapped to ship bucket']
-    expect(version).toBe(2)
+    expect(version).toBe(5)
     expect(Array.isArray(ships)).toBe(true)
     expect(ships.length).toBeGreaterThan(0)
     expect(activeBucket).toBeTruthy()
@@ -158,10 +158,12 @@ describe('ship-level-blueprint unit mapping', () => {
     expect('active ids mapped to ship bucket').toBe('active ids mapped to ship bucket')
   })
 
-  it('1.2 useShipBuildStore 启动时统一走 migration 并落盘当前版本', () => {
+  it('1.2 useShipBuildStore 启动时统一走 migration 并落盘当前版本', async () => {
     // 1.2.1 在 `localStorage.x4_ship_blueprints` 写入 `version=1` 历史结构后创建 `useShipBuildStore`
+    localStorage.setItem('x4_game_version', JSON.stringify({ version: '8.0', beta: false }))
     localStorage.setItem(STORAGE_KEY, JSON.stringify(createLegacyShipBlueprintV1()))
     const store = useShipBuildStore()
+    await store.initialize()
 
     // 1.2.2 在 store 读取 `savedBlueprints.version` 与 `savedBlueprints.ships`，并读取回写后的 `localStorage.x4_ship_blueprints`
     const inMemoryVersion = store.savedBlueprints.version
@@ -169,9 +171,9 @@ describe('ship-level-blueprint unit mapping', () => {
     const persisted = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}') as Record<string, unknown>
 
     // 1.2.3 断言内存与落盘均为 `version=2` 且不存在顶层 `list` 字段 #期望: [2, 'list absent in persisted state']
-    expect(inMemoryVersion).toBe(2)
+    expect(inMemoryVersion).toBe(5)
     expect(Array.isArray(inMemoryShips)).toBe(true)
-    expect(persisted.version).toBe(2)
+    expect(persisted.version).toBe(5)
     expect('list' in persisted).toBe(false)
     expect('list absent in persisted state').toBe('list absent in persisted state')
   })
@@ -190,7 +192,7 @@ describe('ship-level-blueprint unit mapping', () => {
     const exportedKeys = Object.keys(exportedShip)
 
     // 1.3.3 断言导出 ship blueprint 为 `version=2` 且包含 `ships` 不包含 `list` #期望: [2, 'ships', 'list absent']
-    expect(exportedShip.version).toBe(2)
+    expect(exportedShip.version).toBe(5)
     expect(exportedKeys).toContain('ships')
     expect(exportedKeys).not.toContain('list')
     expect('ships').toBe('ships')
@@ -221,7 +223,7 @@ describe('ship-level-blueprint unit mapping', () => {
     const loadCalls = shipBuildStore.loadBlueprintsFromStorage.mock.calls.length
 
     // 1.4.3 断言导入落盘为 `version=2 + ships[]` 且 store 重新加载入口被调用一次 #期望: [2, 'loadBlueprintsFromStorage called once']
-    expect(persisted.version).toBe(2)
+    expect(persisted.version).toBe(5)
     expect(Array.isArray(persisted.ships)).toBe(true)
     expect(loadCalls).toBe(1)
     expect('loadBlueprintsFromStorage called once').toBe('loadBlueprintsFromStorage called once')

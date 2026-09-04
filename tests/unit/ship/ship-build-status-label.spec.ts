@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
 import i18n from '@/i18n'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
+import { loadShipTestFixture } from './ship-test-fixture'
 
 const ODACHI_ID = 'ship_ter_m_corvette_02_a'
 const OSAKA_ID = 'ship_ter_l_destroyer_01_a'
@@ -12,6 +13,7 @@ const OSAKA_ID = 'ship_ter_l_destroyer_01_a'
 describe('ship-build-status-label', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
+    loadShipTestFixture()
     localStorage.clear()
   })
 

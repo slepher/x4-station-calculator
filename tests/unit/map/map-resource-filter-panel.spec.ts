@@ -103,6 +103,41 @@ describe('MapResourceFilterPanel', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
     const gameData = useGameDataStore()
+    gameData.res = [
+      { id: 'ore', color_rgb: '#ff9900' },
+      { id: 'silicon', color_rgb: '#00bbff' },
+      { id: 'methane', color_rgb: '#34d399' },
+      { id: 'hydrogen', color_rgb: '#60a5fa' },
+      { id: 'helium', color_rgb: '#f472b6' }
+    ] as never
+    gameData.maps = {
+      clusters: {
+        cluster_01: { id: 'cluster_01', sectors: ['sector_alpha', 'sector_beta', 'sector_gamma'] }
+      },
+      sectors: {
+        sector_alpha: { id: 'sector_alpha', cluster_id: 'cluster_01', resources: [
+          { ware: 'ore', yield: 'high', level: 12 }, { ware: 'silicon', yield: 'high', level: 11 },
+          { ware: 'methane', yield: 'medium', level: 8 }, { ware: 'hydrogen', yield: 'high', level: 9 }, { ware: 'helium', yield: 'medium', level: 7 }
+        ], area: { sunlight: 1.5 } },
+        sector_beta: { id: 'sector_beta', cluster_id: 'cluster_01', resources: [
+          { ware: 'ore', yield: 'high', level: 10 }, { ware: 'silicon', yield: 'medium', level: 6 },
+          { ware: 'methane', yield: 'high', level: 10 }, { ware: 'hydrogen', yield: 'medium', level: 7 }, { ware: 'helium', yield: 'low', level: 3 }
+        ], area: { sunlight: 1.2 } },
+        sector_gamma: { id: 'sector_gamma', cluster_id: 'cluster_01', resources: [{ ware: 'ore', yield: 'medium', level: 4 }], area: { sunlight: 0.7 } }
+      }
+    } as never
+    gameData.mapResources = {
+      version: '8.0', resource_model: 'regions', regionyield_definitions: [],
+      sectors: {
+        sector_alpha: { resources: [
+          { ware: 'ore', rating: 12 }, { ware: 'silicon', rating: 11 }, { ware: 'methane', rating: 8 }, { ware: 'hydrogen', rating: 9 }, { ware: 'helium', rating: 7 }
+        ] },
+        sector_beta: { resources: [
+          { ware: 'ore', rating: 10 }, { ware: 'silicon', rating: 6 }, { ware: 'methane', rating: 10 }, { ware: 'hydrogen', rating: 7 }, { ware: 'helium', rating: 3 }
+        ] },
+        sector_gamma: { resources: [{ ware: 'ore', rating: 4 }] }
+      }
+    } as never
     gameData.localizedWaresMap = {
       ore: { id: 'ore', localeName: 'Ore Full' },
       silicon: { id: 'silicon', localeName: 'Silicon Full' }

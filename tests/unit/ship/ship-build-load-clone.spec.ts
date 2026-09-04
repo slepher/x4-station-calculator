@@ -4,12 +4,14 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
+import { loadShipTestFixture } from './ship-test-fixture'
 
 const ODACHI_ID = 'ship_ter_m_corvette_02_a'
 
 describe('ship-build-load-clone', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
+    loadShipTestFixture()
     localStorage.clear()
   })
 
@@ -24,7 +26,8 @@ describe('ship-build-load-clone', () => {
 
     setActivePinia(createPinia())
     const storeB = useShipBuildStore()
-    await Promise.resolve()
+    loadShipTestFixture()
+    await storeB.initialize()
 
     const beforeSaved = storeB.savedBlueprints.ships
       .flatMap((bucket) => bucket.blueprints)

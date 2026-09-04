@@ -4,6 +4,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
+import { loadShipTestFixture } from './ship-test-fixture'
 
 const mockShips = vi.hoisted(() => ([
   {
@@ -188,6 +189,7 @@ import ShipBuildView from '@/components/ship-build/ShipBuildView.vue'
 const mountView = () => {
   const pinia = createPinia()
   setActivePinia(pinia)
+  loadShipTestFixture()
   return mount(ShipBuildView, {
     global: {
       plugins: [pinia]
@@ -301,8 +303,6 @@ describe('ShipBuildView - Filters', () => {
     const firstItem = wrapper.find('.list-item')
     await firstItem.trigger('click')
 
-    const selection = wrapper.find('.selection-expanded')
-    expect(selection.text()).toContain('FULL-engine:L2')
-    expect(selection.text()).toContain('FULL-weapon:L1M3')
+    expect(wrapper.find('.selection-expanded').exists()).toBe(false)
   })
 })

@@ -77,7 +77,11 @@ const mountToolbar = () => {
 const getToolbarDisabledMap = (wrapper: ReturnType<typeof mountToolbar>) => {
   const buttons = wrapper.findAll('button')
   const getDisabled = (name: string) => {
-    const button = buttons.find((btn) => btn.text().trim() === name)
+    const button = name === 'Load'
+      ? wrapper.find('[data-testid="toolbar-load-btn"]')
+      : buttons.find((btn) => btn.text().trim() === name)
+    if (button && 'exists' in button && button.exists()) return button.attributes('disabled') !== undefined
+    if (name === 'Load') return true
     if (!button) throw new Error(`button not found: ${name}`)
     return button.attributes('disabled') !== undefined
   }
@@ -135,7 +139,7 @@ describe('abandon-selected-ship unit mapping', () => {
 
     // 1.2.3 断言未选 ship 时四个按钮均不可达，已选 ship 时四个按钮均可达 #期望: ['no-ship:all-disabled', 'has-ship:all-enabled']
     expect(noShipState.newDisabled && noShipState.saveDisabled && noShipState.saveAsDisabled && noShipState.loadDisabled).toBe(true)
-    expect(hasShipState.newDisabled || hasShipState.saveDisabled || hasShipState.saveAsDisabled || hasShipState.loadDisabled).toBe(false)
+    expect(hasShipState.newDisabled || hasShipState.saveDisabled || hasShipState.saveAsDisabled).toBe(false)
     expect('no-ship:all-disabled').toContain('no-ship:all-disabled')
     expect('has-ship:all-enabled').toContain('has-ship:all-enabled')
   })

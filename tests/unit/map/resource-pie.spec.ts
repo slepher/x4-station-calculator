@@ -99,6 +99,23 @@ describe('resource-pie', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
     const gameData = useGameDataStore()
+    gameData.res = [
+      { id: 'ore', color_rgb: '#ff9900' },
+      { id: 'silicon', color_rgb: '#00bbff' },
+      { id: 'methane', color_rgb: '#34d399' },
+      { id: 'hydrogen', color_rgb: '#60a5fa' },
+      { id: 'helium', color_rgb: '#f472b6' }
+    ] as never
+    gameData.maps = {
+      clusters: { cluster_01: { id: 'cluster_01', sectors: ['sector_alpha'] } },
+      sectors: { sector_alpha: { id: 'sector_alpha', cluster_id: 'cluster_01', resources: [
+        { ware: 'ore', yield: 'high', level: 12 }, { ware: 'silicon', yield: 'high', level: 11 }
+      ], area: { sunlight: 1.5 } } }
+    } as never
+    gameData.mapResources = {
+      version: '8.0', resource_model: 'regions', regionyield_definitions: [],
+      sectors: { sector_alpha: { resources: [{ ware: 'ore', rating: 12 }, { ware: 'silicon', rating: 11 }] } }
+    } as never
     gameData.localizedWaresMap = {
       ore: { id: 'ore', localeName: 'Ore Full' },
       silicon: { id: 'silicon', localeName: 'Silicon Full' }

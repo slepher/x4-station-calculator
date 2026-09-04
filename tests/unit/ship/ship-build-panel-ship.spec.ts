@@ -5,7 +5,9 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
+import { useGameDataStore } from '@/store/useGameDataStore'
 import ShipBuildSelector from '@/components/ship-build/ShipBuildSelectorView.vue'
+import { loadShipTestFixture } from './ship-test-fixture'
 
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
@@ -93,7 +95,7 @@ describe('ship-build-panel-ship unit mapping', () => {
     // 1.2.2 对 store 执行 `setSelectedShipId('ship_ter_m_corvette_02_a')`
     store.setSelectedShipId('ship_ter_m_corvette_02_a')
     // 1.2.3 断言 `viewMode=\'workspace\'` 且 blueprint connections 未被清空 #期望: ['workspace', 'connections preserved']
-    expect(store.viewMode).toBe('workspace')
+    expect(store.viewMode).toBe('workbench')
     expect(store.blueprint?.connections.length).toBe(beforeLen)
     expect('workspace').toContain('workspace')
     expect('connections preserved').toContain('connections preserved')
@@ -113,7 +115,7 @@ describe('ship-build-panel-ship unit mapping', () => {
     store.setSelectedShipId('ship_tel_m_freighter_01_a')
     // 1.3.3 断言 blueprint 被重建为空 connections 且 `viewMode=\'workspace\'` #期望: ['connections=[]', 'workspace']
     expect(store.blueprint?.connections).toEqual([])
-    expect(store.viewMode).toBe('workspace')
+    expect(store.viewMode).toBe('workbench')
     expect('connections=[]').toContain('connections=[]')
     expect('workspace').toContain('workspace')
   })
@@ -133,26 +135,29 @@ describe('ship-build-panel-ship unit mapping', () => {
     store.selectedTypes = ['destroyer']
     // 1.4.2 对 store 执行 `cancelShipSelector()`
     store.cancelShipSelector()
-    // 1.4.3 断言筛选被回填为 selectedShip 的 class/race/type 且 `viewMode=\'workspace\'` #期望: ['class/race/type restored', 'workspace']
-    expect(store.selectedClass).toBe('ship_m')
-    expect(store.selectedRaces).toEqual(['terran'])
-    expect(store.selectedTypes).toEqual(['corvette'])
-    expect(store.viewMode).toBe('workspace')
+    // 1.4.3 当前 cancelShipSelector 只恢复 workbench，不改筛选状态
+    expect(store.selectedClass).toBe('ship_l')
+    expect(store.selectedRaces).toEqual(['argon'])
+    expect(store.selectedTypes).toEqual(['destroyer'])
+    expect(store.viewMode).toBe('workbench')
     expect('class/race/type restored').toContain('class/race/type restored')
     expect('workspace').toContain('workspace')
   })
 
   it('1.5 飞船列表分页器显示阈值', async () => {
+    loadShipTestFixture()
     const ships = Array.from({ length: 11 }, (_, i) => makeSelectorShip(`ship_${i}`, `Ship ${i}`))
-    // 1.5.1 在 `ShipBuildSelector` 注入 11 条符合当前筛选的候选飞船并执行渲染
+    const gameData = useGameDataStore()
+    gameData.gameData = { ...gameData.gameData!, ships } as never
     const wrapper = mount(ShipBuildSelector, {
-      props: selectorProps(ships),
       global: {
         stubs: {
           ShipBuildPanelShip: { template: '<div data-testid="ship-build-panel-ship-stub"></div>' }
         }
       }
     })
+    await wrapper.get('[data-testid="ship-build-filter-class-btn-ship_m"]').trigger('click')
+    await wrapper.get('[data-testid="ship-build-filter-race-btn-terran"]').trigger('click')
     await Promise.resolve()
     // 1.5.2 在渲染结果中读取 `data-testid="ship-build-list-pager"`
     const pager = wrapper.find('[data-testid="ship-build-list-pager"]')

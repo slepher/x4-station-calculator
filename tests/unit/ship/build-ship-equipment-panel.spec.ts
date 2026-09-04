@@ -1,11 +1,13 @@
 /**
  * @vitest-environment jsdom
  */
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
+import { createPinia, setActivePinia } from 'pinia'
 import { useEquipmentStats } from '@/composables/useEquipmentStats'
 import type { X4Equipment, X4Ship } from '@/types/x4'
 import equipmentsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/equipments.json'
 import shipsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/ships.json'
+import { loadShipTestFixture } from './ship-test-fixture'
 
 const equipments = equipmentsRaw as X4Equipment[]
 const ships = shipsRaw as X4Ship[]
@@ -18,6 +20,11 @@ const engine = equipments.find((e) => e.type === 'engine' && e.thrust)!
 const thruster = equipments.find((e) => e.type === 'thruster' && e.thrust)!
 
 describe('build-ship-equipment-panel', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia())
+    loadShipTestFixture()
+  })
+
   // 1.1 EngineSummary 类型验证
   it('1.1 EngineSummary 类型验证', () => {
     // 1.1.1 导入 EngineSummary 类型定义
@@ -295,7 +302,7 @@ describe('build-ship-equipment-panel', () => {
     expectedFields.forEach((field) => {
       expect(engineDetails).toHaveProperty(field)
     })
-    expect(Object.keys(engineDetails).length).toBe(14)
+    expect(Object.keys(engineDetails).length).toBe(15)
   })
 
   // 1.19 Thruster Details 计算

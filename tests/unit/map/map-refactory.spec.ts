@@ -24,6 +24,14 @@ const mockLayoutState = (centers: Record<string, Vec2>, clusterRadius: number): 
   viewBox: { x: 0, y: 0, width: 800, height: 600 }
 })
 
+const mapClusterData = (clusters: Record<string, { id: string; sectors?: Record<string, Sector> }>) => ({
+  clusters: computed(() => Object.fromEntries(Object.entries(clusters).map(([id, cluster]) => [id, {
+    ...cluster,
+    sectors: Object.keys(cluster.sectors || {})
+  }]))),
+  sectors: computed(() => Object.fromEntries(Object.values(clusters).flatMap((cluster) => Object.entries(cluster.sectors || {}))))
+})
+
 describe('map-refactory unit tests', () => {
   // 1.1 geometry 工具函数单测
   it('1.1 geometry 工具函数单测', () => {
@@ -117,7 +125,7 @@ describe('map-refactory unit tests', () => {
     
     // 1.2.5 对 `gateClusterRatioFromRaw` 输入 gate raw_local_pos 和 sector normalized，断言返回 cluster ratio #期望: [返回正确的 cluster ratio 或 null]
     const gate = { raw_local_pos: { sx: 0.9, sy: 0.9 } }
-    const sectorNorm2: Sector['normalized'] = { center_offset_ratio: { x: 0.3, y: 0.2 }, sector_radius_ratio: 0.6 }
+    const sectorNorm2 = { id: 'sector-raw', normalized: { center_offset_ratio: { x: 0.3, y: 0.2 }, sector_radius_ratio: 0.6 } } as Sector
     const result4 = gateClusterRatioFromRaw(gate, sectorNorm2)
     expect(result4).not.toBeNull()
     expect(result4!.x).toBeCloseTo(0.3 + 0.9 * 0.6, 5)
@@ -138,11 +146,11 @@ describe('map-refactory unit tests', () => {
       },
       sector_links: { link_001: { id: 'link_001', sector_a_id: 'Cluster_100_Sector001_macro', sector_b_id: 'Cluster_100_Sector002_macro', from_zone_id: 'zone_exit', to_zone_id: 'zone_entry' } }
     }
-    const clusters1 = computed(() => ({ 'Cluster_100_macro': clusterWithSectorLinks }))
+    const data1 = mapClusterData({ 'Cluster_100_macro': clusterWithSectorLinks })
     const regionIds1 = computed(() => ['Cluster_100_macro'])
     const layoutState1 = computed(() => mockLayoutState({ 'Cluster_100_macro': { x: 400, y: 300 } }, 100))
     const resolveOwnerColor = vi.fn().mockReturnValue('#666666')
-    const { sectorLinkLines } = useMapSvgLinks({ clusters: clusters1, regionIds: regionIds1, layoutState: layoutState1, resolveOwnerColor, stargateVisualScale: 1.5 })
+    const { sectorLinkLines } = useMapSvgLinks({ clusters: data1.clusters, sectors: data1.sectors, regionIds: regionIds1, layoutState: layoutState1, resolveOwnerColor, stargateVisualScale: 1.5 })
     expect(sectorLinkLines.value.length).toBeGreaterThan(0)
     expect(sectorLinkLines.value[0]!.id).toBe('link_001')
     expect(sectorLinkLines.value[0]!.start).toBeDefined()
@@ -153,10 +161,10 @@ describe('map-refactory unit tests', () => {
       id: 'Cluster_101_macro',
       sectors: { 'Cluster_101_Sector001_macro': { id: 'Cluster_101_Sector001_macro', normalized: { center_offset_ratio: { x: 0, y: 0 }, sector_radius_ratio: 1 }, highways: { highway_001: { entry: { sx: -0.8, sy: 0 }, exit: { sx: 0.8, sy: 0 }, spline: [{ sx: -0.4, sy: 0.1 }, { sx: 0, sy: 0.2 }, { sx: 0.4, sy: 0.1 }] } } } }
     }
-    const clusters2 = computed(() => ({ 'Cluster_101_macro': clusterWithHighways }))
+    const data2 = mapClusterData({ 'Cluster_101_macro': clusterWithHighways })
     const regionIds2 = computed(() => ['Cluster_101_macro'])
     const layoutState2 = computed(() => mockLayoutState({ 'Cluster_101_macro': { x: 400, y: 300 } }, 100))
-    const { highwaySegments } = useMapSvgLinks({ clusters: clusters2, regionIds: regionIds2, layoutState: layoutState2, resolveOwnerColor, stargateVisualScale: 1.5 })
+    const { highwaySegments } = useMapSvgLinks({ clusters: data2.clusters, sectors: data2.sectors, regionIds: regionIds2, layoutState: layoutState2, resolveOwnerColor, stargateVisualScale: 1.5 })
     expect(highwaySegments.value.length).toBeGreaterThan(0)
     expect(['path', 'line']).toContain(highwaySegments.value[0]!.type)
     
@@ -165,11 +173,11 @@ describe('map-refactory unit tests', () => {
       id: 'Cluster_102_macro',
       sectors: { 'Cluster_102_Sector001_macro': { id: 'Cluster_102_Sector001_macro', normalized: { center_offset_ratio: { x: 0, y: 0 }, sector_radius_ratio: 1 }, owner_color: '#ff0000', cluster_gates: { gate_001: { raw_local_pos: { sx: 0.9, sy: 0.9 }, target_cluster_id: 'Cluster_103_macro' } } } }
     }
-    const clusters3 = computed(() => ({ 'Cluster_102_macro': clusterWithGates }))
+    const data3 = mapClusterData({ 'Cluster_102_macro': clusterWithGates })
     const regionIds3 = computed(() => ['Cluster_102_macro'])
     const layoutState3 = computed(() => mockLayoutState({ 'Cluster_102_macro': { x: 400, y: 300 } }, 100))
     const resolveOwnerColor3 = vi.fn().mockReturnValue('#ff0000')
-    const { gateCircles } = useMapSvgLinks({ clusters: clusters3, regionIds: regionIds3, layoutState: layoutState3, resolveOwnerColor: resolveOwnerColor3, stargateVisualScale: 1.5 })
+    const { gateCircles } = useMapSvgLinks({ clusters: data3.clusters, sectors: data3.sectors, regionIds: regionIds3, layoutState: layoutState3, resolveOwnerColor: resolveOwnerColor3, stargateVisualScale: 1.5 })
     expect(gateCircles.value.length).toBeGreaterThan(0)
     expect(gateCircles.value[0]!.point).toBeDefined()
     expect(gateCircles.value[0]!.r).toBeGreaterThan(0)
@@ -178,11 +186,11 @@ describe('map-refactory unit tests', () => {
     // 1.3.5 构造包含配对 cluster_gates 的两个 cluster，对 `crossClusterGateLines` 执行 computed 计算，断言返回跨 cluster gate 连线 #期望: [返回包含 left、right 的连线数组]
     const clusterA: Cluster = { id: 'Cluster_A_macro', sectors: { 'Sector_A01_macro': { id: 'Sector_A01_macro', normalized: { center_offset_ratio: { x: 0, y: 0 }, sector_radius_ratio: 1 }, owner_color: '#ff0000', cluster_gates: { gate_to_B: { raw_local_pos: { sx: 0.9, sy: 0 }, target_cluster_id: 'Cluster_B_macro' } } } } }
     const clusterB: Cluster = { id: 'Cluster_B_macro', sectors: { 'Sector_B01_macro': { id: 'Sector_B01_macro', normalized: { center_offset_ratio: { x: 0, y: 0 }, sector_radius_ratio: 1 }, owner_color: '#00ff00', cluster_gates: { gate_to_A: { raw_local_pos: { sx: -0.9, sy: 0 }, target_cluster_id: 'Cluster_A_macro' } } } } }
-    const clusters4 = computed(() => ({ 'Cluster_A_macro': clusterA, 'Cluster_B_macro': clusterB }))
+    const data4 = mapClusterData({ 'Cluster_A_macro': clusterA, 'Cluster_B_macro': clusterB })
     const regionIds4 = computed(() => ['Cluster_A_macro', 'Cluster_B_macro'])
     const layoutState4 = computed(() => mockLayoutState({ 'Cluster_A_macro': { x: 200, y: 300 }, 'Cluster_B_macro': { x: 600, y: 300 } }, 100))
     const resolveOwnerColor4 = vi.fn().mockImplementation((node) => node.owner_color || '#666666')
-    const { crossClusterGateLines } = useMapSvgLinks({ clusters: clusters4, regionIds: regionIds4, layoutState: layoutState4, resolveOwnerColor: resolveOwnerColor4, stargateVisualScale: 1.5 })
+    const { crossClusterGateLines } = useMapSvgLinks({ clusters: data4.clusters, sectors: data4.sectors, regionIds: regionIds4, layoutState: layoutState4, resolveOwnerColor: resolveOwnerColor4, stargateVisualScale: 1.5 })
     expect(crossClusterGateLines.value.length).toBeGreaterThan(0)
     expect(crossClusterGateLines.value[0]!.id).toContain('<->')
     expect(crossClusterGateLines.value[0]!.left).toBeDefined()
@@ -197,10 +205,10 @@ describe('map-refactory unit tests', () => {
       },
       sector_links: { super_link: { id: 'super_link', sector_a_id: 'Cluster_100_Sector001_macro', sector_b_id: 'Cluster_100_Sector002_macro', from_zone_id: 'zone_beta', to_zone_id: 'zone_gamma' } }
     }
-    const clusters5 = computed(() => ({ 'Cluster_100_macro': clusterWithSuperhighway }))
+    const data5 = mapClusterData({ 'Cluster_100_macro': clusterWithSuperhighway })
     const regionIds5 = computed(() => ['Cluster_100_macro'])
     const layoutState5 = computed(() => mockLayoutState({ 'Cluster_100_macro': { x: 400, y: 300 } }, 100))
-    const { sectorLinkLines: lines } = useMapSvgLinks({ clusters: clusters5, regionIds: regionIds5, layoutState: layoutState5, resolveOwnerColor, stargateVisualScale: 1.5 })
+    const { sectorLinkLines: lines } = useMapSvgLinks({ clusters: data5.clusters, sectors: data5.sectors, regionIds: regionIds5, layoutState: layoutState5, resolveOwnerColor, stargateVisualScale: 1.5 })
     expect(lines.value.length).toBe(1)
     expect(lines.value[0]!.id).toBe('super_link')
     expect(lines.value[0]!.start.x).toBeDefined()

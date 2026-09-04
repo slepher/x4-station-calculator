@@ -1,34 +1,25 @@
 import { describe, expect, it } from 'vitest'
-import type { FitEquipmentOption } from '@/components/ship-build/fitTypes'
 import {
   extractShipCandidates,
   extractEquipmentCandidatesBySelector,
-  extractEquipmentSlotCandidates,
   extractEquipmentSlotCandidatesWithFacets,
-  filterEquipmentCandidates,
   parseSizeNToSizeNth,
   type EquipmentPickerFilters
 } from '@/store/logic/shipEquipmentPicker'
 import type { X4Equipment, X4Ship } from '@/types/x4'
 
-const option = (id: string, race: string | null, mk: string | null, tags: string[]): FitEquipmentOption => ({
-  id,
-  name: id,
-  race,
-  mk,
-  tags
-})
-
 describe('shipEquipmentPicker logic', () => {
   it('filters by races + mks + tags(any)', () => {
-    const result = filterEquipmentCandidates(
-      [
-        option('eq_a', 'argon', '1', ['standard']),
-        option('eq_b', 'split', '2', ['advanced']),
-        option('eq_c', 'argon', '3', ['standard', 'advanced'])
-      ],
-      { races: ['argon'], mks: ['3'], tags: ['advanced'] }
-    )
+    const result = extractEquipmentCandidatesBySelector({
+      shipMap: new Map([['ship_a', shipA]]),
+      equipmentMap: new Map([
+        ['eq_a', { ...eqMap.get('eq_std')!, id: 'eq_a', race: 'argon', mk: '1', slotTags: ['standard'] }],
+        ['eq_c', { ...eqMap.get('eq_m')!, id: 'eq_c', race: 'argon', mk: '3', slotTags: ['standard', 'advanced'] }]
+      ]),
+      shipId: 'ship_a',
+      selector: { mode: 'slotTypeGroupName', slotType: 'turret', groupName: 'group_mid' },
+      filters: { races: ['argon'], mks: ['3'], tags: ['advanced'] }
+    })
 
     expect(result.map((item) => item.id)).toEqual(['eq_c'])
   })
@@ -210,24 +201,20 @@ describe('shipEquipmentPicker selector modes', () => {
   })
 
   it('tagsAll is independent from filters.tags', () => {
-    const base = extractEquipmentSlotCandidates({
+    const base = extractEquipmentCandidatesBySelector({
       shipMap,
       equipmentMap: eqMap,
       shipId: 'ship_a',
-      slotType: 'turret',
-      size: 'large',
-      tagsAll: ['standard'],
+      selector: { mode: 'slotTypeGroupName', slotType: 'turret', groupName: 'group_back' },
       filters: { races: [], mks: [], tags: [] }
     })
     expect(base.map((item) => item.id)).toEqual(['eq_std'])
 
-    const filtered = extractEquipmentSlotCandidates({
+    const filtered = extractEquipmentCandidatesBySelector({
       shipMap,
       equipmentMap: eqMap,
       shipId: 'ship_a',
-      slotType: 'turret',
-      size: 'large',
-      tagsAll: ['standard'],
+      selector: { mode: 'slotTypeGroupName', slotType: 'turret', groupName: 'group_back' },
       filters: { races: [], mks: [], tags: ['advanced'] }
     })
     expect(filtered.map((item) => item.id)).toEqual([])

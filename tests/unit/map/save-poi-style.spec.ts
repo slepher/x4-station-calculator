@@ -2,7 +2,8 @@
  * @vitest-environment jsdom
  */
 import { describe, expect, it } from 'vitest'
-import { getSavePoiIconSize, OVERLAY_ICON_SIZE, SMALL_ICON_SIZE } from '@/components/map/utils/style'
+import { getSavePoiIconSize, SMALL_ICON_SIZE } from '@/components/map/utils/style'
+import { MAP_ICON_SIZES } from '@/components/map/utils/mapIconConfig'
 
 describe('save poi icon size', () => {
   it('uses large icon size for piratebase tags', () => {
@@ -14,7 +15,7 @@ describe('save poi icon size', () => {
       sectorName: 'Alpha',
       position: { x: 0, z: 0 },
       tag: 'piratebase'
-    })).toBe(OVERLAY_ICON_SIZE)
+    })).toBe(MAP_ICON_SIZES.savePoiLarge)
   })
 
   it('keeps unrelated tags at the small icon size', () => {

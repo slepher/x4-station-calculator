@@ -4,6 +4,7 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
+import { loadShipTestFixture } from './ship-test-fixture'
 
 const STORAGE_KEY = 'x4_ship_blueprints'
 const ODACHI_ID = 'ship_ter_m_corvette_02_a'
@@ -11,7 +12,9 @@ const ODACHI_ID = 'ship_ter_m_corvette_02_a'
 describe('ship-build-storage: storage dirty behavior', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
+    loadShipTestFixture()
     localStorage.clear()
+    localStorage.setItem('x4_game_version', JSON.stringify({ version: '8.0', beta: false }))
   })
 
   it('载入已保存蓝图后修改 U 槽无人机应触发 dirty，且未保存前不落盘', async () => {
@@ -23,7 +26,7 @@ describe('ship-build-storage: storage dirty behavior', () => {
 
     setActivePinia(createPinia())
     const store = useShipBuildStore()
-    await Promise.resolve()
+    await store.initialize()
 
     expect(store.isDirty).toBe(false)
     store.updateBlueprintStorage({
@@ -51,7 +54,7 @@ describe('ship-build-storage: storage dirty behavior', () => {
 
     setActivePinia(createPinia())
     const store = useShipBuildStore()
-    await Promise.resolve()
+    await store.initialize()
 
     expect(store.isDirty).toBe(false)
     store.updateBlueprintStorage({

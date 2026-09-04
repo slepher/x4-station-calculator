@@ -21,7 +21,7 @@ describe('useMapHubLinkRoutes', () => {
     })
 
     expect(routeLines.value).toHaveLength(1)
-    expect(routeLines.value[0]?.d).toBe('M 100.0,100.0 L 104.0,96.0 L 142.2,96.0 L 146.2,100.0')
+    expect(routeLines.value[0]?.d).toBe('M 100.0,100.0 L 146.2,100.0')
   })
 
   it('does not reserve the center lane when only an internal highway id matches but final gates do not match the ring channel', () => {
@@ -68,8 +68,9 @@ describe('useMapHubLinkRoutes', () => {
       to: '#ff8800'
     })
     expect(routeLines.value[0]?.trackPaths).toEqual({
-      from: 'M 99.5,99.5 L 103.9,95.3 L 142.3,95.3 L 146.7,99.5',
-      to: 'M 100.5,100.5 L 104.1,96.7 L 142.1,96.7 L 145.7,100.5'
+      center: 'M 100.0,100.0 L 146.2,100.0',
+      from: 'M 100.0,99.0 L 146.2,99.0',
+      to: 'M 100.0,101.0 L 146.2,101.0'
     })
   })
 })

@@ -150,9 +150,9 @@ describe('module-id unit mapping', () => {
       plan.groups.flatMap((group) => group.nodes.map((node) => node.moduleId).filter(Boolean))
     ) as string[]
 
-    // 1.2.3 断言迁移后版本为 2 且节点 moduleId 可命中 modulesMap #期望: [2, true]
+    // 1.2.3 断言迁移后版本为当前 flow 版本且节点 moduleId 可命中 modulesMap #期望: [3, true]
     const allHit = moduleIds.every((moduleId) => Boolean(lookup.modulesMap[moduleId]))
-    expect(migrated.version).toBe(2)
+    expect(migrated.version).toBe(3)
     expect(allHit).toBe(true)
   })
 
@@ -164,6 +164,7 @@ describe('module-id unit mapping', () => {
       isDirty: false,
       loadData: vi.fn(),
       initializeAllStationCaches: vi.fn(),
+      initializeAllStationDerived: vi.fn(),
       saveToStorage: vi.fn()
     }
     const logicFlowStore = {
@@ -201,6 +202,7 @@ describe('module-id unit mapping', () => {
       empireStore: empireStore as any,
       logicFlowStore: logicFlowStore as any,
       shipBuildStore: shipBuildStore as any
+      ,blueprintStore: empireStore as any
     })
 
     // 1.3.3 调用 migrate 后检查升级到最新版本 #期望: [2, 5]
