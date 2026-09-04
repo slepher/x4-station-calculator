@@ -44,12 +44,17 @@ test.describe('Logic Flow Plans - E2E Tests', () => {
       const newBtn = page.getByTestId('toolbar-new-btn');
       await newBtn.click();
 
-      const dialog = page.locator('.smart-save-dialog, [role="dialog"]').filter({ hasText: /保存|Save/i });
+      const dialog = page.locator('[data-testid="dialog-backdrop"]');
       await expect(dialog).toBeVisible();
-      await dialog.getByRole('button', { name: /保存并新建|Save.*Create New/i }).click();
+      await dialog.getByRole('button', { name: /保存|Save/i }).last().click();
 
       const groupCount = await page.evaluate(() => (window as any).logicFlowStore.groups.length);
       expect(groupCount).toBe(0);
+      await page.getByTestId('toolbar-load-btn').click();
+      const plans = page.locator('[data-testid="dialog-backdrop"]');
+      await expect(plans).toBeVisible();
+      await expect(plans.locator('.group').filter({ hasText: /新建方案|New Plan/i })).toHaveCount(1);
+      await expect(plans).toContainText(/船体部件|Hull Parts/i);
     });
   });
 
@@ -71,7 +76,7 @@ test.describe('Logic Flow Plans - E2E Tests', () => {
       await dragWareToTarget(page, 'hullparts');
 
       await page.getByTestId('toolbar-save-as-btn').click();
-      const saveAs = page.locator('.smart-save-dialog, [role="dialog"]');
+      const saveAs = page.locator('[data-testid="dialog-backdrop"]');
       await expect(saveAs).toBeVisible();
       const nameInput = saveAs.locator('input').first();
       await nameInput.fill('Existing Plan');
@@ -81,6 +86,15 @@ test.describe('Logic Flow Plans - E2E Tests', () => {
 
       await page.getByTestId('toolbar-save-btn').click();
 
+      await expect(page.locator('.smart-save-dialog, [role="dialog"]')).toHaveCount(0);
+      await page.reload();
+      await expect(page.getByTestId('top-view-btn-flow')).toHaveClass(/bg-purple-600/);
+      await page.getByTestId('toolbar-new-btn').click();
+      await expect(page.locator('.production-group')).toHaveCount(0);
+      await page.getByTestId('toolbar-load-btn').click();
+      const savedPlan = page.locator('[data-testid="dialog-backdrop"] .group').filter({ hasText: 'Existing Plan' });
+      await expect(savedPlan).toHaveCount(1);
+      await savedPlan.getByRole('button', { name: /加载|Load/i }).click();
       await expect(page.locator('.flow-node[data-ware-id="weaponcomponents"]')).toBeVisible();
       await expect(page.locator('.plan-title-text')).toHaveText('Existing Plan');
     });
@@ -173,7 +187,9 @@ test.describe('Logic Flow Plans - E2E Tests', () => {
 
       const newDropTarget = page.locator('.groups-list .drop-target').last();
       await expect(newDropTarget).toBeVisible();
-      await expect(page.locator('.production-group')).toHaveCount(1);
+      await newDropTarget.click();
+      await expect(page.locator('.production-group')).toHaveCount(2);
+      await expect(page.locator('.production-group').last()).toBeVisible();
     });
   });
 
@@ -185,7 +201,11 @@ test.describe('Logic Flow Plans - E2E Tests', () => {
       const groupTitle = page.locator('.production-group h3').first();
       await expect(groupTitle).toBeVisible();
       
-      await expect(groupTitle).toContainText(/E1-S1|Hull Parts|船体部件|hullparts/i);
+      const initialTitle = await groupTitle.textContent();
+      await expect(groupTitle).toContainText(/Hull Parts|船体部件|hullparts/i);
+      await dragWareToTarget(page, 'weaponcomponents', 0);
+      await expect(groupTitle).not.toHaveText(initialTitle || '');
+      await expect(groupTitle).toContainText(/Weapon Components|武器组件|weaponcomponents/i);
     });
   });
 });

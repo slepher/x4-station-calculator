@@ -9,13 +9,16 @@ test.describe('Logic Flow Incompatible Drag Feedback', () => {
   });
 
   test('4.16 UI: Incompatible Drop Target Visibility (Unlocked Group)', async ({ page }) => {
+    const defaultLock = page.locator('input[type="checkbox"]').first()
+    await defaultLock.uncheck({ force: true })
     await dragWareToTarget(page, 'energycells');
 
     const spaceweedSource = page.locator('.ware-card-wrapper[data-ware-id="spaceweed"]').first();
     await spaceweedSource.scrollIntoViewIfNeeded();
     await expect(spaceweedSource).toBeVisible();
 
-    await dragWareToTarget(page, 'spaceweed', 0, { expectRejected: true });
+    await dragWareToTarget(page, 'spaceweed', 0, { expectedStatus: 'normal' });
+    await expect(page.locator('.compact-group').first()).not.toHaveClass(/border-red-600/);
   });
 
   test('4.17 UI: Locked Group Conflict Feedback (Locked Group)', async ({ page }) => {
@@ -29,7 +32,8 @@ test.describe('Logic Flow Incompatible Drag Feedback', () => {
     await hullpartsSource.scrollIntoViewIfNeeded();
     await expect(hullpartsSource).toBeVisible();
 
-    await dragWareToTarget(page, 'hullparts', 0, { drop: false, expectRejected: true });
+    const beforeNodes = await page.locator('.flow-node').count();
+    await dragWareToTarget(page, 'hullparts', 0, { drop: false, expectedStatus: 'rejected' });
     await expect(group).toHaveClass(/bg-red-900\/10/);
 
     await expect(group).not.toHaveClass(/opacity-20/);
@@ -40,5 +44,6 @@ test.describe('Logic Flow Incompatible Drag Feedback', () => {
     await expect(rejectedLabel).toContainText(/Rejected|拒绝|🚫/i);
 
     await page.mouse.up();
+    await expect(page.locator('.flow-node')).toHaveCount(beforeNodes);
   });
 });
