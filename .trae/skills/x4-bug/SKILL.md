@@ -10,7 +10,8 @@ It records bug artifacts and owns bug tracking state.
 
 Status note:
 - `bugs.md` status is informational metadata for human readability.
-- Execution/closure decisions are driven by `test_tasks.md` and test results, not by bug status text.
+- Execution/closure decisions are driven by the selected canonical Unit or
+  active E2E case and its result, not by bug status text.
 
 ## Input
 
@@ -38,7 +39,7 @@ Status note:
   - record or update bug entries in `bugs.md`
   - maintain bug id and test linkage metadata
 - `/x4:bug` MUST NOT:
-  - directly edit `test_tasks.md` / `knowledge.md`
+  - directly edit canonical test plans or E2E knowledge artifacts
   - redefine test documentation formats
   - implement source-code fixes in `src/**`
   - run bug-fix verification as if code has changed
@@ -49,8 +50,9 @@ Single-phase execution rule:
 - If user asks to "继续修复" in the same message, finish report artifacts first, then stop and instruct next command: `/x4:bug-fix`.
 
 Documentation ownership rule:
-- If reproduction tasks or UI test knowledge must be added/updated, delegate to `/x4:test-doc`.
-- `x4-test-doc` remains the authority for `test_tasks.md` / `knowledge.md`.
+- Unit reproduction belongs to the implementation task in `tests/unit/**`.
+- Browser reproduction belongs to the active `x4-e2e-test-*` workflow in
+  `tests/e2e/**`.
 
 ## Target Resolution Priority (MANDATORY)
 
@@ -75,7 +77,7 @@ When target descriptions are ambiguous or conflicting:
 - **Expected Behavior**: [What should happen]
 - **Actual Behavior**: [What actually happens]
 - **Status**: [New | Confirmed | Fixed | Verified | Rejected]
-- **Related Test**: [Link to test_tasks.md item]
+- **Related Test**: [Link to canonical Unit or active E2E case]
 ```
 
 ## Workflow (MANDATORY)
@@ -88,13 +90,14 @@ When target descriptions are ambiguous or conflicting:
 
 ### Step 2: Generate Reproduction Task
 
-1. Request/update reproduction task via `/x4:test-doc` (do not edit directly in this skill)
+1. Request/update the reproduction case at its canonical Unit or active E2E boundary
 2. Link bug entry to target test id in `bugs.md` via `**Related Test**`
 3. Keep bug-side reproduction description in `bugs.md` only
 
 ### Step 3: Sync UI Knowledge (Web Integration only)
 
-If the reproduction task is Web Integration, delegate `knowledge.md` updates to `/x4:test-doc`.
+If the reproduction is browser-bound, route its documentation through
+`x4-e2e-test-*`.
 
 ### Step 4: Handoff to Fix Phase
 
@@ -134,7 +137,7 @@ If a reported bug is unrelated to any existing change:
 1. Stop and ask whether to create a new change: `fix-<bug-name>`.
 2. Only create the new change after user confirmation.
 3. If confirmed, create initial bug artifact `bugs.md` under that change.
-4. If test docs are needed, delegate to `/x4:test-doc`.
+4. If browser test docs are needed, route to `x4-e2e-test-*`.
 5. Continue using standard workflow.
 
 ## Constraints
@@ -143,7 +146,7 @@ If a reported bug is unrelated to any existing change:
 - Keep `bugs.md` as bug catalog/reference; avoid using its status as execution gate.
 - Do not run fix verification loops in this skill.
 - Do not include language implying fix completion such as "已修复" in `/x4:bug` output.
-- If `Related Test` is unknown after report step, mark as `PENDING (/x4:test-doc)` instead of vague placeholders like `待添加`.
+- If `Related Test` is unknown after report step, mark as `PENDING (canonical Unit or active E2E case)` instead of vague placeholders like `待添加`.
 
 ## Output (MANDATORY)
 
@@ -151,7 +154,7 @@ If a reported bug is unrelated to any existing change:
 - Must list updated bug IDs and their status.
 - Must include `Related Test` linkage result per bug:
   - linked test id; or
-  - `PENDING (/x4:test-doc)` when not yet linked.
+  - `PENDING (canonical Unit or active E2E case)` when not yet linked.
 - Must include next-step routing:
-  - `/x4:test-doc` for reproduction/task linkage
+  - canonical Unit or `x4-e2e-test-*` for reproduction linkage
   - `/x4:bug-fix` for implementation phase

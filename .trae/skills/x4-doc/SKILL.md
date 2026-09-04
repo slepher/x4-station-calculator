@@ -129,10 +129,12 @@ When generating or translating spec documents (`.md` in `openspec/`), **YOU MUST
 
 When creating or updating planning artifacts:
 
-- `tasks.md` is implementation-only and MUST NOT include:
-  - writing test code
-  - running tests
-- `/x4:apply` scope MUST NOT include writing tests or running tests.
+- `tasks.md` is implementation-owned and MUST include the focused Unit
+  evidence required by each behavior-changing implementation task.
+- `/x4:apply` owns the implementation task and its focused Unit test/evidence;
+  it MUST NOT execute E2E tests or the active E2E workflow.
+- E2E planning, implementation, and execution belong only to `x4-e2e-test-*`
+  skills and their `tests/e2e/**` path.
 - `/x4:apply` must include build validation after code writing is complete:
   - `npm run build`
   - if build has compile errors, fix code and rerun build until pass or explicit blocker

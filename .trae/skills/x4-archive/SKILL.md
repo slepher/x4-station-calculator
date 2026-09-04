@@ -22,14 +22,15 @@ Change name input (if provided) supports abbreviation token and must be resolved
 2. Read and enforce verify gate output contract:
    - require `bug_gate=pass`
    - if `bug_gate=fail`, stop archive and report `non_verified_bug_ids` + `bug_gate_summary`
-3. Confirm archive prerequisites that are not bug-status interpretation (e.g., checklist completion).
+3. Confirm canonical Unit evidence and any selected active E2E evidence are
+   complete; legacy test artifacts are not archive blockers.
 4. Execute archive via `openspec-archive-change`.
 5. Report archive result and promoted artifacts.
 
 ## Gate Consumption Rule (MANDATORY)
 
 - `/x4:archive` is not allowed to reinterpret bug status directly from `bugs.md`.
-- Bug closure decision authority belongs to `/x4:verify` gate output.
+- Bug closure decision authority belongs to `/x4:verify` canonical evidence gate.
 - If verify gate output is missing required fields, treat as blocker and ask for rerun of `/x4:verify`.
 
 ## Delegation

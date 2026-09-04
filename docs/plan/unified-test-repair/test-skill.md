@@ -1,10 +1,10 @@
 # Test Skill 问题记录
 
-## unified-test-repair blocker
+## unified-test-repair legacy evidence
 
 ### 问题归属
 
-这是 X4 测试技能自身的脚本/测试资产不完整问题，不是产品代码问题，也不是 `db.json` fixture 问题。
+这是 legacy X4 测试技能自身的脚本/测试资产不完整问题，不是产品代码问题，也不是 `db.json` fixture 问题。legacy 失败不阻塞 canonical Unit 或 active E2E workflow。
 
 ### 问题一：E2E 配对资产缺失
 
@@ -48,12 +48,12 @@ npm run test:unit -- tests/skills/unit tests/e2e-skills/unit
 
 ### 对 unified-test-repair 的影响
 
-`task-test-1` 只拥有 `tests/unified-unit/` 和 `tests/unit/`，不拥有：
+产品测试任务只拥有 canonical `tests/unit/**` 或 `tests/e2e/**`，不拥有：
 
 - `tests/skills/**`
 - `tests/e2e-skills/**`
 - `skill-scripts/**`
 
-所以当前任务不能通过迁移 unit spec、删除失败测试或修改 `db.json` 来解决此问题。应由 X4 test skill / `x4-test-skill-verify` 的资产与脚本 owner 补齐后，再重新运行 `task-test-1`。
+所以当前任务不能通过迁移 unit spec、删除失败测试或修改 `db.json` 来解决此问题。应由 legacy X4 test skill 的资产与脚本 owner 单独处理；不得将其作为 canonical 验证 blocker。
 
-不得通过跳过 skills suite、删除校验用例或伪造 validator 输出绕过 gate。
+不得通过跳过 active E2E skill suite、删除校验用例或伪造 validator 输出绕过 gate。

@@ -1,6 +1,6 @@
 ---
 name: x4-apply
-description: "Implement a change for X4 Station Calculator. Trigger with /x4:apply <change-name>."
+description: "Implement a named change for X4 Station Calculator. Trigger with /x4:apply change-name."
 metadata:
   version: "1.0"
 ---
@@ -9,7 +9,9 @@ metadata:
 
 This skill is the single implementation entry for `/x4:apply`.
 It extends `openspec-apply-change` with X4-specific bug discipline.
-It supports TDD (test-driven development) during apply, including running individual unit tests, but must not execute E2E tests or full test suite runs.
+It owns implementation changes and their focused Unit tests, including running
+individual Unit tests, but must not execute E2E tests or the active E2E
+workflow.
 
 ## Input
 
@@ -27,11 +29,13 @@ It supports TDD (test-driven development) during apply, including running indivi
 
 1. Read and follow `.trae/skills/openspec-apply-change/SKILL.md` as the base implementation workflow.
 2. Read apply context files from OpenSpec instructions and implement pending items in `tasks.md`.
-3. When using TDD (`/tdd` flag), follow TDD tracer-bullet loop per task:
+3. For every behavior-changing implementation task, add or update the focused
+   Unit test in `tests/unit/**`. When using TDD (`/tdd` flag), follow TDD
+   tracer-bullet loop per task:
    - RED: Write one unit test → verify it fails (`npm run test:unit -- tests/unit/<file>`)
    - GREEN: Write minimal implementation to pass
    - REFACTOR: Clean up while keeping tests green
-   - Mark task complete
+   - Mark task complete only with focused Unit evidence
 4. Mark each completed task immediately (`- [ ]` -> `- [x]`).
 5. If a bug is found during implementation, run the bug loop below before continuing.
 6. After all code modifications are complete, run build validation:
@@ -74,6 +78,9 @@ If a discovered bug is out of current change scope:
   - do not add/remove comments unless explicitly requested
   - do not reformat unrelated code
 - Do not execute full test suites (`npm run test:unit` without path, `npm run test:e2e`) or `playwright` in `/x4:apply`.
+- Do not create or modify `tests/e2e/**`; route E2E work through
+  `x4-e2e-test-doc`, `x4-e2e-test-doc-details`, `x4-e2e-test-impl`, and
+  `x4-e2e-test-run`.
 - TDD unit tests are allowed: `npm run test:unit -- tests/unit/<specific-file>`.
 
 ## Output
