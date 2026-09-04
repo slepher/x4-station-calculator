@@ -1,21 +1,10 @@
 import { test } from '../../test-setup';
 import { expect } from '@playwright/test';
+import { setupLogicFlow } from './helpers/setupLogicFlow';
 
 test.describe('Logic Flow UI Adjust', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
-    const dbFixture = await import('../../fixtures/db.json', { with: { type: 'json' } });
-    const dbData = JSON.parse(JSON.stringify(dbFixture.default));
-    delete dbData.vsn;
-    await page.evaluate((data) => {
-      Object.entries(data).forEach(([key, value]) => localStorage.setItem(key, JSON.stringify(value)));
-      localStorage.setItem('isTestEnv', 'true');
-    }, dbData);
-    await page.reload();
-    await page.locator('select').filter({ hasText: /简体中文|English/ }).selectOption('zh-CN');
-    await page.getByTestId('top-view-btn-flow').click();
-    await expect(page.locator('.flow-layout')).toBeVisible();
-    await expect(page.locator('.candidate-zone')).toBeVisible();
+    await setupLogicFlow(page, 'clean');
   });
 
   const dragWareToNewZone = async (page: any, wareId: string) => {
@@ -25,9 +14,9 @@ test.describe('Logic Flow UI Adjust', () => {
     const sourceBox = await source.boundingBox();
     if (!sourceBox) throw new Error(`Source ware ${wareId} not found`);
 
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
+    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
     await page.mouse.down();
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5);
+    await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
     await page.waitForTimeout(100);
 
     const compactView = page.locator('.compact-view');
@@ -52,7 +41,7 @@ test.describe('Logic Flow UI Adjust', () => {
         return window.getComputedStyle(el).gridTemplateColumns;
       });
       
-      expect(gridStyle).toBeTruthy();
+      expect(gridStyle).toContain('2fr 3fr 3fr 4fr');
     });
 
     test('1.2 ProductionLineGroup tier 列宽度比例测试', async ({ page }) => {
@@ -75,9 +64,9 @@ test.describe('Logic Flow UI Adjust', () => {
       const sourceBox = await source.boundingBox();
       if (!sourceBox) throw new Error('Source not found');
 
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
       await page.mouse.down();
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5);
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
       await page.waitForTimeout(200);
 
       const compactView = page.locator('.compact-view');
@@ -103,8 +92,8 @@ test.describe('Logic Flow UI Adjust', () => {
         };
       });
       
-      expect(gridStyle.paddingLeft).toBeTruthy();
-      expect(gridStyle.paddingRight).toBeTruthy();
+      expect(gridStyle.paddingLeft).toBe('16px');
+      expect(gridStyle.paddingRight).toBe('32px');
     });
 
     test('2.2 规划区间距测试', async ({ page }) => {
@@ -165,7 +154,7 @@ test.describe('Logic Flow UI Adjust', () => {
       const cardBox = await t1PlusCard.boundingBox();
       if (!cardBox) throw new Error('Card not found');
 
-      await page.mouse.move(cardBox.x + cardBox.width / 2, cardBox.y + cardBox.height / 2);
+      await page.mouse.move(cardBox.x + cardBox.width / 2, cardBox.y + cardBox.height / 2, { steps: 5 });
       await page.waitForTimeout(200);
 
       const quickAddBtn = t1PlusCard.locator('.ware-card-add-btn');
@@ -182,7 +171,7 @@ test.describe('Logic Flow UI Adjust', () => {
       const wareName = t1PlusCard.locator('.ware-name');
       const nameBoxBefore = await wareName.boundingBox();
 
-      await page.mouse.move(cardBox.x + cardBox.width / 2, cardBox.y + cardBox.height / 2);
+      await page.mouse.move(cardBox.x + cardBox.width / 2, cardBox.y + cardBox.height / 2, { steps: 5 });
       await page.waitForTimeout(200);
 
       const nameBoxAfter = await wareName.boundingBox();
@@ -198,7 +187,7 @@ test.describe('Logic Flow UI Adjust', () => {
       const cardBox = await t0Card.boundingBox();
       if (!cardBox) throw new Error('Card not found');
 
-      await page.mouse.move(cardBox.x + cardBox.width / 2, cardBox.y + cardBox.height / 2);
+      await page.mouse.move(cardBox.x + cardBox.width / 2, cardBox.y + cardBox.height / 2, { steps: 5 });
       await page.waitForTimeout(200);
 
       const quickAddBtn = t0Card.locator('.ware-card-add-btn');
@@ -221,14 +210,14 @@ test.describe('Logic Flow UI Adjust', () => {
       const resourcePreview = cardWithResource.locator('.resource-preview-container');
       await expect(resourcePreview).toBeVisible();
 
-      await page.mouse.move(cardBox.x + cardBox.width / 2, cardBox.y + cardBox.height / 2);
+      await page.mouse.move(cardBox.x + cardBox.width / 2, cardBox.y + cardBox.height / 2, { steps: 5 });
       await page.waitForTimeout(200);
 
       const opacity = await resourcePreview.evaluate((el) => {
         return window.getComputedStyle(el).opacity;
       });
       
-      expect(['0', '0.5', '1']).toContain(opacity);
+      expect(opacity).toBe('0');
     });
 
     test('5.2 压缩率 hover 时保持显示测试', async ({ page }) => {
@@ -240,7 +229,7 @@ test.describe('Logic Flow UI Adjust', () => {
 
       const compressionRate = t1PlusCard.locator('.compression-rate-container');
       
-      await page.mouse.move(cardBox.x + cardBox.width / 2, cardBox.y + cardBox.height / 2);
+      await page.mouse.move(cardBox.x + cardBox.width / 2, cardBox.y + cardBox.height / 2, { steps: 5 });
       await page.waitForTimeout(200);
 
       await expect(compressionRate).toBeVisible();
@@ -255,9 +244,9 @@ test.describe('Logic Flow UI Adjust', () => {
       const sourceBox = await source.boundingBox();
       if (!sourceBox) throw new Error('Source not found');
 
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
       await page.mouse.down();
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5);
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
       await page.waitForTimeout(200);
 
       const compactView = page.locator('.compact-view');

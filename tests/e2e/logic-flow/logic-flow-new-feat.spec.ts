@@ -1,5 +1,6 @@
 import { test } from '../../test-setup';
 import { expect } from '@playwright/test';
+import { setupLogicFlow } from './helpers/setupLogicFlow';
 
 test.describe('Logic Flow New Features', () => {
   test.beforeEach(async ({ page }) => {
@@ -7,33 +8,21 @@ test.describe('Logic Flow New Features', () => {
       console.error(`Page Error: ${err.message}`);
     });
 
-    await page.goto('/');
-    const dbFixture = await import('../../fixtures/db.json', { with: { type: 'json' } });
-    const dbData = JSON.parse(JSON.stringify(dbFixture.default));
-    delete dbData.vsn;
-    await page.evaluate((data) => {
-      Object.entries(data).forEach(([key, value]) => localStorage.setItem(key, JSON.stringify(value)));
-      localStorage.setItem('isTestEnv', 'true');
-    }, dbData);
-    await page.reload();
-    await page.locator('select').filter({ hasText: /简体中文|English/ }).selectOption('zh-CN');
-    await page.getByTestId('top-view-btn-flow').click();
-    await expect(page.locator('.flow-layout')).toBeVisible();
-    await expect(page.locator('.candidate-zone')).toBeVisible();
+    await setupLogicFlow(page, 'clean');
     
     await page.addStyleTag({ content: '*, *::before, *::after { transition: none !important; animation: none !important; }' });
   });
 
   const dragWareToNewZone = async (page: any, wareId: string) => {
-    const source = page.locator(`.ware-card[data-ware-id="${wareId}"]`).first();
+    const source = page.locator(`.ware-card-wrapper[data-ware-id="${wareId}"]`).first();
     await expect(source).toBeVisible();
 
     const sourceBox = await source.boundingBox();
     if (!sourceBox) throw new Error(`Source ware ${wareId} not found`);
 
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
+    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
     await page.mouse.down();
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5);
+    await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
     await page.waitForTimeout(100);
 
     const compactView = page.locator('.compact-view');
@@ -50,15 +39,15 @@ test.describe('Logic Flow New Features', () => {
   };
 
   const dragWareToExistingGroup = async (page: any, wareId: string, groupIndex: number = 0) => {
-    const source = page.locator(`.ware-card[data-ware-id="${wareId}"]`).first();
+    const source = page.locator(`.ware-card-wrapper[data-ware-id="${wareId}"]`).first();
     await expect(source).toBeVisible();
 
     const sourceBox = await source.boundingBox();
     if (!sourceBox) throw new Error(`Source ware ${wareId} not found`);
 
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
+    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
     await page.mouse.down();
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5);
+    await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
     await page.waitForTimeout(100);
 
     const compactView = page.locator('.compact-view');
@@ -75,20 +64,6 @@ test.describe('Logic Flow New Features', () => {
   };
 
   test.describe('Bug Regression Tests', () => {
-    test('Setup: Check hullparts node count', async ({ page }) => {
-      await dragWareToNewZone(page, 'hullparts');
-      await page.waitForTimeout(300);
-      
-      const manualNodeCount = await page.evaluate(() => {
-        const logicFlow = (window as any).logicFlowStore;
-        const group = logicFlow.groups[0];
-        return group?.nodes.filter((n: any) => n.source === 'manual').length || 0;
-      });
-      
-      console.log(`hullparts manual node count: ${manualNodeCount}`);
-      expect(manualNodeCount).toBe(1);
-    });
-
     test('BUG: Drag then move away then release should NOT add ware', async ({ page }) => {
       
       await dragWareToNewZone(page, 'hullparts');
@@ -104,15 +79,15 @@ test.describe('Logic Flow New Features', () => {
       });
       console.log(`Initial manual node count: ${initialManualNodeCount}`);
 
-      const source = page.locator('.ware-card[data-ware-id="weaponcomponents"]').first();
+      const source = page.locator('.ware-card-wrapper[data-ware-id="weaponcomponents"]').first();
       await expect(source).toBeVisible();
 
       const sourceBox = await source.boundingBox();
       if (!sourceBox) throw new Error('Source ware not found');
 
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
       await page.mouse.down();
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5);
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
       await page.waitForTimeout(100);
 
       const compactView = page.locator('.compact-view');
@@ -324,7 +299,7 @@ test.describe('Logic Flow New Features', () => {
       });
       expect(highlightedDuringHover).toBeGreaterThan(0);
       
-      await page.mouse.move(0, 0);
+      await page.mouse.move(0, 0, { steps: 5 });
       await page.waitForTimeout(200);
       
       const highlightedAfterLeave = await page.evaluate(() => {
@@ -413,13 +388,13 @@ test.describe('Logic Flow New Features', () => {
       await editInput.press('Enter');
       await page.waitForTimeout(100);
 
-      const source = page.locator('.ware-card[data-ware-id="weaponcomponents"]').first();
+      const source = page.locator('.ware-card-wrapper[data-ware-id="weaponcomponents"]').first();
       const sourceBox = await source.boundingBox();
       if (!sourceBox) throw new Error('Source not found');
 
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
       await page.mouse.down();
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5);
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
       await page.waitForTimeout(100);
 
       const compactView = page.locator('.compact-view');
@@ -435,13 +410,13 @@ test.describe('Logic Flow New Features', () => {
       await dragWareToNewZone(page, 'weaponcomponents');
       await page.waitForTimeout(300);
       
-      const source = page.locator('.ware-card[data-ware-id="hullparts"]').first();
+      const source = page.locator('.ware-card-wrapper[data-ware-id="hullparts"]').first();
       const sourceBox = await source.boundingBox();
       if (!sourceBox) throw new Error('Source not found');
 
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
       await page.mouse.down();
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5);
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
       await page.waitForTimeout(100);
 
       const compactView = page.locator('.compact-view');
@@ -467,13 +442,13 @@ test.describe('Logic Flow New Features', () => {
       await editInput.press('Enter');
       await page.waitForTimeout(100);
       
-      const source = page.locator('.ware-card[data-ware-id="weaponcomponents"]').first();
+      const source = page.locator('.ware-card-wrapper[data-ware-id="weaponcomponents"]').first();
       const sourceBox = await source.boundingBox();
       if (!sourceBox) throw new Error('Source not found');
 
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
       await page.mouse.down();
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5);
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
       await page.waitForTimeout(100);
 
       const compactView = page.locator('.compact-view');

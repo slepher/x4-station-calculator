@@ -1,21 +1,10 @@
 import { test } from '../../test-setup';
 import { expect } from '@playwright/test';
+import { setupLogicFlow } from './helpers/setupLogicFlow';
 
 test.describe('Logic Flow Incompatible Drag Feedback', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
-    const dbFixture = await import('../../fixtures/db.json', { with: { type: 'json' } });
-    const dbData = JSON.parse(JSON.stringify(dbFixture.default));
-    delete dbData.vsn;
-    await page.evaluate((data) => {
-      Object.entries(data).forEach(([key, value]) => localStorage.setItem(key, JSON.stringify(value)));
-      localStorage.setItem('isTestEnv', 'true');
-    }, dbData);
-    await page.reload();
-    await page.locator('select').filter({ hasText: /简体中文|English/ }).selectOption('zh-CN');
-    await page.getByTestId('top-view-btn-flow').click();
-    await expect(page.locator('.flow-layout')).toBeVisible();
-    await expect(page.locator('.candidate-zone')).toBeVisible();
+    await setupLogicFlow(page, 'clean');
   });
 
   const dragWareToTarget = async (
@@ -25,15 +14,15 @@ test.describe('Logic Flow Incompatible Drag Feedback', () => {
     options: { drop?: boolean; hoverOnly?: boolean } = {}
   ) => {
     const { drop = true, hoverOnly = false } = options;
-    const source = page.locator(`.ware-card[data-ware-id="${wareId}"]`).first();
+    const source = page.locator(`.ware-card-wrapper[data-ware-id="${wareId}"]`).first();
     await expect(source).toBeVisible();
 
     const sourceBox = await source.boundingBox();
     if (!sourceBox) throw new Error(`Source ware ${wareId} not found`);
 
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
+    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
     await page.mouse.down();
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5);
+    await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
     await page.waitForTimeout(100);
 
     const target = page.locator(targetSelector).first();
@@ -60,16 +49,16 @@ test.describe('Logic Flow Incompatible Drag Feedback', () => {
   test('4.16 UI: Incompatible Drop Target Visibility (Unlocked Group)', async ({ page }) => {
     await dragWareToTarget(page, 'energycells', '.groups-list .drop-target');
 
-    const spaceweedSource = page.locator('.ware-card[data-ware-id="spaceweed"]').first();
+    const spaceweedSource = page.locator('.ware-card-wrapper[data-ware-id="spaceweed"]').first();
     await spaceweedSource.scrollIntoViewIfNeeded();
     await expect(spaceweedSource).toBeVisible();
 
     const sourceBox = await spaceweedSource.boundingBox();
     if (!sourceBox) throw new Error('Spaceweed source not found');
 
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
+    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
     await page.mouse.down();
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5);
+    await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
     await page.waitForTimeout(100);
 
     const compactGroup = page.locator('.compact-group').first();
@@ -101,16 +90,16 @@ test.describe('Logic Flow Incompatible Drag Feedback', () => {
     await expect(group).toBeVisible();
     await expect(group).toHaveClass(/border-amber-500\/50/);
 
-    const hullpartsSource = page.locator('.ware-card[data-ware-id="hullparts"]').first();
+    const hullpartsSource = page.locator('.ware-card-wrapper[data-ware-id="hullparts"]').first();
     await hullpartsSource.scrollIntoViewIfNeeded();
     await expect(hullpartsSource).toBeVisible();
 
     const sourceBox = await hullpartsSource.boundingBox();
     if (!sourceBox) throw new Error('Hullparts source not found');
 
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
+    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
     await page.mouse.down();
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5);
+    await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
     await page.waitForTimeout(100);
 
     const targetBox = await group.boundingBox();

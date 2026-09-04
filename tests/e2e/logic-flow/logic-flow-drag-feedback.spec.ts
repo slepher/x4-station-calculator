@@ -1,21 +1,10 @@
 import { test } from '../../test-setup';
 import { expect } from '@playwright/test';
+import { setupLogicFlow } from './helpers/setupLogicFlow';
 
 test.describe('Logic Flow Advanced Drag Feedback', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
-    const dbFixture = await import('../../fixtures/db.json', { with: { type: 'json' } });
-    const dbData = JSON.parse(JSON.stringify(dbFixture.default));
-    delete dbData.vsn;
-    await page.evaluate((data) => {
-      Object.entries(data).forEach(([key, value]) => localStorage.setItem(key, JSON.stringify(value)));
-      localStorage.setItem('isTestEnv', 'true');
-    }, dbData);
-    await page.reload();
-    await page.locator('select').filter({ hasText: /简体中文|English/ }).selectOption('zh-CN');
-    await page.getByTestId('top-view-btn-flow').click();
-    await expect(page.locator('.flow-layout')).toBeVisible();
-    await expect(page.locator('.candidate-zone')).toBeVisible();
+    await setupLogicFlow(page, 'clean');
   });
 
   const dragWareToTarget = async (
@@ -25,15 +14,15 @@ test.describe('Logic Flow Advanced Drag Feedback', () => {
     options: { drop?: boolean; hoverOnly?: boolean } = {}
   ) => {
     const { drop = true, hoverOnly = false } = options;
-    const source = page.locator(`.ware-card[data-ware-id="${wareId}"]`).first();
+    const source = page.locator(`.ware-card-wrapper[data-ware-id="${wareId}"]`).first();
     await expect(source).toBeVisible();
 
     const sourceBox = await source.boundingBox();
     if (!sourceBox) throw new Error(`Source ware ${wareId} not found`);
 
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
+    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
     await page.mouse.down();
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5);
+    await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
     await page.waitForTimeout(100);
 
     const target = page.locator(targetSelector).first();
@@ -58,15 +47,15 @@ test.describe('Logic Flow Advanced Drag Feedback', () => {
   };
 
   test('4.1 Visual: New Line Ghosting (Phantom Preview)', async ({ page }) => {
-    const source = page.locator('.ware-card[data-ware-id="scanningarrays"]').first();
+    const source = page.locator('.ware-card-wrapper[data-ware-id="scanningarrays"]').first();
     await expect(source).toBeVisible();
 
     const sourceBox = await source.boundingBox();
     if (!sourceBox) throw new Error('Source not found');
 
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
+    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
     await page.mouse.down();
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5);
+    await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
     await page.waitForTimeout(100);
 
     const compactView = page.locator('.compact-view');
@@ -79,7 +68,7 @@ test.describe('Logic Flow Advanced Drag Feedback', () => {
     await page.mouse.move(newZoneBox.x + newZoneBox.width / 2, newZoneBox.y + newZoneBox.height / 2, { steps: 10 });
     await page.waitForTimeout(200);
 
-    const previewTitle = page.locator('span:has-text("Preview:")');
+    const previewTitle = page.locator('span').filter({ hasText: /预览|Preview:/ });
     await expect(previewTitle).toBeVisible({ timeout: 5000 });
     await expect(previewTitle).toContainText(/Scanning Array|扫描阵列/i);
 
@@ -95,13 +84,13 @@ test.describe('Logic Flow Advanced Drag Feedback', () => {
   test('4.2 Visual: Real-time T0 Resource Header Updates', async ({ page }) => {
     await dragWareToTarget(page, 'siliconwafers', '.groups-list .drop-target');
 
-    const source = page.locator('.ware-card[data-ware-id="microchips"]').first();
+    const source = page.locator('.ware-card-wrapper[data-ware-id="microchips"]').first();
     const sourceBox = await source.boundingBox();
     if (!sourceBox) throw new Error('Source not found');
 
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
+    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
     await page.mouse.down();
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5);
+    await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
     await page.waitForTimeout(100);
 
     const compactGroup = page.locator('.compact-group').first();
@@ -117,13 +106,13 @@ test.describe('Logic Flow Advanced Drag Feedback', () => {
     await page.mouse.up();
     await page.waitForTimeout(100);
 
-    const hullSource = page.locator('.ware-card[data-ware-id="hullparts"]').first();
+    const hullSource = page.locator('.ware-card-wrapper[data-ware-id="hullparts"]').first();
     const hullSourceBox = await hullSource.boundingBox();
     if (!hullSourceBox) throw new Error('Hull parts source not found');
 
-    await page.mouse.move(hullSourceBox.x + hullSourceBox.width / 2, hullSourceBox.y + hullSourceBox.height / 2);
+    await page.mouse.move(hullSourceBox.x + hullSourceBox.width / 2, hullSourceBox.y + hullSourceBox.height / 2, { steps: 5 });
     await page.mouse.down();
-    await page.mouse.move(hullSourceBox.x + hullSourceBox.width / 2 + 5, hullSourceBox.y + hullSourceBox.height / 2 + 5);
+    await page.mouse.move(hullSourceBox.x + hullSourceBox.width / 2 + 5, hullSourceBox.y + hullSourceBox.height / 2 + 5, { steps: 5 });
     await page.waitForTimeout(100);
 
     await page.mouse.move(targetBox.x + targetBox.width / 2, targetBox.y + targetBox.height / 2, { steps: 10 });
@@ -148,15 +137,15 @@ test.describe('Logic Flow Advanced Drag Feedback', () => {
     });
 
     await test.step('Case B: Drag to New Zone', async () => {
-      const source = page.locator('.ware-card[data-ware-id="scanningarrays"]').first();
+      const source = page.locator('.ware-card-wrapper[data-ware-id="scanningarrays"]').first();
       await expect(source).toBeVisible();
 
       const sourceBox = await source.boundingBox();
       if (!sourceBox) throw new Error('Source not found');
 
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
       await page.mouse.down();
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5);
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
       await page.waitForTimeout(100);
 
       const compactView = page.locator('.compact-view');
@@ -178,13 +167,13 @@ test.describe('Logic Flow Advanced Drag Feedback', () => {
   });
 
   test('4.6 T0 Ware Behavior: Non-draggable and No Preview', async ({ page }) => {
-    const oreCard = page.locator('.ware-card[data-ware-id="ore"]');
+    const oreCard = page.locator('.ware-card-wrapper[data-ware-id="ore"]');
     await expect(oreCard).toBeVisible();
 
     const resourcePreview = oreCard.locator('.resource-preview-container');
     await expect(resourcePreview).toBeHidden();
 
-    const siliconWafersCard = page.locator('.ware-card[data-ware-id="siliconwafers"]');
+    const siliconWafersCard = page.locator('.ware-card-wrapper[data-ware-id="siliconwafers"]');
     await siliconWafersCard.scrollIntoViewIfNeeded();
     await expect(siliconWafersCard).toBeVisible();
     await expect(siliconWafersCard.locator('.resource-preview-container')).toBeVisible();
@@ -192,9 +181,9 @@ test.describe('Logic Flow Advanced Drag Feedback', () => {
     const oreBox = await oreCard.boundingBox();
     if (!oreBox) throw new Error('Ore card not found');
 
-    await page.mouse.move(oreBox.x + oreBox.width / 2, oreBox.y + oreBox.height / 2);
+    await page.mouse.move(oreBox.x + oreBox.width / 2, oreBox.y + oreBox.height / 2, { steps: 5 });
     await page.mouse.down();
-    await page.mouse.move(oreBox.x + oreBox.width / 2 + 100, oreBox.y + oreBox.height / 2 + 100);
+    await page.mouse.move(oreBox.x + oreBox.width / 2 + 100, oreBox.y + oreBox.height / 2 + 100, { steps: 5 });
     await page.waitForTimeout(300);
 
     const compactView = page.locator('.compact-view');
@@ -208,13 +197,13 @@ test.describe('Logic Flow Advanced Drag Feedback', () => {
       await dragWareToTarget(page, 'refinedmetals', '.groups-list .drop-target');
       await dragWareToTarget(page, 'siliconwafers', '.compact-group');
 
-      const source = page.locator('.ware-card[data-ware-id="energycells"]').first();
+      const source = page.locator('.ware-card-wrapper[data-ware-id="energycells"]').first();
       const sourceBox = await source.boundingBox();
       if (!sourceBox) throw new Error('Source not found');
 
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
       await page.mouse.down();
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5);
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
       await page.waitForTimeout(100);
 
       const compactGroup = page.locator('.compact-group').first();
@@ -238,13 +227,13 @@ test.describe('Logic Flow Advanced Drag Feedback', () => {
       await dragWareToTarget(page, 'siliconwafers', '.groups-list .drop-target');
       await dragWareToTarget(page, 'refinedmetals', '.compact-group');
 
-      const source = page.locator('.ware-card[data-ware-id="energycells"]').first();
+      const source = page.locator('.ware-card-wrapper[data-ware-id="energycells"]').first();
       const sourceBox = await source.boundingBox();
       if (!sourceBox) throw new Error('Source not found');
 
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
       await page.mouse.down();
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5);
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
       await page.waitForTimeout(100);
 
       const compactGroup = page.locator('.compact-group').first();

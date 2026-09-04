@@ -1,5 +1,6 @@
 import { test } from '../../test-setup';
 import { expect } from '@playwright/test';
+import { setupLogicFlow } from './helpers/setupLogicFlow';
 
 test.describe('Logical Flow Integration Verification', () => {
   test.beforeEach(async ({ page }) => {
@@ -7,19 +8,7 @@ test.describe('Logical Flow Integration Verification', () => {
       console.error(`Page Error: ${err.message}`);
     });
 
-    await page.goto('/');
-    const dbFixture = await import('../../fixtures/db.json', { with: { type: 'json' } });
-    const dbData = JSON.parse(JSON.stringify(dbFixture.default));
-    delete dbData.vsn;
-    await page.evaluate((data) => {
-      Object.entries(data).forEach(([key, value]) => localStorage.setItem(key, JSON.stringify(value)));
-      localStorage.setItem('isTestEnv', 'true');
-    }, dbData);
-    await page.reload();
-    await page.locator('select').filter({ hasText: /简体中文|English/ }).selectOption('zh-CN');
-    await page.getByTestId('top-view-btn-flow').click();
-    await expect(page.locator('.flow-layout')).toBeVisible();
-    await expect(page.locator('.candidate-zone')).toBeVisible();
+    await setupLogicFlow(page, 'clean');
   });
 
   const dragWareToNewZone = async (
@@ -28,15 +17,15 @@ test.describe('Logical Flow Integration Verification', () => {
     options: { drop?: boolean } = {}
   ) => {
     const { drop = true } = options;
-    const source = page.locator(`.ware-card[data-ware-id="${wareId}"]`).first();
+    const source = page.locator(`.ware-card-wrapper[data-ware-id="${wareId}"]`).first();
     await expect(source).toBeVisible();
 
     const sourceBox = await source.boundingBox();
     if (!sourceBox) throw new Error(`Source ware ${wareId} not found`);
 
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
+    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
     await page.mouse.down();
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5);
+    await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
     await page.waitForTimeout(100);
 
     const compactView = page.locator('.compact-view');
@@ -64,15 +53,15 @@ test.describe('Logical Flow Integration Verification', () => {
     options: { drop?: boolean } = {}
   ) => {
     const { drop = true } = options;
-    const source = page.locator(`.ware-card[data-ware-id="${wareId}"]`).first();
+    const source = page.locator(`.ware-card-wrapper[data-ware-id="${wareId}"]`).first();
     await expect(source).toBeVisible();
 
     const sourceBox = await source.boundingBox();
     if (!sourceBox) throw new Error(`Source ware ${wareId} not found`);
 
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
+    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
     await page.mouse.down();
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5);
+    await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
     await page.waitForTimeout(100);
 
     const compactView = page.locator('.compact-view');
@@ -136,7 +125,7 @@ test.describe('Logical Flow Integration Verification', () => {
   });
 
   test('2.5 Bug Fix: T0 Resource Not Draggable', async ({ page }) => {
-    const oreCard = page.locator('.ware-card[data-ware-id="ore"]').first();
+    const oreCard = page.locator('.ware-card-wrapper[data-ware-id="ore"]').first();
     await expect(oreCard).toBeVisible();
 
     // 1. 静态属性检查 - T0 资源应该有锁定样式和属性
@@ -156,7 +145,7 @@ test.describe('Logical Flow Integration Verification', () => {
     if (!oreBox) throw new Error('Ore card not found');
 
     // 模拟鼠标拖拽操作
-    await page.mouse.move(oreBox.x + oreBox.width / 2, oreBox.y + oreBox.height / 2);
+    await page.mouse.move(oreBox.x + oreBox.width / 2, oreBox.y + oreBox.height / 2, { steps: 5 });
     await page.mouse.down();
     await page.mouse.move(oreBox.x + oreBox.width / 2 + 100, oreBox.y + oreBox.height / 2 + 100, { steps: 10 });
     await page.waitForTimeout(300);
@@ -169,7 +158,7 @@ test.describe('Logical Flow Integration Verification', () => {
 
   test('2.6 Comparison: T1+ Resources Must Be Draggable', async ({ page }) => {
     // 对照组测试 - 确保 T1+ 资源可以正常拖拽
-    const hullpartsCard = page.locator('.ware-card[data-ware-id="hullparts"]').first();
+    const hullpartsCard = page.locator('.ware-card-wrapper[data-ware-id="hullparts"]').first();
     await expect(hullpartsCard).toBeVisible();
 
     // 1. 静态属性检查 - T1+ 资源应该有可拖拽样式和属性
@@ -189,13 +178,13 @@ test.describe('Logical Flow Integration Verification', () => {
 
   test.describe('Compact View & Smart Insertion', () => {
     test('3.1 Logic: Compact View Appears on Drag', async ({ page }) => {
-      const source = page.locator('.ware-card[data-ware-id="hullparts"]').first();
+      const source = page.locator('.ware-card-wrapper[data-ware-id="hullparts"]').first();
       const sourceBox = await source.boundingBox();
       if (!sourceBox) throw new Error('Source not found');
 
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
       await page.mouse.down();
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5);
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
       await page.waitForTimeout(100);
 
       const compactView = page.locator('.compact-view');
@@ -216,13 +205,13 @@ test.describe('Logical Flow Integration Verification', () => {
     test('3.3 Logic: Duplicate blocking and UI feedback', async ({ page }) => {
       await dragWareToNewZone(page, 'hullparts');
 
-      const source = page.locator('.ware-card[data-ware-id="hullparts"]').first();
+      const source = page.locator('.ware-card-wrapper[data-ware-id="hullparts"]').first();
       const sourceBox = await source.boundingBox();
       if (!sourceBox) throw new Error('Source not found');
 
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
       await page.mouse.down();
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5);
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
       await page.waitForTimeout(100);
 
       const compactGroup = page.locator('.compact-group').first();
@@ -245,13 +234,13 @@ test.describe('Logical Flow Integration Verification', () => {
     test('3.4 Visual: Drag Preview in Compact View', async ({ page }) => {
       await dragWareToNewZone(page, 'hullparts');
 
-      const source = page.locator('.ware-card[data-ware-id="weaponcomponents"]').first();
+      const source = page.locator('.ware-card-wrapper[data-ware-id="weaponcomponents"]').first();
       const sourceBox = await source.boundingBox();
       if (!sourceBox) throw new Error('Source not found');
 
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
       await page.mouse.down();
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5);
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
       await page.waitForTimeout(100);
 
       const compactGroup = page.locator('.compact-group').first();
@@ -303,13 +292,13 @@ test.describe('Logical Flow Integration Verification', () => {
 
   test.describe('Edge Cases', () => {
     test('5.1 Drag State Persists Until Mouse Up', async ({ page }) => {
-      const source = page.locator('.ware-card[data-ware-id="hullparts"]').first();
+      const source = page.locator('.ware-card-wrapper[data-ware-id="hullparts"]').first();
       const sourceBox = await source.boundingBox();
       if (!sourceBox) throw new Error('Source not found');
 
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
       await page.mouse.down();
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5);
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
       await page.waitForTimeout(100);
 
       const compactView = page.locator('.compact-view');

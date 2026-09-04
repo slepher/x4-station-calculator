@@ -1,5 +1,6 @@
 import { test } from '../../test-setup';
 import { expect } from '@playwright/test';
+import { setupLogicFlow } from './helpers/setupLogicFlow';
 
 test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
   test.beforeEach(async ({ page }) => {
@@ -7,19 +8,7 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
       console.error(`Page Error: ${err.message}`);
     });
 
-    await page.goto('/');
-    const dbFixture = await import('../../fixtures/db.json', { with: { type: 'json' } });
-    const dbData = JSON.parse(JSON.stringify(dbFixture.default));
-    delete dbData.vsn;
-    await page.evaluate((data) => {
-      Object.entries(data).forEach(([key, value]) => localStorage.setItem(key, JSON.stringify(value)));
-      localStorage.setItem('isTestEnv', 'true');
-    }, dbData);
-    await page.reload();
-    await page.locator('select').filter({ hasText: /简体中文|English/ }).selectOption('zh-CN');
-    await page.getByTestId('top-view-btn-flow').click();
-    await expect(page.locator('.flow-layout')).toBeVisible();
-    await expect(page.locator('.candidate-zone')).toBeVisible();
+    await setupLogicFlow(page, 'clean');
   });
 
   const dragWareToTarget = async (
@@ -29,15 +18,15 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
     options: { drop?: boolean; hoverOnly?: boolean } = {}
   ) => {
     const { drop = true, hoverOnly = false } = options;
-    const source = page.locator(`.ware-card[data-ware-id="${wareId}"]`).first();
+    const source = page.locator(`.ware-card-wrapper[data-ware-id="${wareId}"]`).first();
     await expect(source).toBeVisible();
 
     const sourceBox = await source.boundingBox();
     if (!sourceBox) throw new Error(`Source ware ${wareId} not found`);
 
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
+    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
     await page.mouse.down();
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5);
+    await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
     await page.waitForTimeout(100);
 
     const target = page.locator(targetSelector).first();
@@ -88,13 +77,13 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
       await setupGroupWithNode(page, 'hullparts', 'default');
       await isolateNode(page, 'hullparts');
 
-      const hullpartsCard = page.locator(`.ware-card[data-ware-id="hullparts"]`).first();
+      const hullpartsCard = page.locator(`.ware-card-wrapper[data-ware-id="hullparts"]`).first();
       const sourceBox = await hullpartsCard.boundingBox();
       if (!sourceBox) throw new Error('Source not found');
 
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
       await page.mouse.down();
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 100, sourceBox.y + sourceBox.height / 2 + 100);
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 100, sourceBox.y + sourceBox.height / 2 + 100, { steps: 5 });
       await page.waitForTimeout(200);
 
       const previewNodes = page.locator('.preview-node');
@@ -145,13 +134,13 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
 
       await dragWareToTarget(page, 'hullparts', '.compact-group');
 
-      const hullpartsCard = page.locator(`.ware-card[data-ware-id="hullparts"]`).first();
+      const hullpartsCard = page.locator(`.ware-card-wrapper[data-ware-id="hullparts"]`).first();
       const sourceBox = await hullpartsCard.boundingBox();
       if (!sourceBox) throw new Error('Source not found');
 
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
       await page.mouse.down();
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5);
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
       await page.waitForTimeout(100);
 
       const compactGroup = page.locator('.compact-group').first();
@@ -546,13 +535,13 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
       });
       await page.waitForTimeout(100);
 
-      const hullpartsCard = page.locator('.ware-card[data-ware-id="hullparts"]').first();
+      const hullpartsCard = page.locator('.ware-card-wrapper[data-ware-id="hullparts"]').first();
       const sourceBox = await hullpartsCard.boundingBox();
       if (!sourceBox) throw new Error('Source not found');
 
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
       await page.mouse.down();
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5);
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
       await page.waitForTimeout(100);
 
       const compactGroup = page.locator('.compact-group').first();
@@ -577,14 +566,14 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
       });
       await page.waitForTimeout(100);
 
-      const grapheneCard = page.locator('.ware-card[data-ware-id="graphene"]').first();
+      const grapheneCard = page.locator('.ware-card-wrapper[data-ware-id="graphene"]').first();
       await grapheneCard.scrollIntoViewIfNeeded();
       const sourceBox = await grapheneCard.boundingBox();
       if (!sourceBox) throw new Error('Source not found');
 
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
       await page.mouse.down();
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5);
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
       await page.waitForTimeout(100);
 
       const compactGroup = page.locator('.compact-group').first();
@@ -604,13 +593,13 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
     test('12.1 重复拖拽相同产品应显示 duplicated 状态', async ({ page }) => {
       await setupGroupWithNode(page, 'hullparts', 'default');
 
-      const hullpartsCard = page.locator('.ware-card[data-ware-id="hullparts"]').first();
+      const hullpartsCard = page.locator('.ware-card-wrapper[data-ware-id="hullparts"]').first();
       const sourceBox = await hullpartsCard.boundingBox();
       if (!sourceBox) throw new Error('Source not found');
 
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
       await page.mouse.down();
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5);
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
       await page.waitForTimeout(100);
 
       const compactGroup = page.locator('.compact-group').first();
@@ -639,13 +628,13 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
       });
       await page.waitForTimeout(100);
 
-      const hullpartsCard = page.locator('.ware-card[data-ware-id="hullparts"]').first();
+      const hullpartsCard = page.locator('.ware-card-wrapper[data-ware-id="hullparts"]').first();
       const sourceBox = await hullpartsCard.boundingBox();
       if (!sourceBox) throw new Error('Source not found');
 
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
       await page.mouse.down();
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5);
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
       await page.waitForTimeout(100);
 
       const compactView = page.locator('.compact-view');
@@ -696,13 +685,13 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
       const groupCount = await page.evaluate(() => (window as any).logicFlowStore.groups.length);
       expect(groupCount).toBe(2);
 
-      const refinedmetalsCard = page.locator('.ware-card[data-ware-id="refinedmetals"]').first();
+      const refinedmetalsCard = page.locator('.ware-card-wrapper[data-ware-id="refinedmetals"]').first();
       const sourceBox = await refinedmetalsCard.boundingBox();
       if (!sourceBox) throw new Error('Source not found');
 
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
       await page.mouse.down();
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5);
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
       await page.waitForTimeout(100);
 
       const firstGroup = page.locator('.compact-group').first();
@@ -734,19 +723,7 @@ test.describe('Module Name Display Tests (E2E)', () => {
       console.error(`Page Error: ${err.message}`);
     });
 
-    await page.goto('/');
-    const dbFixture = await import('../../fixtures/db.json', { with: { type: 'json' } });
-    const dbData = JSON.parse(JSON.stringify(dbFixture.default));
-    delete dbData.vsn;
-    await page.evaluate((data) => {
-      Object.entries(data).forEach(([key, value]) => localStorage.setItem(key, JSON.stringify(value)));
-      localStorage.setItem('isTestEnv', 'true');
-    }, dbData);
-    await page.reload();
-    await page.locator('select').filter({ hasText: /简体中文|English/ }).selectOption('zh-CN');
-    await page.getByTestId('top-view-btn-flow').click();
-    await expect(page.locator('.flow-layout')).toBeVisible();
-    await expect(page.locator('.candidate-zone')).toBeVisible();
+    await setupLogicFlow(page, 'clean');
     
     await page.evaluate(() => {
       const logicFlow = (window as any).logicFlowStore;
@@ -761,15 +738,15 @@ test.describe('Module Name Display Tests (E2E)', () => {
     options: { drop?: boolean; hoverOnly?: boolean } = {}
   ) => {
     const { drop = true, hoverOnly = false } = options;
-    const source = page.locator(`.ware-card[data-ware-id="${wareId}"]`).first();
+    const source = page.locator(`.ware-card-wrapper[data-ware-id="${wareId}"]`).first();
     await expect(source).toBeVisible();
 
     const sourceBox = await source.boundingBox();
     if (!sourceBox) throw new Error(`Source ware ${wareId} not found`);
 
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
+    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
     await page.mouse.down();
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5);
+    await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
     await page.waitForTimeout(100);
 
     const target = page.locator(targetSelector).first();
@@ -802,7 +779,7 @@ test.describe('Module Name Display Tests (E2E)', () => {
 
     await page.waitForTimeout(300);
 
-    const industrialButton = page.locator('button:has-text("Industrial")').first();
+    const industrialButton = page.getByRole('button', { name: /工业链|Industrial/ }).first();
     await industrialButton.click();
     await page.waitForTimeout(200);
 
@@ -810,15 +787,15 @@ test.describe('Module Name Display Tests (E2E)', () => {
     await teladiButton.click();
     await page.waitForTimeout(200);
 
-    const wareCard = page.locator('.ware-card[data-ware-id="weaponcomponents"]').first();
+    const wareCard = page.locator('.ware-card-wrapper[data-ware-id="weaponcomponents"]').first();
     await expect(wareCard).toBeVisible({ timeout: 5000 });
 
     const sourceBox = await wareCard.boundingBox();
     if (!sourceBox) throw new Error('Source not found');
 
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
+    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
     await page.mouse.down();
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5);
+    await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
     await page.waitForTimeout(100);
 
     const compactGroup = page.locator('.compact-group').first();
@@ -866,7 +843,7 @@ test.describe('Module Name Display Tests (E2E)', () => {
   });
 
   test('29. 新产线 Header 显示模块名称', async ({ page }) => {
-    const industrialButton = page.locator('button:has-text("Industrial")').first();
+    const industrialButton = page.getByRole('button', { name: /工业链|Industrial/ }).first();
     await industrialButton.click();
     await page.waitForTimeout(200);
 
@@ -874,15 +851,15 @@ test.describe('Module Name Display Tests (E2E)', () => {
     await teladiButton.click();
     await page.waitForTimeout(200);
 
-    const wareCard = page.locator('.ware-card[data-ware-id="hullparts"]').first();
+    const wareCard = page.locator('.ware-card-wrapper[data-ware-id="hullparts"]').first();
     await expect(wareCard).toBeVisible({ timeout: 5000 });
 
     const sourceBox = await wareCard.boundingBox();
     if (!sourceBox) throw new Error('Source not found');
 
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
+    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
     await page.mouse.down();
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5);
+    await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
     await page.waitForTimeout(100);
 
     const compactView = page.locator('.compact-view');
@@ -910,15 +887,15 @@ test.describe('Module Name Display Tests (E2E)', () => {
   });
 
   test('30. 拖拽幽灵元素显示模块名称', async ({ page }) => {
-    const industrialButton = page.locator('button:has-text("Industrial")').first();
+    const industrialButton = page.getByRole('button', { name: /工业链|Industrial/ }).first();
     await industrialButton.click();
     await page.waitForTimeout(200);
 
-    const defaultButton = page.locator('button:has-text("Default")').first();
+    const defaultButton = page.getByRole('button', { name: /默认|Default/ }).first();
     await defaultButton.click();
     await page.waitForTimeout(200);
 
-    const wareCard = page.locator('.ware-card[data-ware-id="hullparts"]').first();
+    const wareCard = page.locator('.ware-card-wrapper[data-ware-id="hullparts"]').first();
     await expect(wareCard).toBeVisible({ timeout: 5000 });
 
     const dragDisplayName = await page.evaluate(() => {
@@ -953,15 +930,15 @@ test.describe('Module Name Display Tests (E2E)', () => {
   });
 
   test('31. 隔离节点不应被上游扩展自动打破', async ({ page }) => {
-    const industrialButton = page.locator('button:has-text("Industrial")').first();
+    const industrialButton = page.getByRole('button', { name: /工业链|Industrial/ }).first();
     await industrialButton.click();
     await page.waitForTimeout(200);
 
-    const defaultButton = page.locator('button:has-text("Default")').first();
+    const defaultButton = page.getByRole('button', { name: /默认|Default/ }).first();
     await defaultButton.click();
     await page.waitForTimeout(200);
 
-    const hullpartsCard = page.locator('.ware-card[data-ware-id="hullparts"]').first();
+    const hullpartsCard = page.locator('.ware-card-wrapper[data-ware-id="hullparts"]').first();
     await expect(hullpartsCard).toBeVisible({ timeout: 5000 });
     await hullpartsCard.hover();
     
@@ -969,7 +946,7 @@ test.describe('Module Name Display Tests (E2E)', () => {
     await addButton.click();
     await page.waitForTimeout(200);
 
-    const newLineButton = page.locator('button:has-text("New Production Line")').first();
+    const newLineButton = page.getByRole('button', { name: /新建产线|New Production Line/ }).first();
     await newLineButton.click();
     await page.waitForTimeout(500);
 
@@ -991,7 +968,7 @@ test.describe('Module Name Display Tests (E2E)', () => {
     console.log('Isolated state before:', JSON.stringify(isolatedStateBefore, null, 2));
     expect(isolatedStateBefore.oreIsIsolated).toBe(true);
 
-    const weaponCard = page.locator('.ware-card[data-ware-id="weaponcomponents"]').first();
+    const weaponCard = page.locator('.ware-card-wrapper[data-ware-id="weaponcomponents"]').first();
     await weaponCard.hover();
     const weaponAddButton = weaponCard.locator('.quick-add-btn');
     await weaponAddButton.click();
@@ -1018,15 +995,15 @@ test.describe('Module Name Display Tests (E2E)', () => {
   });
 
   test('32. 紧凑模式 T0 预览排除隔离节点', async ({ page }) => {
-    const industrialButton = page.locator('button:has-text("Industrial")').first();
+    const industrialButton = page.getByRole('button', { name: /工业链|Industrial/ }).first();
     await industrialButton.click();
     await page.waitForTimeout(200);
 
-    const defaultButton = page.locator('button:has-text("Default")').first();
+    const defaultButton = page.getByRole('button', { name: /默认|Default/ }).first();
     await defaultButton.click();
     await page.waitForTimeout(200);
 
-    const hullpartsCard = page.locator('.ware-card[data-ware-id="hullparts"]').first();
+    const hullpartsCard = page.locator('.ware-card-wrapper[data-ware-id="hullparts"]').first();
     await expect(hullpartsCard).toBeVisible({ timeout: 5000 });
     await hullpartsCard.hover();
     
@@ -1034,7 +1011,7 @@ test.describe('Module Name Display Tests (E2E)', () => {
     await addButton.click();
     await page.waitForTimeout(200);
 
-    const newLineButton = page.locator('button:has-text("New Production Line")').first();
+    const newLineButton = page.getByRole('button', { name: /新建产线|New Production Line/ }).first();
     await newLineButton.click();
     await page.waitForTimeout(500);
 
@@ -1069,15 +1046,15 @@ test.describe('Module Name Display Tests (E2E)', () => {
   });
 
   test('33. 隔离中间层级时 T0 预览应停止追踪', async ({ page }) => {
-    const industrialButton = page.locator('button:has-text("Industrial")').first();
+    const industrialButton = page.getByRole('button', { name: /工业链|Industrial/ }).first();
     await industrialButton.click();
     await page.waitForTimeout(200);
 
-    const defaultButton = page.locator('button:has-text("Default")').first();
+    const defaultButton = page.getByRole('button', { name: /默认|Default/ }).first();
     await defaultButton.click();
     await page.waitForTimeout(200);
 
-    const hullpartsCard = page.locator('.ware-card[data-ware-id="hullparts"]').first();
+    const hullpartsCard = page.locator('.ware-card-wrapper[data-ware-id="hullparts"]').first();
     await expect(hullpartsCard).toBeVisible({ timeout: 5000 });
     await hullpartsCard.hover();
     
@@ -1085,7 +1062,7 @@ test.describe('Module Name Display Tests (E2E)', () => {
     await addButton.click();
     await page.waitForTimeout(200);
 
-    const newLineButton = page.locator('button:has-text("New Production Line")').first();
+    const newLineButton = page.getByRole('button', { name: /新建产线|New Production Line/ }).first();
     await newLineButton.click();
     await page.waitForTimeout(500);
 
@@ -1169,7 +1146,7 @@ test.describe('Module Name Display Tests (E2E)', () => {
   });
 
   test('34. 语言切换时 ware 文本自动更新', async ({ page }) => {
-    const wareCard = page.locator('.ware-card[data-ware-id="hullparts"]').first();
+    const wareCard = page.locator('.ware-card-wrapper[data-ware-id="hullparts"]').first();
     await expect(wareCard).toBeVisible({ timeout: 5000 });
     
     const wareTextBefore = await wareCard.locator('.ware-name, .name').first().textContent();
@@ -1199,13 +1176,14 @@ test.describe('Module Name Display Tests (E2E)', () => {
     console.log('Ware text after language switch:', wareTextAfter);
 
     const languageChanged = wareTextBefore !== wareTextAfter;
-    expect(languageChanged || wareTextAfter).toBeDefined();
+    expect(languageChanged).toBe(true);
   });
 
   test('35. 候选区锁定开关影响新建规划区', async ({ page }) => {
     const lockCheckbox = page.locator('.lock-control input[type="checkbox"]').first();
     
-    if (await lockCheckbox.isVisible()) {
+    await expect(lockCheckbox).toBeVisible();
+    {
       const isCheckedBefore = await lockCheckbox.isChecked();
       
       if (!isCheckedBefore) {
@@ -1213,15 +1191,15 @@ test.describe('Module Name Display Tests (E2E)', () => {
         await page.waitForTimeout(200);
       }
 
-      const industrialButton = page.locator('button:has-text("Industrial")').first();
+      const industrialButton = page.getByRole('button', { name: /工业链|Industrial/ }).first();
       await industrialButton.click();
       await page.waitForTimeout(200);
 
-      const defaultButton = page.locator('button:has-text("Default")').first();
+      const defaultButton = page.getByRole('button', { name: /默认|Default/ }).first();
       await defaultButton.click();
       await page.waitForTimeout(200);
 
-      const hullpartsCard = page.locator('.ware-card[data-ware-id="hullparts"]').first();
+      const hullpartsCard = page.locator('.ware-card-wrapper[data-ware-id="hullparts"]').first();
       await expect(hullpartsCard).toBeVisible({ timeout: 5000 });
       await hullpartsCard.hover();
       
@@ -1229,7 +1207,7 @@ test.describe('Module Name Display Tests (E2E)', () => {
       await addButton.click();
       await page.waitForTimeout(200);
 
-      const newLineButton = page.locator('button:has-text("New Production Line")').first();
+      const newLineButton = page.getByRole('button', { name: /新建产线|New Production Line/ }).first();
       await newLineButton.click();
       await page.waitForTimeout(500);
 
@@ -1246,18 +1224,15 @@ test.describe('Module Name Display Tests (E2E)', () => {
 
       console.log('Group state after creation:', JSON.stringify(groupState, null, 2));
       expect(groupState.isLocked).toBe(true);
-    } else {
-      console.log('Lock switch not found, skipping test');
-      expect(true).toBe(true);
     }
   });
 
   test('36. 拖拽取消后不添加产品', async ({ page }) => {
-    const industrialButton = page.locator('button:has-text("Industrial")').first();
+    const industrialButton = page.getByRole('button', { name: /工业链|Industrial/ }).first();
     await industrialButton.click();
     await page.waitForTimeout(200);
 
-    const defaultButton = page.locator('button:has-text("Default")').first();
+    const defaultButton = page.getByRole('button', { name: /默认|Default/ }).first();
     await defaultButton.click();
     await page.waitForTimeout(200);
 
@@ -1266,7 +1241,7 @@ test.describe('Module Name Display Tests (E2E)', () => {
       return logicFlow?.groups?.length || 0;
     });
 
-    const hullpartsCard = page.locator('.ware-card[data-ware-id="hullparts"]').first();
+    const hullpartsCard = page.locator('.ware-card-wrapper[data-ware-id="hullparts"]').first();
     await expect(hullpartsCard).toBeVisible({ timeout: 5000 });
 
     await hullpartsCard.hover();
@@ -1321,24 +1296,24 @@ test.describe('Module Name Display Tests (E2E)', () => {
       console.log('Initial T0 resources:', initialT0);
 
       // 切换到 Default 工业分区（不同血统）
-      const industrialButton = page.locator('button:has-text("Industrial")').first();
+      const industrialButton = page.getByRole('button', { name: /工业链|Industrial/ }).first();
       await industrialButton.click();
       await page.waitForTimeout(200);
       
-      const defaultButton = page.locator('button:has-text("Default")').first();
+      const defaultButton = page.getByRole('button', { name: /默认|Default/ }).first();
       await defaultButton.click();
       await page.waitForTimeout(200);
 
       // 拖拽精炼金属(refinedmetals)到锁定的 Teladi 规划区
-      const refinedmetalsCard = page.locator('.ware-card[data-ware-id="refinedmetals"]').first();
+      const refinedmetalsCard = page.locator('.ware-card-wrapper[data-ware-id="refinedmetals"]').first();
       await expect(refinedmetalsCard).toBeVisible({ timeout: 5000 });
       
       const sourceBox = await refinedmetalsCard.boundingBox();
       if (!sourceBox) throw new Error('Source not found');
 
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
       await page.mouse.down();
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5);
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
       await page.waitForTimeout(100);
 
       const compactGroup = page.locator('.compact-group').first();
@@ -1410,15 +1385,15 @@ test.describe('Module Name Display Tests (E2E)', () => {
       await page.waitForTimeout(200);
 
       // 拖拽医疗产线到新建区域
-      const medicalsuppliesCard = page.locator('.ware-card[data-ware-id="medicalsupplies"]').first();
+      const medicalsuppliesCard = page.locator('.ware-card-wrapper[data-ware-id="medicalsupplies"]').first();
       await expect(medicalsuppliesCard).toBeVisible({ timeout: 5000 });
       
       const sourceBox = await medicalsuppliesCard.boundingBox();
       if (!sourceBox) throw new Error('Source not found');
 
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
       await page.mouse.down();
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5);
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
       await page.waitForTimeout(100);
 
       const compactGroup = page.locator('.compact-group').first();
@@ -1443,24 +1418,24 @@ test.describe('Module Name Display Tests (E2E)', () => {
       expect(groupState.hasMedical).toBe(true);
 
       // 切换到工业分区 Default
-      const industrialButton = page.locator('button:has-text("Industrial")').first();
+      const industrialButton = page.getByRole('button', { name: /工业链|Industrial/ }).first();
       await industrialButton.click();
       await page.waitForTimeout(200);
       
-      const defaultButton = page.locator('button:has-text("Default")').first();
+      const defaultButton = page.getByRole('button', { name: /默认|Default/ }).first();
       await defaultButton.click();
       await page.waitForTimeout(200);
 
       // 拖拽石墨烯到未锁定的规划区
-      const grapheneCard = page.locator('.ware-card[data-ware-id="graphene"]').first();
+      const grapheneCard = page.locator('.ware-card-wrapper[data-ware-id="graphene"]').first();
       await expect(grapheneCard).toBeVisible({ timeout: 5000 });
       
       const grapheneSourceBox = await grapheneCard.boundingBox();
       if (!grapheneSourceBox) throw new Error('Graphene source not found');
 
-      await page.mouse.move(grapheneSourceBox.x + grapheneSourceBox.width / 2, grapheneSourceBox.y + grapheneSourceBox.height / 2);
+      await page.mouse.move(grapheneSourceBox.x + grapheneSourceBox.width / 2, grapheneSourceBox.y + grapheneSourceBox.height / 2, { steps: 5 });
       await page.mouse.down();
-      await page.mouse.move(grapheneSourceBox.x + grapheneSourceBox.width / 2 + 5, grapheneSourceBox.y + grapheneSourceBox.height / 2 + 5);
+      await page.mouse.move(grapheneSourceBox.x + grapheneSourceBox.width / 2 + 5, grapheneSourceBox.y + grapheneSourceBox.height / 2 + 5, { steps: 5 });
       await page.waitForTimeout(100);
 
       const existingGroup = page.locator('.compact-group').first();

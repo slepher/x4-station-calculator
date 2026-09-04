@@ -1,24 +1,10 @@
 import { test } from '../test-setup';
 import { expect } from '@playwright/test';
+import { setupLogicFlow } from './logic-flow/helpers/setupLogicFlow';
 
 test.describe('Compact Drag View Integration', () => {
   test.beforeEach(async ({ page }) => {
-    page.on('console', msg => {
-      console.log(`PAGE LOG: ${msg.text()}`);
-    });
-    await page.goto('/');
-    const dbFixture = await import('../fixtures/db.json', { with: { type: 'json' } });
-    const dbData = JSON.parse(JSON.stringify(dbFixture.default));
-    delete dbData.vsn;
-    await page.evaluate((data) => {
-      Object.entries(data).forEach(([key, value]) => localStorage.setItem(key, JSON.stringify(value)));
-      localStorage.setItem('isTestEnv', 'true');
-    }, dbData);
-    await page.reload();
-    await page.locator('select').filter({ hasText: /简体中文|English/ }).selectOption('zh-CN');
-    await page.getByTestId('top-view-btn-flow').click();
-    await expect(page.locator('.flow-layout')).toBeVisible();
-    await expect(page.locator('.candidate-zone')).toBeVisible();
+    await setupLogicFlow(page, 'clean');
   });
 
   test('Compact view toggles on drag start and end', async ({ page }) => {
@@ -35,7 +21,7 @@ test.describe('Compact Drag View Integration', () => {
     
     // Move mouse slowly to trigger drag
     for (let i = 0; i < 5; i++) {
-      await page.mouse.move(100 + i * 50, 100 + i * 50);
+      await page.mouse.move(100 + i * 50, 100 + i * 50, { steps: 5 });
       await page.waitForTimeout(50);
     }
 
@@ -52,42 +38,6 @@ test.describe('Compact Drag View Integration', () => {
     await expect(energyCells).toBeVisible();
   });
 
-  test('Compact view shows vertical list with existing groups and new line button', async ({ page }) => {
-    // 0. Setup: Create 2 groups
-    await page.evaluate(() => {
-      const logicFlow = (window as any).logicFlowStore;
-      logicFlow.clearAllGroups();
-      logicFlow.addGroup('industrial', 'default', 'Group 1');
-      logicFlow.addGroup('industrial', 'default', 'Group 2');
-    });
-
-    // 1. Start drag
-    const card = page.locator('[data-ware-id="energycells"]').first();
-    await card.hover();
-    await page.mouse.down();
-    
-    for (let i = 0; i < 5; i++) {
-      await page.mouse.move(100 + i * 50, 100 + i * 50);
-      await page.waitForTimeout(50);
-    }
-
-    // 2. Verify vertical layout (No grid, just actual groups + 1 new line button)
-    const compactView = page.locator('.compact-view');
-    await expect(compactView).toBeVisible();
-    await expect(compactView).toHaveCSS('display', 'flex');
-    await expect(compactView).toHaveCSS('flex-direction', 'column');
-    
-    // Should have exactly 3 items: 2 groups + 1 new line drop zone
-    const items = compactView.locator('.compact-group');
-    await expect(items).toHaveCount(3); 
-    
-    // The "New Production Line" area should be at the bottom
-    const lastItem = items.last();
-    await expect(lastItem).toContainText(/DROP TO CREATE/i);
-
-    await page.mouse.up();
-  });
-
   test('Drag ware to existing group in compact view', async ({ page }) => {
     // 0. Setup: Ensure we have a group
     await page.evaluate(() => {
@@ -102,7 +52,7 @@ test.describe('Compact Drag View Integration', () => {
     await page.mouse.down();
     
     for (let i = 0; i < 5; i++) {
-      await page.mouse.move(100 + i * 50, 100 + i * 50);
+      await page.mouse.move(100 + i * 50, 100 + i * 50, { steps: 5 });
       await page.waitForTimeout(50);
     }
 

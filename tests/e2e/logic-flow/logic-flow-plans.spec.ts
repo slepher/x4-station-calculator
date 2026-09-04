@@ -1,21 +1,10 @@
 import { test } from '../../test-setup';
 import { expect } from '@playwright/test';
+import { setupLogicFlow } from './helpers/setupLogicFlow';
 
 test.describe('Logic Flow Plans - E2E Tests', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
-    const dbFixture = await import('../../fixtures/db.json', { with: { type: 'json' } });
-    const dbData = JSON.parse(JSON.stringify(dbFixture.default));
-    delete dbData.vsn;
-    await page.evaluate((data) => {
-      Object.entries(data).forEach(([key, value]) => localStorage.setItem(key, JSON.stringify(value)));
-      localStorage.setItem('isTestEnv', 'true');
-    }, dbData);
-    await page.reload();
-    await page.locator('select').filter({ hasText: /简体中文|English/ }).selectOption('zh-CN');
-    await page.getByTestId('top-view-btn-flow').click();
-    await expect(page.locator('.flow-layout')).toBeVisible();
-    await expect(page.locator('.candidate-zone')).toBeVisible();
+    await setupLogicFlow(page, 'clean');
   });
 
   const dragWareToNewZone = async (page: any, wareId: string) => {
@@ -25,9 +14,9 @@ test.describe('Logic Flow Plans - E2E Tests', () => {
     const sourceBox = await source.boundingBox();
     if (!sourceBox) throw new Error(`Source ware ${wareId} not found`);
 
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
+    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
     await page.mouse.down();
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5);
+    await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
     await page.waitForTimeout(100);
 
     const compactView = page.locator('.compact-view');
@@ -44,11 +33,8 @@ test.describe('Logic Flow Plans - E2E Tests', () => {
   };
 
   const switchToLogicFlowView = async (page: any) => {
-    const logicFlowBtn = page.locator('.view-mode-btn').filter({ hasText: /逻辑|Logic/i });
-    if (await logicFlowBtn.count() > 0) {
-      await logicFlowBtn.click();
-      await page.waitForTimeout(200);
-    }
+    const logicFlowBtn = page.getByTestId('top-view-btn-flow');
+    await expect(logicFlowBtn).toHaveClass(/bg-purple-600/);
   };
 
   test.describe('标题栏主题切换', () => {
@@ -93,7 +79,7 @@ test.describe('Logic Flow Plans - E2E Tests', () => {
       }
 
       const groupCount = await page.evaluate(() => (window as any).logicFlowStore.groups.length);
-      expect(groupCount).toBeGreaterThanOrEqual(0);
+      expect(groupCount).toBe(0);
     });
   });
 
@@ -176,14 +162,14 @@ test.describe('Logic Flow Plans - E2E Tests', () => {
       await page.waitForTimeout(200);
 
       const modal = page.locator('.load-plan-modal, [role="dialog"]').filter({ hasText: /加载|Load/i });
-      if (await modal.count() > 0) {
-        const loadPlanBtn = modal.locator('button').filter({ hasText: /加载|Load/i }).first();
-        await loadPlanBtn.click();
-        await page.waitForTimeout(200);
-      }
+      await expect(modal).toBeVisible();
+      const loadPlanBtn = modal.locator('button').filter({ hasText: /加载|Load/i }).first();
+      await expect(loadPlanBtn).toBeVisible();
+      await loadPlanBtn.click();
+      await page.waitForTimeout(200);
 
       const groupCount = await page.evaluate(() => (window as any).logicFlowStore.groups.length);
-      expect(groupCount).toBeGreaterThanOrEqual(0);
+      expect(groupCount).toBe(1);
     });
   });
 
@@ -196,14 +182,13 @@ test.describe('Logic Flow Plans - E2E Tests', () => {
       await page.waitForTimeout(100);
 
       const input = page.locator('.station-toolbar input, .toolbar-input').first();
-      if (await input.count() > 0) {
-        await input.fill('New Plan Title');
-        await input.press('Enter');
-        await page.waitForTimeout(200);
+      await expect(input).toBeVisible();
+      await input.fill('New Plan Title');
+      await input.press('Enter');
+      await page.waitForTimeout(200);
 
-        const planName = await page.evaluate(() => (window as any).logicFlowStore.currentPlanName);
-        expect(planName).toBe('New Plan Title');
-      }
+      const planName = await page.evaluate(() => (window as any).logicFlowStore.currentPlanName);
+      expect(planName).toBe('New Plan Title');
     });
   });
 
@@ -215,11 +200,10 @@ test.describe('Logic Flow Plans - E2E Tests', () => {
       const flowGroupCount = await page.evaluate(() => (window as any).logicFlowStore.groups.length);
       expect(flowGroupCount).toBeGreaterThan(0);
 
-      const productionBtn = page.locator('.view-mode-btn').filter({ hasText: /量化|Quantified|生产|Production/i }).first();
-      if (await productionBtn.count() > 0) {
-        await productionBtn.click();
-        await page.waitForTimeout(200);
-      }
+      const productionBtn = page.getByTestId('top-view-btn-blueprint-production');
+      await expect(productionBtn).toBeVisible();
+      await productionBtn.click();
+      await page.waitForTimeout(200);
 
       await switchToLogicFlowView(page);
       await page.waitForTimeout(200);
@@ -271,8 +255,7 @@ test.describe('Logic Flow Plans - E2E Tests', () => {
       const groupTitle = page.locator('.production-group h3').first();
       await expect(groupTitle).toBeVisible();
       
-      const titleText = await groupTitle.textContent();
-      expect(titleText).toBeTruthy();
+      await expect(groupTitle).toContainText(/E1-S1|Hull Parts|船体部件|hullparts/i);
     });
   });
 });
