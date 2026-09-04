@@ -6,5 +6,5 @@
 - State: `working`
 - Active task: `task-test-4`
 - Candidate: `0643345c`
-- Next action: `final reviewer rechecks gap fixture patch and BHW-834 assertion; keep task-test-4 blocked if gap precondition remains unproven`
+- Next action: `coding worker replaces gap localStorage patch with reviewer-approved UI precondition, then final focused gate and reviewer`
 - Blocker: `none`
