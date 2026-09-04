@@ -1,5 +1,15 @@
 # task-test-1 Report 1
 
+## Routing
+
+- Task: `task-test-1.md`
+- Report: `task-test-1-report-1.md`
+- Scope: `task-test-1.1`
+- Checkpoint: `bd3c3c52` (target-synchronized; original test checkpoint `29a55e80`)
+- Target: `0adc908e48d36d186c3a35278935b72d635266d1`
+- Command: `npm run test:unit -- tests/unified-unit`; `npm run test:unit -- tests/skills/unit tests/e2e-skills/unit`
+- Result: `failed` / `cannot_resolve`
+
 - Status: `cannot_resolve`
 - Candidate: `29a55e80` on `codex/unified-test-repair-g1-integrate`
 - Target: `0adc908e48d36d186c3a35278935b72d635266d1`
@@ -13,6 +23,8 @@ The mandatory skills suite depends on missing out-of-scope assets:
 - `validate-test-results-run.spec.ts`: required `scriptPath`/data directory is missing; subprocess exits `2`.
 
 The task owns only `tests/unified-unit/` and `tests/unit/`; `tests/skills/**`, `tests/e2e-skills/**`, and skill assets are read-only. No legal repair is available in this task.
+
+The integrate lane was subsequently synchronized with the current develop target, producing `bd3c3c52`. This synchronization changed no test evidence and does not turn the checkpoint into an accepted candidate.
 
 ## Changes preserved
 

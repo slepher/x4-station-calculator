@@ -15,4 +15,4 @@
 - Lanes: `lanes-1.md`
 - Base: `b62034868643b9d2a9af48ab0f634b067e80880d`
 - Next action: `route task-test-1 cannot_resolve to the owning skills-asset scope`
-- Blocker: `task-test-1` checkpoint `29a55e80` is not accepted; mandatory skills suite requires missing out-of-scope assets/scripts/data, so dependent `task-test-2` is not dispatched
+- Blocker: `task-test-1` checkpoint `bd3c3c52` is not accepted; mandatory skills suite requires missing out-of-scope assets/scripts/data, so dependent `task-test-2` is not dispatched
