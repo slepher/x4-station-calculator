@@ -13,8 +13,8 @@
 - **Steps to Reproduce**: Start from a saved empire; import `ilf_mixed_groups`, which has one non-empty group and one empty group; choose Save and Import or Discard and Import.
 - **Expected Behavior**: The resulting empire contains exactly one station for the single non-empty group; empty groups are skipped.
 - **Actual Behavior**: The resulting empire contains two stations, including an extra default station created during import reset.
-- **Status**: Confirmed
-- **Related Verification**: `docs/plan/unified-test-repair/task-test-4-review-1a61734f.md`; `tests/e2e/logic-flow/import-logic-flow.spec.ts`
+- **Status**: Verified
+- **Related Verification**: `docs/plan/unified-test-repair/task-test-4-review-1a61734f.md`; `docs/plan/unified-test-repair/task-test-4-review-365fa75c.md`; `tests/e2e/logic-flow/import-logic-flow.spec.ts`; focused commit `fcfea6c4`
 
 ## Bug: Import warnings are cleared before they can be observed
 - **ID**: BUG-003
@@ -22,5 +22,5 @@
 - **Steps to Reproduce**: Import `ilf_mixed_groups` with an empty group, or import `ilf_non_container_isolated` into a station and complete the current strategy flow.
 - **Expected Behavior**: The warning modal remains visible after import and reports skipped empty groups or ignored non-container isolated wares.
 - **Actual Behavior**: Warning state is cleared by the subsequent import modal close callback, so `logicflow-import-warning-modal` is not visible.
-- **Status**: Confirmed
-- **Related Verification**: `docs/plan/unified-test-repair/task-test-4-review-1a61734f.md`; `tests/e2e/logic-flow/import-logic-flow.spec.ts`
+- **Status**: Verified
+- **Related Verification**: `docs/plan/unified-test-repair/task-test-4-review-1a61734f.md`; `docs/plan/unified-test-repair/task-test-4-review-365fa75c.md`; `docs/plan/unified-test-repair/task-test-4-review-0c52a3be.md`; `tests/e2e/logic-flow/import-logic-flow.spec.ts`; focused commit `fcfea6c4`
