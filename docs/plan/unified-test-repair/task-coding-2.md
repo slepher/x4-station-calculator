@@ -6,7 +6,7 @@
 - Plan: `plan-1.md`
 - Lane manifest: `lanes-1.md`
 - Context: `context-1.md`
-- Evidence target: `task-coding-1` accepted merge on target branch `develop`
+- Evidence target: `task-coding-1` accepted merge `7c622141914ae0e532833a98d0949d7a6decf475` on target branch `develop`
 - Task kind: `coding`
 - Mode: `normal`
 - Mode basis: Vitest 与 Playwright 装配路径可拆为两个无重叠、串行 default subtasks。
@@ -15,7 +15,7 @@
 - Lane: `coding`
 - Worktree: `/home/slepher/project/x4-station-calculator/.worktree/coding`
 - Branch: `codex/unified-test-repair-g1-coding`
-- Base: `b62034868643b9d2a9af48ab0f634b067e80880d`
+- Base: `7c622141914ae0e532833a98d0949d7a6decf475`
 - Depends on: `task-coding-1`
 - Covers: `none`
 

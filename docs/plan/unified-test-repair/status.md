@@ -4,7 +4,7 @@
 
 - Goal: unified-test-repair
 - Repository: /home/slepher/project/x4-station-calculator
-- Updated: 2026-09-04T01:04:07+08:00
+- Updated: 2026-09-04T02:32:00+08:00
 
 ## Resume
 
@@ -14,5 +14,5 @@
 - Plan: `plan-1.md`
 - Lanes: `lanes-1.md`
 - Base: `b62034868643b9d2a9af48ab0f634b067e80880d`
-- Next action: `run task-coding-1.2 after accepted task-coding-1.1 target merge`
-- Blocker: `none`
+- Next action: `user validates integrated candidate dfd0d022; then merge to develop`
+- Blocker: `Live browser assertions still fail at legacy .supply-tab locator; deferred to task-test-2`
