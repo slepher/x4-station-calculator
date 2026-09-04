@@ -2,6 +2,29 @@ import { expect, type Page } from '@playwright/test'
 
 type DropTarget = 'new' | number
 
+export async function attemptWareDrag(page: Page, wareId: string): Promise<void> {
+  const source = page.locator(`.ware-card-wrapper[data-ware-id="${wareId}"]`).first()
+  await expect(source).toBeVisible()
+  const box = await source.boundingBox()
+  if (!box) throw new Error(`Source ware ${wareId} not found`)
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2, { steps: 5 })
+  await page.mouse.down()
+  await page.mouse.move(box.x + box.width / 2 + 100, box.y + box.height / 2 + 100, { steps: 10 })
+  await expect(page.getByTestId('compact-view')).toHaveCount(0)
+  await page.mouse.up()
+}
+
+export async function startWareDrag(page: Page, wareId: string): Promise<void> {
+  const source = page.locator(`.ware-card-wrapper[data-ware-id="${wareId}"]`).first()
+  await expect(source).toBeVisible()
+  const box = await source.boundingBox()
+  if (!box) throw new Error(`Source ware ${wareId} not found`)
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2, { steps: 5 })
+  await page.mouse.down()
+  await page.mouse.move(box.x + box.width / 2 + 5, box.y + box.height / 2 + 5, { steps: 5 })
+  await expect(page.getByTestId('compact-view')).toBeVisible({ timeout: 5000 })
+}
+
 export async function dragWareToTarget(
   page: Page,
   wareId: string,
@@ -35,7 +58,7 @@ export async function dragWareToTarget(
     await expect(targetLocator).toHaveClass(/border-red-600/)
     await expect(targetLocator.getByTestId('rejected-label')).toBeVisible()
   } else {
-    await expect.poll(() => page.evaluate(() => (window as any).logicFlowStore.hoveredGroupId)).not.toBeNull()
+    await expect(targetLocator).toHaveClass(/border-(blue|amber)-500\/50/)
   }
 
   if (drop) {

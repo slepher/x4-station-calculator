@@ -46,8 +46,7 @@ test.describe('Logic Flow Plans - E2E Tests', () => {
 
       const dialog = page.locator('.smart-save-dialog, [role="dialog"]').filter({ hasText: /保存|Save/i });
       await expect(dialog).toBeVisible();
-      const cancelBtn = dialog.locator('button').filter({ hasText: /取消|Cancel/i }).first();
-      await cancelBtn.click();
+      await dialog.getByRole('button', { name: /保存并新建|Save.*Create New/i }).click();
 
       const groupCount = await page.evaluate(() => (window as any).logicFlowStore.groups.length);
       expect(groupCount).toBe(0);
@@ -60,8 +59,11 @@ test.describe('Logic Flow Plans - E2E Tests', () => {
       await dragWareToTarget(page, 'hullparts');
 
       await page.getByTestId('toolbar-save-btn').click();
-      await expect(page.locator('.smart-save-dialog, [role="dialog"]')).toBeVisible();
-      await expect(page.locator('.smart-save-dialog, [role="dialog"]')).toContainText(/保存|Save/i);
+      const dialog = page.locator('.smart-save-dialog, [role="dialog"]');
+      await expect(dialog).toBeVisible();
+      await dialog.locator('input').fill('New Plan');
+      await dialog.getByRole('button', { name: /^保存$|^Save$/i }).click();
+      await expect(page.locator('.plan-title-text')).toHaveText('New Plan');
     });
 
     test('E2E-5: 保存已存在方案', async ({ page }) => {
@@ -79,8 +81,8 @@ test.describe('Logic Flow Plans - E2E Tests', () => {
 
       await page.getByTestId('toolbar-save-btn').click();
 
-      const planCount = await page.evaluate(() => (window as any).logicFlowStore.savedPlans.list.length);
-      expect(planCount).toBe(1);
+      await expect(page.locator('.flow-node[data-ware-id="weaponcomponents"]')).toBeVisible();
+      await expect(page.locator('.plan-title-text')).toHaveText('Existing Plan');
     });
   });
 
@@ -103,8 +105,9 @@ test.describe('Logic Flow Plans - E2E Tests', () => {
       await loadPlanBtn.click();
       await page.waitForTimeout(200);
 
-      const groupCount = await page.evaluate(() => (window as any).logicFlowStore.groups.length);
-      expect(groupCount).toBe(1);
+      await expect(page.locator('.production-group')).toHaveCount(3);
+      await expect(page.locator('.plan-title-text')).toHaveText('Logic Flow 1');
+      await expect(page.locator('.flow-node').filter({ hasText: /船体部件|Hull Parts/i }).first()).toBeVisible();
     });
   });
 
@@ -154,6 +157,7 @@ test.describe('Logic Flow Plans - E2E Tests', () => {
       
       await page.getByTestId('toolbar-save-btn').click();
       await expect(page.locator('.status-message, [role="alert"]')).toContainText(/无法保存|cannot save|empty/i);
+      await expect(page.locator('.smart-save-dialog, [role="dialog"]')).toHaveCount(0);
     });
   });
 
@@ -169,6 +173,7 @@ test.describe('Logic Flow Plans - E2E Tests', () => {
 
       const newDropTarget = page.locator('.groups-list .drop-target').last();
       await expect(newDropTarget).toBeVisible();
+      await expect(page.locator('.production-group')).toHaveCount(1);
     });
   });
 

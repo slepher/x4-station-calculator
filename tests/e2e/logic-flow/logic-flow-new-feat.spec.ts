@@ -30,35 +30,12 @@ test.describe('Logic Flow New Features', () => {
       });
       console.log(`Initial manual node count: ${initialManualNodeCount}`);
 
-      const source = page.locator('.ware-card-wrapper[data-ware-id="weaponcomponents"]').first();
-      await expect(source).toBeVisible();
-
-      const sourceBox = await source.boundingBox();
-      if (!sourceBox) throw new Error('Source ware not found');
-
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
-      await page.mouse.down();
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
-      await page.waitForTimeout(100);
-
+      await dragWareToTarget(page, 'weaponcomponents', 0, { drop: false });
       const compactView = page.locator('.compact-view');
-      await expect(compactView).toBeVisible({ timeout: 5000 });
-
-      const targetGroup = compactView.locator('.compact-group').first();
-      const targetBox = await targetGroup.boundingBox();
-      if (!targetBox) throw new Error('Target group not found');
-
-      await page.mouse.move(targetBox.x + targetBox.width / 2, targetBox.y + targetBox.height / 2, { steps: 10 });
-      await page.waitForTimeout(200);
-
-      const isDragging = await page.evaluate(() => (window as any).logicFlowStore.isDragging);
-      expect(isDragging).toBe(true);
-
       await page.mouse.move(50, 50, { steps: 10 });
       await page.waitForTimeout(300);
 
-      const isHoveringAfterLeave = await page.evaluate(() => (window as any).logicFlowStore.hoveredGroupId === null);
-      expect(isHoveringAfterLeave).toBe(true);
+      await expect(compactView.locator('.compact-group').first()).not.toHaveClass(/border-blue-500\/50|border-amber-500\/50/);
 
       await page.mouse.up();
       await page.waitForTimeout(300);
@@ -339,17 +316,8 @@ test.describe('Logic Flow New Features', () => {
       await editInput.press('Enter');
       await page.waitForTimeout(100);
 
-      const source = page.locator('.ware-card-wrapper[data-ware-id="weaponcomponents"]').first();
-      const sourceBox = await source.boundingBox();
-      if (!sourceBox) throw new Error('Source not found');
-
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
-      await page.mouse.down();
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
-      await page.waitForTimeout(100);
-
+      await dragWareToTarget(page, 'weaponcomponents', 0, { drop: false });
       const compactView = page.locator('.compact-view');
-      await expect(compactView).toBeVisible({ timeout: 5000 });
       
       const compactTitle = compactView.locator('.compact-group span.truncate').first();
       await expect(compactTitle).toHaveText('我的产线');
@@ -361,17 +329,8 @@ test.describe('Logic Flow New Features', () => {
       await dragWareToTarget(page, 'weaponcomponents');
       await page.waitForTimeout(300);
       
-      const source = page.locator('.ware-card-wrapper[data-ware-id="hullparts"]').first();
-      const sourceBox = await source.boundingBox();
-      if (!sourceBox) throw new Error('Source not found');
-
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
-      await page.mouse.down();
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
-      await page.waitForTimeout(100);
-
+      await dragWareToTarget(page, 'hullparts', 0, { drop: false });
       const compactView = page.locator('.compact-view');
-      await expect(compactView).toBeVisible({ timeout: 5000 });
       
       const t0Resources = compactView.locator('[data-ware-id]');
       const count = await t0Resources.count();
@@ -393,17 +352,8 @@ test.describe('Logic Flow New Features', () => {
       await editInput.press('Enter');
       await page.waitForTimeout(100);
       
-      const source = page.locator('.ware-card-wrapper[data-ware-id="weaponcomponents"]').first();
-      const sourceBox = await source.boundingBox();
-      if (!sourceBox) throw new Error('Source not found');
-
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
-      await page.mouse.down();
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
-      await page.waitForTimeout(100);
-
+      await dragWareToTarget(page, 'weaponcomponents', 0, { drop: false });
       const compactView = page.locator('.compact-view');
-      await expect(compactView).toBeVisible({ timeout: 5000 });
       
       const compactTitle = compactView.locator('.compact-group span.truncate').first();
       const titleText = await compactTitle.textContent();

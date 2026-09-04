@@ -1,7 +1,7 @@
 import { test } from '../../test-setup';
 import { expect } from '@playwright/test';
 import { setupLogicFlow } from './helpers/setupLogicFlow';
-import { dragWareToTarget } from './helpers/dragLogicFlow';
+import { attemptWareDrag, dragWareToTarget, startWareDrag } from './helpers/dragLogicFlow';
 
 test.describe('Logical Flow Integration Verification', () => {
   test.beforeEach(async ({ page }) => {
@@ -71,15 +71,7 @@ test.describe('Logical Flow Integration Verification', () => {
     // 2. 动态交互测试 - 尝试拖拽 T0 资源
     const initialGroupCount = await page.evaluate(() => (window as any).logicFlowStore.groups.length);
 
-    const oreBox = await oreCard.boundingBox();
-    if (!oreBox) throw new Error('Ore card not found');
-
-    // 模拟鼠标拖拽操作
-    await page.mouse.move(oreBox.x + oreBox.width / 2, oreBox.y + oreBox.height / 2, { steps: 5 });
-    await page.mouse.down();
-    await page.mouse.move(oreBox.x + oreBox.width / 2 + 100, oreBox.y + oreBox.height / 2 + 100, { steps: 10 });
-    await page.waitForTimeout(300);
-    await page.mouse.up();
+    await attemptWareDrag(page, 'ore');
 
     // 3. 断言：数据没有发生变化（T0 资源没有被添加到规划区）
     const finalGroupCount = await page.evaluate(() => (window as any).logicFlowStore.groups.length);
@@ -187,14 +179,7 @@ test.describe('Logical Flow Integration Verification', () => {
 
   test.describe('Edge Cases', () => {
     test('5.1 Drag State Persists Until Mouse Up', async ({ page }) => {
-      const source = page.locator('.ware-card-wrapper[data-ware-id="hullparts"]').first();
-      const sourceBox = await source.boundingBox();
-      if (!sourceBox) throw new Error('Source not found');
-
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
-      await page.mouse.down();
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
-      await page.waitForTimeout(100);
+      await startWareDrag(page, 'hullparts');
 
       const compactView = page.locator('.compact-view');
       await expect(compactView).toBeVisible({ timeout: 5000 });
