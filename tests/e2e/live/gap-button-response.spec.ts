@@ -32,9 +32,9 @@ test.describe('Gap 按钮响应性验证', () => {
     const claytronicsRow = page.locator('.module-row').filter({ hasText: /电子黏土|Claytronics/ }).first()
     await expect(claytronicsRow).toBeVisible({ timeout: 2000 })
     const claytronicsCount = claytronicsRow.locator('input[type="number"]')
-    await claytronicsCount.fill('10')
+    await claytronicsCount.fill('100')
     await claytronicsCount.press('Tab')
-    await expect(claytronicsCount).toHaveValue('10')
+    await expect(claytronicsCount).toHaveValue('100')
     await page.waitForTimeout(500)
 
     const sectorTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_100_sector001_macro"]')
