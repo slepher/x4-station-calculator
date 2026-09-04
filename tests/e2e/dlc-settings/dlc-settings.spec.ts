@@ -42,7 +42,6 @@ test.beforeEach(async ({ page }) => {
     })
     localStorage.setItem("isTestEnv", "true")
     // 设置语言为中文
-    document.cookie = "user_locale=zh-CN; path=/"
   }, dbData)
 
   await page.reload()

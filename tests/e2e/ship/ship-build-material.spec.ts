@@ -10,8 +10,6 @@ const THRUSTER_ID = 'thruster_gen_l_allround_01_mk1'
 const openShipBuild = async (page: Page) => {
   await page.goto('/')
   await page.evaluate(() => {
-    localStorage.clear()
-    sessionStorage.clear()
     localStorage.setItem('isTestEnv', 'true')
   })
   await page.reload()

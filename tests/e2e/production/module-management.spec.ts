@@ -5,8 +5,6 @@ test.describe('Module Management - Storage Auto-Fill', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/')
     await page.evaluate(() => {
-      localStorage.clear()
-      sessionStorage.clear()
     })
     await page.reload()
     await page.addStyleTag({ content: '*, *::before, *::after { transition: none !important; animation: none !important; }' })

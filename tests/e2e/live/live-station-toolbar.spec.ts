@@ -20,12 +20,17 @@ async function switchToLiveProduction(page: Page) {
 }
 
 async function selectStationInSector(page: Page, sectorName: string, stationName: string) {
-  const supplyTab = page.locator('.supply-tab').filter({ hasText: sectorName })
+  const sectorIds: Record<string, string> = {
+    '小行星': '186727eb-7c4a-c0e0-b20d-f17405fd3aa3',
+    '神圣眼光': '0d8351a1-66af-cb13-2e9e-0e7d061a8df9',
+    '阿尔忒弥斯的朦胧': '1e6fdef6-b279-6da6-76c4-ce8f671dfcd9'
+  }
+  const supplyTab = page.locator(`[data-testid="sidebar-sector"][data-sector-id="${sectorIds[sectorName]}"]`)
   await expect(supplyTab).toBeVisible({ timeout: 5000 })
   await supplyTab.click()
   await page.waitForTimeout(500)
 
-  const stationTab = page.locator('.station-tab').filter({ hasText: stationName })
+  const stationTab = page.locator(`[data-testid="sidebar-station"][data-station-id="${stationName}"]`)
   await expect(stationTab).toBeVisible({ timeout: 5000 })
   await stationTab.click()
   await page.waitForTimeout(300)
@@ -33,11 +38,11 @@ async function selectStationInSector(page: Page, sectorName: string, stationName
 
 test.describe('Live Station Fixture Load', () => {
   test('loads save binding fixture and reveals archive-only station tabs', async ({ page }) => {
-    const sectorTab = page.locator('.supply-tab').filter({ hasText: '神圣眼光' })
+    const sectorTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="0d8351a1-66af-cb13-2e9e-0e7d061a8df9"]')
     await expect(sectorTab).toBeVisible({ timeout: 5000 })
     await sectorTab.click()
 
-    const archiveStationTab = page.locator('.station-tab').filter({ hasText: 'PPW-916' })
+    const archiveStationTab = page.locator('[data-testid="sidebar-station"][data-station-id="PPW-916"]')
     await expect(archiveStationTab).toBeVisible({ timeout: 5000 })
   })
 })
@@ -225,26 +230,26 @@ test.describe('3 E2E 测试场景', () => {
   })
 
   test('3.10 Case: 星区中转站已绑定的空间站不在tab列表显示', async ({ page }) => {
-    const sectorTab = page.locator('.supply-tab').filter({ hasText: '阿尔忒弥斯的朦胧' })
+    const sectorTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="1e6fdef6-b279-6da6-76c4-ce8f671dfcd9"]')
     await expect(sectorTab).toBeVisible({ timeout: 5000 })
     await sectorTab.click()
     await page.waitForTimeout(500)
 
-    const stationRWC = page.locator('.station-tab').filter({ hasText: 'RWC-785' })
+    const stationRWC = page.locator('[data-testid="sidebar-station"][data-station-id="RWC-785"]')
     await expect(stationRWC).toBeVisible({ timeout: 3000 })
 
-    const allStationTabs = await page.locator('.station-tab').allInnerTexts()
+    const allStationTabs = await page.locator('[data-testid="sidebar-station"]').allInnerTexts()
     const bhwStationTabs = allStationTabs.filter(text => text.includes('BHW-834'))
     expect(bhwStationTabs.length).toBe(0)
   })
 
   test('3.11 Case: 空间站tab显示正确的tag和factoryGroup属性', async ({ page }) => {
-    const sectorTab = page.locator('.supply-tab').filter({ hasText: '阿尔忒弥斯的朦胧' })
+    const sectorTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="1e6fdef6-b279-6da6-76c4-ce8f671dfcd9"]')
     await expect(sectorTab).toBeVisible({ timeout: 5000 })
     await sectorTab.click()
     await page.waitForTimeout(500)
 
-    const stationRWC = page.locator('.station-tab').filter({ hasText: 'RWC-785' })
+    const stationRWC = page.locator('[data-testid="sidebar-station"][data-station-id="RWC-785"]')
     await expect(stationRWC).toBeVisible({ timeout: 3000 })
 
     const tagAttr = await stationRWC.getAttribute('data-tag')

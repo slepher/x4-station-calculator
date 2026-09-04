@@ -16,7 +16,7 @@ test.describe('Contribution name 显示验证', () => {
   })
 
   test('小行星星区: 反物质转换器展开后应显示 station name "新建空间站"', async ({ page }) => {
-    const sectorTab = page.locator('.supply-tab').filter({ hasText: '小行星' })
+    const sectorTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="186727eb-7c4a-c0e0-b20d-f17405fd3aa3"]')
     await expect(sectorTab).toBeVisible({ timeout: 5000 })
     await sectorTab.click()
     await page.waitForTimeout(500)
@@ -39,7 +39,7 @@ test.describe('Contribution name 显示验证', () => {
   })
 
   test('地球人缺口: 星区产品电子基质展开后应显示 station name "地球人"', async ({ page }) => {
-    const sectorTab = page.locator('.supply-tab').filter({ hasText: '小行星' })
+    const sectorTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="186727eb-7c4a-c0e0-b20d-f17405fd3aa3"]')
     await expect(sectorTab).toBeVisible({ timeout: 5000 })
     await sectorTab.click()
     await page.waitForTimeout(500)
@@ -53,7 +53,7 @@ test.describe('Contribution name 显示验证', () => {
     }
     await expect(modeBtn).toHaveClass(/active-planning/)
 
-    const stationTab = page.locator('.station-tab').filter({ hasText: '地球人' })
+    const stationTab = page.locator('[data-testid="sidebar-station"][data-station-id="KXN-018"]')
     await expect(stationTab).toBeVisible({ timeout: 5000 })
     await stationTab.click()
     await page.waitForTimeout(300)
@@ -81,7 +81,7 @@ test.describe('Contribution name 显示验证', () => {
   })
 
   test('小行星仓储视图: 反物质转换器展开后贡献名应显示 "新建空间站"', async ({ page }) => {
-    const sectorTab = page.locator('.supply-tab').filter({ hasText: '小行星' })
+    const sectorTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="186727eb-7c4a-c0e0-b20d-f17405fd3aa3"]')
     await expect(sectorTab).toBeVisible({ timeout: 5000 })
     await sectorTab.click()
     await page.waitForTimeout(500)
@@ -115,7 +115,7 @@ test.describe('Contribution name 显示验证', () => {
   })
 
   test('小行星运输视图: 反物质转换器展开后贡献名应显示 "新建空间站"', async ({ page }) => {
-    const sectorTab = page.locator('.supply-tab').filter({ hasText: '小行星' })
+    const sectorTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="186727eb-7c4a-c0e0-b20d-f17405fd3aa3"]')
     await expect(sectorTab).toBeVisible({ timeout: 5000 })
     await sectorTab.click()
     await page.waitForTimeout(500)
@@ -149,7 +149,7 @@ test.describe('Contribution name 显示验证', () => {
   })
 
   test('新建空间站缺口: 星区运营量子管明细应含 "阿尔忒弥斯的朦胧" 和 "警惕凝视"', async ({ page }) => {
-    const sectorTab = page.locator('.supply-tab').filter({ hasText: '小行星' })
+    const sectorTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="186727eb-7c4a-c0e0-b20d-f17405fd3aa3"]')
     await expect(sectorTab).toBeVisible({ timeout: 5000 })
     await sectorTab.click()
     await page.waitForTimeout(500)
@@ -163,7 +163,7 @@ test.describe('Contribution name 显示验证', () => {
     }
     await expect(modeBtn).toHaveClass(/active-planning/)
 
-    const stationTab = page.locator('.station-tab').filter({ hasText: '新建空间站' })
+    const stationTab = page.locator('[data-testid="sidebar-station"][data-station-id="f36126e5-7798-ed14-3c03-938b961efa0b"]')
     await expect(stationTab).toBeVisible({ timeout: 5000 })
     await stationTab.click()
     await page.waitForTimeout(300)

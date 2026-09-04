@@ -20,12 +20,18 @@ async function switchToLiveProduction(page: Page) {
 }
 
 async function selectStationInSector(page: Page, sectorName: string, stationName: string) {
-  const supplyTab = page.locator('.supply-tab').filter({ hasText: sectorName })
+  const sectorIds: Record<string, string> = {
+    '小行星': '186727eb-7c4a-c0e0-b20d-f17405fd3aa3',
+    '神圣眼光': '0d8351a1-66af-cb13-2e9e-0e7d061a8df9',
+    '阿尔忒弥斯的朦胧': '1e6fdef6-b279-6da6-76c4-ce8f671dfcd9'
+  }
+  const supplyTab = page.locator(`[data-testid="sidebar-sector"][data-sector-id="${sectorIds[sectorName]}"]`)
   await expect(supplyTab).toBeVisible({ timeout: 5000 })
   await supplyTab.click()
   await page.waitForTimeout(500)
 
-  const stationTab = page.locator('.station-tab').filter({ hasText: stationName })
+  const stationIds: Record<string, string> = { '地球人': 'KXN-018', '新建空间站': 'f36126e5-7798-ed14-3c03-938b961efa0b' }
+  const stationTab = page.locator(`[data-testid="sidebar-station"][data-station-id="${stationIds[stationName] || stationName}"]`)
   await expect(stationTab).toBeVisible({ timeout: 5000 })
   await stationTab.click()
   await page.waitForTimeout(300)
@@ -148,7 +154,7 @@ test.describe('Live Flow Map - 模块列表验证', () => {
 
 test.describe('Live Flow Map - Transit Hub 切换规则验证', () => {
   test('transit hub toggle 按钮 UI 存在且文本变化', async ({ page }) => {
-    const transitTab = page.locator('.supply-tab').filter({ hasText: '阿尔忒弥斯的朦胧' })
+    const transitTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="1e6fdef6-b279-6da6-76c4-ce8f671dfcd9"]')
     await expect(transitTab).toBeVisible({ timeout: 5000 })
     await transitTab.click()
     await page.waitForTimeout(500)
@@ -169,7 +175,7 @@ test.describe('Live Flow Map - Transit Hub 切换规则验证', () => {
   })
 
   test('transit hub 无 archive 时，按钮文本变化但样式保持 planning 色', async ({ page }) => {
-    const transitTab = page.locator('.supply-tab').filter({ hasText: '小行星' })
+    const transitTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="186727eb-7c4a-c0e0-b20d-f17405fd3aa3"]')
     await expect(transitTab).toBeVisible({ timeout: 5000 })
     await transitTab.click()
     await page.waitForTimeout(500)
@@ -191,7 +197,7 @@ test.describe('Live Flow Map - Transit Hub 切换规则验证', () => {
   })
 
   test('transit hub 有 archive 时，切换后建筑模块面板存在', async ({ page }) => {
-    const transitTab = page.locator('.supply-tab').filter({ hasText: '阿尔忒弥斯的朦胧' })
+    const transitTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="1e6fdef6-b279-6da6-76c4-ce8f671dfcd9"]')
     await expect(transitTab).toBeVisible({ timeout: 5000 })
     await transitTab.click()
     await page.waitForTimeout(500)
@@ -208,7 +214,7 @@ test.describe('Live Flow Map - Transit Hub 切换规则验证', () => {
   })
 
   test('transit hub 无 archive 时，切换后建筑模块面板内容不变', async ({ page }) => {
-    const transitTab = page.locator('.supply-tab').filter({ hasText: '小行星' })
+    const transitTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="186727eb-7c4a-c0e0-b20d-f17405fd3aa3"]')
     await expect(transitTab).toBeVisible({ timeout: 5000 })
     await transitTab.click()
     await page.waitForTimeout(500)
@@ -246,7 +252,7 @@ test.describe('Live Flow Map - Transit Hub 切换规则验证', () => {
   })
 
   test('transit hub 有 archive 时，切换后 build 区使用 ArchiveModuleList', async ({ page }) => {
-    const transitTab = page.locator('.supply-tab').filter({ hasText: '阿尔忒弥斯的朦胧' })
+    const transitTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="1e6fdef6-b279-6da6-76c4-ce8f671dfcd9"]')
     await expect(transitTab).toBeVisible({ timeout: 5000 })
     await transitTab.click()
     await page.waitForTimeout(500)
@@ -267,7 +273,7 @@ test.describe('Live Flow Map - Transit Hub 切换规则验证', () => {
   })
 
   test('transit hub center dashboard 在 live mode 下切换数据源', async ({ page }) => {
-    const transitTab = page.locator('.supply-tab').filter({ hasText: '阿尔忒弥斯的朦胧' })
+    const transitTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="1e6fdef6-b279-6da6-76c4-ce8f671dfcd9"]')
     await expect(transitTab).toBeVisible({ timeout: 5000 })
     await transitTab.click()
     await page.waitForTimeout(500)
@@ -289,7 +295,7 @@ test.describe('Live Flow Map - Transit Hub 切换规则验证', () => {
   })
 
   test('transit hub materials panel 在无 archive 时保持 planning 数据', async ({ page }) => {
-    const transitTab = page.locator('.supply-tab').filter({ hasText: '小行星' })
+    const transitTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="186727eb-7c4a-c0e0-b20d-f17405fd3aa3"]')
     await expect(transitTab).toBeVisible({ timeout: 5000 })
     await transitTab.click()
     await page.waitForTimeout(500)
@@ -309,7 +315,7 @@ test.describe('Live Flow Map - Transit Hub 切换规则验证', () => {
   })
 
   test('transit hub 扇区信息显示正确的日照效率而非默认100%', async ({ page }) => {
-    const transitTab = page.locator('.supply-tab').filter({ hasText: '阿尔忒弥斯的朦胧' })
+    const transitTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="1e6fdef6-b279-6da6-76c4-ce8f671dfcd9"]')
     await expect(transitTab).toBeVisible({ timeout: 5000 })
     await transitTab.click()
     await page.waitForTimeout(500)
@@ -332,7 +338,7 @@ test.describe('Live Flow Map - Transit Hub 切换规则验证', () => {
   })
 
   test('transit hub 扇区信息显示正确的扇区资源数量', async ({ page }) => {
-    const transitTab = page.locator('.supply-tab').filter({ hasText: '阿尔忒弥斯的朦胧' })
+    const transitTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="1e6fdef6-b279-6da6-76c4-ce8f671dfcd9"]')
     await expect(transitTab).toBeVisible({ timeout: 5000 })
     await transitTab.click()
     await page.waitForTimeout(500)
@@ -351,7 +357,7 @@ test.describe('Live Flow Map - Transit Hub 切换规则验证', () => {
   })
 
   test('transit hub 扇区 popover 显示正确的扇区名称', async ({ page }) => {
-    const transitTab = page.locator('.supply-tab').filter({ hasText: '阿尔忒弥斯的朦胧' })
+    const transitTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="1e6fdef6-b279-6da6-76c4-ce8f671dfcd9"]')
     await expect(transitTab).toBeVisible({ timeout: 5000 })
     await transitTab.click()
     await page.waitForTimeout(500)

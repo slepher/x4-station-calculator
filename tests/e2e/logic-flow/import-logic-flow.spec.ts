@@ -225,13 +225,13 @@ const ensureStationContext = async (page: any) => {
       empireStore.selectStation(empireStore.activeEmpire.stations[0].id)
     }
   })
-  const firstStationTab = page.locator('.station-tab').first()
+  const firstStationTab = page.locator('[data-testid="sidebar-station"]').first()
   await expect(firstStationTab).toBeVisible()
   await firstStationTab.click({ force: true })
 }
 
 const ensureEmpireOverview = async (page: any) => {
-  await page.locator('.overview-tab').click({ force: true })
+  await page.locator('[data-testid="sidebar-overview"]').click({ force: true })
 }
 
 const openImportModal = async (page: any, mode: 'station' | 'empire') => {

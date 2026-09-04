@@ -16,7 +16,7 @@ test.describe('Gap 按钮响应性验证', () => {
   })
 
   test('新建空间站缺口: 点击量子管 + 按钮后数据应变化', async ({ page }) => {
-    const sectorTab = page.locator('.supply-tab').filter({ hasText: '小行星' })
+    const sectorTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="186727eb-7c4a-c0e0-b20d-f17405fd3aa3"]')
     await expect(sectorTab).toBeVisible({ timeout: 5000 })
     await sectorTab.click()
     await page.waitForTimeout(500)
@@ -30,7 +30,7 @@ test.describe('Gap 按钮响应性验证', () => {
     }
     await expect(modeBtn).toHaveClass(/active-planning/)
 
-    const stationTab = page.locator('.station-tab').filter({ hasText: '新建空间站' })
+    const stationTab = page.locator('[data-testid="sidebar-station"][data-station-id="f36126e5-7798-ed14-3c03-938b961efa0b"]')
     await expect(stationTab).toBeVisible({ timeout: 5000 })
     await stationTab.click()
     await page.waitForTimeout(300)

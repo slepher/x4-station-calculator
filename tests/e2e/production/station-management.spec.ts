@@ -2,12 +2,12 @@ import { test } from '../../test-setup'
 import { expect, Page } from '@playwright/test'
 
 async function getStationNames(page: Page) {
-  const labels = await page.locator('.station-tab .tab-label').allTextContents()
+  const labels = await page.locator('[data-testid="sidebar-station"] .sidebar-item-label').allTextContents()
   return labels.map(v => v.trim())
 }
 
 async function getStationIds(page: Page) {
-  return page.locator('.station-tab[data-station-id]').evaluateAll((nodes) =>
+  return page.locator('[data-testid="sidebar-station"][data-station-id]').evaluateAll((nodes) =>
     nodes
       .map((node) => node.getAttribute('data-station-id') || '')
       .filter(Boolean)
@@ -15,7 +15,7 @@ async function getStationIds(page: Page) {
 }
 
 async function getStationPositionSnapshot(page: Page) {
-  return page.locator('.station-tab[data-station-id]').evaluateAll((nodes) =>
+  return page.locator('[data-testid="sidebar-station"][data-station-id]').evaluateAll((nodes) =>
     nodes.map((node) => {
       const el = node as HTMLElement
       const rect = el.getBoundingClientRect()
@@ -29,7 +29,7 @@ async function getStationPositionSnapshot(page: Page) {
 
 async function waitForStationCount(page: Page, count: number) {
   await expect.poll(async () => {
-    return page.locator('.station-tab[data-station-id]').count()
+    return page.locator('[data-testid="sidebar-station"][data-station-id]').count()
   }, { timeout: 5000 }).toBe(count)
 }
 
@@ -40,7 +40,7 @@ async function createNamedStations(page: Page, names: string[]) {
     await addBtn.click({ timeout: 500 })
     await page.waitForTimeout(150)
 
-    const currentTab = page.locator('.station-tab').nth(i)
+    const currentTab = page.locator('[data-testid="sidebar-station"]').nth(i)
     await currentTab.click({ timeout: 500 })
 
     const nameInput = page.locator('.ghost-input.w-32').first()
@@ -52,8 +52,8 @@ async function createNamedStations(page: Page, names: string[]) {
 }
 
 async function dragStationBeforeStation(page: Page, sourceId: string, targetId: string) {
-  const source = page.locator(`.station-tab[data-station-id="${sourceId}"]`).first()
-  const target = page.locator(`.station-tab[data-station-id="${targetId}"]`).first()
+  const source = page.locator(`[data-testid="sidebar-station"][data-station-id="${sourceId}"]`).first()
+  const target = page.locator(`[data-testid="sidebar-station"][data-station-id="${targetId}"]`).first()
 
   const s = await source.boundingBox()
   const t = await target.boundingBox()
@@ -97,8 +97,6 @@ async function setupBase(page: Page) {
   })
   await page.goto('/')
   await page.evaluate(() => {
-    localStorage.clear()
-    sessionStorage.clear()
   })
   await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 10000 })
 }
@@ -109,7 +107,7 @@ test.describe('Station Tab Interactions', () => {
   })
 
   test('标签切换测试', async ({ page }) => {
-    const stationTab = page.locator('.station-tab').first()
+    const stationTab = page.locator('[data-testid="sidebar-station"]').first()
     await expect(stationTab).toBeVisible()
     await stationTab.click()
     await expect(page.locator('.main-layout')).toBeVisible()
@@ -118,7 +116,7 @@ test.describe('Station Tab Interactions', () => {
     await addBtn.click()
     await page.waitForTimeout(200)
 
-    const newStationTab = page.locator('.station-tab').last()
+    const newStationTab = page.locator('[data-testid="sidebar-station"]').last()
     await expect(newStationTab).toBeVisible()
     await newStationTab.click()
     await expect(page.locator('.main-layout')).toBeVisible()
@@ -126,15 +124,15 @@ test.describe('Station Tab Interactions', () => {
 
   test('新建分站测试', async ({ page }) => {
     const addBtn = page.locator('.add-btn')
-    const initialCount = await page.locator('.station-tab').count()
+    const initialCount = await page.locator('[data-testid="sidebar-station"]').count()
 
     await addBtn.click()
     await page.waitForTimeout(200)
 
-    const newCount = await page.locator('.station-tab').count()
+    const newCount = await page.locator('[data-testid="sidebar-station"]').count()
     expect(newCount).toBe(initialCount + 1)
 
-    const newTab = page.locator('.station-tab').last()
+    const newTab = page.locator('[data-testid="sidebar-station"]').last()
     await expect(newTab).toHaveClass(/active/)
 
     await expect(page.locator('.main-layout')).toBeVisible()
@@ -145,7 +143,7 @@ test.describe('Station Tab Interactions', () => {
     await addBtn.click()
     await page.waitForTimeout(200)
 
-    const stationTab = page.locator('.station-tab').first()
+    const stationTab = page.locator('[data-testid="sidebar-station"]').first()
     await stationTab.click({ button: 'right' })
 
     await expect(page.locator('.context-menu')).toBeVisible()
@@ -158,7 +156,7 @@ test.describe('Station Tab Interactions', () => {
   })
 
   test('工具栏内容切换测试', async ({ page }) => {
-    const stationTab = page.locator('.station-tab').first()
+    const stationTab = page.locator('[data-testid="sidebar-station"]').first()
     await stationTab.click()
     await expect(page.locator('.context-toolbar')).toBeVisible()
 
@@ -207,7 +205,7 @@ test.describe('Station Tab Interactions', () => {
     await addBtn.click()
     await page.waitForTimeout(200)
 
-    const tabs = page.locator('.station-tab')
+    const tabs = page.locator('[data-testid="sidebar-station"]')
     await expect(tabs).toHaveCount(3)
 
     await tabs.nth(0).click()
@@ -223,11 +221,11 @@ test.describe('Station Tab Interactions', () => {
 
     await addBtn.click()
     await page.waitForTimeout(200)
-    const station1Tab = page.locator('.station-tab').first()
+    const station1Tab = page.locator('[data-testid="sidebar-station"]').first()
 
     await addBtn.click()
     await page.waitForTimeout(200)
-    const station2Tab = page.locator('.station-tab').last()
+    const station2Tab = page.locator('[data-testid="sidebar-station"]').last()
 
     await station1Tab.click()
     await page.waitForTimeout(100)
@@ -253,8 +251,6 @@ test.describe.skip('多空间站帝国规划 - 标签拖拽重排', () => {
     })
     await page.goto('/')
     await page.evaluate(() => {
-      localStorage.clear()
-      sessionStorage.clear()
     })
     await page.reload()
     await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 10000 })
@@ -269,14 +265,14 @@ test.describe.skip('多空间站帝国规划 - 标签拖拽重排', () => {
   }
 
   const getStationOrder = async (page: any) => {
-    return await page.locator('.station-tab').evaluateAll((els: Element[]) =>
+    return await page.locator('[data-testid="sidebar-station"]').evaluateAll((els: Element[]) =>
       els.map((el) => (el as HTMLElement).dataset.stationId || '')
     )
   }
 
   const dragStationTab = async (page: any, fromIndex: number, toIndex: number) => {
-    const source = page.locator('.station-tab').nth(fromIndex)
-    const target = page.locator('.station-tab').nth(toIndex)
+    const source = page.locator('[data-testid="sidebar-station"]').nth(fromIndex)
+    const target = page.locator('[data-testid="sidebar-station"]').nth(toIndex)
 
     const sourceBox = await source.boundingBox()
     const targetBox = await target.boundingBox()
@@ -354,7 +350,7 @@ test.describe.skip('多空间站帝国规划 - 标签拖拽重排', () => {
     await addStations(page, 3)
     const beforeOrder = await getStationOrder(page)
 
-    const source = page.locator('.station-tab').nth(2)
+    const source = page.locator('[data-testid="sidebar-station"]').nth(2)
     const sourceBox = await source.boundingBox()
     if (!sourceBox) {
       throw new Error('missing source station tab bounding box')
@@ -376,8 +372,6 @@ test.describe.skip('station-tab-drag web integration', () => {
     await page.goto('/')
     await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 10000 })
     await page.evaluate(() => {
-      localStorage.clear()
-      sessionStorage.clear()
     })
     await page.reload()
     await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 10000 })
@@ -462,14 +456,14 @@ test.describe.skip('station-tab-drag web integration', () => {
     const reloaded = await getStationIds(page)
     expect(reloaded).toEqual(expected)
 
-    await expect(page.locator('.station-tab[data-station-id]')).toHaveCount(3)
+    await expect(page.locator('[data-testid="sidebar-station"][data-station-id]')).toHaveCount(3)
   })
 
   test('W4: 取消拖拽不改变顺序', async ({ page }) => {
     await createNamedStations(page, ['Alpha', 'Beta'])
     const before = await getStationNames(page)
 
-    const source = page.locator('.station-tab').nth(2)
+    const source = page.locator('[data-testid="sidebar-station"]').nth(2)
     const s = await source.boundingBox()
     if (!s) throw new Error('missing source tab box')
 
@@ -490,14 +484,14 @@ test.describe('帝国数据持久化', () => {
     await page.goto('/')
     await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 10000 })
 
-    const stationTab = page.locator('.station-tab').first()
+    const stationTab = page.locator('[data-testid="sidebar-station"]').first()
     await expect(stationTab).toBeVisible()
     const stationName = await stationTab.textContent()
 
     await page.reload()
     await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 10000 })
 
-    const afterReload = page.locator('.station-tab').first()
+    const afterReload = page.locator('[data-testid="sidebar-station"]').first()
     await expect(afterReload).toBeVisible()
     await expect(afterReload).toContainText(stationName || '')
   })
@@ -546,7 +540,7 @@ test.describe('Station Name Editing', () => {
     await nameInput.fill('Persistent Station')
     await nameInput.press('Tab')
     
-    const stationTab = page.locator('.station-tab').first()
+    const stationTab = page.locator('[data-testid="sidebar-station"]').first()
     await stationTab.click()
     const nameVal = await nameInput.inputValue()
     expect(nameVal).toBe('Persistent Station')

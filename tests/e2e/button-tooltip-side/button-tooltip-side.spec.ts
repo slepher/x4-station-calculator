@@ -19,8 +19,6 @@ const fixtureStorage = loadFixtureStorage()
 test.describe('button-tooltip-side web integration', () => {
   test.beforeEach(async ({ page }) => {
     await page.addInitScript((entries: StorageEntry[]) => {
-      window.localStorage.clear()
-      window.sessionStorage.clear()
       for (const [key, value] of entries) {
         window.localStorage.setItem(key, value)
       }
@@ -30,7 +28,7 @@ test.describe('button-tooltip-side web integration', () => {
 
     await page.goto('/')
     await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 10000 })
-    const stationTab = page.locator('.station-tab[data-station-id]').first()
+    const stationTab = page.locator('[data-testid="sidebar-station"][data-station-id]').first()
     await expect(stationTab).toBeVisible({ timeout: 10000 })
     await stationTab.click()
     await page.waitForSelector('.flow-wrapper', { timeout: 10000 })

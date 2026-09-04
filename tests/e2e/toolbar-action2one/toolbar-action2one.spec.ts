@@ -7,8 +7,6 @@ test.beforeEach(async ({ page }) => {
   })
   await page.goto('/')
   await page.evaluate(() => {
-    localStorage.clear()
-    sessionStorage.clear()
   })
   await page.reload()
   await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 500 })
@@ -43,14 +41,14 @@ async function buildImportModalOpenOnEmpire(page: any) {
   await loadDbFixture(page)
   await setLanguage(page, 'zh-CN')
   // Delete all stations to make isOverview=true
-  const overviewTab = page.locator('.overview-tab').filter({ hasText: /帝国总览|Overview/ })
+  const overviewTab = page.locator('[data-testid="sidebar-overview"]').filter({ hasText: /帝国总览|Overview/ })
   if (await overviewTab.count() > 0) {
     await overviewTab.click()
     await page.waitForTimeout(100)
   }
-  let stationCount = await page.locator('.station-tab').count()
+  let stationCount = await page.locator('[data-testid="sidebar-station"]').count()
   while (stationCount > 0) {
-    const stationTab = page.locator('.station-tab').first()
+    const stationTab = page.locator('[data-testid="sidebar-station"]').first()
     await stationTab.click({ button: 'right' })
     await page.waitForTimeout(200)
     const deleteOption = page.locator('.menu-item').filter({ hasText: /删除|delete/i })
@@ -63,7 +61,7 @@ async function buildImportModalOpenOnEmpire(page: any) {
         await page.waitForTimeout(300)
       }
     }
-    stationCount = await page.locator('.station-tab').count()
+    stationCount = await page.locator('[data-testid="sidebar-station"]').count()
   }
   // Click empire import entry
   await page.locator('[data-testid="logicflow-import-entry-empire"]').click()

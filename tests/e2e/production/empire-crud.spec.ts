@@ -8,8 +8,6 @@ test.describe('Empire CRUD', () => {
     })
     await page.goto('/')
     await page.evaluate(() => {
-      localStorage.clear()
-      sessionStorage.clear()
       localStorage.setItem('isTestEnv', 'true')
     })
     await page.reload()
@@ -24,7 +22,7 @@ test.describe('Empire CRUD', () => {
   })
 
   test('default empire exists with one station', async ({ page }) => {
-    const stationTabs = page.locator('.station-tab')
+    const stationTabs = page.locator('[data-testid="sidebar-station"]')
     const count = await stationTabs.count()
     expect(count).toBeGreaterThan(0)
   })
@@ -40,7 +38,7 @@ test.describe('Empire CRUD', () => {
     }
     await page.waitForTimeout(200)
 
-    const stationTabs = page.locator('.station-tab')
+    const stationTabs = page.locator('[data-testid="sidebar-station"]')
     const count = await stationTabs.count()
     expect(count).toBeGreaterThan(0)
   })

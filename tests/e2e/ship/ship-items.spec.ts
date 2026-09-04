@@ -5,8 +5,6 @@ import { test } from '../../test-setup'
 const openShipBuildPage = async (page: any) => {
   await page.goto('/')
   await page.evaluate(() => {
-    localStorage.clear()
-    sessionStorage.clear()
     localStorage.setItem('isTestEnv', 'true')
   })
   await page.reload()

@@ -24,7 +24,6 @@ test.beforeEach(async ({ page }) => {
       localStorage.setItem(key, JSON.stringify(value))
     })
     localStorage.setItem('isTestEnv', 'true')
-    document.cookie = 'user_locale=zh-CN; path=/'
   }, dbData)
   await page.reload()
   await page.waitForTimeout(300)

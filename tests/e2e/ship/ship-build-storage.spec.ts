@@ -12,8 +12,6 @@ const getBlueprintStorage = async (page: any) => {
 const openShipBuild = async (page: any, clearStorage = true) => {
   await page.goto('/')
   await page.evaluate(() => {
-    localStorage.clear()
-    sessionStorage.clear()
     localStorage.setItem('isTestEnv', 'true')
   })
   await page.reload()

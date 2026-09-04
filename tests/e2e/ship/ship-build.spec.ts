@@ -7,8 +7,6 @@ test.describe('Ship Build View', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/')
     await page.evaluate(() => {
-      localStorage.clear()
-      sessionStorage.clear()
     })
     await page.reload()
     await page.addStyleTag({ content: '*, *::before, *::after { transition: none !important; animation: none !important; }' })

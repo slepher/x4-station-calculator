@@ -223,7 +223,7 @@ async function uploadStorageImportJson(page: Page, fileName: string, payload: ob
 }
 
 async function ensureStationMode(page: Page) {
-  const stationTab = page.locator('.station-tab').first()
+  const stationTab = page.locator('[data-testid="sidebar-station"]').first()
   for (let i = 0; i < 3; i += 1) {
     await stationTab.click({ force: true })
     const isStation = await page.evaluate(() => (window as any).empireStore?.activeStationId !== null)
@@ -233,7 +233,7 @@ async function ensureStationMode(page: Page) {
 }
 
 async function ensureOverviewMode(page: Page) {
-  const overviewTab = page.locator('.overview-tab').first()
+  const overviewTab = page.locator('[data-testid="sidebar-overview"]').first()
   for (let i = 0; i < 3; i += 1) {
     await overviewTab.click({ force: true })
     const isOverview = await page.evaluate(() => (window as any).empireStore?.activeStationId === null)
@@ -383,7 +383,7 @@ async function flowStateV2StorageLoaded(page: Page) {
 }
 
 async function flowStateImportEmpireModalReady(page: Page) {
-  const overviewTab = page.locator('.overview-tab').filter({ hasText: /帝国总览|Overview/ })
+  const overviewTab = page.locator('[data-testid="sidebar-overview"]').filter({ hasText: /帝国总览|Overview/ })
   await expect(overviewTab).toBeVisible()
   await overviewTab.click({ force: true })
   await page.locator('[data-testid="logicflow-import-entry-empire"]').click({ force: true })
@@ -397,7 +397,7 @@ async function flowStateImportEmpireModalReady(page: Page) {
 }
 
 async function flowTransitionLoadedToImportModal(page: Page) {
-  const overviewTab = page.locator('.overview-tab').filter({ hasText: /帝国总览|Overview/ })
+  const overviewTab = page.locator('[data-testid="sidebar-overview"]').filter({ hasText: /帝国总览|Overview/ })
   await expect(overviewTab).toBeVisible()
   await overviewTab.click({ force: true })
   await page.locator('[data-testid="logicflow-import-entry-empire"]').click({ force: true })
@@ -615,7 +615,7 @@ test.describe.skip('Flow Simplify', () => {
     await flowTransitionLoadedToImportModal(page)
     await page.locator('[data-testid="logicflow-import-plan-direct-logic-flow-1"]').click({ force: true })
     await expect(importModal(page)).toBeVisible()
-    await expect(page.locator('.station-tab')).toHaveCount(3)
+    await expect(page.locator('[data-testid="sidebar-station"]')).toHaveCount(3)
     expect(1).toBe(1)
     expect(3).toBe(3)
   })
@@ -649,7 +649,7 @@ test.describe.skip('Flow Simplify', () => {
       flow.list[0].groups[0].nodes.push({ isolated: 'quantumtubes' })
       localStorage.setItem('x4_logic_flow_plans', JSON.stringify(flow))
     })
-    await page.locator('.overview-tab').click({ force: true })
+    await page.locator('[data-testid="sidebar-overview"]').click({ force: true })
     await page.locator('[data-testid="logicflow-import-entry-empire"]').click({ force: true })
     await flowStateImportEmpireModalReady(page)
     await page.locator('[data-testid="logicflow-import-plan-direct-logic-flow-1"]').click({ force: true })

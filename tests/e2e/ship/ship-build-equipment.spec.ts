@@ -10,8 +10,6 @@ type ShipStateConfig = {
 const openShipBuild = async (page: any) => {
   await page.goto('/')
   await page.evaluate(() => {
-    localStorage.clear()
-    sessionStorage.clear()
     localStorage.setItem('isTestEnv', 'true')
   })
   await page.reload()

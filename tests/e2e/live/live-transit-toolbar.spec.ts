@@ -18,12 +18,12 @@ test.describe('Live Transit Toolbar - Group Name Binding', () => {
   test('transit toolbar displays bindingGroup.name instead of binding.name', async ({ page }) => {
     await setLanguage(page, 'zh-CN')
 
-    const sectorTab = page.locator('.supply-tab').filter({ hasText: '小行星' })
+    const sectorTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="186727eb-7c4a-c0e0-b20d-f17405fd3aa3"]')
     await expect(sectorTab).toBeVisible({ timeout: 5000 })
     await sectorTab.click()
     await page.waitForTimeout(500)
 
-    const stationTab = page.locator('.station-tab').filter({ hasText: '地球人' })
+    const stationTab = page.locator('[data-testid="sidebar-station"][data-station-id="KXN-018"]')
     await expect(stationTab).toBeVisible({ timeout: 5000 })
 
     const toolbar = page.locator('.live-toolbar')
@@ -46,10 +46,10 @@ test.describe('Live Transit Toolbar - Group Name Binding', () => {
     const fillValue = await nameInput.inputValue()
     expect(fillValue).toBe('测试名称')
 
-    const renamedTab = page.locator('.supply-tab').filter({ hasText: '测试名称' })
+    const renamedTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="186727eb-7c4a-c0e0-b20d-f17405fd3aa3"]')
     await expect(renamedTab).toBeVisible({ timeout: 3000 })
 
-    const overviewTab = page.locator('.overview-tab')
+    const overviewTab = page.locator('[data-testid="sidebar-overview"]')
     await expect(overviewTab).toBeVisible({ timeout: 3000 })
     await overviewTab.click()
     await page.waitForTimeout(300)

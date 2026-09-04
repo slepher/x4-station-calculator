@@ -33,7 +33,7 @@ const closeImportModalIfOpen = async (page: any) => {
 }
 
 const ensureStationMode = async (page: any) => {
-  const stationTab = page.locator('.station-tab').first()
+  const stationTab = page.locator('[data-testid="sidebar-station"]').first()
   for (let i = 0; i < 3; i += 1) {
     await stationTab.click({ force: true })
     const isStation = await page.evaluate(() => {
@@ -51,7 +51,7 @@ const ensureStationMode = async (page: any) => {
 }
 
 const ensureOverviewMode = async (page: any) => {
-  const overviewTab = page.locator('.overview-tab').first()
+  const overviewTab = page.locator('[data-testid="sidebar-overview"]').first()
   for (let i = 0; i < 3; i += 1) {
     await overviewTab.click({ force: true })
     const isOverview = await page.evaluate(() => {
@@ -156,9 +156,9 @@ test('3.1 Case: StationToolbar Import 打开 storage-import 向导', async ({ pa
   })
 
   test('3.4 Case: x4-station 在帝国总览导入时新建默认命名空间站', async ({ page }) => {
-    // 3.4.1 点击 `.overview-tab` 并断言 `.overview-tab.active` 可见后，再通过 `logicflow-import-entry-empire` 打开 `import-view-modal` #期望: [true]
+    // 3.4.1 点击 `[data-testid="sidebar-overview"]` 并断言 `[data-testid="sidebar-overview"].active` 可见后，再通过 `logicflow-import-entry-empire` 打开 `import-view-modal` #期望: [true]
     await ensureOverviewMode(page)
-    const hasOverviewActive = await page.locator('.overview-tab.active').isVisible()
+    const hasOverviewActive = await page.locator('[data-testid="sidebar-overview"].active').isVisible()
     expect(hasOverviewActive).toBe(true)
 
     await openFromContextToolbar(page, 'empire')
@@ -188,20 +188,20 @@ test('3.1 Case: StationToolbar Import 打开 storage-import 向导', async ({ pa
       }
     })
 
-    // 3.4.3 断言导入后 `import-view-modal` 不可见，且 `.station-tab[data-station-id]` 数量从 `N` 变为 `N+1` #期望: ['N+1']
+    // 3.4.3 断言导入后 `import-view-modal` 不可见，且 `[data-testid="sidebar-station"][data-station-id]` 数量从 `N` 变为 `N+1` #期望: ['N+1']
     const importModalGone = await page.locator('[data-testid="import-view-modal"]').isVisible().catch(() => false)
     expect(importModalGone).toBe(false)
     // 'N+1' expected value for station count
     expect('N+1').toBeDefined()
 
-    // 3.4.4 断言当前激活标签 `.station-tab.active .tab-label` 文案为 `新建空间站` #期望: ['新建空间站']
-    await page.waitForSelector('.station-tab.active .tab-label')
-    const activeTabLabel = await page.locator('.station-tab.active .tab-label').textContent()
+    // 3.4.4 断言当前激活标签 `[data-testid="sidebar-station"].active .sidebar-item-label` 文案为 `新建空间站` #期望: ['新建空间站']
+    await page.waitForSelector('[data-testid="sidebar-station"].active .sidebar-item-label')
+    const activeTabLabel = await page.locator('[data-testid="sidebar-station"].active .sidebar-item-label').textContent()
     expect(activeTabLabel).toContain('新建空间站')
 
-    // 3.4.5 断言站点标签区可见且 `.overview-tab.active` 不可见（已从帝国总览切回新建站点） #期望: [true]
-    const hasStationTabs = await page.locator('.station-tab').first().isVisible()
-    const hasNoOverviewActive = await page.locator('.overview-tab.active').isVisible().catch(() => false)
+    // 3.4.5 断言站点标签区可见且 `[data-testid="sidebar-overview"].active` 不可见（已从帝国总览切回新建站点） #期望: [true]
+    const hasStationTabs = await page.locator('[data-testid="sidebar-station"]').first().isVisible()
+    const hasNoOverviewActive = await page.locator('[data-testid="sidebar-overview"].active').isVisible().catch(() => false)
     expect(hasStationTabs && !hasNoOverviewActive).toBe(true)
   })
 
