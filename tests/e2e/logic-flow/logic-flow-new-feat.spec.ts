@@ -34,6 +34,7 @@ test.describe('Logic Flow New Features', () => {
       const compactView = page.locator('.compact-view');
       await page.mouse.move(50, 50, { steps: 10 });
       await page.waitForTimeout(300);
+      await expect.poll(() => page.evaluate(() => (window as any).logicFlowStore.hoveredGroupId)).toBeNull();
 
       await expect(compactView.locator('.compact-group').first()).not.toHaveClass(/border-blue-500\/50|border-amber-500\/50/);
 

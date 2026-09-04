@@ -52,6 +52,9 @@ export async function dragWareToTarget(
   await targetLocator.scrollIntoViewIfNeeded()
   const targetBox = await targetLocator.boundingBox()
   if (!targetBox) throw new Error('Logic Flow drop target not found')
+  const compactBox = await compactView.boundingBox()
+  if (!compactBox) throw new Error('Compact view not found')
+  await page.mouse.move(compactBox.x + 5, compactBox.y + 5, { steps: 10 })
   await page.mouse.move(targetBox.x + targetBox.width / 2, targetBox.y + targetBox.height / 2, { steps: 20 })
 
   let groupId: string | undefined
@@ -139,6 +142,7 @@ export async function dragWareToTarget(
         return group?.nodes.filter((node: any) => node.wareId === ware).length
       }, { id: groupId, ware: wareId })).toBe(beforeWareCount)
     } else if (resolvedStatus === 'isolated') {
+      expect(expectedModuleId).toBeTruthy()
       await expect.poll(() => page.evaluate(({ id, ware }) => {
         const group = (window as any).logicFlowStore.groups.find((item: any) => item.id === id)
         return group?.nodes.filter((node: any) => node.wareId === ware).length
@@ -175,6 +179,8 @@ export async function dragWareToTarget(
           !== previous
       }, { id: groupId, ware: wareId, previous: beforeLineage })).toBe(true)
     } else if (resolvedStatus === 'locked') {
+      expect(effectiveLineage).toBeTruthy()
+      expect(expectedModuleId).toBeTruthy()
       await expect.poll(() => page.evaluate(({ id, ware, lineage }) => {
         const group = (window as any).logicFlowStore.groups.find((item: any) => item.id === id)
         const node = group?.nodes.find((item: any) => item.wareId === ware && item.source === 'manual')

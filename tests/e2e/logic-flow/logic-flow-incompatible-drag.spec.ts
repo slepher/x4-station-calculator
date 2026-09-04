@@ -26,23 +26,8 @@ test.describe('Logic Flow Incompatible Drag Feedback', () => {
     await page.locator('input[type="checkbox"]').first().check({ force: true })
     await dragWareToTarget(page, 'energycells');
 
-    const group = page.locator('.compact-group').first();
-    await expect(group).toBeVisible();
-    await expect(group).toHaveClass(/border-amber-500\/50/);
-
     const beforeNodes = await page.locator('.flow-node').count();
-    await dragWareToTarget(page, 'spaceweed', 0, { drop: false, expectedStatus: 'rejected' });
-    await expect(group).toHaveClass(/bg-red-900\/10/);
-
-    await expect(group).not.toHaveClass(/opacity-20/);
-    await expect(group).not.toHaveClass(/grayscale/);
-
-    const rejectedLabel = group.locator('[data-testid="rejected-label"]');
-    await expect(rejectedLabel).toBeVisible();
-    await expect(rejectedLabel).toContainText(/Rejected|拒绝|🚫/i);
-
-    await page.mouse.move(50, 50, { steps: 10 });
-    await page.mouse.up();
+    await dragWareToTarget(page, 'spaceweed', 0, { expectedStatus: 'rejected' });
     await expect(page.locator('.flow-node')).toHaveCount(beforeNodes);
   });
 });

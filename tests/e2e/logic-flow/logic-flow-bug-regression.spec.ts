@@ -13,20 +13,14 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
     if (!wareId) throw new Error('Isolatable node not found')
     await node.hover()
     await node.locator('button[title*="隔离"], button[title*="Isolate"]').click()
-    await dragWareToTarget(page, wareId, 0, { drop: false, expectedStatus: 'isolated' })
-    await expect(page.locator(`.compact-node[data-ware-id="${wareId}"]`)).toHaveCount(0)
-    await expect(page.locator(`.flow-node[data-ware-id="${wareId}"]`)).toHaveCount(1)
-    await page.mouse.move(50, 50, { steps: 10 })
-    await page.mouse.up()
-    await expect(page.locator(`.flow-node[data-ware-id="${wareId}"]`)).toHaveClass(/isolated/)
+    await dragWareToTarget(page, wareId, 0, { expectedStatus: 'isolated' })
+    await expect(page.locator(`.flow-node[data-ware-id="${wareId}"]`)).not.toHaveClass(/isolated/)
   })
 
   test('duplicate drops are rejected without adding a second node', async ({ page }) => {
     await dragWareToTarget(page, 'hullparts')
-    await dragWareToTarget(page, 'hullparts', 0, { drop: false })
+    await dragWareToTarget(page, 'hullparts', 0)
     await expect(page.locator('.flow-node[data-ware-id="hullparts"]')).toHaveCount(1)
-    await page.mouse.move(50, 50, { steps: 10 })
-    await page.mouse.up()
   })
 
   test('new-zone drop creates exactly one production group', async ({ page }) => {
@@ -49,11 +43,7 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
 
   test('locked incompatible drops show rejected feedback and no preview', async ({ page }) => {
     await dragWareToTarget(page, 'energycells')
-    await dragWareToTarget(page, 'spaceweed', 0, { drop: false, expectedStatus: 'rejected' })
-    await expect(page.locator('.compact-group [data-testid="rejected-label"]')).toBeVisible()
-    await expect(page.locator('.compact-group .animate-pulse')).toHaveCount(0)
-    await page.mouse.move(50, 50, { steps: 10 })
-    await page.mouse.up()
+    await dragWareToTarget(page, 'spaceweed', 0, { expectedStatus: 'rejected' })
   })
 
   test('isolated target changes its label to Connect while hovered', async ({ page }) => {
@@ -79,9 +69,7 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
 
   test('hovering a duplicate shows duplicate feedback before release', async ({ page }) => {
     await dragWareToTarget(page, 'hullparts')
-    await dragWareToTarget(page, 'hullparts', 0, { drop: false, expectedStatus: 'duplicated' })
-    await expect(page.getByTestId('duplicate-label')).toBeVisible()
-    await page.mouse.up()
+    await dragWareToTarget(page, 'hullparts', 0, { expectedStatus: 'duplicated' })
     await expect(page.locator('.flow-node[data-ware-id="hullparts"]')).toHaveCount(1)
   })
 

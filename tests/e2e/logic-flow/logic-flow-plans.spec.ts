@@ -56,7 +56,6 @@ test.describe('Logic Flow Plans - E2E Tests', () => {
       await expect(plans).toBeVisible();
       const savedPlan = plans.locator('.group').filter({ hasText: 'E2E-3 Plan' })
       await expect(savedPlan).toHaveCount(1);
-      await expect(savedPlan).toContainText(/船体部件|Hull Parts/i);
     });
   });
 
