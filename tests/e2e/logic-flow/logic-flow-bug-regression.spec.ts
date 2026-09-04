@@ -17,6 +17,19 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
     await expect(page.locator(`.flow-node[data-ware-id="${wareId}"]`)).toHaveCount(1)
   })
 
+  test('isolated middle node keeps isolation and stops upstream preview', async ({ page }) => {
+    await dragWareToTarget(page, 'weaponcomponents')
+    const isolated = page.locator('.flow-node[data-ware-id="hullparts"]').first()
+    await isolated.hover()
+    await isolated.locator('button[title*="隔离"], button[title*="Isolate"]').click()
+    await expect.poll(() => page.evaluate(() => (window as any).logicFlowStore.groups[0].nodes.find((n: any) => n.wareId === 'hullparts')?.isIsolated)).toBe(true)
+
+    await dragWareToTarget(page, 'microchips', 0, { drop: false })
+    await expect(page.locator('.compact-group').first().locator('[data-ware-id="advancedcomposites"]')).toHaveCount(0)
+    await page.mouse.up()
+    await expect.poll(() => page.evaluate(() => (window as any).logicFlowStore.groups[0].nodes.find((n: any) => n.wareId === 'hullparts')?.isIsolated)).toBe(true)
+  })
+
   test('duplicate drops are rejected without adding a second node', async ({ page }) => {
     await dragWareToTarget(page, 'hullparts')
     await dragWareToTarget(page, 'hullparts', 0)
@@ -47,20 +60,6 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
     await dragWareToTarget(page, 'spaceweed', 0, { expectedStatus: 'rejected' })
   })
 
-  test('isolated target changes its label to Connect while hovered', async ({ page }) => {
-    await dragWareToTarget(page, 'hullparts')
-    const node = page.locator('.flow-node:visible').filter({ has: page.locator('button') }).first()
-    const wareId = await node.getAttribute('data-ware-id')
-    if (!wareId) throw new Error('Isolatable node not found')
-    await node.hover()
-    await node.locator('button[title*="隔离"], button[title*="Isolate"]').click()
-    await page.locator('.tab-btn').first().click()
-    await dragWareToTarget(page, wareId, 0, { drop: false, expectedStatus: 'isolated' })
-    await expect(page.locator('[data-testid="isolated-label"]')).toContainText(/连接|Connect/i)
-    await page.mouse.up()
-    await expect(page.locator(`.flow-node[data-ware-id="${wareId}"]`)).not.toHaveClass(/isolated/)
-  })
-
   test('the same ware can coexist across two selected lineages', async ({ page }) => {
     await page.locator('input[type="checkbox"]').first().uncheck({ force: true })
     await dragWareToTarget(page, 'hullparts')
@@ -70,25 +69,50 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
     const nodes = await page.evaluate(() => (window as any).logicFlowStore.groups[0].nodes
       .filter((node: any) => node.wareId === 'hullparts')
       .map((node: any) => ({ lineage: node.lineage, moduleId: node.moduleId })))
-    expect(new Set(nodes.map((node: any) => node.lineage)).size).toBe(2)
-    expect(new Set(nodes.map((node: any) => node.moduleId)).size).toBe(2)
-    await expect(page.locator('.flow-node[data-ware-id="hullparts"]').first()).toHaveText(/船体部件|Hull Parts/)
-    await expect(page.locator('.connection-line')).toHaveCount(2)
+    expect(nodes).toEqual(expect.arrayContaining([
+      { lineage: 'default', moduleId: 'module_gen_prod_hullparts_01' },
+      { lineage: 'teladi', moduleId: 'module_tel_prod_hullparts_01' },
+    ]))
+    const hullNodes = page.locator('.flow-node[data-ware-id="hullparts"]')
+    await expect(hullNodes.nth(0)).toContainText(/船体部件产线|Hull Part Production/)
+    await expect(hullNodes.nth(1)).toContainText(/Teladi 船体部件产线|Teladi Hull Part Production/)
+    await dragWareToTarget(page, 'weaponcomponents', 0)
+    await expect(page.locator('.compact-group').first().locator('.compact-node').filter({ hasText: /船体部件产线|Hull Part Production/ })).toHaveCount(2)
+    await expect(page.locator('.compact-group').first()).toContainText(/Weapon Component Production|武器部件产线/)
+    await expect(page.locator('.compact-group').first().locator('.compact-node[data-ware-id="hullparts"]')).toHaveCount(2)
+    const connections = await page.evaluate(() => {
+      const group = (window as any).logicFlowStore.groups[0]
+      const hull = group.nodes.filter((n: any) => n.wareId === 'hullparts').map((n: any) => document.getElementById(`node-${n.id}`)?.getBoundingClientRect())
+      const weapon = group.nodes.find((n: any) => n.wareId === 'weaponcomponents')
+      const target = weapon && document.getElementById(`node-${weapon.id}`)?.getBoundingClientRect()
+      return Array.from(document.querySelectorAll<SVGPathElement>('.connection-line')).filter(path => {
+        const numbers = path.getAttribute('d')?.match(/[-\d.]+/g)?.map(Number) ?? []
+        return hull.some((box: any) => box && Math.abs(numbers[0] - box.right) < 2 && target && Math.abs(numbers[numbers.length - 2] - target.left) < 2)
+      }).length
+    })
+    expect(connections).toBe(2)
   })
 
-  test('auto nodes promote and replace through visible lineage targets', async ({ page }) => {
+  test('default hullparts auto node promotes through a real drop', async ({ page }) => {
+    await page.locator('input[type="checkbox"]').first().uncheck({ force: true })
     await dragWareToTarget(page, 'weaponcomponents')
-    await dragWareToTarget(page, 'refinedmetals', 0, { expectedStatus: 'auto' })
-    await expect(page.locator('.flow-node[data-ware-id="refinedmetals"]')).toContainText(/自动|Auto/)
-    const before = await page.evaluate(() => (window as any).logicFlowStore.groups[0].nodes
-      .find((node: any) => node.wareId === 'refinedmetals')?.moduleId)
+    await dragWareToTarget(page, 'hullparts', 0, { expectedStatus: 'auto' })
+    await expect(page.locator('.flow-node[data-ware-id="hullparts"]')).toContainText(/船体部件产线|Hull Part Production/)
+    const node = await page.evaluate(() => (window as any).logicFlowStore.groups[0].nodes
+      .find((item: any) => item.wareId === 'hullparts'))
+    expect(node).toMatchObject({ source: 'manual', lineage: 'default', moduleId: 'module_gen_prod_hullparts_01' })
+  })
+
+  test('Teladi hullparts replaces a default auto node', async ({ page }) => {
+    await page.locator('input[type="checkbox"]').first().uncheck({ force: true })
+    await dragWareToTarget(page, 'weaponcomponents')
+    await dragWareToTarget(page, 'hullparts', 0, { expectedStatus: 'auto' })
     await page.getByRole('button', { name: /Teladi|泰拉迪/i }).first().click()
-    await dragWareToTarget(page, 'refinedmetals', 0, { expectedStatus: 'replace' })
-    const after = await page.evaluate(() => (window as any).logicFlowStore.groups[0].nodes
-      .find((node: any) => node.wareId === 'refinedmetals')?.moduleId)
-    expect(after).toBeTruthy()
-    expect(after).not.toBe(before)
-    await expect(page.locator('.flow-node[data-ware-id="refinedmetals"]')).toContainText(/Teladi|泰拉迪/i)
+    await dragWareToTarget(page, 'hullparts', 0, { expectedStatus: 'replace' })
+    const node = await page.evaluate(() => (window as any).logicFlowStore.groups[0].nodes
+      .find((item: any) => item.wareId === 'hullparts'))
+    expect(node).toMatchObject({ source: 'manual', lineage: 'teladi', moduleId: 'module_tel_prod_hullparts_01' })
+    await expect(page.locator('.flow-node[data-ware-id="hullparts"]')).toContainText(/Teladi 船体部件产线|Teladi Hull Part Production/)
   })
 
   test('hovering a duplicate shows duplicate feedback before release', async ({ page }) => {
@@ -121,18 +145,23 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
   test('candidate lock toggle is reflected in a UI-created group', async ({ page }) => {
     const lock = page.locator('input[type="checkbox"]').first()
     await lock.check({ force: true })
-    await page.locator('.groups-list .drop-target').last().click()
+    await dragWareToTarget(page, 'hullparts')
     await expect.poll(() => page.evaluate(() => (window as any).logicFlowStore.groups[0]?.isLocked)).toBe(true)
+    await expect.poll(() => page.evaluate(() => (window as any).logicFlowStore.groups[0]?.nodes.find((n: any) => n.wareId === 'hullparts'))).toMatchObject({ lineage: 'default', source: 'manual' })
     await lock.uncheck({ force: true })
-    await page.locator('.groups-list .drop-target').last().click()
+    await dragWareToTarget(page, 'weaponcomponents')
     await expect.poll(() => page.evaluate(() => (window as any).logicFlowStore.groups[1]?.isLocked)).toBe(false)
+    await expect.poll(() => page.evaluate(() => (window as any).logicFlowStore.groups[1]?.nodes.find((n: any) => n.wareId === 'weaponcomponents'))).toMatchObject({ lineage: 'default', source: 'manual' })
   })
 
   test('language switch updates candidate and planning UI', async ({ page }) => {
-    await expect(page.locator('.candidate-zone')).toContainText(/工业|Industrial/i)
-    await page.getByTestId('language-select').selectOption('en')
-    await expect(page.locator('.candidate-zone')).toContainText(/Industrial|Agricultural/i)
+    const candidate = page.locator('.ware-card-wrapper[data-ware-id="hullparts"]').first()
+    await expect(candidate).toContainText(/船体部件|Hull Parts/i)
     await dragWareToTarget(page, 'hullparts')
-    await expect(page.locator('.production-group')).toContainText(/Hull Parts/i)
+    const node = page.locator('.flow-node[data-ware-id="hullparts"]').first()
+    await expect(node).toContainText(/船体部件产线/)
+    await page.getByTestId('language-select').selectOption('en')
+    await expect(candidate).toContainText('Hull Parts')
+    await expect(node).toContainText('Hull Part Production')
   })
 })

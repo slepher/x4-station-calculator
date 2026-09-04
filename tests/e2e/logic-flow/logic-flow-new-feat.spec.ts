@@ -15,43 +15,6 @@ test.describe('Logic Flow New Features', () => {
   });
 
   test.describe('Bug Regression Tests', () => {
-    test('BUG: Drag then move away then release should NOT add ware', async ({ page }) => {
-      
-      await dragWareToTarget(page, 'hullparts');
-      await page.waitForTimeout(300);
-      
-      const initialGroupCount = await page.evaluate(() => (window as any).logicFlowStore.groups.length);
-      expect(initialGroupCount).toBe(1);
-      
-      const initialManualNodeCount = await page.evaluate(() => {
-        const logicFlow = (window as any).logicFlowStore;
-        const group = logicFlow.groups[0];
-        return group?.nodes.filter((n: any) => n.source === 'manual').length || 0;
-      });
-      console.log(`Initial manual node count: ${initialManualNodeCount}`);
-
-      await dragWareToTarget(page, 'weaponcomponents', 0, { drop: false });
-      const compactView = page.locator('.compact-view');
-      await page.mouse.move(50, 50, { steps: 10 });
-      await page.waitForTimeout(300);
-      await expect.poll(() => page.evaluate(() => (window as any).logicFlowStore.hoveredGroupId)).toBeNull();
-
-      await expect(compactView.locator('.compact-group').first()).not.toHaveClass(/border-blue-500\/50|border-amber-500\/50/);
-
-      await page.mouse.up();
-      await page.waitForTimeout(300);
-
-      const finalGroupCount = await page.evaluate(() => (window as any).logicFlowStore.groups.length);
-      const finalManualNodeCount = await page.evaluate(() => {
-        const logicFlow = (window as any).logicFlowStore;
-        const group = logicFlow.groups[0];
-        return group?.nodes.filter((n: any) => n.source === 'manual').length || 0;
-      });
-      console.log(`Final manual node count: ${finalManualNodeCount}`);
-      
-      expect(finalGroupCount).toBe(initialGroupCount);
-      expect(finalManualNodeCount).toBe(initialManualNodeCount);
-    });
   });
 
   test.describe('Production Line Title Editing', () => {

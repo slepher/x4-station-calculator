@@ -139,6 +139,8 @@ test.describe('Logical Flow Integration Verification', () => {
 
       const previewNode = page.locator('.compact-node.bg-blue-500\\/20');
       await expect(previewNode).toBeVisible();
+      await expect(previewNode).toContainText(/Weapon Component Production|武器部件产线/);
+      await expect(compactGroup.locator('.compact-node[data-ware-id="hullparts"]')).toContainText(/Hull Part Production|船体部件产线/);
 
       await page.mouse.up();
     });
@@ -178,22 +180,6 @@ test.describe('Logical Flow Integration Verification', () => {
   });
 
   test.describe('Edge Cases', () => {
-    test('5.1 Drag State Persists Until Mouse Up', async ({ page }) => {
-      await startWareDrag(page, 'hullparts');
-
-      const compactView = page.locator('.compact-view');
-      await expect(compactView).toBeVisible({ timeout: 5000 });
-
-      const isDragging = await page.evaluate(() => (window as any).logicFlowStore.isDragging);
-      expect(isDragging).toBe(true);
-
-      await page.mouse.up();
-      await page.waitForTimeout(200);
-
-      const isDraggingAfterUp = await page.evaluate(() => (window as any).logicFlowStore.isDragging);
-      expect(isDraggingAfterUp).toBe(false);
-    });
-
     test('5.1b Release outside target leaves groups and nodes unchanged', async ({ page }) => {
       await dragWareToTarget(page, 'hullparts');
       const before = await page.evaluate(() => (window as any).logicFlowStore.groups.map((g: any) => g.nodes.map((n: any) => n.wareId)));

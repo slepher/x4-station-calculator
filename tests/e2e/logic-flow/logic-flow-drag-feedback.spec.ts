@@ -9,20 +9,21 @@ test.describe('Logic Flow Advanced Drag Feedback', () => {
   });
 
   test('4.1 Visual: New Line Ghosting (Phantom Preview)', async ({ page }) => {
-    await dragWareToTarget(page, 'scanningarrays', 'new', { drop: false });
+    await dragWareToTarget(page, 'hullparts', 'new', { drop: false });
     const compactView = page.getByTestId('compact-view');
     const newZone = compactView.locator('.compact-group').last();
     await page.waitForTimeout(200);
 
     const previewTitle = page.locator('.compact-group').last().locator('span.italic');
     await expect(previewTitle).toBeVisible({ timeout: 5000 });
-    await expect(previewTitle).toContainText(/Scanning Array|扫描阵列/i);
+    await expect(previewTitle).toContainText(/Hull Part Production|船体部件产线/);
 
     const headerResources = page.locator('.compact-group').last().locator('.flex.items-center [data-ware-id]');
     await expect(headerResources).toHaveCount(2);
 
     const phantomNode = page.locator('.compact-node.animate-pulse');
     await expect(phantomNode).toBeVisible();
+    await expect(phantomNode).toContainText(/Hull Part Production|船体部件产线/);
 
     await page.mouse.up();
   });
