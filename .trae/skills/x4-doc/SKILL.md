@@ -125,14 +125,14 @@ When generating or translating spec documents (`.md` in `openspec/`), **YOU MUST
 
 - **Feature Folders**: All specs MUST reside in a feature-specific subdirectory under `specs/` (e.g., `specs/title-as-plan-title/spec.md`). Do NOT place spec files directly in `specs/`.
 
-### 5. Task Scope Boundary (MANDATORY)
+### 5. Task and Unit-Test Scope (MANDATORY)
 
 When creating or updating planning artifacts:
 
-- `tasks.md` is implementation-only and MUST NOT include:
-  - writing test code
-  - running tests
-- `/x4:apply` scope MUST NOT include writing tests or running tests.
+- `tasks.md` MUST include the focused Unit coverage required by each behavior-changing implementation task.
+- Unit tests live only under `tests/unit/**` and are implemented and run with the owning code task in `/x4:apply`.
+- Do not create a separate Unit-test implementation phase or route Unit work to `x4-test-*`.
+- E2E planning and execution do not belong in `tasks.md`; route them through `x4-e2e-test` and its `e2e_tests.md` / `e2e_test_tasks.md` artifacts.
 - `/x4:apply` must include build validation after code writing is complete:
   - `npm run build`
   - if build has compile errors, fix code and rerun build until pass or explicit blocker

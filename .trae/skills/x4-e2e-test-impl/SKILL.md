@@ -1,6 +1,6 @@
 ---
 name: x4-e2e-test-impl
-description: "Implement Playwright E2E tests for X4 changes from `e2e_test_tasks.md` and validate task-to-test mapping. Trigger with /x4:e2e-test-impl <change-name>."
+description: "Implement Playwright E2E tests from `e2e_test_tasks.md` and validate task-to-test mapping for an X4 change."
 ---
 
 # X4 E2E Test Implementation

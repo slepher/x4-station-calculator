@@ -2,7 +2,7 @@
 
 ## Lane
 
-- Name: `integrate`
+- Name: `full-test`
 - State: `unprovisioned`
 - Active task: `none`
 - Candidate: `none`

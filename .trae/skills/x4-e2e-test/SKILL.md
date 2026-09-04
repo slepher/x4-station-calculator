@@ -1,13 +1,15 @@
 ---
 name: x4-e2e-test
-description: "Orchestrate X4 E2E-only test workflow across high-level docs, detailed docs, review, implementation, and run phases. Trigger with /x4:e2e-test <change-name>."
+description: "Orchestrate the X4 E2E-only workflow across documentation, review, implementation, and run phases. Trigger with /x4:e2e-test and a change name."
 ---
 
 # X4 E2E Test Workflow
 
 ## 目的
 
-`x4-e2e-test` 只负责编排 E2E 测试链路，不接管旧 `x4-test-*` 的 `test_tasks.md` / Unit / Bug 测试职责。
+`x4-e2e-test` 是当前唯一的 E2E 测试编排入口，负责从 E2E 文档到实现和运行的完整链路。
+
+旧 `x4-test-*` skill 仅作为保留资产，不属于 active workflow，不得从本 skill 或 `x4-user-workflow` 路由调用。Unit 测试属于代码实现与验证流程。
 
 ## 输入
 
