@@ -15,7 +15,7 @@ const port = process.env.PORT ? parseInt(process.env.PORT, 10) : getDirectoryPor
 
 // 4. Playwright 最终配置
 export default defineConfig({
-  testDir: './tests/unified-e2e',
+  testDir: './tests/e2e',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,

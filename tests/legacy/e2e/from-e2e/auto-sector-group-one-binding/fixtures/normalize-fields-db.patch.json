@@ -1,0 +1,413 @@
+{
+  "$target": "db.json",
+  "$delete": [
+    "x4_save_bindings.list.0"
+  ],
+  "$append": {
+    "x4_save_bindings.list": [
+      {
+        "gameGuid": "CB8837FE-98C1-42F8-9D6A-ED0ADC539111",
+        "bindingName": "slepher",
+        "selectedArchiveTime": null,
+        "groups": [
+          {
+            "id": "186727eb-7c4a-c0e0-b20d-f17405fd3aa3",
+            "name": "小行星",
+            "order": 1,
+            "sectorMacro": "cluster_100_sector001_macro",
+            "jumpRange": 3,
+            "coverageSectorMacros": [
+              {
+                "ref": "cluster_106_sector001_macro",
+                "jump": 3
+              }
+            ],
+            "connectedGroupIds": [
+              "16f32571-659b-3035-a6c7-ce40f9a354b1"
+            ],
+            "tradeStation": {
+              "id": "5173b252-78ca-ac45-9e40-5afae79c4bab",
+              "name": "小行星 中转站",
+              "sectorMacro": "cluster_100_sector001_macro",
+              "position": {
+                "x": 110000,
+                "y": 0,
+                "z": -48943
+              }
+            }
+          },
+          {
+            "id": "0d8351a1-66af-cb13-2e9e-0e7d061a8df9",
+            "name": "神圣眼光",
+            "order": 2,
+            "sectorMacro": "cluster_24_sector001_macro",
+            "jumpRange": 3,
+            "coverageSectorMacros": [
+              {
+                "ref": "cluster_26_sector001_macro",
+                "jump": 2
+              },
+              {
+                "ref": "cluster_740_sector001_macro",
+                "jump": 2
+              }
+            ],
+            "connectedGroupIds": [
+              "1e6fdef6-b279-6da6-76c4-ce8f671dfcd9",
+              "16f32571-659b-3035-a6c7-ce40f9a354b1"
+            ],
+            "tradeStation": {
+              "id": "886fbc50-a01f-21e0-b4a0-e24aacb04c55",
+              "name": "神圣眼光 中转站",
+              "sectorMacro": "cluster_24_sector001_macro",
+              "position": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+              }
+            }
+          },
+          {
+            "id": "1e6fdef6-b279-6da6-76c4-ce8f671dfcd9",
+            "name": "阿尔忒弥斯的朦胧",
+            "order": 3,
+            "sectorMacro": "cluster_715_sector001_macro",
+            "jumpRange": 3,
+            "coverageSectorMacros": [],
+            "connectedGroupIds": [
+              "0d8351a1-66af-cb13-2e9e-0e7d061a8df9",
+              "16f32571-659b-3035-a6c7-ce40f9a354b1"
+            ],
+            "tradeStation": {
+              "id": "b93b3a8f-cdc0-c61c-3d1e-63ec19f5dc90",
+              "name": "阿尔忒弥斯的朦胧 中转站",
+              "saveStationCode": "BHW-834",
+              "sectorMacro": "cluster_715_sector001_macro"
+            }
+          },
+          {
+            "id": "16f32571-659b-3035-a6c7-ce40f9a354b1",
+            "name": "月之舟",
+            "order": 4,
+            "sectorMacro": "cluster_48_sector001_macro",
+            "jumpRange": 3,
+            "coverageSectorMacros": [
+              {
+                "ref": "cluster_27_sector001_macro",
+                "jump": 1
+              }
+            ],
+            "connectedGroupIds": [
+              "186727eb-7c4a-c0e0-b20d-f17405fd3aa3",
+              "1e6fdef6-b279-6da6-76c4-ce8f671dfcd9",
+              "0d8351a1-66af-cb13-2e9e-0e7d061a8df9",
+              "af2f3083-3207-c8bc-d981-4dc848844f32"
+            ],
+            "tradeStation": {
+              "id": "a43dc32c-542d-a6cd-2bc9-3fd74b21c287",
+              "name": "月之舟 中转站",
+              "sectorMacro": "cluster_48_sector001_macro",
+              "position": {
+                "x": 212136,
+                "y": 0,
+                "z": 55597
+              }
+            }
+          },
+          {
+            "id": "af2f3083-3207-c8bc-d981-4dc848844f32",
+            "name": "警惕凝视",
+            "order": 5,
+            "sectorMacro": "cluster_601_sector001_macro",
+            "jumpRange": 3,
+            "coverageSectorMacros": [
+              {
+                "ref": "cluster_31_sector001_macro",
+                "jump": 1
+              }
+            ],
+            "connectedGroupIds": [
+              "16f32571-659b-3035-a6c7-ce40f9a354b1"
+            ],
+            "tradeStation": {
+              "id": "c9a28d5f-e1c7-f607-537c-655a76fffbea",
+              "name": "警惕凝视 中转站",
+              "saveStationCode": "UKW-234",
+              "sectorMacro": "cluster_601_sector001_macro"
+            }
+          }
+        ],
+        "stationPlans": [
+          {
+            "id": "KXN-018",
+            "saveStationCode": "KXN-018",
+            "groupId": "186727eb-7c4a-c0e0-b20d-f17405fd3aa3",
+            "name": "地球人",
+            "type": "industrial",
+            "count": 1,
+            "modules": [
+              {
+                "id": "module_ter_prod_computronicsubstrate_01",
+                "count": 10
+              },
+              {
+                "id": "module_ter_prod_siliconcarbide_01",
+                "count": 10
+              },
+              {
+                "id": "module_ter_prod_metallicmicrolattice_01",
+                "count": 10
+              }
+            ],
+            "settings": {
+              "sunlight": 100,
+              "useHQ": false,
+              "manualWorkforce": 0,
+              "workforcePercent": 100,
+              "workforceAuto": true,
+              "considerWorkforceForAutoFill": false,
+              "supplyWorkforceBonus": false,
+              "buyMultiplier": 0.5,
+              "sellMultiplier": 0.5,
+              "minersEnabled": false,
+              "internalSupply": false,
+              "showEmpireGaps": false,
+              "racePreference": "argon",
+              "resourceBufferHours": 1,
+              "primaryProductBufferHours": 12,
+              "secondaryProductBufferHours": 2,
+              "transportShipCapacity": 62000
+            },
+            "lastUpdated": 1772453451902,
+            "lockedWares": [],
+            "warePriority": {}
+          },
+          {
+            "id": "RWC-785",
+            "saveStationCode": "RWC-785",
+            "groupId": "1e6fdef6-b279-6da6-76c4-ce8f671dfcd9",
+            "name": "RWC-785",
+            "type": "industrial",
+            "count": 1,
+            "modules": [
+              {
+                "id": "module_gen_prod_claytronics_01",
+                "count": 2
+              }
+            ],
+            "settings": {
+              "sunlight": 100,
+              "useHQ": false,
+              "manualWorkforce": 0,
+              "workforcePercent": 100,
+              "workforceAuto": true,
+              "considerWorkforceForAutoFill": false,
+              "supplyWorkforceBonus": false,
+              "buyMultiplier": 0.5,
+              "sellMultiplier": 0.5,
+              "minersEnabled": false,
+              "internalSupply": false,
+              "showEmpireGaps": false,
+              "racePreference": "argon",
+              "resourceBufferHours": 1,
+              "primaryProductBufferHours": 12,
+              "secondaryProductBufferHours": 2,
+              "transportShipCapacity": 62000
+            },
+            "lastUpdated": 1772453451902,
+            "lockedWares": [
+              "quantumtubes"
+            ],
+            "warePriority": {}
+          },
+          {
+            "id": "XAJ-926",
+            "saveStationCode": "XAJ-926",
+            "groupId": "16f32571-659b-3035-a6c7-ce40f9a354b1",
+            "name": "XAJ-926",
+            "type": "industrial",
+            "count": 1,
+            "modules": [],
+            "settings": {
+              "sunlight": 100,
+              "useHQ": false,
+              "manualWorkforce": 0,
+              "workforcePercent": 100,
+              "workforceAuto": true,
+              "considerWorkforceForAutoFill": false,
+              "supplyWorkforceBonus": false,
+              "buyMultiplier": 0.5,
+              "sellMultiplier": 0.5,
+              "minersEnabled": false,
+              "internalSupply": false,
+              "showEmpireGaps": false,
+              "racePreference": "argon",
+              "resourceBufferHours": 1,
+              "primaryProductBufferHours": 12,
+              "secondaryProductBufferHours": 2,
+              "transportShipCapacity": 62000
+            },
+            "lastUpdated": 1772453451902,
+            "lockedWares": [],
+            "warePriority": {}
+          },
+          {
+            "id": "AVE-937",
+            "saveStationCode": "AVE-937",
+            "groupId": "1e6fdef6-b279-6da6-76c4-ce8f671dfcd9",
+            "name": "AVE-937",
+            "type": "industrial",
+            "count": 1,
+            "modules": [],
+            "settings": {
+              "sunlight": 100,
+              "useHQ": false,
+              "manualWorkforce": 0,
+              "workforcePercent": 100,
+              "workforceAuto": true,
+              "considerWorkforceForAutoFill": false,
+              "supplyWorkforceBonus": false,
+              "buyMultiplier": 0.5,
+              "sellMultiplier": 0.5,
+              "minersEnabled": false,
+              "internalSupply": false,
+              "showEmpireGaps": false,
+              "racePreference": "argon",
+              "resourceBufferHours": 1,
+              "primaryProductBufferHours": 12,
+              "secondaryProductBufferHours": 2,
+              "transportShipCapacity": 62000
+            },
+            "lastUpdated": 1772453451902,
+            "lockedWares": [],
+            "warePriority": {}
+          },
+          {
+            "id": "MGO-010",
+            "saveStationCode": "MGO-010",
+            "groupId": "186727eb-7c4a-c0e0-b20d-f17405fd3aa3",
+            "name": "MGO-010",
+            "type": "industrial",
+            "count": 1,
+            "modules": [
+              {
+                "id": "module_gen_prod_fieldcoils_01",
+                "count": 1
+              }
+            ],
+            "settings": {
+              "sunlight": 100,
+              "useHQ": false,
+              "manualWorkforce": 0,
+              "workforcePercent": 100,
+              "workforceAuto": true,
+              "considerWorkforceForAutoFill": false,
+              "supplyWorkforceBonus": false,
+              "buyMultiplier": 0.5,
+              "sellMultiplier": 0.5,
+              "minersEnabled": false,
+              "internalSupply": false,
+              "showEmpireGaps": false,
+              "racePreference": "argon",
+              "resourceBufferHours": 1,
+              "primaryProductBufferHours": 12,
+              "secondaryProductBufferHours": 2,
+              "transportShipCapacity": 62000
+            },
+            "lastUpdated": 1772453451902,
+            "lockedWares": [
+              "quantumtubes"
+            ],
+            "warePriority": {}
+          },
+          {
+            "id": "EOF-448",
+            "saveStationCode": "EOF-448",
+            "groupId": "af2f3083-3207-c8bc-d981-4dc848844f32",
+            "name": "EOF-448",
+            "type": "industrial",
+            "count": 1,
+            "modules": [
+              {
+                "id": "module_gen_prod_quantumtubes_01",
+                "count": 2
+              }
+            ],
+            "settings": {
+              "sunlight": 100,
+              "useHQ": false,
+              "manualWorkforce": 0,
+              "workforcePercent": 100,
+              "workforceAuto": true,
+              "considerWorkforceForAutoFill": false,
+              "supplyWorkforceBonus": false,
+              "buyMultiplier": 0.5,
+              "sellMultiplier": 0.5,
+              "minersEnabled": false,
+              "internalSupply": false,
+              "showEmpireGaps": false,
+              "racePreference": "argon",
+              "resourceBufferHours": 1,
+              "primaryProductBufferHours": 12,
+              "secondaryProductBufferHours": 2,
+              "transportShipCapacity": 62000
+            },
+            "lastUpdated": 1772453451902,
+            "lockedWares": [],
+            "warePriority": {}
+          },
+          {
+            "id": "f36126e5-7798-ed14-3c03-938b961efa0b",
+            "groupId": "186727eb-7c4a-c0e0-b20d-f17405fd3aa3",
+            "name": "新建空间站",
+            "type": "industrial",
+            "count": 1,
+            "modules": [
+              {
+                "id": "module_gen_prod_antimatterconverters_01",
+                "count": 2
+              },
+              {
+                "id": "module_gen_prod_fieldcoils_01",
+                "count": 1
+              }
+            ],
+            "settings": {
+              "sunlight": 100,
+              "useHQ": false,
+              "manualWorkforce": 0,
+              "workforcePercent": 100,
+              "workforceAuto": true,
+              "considerWorkforceForAutoFill": false,
+              "supplyWorkforceBonus": false,
+              "buyMultiplier": 0.5,
+              "sellMultiplier": 0.5,
+              "minersEnabled": false,
+              "internalSupply": false,
+              "showEmpireGaps": false,
+              "racePreference": "argon",
+              "resourceBufferHours": 1,
+              "primaryProductBufferHours": 12,
+              "secondaryProductBufferHours": 2,
+              "transportShipCapacity": 62000
+            },
+            "lastUpdated": 1772453451902,
+            "lockedWares": [],
+            "warePriority": {},
+            "sectorMacro": "cluster_100_sector001_macro",
+            "position": {
+              "x": 67524,
+              "y": 0,
+              "z": 81288
+            }
+          }
+        ],
+        "updatedAt": 1772453451902,
+        "appliedAutoGroupArchiveTime": 1345095294,
+        "prefJumpRange": 2,
+        "bridgeSearchJumpRange": 5,
+        "prefThreshold": 500
+      }
+    ]
+  }
+}

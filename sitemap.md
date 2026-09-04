@@ -62,11 +62,11 @@ index.html
 
 - 权威单元测试：[`tests/unit/`](tests/unit/)
 - 权威 E2E：[`tests/e2e/`](tests/e2e/)
-- 待迁移历史集合：[`tests/unified-unit/`](tests/unified-unit/)、[`tests/unified-e2e/`](tests/unified-e2e/)
+- 历史 E2E 原件：[`tests/legacy/e2e/from-e2e/`](tests/legacy/e2e/from-e2e/)
 - 迁移后的只读历史测试：`tests/legacy/`（不进入默认验证）
 - 测试数据：[`tests/fixtures/`](tests/fixtures/)、[`tests/seeds/`](tests/seeds/)
 - 测试装配：[`tests/test-setup.ts`](tests/test-setup.ts)
-- Live Binding fixture helper 当前迁移源：[`loadLiveBindingFixture.ts`](tests/unified-e2e/live/helpers/loadLiveBindingFixture.ts)；目标为 `tests/e2e/live/helpers/`
+- Live Binding fixture helper：[`loadLiveBindingFixture.ts`](tests/e2e/live/helpers/loadLiveBindingFixture.ts)
 - 测试技能验证独立于产品 Unit：[`tests/skills/`](tests/skills/)、[`tests/e2e-skills/`](tests/e2e-skills/)
 
 ## 文档与变更记录

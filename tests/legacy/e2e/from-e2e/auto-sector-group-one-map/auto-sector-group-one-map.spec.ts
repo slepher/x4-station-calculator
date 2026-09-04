@@ -1,6 +1,6 @@
 import { test } from '../../test-setup'
 import { expect, type Page } from '@playwright/test'
-import { loadLiveBindingFixture } from '../live/helpers/loadLiveBindingFixture'
+import { loadLiveBindingFixture } from '../../unified-e2e/live/helpers/loadLiveBindingFixture'
 
 const GAME_GUID = 'CB8837FE-98C1-42F8-9D6A-ED0ADC539111'
 

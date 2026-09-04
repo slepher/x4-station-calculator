@@ -202,7 +202,6 @@ test.beforeEach(async ({ page }) => {
 
 统一使用：
 - 权威目标：`tests/e2e/live/helpers/loadLiveBindingFixture.ts`
-- 迁移完成前的现有位置：`tests/unified-e2e/live/helpers/loadLiveBindingFixture.ts`
 - 入口函数：`loadLiveBindingFixture(page)`
 
 原因：
