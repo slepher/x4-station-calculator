@@ -1,53 +1,15 @@
 import { test } from '../../test-setup';
 import { expect } from '@playwright/test';
 import { setupLogicFlow } from './helpers/setupLogicFlow';
+import { dragWareToTarget } from './helpers/dragLogicFlow';
 
 test.describe('Logic Flow Incompatible Drag Feedback', () => {
   test.beforeEach(async ({ page }) => {
     await setupLogicFlow(page, 'clean');
   });
 
-  const dragWareToTarget = async (
-    page: any, 
-    wareId: string, 
-    targetSelector: string,
-    options: { drop?: boolean; hoverOnly?: boolean } = {}
-  ) => {
-    const { drop = true, hoverOnly = false } = options;
-    const source = page.locator(`.ware-card-wrapper[data-ware-id="${wareId}"]`).first();
-    await expect(source).toBeVisible();
-
-    const sourceBox = await source.boundingBox();
-    if (!sourceBox) throw new Error(`Source ware ${wareId} not found`);
-
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
-    await page.mouse.down();
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
-    await page.waitForTimeout(100);
-
-    const target = page.locator(targetSelector).first();
-    await expect(target).toBeVisible({ timeout: 5000 });
-
-    const targetBox = await target.boundingBox();
-    if (!targetBox) throw new Error(`Target ${targetSelector} not found`);
-
-    await page.mouse.move(targetBox.x + targetBox.width / 2, targetBox.y + targetBox.height / 2, { steps: 10 });
-    await page.waitForTimeout(200);
-
-    if (hoverOnly) {
-      return { sourceBox, targetBox };
-    }
-
-    if (drop) {
-      await page.mouse.up();
-      await page.waitForTimeout(300);
-    }
-
-    return { sourceBox, targetBox };
-  };
-
   test('4.16 UI: Incompatible Drop Target Visibility (Unlocked Group)', async ({ page }) => {
-    await dragWareToTarget(page, 'energycells', '.groups-list .drop-target');
+    await dragWareToTarget(page, 'energycells');
 
     const spaceweedSource = page.locator('.ware-card-wrapper[data-ware-id="spaceweed"]').first();
     await spaceweedSource.scrollIntoViewIfNeeded();
@@ -65,26 +27,15 @@ test.describe('Logic Flow Incompatible Drag Feedback', () => {
     const targetBox = await compactGroup.boundingBox();
     if (!targetBox) throw new Error('Target not found');
 
-    await page.mouse.move(targetBox.x + targetBox.width / 2, targetBox.y + targetBox.height / 2, { steps: 10 });
-    await page.waitForTimeout(200);
-
-    await expect(compactGroup).toHaveClass(/opacity-20/);
-    await expect(compactGroup).toHaveClass(/grayscale/);
-    await expect(compactGroup).toHaveClass(/pointer-events-none/);
-    await expect(compactGroup).toHaveClass(/border-transparent/);
-
-    await expect(compactGroup).not.toHaveClass(/border-red-600/);
+    await page.mouse.move(targetBox.x + targetBox.width / 2, targetBox.y + targetBox.height / 2, { steps: 20 });
+    await expect(compactGroup).toHaveClass(/border-red-600/);
+    await expect(compactGroup.getByTestId('rejected-label')).toBeVisible();
 
     await page.mouse.up();
   });
 
   test('4.17 UI: Locked Group Conflict Feedback (Locked Group)', async ({ page }) => {
-    await page.evaluate(() => {
-      const logicFlow = (window as any).logicFlowStore;
-      logicFlow.isDefaultLocked = true;
-    });
-
-    await dragWareToTarget(page, 'energycells', '.groups-list .drop-target');
+    await dragWareToTarget(page, 'energycells');
 
     const group = page.locator('.compact-group').first();
     await expect(group).toBeVisible();

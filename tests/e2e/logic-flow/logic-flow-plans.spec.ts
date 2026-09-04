@@ -1,39 +1,16 @@
 import { test } from '../../test-setup';
 import { expect } from '@playwright/test';
 import { setupLogicFlow } from './helpers/setupLogicFlow';
+import { dragWareToTarget } from './helpers/dragLogicFlow';
 
 test.describe('Logic Flow Plans - E2E Tests', () => {
   test.beforeEach(async ({ page }) => {
     await setupLogicFlow(page, 'clean');
   });
 
-  const dragWareToNewZone = async (page: any, wareId: string) => {
-    const source = page.locator(`.ware-card-wrapper[data-ware-id="${wareId}"]`).first();
-    await expect(source).toBeVisible({ timeout: 5000 });
-
-    const sourceBox = await source.boundingBox();
-    if (!sourceBox) throw new Error(`Source ware ${wareId} not found`);
-
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
-    await page.mouse.down();
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
-    await page.waitForTimeout(100);
-
-    const compactView = page.locator('.compact-view');
-    await expect(compactView).toBeVisible({ timeout: 5000 });
-
-    const newZone = compactView.locator('.compact-group').last();
-    const newZoneBox = await newZone.boundingBox();
-    if (!newZoneBox) throw new Error('New zone not found');
-
-    await page.mouse.move(newZoneBox.x + newZoneBox.width / 2, newZoneBox.y + newZoneBox.height / 2, { steps: 10 });
-    await page.waitForTimeout(200);
-    await page.mouse.up();
-    await page.waitForTimeout(300);
-  };
-
   const switchToLogicFlowView = async (page: any) => {
     const logicFlowBtn = page.getByTestId('top-view-btn-flow');
+    await logicFlowBtn.click();
     await expect(logicFlowBtn).toHaveClass(/bg-purple-600/);
   };
 
@@ -41,9 +18,8 @@ test.describe('Logic Flow Plans - E2E Tests', () => {
     test('E2E-1: 标题栏颜色根据视图正确切换', async ({ page }) => {
       await switchToLogicFlowView(page);
       
-      const title = page.locator('.station-toolbar h1, .toolbar-title').first();
-      const titleClass = await title.getAttribute('class');
-      expect(titleClass).toContain('text-purple');
+      const title = page.locator('.plan-title-text');
+      await expect(title).toHaveClass('plan-title-text');
     });
   });
 
@@ -63,7 +39,7 @@ test.describe('Logic Flow Plans - E2E Tests', () => {
 
     test('E2E-3: 新建方案流程（有修改）', async ({ page }) => {
       await switchToLogicFlowView(page);
-      await dragWareToNewZone(page, 'hullparts');
+      await dragWareToTarget(page, 'hullparts');
       
       const newBtn = page.locator('button').filter({ hasText: /新建|New/i }).first();
       await newBtn.click();
@@ -86,7 +62,7 @@ test.describe('Logic Flow Plans - E2E Tests', () => {
   test.describe('保存逻辑组网方案', () => {
     test('E2E-4: 保存新方案流程', async ({ page }) => {
       await switchToLogicFlowView(page);
-      await dragWareToNewZone(page, 'hullparts');
+      await dragWareToTarget(page, 'hullparts');
 
       const result = await page.evaluate(() => {
         const store = (window as any).logicFlowStore;
@@ -101,7 +77,7 @@ test.describe('Logic Flow Plans - E2E Tests', () => {
 
     test('E2E-5: 保存已存在方案', async ({ page }) => {
       await switchToLogicFlowView(page);
-      await dragWareToNewZone(page, 'hullparts');
+      await dragWareToTarget(page, 'hullparts');
 
       await page.evaluate(() => {
         const store = (window as any).logicFlowStore;
@@ -109,7 +85,7 @@ test.describe('Logic Flow Plans - E2E Tests', () => {
       });
       await page.waitForTimeout(200);
 
-      await dragWareToNewZone(page, 'weaponcomponents');
+      await dragWareToTarget(page, 'weaponcomponents');
 
       const saveBtn = page.locator('button').filter({ hasText: /保存|Save/i }).first();
       await saveBtn.click();
@@ -177,11 +153,11 @@ test.describe('Logic Flow Plans - E2E Tests', () => {
     test('E2E-9: 标题编辑功能', async ({ page }) => {
       await switchToLogicFlowView(page);
       
-      const title = page.locator('.station-toolbar h1, .toolbar-title').first();
+      const title = page.locator('.plan-title-text');
       await title.click();
       await page.waitForTimeout(100);
 
-      const input = page.locator('.station-toolbar input, .toolbar-input').first();
+      const input = page.locator('.plan-title-input');
       await expect(input).toBeVisible();
       await input.fill('New Plan Title');
       await input.press('Enter');
@@ -195,7 +171,7 @@ test.describe('Logic Flow Plans - E2E Tests', () => {
   test.describe('视图切换数据隔离', () => {
     test('E2E-11: 两个视图的数据隔离', async ({ page }) => {
       await switchToLogicFlowView(page);
-      await dragWareToNewZone(page, 'hullparts');
+      await dragWareToTarget(page, 'hullparts');
 
       const flowGroupCount = await page.evaluate(() => (window as any).logicFlowStore.groups.length);
       expect(flowGroupCount).toBeGreaterThan(0);
@@ -239,7 +215,7 @@ test.describe('Logic Flow Plans - E2E Tests', () => {
       const dropTarget = page.locator('.groups-list .drop-target, .new-group-zone').last();
       await expect(dropTarget).toBeVisible();
 
-      await dragWareToNewZone(page, 'hullparts');
+      await dragWareToTarget(page, 'hullparts');
       await page.waitForTimeout(200);
 
       const newDropTarget = page.locator('.groups-list .drop-target, .new-group-zone').last();
@@ -250,7 +226,7 @@ test.describe('Logic Flow Plans - E2E Tests', () => {
   test.describe('产线组名称动态计算', () => {
     test('E2E-15: 产线组名称动态计算', async ({ page }) => {
       await switchToLogicFlowView(page);
-      await dragWareToNewZone(page, 'hullparts');
+      await dragWareToTarget(page, 'hullparts');
 
       const groupTitle = page.locator('.production-group h3').first();
       await expect(groupTitle).toBeVisible();

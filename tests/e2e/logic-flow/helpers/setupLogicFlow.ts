@@ -31,10 +31,16 @@ export async function setupLogicFlow(
   await expectLogicFlowReady(page)
 
   if (state === 'clean') {
-    await page.evaluate(() => (window as any).logicFlowStore.clearAllGroups())
-    await page.waitForFunction(() => (window as any).logicFlowStore.groups.length === 0)
+    const clearButton = page.locator('.clear-all-btn')
+    if (await clearButton.isVisible()) {
+      page.once('dialog', dialog => dialog.accept())
+      await clearButton.click()
+    }
+    await expect(page.locator('.production-group')).toHaveCount(0)
+    await expect(page.locator('.plan-title-text')).toHaveText(/新建方案|New Plan|Logic Flow 1/i)
   } else {
-    await page.waitForFunction(() => (window as any).logicFlowStore.groups.length === 3)
+    await expect(page.locator('.production-group')).toHaveCount(3)
+    await expect(page.locator('.plan-title-text')).toHaveText('Logic Flow 1')
   }
 }
 

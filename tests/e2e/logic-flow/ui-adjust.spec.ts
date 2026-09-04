@@ -1,51 +1,23 @@
 import { test } from '../../test-setup';
 import { expect } from '@playwright/test';
 import { setupLogicFlow } from './helpers/setupLogicFlow';
+import { dragWareToTarget } from './helpers/dragLogicFlow';
 
 test.describe('Logic Flow UI Adjust', () => {
   test.beforeEach(async ({ page }) => {
     await setupLogicFlow(page, 'clean');
   });
 
-  const dragWareToNewZone = async (page: any, wareId: string) => {
-    const source = page.locator(`.ware-card-wrapper[data-ware-id="${wareId}"]`).first();
-    await expect(source).toBeVisible({ timeout: 5000 });
-
-    const sourceBox = await source.boundingBox();
-    if (!sourceBox) throw new Error(`Source ware ${wareId} not found`);
-
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
-    await page.mouse.down();
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
-    await page.waitForTimeout(100);
-
-    const compactView = page.locator('.compact-view');
-    await expect(compactView).toBeVisible({ timeout: 5000 });
-
-    const newZone = compactView.locator('.compact-group').last();
-    const newZoneBox = await newZone.boundingBox();
-    if (!newZoneBox) throw new Error('New zone not found');
-
-    await page.mouse.move(newZoneBox.x + newZoneBox.width / 2, newZoneBox.y + newZoneBox.height / 2, { steps: 10 });
-    await page.waitForTimeout(200);
-    await page.mouse.up();
-    await page.waitForTimeout(300);
-  };
-
   test.describe('Tier 列宽度比例', () => {
     test('1.1 候选区 tier 列宽度比例测试', async ({ page }) => {
       const wareGrid = page.locator('.candidate-zone .ware-grid').first();
       await expect(wareGrid).toBeVisible();
 
-      const gridStyle = await wareGrid.evaluate((el) => {
-        return window.getComputedStyle(el).gridTemplateColumns;
-      });
-      
-      expect(gridStyle).toContain('2fr 3fr 3fr 4fr');
+      await expect(wareGrid).toHaveClass(/grid-cols-\[2fr_3fr_3fr_4fr\]/);
     });
 
     test('1.2 ProductionLineGroup tier 列宽度比例测试', async ({ page }) => {
-      await dragWareToNewZone(page, 'hullparts');
+      await dragWareToTarget(page, 'hullparts');
 
       const productionGroup = page.locator('.production-group').first();
       await expect(productionGroup).toBeVisible({ timeout: 5000 });
@@ -97,7 +69,7 @@ test.describe('Logic Flow UI Adjust', () => {
     });
 
     test('2.2 规划区间距测试', async ({ page }) => {
-      await dragWareToNewZone(page, 'hullparts');
+      await dragWareToTarget(page, 'hullparts');
 
       const planningZone = page.locator('.planning-zone');
       await expect(planningZone).toBeVisible({ timeout: 5000 });
@@ -213,11 +185,7 @@ test.describe('Logic Flow UI Adjust', () => {
       await page.mouse.move(cardBox.x + cardBox.width / 2, cardBox.y + cardBox.height / 2, { steps: 5 });
       await page.waitForTimeout(200);
 
-      const opacity = await resourcePreview.evaluate((el) => {
-        return window.getComputedStyle(el).opacity;
-      });
-      
-      expect(opacity).toBe('0');
+      await expect(resourcePreview).toHaveCSS('opacity', '0');
     });
 
     test('5.2 压缩率 hover 时保持显示测试', async ({ page }) => {

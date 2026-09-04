@@ -1,6 +1,7 @@
 import { test } from '../../test-setup';
 import { expect } from '@playwright/test';
 import { setupLogicFlow } from './helpers/setupLogicFlow';
+import { dragWareToTarget } from './helpers/dragLogicFlow';
 
 test.describe('Logic Flow New Features', () => {
   test.beforeEach(async ({ page }) => {
@@ -13,60 +14,10 @@ test.describe('Logic Flow New Features', () => {
     await page.addStyleTag({ content: '*, *::before, *::after { transition: none !important; animation: none !important; }' });
   });
 
-  const dragWareToNewZone = async (page: any, wareId: string) => {
-    const source = page.locator(`.ware-card-wrapper[data-ware-id="${wareId}"]`).first();
-    await expect(source).toBeVisible();
-
-    const sourceBox = await source.boundingBox();
-    if (!sourceBox) throw new Error(`Source ware ${wareId} not found`);
-
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
-    await page.mouse.down();
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
-    await page.waitForTimeout(100);
-
-    const compactView = page.locator('.compact-view');
-    await expect(compactView).toBeVisible({ timeout: 5000 });
-
-    const newZone = compactView.locator('.compact-group').last();
-    const newZoneBox = await newZone.boundingBox();
-    if (!newZoneBox) throw new Error('New zone not found');
-
-    await page.mouse.move(newZoneBox.x + newZoneBox.width / 2, newZoneBox.y + newZoneBox.height / 2, { steps: 10 });
-    await page.waitForTimeout(200);
-    await page.mouse.up();
-    await page.waitForTimeout(300);
-  };
-
-  const dragWareToExistingGroup = async (page: any, wareId: string, groupIndex: number = 0) => {
-    const source = page.locator(`.ware-card-wrapper[data-ware-id="${wareId}"]`).first();
-    await expect(source).toBeVisible();
-
-    const sourceBox = await source.boundingBox();
-    if (!sourceBox) throw new Error(`Source ware ${wareId} not found`);
-
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
-    await page.mouse.down();
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
-    await page.waitForTimeout(100);
-
-    const compactView = page.locator('.compact-view');
-    await expect(compactView).toBeVisible({ timeout: 5000 });
-
-    const targetGroup = compactView.locator('.compact-group').nth(groupIndex);
-    const targetBox = await targetGroup.boundingBox();
-    if (!targetBox) throw new Error('Target group not found');
-
-    await page.mouse.move(targetBox.x + targetBox.width / 2, targetBox.y + targetBox.height / 2, { steps: 10 });
-    await page.waitForTimeout(200);
-    await page.mouse.up();
-    await page.waitForTimeout(300);
-  };
-
   test.describe('Bug Regression Tests', () => {
     test('BUG: Drag then move away then release should NOT add ware', async ({ page }) => {
       
-      await dragWareToNewZone(page, 'hullparts');
+      await dragWareToTarget(page, 'hullparts');
       await page.waitForTimeout(300);
       
       const initialGroupCount = await page.evaluate(() => (window as any).logicFlowStore.groups.length);
@@ -127,7 +78,7 @@ test.describe('Logic Flow New Features', () => {
 
   test.describe('Production Line Title Editing', () => {
     test('Test 1: Title Edit Interaction - Click to Edit', async ({ page }) => {
-      await dragWareToNewZone(page, 'hullparts');
+      await dragWareToTarget(page, 'hullparts');
       await page.waitForTimeout(300);
       
       const groupTitle = page.locator('.production-group h3').first();
@@ -145,7 +96,7 @@ test.describe('Logic Flow New Features', () => {
     });
 
     test('Test 2: Title Confirm Edit', async ({ page }) => {
-      await dragWareToNewZone(page, 'hullparts');
+      await dragWareToTarget(page, 'hullparts');
       await page.waitForTimeout(300);
       
       const groupTitle = page.locator('.production-group h3').first();
@@ -168,7 +119,7 @@ test.describe('Logic Flow New Features', () => {
     });
 
     test('Test 3: Title Cancel Edit - Blur', async ({ page }) => {
-      await dragWareToNewZone(page, 'hullparts');
+      await dragWareToTarget(page, 'hullparts');
       await page.waitForTimeout(300);
       
       const groupTitle = page.locator('.production-group h3').first();
@@ -188,7 +139,7 @@ test.describe('Logic Flow New Features', () => {
     });
 
     test('Test 4: Empty Title Reversion', async ({ page }) => {
-      await dragWareToNewZone(page, 'hullparts');
+      await dragWareToTarget(page, 'hullparts');
       await page.waitForTimeout(300);
       
       const groupTitle = page.locator('.production-group h3').first();
@@ -205,7 +156,7 @@ test.describe('Logic Flow New Features', () => {
     });
 
     test('Test 5: Custom Title Not Auto Updated', async ({ page }) => {
-      await dragWareToNewZone(page, 'hullparts');
+      await dragWareToTarget(page, 'hullparts');
       await page.waitForTimeout(300);
       
       const groupTitle = page.locator('.production-group h3').first();
@@ -227,7 +178,7 @@ test.describe('Logic Flow New Features', () => {
 
   test.describe('Upstream/Downstream Highlight Chain', () => {
     test('Test 6: Upstream Trace to T0', async ({ page }) => {
-      await dragWareToNewZone(page, 'weaponcomponents');
+      await dragWareToTarget(page, 'weaponcomponents');
       await page.waitForTimeout(300);
       
       const t3Node = page.locator('.flow-node').filter({ hasText: /武器组件|Weapon/i }).first();
@@ -254,7 +205,7 @@ test.describe('Logic Flow New Features', () => {
     });
 
     test('Test 7: Downstream Trace to T3', async ({ page }) => {
-      await dragWareToNewZone(page, 'weaponcomponents');
+      await dragWareToTarget(page, 'weaponcomponents');
       await page.waitForTimeout(300);
       
       const t0Node = page.locator('.flow-node').filter({ hasText: /矿石|Ore|硅晶片|Silicon/i }).first();
@@ -269,7 +220,7 @@ test.describe('Logic Flow New Features', () => {
     });
 
     test('Test 8: Middle Tier Bidirectional Trace', async ({ page }) => {
-      await dragWareToNewZone(page, 'weaponcomponents');
+      await dragWareToTarget(page, 'weaponcomponents');
       await page.waitForTimeout(300);
       
       const t2Node = page.locator('.flow-node').filter({ hasText: /精炼金属|Refined/i }).first();
@@ -286,7 +237,7 @@ test.describe('Logic Flow New Features', () => {
     });
 
     test('Test 9: Leave Node Clears Highlight', async ({ page }) => {
-      await dragWareToNewZone(page, 'weaponcomponents');
+      await dragWareToTarget(page, 'weaponcomponents');
       await page.waitForTimeout(300);
       
       const node = page.locator('.flow-node').first();
@@ -310,7 +261,7 @@ test.describe('Logic Flow New Features', () => {
     });
 
     test('Test 9.1: Isolated Node Highlight', async ({ page }) => {
-      await dragWareToNewZone(page, 'hullparts');
+      await dragWareToTarget(page, 'hullparts');
       await page.waitForTimeout(300);
       
       const result = await page.evaluate(async () => {
@@ -376,7 +327,7 @@ test.describe('Logic Flow New Features', () => {
 
   test.describe('Compact Mode & Preview Custom Title', () => {
     test('Test 17: Compact Mode Shows Custom Title', async ({ page }) => {
-      await dragWareToNewZone(page, 'hullparts');
+      await dragWareToTarget(page, 'hullparts');
       await page.waitForTimeout(300);
       
       const groupTitle = page.locator('.production-group h3').first();
@@ -407,7 +358,7 @@ test.describe('Logic Flow New Features', () => {
     });
 
     test('Test 18: T0 Resources Fully Displayed', async ({ page }) => {
-      await dragWareToNewZone(page, 'weaponcomponents');
+      await dragWareToTarget(page, 'weaponcomponents');
       await page.waitForTimeout(300);
       
       const source = page.locator('.ware-card-wrapper[data-ware-id="hullparts"]').first();
@@ -430,7 +381,7 @@ test.describe('Logic Flow New Features', () => {
     });
 
     test('Test 19: Preview Menu Title Abbreviation', async ({ page }) => {
-      await dragWareToNewZone(page, 'hullparts');
+      await dragWareToTarget(page, 'hullparts');
       await page.waitForTimeout(300);
       
       const groupTitle = page.locator('.production-group h3').first();
@@ -464,7 +415,7 @@ test.describe('Logic Flow New Features', () => {
 
   test.describe('Visual Tests', () => {
     test('Test 10: Edit Mode UI Consistency', async ({ page }) => {
-      await dragWareToNewZone(page, 'hullparts');
+      await dragWareToTarget(page, 'hullparts');
       await page.waitForTimeout(300);
       
       const groupTitle = page.locator('.production-group h3').first();
@@ -481,7 +432,7 @@ test.describe('Logic Flow New Features', () => {
     });
 
     test('Test 11: Edit Mode Height Stability', async ({ page }) => {
-      await dragWareToNewZone(page, 'hullparts');
+      await dragWareToTarget(page, 'hullparts');
       await page.waitForTimeout(300);
       
       const groupHeader = page.locator('.production-group > div').first();
@@ -499,7 +450,7 @@ test.describe('Logic Flow New Features', () => {
     });
 
     test('Test 12: Container Highlight Style', async ({ page }) => {
-      await dragWareToNewZone(page, 'weaponcomponents');
+      await dragWareToTarget(page, 'weaponcomponents');
       await page.waitForTimeout(300);
       
       const node = page.locator('.flow-node').first();
@@ -513,7 +464,7 @@ test.describe('Logic Flow New Features', () => {
     });
 
     test('Test 13: Connection Highlight Style', async ({ page }) => {
-      await dragWareToNewZone(page, 'weaponcomponents');
+      await dragWareToTarget(page, 'weaponcomponents');
       await page.waitForTimeout(300);
       
       const node = page.locator('.flow-node').first();

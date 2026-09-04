@@ -1,6 +1,7 @@
 import { test } from '../../test-setup';
 import { expect } from '@playwright/test';
 import { setupLogicFlow } from './helpers/setupLogicFlow';
+import { dragWareToTarget } from './helpers/dragLogicFlow';
 
 test.describe('Logical Flow Integration Verification', () => {
   test.beforeEach(async ({ page }) => {
@@ -11,79 +12,8 @@ test.describe('Logical Flow Integration Verification', () => {
     await setupLogicFlow(page, 'clean');
   });
 
-  const dragWareToNewZone = async (
-    page: any, 
-    wareId: string,
-    options: { drop?: boolean } = {}
-  ) => {
-    const { drop = true } = options;
-    const source = page.locator(`.ware-card-wrapper[data-ware-id="${wareId}"]`).first();
-    await expect(source).toBeVisible();
-
-    const sourceBox = await source.boundingBox();
-    if (!sourceBox) throw new Error(`Source ware ${wareId} not found`);
-
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
-    await page.mouse.down();
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
-    await page.waitForTimeout(100);
-
-    const compactView = page.locator('.compact-view');
-    await expect(compactView).toBeVisible({ timeout: 5000 });
-
-    const newZone = compactView.locator('.compact-group').last();
-    const newZoneBox = await newZone.boundingBox();
-    if (!newZoneBox) throw new Error('New zone not found');
-
-    await page.mouse.move(newZoneBox.x + newZoneBox.width / 2, newZoneBox.y + newZoneBox.height / 2, { steps: 10 });
-    await page.waitForTimeout(200);
-
-    if (drop) {
-      await page.mouse.up();
-      await page.waitForTimeout(300);
-    }
-
-    return { sourceBox, newZoneBox };
-  };
-
-  const dragWareToExistingGroup = async (
-    page: any, 
-    wareId: string,
-    groupIndex: number = 0,
-    options: { drop?: boolean } = {}
-  ) => {
-    const { drop = true } = options;
-    const source = page.locator(`.ware-card-wrapper[data-ware-id="${wareId}"]`).first();
-    await expect(source).toBeVisible();
-
-    const sourceBox = await source.boundingBox();
-    if (!sourceBox) throw new Error(`Source ware ${wareId} not found`);
-
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
-    await page.mouse.down();
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
-    await page.waitForTimeout(100);
-
-    const compactView = page.locator('.compact-view');
-    await expect(compactView).toBeVisible({ timeout: 5000 });
-
-    const targetGroup = compactView.locator('.compact-group').nth(groupIndex);
-    const targetBox = await targetGroup.boundingBox();
-    if (!targetBox) throw new Error('Target group not found');
-
-    await page.mouse.move(targetBox.x + targetBox.width / 2, targetBox.y + targetBox.height / 2, { steps: 10 });
-    await page.waitForTimeout(200);
-
-    if (drop) {
-      await page.mouse.up();
-      await page.waitForTimeout(300);
-    }
-
-    return { sourceBox, targetBox };
-  };
-
   test('2.1 Bug Fix: No Module Node for Weapon Components', async ({ page }) => {
-    await dragWareToNewZone(page, 'weaponcomponents');
+    await dragWareToTarget(page, 'weaponcomponents');
 
     const nodes = page.locator('.flow-node');
     await expect(nodes.filter({ hasText: 'No Module' })).toHaveCount(0);
@@ -97,7 +27,7 @@ test.describe('Logical Flow Integration Verification', () => {
     await teladiPill.click();
     await page.waitForTimeout(200);
 
-    await dragWareToNewZone(page, 'missilecomponents');
+    await dragWareToTarget(page, 'missilecomponents');
 
     const teladianiumNode = page.locator('.flow-node').filter({ hasText: /泰拉迪合金|Teladianium/i });
     const refinedMetalsNode = page.locator('.flow-node').filter({ hasText: /精炼金属|Refined Metals/i });
@@ -118,7 +48,7 @@ test.describe('Logical Flow Integration Verification', () => {
   test('2.4 Bug Fix: vuedraggable Crash (TypeError Check)', async ({ page }) => {
     const initialGroupCount = await page.evaluate(() => (window as any).logicFlowStore.groups.length);
     
-    await dragWareToNewZone(page, 'hullparts');
+    await dragWareToTarget(page, 'hullparts');
 
     const finalGroupCount = await page.evaluate(() => (window as any).logicFlowStore.groups.length);
     expect(finalGroupCount).toBe(initialGroupCount + 1);
@@ -135,7 +65,7 @@ test.describe('Logical Flow Integration Verification', () => {
     await expect(oreCard).toHaveAttribute('draggable', 'false');
 
     // T0 资源没有快速添加按钮
-    const quickAddBtn = oreCard.locator('.quick-add-btn');
+    const quickAddBtn = oreCard.locator('.ware-card-add-btn');
     await expect(quickAddBtn).toHaveCount(0);
 
     // 2. 动态交互测试 - 尝试拖拽 T0 资源
@@ -169,7 +99,7 @@ test.describe('Logical Flow Integration Verification', () => {
     // 2. 动态交互测试 - 拖拽 T1+ 资源到新区域
     const initialGroupCount = await page.evaluate(() => (window as any).logicFlowStore.groups.length);
 
-    await dragWareToNewZone(page, 'hullparts');
+    await dragWareToTarget(page, 'hullparts');
 
     // 3. 断言：数据发生变化（T1+ 资源被添加到规划区）
     const finalGroupCount = await page.evaluate(() => (window as any).logicFlowStore.groups.length);
@@ -194,8 +124,8 @@ test.describe('Logical Flow Integration Verification', () => {
     });
 
     test('3.2 Logic: Smart Insertion Order (UI Check)', async ({ page }) => {
-      await dragWareToNewZone(page, 'hullparts');
-      await dragWareToExistingGroup(page, 'siliconwafers', 0);
+      await dragWareToTarget(page, 'hullparts');
+      await dragWareToTarget(page, 'siliconwafers', 0);
 
       const nodes = page.locator('.flow-node');
       const nodeCount = await nodes.count();
@@ -203,7 +133,7 @@ test.describe('Logical Flow Integration Verification', () => {
     });
 
     test('3.3 Logic: Duplicate blocking and UI feedback', async ({ page }) => {
-      await dragWareToNewZone(page, 'hullparts');
+      await dragWareToTarget(page, 'hullparts');
 
       const source = page.locator('.ware-card-wrapper[data-ware-id="hullparts"]').first();
       const sourceBox = await source.boundingBox();
@@ -232,7 +162,7 @@ test.describe('Logical Flow Integration Verification', () => {
     });
 
     test('3.4 Visual: Drag Preview in Compact View', async ({ page }) => {
-      await dragWareToNewZone(page, 'hullparts');
+      await dragWareToTarget(page, 'hullparts');
 
       const source = page.locator('.ware-card-wrapper[data-ware-id="weaponcomponents"]').first();
       const sourceBox = await source.boundingBox();
@@ -259,16 +189,16 @@ test.describe('Logical Flow Integration Verification', () => {
 
   test.describe('Multi-Line Integration', () => {
     test('4.1 Logic: Create Multiple Lines', async ({ page }) => {
-      await dragWareToNewZone(page, 'hullparts');
-      await dragWareToNewZone(page, 'weaponcomponents');
+      await dragWareToTarget(page, 'hullparts');
+      await dragWareToTarget(page, 'weaponcomponents');
 
       const groupCount = await page.evaluate(() => (window as any).logicFlowStore.groups.length);
       expect(groupCount).toBe(2);
     });
 
     test('4.2 Logic: Drag to Existing Line', async ({ page }) => {
-      await dragWareToNewZone(page, 'hullparts');
-      await dragWareToExistingGroup(page, 'weaponcomponents', 0);
+      await dragWareToTarget(page, 'hullparts');
+      await dragWareToTarget(page, 'weaponcomponents', 0);
 
       const result = await page.evaluate(() => {
         const logicFlow = (window as any).logicFlowStore;
@@ -282,7 +212,7 @@ test.describe('Logical Flow Integration Verification', () => {
     });
 
     test('4.3 Visual: Connection Lines Between Nodes', async ({ page }) => {
-      await dragWareToNewZone(page, 'hullparts');
+      await dragWareToTarget(page, 'hullparts');
 
       const connectionLines = page.locator('.connection-line');
       const count = await connectionLines.count();
@@ -315,7 +245,7 @@ test.describe('Logical Flow Integration Verification', () => {
     });
 
     test('5.2 Drop on New Zone Creates Group', async ({ page }) => {
-      await dragWareToNewZone(page, 'hullparts');
+      await dragWareToTarget(page, 'hullparts');
 
       const groupCount = await page.evaluate(() => (window as any).logicFlowStore.groups.length);
       expect(groupCount).toBe(1);

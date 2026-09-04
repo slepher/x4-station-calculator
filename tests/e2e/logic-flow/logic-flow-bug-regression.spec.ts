@@ -1,6 +1,7 @@
 import { test } from '../../test-setup';
 import { expect } from '@playwright/test';
 import { setupLogicFlow } from './helpers/setupLogicFlow';
+import { dragWareToTarget } from './helpers/dragLogicFlow';
 
 test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
   test.beforeEach(async ({ page }) => {
@@ -10,45 +11,6 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
 
     await setupLogicFlow(page, 'clean');
   });
-
-  const dragWareToTarget = async (
-    page: any, 
-    wareId: string, 
-    targetSelector: string,
-    options: { drop?: boolean; hoverOnly?: boolean } = {}
-  ) => {
-    const { drop = true, hoverOnly = false } = options;
-    const source = page.locator(`.ware-card-wrapper[data-ware-id="${wareId}"]`).first();
-    await expect(source).toBeVisible();
-
-    const sourceBox = await source.boundingBox();
-    if (!sourceBox) throw new Error(`Source ware ${wareId} not found`);
-
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
-    await page.mouse.down();
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
-    await page.waitForTimeout(100);
-
-    const target = page.locator(targetSelector).first();
-    await expect(target).toBeVisible({ timeout: 5000 });
-
-    const targetBox = await target.boundingBox();
-    if (!targetBox) throw new Error(`Target ${targetSelector} not found`);
-
-    await page.mouse.move(targetBox.x + targetBox.width / 2, targetBox.y + targetBox.height / 2, { steps: 10 });
-    await page.waitForTimeout(200);
-
-    if (hoverOnly) {
-      return { sourceBox, targetBox };
-    }
-
-    if (drop) {
-      await page.mouse.up();
-      await page.waitForTimeout(300);
-    }
-
-    return { sourceBox, targetBox };
-  };
 
   async function setupGroupWithNode(page: any, wareId: string, lineage: string = 'default') {
     await page.evaluate((args: { wareId: string; lineage: string }) => {
@@ -132,7 +94,7 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
       });
       await page.waitForTimeout(100);
 
-      await dragWareToTarget(page, 'hullparts', '.compact-group');
+      await dragWareToTarget(page, 'hullparts', 0);
 
       const hullpartsCard = page.locator(`.ware-card-wrapper[data-ware-id="hullparts"]`).first();
       const sourceBox = await hullpartsCard.boundingBox();
@@ -181,7 +143,7 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
       });
       await page.waitForTimeout(100);
 
-      await dragWareToTarget(page, 'hullparts', '.compact-group');
+      await dragWareToTarget(page, 'hullparts', 0);
       await page.waitForTimeout(200);
 
       const grapheneStatus = await page.evaluate(() => {
@@ -192,7 +154,7 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
       });
       expect(grapheneStatus.source).toBe('auto');
 
-      await dragWareToTarget(page, 'graphene', '.compact-group');
+      await dragWareToTarget(page, 'graphene', 0);
       await page.waitForTimeout(200);
 
       const result = await page.evaluate(() => {
@@ -244,7 +206,7 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
       expect(status.nodeSource).toBe('auto');
       expect(status.wareStatus).toBe('auto');
 
-      await dragWareToTarget(page, 'graphene', '.compact-group');
+      await dragWareToTarget(page, 'graphene', 0);
       await page.waitForTimeout(200);
 
       const result = await page.evaluate(() => {
@@ -359,7 +321,7 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
       await isolateNode(page, 'hullparts');
       await page.waitForTimeout(200);
 
-      await dragWareToTarget(page, 'hullparts', '.compact-group');
+      await dragWareToTarget(page, 'hullparts', 0);
       await page.waitForTimeout(500);
 
       const result = await page.evaluate(() => {
@@ -463,7 +425,7 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
       });
       await page.waitForTimeout(100);
 
-      await dragWareToTarget(page, 'hullparts', '.compact-group');
+      await dragWareToTarget(page, 'hullparts', 0);
       await page.waitForTimeout(200);
 
       const count = await page.evaluate(() => {
@@ -661,7 +623,7 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
       await teladiButton.click();
       await page.waitForTimeout(200);
 
-      await dragWareToTarget(page, 'hullparts', '.compact-group');
+      await dragWareToTarget(page, 'hullparts', 0);
 
       const result = await page.evaluate(() => {
         const logicFlow = (window as any).logicFlowStore;
@@ -679,8 +641,8 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
 
   test.describe('Bug 15: 多组交互', () => {
     test('15.1 多个组之间拖拽应正确切换', async ({ page }) => {
-      await dragWareToTarget(page, 'hullparts', '.compact-group');
-      await dragWareToTarget(page, 'weaponcomponents', '.compact-group:last-child');
+      await dragWareToTarget(page, 'hullparts', 0);
+      await dragWareToTarget(page, 'weaponcomponents', 1);
 
       const groupCount = await page.evaluate(() => (window as any).logicFlowStore.groups.length);
       expect(groupCount).toBe(2);
@@ -730,45 +692,6 @@ test.describe('Module Name Display Tests (E2E)', () => {
       logicFlow.clearAllGroups();
     });
   });
-
-  const dragWareToTarget = async (
-    page: any, 
-    wareId: string, 
-    targetSelector: string,
-    options: { drop?: boolean; hoverOnly?: boolean } = {}
-  ) => {
-    const { drop = true, hoverOnly = false } = options;
-    const source = page.locator(`.ware-card-wrapper[data-ware-id="${wareId}"]`).first();
-    await expect(source).toBeVisible();
-
-    const sourceBox = await source.boundingBox();
-    if (!sourceBox) throw new Error(`Source ware ${wareId} not found`);
-
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
-    await page.mouse.down();
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
-    await page.waitForTimeout(100);
-
-    const target = page.locator(targetSelector).first();
-    await expect(target).toBeVisible({ timeout: 5000 });
-
-    const targetBox = await target.boundingBox();
-    if (!targetBox) throw new Error(`Target ${targetSelector} not found`);
-
-    await page.mouse.move(targetBox.x + targetBox.width / 2, targetBox.y + targetBox.height / 2, { steps: 10 });
-    await page.waitForTimeout(200);
-
-    if (hoverOnly) {
-      return { sourceBox, targetBox };
-    }
-
-    if (drop) {
-      await page.mouse.up();
-      await page.waitForTimeout(300);
-    }
-
-    return { sourceBox, targetBox };
-  };
 
   test('28. 紧凑版节点显示模块名称', async ({ page }) => {
     await page.evaluate(() => {
@@ -942,7 +865,7 @@ test.describe('Module Name Display Tests (E2E)', () => {
     await expect(hullpartsCard).toBeVisible({ timeout: 5000 });
     await hullpartsCard.hover();
     
-    const addButton = hullpartsCard.locator('.quick-add-btn');
+    const addButton = hullpartsCard.locator('.ware-card-add-btn');
     await addButton.click();
     await page.waitForTimeout(200);
 
@@ -970,7 +893,7 @@ test.describe('Module Name Display Tests (E2E)', () => {
 
     const weaponCard = page.locator('.ware-card-wrapper[data-ware-id="weaponcomponents"]').first();
     await weaponCard.hover();
-    const weaponAddButton = weaponCard.locator('.quick-add-btn');
+    const weaponAddButton = weaponCard.locator('.ware-card-add-btn');
     await weaponAddButton.click();
     await page.waitForTimeout(200);
 
@@ -1007,7 +930,7 @@ test.describe('Module Name Display Tests (E2E)', () => {
     await expect(hullpartsCard).toBeVisible({ timeout: 5000 });
     await hullpartsCard.hover();
     
-    const addButton = hullpartsCard.locator('.quick-add-btn');
+    const addButton = hullpartsCard.locator('.ware-card-add-btn');
     await addButton.click();
     await page.waitForTimeout(200);
 
@@ -1058,7 +981,7 @@ test.describe('Module Name Display Tests (E2E)', () => {
     await expect(hullpartsCard).toBeVisible({ timeout: 5000 });
     await hullpartsCard.hover();
     
-    const addButton = hullpartsCard.locator('.quick-add-btn');
+    const addButton = hullpartsCard.locator('.ware-card-add-btn');
     await addButton.click();
     await page.waitForTimeout(200);
 
@@ -1152,7 +1075,7 @@ test.describe('Module Name Display Tests (E2E)', () => {
     const wareTextBefore = await wareCard.locator('.ware-name, .name').first().textContent();
     console.log('Ware text before language switch:', wareTextBefore);
 
-    const languageSelector = page.locator('.language-selector, select[name="language"], [data-testid="language-selector"]').first();
+    const languageSelector = page.getByTestId('language-select');
     if (await languageSelector.isVisible()) {
       await languageSelector.click();
       await page.waitForTimeout(200);
@@ -1203,7 +1126,7 @@ test.describe('Module Name Display Tests (E2E)', () => {
       await expect(hullpartsCard).toBeVisible({ timeout: 5000 });
       await hullpartsCard.hover();
       
-      const addButton = hullpartsCard.locator('.quick-add-btn');
+      const addButton = hullpartsCard.locator('.ware-card-add-btn');
       await addButton.click();
       await page.waitForTimeout(200);
 
