@@ -14,5 +14,5 @@
 - Plan: `plan-2.md`
 - Lanes: `lanes-2.md`
 - Base: `1c9fab8809fd8e31f8679a2f27a7021cc3f46e02`
-- Next action: `resolve canonical Unit failures and resume task-test-3 before task-test-4`
-- Blocker: `task-test-3 checkpoint e44fdeed is not accepted; canonical Unit failures require product/planner ownership`
+- Next action: `route the build-plan race-preference regression to product-code owner, then resume task-test-3 and task-test-4`
+- Blocker: `task-test-3 correction e710011f intentionally fails one historical regression test; accepting it requires a src/ product fix outside the test-owned lane`

@@ -5,6 +5,6 @@
 - Name: `integrate`
 - State: `blocked`
 - Active task: `task-test-3`
-- Candidate: `e44fdeede278d4b0848318a3cfc133e448aeae24`
-- Next action: `route canonical Unit source/import/API failures to planner or product-code owner before resuming`
-- Blocker: `npm run test:unit: 87 failed files, 189 failed tests, 16 errors; missing source imports and API/fixture mismatches exceed test-owned repair`
+- Candidate: `e710011f`
+- Next action: `route unmatched build-plan race-preference regression to product-code owner; then rerun focused and full Unit`
+- Blocker: `tests/unit/current/build-flow-plan/buildPlanProductionLine.spec.ts:212` preserves a historical Terran preference regression; current source returns the generic module for a synthetic unmatched group
