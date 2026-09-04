@@ -3,6 +3,7 @@ import path from 'node:path'
 import YAML from 'yaml'
 import { expect } from '@playwright/test'
 import { test } from '../../test-setup'
+import dbFixture from '../../fixtures/db.json' with { type: 'json' }
 
 type FixtureManualNode = { ware_id: string; module_id: string }
 type FixtureIsolated = { ware_ids?: string[] }
@@ -206,7 +207,7 @@ const buildInjectedPlansFromFixture = () => {
   }
 
   return {
-    version: 1,
+    version: 3,
     activeId: 'ilf_valid_single_group',
     list: [ilfValid, ilfMixed, ilfEmpty, ilfNonContainerIsolated, ...mapped],
   }
@@ -214,7 +215,7 @@ const buildInjectedPlansFromFixture = () => {
 
 const ensureStationContext = async (page: any) => {
   await page.evaluate(() => {
-    const empireStore = (window as any).empireStore
+    const empireStore = (window as any).blueprintStore
     if (!empireStore.activeEmpire || !Array.isArray(empireStore.activeEmpire.stations)) {
       empireStore.createEmpire('ILF E2E Empire')
     }
@@ -242,7 +243,7 @@ const openImportModal = async (page: any, mode: 'station' | 'empire') => {
     await ensureEmpireOverview(page)
     await page.locator('[data-testid="logicflow-import-entry-empire"]').click({ force: true })
   }
-  await expect(page.locator('[data-testid="logicflow-import-modal"]')).toBeVisible()
+  await expect(page.locator('[data-testid="import-view-modal"]')).toBeVisible()
 }
 
 const getLoadFlowModal = (page: any) =>
@@ -279,7 +280,7 @@ const makeEmpireSavedBaseline = async (page: any) => {
   })
   await ensureStationContext(page)
   await page.evaluate(() => {
-    const empireStore = (window as any).empireStore
+    const empireStore = (window as any).blueprintStore
     if (!empireStore.activeEmpire) {
       empireStore.createEmpire('ILF E2E Empire')
     }
@@ -302,7 +303,7 @@ const makeEmpireDirtyWithoutSave = async (page: any) => {
   })
   await ensureStationContext(page)
   await page.evaluate(() => {
-    const empireStore = (window as any).empireStore
+    const empireStore = (window as any).blueprintStore
     if (!empireStore.activeEmpire) return
     empireStore.activeEmpire.name = `ILF Dirty ${Date.now()}`
   })
@@ -332,14 +333,27 @@ test.describe('import-logic-flow e2e (test implementation)', () => {
   const injectedPlans = buildInjectedPlansFromFixture()
 
   test.beforeEach(async ({ page }) => {
-    await page.addInitScript((plansData) => {
-      ;(window as any).isTestEnv = true
-      window.localStorage.setItem('isTestEnv', 'true')
-      window.localStorage.setItem('x4_logic_flow_plans', JSON.stringify(plansData))
-    }, injectedPlans)
+    await page.goto('/')
 
-    await page.goto('./?test=true')
+    const data = JSON.parse(JSON.stringify(dbFixture))
+    delete data.vsn
+    data.x4_logic_flow_plans = injectedPlans
+
+    await page.evaluate((fixture) => {
+      localStorage.setItem('x4_game_version', JSON.stringify({ version: '8.0', beta: false }))
+      Object.entries(fixture).forEach(([key, value]) => {
+        localStorage.setItem(key, JSON.stringify(value))
+      })
+      localStorage.setItem('isTestEnv', 'true')
+    }, data)
+
+    await page.reload()
     await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 10000 })
+    await expect.poll(() => page.evaluate(() => {
+      const store = (window as any).gameDataStore
+      return { version: store.currentVersion, key: store.getStorageKey('logic_flow') }
+    })).toEqual({ version: '8.0', key: 'x4_logic_flow_plans' })
+    await page.getByTestId('language-select').selectOption('zh-CN')
   })
 
   test('2.0 测试启动与数据预置：注入 x4_logic_flow_plans，并确认空间站页/帝国页导入入口可见', async ({ page }) => {
@@ -359,8 +373,7 @@ test.describe('import-logic-flow e2e (test implementation)', () => {
   })
 
   test('2.1 Logic-Flow 主界面数据可用性：通过载入流程方案入口可见并加载 2 个方案', async ({ page }) => {
-    const flowViewBtn = page.locator('button').filter({ hasText: /view\.logical_flow|Logical Flow|逻辑组网/i }).first()
-    await flowViewBtn.click({ force: true })
+    await page.getByTestId('top-view-btn-flow').click({ force: true })
 
     const openLoadModal = async () => {
       const loadBtn = page.locator('button').filter({ hasText: /menu\.load|Load|加载/i }).first()
@@ -485,9 +498,9 @@ test.describe('import-logic-flow e2e (test implementation)', () => {
   test('2.3 空间站页面入口与确认流程（覆盖导入）', async ({ page }) => {
     await ensureStationContext(page)
     await page.evaluate(() => {
-      const empireStore = (window as any).empireStore
+      const empireStore = (window as any).blueprintStore
       const station = empireStore.activeStation
-      station.modules = [{ id: 'dummy_module_before_import', count: 9 }]
+      station.modules = [{ id: 'prod_gen_hullparts_macro', count: 9 }]
       station.lockedWares = []
       station.lastUpdated = Date.now()
     })
@@ -498,7 +511,7 @@ test.describe('import-logic-flow e2e (test implementation)', () => {
     await expect(page.locator('[data-testid="station-import-confirm-modal"]')).toBeVisible()
     await page.locator('[data-testid="station-import-confirm-overwrite"]').click({ force: true })
 
-    const activeModules = await page.evaluate(() => (window as any).empireStore.activeStation.modules)
+    const activeModules = await page.evaluate(() => (window as any).blueprintStore.activeStation.modules)
     expect(activeModules).toEqual([{ id: 'prod_gen_hullparts_macro', count: 1 }])
   })
 
@@ -506,7 +519,7 @@ test.describe('import-logic-flow e2e (test implementation)', () => {
     await ensureStationContext(page)
 
     const before = await page.evaluate(() => {
-      const empireStore = (window as any).empireStore
+      const empireStore = (window as any).blueprintStore
       return {
         count: empireStore.activeEmpire.stations.length,
         activeId: empireStore.activeStationId,
@@ -518,7 +531,7 @@ test.describe('import-logic-flow e2e (test implementation)', () => {
     await page.locator('[data-testid="station-import-confirm-new"]').click({ force: true })
 
     const after = await page.evaluate(() => {
-      const empireStore = (window as any).empireStore
+      const empireStore = (window as any).blueprintStore
       return {
         count: empireStore.activeEmpire.stations.length,
         activeId: empireStore.activeStationId,
@@ -532,7 +545,7 @@ test.describe('import-logic-flow e2e (test implementation)', () => {
   test('2.5 帝国总览入口与 SmartSaveDialog 复用（保存并导入）', async ({ page }) => {
     // 使用 page.evaluate 构造未保存状态（虽然不建议，但为了测试 SmartSaveDialog）
     await page.evaluate(() => {
-      const store = (window as any).empireStore
+      const store = (window as any).blueprintStore
       // 创建测试用的空间站状态
       if (!store.activeEmpire) {
         store.createEmpire('Test Empire')
@@ -543,19 +556,19 @@ test.describe('import-logic-flow e2e (test implementation)', () => {
       // 修改模块但不保存，构造 dirty 状态
       const station = store.activeEmpire.stations.find((s: any) => s.id === store.activeStationId)
       if (station) {
-        station.modules = [{ id: 'test_module_for_dirty_state', count: 1 }]
+        station.modules = [{ id: 'prod_gen_hullparts_macro', count: 1 }]
         station.lastUpdated = Date.now()
       }
     })
     // 等待状态更新
     await page.waitForTimeout(300)
     // 验证 isDirty 为 true
-    const isDirty = await page.evaluate(() => (window as any).empireStore.shouldConfirmBeforeEmpireReset())
+    const isDirty = await page.evaluate(() => (window as any).blueprintStore.shouldConfirmBeforeEmpireReset())
     if (!isDirty) {
       console.log('Warning: isDirty is false, SmartSaveDialog may not appear')
     }
     // 获取添加前的空间站数量
-    const before = await page.evaluate(() => (window as any).empireStore.activeEmpire.stations.length)
+    const before = await page.evaluate(() => (window as any).blueprintStore.activeEmpire.stations.length)
 
     await openImportModal(page, 'empire')
     // 新交互：直接点击方案卡片的导入按钮
@@ -565,7 +578,7 @@ test.describe('import-logic-flow e2e (test implementation)', () => {
     await expect(page.getByText(/Discard and Import|放弃并导入/i)).toBeVisible()
 
     await page.getByRole('button', { name: /Save and Import|保存并导入/i }).click({ force: true })
-    const after = await page.evaluate(() => (window as any).empireStore.activeEmpire.stations.length)
+    const after = await page.evaluate(() => (window as any).blueprintStore.activeEmpire.stations.length)
 
     // 注意：resetEmpireForImport() 会创建新帝国（清空原空间站），然后 executeEmpireImport() 创建导入的空间站
     // ilf_mixed_groups 有 1 个非空规划区，所以最终空间站数量应为 1
@@ -575,7 +588,7 @@ test.describe('import-logic-flow e2e (test implementation)', () => {
   test('2.5 帝国总览入口与 SmartSaveDialog 复用（放弃并导入）', async ({ page }) => {
     // 使用 page.evaluate 构造未保存状态（虽然不建议，但为了测试 SmartSaveDialog）
     await page.evaluate(() => {
-      const store = (window as any).empireStore
+      const store = (window as any).blueprintStore
       // 创建测试用的空间站状态
       if (!store.activeEmpire) {
         store.createEmpire('Test Empire')
@@ -586,21 +599,21 @@ test.describe('import-logic-flow e2e (test implementation)', () => {
       // 修改模块但不保存，构造 dirty 状态
       const station = store.activeEmpire.stations.find((s: any) => s.id === store.activeStationId)
       if (station) {
-        station.modules = [{ id: 'test_module_for_dirty_state', count: 1 }]
+        station.modules = [{ id: 'prod_gen_hullparts_macro', count: 1 }]
         station.lastUpdated = Date.now()
       }
     })
     // 等待状态更新
     await page.waitForTimeout(300)
     // 获取添加前的空间站数量
-    const before = await page.evaluate(() => (window as any).empireStore.activeEmpire.stations.length)
+    const before = await page.evaluate(() => (window as any).blueprintStore.activeEmpire.stations.length)
 
     await openImportModal(page, 'empire')
     // 新交互：直接点击方案卡片的导入按钮
     await page.locator('[data-testid="logicflow-import-plan-direct-ilf_mixed_groups"]').click({ force: true })
 
     await page.getByRole('button', { name: /Discard and Import|放弃并导入/i }).click({ force: true })
-    const after = await page.evaluate(() => (window as any).empireStore.activeEmpire.stations.length)
+    const after = await page.evaluate(() => (window as any).blueprintStore.activeEmpire.stations.length)
 
     // 注意：resetEmpireForImport() 会创建新帝国（清空原空间站），然后 executeEmpireImport() 创建导入的空间站
     // ilf_mixed_groups 有 1 个非空规划区，所以最终空间站数量应为 1
@@ -613,7 +626,7 @@ test.describe('import-logic-flow e2e (test implementation)', () => {
     const emptyPlanButton = page.locator('[data-testid="logicflow-import-plan-direct-ilf_empty_plan"]')
     await expect(emptyPlanButton).toBeDisabled()
     // 弹窗保持打开状态
-    await expect(page.locator('[data-testid="logicflow-import-modal"]')).toBeVisible()
+    await expect(page.locator('[data-testid="import-view-modal"]')).toBeVisible()
   })
 
   test('2.7 空规划区跳过 + warning 汇总', async ({ page }) => {
@@ -645,7 +658,7 @@ test.describe('import-logic-flow e2e (test implementation)', () => {
     await directImportFromStationGroupCard(page, 'ilf_non_container_isolated', 'g_non_container_warning')
     await page.locator('[data-testid="station-import-confirm-overwrite"]').click({ force: true })
 
-    const locked = await page.evaluate(() => (window as any).empireStore.activeStation.lockedWares)
+    const locked = await page.evaluate(() => (window as any).blueprintStore.activeStation.lockedWares)
     expect(locked).not.toContain('ore')
 
     await expect(page.locator('[data-testid="logicflow-import-warning-modal"]')).toBeVisible()
@@ -656,7 +669,7 @@ test.describe('import-logic-flow e2e (test implementation)', () => {
     await ensureStationContext(page)
 
     await page.evaluate(() => {
-      const empireStore = (window as any).empireStore
+      const empireStore = (window as any).blueprintStore
       const station = empireStore.activeStation
       station.modules = []
       station.lockedWares = []
@@ -670,7 +683,7 @@ test.describe('import-logic-flow e2e (test implementation)', () => {
     await page.reload()
     await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 10000 })
 
-    const afterReloadWithoutSave = await page.evaluate(() => (window as any).empireStore.activeStation.modules)
+    const afterReloadWithoutSave = await page.evaluate(() => (window as any).blueprintStore.activeStation.modules)
     expect(afterReloadWithoutSave).toEqual([])
 
     await openImportModal(page, 'station')
@@ -681,7 +694,7 @@ test.describe('import-logic-flow e2e (test implementation)', () => {
 
     await page.reload()
     await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 10000 })
-    const afterReloadWithSave = await page.evaluate(() => (window as any).empireStore.activeStation.modules)
+    const afterReloadWithSave = await page.evaluate(() => (window as any).blueprintStore.activeStation.modules)
     expect(afterReloadWithSave).toEqual([{ id: 'prod_gen_hullparts_macro', count: 1 }])
   })
 
@@ -713,7 +726,7 @@ test.describe('import-logic-flow e2e (test implementation)', () => {
   test('2.11 增量需求：帝国导入切换为“加载帝国”形态（改当前模板）', async ({ page }) => {
     await openImportModal(page, 'empire')
 
-    const importModal = page.locator('[data-testid="logicflow-import-modal"]')
+    const importModal = page.locator('[data-testid="import-view-modal"]')
     await expect(importModal).toBeVisible()
 
     // 新口径：帝国导入应呈现”加载帝国”形态（仍基于当前模板改造）
@@ -790,16 +803,16 @@ test.describe('import-logic-flow e2e (test implementation)', () => {
     await openImportModal(page, 'station')
     await directImportFromStationGroupCard(page, 'ilf_valid_single_group', 'g_valid_1')
     await page.locator('[data-testid="station-import-confirm-overwrite"]').click({ force: true })
-    const overwriteModules = await page.evaluate(() => (window as any).empireStore.activeStation.modules)
+    const overwriteModules = await page.evaluate(() => (window as any).blueprintStore.activeStation.modules)
     expect(overwriteModules).toEqual([{ id: 'prod_gen_hullparts_macro', count: 1 }])
 
     // 导入为新空间站：聚合结果保持一致
-    const beforeNewStationCount = await page.evaluate(() => (window as any).empireStore.activeEmpire.stations.length)
+    const beforeNewStationCount = await page.evaluate(() => (window as any).blueprintStore.activeEmpire.stations.length)
     await openImportModal(page, 'station')
     await directImportFromStationGroupCard(page, 'ilf_valid_single_group', 'g_valid_1')
     await page.locator('[data-testid="station-import-confirm-new"]').click({ force: true })
     const afterNewStation = await page.evaluate(() => {
-      const empireStore = (window as any).empireStore
+      const empireStore = (window as any).blueprintStore
       return {
         count: empireStore.activeEmpire.stations.length,
         modules: empireStore.activeStation.modules,
@@ -832,8 +845,8 @@ test.describe('import-logic-flow e2e (test implementation)', () => {
       await expect(empireMore).toContainText(/\+\d+\s*more/i)
     }
     // 关闭弹窗
-    await page.locator('[data-testid="logicflow-import-modal"] button', { hasText: /Cancel|取消/i }).first().click()
-    await expect(page.locator('[data-testid="logicflow-import-modal"]')).toHaveCount(0)
+    await page.locator('[data-testid="import-view-modal"] button', { hasText: /Cancel|取消/i }).first().click()
+    await expect(page.locator('[data-testid="import-view-modal"]')).toHaveCount(0)
 
     // 空间站导入界面
     await openImportModal(page, 'station')
@@ -857,8 +870,8 @@ test.describe('import-logic-flow e2e (test implementation)', () => {
     // 帝国模式下应有方案级别的直接导入按钮
     await expect(page.locator('[data-testid^="logicflow-import-plan-direct-"]')).not.toHaveCount(0)
     // 关闭弹窗
-    await page.locator('[data-testid="logicflow-import-modal"] button', { hasText: /Cancel|取消/i }).first().click()
-    await expect(page.locator('[data-testid="logicflow-import-modal"]')).toHaveCount(0)
+    await page.locator('[data-testid="import-view-modal"] button', { hasText: /Cancel|取消/i }).first().click()
+    await expect(page.locator('[data-testid="import-view-modal"]')).toHaveCount(0)
 
     // 空间站模式
     await openImportModal(page, 'station')
@@ -881,7 +894,7 @@ test.describe('import-logic-flow e2e (test implementation)', () => {
     await openImportModal(page, 'empire')
     await page.locator('[data-testid="logicflow-import-plan-direct-ilf_valid_single_group"]').click({ force: true })
     // 无 SmartSaveDialog，直接完成导入
-    await expect(page.locator('[data-testid="logicflow-import-modal"]')).toHaveCount(0)
+    await expect(page.locator('[data-testid="import-view-modal"]')).toHaveCount(0)
 
     // 场景 B：新建弹框 -> 导入也弹框（通过 UI 构造需要保存的状态）
     await ensureStationContext(page)
@@ -920,9 +933,9 @@ test.describe('import-logic-flow e2e (test implementation)', () => {
   test('3.1 空间站页面入口与确认流程（覆盖导入）', async ({ page }) => {
     await ensureStationContext(page)
     await page.evaluate(() => {
-      const empireStore = (window as any).empireStore
+      const empireStore = (window as any).blueprintStore
       const station = empireStore.activeStation
-      station.modules = [{ id: 'module_before_overwrite', count: 5 }]
+      station.modules = [{ id: 'prod_gen_hullparts_macro', count: 5 }]
       station.lockedWares = []
       station.lastUpdated = Date.now()
     })
@@ -932,14 +945,14 @@ test.describe('import-logic-flow e2e (test implementation)', () => {
     await expect(page.locator('[data-testid="station-import-confirm-modal"]')).toBeVisible()
 
     await page.locator('[data-testid="station-import-confirm-overwrite"]').click({ force: true })
-    const modulesAfterOverwrite = await page.evaluate(() => (window as any).empireStore.activeStation.modules)
+    const modulesAfterOverwrite = await page.evaluate(() => (window as any).blueprintStore.activeStation.modules)
     expect(modulesAfterOverwrite).toEqual([{ id: 'prod_gen_hullparts_macro', count: 1 }])
   })
 
   test('3.2 空间站：导入为新空间站', async ({ page }) => {
     await ensureStationContext(page)
     const before = await page.evaluate(() => {
-      const empireStore = (window as any).empireStore
+      const empireStore = (window as any).blueprintStore
       return { count: empireStore.activeEmpire.stations.length, activeId: empireStore.activeStationId }
     })
 
@@ -948,7 +961,7 @@ test.describe('import-logic-flow e2e (test implementation)', () => {
     await page.locator('[data-testid="station-import-confirm-new"]').click({ force: true })
 
     const after = await page.evaluate(() => {
-      const empireStore = (window as any).empireStore
+      const empireStore = (window as any).blueprintStore
       return { count: empireStore.activeEmpire.stations.length, activeId: empireStore.activeStationId }
     })
     expect(after.count).toBe(before.count + 1)
@@ -976,7 +989,7 @@ test.describe('import-logic-flow e2e (test implementation)', () => {
     await openImportModal(page, 'empire')
     const emptyPlanDirectImport = page.locator('[data-testid="logicflow-import-plan-direct-ilf_empty_plan"]')
     await expect(emptyPlanDirectImport).toBeDisabled()
-    await expect(page.locator('[data-testid="logicflow-import-modal"]')).toBeVisible()
+    await expect(page.locator('[data-testid="import-view-modal"]')).toBeVisible()
   })
 
   test('3.18 增量需求：导入与新建弹框判定逐条一致', async ({ page }) => {
@@ -1009,7 +1022,7 @@ test.describe('import-logic-flow e2e (test implementation)', () => {
     await makeEmpireSavedBaseline(page)
 
     const beforeSavedCount = await page.evaluate(() => {
-      const empireStore = (window as any).empireStore
+      const empireStore = (window as any).blueprintStore
       return empireStore.savedEmpires?.list?.length || 0
     })
 
