@@ -12,5 +12,5 @@
   5. 查看 unmatched derived item 的 `moduleId`。
 - **Expected Behavior**: unmatched derived item 应按 `settings.racePreference` 选择 `module_ter_prod_energycells_01`。
 - **Actual Behavior**: 当前返回 `module_gen_prod_energycells_01`。
-- **Status**: New
-- **Related Verification**: `tests/unit/current/build-flow-plan/buildPlanProductionLine.spec.ts`（task-test-3；实现修复与 Unit 归属待 `/x4:doc` 链接）
+- **Status**: Fixed
+- **Related Verification**: `tests/unit/current/build-flow-plan/buildPlanProductionLine.spec.ts`（task-coding-4 / task-test-3；focused regression、完整 Unit 与 build 均通过）

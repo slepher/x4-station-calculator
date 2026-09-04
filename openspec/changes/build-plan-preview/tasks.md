@@ -59,7 +59,7 @@
 
 ## Phase 9: BUG-001 correction
 
-- [ ] T34: 保留 unmatched synthetic `groupId` 的稳定身份，同时显式区分 unmatched 与真实 logic-flow 产线的 lineage 来源
-- [ ] T35: 修复 unmatched derived module 选择，使其继续按 `settings.racePreference` 选择 module
-- [ ] T36: 保留并运行 `tests/unit/current/build-flow-plan/buildPlanProductionLine.spec.ts` 的 Terran race-preference focused regression
-- [ ] T37: 完成 `npm run build` 与 BUG-001 focused Unit 验证，并同步 bug 状态
+- [x] T34: 保留 unmatched synthetic `groupId` 的稳定身份，同时显式区分 unmatched 与真实 logic-flow 产线的 lineage 来源
+- [x] T35: 修复 unmatched derived module 选择，使其继续按 `settings.racePreference` 选择 module
+- [x] T36: 保留并运行 `tests/unit/current/build-flow-plan/buildPlanProductionLine.spec.ts` 的 Terran race-preference focused regression
+- [x] T37: 完成 `npm run build` 与 BUG-001 focused Unit 验证，并同步 bug 状态
