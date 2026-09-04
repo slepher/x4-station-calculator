@@ -8,6 +8,20 @@ test.describe('Gap 按钮响应性验证', () => {
       content: '*, *::before, *::after { transition: none !important; animation: none !important; }'
     })
     await loadLiveBindingFixture(page)
+
+    await page.evaluate(() => {
+      const gameDataStore = (window as any).gameDataStore
+      const saveArchivesKey = gameDataStore.getStorageKey('save_archives')
+      const bindingsKey = saveArchivesKey.replace('save_archives', 'save_bindings')
+      const bindings = JSON.parse(localStorage.getItem(bindingsKey) || '{}')
+      const stationPlans = bindings.list[0].stationPlans
+      const stationA = stationPlans.find((station: { id: string }) => station.id === 'MGO-010')
+      stationA.modules = [{ id: 'module_gen_prod_claytronics_01', count: 1 }]
+      stationA.lockedWares = ['quantumtubes']
+      localStorage.setItem(bindingsKey, JSON.stringify(bindings))
+    })
+    await page.reload()
+    await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 2000 })
     await page.waitForTimeout(300)
 
     const langSelect = page.locator('select').filter({ hasText: /简体中文|English/ })
@@ -40,7 +54,10 @@ test.describe('Gap 按钮响应性验证', () => {
     await gapToggle.click()
     await page.waitForTimeout(300)
 
-    const quantumTubes = page.locator('[data-testid="flow-wrapper"][data-resource-id="quantumtubes"]')
+    const opsSection = page.locator('.empire-gap-group').filter({ hasText: /星区运营|Sector Operations/i })
+    await expect(opsSection).toBeVisible({ timeout: 2000 })
+
+    const quantumTubes = opsSection.locator('[data-testid="flow-wrapper"][data-resource-id="quantumtubes"]')
     await expect(quantumTubes).toBeVisible({ timeout: 2000 })
 
     const beforeText = await quantumTubes.locator('.value').textContent()
@@ -48,14 +65,11 @@ test.describe('Gap 按钮响应性验证', () => {
 
     const addBtn = quantumTubes.locator('[data-testid="add-btn"]')
     await expect(addBtn).toBeVisible({ timeout: 2000 })
+    await expect(addBtn).toBeEnabled()
     await addBtn.click()
     await page.waitForTimeout(500)
 
-    const prodSection = page.locator('.empire-gap-group').filter({ hasText: /星区产品|Sector Products/i })
-    await expect(prodSection).toBeVisible({ timeout: 2000 })
-    const afterQuantumTubes = prodSection.locator('[data-testid="flow-wrapper"]').filter({ hasText: '量子管' })
-    await expect(afterQuantumTubes).toBeVisible({ timeout: 2000 })
-    const afterText = await afterQuantumTubes.locator('.value').textContent()
+    const afterText = await quantumTubes.locator('.value').textContent()
     const afterValue = parseFloat(afterText?.replace(/[+\s,]/g, '') || '0')
 
     expect(afterValue).not.toBe(beforeValue)

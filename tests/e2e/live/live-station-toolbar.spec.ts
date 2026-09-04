@@ -233,7 +233,7 @@ test.describe('3 E2E 测试场景', () => {
     await expect(workforceBtn).toBeHidden({ timeout: 500 })
   })
 
-  test('3.10 Case: 星区中转站已绑定的空间站不在tab列表显示', async ({ page }) => {
+  test('3.10 Case: 星区中转站已绑定的空间站仍在星区tab列表显示', async ({ page }) => {
     const sectorTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_715_sector001_macro"]')
     await expect(sectorTab).toBeVisible({ timeout: 5000 })
     await sectorTab.click()
@@ -242,7 +242,9 @@ test.describe('3 E2E 测试场景', () => {
     const stationRWC = page.locator('[data-testid="sidebar-station"][data-station-id="RWC-785"]')
     await expect(stationRWC).toBeVisible({ timeout: 3000 })
 
-    await expect(page.locator('[data-testid="sidebar-station"][data-station-id="BHW-834"]')).toHaveCount(0)
+    const transitHubStation = page.locator('[data-testid="sidebar-station"][data-station-id="BHW-834"]')
+    await expect(transitHubStation).toHaveCount(1)
+    await expect(transitHubStation).toBeVisible()
   })
 
   test('3.11 Case: 空间站tab显示正确的station id和名称', async ({ page }) => {
