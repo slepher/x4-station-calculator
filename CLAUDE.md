@@ -201,7 +201,7 @@ test.beforeEach(async ({ page }) => {
 - 手动向 `liveStore.playerStationRecords` 回填 records
 
 统一使用：
-- `tests/e2e/helpers/loadLiveBindingFixture.ts`
+- `tests/unified-e2e/live/helpers/loadLiveBindingFixture.ts`
 - 入口函数：`loadLiveBindingFixture(page)`
 
 原因：
@@ -209,8 +209,8 @@ test.beforeEach(async ({ page }) => {
 - `tests/fixtures/save.json` 承载 save 明细
 - `loadLiveBindingFixture(page)` 会负责：
   1. 注入 `db.json` 到 localStorage
-  2. 基于 `save.json` 构造 `x4_save_archives` state
-  3. 把 `save.json` 写入 IndexedDB
+  2. 基于 `tests/fixtures/save/*.json` 构造当前版本 save archives state
+  3. 通过 `saveArchiveDB.saveArchiveToDB` 写入当前版本 IndexedDB
   4. reload 后切到 `live-production`
   5. 通过 UI 设置语言
 
