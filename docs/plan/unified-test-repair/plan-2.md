@@ -27,10 +27,12 @@
 ## 任务拓扑
 
 1. `task-coding-3`：收口 active skill discovery、命令路由、agent gate 与 bug/verify/archive 契约。
-2. `task-test-3`：迁移 Unit 与旧 mixed skill tests，翻转 Vitest/default scripts。
-3. `task-test-4`：迁移 E2E，翻转 Playwright，并完成 Live helper 与文档路径。
+2. `task-test-3`：迁移 Unit 与旧 mixed skill tests，翻转 Vitest/default scripts；其 checkpoint 发现的 `BUG-001` 先走 `task-coding-4` correction。
+3. `task-coding-4`：在 coding lane 修复 unmatched synthetic `groupId` 错用 lineage 的产品缺陷，并经 reviewer 接受后先进入 target。
+4. `task-test-3`：integrate 从已含修复的 target 刷新，复跑 focused 与完整 Unit 后再进入 target。
+5. `task-test-4`：迁移 E2E，翻转 Playwright，并完成 Live helper 与文档路径。
 
-三项串行执行，避免目录移动与配置切换期间出现双 owner。详细合同见同名文件和 `lanes-2.md`。
+全部串行执行，避免目录移动与配置切换期间出现双 owner。详细合同见同名文件和 `lanes-2.md`。
 
 ## task-coding-3
 
@@ -39,6 +41,10 @@
 ## task-test-3
 
 迁移 Unit 与旧 mixed skill tests，翻转 Vitest/default scripts；冻结合同见 `task-test-3.md`。
+
+## task-coding-4
+
+修复 `BUG-001`，只拥有 `src/store/logic/buildPlanProductionLine.ts`；复用既有 Terran regression，不新增平行测试或选择器。冻结合同见 `task-coding-4.md`。
 
 ## task-test-4
 
@@ -59,3 +65,11 @@
 - legacy failure、未改动的外部 skill failure、当前任务无权修复的既有 failure：记录 owner 后延期，不阻塞 task acceptance。
 - 当前任务 owned path 的失败、测试原件丢失、canonical 配置仍双收集、active route 仍调用旧 skill：阻塞。
 - 需要改变产品语义、删除无法分类的旧测试或新增测试框架时停止并返回用户；不得用兼容层掩盖迁移未完成。
+
+## BUG-001 correction 验收
+
+1. `__preview_unmatched__:<index>` 继续仅作为稳定身份；unmatched module 选择使用 `settings.racePreference`，真实 logic-flow line 继续使用自身 lineage。
+2. `task-coding-4` 的 immutable candidate 通过 focused Unit、`npm run build`、`git diff --check` 与独立 `reviewer` gate。
+3. 路由严格为 `coding -> target -> integrate -> target`；禁止 coding candidate 直接进入 integrate。
+4. integrate 刷新后，`tests/unit/current/build-flow-plan/buildPlanProductionLine.spec.ts` 的 Terran regression 与 `npm run test:unit` 均通过，`task-test-3` reviewer 才可接受候选。
+5. target owner 以已接受的 source candidate、focused/full Unit 和 build evidence 将 `BUG-001` 标记为 closed，并同步 Phase 9 `T34`-`T37`；该 closure 不授权 planner 或 coding worker 改写 OpenSpec。

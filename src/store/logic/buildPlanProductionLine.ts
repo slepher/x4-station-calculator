@@ -446,6 +446,7 @@ function mergeGraphAndAllocationLines(
           waresMap,
           alloc.previewGroupId,
           settings,
+          alloc.isUnmatched,
         ))
         .filter((item): item is PreviewItem => Boolean(item))
         .filter(item => isGraphOverlap
@@ -604,6 +605,7 @@ function buildAllocationOnlyPreviewLines(
         waresMap,
         effectiveGroupId,
         settings,
+        alloc.isUnmatched,
       ))
       .filter((item): item is PreviewItem => Boolean(item))
       .map((item) => {
@@ -1543,9 +1545,10 @@ function goalToPreviewItem(
   waresMap: Record<string, X4Ware>,
   groupId?: string,
   settings: StationSettings = DEFAULT_BUILD_PLAN_SETTINGS,
+  isUnmatched = false,
 ): PreviewItem | null {
   const relatedLineGroupIds = groupId ? [groupId] : []
-  const producerLineage = groupId ? lineage : settings.racePreference
+  const producerLineage = isUnmatched ? settings.racePreference : lineage
 
   if (goal.type === 'build-module') {
     return {

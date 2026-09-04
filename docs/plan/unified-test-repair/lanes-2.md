@@ -10,7 +10,7 @@
 - Name: `x4-station-calculator`
 - Path: `/home/slepher/project/x4-station-calculator`
 - Target branch: `develop`
-- Target base: `1c9fab8809fd8e31f8679a2f27a7021cc3f46e02`
+- Target base: `85255b1ed076ffe7704367959753dc01450bdf89`
 
 ## Lane coding
 
@@ -18,8 +18,8 @@
 - Worktree path: `/home/slepher/project/x4-station-calculator/.worktree/coding`
 - Branch: `codex/unified-test-repair-g1-coding-final`
 - Serial: `true`
-- Owns: `task-coding-3`
-- Purpose: active workflow/skill contract and agent gate
+- Owns: `task-coding-3, task-coding-4`
+- Purpose: active workflow/skill contract、agent gate 与 test-discovered product correction
 
 ## Lane integrate
 
@@ -50,9 +50,21 @@
 
 - Kind: `test`
 - Lane: `integrate`
-- Depends on: `task-coding-3`
-- Covers: `task-coding-3`
+- Depends on: `task-coding-3, task-coding-4`
+- Covers: `task-coding-3, task-coding-4`
 - Base: `1c9fab8809fd8e31f8679a2f27a7021cc3f46e02`
+
+## Phase task-coding-4
+
+- Kind: `coding`
+- Mode: `normal`
+- Mode basis: 单一函数内的 lineage 来源混淆，已有 focused regression，可由一个 bounded default worker 修复。
+- Execution strategy: `single-def`
+- Worker role: `def_coding_worker`
+- Lane: `coding`
+- Depends on: `task-coding-3`
+- Covers: `none`
+- Base: `85255b1ed076ffe7704367959753dc01450bdf89`
 
 ## Phase task-test-4
 
@@ -64,13 +76,16 @@
 
 ## Order
 
+- BUG-001 control path: `planner -> coding worker -> reviewer -> coding -> target -> integrate -> target`
+
 ```text
-task-coding-3 -> target -> task-test-3 -> target -> task-test-4 -> target
+task-coding-3 -> target -> task-test-3 checkpoint -> task-coding-4 -> target -> task-test-3 refresh/rerun -> target -> task-test-4 -> target
 ```
 
 - `task-test-3` starts only after active routing no longer exposes old `x4-test-*`.
 - `task-test-4` starts only after Unit/Vitest migration is accepted, so `tests/legacy/**` layout and package scripts are stable.
 - Product defects found by test tasks return to a coding fix task; test workers do not repair `src/**`.
+- `task-coding-4` 必须走 `coding -> target -> integrate -> target`：source candidate 经 reviewer 通过后先进入 `develop`，integrate 再从该 target HEAD 刷新；禁止 coding -> integrate 直合。
 - Out-of-scope failures are routed to their owner and do not block the current task.
 
 ## Owned-path partition
@@ -78,6 +93,7 @@ task-coding-3 -> target -> task-test-3 -> target -> task-test-4 -> target
 | Task | Exclusive owned paths |
 | --- | --- |
 | `task-coding-3` | `.trae/skills/**`, `.trae/skills-legacy/**`, `.codex/multiagent.config.yaml`, `tests/e2e-skills/**`, relevant skill scripts, `docs/plan/unified-test-repair/test-skill.md` |
+| `task-coding-4` | `src/store/logic/buildPlanProductionLine.ts` |
 | `task-test-3` | `tests/unit/**`, `tests/unified-unit/**`, `tests/skills/**`, `tests/legacy/unit/**`, `tests/legacy/skills/x4-test/**`, `tests/test-setup.ts`, `vitest.config.ts`, Unit/skill scripts in `package.json` |
 | `task-test-4` | `tests/e2e/**`, `tests/unified-e2e/**`, `tests/legacy/e2e/**`, `playwright.config.ts`, E2E scripts in `package.json`, `CLAUDE.md`, `sitemap.md` |
 
