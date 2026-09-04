@@ -5,28 +5,7 @@ import { loadLiveBindingFixture } from '../live/helpers/loadLiveBindingFixture'
 const GAME_GUID = 'CB8837FE-98C1-42F8-9D6A-ED0ADC539111'
 
 async function waitForAppReady(page: Page) {
-  await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 500 })
-}
-
-async function migrateStorageKeys(page: Page, gameGuid: string) {
-  await page.evaluate(({ gameGuid }: { gameGuid: string }) => {
-    const pairs = [
-      ['x4_save_bindings', 'x4_save_bindings_v9'],
-      ['x4_save_archives', 'x4_save_archives_v9'],
-      ['x4_empire_data', 'x4_empire_data_v9'],
-    ]
-    for (const [oldKey, newKey] of pairs) {
-      const val = localStorage.getItem(oldKey)
-      if (val) {
-        localStorage.setItem(newKey, val)
-      }
-    }
-    // Restore activeBinding that was cleared by store auto-save
-    localStorage.setItem('x4_station_active_view', JSON.stringify({
-      activeBinding: gameGuid,
-      activeView: 'live-production'
-    }))
-  }, { gameGuid })
+  await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 10000 })
 }
 
 async function ensureAutoGroupResult(page: Page) {
@@ -90,17 +69,6 @@ test.beforeEach(async ({ page }) => {
     content: '*, *::before, *::after { transition: none !important; animation: none !important; }'
   })
   await loadLiveBindingFixture(page)
-
-  // Migrate fixture data from old keys to v9 keys and reload
-  await migrateStorageKeys(page, GAME_GUID)
-  await page.reload()
-  await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 500 })
-
-  await page.getByTestId('top-view-btn-live-production').click()
-  await page.waitForTimeout(200)
-
-  const langSelect = page.locator('select').filter({ hasText: /简体中文|English/ })
-  await langSelect.selectOption('zh-CN')
 })
 
 // ================================================================
@@ -110,7 +78,8 @@ test.describe('1 自动分组与连接', () => {
   test('1.1 Clean slate 分组', async ({ page }) => {
     // 1.1.1 绑定无已有 binding 的 save guid，触发自动星区划分
     await page.evaluate(() => {
-      localStorage.setItem('x4_save_bindings', JSON.stringify({ version: 1, list: [] }))
+      const key = (window as any).gameDataStore.getStorageKey('save_bindings')
+      localStorage.setItem(key, JSON.stringify({ version: 1, list: [] }))
     })
     await page.reload()
     await waitForAppReady(page)

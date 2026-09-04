@@ -8,24 +8,6 @@ async function waitForAppReady(page: Page) {
   await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 5000 })
 }
 
-async function migrateStorageKeys(page: Page, gameGuid: string) {
-  await page.evaluate(({ gameGuid }: { gameGuid: string }) => {
-    const pairs = [
-      ['x4_save_bindings', 'x4_save_bindings_v9'],
-      ['x4_save_archives', 'x4_save_archives_v9'],
-      ['x4_empire_data', 'x4_empire_data_v9'],
-    ]
-    for (const [oldKey, newKey] of pairs) {
-      const val = localStorage.getItem(oldKey)
-      if (val) localStorage.setItem(newKey, val)
-    }
-    localStorage.setItem('x4_station_active_view', JSON.stringify({
-      activeBinding: gameGuid,
-      activeView: 'live-production'
-    }))
-  }, { gameGuid })
-}
-
 async function ensureAutoGroupResult(page: Page) {
   const hasResult = await page.evaluate(() => {
     const r = (window as any).liveStore?.autoGroupResult
@@ -88,13 +70,6 @@ test.beforeEach(async ({ page }) => {
     content: '*, *::before, *::after { transition: none !important; animation: none !important; }'
   })
   await loadLiveBindingFixture(page)
-  await migrateStorageKeys(page, GAME_GUID)
-  await page.reload()
-  await waitForAppReady(page)
-  await page.getByTestId('top-view-btn-live-production').click()
-  await page.waitForTimeout(200)
-  const langSelect = page.locator('select').filter({ hasText: /简体中文|English/ })
-  await langSelect.selectOption('zh-CN')
 })
 
 // ================================================================
