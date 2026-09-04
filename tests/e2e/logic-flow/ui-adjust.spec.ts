@@ -30,22 +30,11 @@ test.describe('Logic Flow UI Adjust', () => {
     });
 
     test('1.3 紧凑区等宽布局测试', async ({ page }) => {
-      const source = page.locator(`.ware-card-wrapper[data-ware-id="hullparts"]`).first();
-      await expect(source).toBeVisible({ timeout: 5000 });
-      
-      const sourceBox = await source.boundingBox();
-      if (!sourceBox) throw new Error('Source not found');
-
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
-      await page.mouse.down();
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
-      await page.waitForTimeout(200);
-
-      const compactView = page.locator('.compact-view');
-      await expect(compactView).toBeVisible({ timeout: 5000 });
-
-      const compactGroup = compactView.locator('.compact-group').first();
-      await expect(compactGroup).toBeVisible({ timeout: 5000 });
+      await dragWareToTarget(page, 'hullparts', 'new', { drop: false });
+      const compactView = page.getByTestId('compact-view');
+      await expect(compactView).toHaveClass(/grid-cols-4/);
+      const compactGroup = compactView.locator('.compact-group').last();
+      await expect(compactGroup).toHaveClass(/border-blue-500\/50/);
 
       await page.mouse.up();
     });
@@ -206,22 +195,10 @@ test.describe('Logic Flow UI Adjust', () => {
 
   test.describe('新建规划区预览', () => {
     test('6.1 新建规划区预览位置测试', async ({ page }) => {
-      const source = page.locator(`.ware-card-wrapper[data-ware-id="hullparts"]`).first();
-      await expect(source).toBeVisible({ timeout: 5000 });
-      
-      const sourceBox = await source.boundingBox();
-      if (!sourceBox) throw new Error('Source not found');
-
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
-      await page.mouse.down();
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
-      await page.waitForTimeout(200);
-
-      const compactView = page.locator('.compact-view');
-      await expect(compactView).toBeVisible({ timeout: 5000 });
-
-      const newZone = compactView.locator('.drop-target').last();
-      await expect(newZone).toBeVisible({ timeout: 5000 });
+      await dragWareToTarget(page, 'hullparts', 'new', { drop: false });
+      const compactView = page.getByTestId('compact-view');
+      const newZone = compactView.locator('.compact-group').last();
+      await expect(newZone).toHaveClass(/border-blue-500\/50/);
 
       await page.mouse.up();
     });

@@ -108,17 +108,10 @@ test.describe('Logical Flow Integration Verification', () => {
 
   test.describe('Compact View & Smart Insertion', () => {
     test('3.1 Logic: Compact View Appears on Drag', async ({ page }) => {
-      const source = page.locator('.ware-card-wrapper[data-ware-id="hullparts"]').first();
-      const sourceBox = await source.boundingBox();
-      if (!sourceBox) throw new Error('Source not found');
-
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
-      await page.mouse.down();
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
-      await page.waitForTimeout(100);
-
-      const compactView = page.locator('.compact-view');
+      await dragWareToTarget(page, 'hullparts', 'new', { drop: false });
+      const compactView = page.getByTestId('compact-view');
       await expect(compactView).toBeVisible({ timeout: 5000 });
+      await expect(compactView.locator('.compact-group').last()).toHaveClass(/border-blue-500\/50/);
 
       await page.mouse.up();
     });
@@ -135,21 +128,7 @@ test.describe('Logical Flow Integration Verification', () => {
     test('3.3 Logic: Duplicate blocking and UI feedback', async ({ page }) => {
       await dragWareToTarget(page, 'hullparts');
 
-      const source = page.locator('.ware-card-wrapper[data-ware-id="hullparts"]').first();
-      const sourceBox = await source.boundingBox();
-      if (!sourceBox) throw new Error('Source not found');
-
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
-      await page.mouse.down();
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
-      await page.waitForTimeout(100);
-
-      const compactGroup = page.locator('.compact-group').first();
-      const targetBox = await compactGroup.boundingBox();
-      if (!targetBox) throw new Error('Target not found');
-
-      await page.mouse.move(targetBox.x + targetBox.width / 2, targetBox.y + targetBox.height / 2, { steps: 10 });
-      await page.waitForTimeout(200);
+      const { targetLocator: compactGroup } = await dragWareToTarget(page, 'hullparts', 0, { drop: false });
 
       const status = await page.evaluate(() => {
         const logicFlow = (window as any).logicFlowStore;
@@ -164,21 +143,7 @@ test.describe('Logical Flow Integration Verification', () => {
     test('3.4 Visual: Drag Preview in Compact View', async ({ page }) => {
       await dragWareToTarget(page, 'hullparts');
 
-      const source = page.locator('.ware-card-wrapper[data-ware-id="weaponcomponents"]').first();
-      const sourceBox = await source.boundingBox();
-      if (!sourceBox) throw new Error('Source not found');
-
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
-      await page.mouse.down();
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
-      await page.waitForTimeout(100);
-
-      const compactGroup = page.locator('.compact-group').first();
-      const targetBox = await compactGroup.boundingBox();
-      if (!targetBox) throw new Error('Target not found');
-
-      await page.mouse.move(targetBox.x + targetBox.width / 2, targetBox.y + targetBox.height / 2, { steps: 10 });
-      await page.waitForTimeout(200);
+      const { targetLocator: compactGroup } = await dragWareToTarget(page, 'weaponcomponents', 0, { drop: false });
 
       const previewNode = page.locator('.compact-node.bg-blue-500\\/20');
       await expect(previewNode).toBeVisible();

@@ -13,25 +13,16 @@ test.describe('Logic Flow Bug Regression Tests (E2E)', () => {
   });
 
   async function setupGroupWithNode(page: any, wareId: string, lineage: string = 'default') {
-    await page.evaluate((args: { wareId: string; lineage: string }) => {
-      const logicFlow = (window as any).logicFlowStore;
-      logicFlow.clearAllGroups();
-      const group = logicFlow.addGroup('industrial', args.lineage);
-      logicFlow.expandUpstream(group.id, args.wareId, 'manual', args.lineage);
-    }, { wareId, lineage });
-    await page.waitForTimeout(200);
+    if (lineage !== 'default') {
+      await page.locator('button').filter({ hasText: new RegExp(lineage, 'i') }).first().click();
+    }
+    await dragWareToTarget(page, wareId);
   }
 
   async function isolateNode(page: any, wareId: string) {
-    await page.evaluate((wareId: string) => {
-      const logicFlow = (window as any).logicFlowStore;
-      const group = logicFlow.groups[0];
-      const node = group.nodes.find((n: any) => n.wareId === wareId);
-      if (node) {
-        logicFlow.toggleNodeIsolation(group.id, node.id);
-      }
-    }, wareId);
-    await page.waitForTimeout(100);
+    const node = page.locator(`.flow-node[data-ware-id="${wareId}"]`).first();
+    await node.hover();
+    await node.locator('button[title*="隔离"], button[title*="Isolate"]').click();
   }
 
   test.describe('Bug 1: 隔离节点在拖拽时显示重复', () => {

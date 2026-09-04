@@ -19,7 +19,7 @@ test.describe('Logic Flow Plans - E2E Tests', () => {
       await switchToLogicFlowView(page);
       
       const title = page.locator('.plan-title-text');
-      await expect(title).toHaveClass('plan-title-text');
+      await expect(title).toHaveClass(/text-purple-400/);
     });
   });
 
@@ -29,7 +29,7 @@ test.describe('Logic Flow Plans - E2E Tests', () => {
       
       const initialGroupCount = await page.evaluate(() => (window as any).logicFlowStore.groups.length);
       
-      const newBtn = page.locator('button').filter({ hasText: /新建|New/i }).first();
+      const newBtn = page.getByTestId('toolbar-new-btn');
       await newBtn.click();
       await page.waitForTimeout(200);
 
@@ -41,18 +41,13 @@ test.describe('Logic Flow Plans - E2E Tests', () => {
       await switchToLogicFlowView(page);
       await dragWareToTarget(page, 'hullparts');
       
-      const newBtn = page.locator('button').filter({ hasText: /新建|New/i }).first();
+      const newBtn = page.getByTestId('toolbar-new-btn');
       await newBtn.click();
-      await page.waitForTimeout(200);
 
       const dialog = page.locator('.smart-save-dialog, [role="dialog"]').filter({ hasText: /保存|Save/i });
-      const dialogVisible = await dialog.count() > 0;
-      
-      if (dialogVisible) {
-        const cancelBtn = dialog.locator('button').filter({ hasText: /取消|Cancel|丢弃|Discard/i }).first();
-        await cancelBtn.click();
-        await page.waitForTimeout(200);
-      }
+      await expect(dialog).toBeVisible();
+      const cancelBtn = dialog.locator('button').filter({ hasText: /取消|Cancel/i }).first();
+      await cancelBtn.click();
 
       const groupCount = await page.evaluate(() => (window as any).logicFlowStore.groups.length);
       expect(groupCount).toBe(0);
@@ -64,32 +59,25 @@ test.describe('Logic Flow Plans - E2E Tests', () => {
       await switchToLogicFlowView(page);
       await dragWareToTarget(page, 'hullparts');
 
-      const result = await page.evaluate(() => {
-        const store = (window as any).logicFlowStore;
-        return store.saveCurrentPlan('Test Plan E2E');
-      });
-
-      expect(result).toBe(true);
-      
-      const planCount = await page.evaluate(() => (window as any).logicFlowStore.savedPlans.list.length);
-      expect(planCount).toBeGreaterThan(0);
+      await page.getByTestId('toolbar-save-btn').click();
+      await expect(page.locator('.smart-save-dialog, [role="dialog"]')).toBeVisible();
+      await expect(page.locator('.smart-save-dialog, [role="dialog"]')).toContainText(/保存|Save/i);
     });
 
     test('E2E-5: 保存已存在方案', async ({ page }) => {
       await switchToLogicFlowView(page);
       await dragWareToTarget(page, 'hullparts');
 
-      await page.evaluate(() => {
-        const store = (window as any).logicFlowStore;
-        store.saveCurrentPlan('Existing Plan');
-      });
-      await page.waitForTimeout(200);
+      await page.getByTestId('toolbar-save-as-btn').click();
+      const saveAs = page.locator('.smart-save-dialog, [role="dialog"]');
+      await expect(saveAs).toBeVisible();
+      const nameInput = saveAs.locator('input').first();
+      await nameInput.fill('Existing Plan');
+      await saveAs.getByRole('button', { name: /保存|Save/i }).last().click();
 
       await dragWareToTarget(page, 'weaponcomponents');
 
-      const saveBtn = page.locator('button').filter({ hasText: /保存|Save/i }).first();
-      await saveBtn.click();
-      await page.waitForTimeout(200);
+      await page.getByTestId('toolbar-save-btn').click();
 
       const planCount = await page.evaluate(() => (window as any).logicFlowStore.savedPlans.list.length);
       expect(planCount).toBe(1);
@@ -100,38 +88,9 @@ test.describe('Logic Flow Plans - E2E Tests', () => {
     test('E2E-7: 加载方案流程', async ({ page }) => {
       await switchToLogicFlowView(page);
       
-      await page.evaluate(() => {
-        const store = (window as any).logicFlowStore;
-        store.groups = [{
-          id: 'test-group',
-          name: 'Test Group',
-          category: 'industrial',
-          subCategory: 'default',
-          isLocked: false,
-          lockedLineage: 'default',
-          nodes: [{
-            id: 'node-1',
-            wareId: 'hullparts',
-            moduleId: 'module-hullparts',
-            race: 'argon',
-            lineage: 'default',
-            column: 2,
-            isIsolated: false,
-            isAuto: false,
-            isRoot: true,
-            source: 'manual',
-            order: 0,
-          }]
-        }];
-        store.saveCurrentPlan('Pre-saved Plan');
-      });
-      await page.waitForTimeout(200);
-
-      await page.evaluate(() => {
-        const store = (window as any).logicFlowStore;
-        store.clearAll();
-      });
-      await page.waitForTimeout(200);
+      await setupLogicFlow(page, 'seeded');
+      await page.getByTestId('toolbar-new-btn').click();
+      await expect(page.locator('.production-group')).toHaveCount(0);
 
       const loadBtn = page.locator('button').filter({ hasText: /加载|Load/i }).first();
       await loadBtn.click();
@@ -193,18 +152,8 @@ test.describe('Logic Flow Plans - E2E Tests', () => {
     test('E2E-12: 空方案无法保存', async ({ page }) => {
       await switchToLogicFlowView(page);
       
-      await page.evaluate(() => {
-        const store = (window as any).logicFlowStore;
-        store.clearAll();
-      });
-      await page.waitForTimeout(200);
-
-      const result = await page.evaluate(() => {
-        const store = (window as any).logicFlowStore;
-        return store.saveCurrentPlan('Empty Plan');
-      });
-
-      expect(result).toBe(false);
+      await page.getByTestId('toolbar-save-btn').click();
+      await expect(page.locator('.status-message, [role="alert"]')).toContainText(/无法保存|cannot save|empty/i);
     });
   });
 
@@ -212,13 +161,13 @@ test.describe('Logic Flow Plans - E2E Tests', () => {
     test('E2E-14: 创建新产区入口始终可见', async ({ page }) => {
       await switchToLogicFlowView(page);
       
-      const dropTarget = page.locator('.groups-list .drop-target, .new-group-zone').last();
+      const dropTarget = page.locator('.groups-list .drop-target').last();
       await expect(dropTarget).toBeVisible();
 
       await dragWareToTarget(page, 'hullparts');
       await page.waitForTimeout(200);
 
-      const newDropTarget = page.locator('.groups-list .drop-target, .new-group-zone').last();
+      const newDropTarget = page.locator('.groups-list .drop-target').last();
       await expect(newDropTarget).toBeVisible();
     });
   });

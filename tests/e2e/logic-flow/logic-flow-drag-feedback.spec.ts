@@ -9,25 +9,9 @@ test.describe('Logic Flow Advanced Drag Feedback', () => {
   });
 
   test('4.1 Visual: New Line Ghosting (Phantom Preview)', async ({ page }) => {
-    const source = page.locator('.ware-card-wrapper[data-ware-id="scanningarrays"]').first();
-    await expect(source).toBeVisible();
-
-    const sourceBox = await source.boundingBox();
-    if (!sourceBox) throw new Error('Source not found');
-
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
-    await page.mouse.down();
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
-    await page.waitForTimeout(100);
-
-    const compactView = page.locator('.compact-view');
-    await expect(compactView).toBeVisible({ timeout: 5000 });
-
+    await dragWareToTarget(page, 'scanningarrays', 'new', { drop: false });
+    const compactView = page.getByTestId('compact-view');
     const newZone = compactView.locator('.compact-group').last();
-    const newZoneBox = await newZone.boundingBox();
-    if (!newZoneBox) throw new Error('New zone not found');
-
-    await page.mouse.move(newZoneBox.x + newZoneBox.width / 2, newZoneBox.y + newZoneBox.height / 2, { steps: 10 });
     await page.waitForTimeout(200);
 
     const previewTitle = page.locator('.compact-group').last().locator('span.italic');
@@ -99,25 +83,7 @@ test.describe('Logic Flow Advanced Drag Feedback', () => {
     });
 
     await test.step('Case B: Drag to New Zone', async () => {
-      const source = page.locator('.ware-card-wrapper[data-ware-id="scanningarrays"]').first();
-      await expect(source).toBeVisible();
-
-      const sourceBox = await source.boundingBox();
-      if (!sourceBox) throw new Error('Source not found');
-
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 });
-      await page.mouse.down();
-      await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 5, sourceBox.y + sourceBox.height / 2 + 5, { steps: 5 });
-      await page.waitForTimeout(100);
-
-      const compactView = page.locator('.compact-view');
-      await expect(compactView).toBeVisible({ timeout: 5000 });
-
-      const newZone = compactView.locator('.compact-group').last();
-      const newZoneBox = await newZone.boundingBox();
-      if (!newZoneBox) throw new Error('New zone not found');
-
-      await page.mouse.move(newZoneBox.x + newZoneBox.width / 2, newZoneBox.y + newZoneBox.height / 2, { steps: 10 });
+      await dragWareToTarget(page, 'scanningarrays', 'new', { drop: false });
       await page.waitForTimeout(200);
 
       await page.mouse.up();
@@ -184,7 +150,8 @@ test.describe('Logic Flow Advanced Drag Feedback', () => {
     });
 
     await test.step('Case 2: Silicon Wafers first, then Refined Metals', async () => {
-      await page.evaluate(() => (window as any).logicFlowStore.groups = []);
+      await page.getByTestId('toolbar-new-btn').click();
+      await expect(page.locator('.production-group')).toHaveCount(0);
 
       await dragWareToTarget(page, 'siliconwafers');
       await dragWareToTarget(page, 'refinedmetals', 0);

@@ -24,12 +24,13 @@ export async function dragWareToTarget(
     ? compactView.locator('.compact-group').last()
     : compactView.locator('.compact-group').nth(target)
   await expect(targetLocator).toBeVisible()
+  await targetLocator.scrollIntoViewIfNeeded()
   const targetBox = await targetLocator.boundingBox()
   if (!targetBox) throw new Error('Logic Flow drop target not found')
   await page.mouse.move(targetBox.x + targetBox.width / 2, targetBox.y + targetBox.height / 2, { steps: 20 })
 
   if (target === 'new') {
-    await expect(targetLocator).toHaveClass(/border-blue-500/)
+    await expect(targetLocator).toHaveClass(/border-blue-500\/50/)
   } else if (expectRejected) {
     await expect(targetLocator).toHaveClass(/border-red-600/)
     await expect(targetLocator.getByTestId('rejected-label')).toBeVisible()

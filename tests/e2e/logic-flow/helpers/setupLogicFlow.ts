@@ -13,6 +13,10 @@ export async function setupLogicFlow(
   const data = JSON.parse(JSON.stringify(dbFixture))
   delete data.vsn
 
+  if (state === 'clean') {
+    data.x4_logic_flow_plans = { version: 3, activeId: null, list: [] }
+  }
+
   await page.evaluate((fixture) => {
     localStorage.setItem('x4_game_version', JSON.stringify({ version: '8.0', beta: false }))
     Object.entries(fixture).forEach(([key, value]) => {
@@ -31,13 +35,8 @@ export async function setupLogicFlow(
   await expectLogicFlowReady(page)
 
   if (state === 'clean') {
-    const clearButton = page.locator('.clear-all-btn')
-    if (await clearButton.isVisible()) {
-      page.once('dialog', dialog => dialog.accept())
-      await clearButton.click()
-    }
     await expect(page.locator('.production-group')).toHaveCount(0)
-    await expect(page.locator('.plan-title-text')).toHaveText(/新建方案|New Plan|Logic Flow 1/i)
+    await expect(page.locator('.plan-title-text')).toHaveText(/新建方案|New Plan|我的逻辑组网|My Logic Flow/i)
   } else {
     await expect(page.locator('.production-group')).toHaveCount(3)
     await expect(page.locator('.plan-title-text')).toHaveText('Logic Flow 1')
