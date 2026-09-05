@@ -109,7 +109,7 @@ async function buildMapSectorHoverActive(page: Page) {
   await page.waitForSelector('.map-viewport svg[data-testid="map-svg-canvas"]', { timeout: 10000 })
   
   // 2.3.3 对 `.sector-hover-target` 第一个元素执行 hover 操作
-  const sectorTarget = page.locator('.sector-hover-target').first()
+  const sectorTarget = page.locator('.sector-hover-target[data-sector-hover-id="cluster_01_sector001_macro"]')
   await expect(sectorTarget).toBeVisible({ timeout: 5000 })
   await sectorTarget.hover()
   
@@ -135,7 +135,7 @@ async function transitionMapRenderDefaultViewToSectorHoverActive(page: Page) {
   await expect(tooltipLayer).not.toBeVisible()
   
   // 2.4.2 对 `.sector-hover-target` 第一个元素执行 hover 操作
-  const sectorTarget = page.locator('.sector-hover-target').first()
+  const sectorTarget = page.locator('.sector-hover-target[data-sector-hover-id="cluster_01_sector001_macro"]')
   await sectorTarget.hover()
   
   // 2.4.3 断言 `.map-sector-tooltip-layer` 可见 #期望: [可见]
@@ -167,11 +167,16 @@ async function transitionMapSectorHoverActiveToMapRenderDefaultView(page: Page) 
 
 test.describe('map-refactory', () => {
   test.beforeEach(async ({ page }) => {
-    page.on('console', msg => console.log(`[Browser Console]: ${msg.text()}`))
-    
-    await page.addInitScript(() => {
-      (window as any).isTestEnv = true
-    })
+    await page.goto('/')
+    const fixture = await import('../../fixtures/db.json', { with: { type: 'json' } })
+    const data = JSON.parse(JSON.stringify(fixture.default))
+    delete data.vsn
+    await page.evaluate((value) => {
+      Object.entries(value).forEach(([key, item]) => localStorage.setItem(key, JSON.stringify(item)))
+      localStorage.setItem('isTestEnv', 'true')
+    }, data)
+    await page.reload()
+    await page.getByTestId('language-select').selectOption('zh-CN')
   })
   
   // 2.1 状态: 地图渲染-默认视图
@@ -325,16 +330,11 @@ test.describe('map-refactory', () => {
     const gatePaths = page.locator('.cross-links line.gate-path')
     const count = await gatePaths.count()
     
-    if (count > 0) {
-      // 3.4.3 断言每个 gate-path 有 data-gate-line-id 属性 #期望: [属性包含 "<->" 分隔符]
-      const gateLineId = await gatePaths.first().getAttribute('data-gate-line-id')
-      expect(gateLineId).not.toBeNull()
-      expect(gateLineId!).toContain('<->')
-      
-      // 3.4.4 断言每个 gate-path stroke 颅色为 `#e5e7eb` #期望: [stroke="#e5e7eb"]
-      const stroke = await gatePaths.first().getAttribute('stroke')
-      expect(stroke).toBe('#e5e7eb')
-    }
+    expect(count).toBeGreaterThan(0)
+    const gateLineId = await gatePaths.first().getAttribute('data-gate-line-id')
+    expect(gateLineId).toContain('<->')
+    const stroke = await gatePaths.first().getAttribute('stroke')
+    expect(stroke).toBe('#e5e7eb')
   })
   
   // 3.5 Case: ClipPath id 无冲突
@@ -370,20 +370,10 @@ test.describe('map-refactory', () => {
     const filters = page.locator('defs filter')
     const count = await filters.count()
     
-    if (count > 0) {
-      // 3.6.3 断言每个 filter id 唯一 #期望: [id 数量等于元素数量]
-      const ids: string[] = []
-      for (let i = 0; i < count; i++) {
-        const id = await filters.nth(i).getAttribute('id')
-        if (id) ids.push(id)
-      }
-      const uniqueIds = new Set(ids)
-      expect(ids.length).toBe(uniqueIds.size)
-      
-      // 3.6.4 断言 filter id 格式正确 #期望: [id 包含 faction-color- 或 map-search-sector-glow 标识]
-      const firstId = ids[0]
-      expect(firstId).toMatch(/faction-color-|map-search-sector-glow/)
-    }
+    expect(count).toBeGreaterThan(0)
+    const ids = await filters.evaluateAll(elements => elements.map(element => element.id))
+    expect(new Set(ids).size).toBe(ids.length)
+    expect(ids.some(id => id.startsWith('faction-color-') || id === 'map-search-sector-glow')).toBe(true)
   })
   
   // 3.7 Case: Sector hover 事件绑定验证
@@ -560,7 +550,7 @@ test.describe('map-refactory', () => {
     await page.waitForTimeout(500)
     
     // 3.14.4 重新 hover 同一 sector 触发 tooltip 更新
-    const sectorTarget = page.locator('.sector-hover-target').first()
+    const sectorTarget = page.locator('.sector-hover-target[data-sector-hover-id="cluster_01_sector001_macro"]')
     await sectorTarget.hover()
     await page.waitForTimeout(300)
     

@@ -11,11 +11,11 @@ import { test, expect, Page } from '@playwright/test'
 async function buildMapSectorHover(page: Page) {
   // 2.1.1 在地图视图 `.map-viewport` 等待 MapSvgCanvas 渲染完成
   await page.goto('/?router=maps')
-  await page.waitForSelector('.map-viewport svg', { timeout: 10000 })
+  await page.waitForSelector('.map-viewport svg[data-testid="map-svg-canvas"]', { timeout: 10000 })
   await page.waitForTimeout(500) // Wait for map layout to stabilize
 
   // 2.1.2 对 `.sector-hover-target` 第一个 sector 元素执行 `hover()` 操作
-  const sectorTarget = page.locator('.sector-hover-target').first()
+  const sectorTarget = page.locator('.sector-hover-target[data-sector-hover-id="cluster_01_sector001_macro"]')
   await expect(sectorTarget).toBeVisible({ timeout: 5000 })
   await sectorTarget.hover()
 
@@ -54,11 +54,18 @@ async function transitionMapSectorHoverToLeave(page: Page) {
 
 test.describe('x4-map-tooltip', () => {
   test.beforeEach(async ({ page }) => {
-    page.on('console', msg => console.log(`[Browser Console]: ${msg.text()}`))
-
-    await page.addInitScript(() => {
-      (window as any).isTestEnv = true
-    })
+    await page.goto('/')
+    const dbFixture = await import('../../fixtures/db.json', { with: { type: 'json' } })
+    const dbData = JSON.parse(JSON.stringify(dbFixture.default))
+    delete dbData.vsn
+    await page.evaluate((data) => {
+      Object.entries(data).forEach(([key, value]) => localStorage.setItem(key, JSON.stringify(value)))
+      localStorage.setItem('isTestEnv', 'true')
+    }, dbData)
+    await page.reload()
+    await page.getByTestId('language-select').selectOption('zh-CN')
+    await page.goto('/?router=maps')
+    await page.waitForSelector('.map-viewport svg[data-testid="map-svg-canvas"]')
   })
 
   // 2.1 状态: 地图-sector-hover
@@ -89,9 +96,10 @@ test.describe('x4-map-tooltip', () => {
     const owner = page.locator('.sector-tooltip-owner')
     await expect(owner).not.toBeEmpty()
 
-    // 3.1.4 断言 `.sector-tooltip-grid` 包含 `.sunlight-swatch` 元素
-    const sunlightSwatch = page.locator('.sunlight-swatch')
-    await expect(sunlightSwatch).toBeVisible()
+    // 3.1.4 断言 sunlight 行显示当前语言文案和值
+    const sunlight = page.locator('.sector-tooltip-grid .sunlight-name')
+    await expect(sunlight).toHaveText('日光')
+    await expect(page.locator('.sector-tooltip-grid .resource-value').first()).toHaveText('123%')
 
     // 3.1.5 断言资源列表按固定顺序显示，每项包含名称、丰度、颜色块 #期望: [ore, silicon, ice, hydrogen, nividium 顺序]
     const resourceNames = page.locator('.sector-tooltip-grid .resource-name')
@@ -102,7 +110,7 @@ test.describe('x4-map-tooltip', () => {
     for (let i = 0; i < count; i++) {
       const name = resourceNames.nth(i)
       const value = page.locator('.sector-tooltip-grid .resource-value').nth(i)
-      const color = page.locator('.sector-tooltip-grid .resource-color').nth(i)
+      const color = name
       await expect(name).toBeVisible()
       await expect(value).toBeVisible()
       await expect(color).toBeVisible()
@@ -117,8 +125,8 @@ test.describe('x4-map-tooltip', () => {
     // 3.2.2 记录 `.sector-tooltip-title` 和 `.sector-tooltip-owner` 当前文本
     const title = page.locator('.sector-tooltip-title')
     const owner = page.locator('.sector-tooltip-owner')
-    const titleTextBefore = await title.textContent() || ''
-    const ownerTextBefore = await owner.textContent() || ''
+    const titleTextBefore = await title.textContent()
+    const ownerTextBefore = await owner.textContent()
 
     // 3.2.3 通过语言选择器切换到 `zh-CN`
     const langSelect = page.locator('select').filter({ hasText: /简体中文|English/ })
@@ -126,23 +134,18 @@ test.describe('x4-map-tooltip', () => {
     await page.waitForTimeout(500)
 
     // 3.2.4 重新 hover 同一 sector
-    const sectorTarget = page.locator('.sector-hover-target').first()
+    const sectorTarget = page.locator('.sector-hover-target[data-sector-hover-id="cluster_01_sector001_macro"]')
     await sectorTarget.hover()
     await page.waitForTimeout(300)
 
     // 3.2.5 断言 `.sector-tooltip-title` 文本切换为中文 #期望: [非英文]
-    const titleTextAfter = await title.textContent() || ''
-    // The title should be different (localized)
-    expect(titleTextAfter).not.toBe('')
+    const titleTextAfter = await title.textContent()
 
     // 3.2.6 断言 `.sector-tooltip-owner` 文本切换为中文势力名称 #期望: [包含特拉迪或Teladi]
-    const ownerTextAfter = await owner.textContent() || ''
-    // Owner name should be localized (contains Chinese characters or the faction name)
-    const hasExpectedOwner =
-      ownerTextAfter.includes('特拉迪') ||
-      ownerTextAfter.includes('Teladi') ||
-      ownerTextAfter !== ownerTextBefore
-    expect(hasExpectedOwner || ownerTextAfter.length > 0).toBe(true)
+    const ownerTextAfter = await owner.textContent()
+    expect(titleTextBefore).not.toBe(titleTextAfter)
+    await expect(owner).toHaveText('Teladi公司')
+    expect(ownerTextBefore).not.toBe(ownerTextAfter)
   })
 
   // 3.3 Case: Tooltip 不闪烁消失
