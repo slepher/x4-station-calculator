@@ -21,7 +21,7 @@
 
 Base SHA：`761310260d1188d836326fadbdd7bdc7616de05c`
 
-Candidate SHA：`761310260d1188d836326fadbdd7bdc7616de05c`
+Candidate SHA：`741db35cd19afab0694465fd77c9ad9f4d855ffb`
 
 | # | 测试 | fixture / 动作 / oracle / trace | 分类 |
 |---:|---|---|---|
