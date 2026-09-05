@@ -92,3 +92,77 @@ Playwright 生成于 `test-results/`，包括：
 ## 变更边界
 
 只修改了本子任务 owned paths 中的两份 spec、`dragLogicFlow.ts` 与本迁移文档；未修改 source、fixture 原件、其他 spec、配置、计划/状态或 Git metadata。未使用 skip/fixme/only、direct store mutation、伪造拖拽状态或默认 target index `0`。
+
+## 正式 post-fix rerun（target 已进入 integrate）
+
+核对：
+
+```text
+git log -5 --oneline --decorate
+7a4a601c (HEAD -> workflow/unified-test-repair-integrate) resume task-test-5.1 migration
+76131026 (develop) merge task-test-5-fix-1 candidate
+d309409c (workflow/unified-test-repair-coding) fix logic flow candidate drag restrictions
+b2060a45 (workflow/unified-test-repair-retained-task-test-5) docs: bind logic flow evidence to checkpoint
+365ef5cc test: migrate logic flow drag behavior
+
+git status --short --branch
+## workflow/unified-test-repair-integrate
+```
+
+focused 正式命令：
+
+```text
+npm exec playwright test -- tests/e2e/logic-flow/logic-flow-drag-feedback.spec.ts tests/e2e/logic-flow/logic-flow-incompatible-drag.spec.ts --project=chromium --workers=1 --retries=0 --trace=on
+exit 1; 8 tests: 3 passed, 5 failed
+```
+
+逐用例结果与分类：
+
+| 用例 | 结果 | 分类与证据 |
+| --- | --- | --- |
+| 4.1 New Line Ghosting | passed | test-owned oracle 通过 |
+| 4.2 Real-time T0 Resource Header Updates | passed | test-owned oracle 通过 |
+| 4.5 Final State Verification | passed | test-owned oracle 通过 |
+| 4.6 T0 Ware Behavior | failed | product-owned candidate：`dragLogicFlow.ts:14` 预期 `compact-view` count 0，实际 count 1；Ore 拖动期间 compact-view 未隐藏，trace `test-results/logic-flow-logic-flow-drag-a5b00-on-draggable-and-No-Preview-chromium/trace.zip` |
+| 4.7 Refined Metals first | failed | product-owned candidate：`dragLogicFlow.ts:60` 预期合法拖动中 compact-view visible，实际 hidden；trace `test-results/logic-flow-logic-flow-drag-92ab5-ting---Refined-Metals-first-chromium/trace.zip` |
+| 4.7 Silicon Wafers first | failed | product-owned candidate：同一 helper signature，compact-view 实际 hidden；trace `test-results/logic-flow-logic-flow-drag-6b381-ting---Silicon-Wafers-first-chromium/trace.zip` |
+| 4.16 Unlocked incompatible target | failed | product-owned candidate：同一 helper signature，compact-view 实际 hidden；trace `test-results/logic-flow-logic-flow-inco-8ea21--Visibility-Unlocked-Group--chromium/trace.zip` |
+| 4.17 Locked group conflict | failed | product-owned candidate：同一 helper signature，compact-view 实际 hidden；trace `test-results/logic-flow-logic-flow-inco-d5172-lict-Feedback-Locked-Group--chromium/trace.zip` |
+
+这些失败均发生在真实 Mouse API pointer down/move 路径，未修改产品源码；未把失败改写为通过，也未重复 focused rerun。
+
+collection/list：
+
+```text
+npm exec playwright test -- tests/e2e/logic-flow/logic-flow-drag-feedback.spec.ts tests/e2e/logic-flow/logic-flow-incompatible-drag.spec.ts --list --reporter=list
+exit 0; 8 tests in 2 files
+```
+
+build 与差异检查：
+
+```text
+npm run build
+exit 0
+
+git diff --check
+exit 0
+```
+
+helper cross-consumer 正式命令：
+
+```text
+npm exec playwright test -- tests/e2e/logic-flow tests/e2e/compact-drag-view.spec.ts tests/e2e/vue-drag-test.spec.ts tests/e2e/build-flow --project=chromium --workers=1 --retries=0 --trace=on
+exit 130; runner 人工中止；已观测 64/165：34 passed, 29 failed, 1 interrupted, 101 did not run
+```
+
+cross-consumer signature 归属：
+
+| signature | 结果 | 分类 |
+| --- | --- | --- |
+| `build-flow/*` 27 cases `page.goto: net::ERR_CONNECTION_REFUSED` | failed | unavailable/environment；WebServer 生命周期失效，未归因本任务 |
+| `compact-drag-view.spec.ts` 2 cases | failed | product-owned candidate；共享 helper 的 compact-view drag-state 断言失败 |
+| `logic-flow-bug-regression.spec.ts` isolating node | interrupted | unknown；中止时无完整独立结果 |
+| `logic-flow/import-logic-flow.spec.ts` cases 2.0–3.19 | passed | cross-consumer 观察到通过 |
+| 其余 101 cases | did not run | unavailable due to requested stop |
+
+本轮未写入非 owned path；未提交 Git。当前完整 HEAD SHA：`7a4a601c3844f8359040eca00f666e3f8042b1be`。
