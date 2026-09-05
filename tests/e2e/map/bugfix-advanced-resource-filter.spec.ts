@@ -19,16 +19,11 @@ test.beforeEach(async ({ page }) => {
     localStorage.setItem('isTestEnv', 'true')
   }, dbData)
   await page.reload()
-  const langSelect = page.locator('select').filter({ hasText: /简体中文|English/ })
-  await langSelect.selectOption('zh-CN')
-  // Switch to maps view to access resource filter
-  await page.evaluate(() => {
-    (window as any).shipBuildStore.activeView = 'maps'
-  })
-  await page.waitForTimeout(200)
+  await page.getByTestId('language-select').selectOption('zh-CN')
+  await page.goto('/?router=maps')
   // Wait for map workbench to be visible
   await expect(page.locator('.map-workbench')).toBeVisible()
-  await page.getByTestId('map-resource-entry-button').click()
+  await page.getByTestId('map-resource-panel-tab').click()
   await page.waitForTimeout(200)
 })
 
