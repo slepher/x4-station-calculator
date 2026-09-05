@@ -79,16 +79,11 @@ test.beforeEach(async ({ page }) => {
     localStorage.setItem('isTestEnv', 'true')
   }, dbData)
   await page.reload()
-  const langSelect = page.locator('select').filter({ hasText: /简体中文|English/ })
-  await langSelect.selectOption('zh-CN')
-  // Switch to maps view to access resource filter
-  await page.evaluate(() => {
-    (window as any).shipBuildStore.activeView = 'maps'
-  })
-  await page.waitForTimeout(200)
+  await page.getByTestId('language-select').selectOption('zh-CN')
+  await page.goto('/?router=maps')
   // Wait for map workbench to be visible
   await expect(page.locator('.map-workbench')).toBeVisible()
-  await page.getByTestId('map-resource-entry-button').click()
+  await page.getByTestId('map-resource-panel-tab').click()
   await page.waitForTimeout(200)
 })
 
@@ -135,7 +130,6 @@ test('3.1 Case: Tab 切换保持状态独立', async ({ page }) => {
   await oreTag.click()
   await page.getByTestId('map-resource-advanced-add-group').click()
   const secondGroup = page.locator('.advanced-group-card').nth(1)
-  await secondGroup.locator('button:has-text("编辑")').click()
   const siliconTag = page.locator('[data-testid^="map-resource-advanced-tag-"][data-testid$="-silicon"]').first()
   await siliconTag.click()
   await page.getByTestId('map-resource-advanced-refresh').click()
@@ -162,7 +156,6 @@ test('3.2 Case: 多 tag 组 AND 语义命中', async ({ page }) => {
   // 3.2.3 添加第二个 tag 组并选中 silicon (丰度 high)
   await page.getByTestId('map-resource-advanced-add-group').click()
   const secondGroup = page.locator('.advanced-group-card').nth(1)
-  await secondGroup.locator('button:has-text("编辑")').click()
   const siliconTag = page.locator('[data-testid^="map-resource-advanced-tag-"][data-testid$="-silicon"]').first()
   await siliconTag.click()
   await page.getByTestId('map-resource-advanced-refresh').click()
@@ -184,7 +177,6 @@ test('3.3 Case: 单星区覆盖多组', async ({ page }) => {
   // 3.3.3 添加第二个 tag 组并选中 silicon (丰度 lowest)
   await page.getByTestId('map-resource-advanced-add-group').click()
   const secondGroup = page.locator('.advanced-group-card').nth(1)
-  await secondGroup.locator('button:has-text("编辑")').click()
   const siliconTag = page.locator('[data-testid^="map-resource-advanced-tag-"][data-testid$="-silicon"]').first()
   await siliconTag.click()
   await page.getByTestId('map-resource-advanced-refresh').click()

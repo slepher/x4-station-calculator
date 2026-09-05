@@ -14,7 +14,7 @@ async function buildMapResourcePanelOpen(page: Page) {
   await page.waitForSelector('.map-viewport svg', { timeout: 10000 })
   await page.waitForTimeout(500)
   // 2.1.3 对 `data-testid="map-resource-entry-button"` 执行点击操作打开资源面板
-  const entryButton = page.locator('[data-testid="map-resource-entry-button"]')
+  const entryButton = page.locator('[data-testid="map-resource-panel-tab"]')
   await entryButton.click()
   // 2.1.4 断言 `data-testid="map-resource-panel-header"` 可见 #期望: [资源面板已展开]
   const panelHeader = page.locator('[data-testid="map-resource-panel-header"]')
@@ -41,10 +41,19 @@ async function transitionMapResourcePanelOpenToClose(page: Page) {
 
 test.describe('map-resource-filter', () => {
   test.beforeEach(async ({ page }) => {
-    page.on('console', msg => console.log(`[Browser Console]: ${msg.text()}`))
-    await page.addInitScript(() => {
-      (window as any).isTestEnv = true
-    })
+    await page.goto('/')
+    const dbFixture = await import('../../fixtures/db.json', { with: { type: 'json' } })
+    const dbData = JSON.parse(JSON.stringify(dbFixture.default))
+    delete dbData.vsn
+    await page.evaluate((data) => {
+      Object.entries(data).forEach(([key, value]) => localStorage.setItem(key, JSON.stringify(value)))
+      localStorage.setItem('isTestEnv', 'true')
+    }, dbData)
+    await page.reload()
+    await page.getByTestId('language-select').selectOption('zh-CN')
+    await page.goto('/?router=maps')
+    await page.waitForSelector('.map-viewport svg', { timeout: 10000 })
+    await page.getByTestId('map-resource-panel-tab').click()
   })
 
   // 2.1 状态: 地图-资源面板打开
