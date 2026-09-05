@@ -27,7 +27,7 @@ test.describe('build-plan-preview', () => {
   async function addProductionGoal(page: Page, name = 'energycells') {
     await page.locator('[data-testid="candidate-search-input"]').fill(name)
     await page.locator('[data-testid="grouped-candidate-popover"]').waitFor({ state: 'visible', timeout: 5000 })
-    await page.locator('[data-testid^="grouped-candidate-item-"]').first().click()
+    await page.locator(`[data-testid="grouped-candidate-item-${name}"]`).click()
   }
 
   async function buildPreviewState(page: Page) {
@@ -35,12 +35,22 @@ test.describe('build-plan-preview', () => {
     await page.waitForTimeout(500)
   }
 
-  async function toggleCheckbox(page: Page) {
-    const cb = page.locator('input[type=checkbox]')
-    if (await cb.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await cb.click()
-      await page.waitForTimeout(500)
-    }
+  async function selectFlowPlan(page: Page, id = 'logic-flow-1') {
+    await page.locator('[data-testid="build-plan-flow-menu-trigger"]').click()
+    await page.locator(`[data-testid="flow-plan-menu-item-${id}"]`).click()
+    await page.waitForTimeout(500)
+  }
+
+  function buildMaterialCheckbox(page: Page) {
+    return page.locator('input[type="checkbox"]')
+  }
+
+  async function setBuildMaterialPlanning(page: Page, enabled: boolean) {
+    const checkbox = buildMaterialCheckbox(page)
+    await expect(checkbox).toHaveCount(1)
+    if (await checkbox.isChecked() !== enabled) await checkbox.click()
+    await expect(checkbox).toBeChecked({ checked: enabled })
+    await expect(page.locator('[data-testid="preview-section"]').first()).toBeVisible()
   }
 
   // ── Chapter 2 ─────────────────────────────────────────────────────────
@@ -50,58 +60,66 @@ test.describe('build-plan-preview', () => {
     await expect(page.locator('[data-testid="preview-section"]')).toBeVisible()
     const groups = page.locator('.allocation-group')
     await expect(groups.first()).toBeVisible()
-    await expect(page.locator('.allocation-group-name').first()).toBeVisible()
+    await expect(groups.first().locator('.allocation-group-name')).not.toHaveText('')
+    await expect(groups.first().locator('.allocation-group-count')).toHaveText('1')
   })
 
   test('2.2 切换: 勾选建材产线 checkbox -> Preview 重算', async ({ page }) => {
     await buildPreviewState(page)
-    const groupsBefore = await page.locator('.allocation-group').count()
-    await toggleCheckbox(page)
-    const groupsAfter = await page.locator('.allocation-group').count()
-    expect(groupsAfter).not.toBe(groupsBefore)
+    const checkbox = buildMaterialCheckbox(page)
+    const wasChecked = await checkbox.isChecked()
+    await checkbox.click()
+    await expect(checkbox).toBeChecked({ checked: !wasChecked })
+    const materialSection = page.locator('[data-testid="preview-section"]').filter({ hasText: '建材产线分配' })
+    if (wasChecked) {
+      await expect(materialSection).toHaveCount(0)
+    } else {
+      await expect(materialSection).toBeVisible()
+    }
   })
 
   // ── Chapter 3 ─────────────────────────────────────────────────────────
 
   test('3.1 Case: Preview 区渲染 derived 与 required 项', async ({ page }) => {
     // 3.1.1 状态: Preview 面板已加载且有预览结果
-    await buildPreviewState(page)
-    // 3.1.2 定位 goal-row
-    const rows = page.locator('.goal-row')
-    if (await rows.count() > 0) {
-      // 3.1.3 derived 绿色标签
-      const greenTags = page.locator('.preview-tag--derived')
-      const hasGreen = await greenTags.count() > 0
-      // 3.1.4 required 红色标签
-      const redTags = page.locator('.preview-tag--required')
-      const hasRed = await redTags.count() > 0
-      expect(hasGreen || hasRed).toBe(true)
-      // 3.1.5 锁定图标
-      await expect(page.locator('.derived-badge').first()).toBeVisible()
-    }
+    await addProductionGoal(page, 'hullparts')
+    await selectFlowPlan(page)
+    await expect(page.locator('[data-testid="preview-section"]')).toBeVisible()
+    await setBuildMaterialPlanning(page, true)
+    // 3.1.2/3.1.3 derived 项显示固定模块名与目标标签
+    const productionSection = page.locator('[data-testid="preview-section"]').filter({ hasText: '生产产线' })
+    await expect(productionSection.locator('.goal-name')).toContainText('船体部件产线')
+    await expect(productionSection.locator('.preview-tag--derived')).toHaveText('目标')
+    // 3.1.4 required 项显示固定 ware 名与建材标签
+    const materialSection = page.locator('[data-testid="preview-section"]').filter({ hasText: '建材产线分配' })
+    await expect(materialSection.locator('.preview-tag--required')).toHaveCount(3)
+    await expect(materialSection.locator('.goal-name')).toContainText(['能量电池', '石墨烯', '精炼金属'])
+    await expect(materialSection.locator('.preview-tag--required').first()).toHaveText('建材')
+    // 3.1.5 preview 项不可编辑
+    await expect(page.locator('[data-testid="preview-section"] .derived-badge')).toHaveCount(5)
   })
 
   test('3.2 Case: 分组 card 显示 moduleId 去重计数', async ({ page }) => {
     // 3.2.1 状态: Preview 面板已加载且有预览结果
-    await buildPreviewState(page)
-    const countBadge = page.locator('.allocation-group-count').first()
-    if (await countBadge.isVisible({ timeout: 3000 }).catch(() => false)) {
-      // 3.2.2/3.2.3 断言计数存在
-      await expect(countBadge).toBeVisible()
-    }
+    await addProductionGoal(page, 'hullparts')
+    await selectFlowPlan(page)
+    await setBuildMaterialPlanning(page, true)
+    await expect(page.locator('[data-testid="preview-section"]').filter({ hasText: '生产产线' }).locator('.allocation-group-count')).toHaveText('1')
   })
 
   test('3.3 Case: checkbox 切换影响预览', async ({ page }) => {
     // 3.3.1 状态: Preview 面板已加载
     await buildPreviewState(page)
-    // 3.3.2 切换: 勾选 checkbox -> 重算
-    await toggleCheckbox(page)
-    await page.waitForTimeout(300)
-    // 3.3.3 切换后状态
-    await toggleCheckbox(page)
-    await page.waitForTimeout(300)
-    // 断言面板仍在
-    await expect(page.locator('[data-testid="preview-section"]')).toBeVisible()
+    const checkbox = buildMaterialCheckbox(page)
+    await selectFlowPlan(page)
+    await setBuildMaterialPlanning(page, true)
+    // 3.3.2/3.3.3 勾选后建材分组出现
+    await expect(page.locator('[data-testid="preview-section"]').filter({ hasText: '建材产线分配' })).toBeVisible()
+    await checkbox.click()
+    await expect(checkbox).not.toBeChecked()
+    // 3.3.4/3.3.5 关闭后建材分组隐藏，用户目标仍保留
+    await expect(page.locator('[data-testid="preview-section"]').filter({ hasText: '建材产线分配' })).toHaveCount(0)
+    await expect(page.locator('.ware-row').filter({ hasText: '能量电池' })).toBeVisible()
   })
 
   test('3.4 Case: 无规划模式 preview 生成', async ({ page }) => {
@@ -110,21 +128,15 @@ test.describe('build-plan-preview', () => {
     await page.waitForTimeout(300)
     // 3.4.2 选择无规划
     const flowTrigger = page.locator('[data-testid="build-plan-flow-menu-trigger"]')
-    if (await flowTrigger.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await flowTrigger.click()
-      const menu = page.locator('[data-testid="build-plan-flow-menu"]')
-      await expect(menu).toBeVisible()
-      const unplanned = menu.locator('[data-testid="flow-plan-menu-item-unplanned"]')
-      if (await unplanned.isVisible({ timeout: 2000 }).catch(() => false)) {
-        await unplanned.click()
-      }
-    }
+    await expect(flowTrigger).toBeVisible()
+    await flowTrigger.click()
+    const menu = page.locator('[data-testid="build-plan-flow-menu"]')
+    await expect(menu).toBeVisible()
+    await menu.locator('[data-testid="flow-plan-menu-item-unplanned"]').click()
     await page.waitForTimeout(500)
     // 3.4.3 断言待规划分组
     const unmatched = page.locator('.allocation-group--unmatched')
-    if (await unmatched.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(unmatched).toBeVisible()
-    }
+    await expect(unmatched).toBeVisible()
   })
 
   test('3.5 Case: Preview 项名称显示规则', async ({ page }) => {
@@ -132,11 +144,7 @@ test.describe('build-plan-preview', () => {
     await buildPreviewState(page)
     // 3.5.2 定位名称
     const nameEl = page.locator('.goal-name').first()
-    if (await nameEl.isVisible({ timeout: 3000 }).catch(() => false)) {
-      // 3.5.3/3.5.4 名称非空
-      const name = await nameEl.textContent()
-      expect(name?.trim().length).toBeGreaterThan(0)
-    }
+    await expect(nameEl).toHaveText('能量电池产线')
   })
 
   test('3.6 Case: 用户目标区与 preview 区分离', async ({ page }) => {
@@ -144,9 +152,17 @@ test.describe('build-plan-preview', () => {
     await buildPreviewState(page)
     // 3.6.2 preview 区不含数量输入框
     const inputs = page.locator('[data-testid="preview-section"]').locator('.goal-number-input')
-    expect(await inputs.count()).toBe(0)
+    await expect(inputs).toHaveCount(0)
     // 3.6.3 preview 区不含删除按钮
     const removeBtns = page.locator('[data-testid="preview-section"]').locator('.remove-btn')
-    expect(await removeBtns.count()).toBe(0)
+    await expect(removeBtns).toHaveCount(0)
+  })
+
+  test('4.1 Bug: 无规划仍显示 unmatched 且不移除用户目标', async ({ page }) => {
+    await buildPreviewState(page)
+    await page.locator('[data-testid="build-plan-flow-menu-trigger"]').click()
+    await page.locator('[data-testid="flow-plan-menu-item-unplanned"]').click()
+    await expect(page.locator('.allocation-group--unmatched')).toBeVisible()
+    await expect(page.locator('.ware-row').filter({ hasText: '能量电池' })).toBeVisible()
   })
 })
