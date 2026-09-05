@@ -182,6 +182,7 @@ defineExpose({ handleAddWare, activeCategory, activeSubCategory })
             :group="{ name: 'wares', pull: 'clone', put: false }"
             :clone="(original: any) => ({ ...original, instanceId: Date.now() + Math.random() })"
             :sort="false"
+            filter=".is-locked-tier"
             :disabled="column.wares.length > 0 && column.wares.every(ware => !ware.isSelectable)"
             item-key="id"
             :data-subcategory="activeSubCategory"
