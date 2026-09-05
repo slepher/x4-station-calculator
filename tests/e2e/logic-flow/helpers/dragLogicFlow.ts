@@ -1,6 +1,6 @@
 import { expect, type Page } from '@playwright/test'
 
-type DropTarget = 'new' | number
+type DropTarget = 'new' | number | { groupId: string }
 type DropStatus = 'normal' | 'duplicated' | 'auto' | 'isolated' | 'replace' | 'locked' | 'rejected'
 
 export async function attemptWareDrag(page: Page, wareId: string): Promise<void> {
@@ -26,6 +26,17 @@ export async function startWareDrag(page: Page, wareId: string): Promise<void> {
   await expect(page.getByTestId('compact-view')).toBeVisible({ timeout: 5000 })
 }
 
+export async function getGroupIdForWare(page: Page, wareId: string): Promise<string> {
+  const groupId = await page.evaluate((id) => {
+    const group = (window as any).logicFlowStore.groups.find((item: any) =>
+      item.nodes.some((node: any) => node.wareId === id)
+    )
+    return group?.id
+  }, wareId)
+  if (!groupId) throw new Error(`Group containing ${wareId} not found`)
+  return groupId
+}
+
 export async function dragWareToTarget(
   page: Page,
   wareId: string,
@@ -48,9 +59,13 @@ export async function dragWareToTarget(
   await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 30, sourceBox.y + sourceBox.height / 2 + 30, { steps: 10 })
   await expect(compactView).toBeVisible()
 
+  const targetIndex = typeof target === 'object'
+    ? await page.evaluate((id) => (window as any).logicFlowStore.groups.findIndex((item: any) => item.id === id), target.groupId)
+    : target
+  if (target !== 'new' && targetIndex === -1) throw new Error(`Logic Flow group ${target.groupId} not found`)
   const targetLocator = target === 'new'
     ? compactView.locator('.compact-group').last()
-    : compactView.locator('.compact-group').nth(target)
+    : compactView.locator('.compact-group').nth(targetIndex as number)
   await expect(targetLocator).toBeVisible()
   await targetLocator.scrollIntoViewIfNeeded()
   const targetBox = await targetLocator.boundingBox()
@@ -72,7 +87,9 @@ export async function dragWareToTarget(
     await expect.poll(() => page.evaluate(() => (window as any).logicFlowStore.isHoveringNewZone)).toBe(true)
     await expect(targetLocator).toHaveClass(/border-blue-500\/50/)
   } else {
-    groupId = await page.evaluate((index) => (window as any).logicFlowStore.groups[index]?.id, target)
+    groupId = typeof target === 'object'
+      ? target.groupId
+      : await page.evaluate((index) => (window as any).logicFlowStore.groups[index]?.id, target)
     await expect.poll(() => page.evaluate(() => (window as any).logicFlowStore.hoveredGroupId)).toBe(groupId)
     const state = await page.evaluate(({ id, ware }) => {
       const store = (window as any).logicFlowStore
@@ -123,10 +140,10 @@ export async function dragWareToTarget(
       await expect(targetLocator).toContainText(/连接|Connect/i)
     } else if (resolvedStatus === 'auto') {
       await expect(targetLocator).toContainText(/手动|Manual/i)
-      await expect(targetLocator).toHaveClass(/border-blue-500/)
+      await expect(targetLocator.getByTestId('auto-label').locator('span')).toHaveClass(/text-blue-400/)
     } else if (resolvedStatus === 'replace') {
       await expect(targetLocator).toContainText(/替换|Replace/i)
-      await expect(targetLocator).toHaveClass(/border-blue-500/)
+      await expect(targetLocator.getByTestId('replace-label').locator('span')).toHaveClass(/text-blue-400/)
     } else if (resolvedStatus === 'locked') {
       await expect(targetLocator).toHaveClass(/border-amber-500\/50/)
     } else {
