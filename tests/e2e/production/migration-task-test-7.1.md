@@ -6,7 +6,7 @@
 - 规范只读来源：`openspec/specs/empire-management/spec.md`、`openspec/specs/station-tabs/spec.md`、`openspec/specs/station-tab-bar/spec.md`。
 - 旧测试目录 → 当前 canonical：`tests/unified-unit/` → `tests/unit/`；`tests/unified-e2e/` → `tests/e2e/`。本次 runner 使用当前路径 `tests/e2e/production/`。
 - Base SHA：`da05d84514c90428fd4e51907df9b6424fa5ccff`。
-- Candidate SHA：`da05d84514c90428fd4e51907df9b6424fa5ccff`（未提交，仅有工作树改动）。
+- Candidate SHA：`833e2d5b0eb1228425c5f15f68bf89355d31b396`。
 - Runner：Playwright `1.57.0`，Chromium，1 worker，retries 0，trace on。
 - Fixture：`tests/fixtures/db.json` 副本；逐 key 注入 localStorage，删除 `vsn`，设置 `isTestEnv=true`，reload 后通过 `[data-testid="language-select"]` 选择 `zh-CN`。未使用 `localStorage.clear`。
 
