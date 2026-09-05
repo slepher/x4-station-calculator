@@ -13,6 +13,21 @@ test.describe('binding selects latest valid archive', () => {
           return { ...save, meta: { ...save.meta, parser_version: 'v4' } }
         }
         return save
+      },
+      transformSaves: (saves) => {
+        const olderValid = saves.find((save) => save.meta.filename === 'save_008')
+        if (!olderValid) throw new Error('save_008 fixture is required')
+        return [
+          ...saves,
+          {
+            ...olderValid,
+            meta: {
+              ...olderValid.meta,
+              time: 700000,
+              filename: 'save_008_later'
+            }
+          }
+        ]
       }
     })
   })
@@ -35,7 +50,35 @@ test.describe('binding selects latest valid archive', () => {
     const groupTitle = panel.getByTestId('save-group-active').getByTestId('save-group-title')
     await expect(groupTitle).toBeVisible()
     await expect(groupTitle).toContainText(/slepher/)
-    await expect(groupTitle).toContainText(/1 个存档|1 archive/i)
+    await expect(groupTitle).toContainText(/2 个存档|2 archives/i)
+
+    const validArchives = panel.locator('.save-item').filter({ hasText: 'save_008' })
+    await expect(validArchives).toHaveCount(2)
+    const selectedArchive = validArchives.filter({ hasText: 'save_008_later' })
+    await selectedArchive.locator('.save-info').click()
+    await expect(selectedArchive).toHaveClass(/save-item-active/)
+
+    await expect.poll(async () => page.evaluate(() => {
+      const archive = (window as any).saveStore?.selectedArchive
+      return archive
+        ? { guid: archive.meta.guid, time: archive.meta.time, filename: archive.meta.filename, isValid: archive.isValid }
+        : null
+    })).toEqual({
+      guid: 'CB8837FE-98C1-42F8-9D6A-ED0ADC539111',
+      time: 700000,
+      filename: 'save_008_later',
+      isValid: true
+    })
+
+    await page.reload()
+    await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 2000 })
+    await page.getByTestId('top-view-btn-maps').click()
+    await page.getByTestId('map-save-panel-tab').click()
+    await expect(page.getByTestId('map-save-panel').locator('.save-item-active').filter({ hasText: 'save_008_later' })).toBeVisible()
+    await expect.poll(async () => page.evaluate(() => {
+      const archive = (window as any).saveStore?.selectedArchive
+      return archive ? [archive.meta.guid, archive.meta.time, archive.meta.filename, archive.isValid] : null
+    })).toEqual(['CB8837FE-98C1-42F8-9D6A-ED0ADC539111', 700000, 'save_008_later', true])
   })
 
   test('stations load from older valid archive when newer one is invalid', async ({ page }) => {

@@ -31,10 +31,13 @@ interface SaveData {
   sectors: Record<string, any>
 }
 
-function loadAllSaves(): SaveData[] {
+function loadAllSaves(): Array<{ save: SaveData; filename: string }> {
   return readdirSync(SAVE_DIR)
     .filter((f) => f.endsWith('.json'))
-    .map((f) => JSON.parse(readFileSync(join(SAVE_DIR, f), 'utf-8')) as SaveData)
+    .map((filename) => ({
+      filename,
+      save: JSON.parse(readFileSync(join(SAVE_DIR, filename), 'utf-8')) as SaveData
+    }))
 }
 
 function buildSaveArchivesState(saves: SaveData[]) {
@@ -87,13 +90,15 @@ async function setLanguage(page: Page, lang: 'zh-CN' | 'en'): Promise<void> {
 
 export async function loadLiveBindingFixture(
   page: Page,
-  options?: { transformSave?: (save: SaveData, filename: string) => SaveData }
+  options?: {
+    transformSave?: (save: SaveData, filename: string) => SaveData
+    transformSaves?: (saves: SaveData[]) => SaveData[]
+  }
 ): Promise<void> {
   const saves = loadAllSaves()
-  const filenames = readdirSync(SAVE_DIR).filter((f) => f.endsWith('.json'))
-  const transformed = options?.transformSave
-    ? saves.map((s, i) => options.transformSave!(s, filenames[i]))
-    : saves
+  const transformed = options?.transformSaves
+    ? options.transformSaves(saves.map(({ save, filename }) => options.transformSave?.(save, filename) ?? save))
+    : saves.map(({ save, filename }) => options?.transformSave?.(save, filename) ?? save)
   transformed.sort((a, b) => b.meta.time - a.meta.time)
 
   const archiveState = buildSaveArchivesState(transformed)
