@@ -93,6 +93,7 @@ export async function loadLiveBindingFixture(
   options?: {
     transformSave?: (save: SaveData, filename: string) => SaveData
     transformSaves?: (saves: SaveData[]) => SaveData[]
+    initialArchiveId?: string
   }
 ): Promise<void> {
   const saves = loadAllSaves()
@@ -102,6 +103,7 @@ export async function loadLiveBindingFixture(
   transformed.sort((a, b) => b.meta.time - a.meta.time)
 
   const archiveState = buildSaveArchivesState(transformed)
+  if (options?.initialArchiveId) archiveState.activeArchiveId = options.initialArchiveId
   const snapshot = JSON.parse(JSON.stringify(dbFixture))
   delete snapshot.vsn
 
