@@ -4,7 +4,7 @@
 
 - Lane：`integrate`，分支 `workflow/unified-test-repair-integrate`。
 - 执行 target/base：`761310260d1188d836326fadbdd7bdc7616de05c`。
-- candidate：`a75b4f8a1a9236ea59d648050127fce94b51acbb`；focused run 未完成，不能作为通过证据。
+- candidate：`a4d425379238088f14b003112cf31c2e86affc07`；focused run 未完成，不能作为通过证据。
 - runner：Playwright Chromium，`--workers=1 --retries=0 --trace=on`。
 - fixture：`tests/fixtures/db.json` 的运行时副本，删除 `vsn` 后逐项注入；每个 spec reload，再以 `data-testid="language-select"` 选择 `zh-CN`。
 - 固定地图实体：`cluster_01_sector001_macro`（Grand Exchange I / 大交易所 I）。
