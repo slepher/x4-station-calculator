@@ -68,7 +68,8 @@ export function useLogicFlowCandidatePresenter() {
 
   function isCandidateSelectable(wareId: string) {
     const ware = gameData.waresMap[wareId]
-    if (!ware || ware.tier === null || gameData.isRawMaterialWare(wareId)) return false
+    if (!ware || ware.tier === null) return false
+    if (ware.id === 'energycells' || gameData.isRawMaterialWare(wareId)) return false
     return activeSubCategory.value !== 'recycling' || ware.tier > 0
   }
 

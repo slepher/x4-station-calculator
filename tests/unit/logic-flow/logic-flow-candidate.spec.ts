@@ -12,11 +12,11 @@ vi.mock('@/store/useGameDataStore', () => ({
       ore: { id: 'ore', name: 'Ore', tier: 0, group: 'minerals' },
       silicon: { id: 'silicon', name: 'Silicon', tier: 0, group: 'minerals' },
       energycells: { id: 'energycells', name: 'Energy Cells', tier: 0, group: 'energy' },
-      microchip: { id: 'microchip', name: 'Microchip', tier: 1, group: 'hightech' },
+      hullparts: { id: 'hullparts', name: 'Hull Parts', tier: 1, group: 'construction' },
     },
     localizedWaresMap: {},
-    wareSetsByIndustrialRace: { default: new Set(['ore', 'silicon', 'energycells', 'microchip']) },
-    wareSetsByRace: { default: new Set(['ore', 'silicon', 'energycells', 'microchip']) },
+    wareSetsByIndustrialRace: { default: new Set(['ore', 'silicon', 'energycells', 'hullparts']) },
+    wareSetsByRace: { default: new Set(['ore', 'silicon', 'energycells', 'hullparts']) },
     searchQuery: '',
     activeDlcs: [],
     enforceDlcActivation: false,
@@ -65,23 +65,23 @@ describe('LogicFlowCandidateZone', () => {
     'ore': { id: 'ore', name: 'Ore', tier: 0, group: 'minerals' },
     'silicon': { id: 'silicon', name: 'Silicon', tier: 0, group: 'minerals' },
     'energycells': { id: 'energycells', name: 'Energy Cells', tier: 0, group: 'energy' },
-    'microchip': { id: 'microchip', name: 'Microchip', tier: 1, group: 'hightech' },
+    'hullparts': { id: 'hullparts', name: 'Hull Parts', tier: 1, group: 'construction' },
   }
 
   const localizedWaresMap = {
     'ore': { localeName: 'Ore' },
     'silicon': { localeName: 'Silicon' },
     'energycells': { localeName: 'Energy Cells' },
-    'microchip': { localeName: 'Microchip' },
+    'hullparts': { localeName: 'Hull Parts' },
   }
 
   const initialState = {
     gameData: {
       waresMap,
       localizedWaresMap,
-      wareSetsByIndustrialRace: { 'default': new Set(['ore', 'silicon', 'energycells', 'microchip']) },
-      wareSetsByRace: { 'default': new Set(['ore', 'silicon', 'energycells', 'microchip']) },
-      modulesByOutputMap: { energycells: [{}], microchip: [{}] },
+      wareSetsByIndustrialRace: { 'default': new Set(['ore', 'silicon', 'energycells', 'hullparts']) },
+      wareSetsByRace: { 'default': new Set(['ore', 'silicon', 'energycells', 'hullparts']) },
+      modulesByOutputMap: { energycells: [{}], hullparts: [{}] },
       activeDlcs: [],
       dlcSetting: { activeDlcs: [], enforceDlcActivation: false },
       searchQuery: ''
@@ -93,7 +93,7 @@ describe('LogicFlowCandidateZone', () => {
     }
   }
 
-  it('should NOT show quick add button for Tier 0 resources (except Energy Cells)', () => {
+  it('should hide quick add and disable dragging for Ore, Silicon, and Energy Cells', () => {
     const wrapper = mount(LogicFlowCandidateZone, {
       global: {
         plugins: [createTestingPinia({
@@ -110,31 +110,19 @@ describe('LogicFlowCandidateZone', () => {
     // Find Ore card
     const oreCard = wrapper.find('[data-ware-id="ore"]')
     expect(oreCard.exists()).toBe(true)
-    // Check for quick add container
-    expect(oreCard.find('.quick-add-container').exists()).toBe(false)
+    expect(oreCard.attributes('draggable')).toBe('false')
+    expect(oreCard.find('.ware-card-add-btn').exists()).toBe(false)
 
     // Find Silicon card
     const siliconCard = wrapper.find('[data-ware-id="silicon"]')
     expect(siliconCard.exists()).toBe(true)
-    expect(siliconCard.find('.quick-add-container').exists()).toBe(false)
-  })
-
-  it('should show add button for Energy Cells', () => {
-    const wrapper = mount(LogicFlowCandidateZone, {
-      global: {
-        plugins: [createTestingPinia({
-          createSpy: vi.fn,
-          initialState
-        })],
-        stubs: {
-            Teleport: true
-        }
-      }
-    })
+    expect(siliconCard.attributes('draggable')).toBe('false')
+    expect(siliconCard.find('.ware-card-add-btn').exists()).toBe(false)
 
     const ecCard = wrapper.find('[data-ware-id="energycells"]')
     expect(ecCard.exists()).toBe(true)
-    expect(ecCard.find('.ware-card-add-btn').exists()).toBe(true)
+    expect(ecCard.attributes('draggable')).toBe('false')
+    expect(ecCard.find('.ware-card-add-btn').exists()).toBe(false)
   })
 
   it('should show add button for Tier 1+ resources', () => {
@@ -150,8 +138,9 @@ describe('LogicFlowCandidateZone', () => {
       }
     })
 
-    const microchipCard = wrapper.find('[data-ware-id="microchip"]')
-    expect(microchipCard.exists()).toBe(true)
-    expect(microchipCard.find('.ware-card-add-btn').exists()).toBe(true)
+    const hullPartsCard = wrapper.find('[data-ware-id="hullparts"]')
+    expect(hullPartsCard.exists()).toBe(true)
+    expect(hullPartsCard.attributes('draggable')).toBe('true')
+    expect(hullPartsCard.find('.ware-card-add-btn').exists()).toBe(true)
   })
 })
