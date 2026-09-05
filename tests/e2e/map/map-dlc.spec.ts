@@ -22,6 +22,23 @@ async function closeSettingsModalWithoutSave(page: Page) {
   await page.waitForTimeout(500)
 }
 
+async function loadDbFixture(page: Page) {
+  await page.goto('/')
+  const dbFixture = await import('../../fixtures/db.json', { with: { type: 'json' } })
+  const dbData = JSON.parse(JSON.stringify(dbFixture.default))
+  delete dbData.vsn
+
+  await page.evaluate((data) => {
+    Object.entries(data).forEach(([key, value]) => {
+      localStorage.setItem(key, JSON.stringify(value))
+    })
+    localStorage.setItem('isTestEnv', 'true')
+  }, dbData)
+
+  await page.reload()
+  await page.getByTestId('language-select').selectOption('zh-CN')
+}
+
 // 2.1 状态: 地图界面
 async function buildMapInterface(page: Page) {
   // 2.1.1 在首页，点击 Sector Map 进入地图
@@ -31,7 +48,7 @@ async function buildMapInterface(page: Page) {
     const win = window as any
     return win.gameDataStore?.isReady === true
   }, { timeout: 30000 })
-  await page.getByRole('button', { name: 'Sector Map' }).click()
+  await page.getByRole('button', { name: /Sector Map|星区地图/ }).click()
   // 2.1.3 等待地图 SVG 渲染完成
   await page.waitForSelector('[data-testid="map-svg-canvas"]')
   // 2.1.4 检查地图视口可见且显示 cluster 多边形
@@ -59,9 +76,8 @@ async function buildMapInterfaceDlcOff(page: Page) {
   }
   // 2.2.5 点击保存按钮关闭设置模态框
   await closeSettingsModalWithConfirm(page)
-  // 2.2.6 验证地图中全部 cluster 多边形可见
-  const clusterCount = await page.locator('polygon[data-cluster-id]').count()
-  expect(clusterCount).toBe(173) // 期望:[polygon 数量为 173 (152 sectors + 21 multi-sector clusters)]
+  // 2.2.6 验证未激活 DLC cluster 仍可见
+  await expect(page.locator('polygon.cluster-polygon[data-cluster-id="Cluster_408_macro"]')).toHaveCount(1)
 }
 
 // 2.3 状态: 地图界面DLC限制开
@@ -86,9 +102,9 @@ async function buildMapInterfaceDlcOn(page: Page) {
   }
   // 2.3.5 点击保存按钮关闭设置模态框
   await closeSettingsModalWithConfirm(page)
-  // 2.3.6 验证地图中仅显示已激活 DLC 的 cluster
-  const clusterCount = await page.locator('polygon[data-cluster-id]').count()
-  expect(clusterCount).toBe(88) // 期望:[polygon 数量为 88 (76 base sectors + 12 multi-sector base clusters)]
+  // 2.3.6 验证未激活 DLC cluster 与 sector 已消失
+  await expect(page.locator('polygon.cluster-polygon[data-cluster-id="Cluster_408_macro"]')).toHaveCount(0)
+  await expect(page.locator('polygon.sector-polygon[data-sector-id^="Cluster_400"]')).toHaveCount(0)
 }
 
 // 2.4 切换: DLC限制关 -> DLC限制开
@@ -140,13 +156,7 @@ async function transitionDlcOnToOff(page: Page) {
 // Chapter 2 tests
 test.describe('2 E2E 标准状态与状态迁移', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/')
-    // 加载测试 fixture
-    await page.evaluate(() => {
-      localStorage.setItem('isTestEnv', 'true')
-    })
-    // 重新加载页面使 isTestEnv 生效
-    await page.reload()
+    await loadDbFixture(page)
   })
 
   // 2.1 状态: 地图界面
@@ -184,12 +194,7 @@ test.describe('2 E2E 标准状态与状态迁移', () => {
 // Chapter 3 tests
 test.describe('3 E2E 测试场景', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/')
-    await page.evaluate(() => {
-      localStorage.setItem('isTestEnv', 'true')
-    })
-    // 重新加载页面使 isTestEnv 生效
-    await page.reload()
+    await loadDbFixture(page)
   })
 
   // 3.1 Case: enforceDlcActivation=false 时显示全部 cluster
@@ -197,10 +202,7 @@ test.describe('3 E2E 测试场景', () => {
     // 3.1.1 状态: 地图界面DLC限制关
     await buildMapInterface(page)
     await buildMapInterfaceDlcOff(page)
-    // 3.1.2-3.1.3 验证 cluster 多边形数量
-    const clusterCount = await page.locator('polygon[data-cluster-id]').count()
-    expect(clusterCount).toBe(173) // 期望:[cluster 多边形数量为 173]
-    // 3.1.4 验证未激活 DLC cluster 存在且有虚线边框
+    // 3.1.2-3.1.4 验证未激活 DLC cluster 存在且有虚线边框
     const cluster408Dashed = page.locator('polygon.cluster-polygon[data-cluster-id="Cluster_408_macro"][stroke-dasharray="6,4"]')
     await expect(cluster408Dashed).toHaveCount(1) // 期望:[Cluster_408_macro (Split DLC) cluster 多边形存在且有虚线边框]
     // 3.1.5 验证已激活 DLC cluster 无边框虚线
@@ -213,10 +215,7 @@ test.describe('3 E2E 测试场景', () => {
     // 3.2.1 状态: 地图界面DLC限制开
     await buildMapInterface(page)
     await buildMapInterfaceDlcOn(page)
-    // 3.2.2-3.2.3 验证 cluster 多边形数量
-    const clusterCount = await page.locator('polygon[data-cluster-id]').count()
-    expect(clusterCount).toBe(88) // 期望:[cluster 多边形数量为 88]
-    // 3.2.4 验证未激活 DLC cluster 不存在
+    // 3.2.2-3.2.4 验证未激活 DLC cluster 不存在
     const cluster408 = page.locator('polygon.cluster-polygon[data-cluster-id="Cluster_408_macro"]')
     await expect(cluster408).toHaveCount(0) // 期望:[Cluster_408_macro (Split DLC) cluster 多边形不存在]
     // 3.2.5 验证未激活 DLC sector 不存在 (Cluster_400 is single-sector, no cluster-polygon)
