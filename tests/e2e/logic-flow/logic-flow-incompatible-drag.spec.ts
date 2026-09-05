@@ -13,12 +13,15 @@ test.describe('Logic Flow Incompatible Drag Feedback', () => {
     await defaultLock.uncheck({ force: true })
     await dragWareToTarget(page, 'energycells');
 
-    await page.locator('.tab-btn').nth(1).click()
-    const spaceweedSource = page.locator('.ware-card-wrapper[data-ware-id="spaceweed"]').first();
+    await page.locator('.tab-btn').filter({ hasText: /农业|Agricultural/i }).click()
+    await page.locator('.race-btn').filter({ hasText: /泰拉迪|Teladi/i }).click()
+    const spaceweedSource = page.locator('.ware-card-wrapper[data-ware-id="spaceweed"]:visible').first();
     await spaceweedSource.scrollIntoViewIfNeeded();
     await expect(spaceweedSource).toBeVisible();
 
-    await dragWareToTarget(page, 'spaceweed', 0, { expectedStatus: 'normal' });
+    const groupId = await page.evaluate(() => (window as any).logicFlowStore.groups[0]?.id)
+    expect(groupId).toBeTruthy()
+    await dragWareToTarget(page, 'spaceweed', { groupId }, { expectedStatus: 'normal' });
     await expect(page.locator('.flow-node[data-ware-id="spaceweed"]')).toBeVisible();
     await expect(page.locator('.compact-group').first()).not.toHaveClass(/border-red-600/);
   });
@@ -27,9 +30,12 @@ test.describe('Logic Flow Incompatible Drag Feedback', () => {
     await page.locator('input[type="checkbox"]').first().check({ force: true })
     await dragWareToTarget(page, 'energycells');
 
-    await page.locator('.tab-btn').nth(1).click()
+    await page.locator('.tab-btn').filter({ hasText: /农业|Agricultural/i }).click()
+    await page.locator('.race-btn').filter({ hasText: /泰拉迪|Teladi/i }).click()
     const beforeNodes = await page.locator('.flow-node').count();
-    await dragWareToTarget(page, 'spaceweed', 0, { expectedStatus: 'rejected' });
+    const groupId = await page.evaluate(() => (window as any).logicFlowStore.groups[0]?.id)
+    expect(groupId).toBeTruthy()
+    await dragWareToTarget(page, 'spaceweed', { groupId }, { expectedStatus: 'rejected' });
     await expect(page.locator('.flow-node')).toHaveCount(beforeNodes);
   });
 });
