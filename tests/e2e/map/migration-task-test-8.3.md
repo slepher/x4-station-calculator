@@ -4,7 +4,7 @@
 - Branch: `workflow/unified-test-repair-integrate`
 - Required HEAD: `761310260d1188d836326fadbdd7bdc7616de05c`
 - Scope: `tests/e2e/map/map-dlc.spec.ts`
-- Git commit: none
+- Git commit: `9915c3960ad32883a2c3ca6f9354cc2b852366f7`
 
 ## Commands and evidence
 
