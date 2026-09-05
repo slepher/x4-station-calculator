@@ -4,7 +4,8 @@
 
 - cwd: `/home/slepher/project/x4-station-calculator/.worktree/integrate`
 - branch: `workflow/unified-test-repair-integrate`
-- immutable base / candidate SHA: `da05d84514c90428fd4e51907df9b6424fa5ccff`（candidate 为未提交工作树）
+- immutable base SHA: `da05d84514c90428fd4e51907df9b6424fa5ccff`
+- candidate SHA: `365ef5cc6102c086830b27cee14faaca6dd92cfe`
 - runner: Playwright + Chromium，`--workers=1 --retries=0`
 - fixture: `tests/fixtures/db.json` 副本；`setupLogicFlow(page, 'clean')` 删除 `vsn`，写入 `x4_game_version = 8.0`，reload，再通过 `language-select` UI 选择 `zh-CN`，进入 Logic Flow。
 
