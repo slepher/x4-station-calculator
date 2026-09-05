@@ -26,3 +26,9 @@ SCC 只保留“单调增量、最大迭代次数限制”的候选约束；本 
 ## Current classification
 
 5 个 E2E 通过；3.3 在当前公开 unplanned 方案上无法找到 `role=switch`，归类为产品/fixture 可达性待分类失败，未改源码。最终完整 focused run 另有 webServer `ERR_CONNECTION_REFUSED` 环境失败，见 progress。
+
+## Checkpoint
+
+- Base: `761310260d1188d836326fadbdd7bdc7616de05c`
+- Candidate: `8ba9c9eeb865b37dde0a61f045782c834da8a5d7`
+- Candidate branch: `workflow/unified-test-repair-integrate`
