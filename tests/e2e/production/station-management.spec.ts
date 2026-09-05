@@ -34,7 +34,7 @@ async function waitForStationCount(page: Page, count: number) {
 }
 
 async function createNamedStations(page: Page, names: string[]) {
-  const addBtn = page.locator('.add-btn').first()
+  const addBtn = page.getByTestId('sidebar-add-station')
 
   for (let i = 0; i < names.length; i++) {
     await addBtn.click({ timeout: 500 })
@@ -96,9 +96,18 @@ async function setupBase(page: Page) {
     content: '*, *::before, *::after { transition: none !important; animation: none !important; }'
   })
   await page.goto('/')
-  await page.evaluate(() => {
-  })
+  const dbFixture = await import('../../fixtures/db.json', { with: { type: 'json' } })
+  const dbData = JSON.parse(JSON.stringify(dbFixture.default))
+  delete dbData.vsn
+  await page.evaluate((data) => {
+    Object.entries(data).forEach(([key, value]) => localStorage.setItem(key, JSON.stringify(value)))
+    localStorage.setItem('isTestEnv', 'true')
+  }, dbData)
+  await page.reload()
   await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 10000 })
+  await page.getByTestId('language-select').selectOption('zh-CN')
+  await page.getByTestId('sidebar-add-station').click()
+  await expect(page.locator('[data-testid="sidebar-station"][data-station-id]')).toHaveCount(1)
 }
 
 test.describe('Station Tab Interactions', () => {
@@ -112,7 +121,7 @@ test.describe('Station Tab Interactions', () => {
     await stationTab.click()
     await expect(page.locator('.main-layout')).toBeVisible()
 
-    const addBtn = page.locator('.add-btn')
+    const addBtn = page.getByTestId('sidebar-add-station')
     await addBtn.click()
     await page.waitForTimeout(200)
 
@@ -123,7 +132,7 @@ test.describe('Station Tab Interactions', () => {
   })
 
   test('新建分站测试', async ({ page }) => {
-    const addBtn = page.locator('.add-btn')
+    const addBtn = page.getByTestId('sidebar-add-station')
     const initialCount = await page.locator('[data-testid="sidebar-station"]').count()
 
     await addBtn.click()
@@ -139,20 +148,20 @@ test.describe('Station Tab Interactions', () => {
   })
 
   test('分站菜单测试', async ({ page }) => {
-    const addBtn = page.locator('.add-btn')
+    const addBtn = page.getByTestId('sidebar-add-station')
     await addBtn.click()
     await page.waitForTimeout(200)
 
     const stationTab = page.locator('[data-testid="sidebar-station"]').first()
     await stationTab.click({ button: 'right' })
 
-    await expect(page.locator('.context-menu')).toBeVisible()
+    await expect(page.getByTestId('sidebar-context-menu')).toBeVisible()
 
-    const deleteOption = page.locator('.context-menu .menu-item.danger')
+    const deleteOption = page.getByTestId('sidebar-menu-delete')
     await expect(deleteOption).toBeVisible()
 
     await deleteOption.click()
-    await expect(page.locator('.modal-backdrop')).toBeVisible()
+    await expect(page.getByTestId('sidebar-delete-dialog')).toBeVisible()
   })
 
   test('工具栏内容切换测试', async ({ page }) => {
@@ -160,7 +169,7 @@ test.describe('Station Tab Interactions', () => {
     await stationTab.click()
     await expect(page.locator('.context-toolbar')).toBeVisible()
 
-    const addBtn = page.locator('.add-btn')
+    const addBtn = page.getByTestId('sidebar-add-station')
     await addBtn.click()
     await page.waitForTimeout(200)
 
@@ -168,7 +177,7 @@ test.describe('Station Tab Interactions', () => {
   })
 
   test('工人运算开关测试', async ({ page }) => {
-    const addBtn = page.locator('.add-btn')
+    const addBtn = page.getByTestId('sidebar-add-station')
     await addBtn.click()
     await page.waitForTimeout(200)
 
@@ -182,7 +191,7 @@ test.describe('Station Tab Interactions', () => {
   })
 
   test('星区矿物选择测试', async ({ page }) => {
-    const addBtn = page.locator('.add-btn')
+    const addBtn = page.getByTestId('sidebar-add-station')
     await addBtn.click()
     await page.waitForTimeout(200)
 
@@ -199,7 +208,7 @@ test.describe('Station Tab Interactions', () => {
   })
 
   test('切换分站不串站', async ({ page }) => {
-    const addBtn = page.locator('.add-btn')
+    const addBtn = page.getByTestId('sidebar-add-station')
     await addBtn.click()
     await page.waitForTimeout(200)
     await addBtn.click()
@@ -217,7 +226,7 @@ test.describe('Station Tab Interactions', () => {
   })
 
   test('分站数据隔离测试', async ({ page }) => {
-    const addBtn = page.locator('.add-btn')
+    const addBtn = page.getByTestId('sidebar-add-station')
 
     await addBtn.click()
     await page.waitForTimeout(200)
@@ -244,20 +253,13 @@ test.describe('Station Tab Interactions', () => {
   })
 })
 
-test.describe.skip('多空间站帝国规划 - 标签拖拽重排', () => {
+test.describe('多空间站帝国规划 - 标签拖拽重排', () => {
   test.beforeEach(async ({ page }) => {
-    await page.addStyleTag({
-      content: '*, *::before, *::after { transition: none !important; animation: none !important; }'
-    })
-    await page.goto('/')
-    await page.evaluate(() => {
-    })
-    await page.reload()
-    await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 10000 })
+    await setupBase(page)
   })
 
   const addStations = async (page: any, count: number) => {
-    const addBtn = page.locator('.add-btn')
+    const addBtn = page.getByTestId('sidebar-add-station')
     for (let i = 0; i < count; i++) {
       await addBtn.click()
       await page.waitForTimeout(120)
@@ -366,17 +368,9 @@ test.describe.skip('多空间站帝国规划 - 标签拖拽重排', () => {
   })
 })
 
-test.describe.skip('station-tab-drag web integration', () => {
+test.describe('station-tab-drag web integration', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/')
-    await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 10000 })
-    await page.evaluate(() => {
-    })
-    await page.reload()
-    await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 10000 })
-    await page.addStyleTag({
-      content: '*, *::before, *::after { transition: none !important; animation: none !important; }'
-    })
+    await setupBase(page)
   })
 
   test('W1: 标签拖拽重排成功', async ({ page }) => {
@@ -478,14 +472,14 @@ test.describe.skip('station-tab-drag web integration', () => {
 })
 
 test.describe('帝国数据持久化', () => {
-  test('保存的帝国数据在刷新后保留', async ({ page }) => {
-    await page.goto('/')
-    await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 10000 })
+  test.beforeEach(async ({ page }) => setupBase(page))
 
+  test('保存的帝国数据在刷新后保留', async ({ page }) => {
     const stationTab = page.locator('[data-testid="sidebar-station"]').first()
     await expect(stationTab).toBeVisible()
     const stationName = await stationTab.textContent()
 
+    await page.getByTestId('toolbar-save-btn').click()
     await page.reload()
     await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 10000 })
 
@@ -496,9 +490,9 @@ test.describe('帝国数据持久化', () => {
 })
 
 test.describe('Station Name Editing', () => {
+  test.beforeEach(async ({ page }) => setupBase(page))
+
   test('Test 1: Default Name Display', async ({ page }) => {
-    await page.goto('/')
-    
     const nameInput = page.locator('.ghost-input.w-32').first()
     await expect(nameInput).toBeVisible()
     const val = await nameInput.inputValue()
@@ -506,8 +500,6 @@ test.describe('Station Name Editing', () => {
   })
 
   test('Test 2: Edit Station Name', async ({ page }) => {
-    await page.goto('/')
-    
     const nameInput = page.locator('.ghost-input.w-32').first()
     await nameInput.fill('My New Station')
     await nameInput.press('Tab')
@@ -517,23 +509,17 @@ test.describe('Station Name Editing', () => {
   })
 
   test('Test 3: Name Input Is Editable', async ({ page }) => {
-    await page.goto('/')
-    
     const nameInput = page.locator('.ghost-input.w-32').first()
     await expect(nameInput).toBeVisible()
     await expect(nameInput).toBeEnabled()
   })
 
   test('Test 4: Save Button Exists', async ({ page }) => {
-    await page.goto('/')
-    
     const saveBtn = page.locator('[data-testid="toolbar-save-btn"]')
     await expect(saveBtn).toBeVisible()
   })
 
   test('Test 5: Station Name Persists', async ({ page }) => {
-    await page.goto('/')
-    
     const nameInput = page.locator('.ghost-input.w-32').first()
     await nameInput.fill('Persistent Station')
     await nameInput.press('Tab')
@@ -545,8 +531,6 @@ test.describe('Station Name Editing', () => {
   })
 
   test('Test 6: Default name is not empty', async ({ page }) => {
-    await page.goto('/')
-    
     const nameInput = page.locator('.ghost-input.w-32').first()
     const val = await nameInput.inputValue()
     expect(val.length).toBeGreaterThan(0)
