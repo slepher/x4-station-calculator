@@ -892,7 +892,11 @@ function applyTradeStationDefaultsToResult() {
       changed = true
       continue
     }
-    if (cands.length === 0) continue
+    if (cands.length === 0) {
+      groups[i] = { ...group, selectedTradeStation: { type: 'virtual' as const, stationCode: '__virtual__' } }
+      changed = true
+      continue
+    }
     const aDefault = determineDefaultTradeStation(cands)
     if (aDefault) {
       groups[i] = { ...group, selectedTradeStation: aDefault }

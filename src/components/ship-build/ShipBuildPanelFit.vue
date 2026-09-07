@@ -9,6 +9,7 @@ import { useShipBuildStore } from '@/store/useShipBuildStore'
 import type { ShipEquipmentSize, X4SlotTag } from '@/types/x4'
 import X4DualPhaseRangeSlider from '@/components/common/X4DualPhaseRangeSlider.vue'
 import ShipStoragePanel from '@/components/ship-build/ShipStoragePanel.vue'
+import { useShipBuildFitPresenter } from './presenters/useShipBuildFitPresenter'
 
 type AggregatedGroup = {
   key: string
@@ -63,7 +64,7 @@ const emit = defineEmits<{
 const shipBuildStore = useShipBuildStore()
 const gameData = useGameDataStore()
 const { selectedShip, blueprint, mockTagPatch, isDirty, activeBlueprintStatusLabel, isBuiltInPresetUnchanged } = storeToRefs(shipBuildStore)
-const { applyConnectionAssignment, setConnectionAssignmentCount, enterShipSelector, toggleFavoriteBlueprint } = shipBuildStore
+const { enterShipSelector, toggleFavoriteBlueprint } = shipBuildStore
 
 // 本地 connectionKeyMap：从 connectionRows 构建
 const localConnectionKeyMap = computed(() => {
@@ -265,7 +266,6 @@ const activeTabKey = ref('')
 const expandedSlotKey = ref<string | null>(null)
 const pendingExpandedConnectionKeys = ref<string[] | null>(null)
 const highlightedEquipmentId = ref<string | null>(null)
-const draftCountByTarget = ref<Record<string, number>>({})
 const blueprintMenuOpen = ref(false)
 const blueprintMenuRef = ref<HTMLElement | null>(null)
 const fitPanelRef = ref<HTMLElement | null>(null)
@@ -802,9 +802,8 @@ const closePicker = () => {
   handlePickerOpenChange(false)
 }
 
-const handleSlotClick = (target: SlotTarget) => {
-  openPicker(target.key)
-}
+const { draftCountByTarget, handleSlotClick, sliderStepForTarget, isCountSliderDisabled,
+  getDisplayedCount, handleCountSliderRealtime, handleCountSliderCommit } = useShipBuildFitPresenter(fitMode, openPicker)
 
 const handleSlotTypeClick = (slotType: typeof activeSlotType.value) => {
   activeSlotType.value = slotType
@@ -817,94 +816,6 @@ const jumpToTab = (tabKey: string) => {
     pendingExpandedConnectionKeys.value = current ? [...current.connectionKeys] : null
   }
   activeTabKey.value = tabKey
-}
-
-const clampToTargetCount = (target: SlotTarget, raw: number) => {
-  const safe = Number.isFinite(raw) ? raw : 0
-  return Math.max(0, Math.min(target.totalCount, Math.round(safe)))
-}
-
-const sliderStepForTarget = (target: SlotTarget) => {
-  if (fitMode.value === 'group') return Math.max(1, target.connectionKeys.length)
-  return 1
-}
-
-const isCountSliderDisabled = (target: SlotTarget) => {
-  const selectedId = selectedForConnectionKeys(target.connectionKeys)
-  if (selectedId === '' || selectedId === '__mixed__') return true
-  return target.totalCount <= 0
-}
-
-const getDisplayedCount = (target: SlotTarget) => {
-  return draftCountByTarget.value[target.key] ?? target.count
-}
-
-const distributeCountByCapacity = (connectionKeys: string[], total: number) => {
-  const maxByKey = connectionKeys.map((key) => ({
-    key,
-    max: Math.max(0, connectionCountMap.value.get(key) || 0)
-  }))
-  const sumMax = maxByKey.reduce((sum, item) => sum + item.max, 0)
-  const clampedTotal = Math.max(0, Math.min(total, sumMax))
-
-  if (sumMax === 0 || clampedTotal === 0) {
-    return Object.fromEntries(connectionKeys.map((key) => [key, 0]))
-  }
-  if (clampedTotal === sumMax) {
-    return Object.fromEntries(maxByKey.map((item) => [item.key, item.max]))
-  }
-
-  const allocations = maxByKey.map((item) => {
-    const exact = (clampedTotal * item.max) / sumMax
-    const base = Math.min(item.max, Math.floor(exact))
-    return { ...item, exact, base, frac: exact - Math.floor(exact) }
-  })
-
-  let remaining = clampedTotal - allocations.reduce((sum, item) => sum + item.base, 0)
-  allocations
-    .sort((a, b) => b.frac - a.frac)
-    .forEach((item) => {
-      if (remaining <= 0) return
-      if (item.base >= item.max) return
-      item.base += 1
-      remaining -= 1
-    })
-
-  return Object.fromEntries(allocations.map((item) => [item.key, item.base]))
-}
-
-const handleCountSliderRealtime = (target: SlotTarget, value: number) => {
-  draftCountByTarget.value = {
-    ...draftCountByTarget.value,
-    [target.key]: clampToTargetCount(target, value)
-  }
-}
-
-const handleCountSliderCommit = (target: SlotTarget, value: number) => {
-  if (isCountSliderDisabled(target)) return
-  const committed = clampToTargetCount(target, value)
-  draftCountByTarget.value = {
-    ...draftCountByTarget.value,
-    [target.key]: committed
-  }
-
-  if (fitMode.value === 'group') {
-    const selectedId = selectedForConnectionKeys(target.connectionKeys)
-    if (!selectedId || selectedId === '__mixed__') return
-    const distributed = distributeCountByCapacity(target.connectionKeys, committed)
-    target.connectionKeys.forEach((connectionKey) => {
-      const nextCount = distributed[connectionKey] || 0
-      applyConnectionAssignment({
-        connectionKey,
-        equipmentId: nextCount > 0 ? selectedId : null
-      })
-      setConnectionAssignmentCount({ connectionKey, count: nextCount })
-    })
-  } else {
-    target.connectionKeys.forEach((connectionKey) => {
-      setConnectionAssignmentCount({ connectionKey, count: committed })
-    })
-  }
 }
 
 watch(pickerTarget, (newTarget) => {

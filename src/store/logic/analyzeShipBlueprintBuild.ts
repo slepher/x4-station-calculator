@@ -158,6 +158,13 @@ export function analyzeShipBlueprintBuild(input: AnalyzeShipBlueprintBuildInput)
     if (!input.ship) return null
     const production = resolveShipProductionByMethod(input.ship, selectedMethod)
     const unitBuildTime = production?.time || 0
+    const cost = { ...production?.cost }
+    if (input.blueprint?.hull) {
+      for (const [wareId, count] of Object.entries(input.blueprint.hull.materials)) {
+        const productionCount = cost[wareId]
+        cost[wareId] = productionCount === undefined ? count : productionCount + count
+      }
+    }
     return buildEntryBase({
       key: `ship:${input.ship.id}`,
       kind: 'ship',
@@ -165,7 +172,7 @@ export function analyzeShipBlueprintBuild(input: AnalyzeShipBlueprintBuildInput)
       quantity: 1,
       unitBuildTime,
       totalBuildTime: unitBuildTime,
-      cost: production?.cost || {},
+      cost,
       wares: input.wares,
       priceMultiplier: input.priceMultiplier
     })

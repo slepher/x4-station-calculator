@@ -1,25 +1,23 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { extractShipCandidates, filterTypesByClass } from '@/store/logic/shipEquipmentPicker'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
 import ShipBuildPanelShip from '@/components/ship-build/ShipBuildPanelShip.vue'
+import { useShipBuildSelectorPresenter } from './presenters/useShipBuildSelectorPresenter'
 import type { X4Ship, EquipmentType, ShipEquipmentSize } from '@/types/x4'
 
 const { t } = useI18n()
 const { translateShip, translateShipType } = useX4I18n()
 const gameData = useGameDataStore()
 const shipBuildStore = useShipBuildStore()
-const { selectedShipId } = storeToRefs(shipBuildStore)
-const { setSelectedShipId, cancelShipSelector } = shipBuildStore
-
-const pendingShipId = ref<string | null>(null)
-const selectedClass = ref<X4Ship['class'] | null>(null)
-const selectedRaces = ref<string[]>([])
-const selectedTypes = ref<string[]>([])
+const {
+  selectedShipId, pendingShipId, selectedClass, selectedRaces, selectedTypes,
+  currentShip, confirmShipId, setSelectedClass, toggleRace, toggleType,
+  setPendingShipId, confirmPendingShip, handleCancelShipChange
+} = useShipBuildSelectorPresenter()
 
 const classOptions = [
   { id: 'ship_s', label: 'S' },
@@ -28,18 +26,11 @@ const classOptions = [
   { id: 'ship_xl', label: 'XL' }
 ]
 
-const currentShip = computed<X4Ship | null>(() => {
-  const shipId = selectedShipId.value
-  if (!shipId) return null
-  return shipBuildStore.shipMap.get(shipId) || null
-})
-
 const pendingShip = computed<X4Ship | null>(() => {
   if (!pendingShipId.value) return null
   return shipBuildStore.shipMap.get(pendingShipId.value) || null
 })
 
-const confirmShipId = computed<string | null>(() => pendingShipId.value || selectedShipId.value || null)
 const pageSize = 10
 const currentPage = ref(1)
 
@@ -156,19 +147,6 @@ watch([filteredShips, selectedShipId], ([next]) => {
   syncPendingShip(next)
 }, { immediate: true })
 
-watch(selectedShipId, (shipId) => {
-  const ship = shipId ? shipBuildStore.findShip(shipId) : null
-  if (!ship) {
-    selectedClass.value = null
-    selectedRaces.value = []
-    selectedTypes.value = []
-    return
-  }
-  selectedClass.value = ship.class
-  selectedRaces.value = ship.race ? [ship.race] : []
-  selectedTypes.value = ship.type ? [ship.type] : []
-}, { immediate: true })
-
 watch(filteredShips, (next) => {
   if (next.length <= pageSize) {
     currentPage.value = 1
@@ -176,39 +154,6 @@ watch(filteredShips, (next) => {
   }
   if (currentPage.value > totalPages.value) currentPage.value = totalPages.value
 })
-
-const setSelectedClass = (value: string | null) => {
-  selectedClass.value = value as X4Ship['class'] | null
-}
-
-const toggleRace = (value: string) => {
-  if (selectedRaces.value.includes(value)) {
-    selectedRaces.value = selectedRaces.value.filter((id) => id !== value)
-    return
-  }
-  selectedRaces.value = [...selectedRaces.value, value]
-}
-
-const toggleType = (value: string) => {
-  if (selectedTypes.value.includes(value)) {
-    selectedTypes.value = selectedTypes.value.filter((id) => id !== value)
-    return
-  }
-  selectedTypes.value = [...selectedTypes.value, value]
-}
-
-const setPendingShipId = (value: string | null) => {
-  pendingShipId.value = value
-}
-
-const confirmPendingShip = () => {
-  if (!confirmShipId.value) return
-  setSelectedShipId(confirmShipId.value)
-}
-
-const handleCancelShipChange = () => {
-  cancelShipSelector()
-}
 
 const goPrevPage = () => {
   if (currentPage.value <= 1) return

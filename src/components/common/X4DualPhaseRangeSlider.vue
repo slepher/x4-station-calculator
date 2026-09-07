@@ -76,23 +76,24 @@ const trackStyle = computed(() => ({
   borderColor: props.trackBorderColor,
 }))
 
-const toNumber = (event: Event): number => {
-  const input = event.target as HTMLInputElement
+const toNumber = (input: HTMLInputElement): number => {
   const n = Number(input.value)
   if (!Number.isFinite(n)) return props.min
   // Clamp to effectiveMax (dragMax) to prevent going beyond available range
-  return Math.min(effectiveMax.value, Math.max(props.min, n))
+  const value = Math.min(effectiveMax.value, Math.max(props.min, n))
+  input.value = String(value)
+  return value
 }
 
 const commitCurrent = () => {
   if (!sliderRef.value) return
   const n = Number(sliderRef.value.value)
   if (!Number.isFinite(n)) return
-  emit('commit', Math.min(effectiveMax.value, Math.max(props.min, n)))
+  emit('commit', toNumber(sliderRef.value))
 }
 
 const handleInput = (event: Event) => {
-  emit('update:modelValue', toNumber(event))
+  emit('update:modelValue', toNumber(event.target as HTMLInputElement))
 }
 
 const handleChange = () => {

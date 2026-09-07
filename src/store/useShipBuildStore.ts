@@ -26,6 +26,7 @@ import { migrateShipBlueprintStateToCurrent } from './logic/stateMigrations'
 import { CURRENT_SHIP_BLUEPRINT_VERSION } from './logic/storageVersions'
 import { buildConsumableDatas, buildShipBuildDatas } from './logic/useGameData'
 import { analyzeShipBlueprintBuild, DEFAULT_SHIP_BUILD_PRICE_MULTIPLIER } from './logic/analyzeShipBlueprintBuild'
+import { extractEquipmentSlotCandidatesWithFacets } from './logic/shipEquipmentPicker'
 
 const BUILT_IN_BLUEPRINT_ID_PREFIX = '__built_in_ship_blueprint__'
 const EMPTY_SHIP_STORAGE: ShipBlueprintStorage = {
@@ -1346,7 +1347,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     const setEquipmentOnTarget = (targetSlotType: string) => {
       const connection = findOrCreateConnectionInBlueprint(target, targetSlotType)
       const groupData = connection.group.find(g => g.group === groupName)
-      if (payload.equipmentId === null || payload.count <= 0) {
+      if (payload.equipmentId === null) {
         if (groupData) {
           groupData.equipment_id = ''
           groupData.count = 0
@@ -1376,7 +1377,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
         }
         connection.group.push(groupData)
       }
-      if (payload.equipmentId === null || payload.count <= 0) {
+      if (payload.equipmentId === null) {
         groupData.shield = { equipment_id: '', count: 0 }
         return
       }
@@ -1477,7 +1478,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
         const nextCount = distributed[connectionKey] || 0
         applyAssignmentOnBlueprint(target, {
           connectionKey,
-          equipmentId: nextCount > 0 ? payload.equipmentId : null,
+          equipmentId: payload.equipmentId,
           count: nextCount
         })
       })
@@ -1487,7 +1488,10 @@ export const useShipBuildStore = defineStore('ship-build', () => {
 
     keys.forEach((connectionKey) => {
       const currentCount = selectedByConnectionComputed.value[connectionKey]?.count
-      const nextCount = currentCount ?? resolveConnectionCapacityByKey(connectionKey)
+      const capacity = resolveConnectionCapacityByKey(connectionKey)
+      const nextCount = payload.targetCount === undefined
+        ? (currentCount ?? capacity)
+        : Math.min(capacity, Math.max(0, Math.round(payload.targetCount)))
       applyAssignmentOnBlueprint(target, {
         connectionKey,
         equipmentId: payload.equipmentId,
@@ -1497,6 +1501,33 @@ export const useShipBuildStore = defineStore('ship-build', () => {
 
     cleanupPreviewBlueprint(target)
     return target
+  }
+
+  const applyTargetAssignment = (payload: {
+    connectionKeys: string[]
+    equipmentId: string | null
+    mode: FitMode
+    targetCount: number
+  }) => {
+    const next = buildPreviewBlueprint(payload)
+    if (next) blueprint.value = next
+  }
+
+  const getCompatibleEquipmentIds = (connectionKeys: string[]): string[] => {
+    if (!selectedShip.value || connectionKeys.length === 0) return []
+    const candidateSets: Set<string>[] = []
+    for (const key of connectionKeys) {
+      const row = connectionRows.value.find(item => item.connectionKey === key)
+      if (!row) return []
+      const candidates = extractEquipmentSlotCandidatesWithFacets({
+        shipMap: shipMap.value, equipmentMap: equipmentMap.value,
+        shipId: selectedShip.value.id, slotType: row.slotType, size: row.size,
+        tagsAll: row.tags, filters: { races: [], mks: [], tags: [] },
+        includeEquipment: equipment => isEquipmentDlcUsable(equipment)
+      })
+      candidateSets.push(new Set(candidates.items.map(item => item.id)))
+    }
+    return [...candidateSets[0]!].filter(id => candidateSets.every(set => set.has(id)))
   }
 
   const applyGroupAssignment = (payload: { connectionKeys: string[]; equipmentId: string | null }) => {
@@ -1775,6 +1806,9 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     applyConnectionAssignment,
     setConnectionAssignmentCount,
     buildPreviewBlueprint,
+    applyTargetAssignment,
+    getCompatibleEquipmentIds,
+    getConnectionAssignment: (key: string) => selectedByConnectionComputed.value[key],
     applyGroupAssignment,
     setStatsViewMode,
     setMaterialMethod,

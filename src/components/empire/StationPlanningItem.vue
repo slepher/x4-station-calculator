@@ -4,11 +4,10 @@ import { useX4I18n } from '@/utils/UseX4I18n';
 import X4NumberInput from '@/components/common/X4NumberInput.vue';
 import { useI18n } from 'vue-i18n';
 import { computed } from 'vue';
-import { useGameDataStore } from '@/store/useGameDataStore';
+import { useStationPlanningItemPresenter } from './presenters/useStationPlanningItemPresenter';
 
 const { translateModule } = useX4I18n();
 const { t } = useI18n();
-const gameData = useGameDataStore()
 
 const props = defineProps<{
   item: SavedModule
@@ -61,9 +60,7 @@ const moduleInfoClass = computed(() => {
   return !props.readonly ? 'module-info--editable ignore-drag' : 'module-info--readonly'
 })
 
-const shouldShowDlcTag = computed(() => props.info.dlc_tag !== 'base')
-const dlcLabel = computed(() => gameData.getDlcDisplayName(props.info.dlc_tag))
-const isDlcActive = computed(() => gameData.isDlcActive(props.info.dlc_tag))
+const { shouldShowDlcTag, dlcLabel, isDlcActive, isCountDisabled } = useStationPlanningItemPresenter(props)
 const localizedModuleName = computed(() => translateModule(props.info))
 const moduleDiffAnnotation = computed(() => props.diffAnnotation ?? props.item.diffAnnotation)
 const moduleDiffClass = computed(() => {
@@ -95,7 +92,7 @@ const moduleDiffClass = computed(() => {
           >{{ moduleDiffAnnotation }}</span>
         </div>
         <span v-if="shouldShowDlcTag" class="dlc-tag" :class="isDlcActive ? 'dlc-tag--active' : 'dlc-tag--inactive'"
-          :title="dlcLabel">DLC</span>
+          :title="dlcLabel">{{ dlcLabel }}</span>
       </div>
     </div>
 
@@ -106,7 +103,7 @@ const moduleDiffClass = computed(() => {
         'input-wrapper--positive': isAboveThreshold
       }">
         <X4NumberInput :modelValue="item.count" @update:modelValue="emit('update:count', $event)" width-class="w-14"
-          :min="props.isRecommended ? (props.threshold ?? 1) : 1" :disabled="countDisabled" />
+          :min="props.isRecommended ? (props.threshold ?? 1) : 1" :disabled="isCountDisabled" />
       </div>
       <button @click="emit('remove')" class="remove-btn ignore-drag" :title="t('planning.remove')">×</button>
     </div>

@@ -7,6 +7,7 @@ import type { GroupDraftInfo, SectorAssignment } from '@/store/logic/autoGroup'
 import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
 import { getCoverageSectors, getReachableCoverageSectors } from '@/store/logic/saveBindingUtils'
 import JumpInput from '@/components/common/JumpInput.vue'
+import { useSectorGroupColorPresenter } from './presenters/useSectorGroupColorPresenter'
 import type { SectorReachability, X4MapSector } from '@/types/x4'
 
 const props = withDefaults(defineProps<{
@@ -62,30 +63,16 @@ const emit = defineEmits<{
 const { t, te } = useI18n()
 
 const showColorPicker = ref(false)
+const { updateColor } = useSectorGroupColorPresenter(color => emit('color-change', props.group.id, color))
 
 function onColorChipClick() {
   if (!props.editable) return
   showColorPicker.value = !showColorPicker.value
 }
 
-function onColorUpdate(hex: string) {
+function onColorUpdate(hex: Parameters<typeof updateColor>[0]) {
   // vue-color SketchPicker may emit object or string
-  const color = typeof hex === 'string' ? hex : '#3b82f6'
-  emit('color-change', props.group.id, color)
-  showColorPicker.value = false
-}
-
-function onPresetClick(e: MouseEvent) {
-  const target = (e.target as HTMLElement).closest('.preset-color')
-  if (target) {
-    const hex = target.getAttribute('data-color')
-    if (hex === 'transparent') {
-      emit('color-change', props.group.id, undefined)
-    } else if (hex) {
-      emit('color-change', props.group.id, hex)
-    }
-    showColorPicker.value = false
-  }
+  if (updateColor(hex)) showColorPicker.value = false
 }
 
 function onPickerOverlayClick() {
@@ -538,9 +525,9 @@ function isPillDimmed(entry: UnifiedPillEntry): boolean {
 
     <Teleport to="body">
       <div v-if="showColorPicker" class="color-picker-overlay" @click="onPickerOverlayClick" />
-      <div v-if="showColorPicker" class="color-picker-popper" @click="onPresetClick" @keydown="onEsc">
+      <div v-if="showColorPicker" class="color-picker-popper" @keydown="onEsc">
         <SketchPicker
-          :model-value="group.color || '#3b82f6'"
+          :model-value="group.color === undefined ? 'transparent' : group.color"
           :preset-colors="HUB_PALETTE"
           :disable-alpha="true"
           @update:model-value="onColorUpdate"

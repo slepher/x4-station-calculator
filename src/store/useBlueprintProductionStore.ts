@@ -137,11 +137,21 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     return sourceView.getStationById(stationId)
   }
 
+  const calculationModulesMap = computed(() => {
+    if (!gameData.enforceDlcActivation) return gameData.modulesMap
+    return Object.fromEntries(Object.entries(gameData.modulesMap)
+      .filter(([, module]) => gameData.isDlcActive(module.dlc_tag)))
+  })
+
+  function getCalculationModules(modules: SavedModule[]): SavedModule[] {
+    return modules.filter(module => calculationModulesMap.value[module.id] !== undefined)
+  }
+
   function getComputeDeps(): StationComputeDeps | null {
     const { modulesMap, waresMap, workforceConsumptionMap, enforceDlcActivation } = gameData
     if (!gameData.isReady || !modulesMap || !waresMap || !workforceConsumptionMap) return null
     return {
-      modulesMap,
+      modulesMap: calculationModulesMap.value,
       waresMap,
       workforceConsumptionMap,
       enforceDlcActivation,
@@ -186,7 +196,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       if (!station) return
       station.modules = deepClone(value)
       station.lastUpdated = Date.now()
-      planningDerivedMap.value!.updateModules(station.id, station.modules)
+      planningDerivedMap.value!.updateModules(station.id, getCalculationModules(station.modules))
     }
   })
 
@@ -245,13 +255,14 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       }
     }
     const cache = planningDerivedMap.value?.getCache(stationId) || null
-    return buildDerivedActiveStationState({
+    const state = buildDerivedActiveStationState({
       stationId,
-      plannedModules: plannedModules.value,
+      plannedModules: getCalculationModules(plannedModules.value),
       settings: settings.value,
       cache,
       deps: getComputeDeps()
     })
+    return { ...state, plannedModules: plannedModules.value }
   })
 
   const tabSemanticsById = computed<Record<string, { tag?: string; factoryGroup?: string }>>(() => {
@@ -329,12 +340,9 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
   )
 
   watch(
-    () => gameData.enforceDlcActivation,
+    () => [gameData.enforceDlcActivation, ...gameData.activeDlcs],
     () => {
-      if (!activeEmpire.value) return
-      activeEmpire.value.stations.forEach(station => {
-        syncPlanStationDerivedSnapshot(station.id)
-      })
+      initializeAllStationDerived()
     }
   )
 
@@ -344,7 +352,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     ensurePlanningDerivedMap()!.upsertStation(stationId, {
       modulesMode: 'plan',
       sectorId: station.sectorId,
-      modules: station.modules || [],
+      modules: getCalculationModules(station.modules || []),
       settings: station.settings || {},
       lockedWares: station.lockedWares || [],
       warePriority: station.warePriority || {},
@@ -482,7 +490,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       map.upsertStation(station.id, {
         modulesMode: 'plan',
         sectorId: station.sectorId,
-        modules: station.modules || [],
+        modules: getCalculationModules(station.modules || []),
         settings: station.settings || {},
         lockedWares: station.lockedWares || [],
         warePriority: station.warePriority || {},
@@ -550,7 +558,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
 
 function updateStationModules(stationId: string, modules: SavedModule[]) {
     if (empireDataStore.updateStationModulesInEmpire(activeEmpire.value, stationId, modules)) {
-      planningDerivedMap.value!.updateModules(stationId, modules)
+      planningDerivedMap.value!.updateModules(stationId, getCalculationModules(modules))
     }
   }
 
@@ -665,6 +673,7 @@ function updateStationModules(stationId: string, modules: SavedModule[]) {
     }
 
     savedEmpires.value.activeId = empireData.id
+    activeViewStore.activeEmpireId = empireData.id
     saveToStorage()
     takeSnapshot()
   }
@@ -672,10 +681,13 @@ function updateStationModules(stationId: string, modules: SavedModule[]) {
   function saveEmpireAs(name: string) {
     if (!activeEmpire.value) return false
     const newEmpire = JSON.parse(JSON.stringify(activeEmpire.value))
+    const selectedStationIndex = newEmpire.stations.findIndex((station: { id: string }) => station.id === activeStationId.value)
     newEmpire.id = crypto.randomUUID()
     newEmpire.name = name
     newEmpire.stations.forEach((s: { id: string }) => { s.id = crypto.randomUUID() })
     activeEmpire.value = newEmpire
+    activeStationId.value = selectedStationIndex === -1 ? null : newEmpire.stations[selectedStationIndex].id
+    initializeAllStationDerived()
     saveEmpire()
     return true
   }

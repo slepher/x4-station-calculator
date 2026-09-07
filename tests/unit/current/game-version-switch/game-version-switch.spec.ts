@@ -109,6 +109,7 @@ const shipBuildState = {
 
 vi.mock('@/store/useGameDataStore', () => ({
   useGameDataStore: vi.fn(() => ({
+    activeDlcs: [],
     get currentVersion() {
       return gameDataState.currentVersion
     },

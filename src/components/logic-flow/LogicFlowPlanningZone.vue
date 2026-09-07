@@ -7,10 +7,12 @@ import { useGameDataStore } from '@/store/useGameDataStore'
 import { getLogicFlowGroupDisplayName } from '@/store/logic/logicFlowGroupName'
 import ProductionLineGroupComponent from './ProductionLineGroup.vue'
 import type { ProductionLineGroup, FlowNode } from '@/types/x4'
+import { useLogicFlowPlanningPresenter } from './presenters/useLogicFlowPlanningPresenter'
 
 const { t } = useI18n()
 const logicFlow = useLogicFlowStore()
 const gameData = useGameDataStore()
+const { getCompactNodeDisplayName } = useLogicFlowPlanningPresenter()
 
 const dragEnterCounter = ref<Record<string, number>>({})
 const newZoneEnterCounter = ref(0)
@@ -167,35 +169,6 @@ const getNewLineModuleName = (): string => {
   }
   
   return gameData.getWareDisplayName(logicFlow.draggingWareId)
-}
-
-/**
- * 获取紧凑版节点显示名称
- */
-const getCompactNodeDisplayName = (node: any, group: any): string => {
-  if (gameData.isRawMaterialWare(node.wareId)) {
-    return gameData.getWareDisplayName(node.wareId)
-  }
-  
-  // 非预览节点：直接从 group.nodes 查找 moduleId
-  if (!node.isPreview) {
-    const storeNode = group.nodes.find((n: any) => n.wareId === node.wareId)
-    if (storeNode?.moduleId) {
-      return gameData.getModuleDisplayName(storeNode.moduleId) || gameData.getWareDisplayName(node.wareId)
-    }
-  }
-  
-  // 预览节点：根据 wareId + 血统查找模块
-  if (node.isPreview) {
-    const lineage = getEffectiveLineage(group)
-    const module = gameData.findModuleForWare(node.wareId, lineage)
-    if (module) {
-      return gameData.getModuleDisplayName(module.id) || gameData.getWareDisplayName(node.wareId)
-    }
-  }
-  
-  // 最终回退：显示产品名称
-  return gameData.getWareDisplayName(node.wareId)
 }
 
 /**

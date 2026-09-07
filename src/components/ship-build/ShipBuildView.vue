@@ -22,7 +22,7 @@ setDisplayResolvers({
     :data-view-mode="viewMode"
     :data-selected-ship-id="selectedShipId || ''"
   >
-    <ShipBuildSelectorView v-if="viewMode === 'selector'" />
-    <ShipBuildWorkspaceView v-else />
+    <ShipBuildSelectorView v-show="viewMode === 'selector'" />
+    <ShipBuildWorkspaceView v-if="viewMode !== 'selector'" />
   </div>
 </template>
