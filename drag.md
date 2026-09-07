@@ -1,5 +1,7 @@
 # 拖放实现与测试指导需求及方案
 
+更新状态（2026-09-07）：按后续审核讨论，现有 skill 已从 `x4-drag-test` 改名为 [x4-drag](.trae/skills/x4-drag/SKILL.md)，覆盖设计、开发、测试和排障，并增加列表与地图实现配方、shadow/占位和计数器说明。更新前 evidence_runner 的 15 项专项运行结果为 14 通过、1 失败，范围与缺口记录在 [drag-playbook](.trae/skills/x4-drag/references/drag-playbook.md)。下文保留原方案背景，当前执行规则以 skill 为准。
+
 ## 需求背景
 
 拖放实现与 E2E 测试在多轮工作中反复出现卡住、失败或假阳性。问题不仅发生在执行阶段，也可能来自交互方案、状态与 DOM 归属、实现 API 和测试 API 的选择。需要让 Luna 等 agent 从方案设计开始做出有依据的选择，再准确定位失败阶段，避免用反复调整鼠标路径、增加等待时间或重复执行来弥补设计缺陷。
@@ -13,11 +15,11 @@
 - 明确何时继续排查、何时停止重复尝试并提交证据。
 - 同时指导拖放实现和测试，遵守当前 `store → presenter → vue` 分层。
 
-本文件只记录需求与方案；尚未修改 skill、实现代码或测试。
+本文件保留需求与方案；skill 已更新，本次未修改产品实现或测试。
 
 ## 已有资产与问题
 
-已有项目 skill：[x4-drag-test](.trae/skills/x4-drag-test/SKILL.md)。应在此基础上修订，不另建 Luna 专用副本。
+已有项目 skill：[x4-drag](.trae/skills/x4-drag/SKILL.md)。应在此基础上修订，不另建 Luna 专用副本。
 
 当前需要纠正或补充的内容：
 
@@ -44,7 +46,7 @@
 
 | 载体 | 职责 |
 | --- | --- |
-| `.trae/skills/x4-drag-test/SKILL.md` | 保存设计与 API 选择步骤、实施和验证要求、停止条件；触发范围覆盖设计、实现、测试和排障 |
+| `.trae/skills/x4-drag/SKILL.md` | 保存设计与 API 选择步骤、实施和验证要求、停止条件；触发范围覆盖设计、实现、测试和排障 |
 | skill 下的 `references/drag-playbook.md`（拟新增） | 保存方案与 API 适用条件、机制分类、helper 索引、失败签名及证据案例 |
 | 拖放任务的派发说明及适用设计、实现、E2E 工作流 | 明确要求方案设计前读取该 skill，不能仅依赖自动触发或等到测试失败再读 |
 

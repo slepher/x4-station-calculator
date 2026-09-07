@@ -70,9 +70,9 @@ await page.locator('.result-item').first().click();
 
 ---
 
-## Vue 拖拽测试 (使用 x4-drag-test skill)
+## 拖拽开发与测试 (使用 x4-drag skill)
 
-> 详细指南请参阅 `x4-drag-test` skill
+> 方案选择、shadow、占位和测试指南参阅 [x4-drag](../.trae/skills/x4-drag/SKILL.md)。以下状态分类仅适用于 Logic Flow，不是地图或文件拖入的通用规则。
 
 ### 拖拽状态分类
 - **Normal**: 空区域 → `border-blue-500`
@@ -81,8 +81,9 @@ await page.locator('.result-item').first().click();
 - **Rejected**: 不匹配阵营 → `border-red-600`
 
 ### 事件序列
-- **成功投放**: `dragstart` → `dragenter` → `drop` → `dragend`
-- **取消拖拽**: `dragstart` → `dragend` (无 `drop`)
+- **成功投放**: 有效按下 → 实际启动 → 精确目标 hover/preview → 释放 → 精确业务结果 → 清理。
+- **取消拖拽**: 实际启动 → 离开/取消 → 释放 → 合同要求的状态不变与清理。
+- 使用匹配机制的真实输入，不派发合成事件代替拖拽。计数器防 hover 闪烁、占位不跳动和异构 shadow 分别验证；已有普通拖放通过不代表这些专项合同通过。
 
 ---
 

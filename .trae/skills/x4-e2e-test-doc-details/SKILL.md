@@ -5,6 +5,8 @@ description: "Use when refining X4 `e2e_tests.md` into detailed E2E task, fixtur
 
 # X4 E2E Test Documentation Details
 
+涉及拖拽（含 shadow、占位与 hover 稳定性）时，在方案设计、实现、测试或排障前读取 [x4-drag](../x4-drag/SKILL.md)，并将该要求带入子任务派发说明。按其场景配方选择实现和验证方式；本阶段的文件与执行权限保持不变。
+
 ## 目的
 
 基于 `e2e_tests.md` 细化 E2E 测试方案，生成实现前需要的详细文档和 fixture 资产。

@@ -5,6 +5,8 @@ description: "Run change-scoped X4 Playwright E2E tests and validate coverage ag
 
 # X4 E2E Test Run
 
+涉及拖拽（含 shadow、占位与 hover 稳定性）时，在方案设计、实现、测试或排障前读取 [x4-drag](../x4-drag/SKILL.md)，并将该要求带入子任务派发说明。按其场景配方选择实现和验证方式；本阶段的文件与执行权限保持不变。
+
 ## 目的
 
 运行指定 change 的 E2E 测试，并在运行前后确认 `e2e_test_tasks.md` 与实际 Playwright 用例仍保持对应。

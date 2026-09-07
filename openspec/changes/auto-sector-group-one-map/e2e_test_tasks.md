@@ -55,7 +55,7 @@
 
 - [ ] 2.5 drag sort：覆盖 Hub list 拖拽排序只改变 groups 顺序，不触发计算，不改变 coverage/connection/jumpRange
   - [ ] 2.5.1 Drag handle 可见：编辑态 → 检查 `.group-item` → 断言 drag handle 存在
-  - [ ] 2.5.2 拖拽排序改变 groups 顺序：记录排序前顺序 → Playwright Mouse API 拖拽 (参考 x4-drag-test) → 断言顺序改变
+  - [ ] 2.5.2 拖拽排序改变 groups 顺序：记录排序前顺序 → Playwright Mouse API 拖拽 (参考 x4-drag) → 断言顺序改变
   - [ ] 2.5.3 拖拽不触发计算：排序后 → 断言 groups 的 coverage/connectedGroupIds/jumpRange 与排序前一致
   - [ ] 2.5.4 拖拽过程中 placeholder 可见：mouse.down 后 → 断言虚线 placeholder 存在
 
@@ -113,7 +113,7 @@
 
 - [ ] 5.1 blueprint 创建：覆盖从 blueprint station 拖拽创建 virtual station draft，并复制 station plan 必要字段
   - [ ] 5.1.1 拖拽源存在：Virtual Station tab 选择 empire → 断言 `.free-station-item` 可拖拽项存在
-  - [ ] 5.1.2 创建增加 draft 计数：通过 page.evaluate 调用 createVirtualStationDraftFromBlueprint → 断言 virtualStationDrafts.length +1
+  - [ ] 5.1.2 创建增加 draft 计数：通过 UI 选择蓝图来源 → 真实鼠标拖入合法 map sector → 释放前断言 preview → 释放后断言 virtualStationDrafts.length +1（只读状态，不调用 store 模拟拖入）
   - [ ] 5.1.3 复制字段包括 name/type/modules/settings/lockedWares/warePriority：检查新 draft → 断言六个字段均已复制 (deep clone)
   - [ ] 5.1.4 不复制 id/sectorId：检查新 draft → 断言 id 为新 UUID ≠ source id → 断言 saveStationCode 为 undefined
 

@@ -5,6 +5,8 @@ description: "Fix a tracked X4 bug with current-run Unit or E2E reproduction and
 
 # X4 Bug Fix Workflow
 
+涉及拖拽（含 shadow、占位与 hover 稳定性）时，在方案设计、实现、测试或排障前读取 [x4-drag](../x4-drag/SKILL.md)，并将该要求带入子任务派发说明。按其场景配方选择实现和验证方式；本阶段的文件与执行权限保持不变。
+
 This skill owns `/x4:bug-fix`. It keeps reproduction, implementation, and verification in the workflow that owns the affected boundary.
 
 ## Input

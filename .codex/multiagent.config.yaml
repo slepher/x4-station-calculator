@@ -58,14 +58,14 @@ agents:
 
   discuss_analyst:
     role: "Discussion and requirement clarification"
-    use_skills: [x4-discuss]
+    use_skills: [x4-discuss, x4-drag]
     constraints:
       - "No source or test edits."
       - "No document edits unless requested."
 
   doc_editor:
     role: "OpenSpec planning editor"
-    use_skills: [x4-doc, openspec-sync-specs]
+    use_skills: [x4-doc, openspec-sync-specs, x4-drag]
     outputs:
       - "request/spec/design/tasks artifacts"
       - "Focused Unit coverage attached to behavior-changing tasks"
@@ -75,15 +75,15 @@ agents:
 
   change_creator:
     role: "Step-by-step artifact creator"
-    use_skills: [x4-new, x4-doc]
+    use_skills: [x4-new, x4-doc, x4-drag]
 
   fast_forward_creator:
     role: "One-pass artifact creator"
-    use_skills: [x4-ff, x4-doc]
+    use_skills: [x4-ff, x4-doc, x4-drag]
 
   implementer:
     role: "Source and focused Unit-test owner"
-    use_skills: [x4-apply]
+    use_skills: [x4-apply, x4-drag]
     required_inputs:
       - "openspec/changes/<change>/tasks.md"
       - "openspec/changes/<change>/design.md"
@@ -102,7 +102,7 @@ agents:
 
   bug_fixer:
     role: "Bug reproduction and fix router"
-    use_skills: [x4-bug-fix, x4-apply, x4-e2e-test]
+    use_skills: [x4-bug-fix, x4-apply, x4-e2e-test, x4-drag]
 
   e2e_test_engineer:
     role: "E2E documentation, review, implementation, and run owner"
@@ -113,7 +113,7 @@ agents:
       - x4-e2e-test-doc-viewer
       - x4-e2e-test-impl
       - x4-e2e-test-run
-      - x4-drag-test
+      - x4-drag
     required_outputs:
       - "openspec/changes/<change>/e2e_tests.md"
       - "openspec/changes/<change>/e2e_test_tasks.md"

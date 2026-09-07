@@ -5,6 +5,8 @@ description: "Orchestrate the X4 E2E-only workflow across documentation, review,
 
 # X4 E2E Test Workflow
 
+涉及拖拽（含 shadow、占位与 hover 稳定性）时，在方案设计、实现、测试或排障前读取 [x4-drag](../x4-drag/SKILL.md)，并将该要求带入子任务派发说明。按其场景配方选择实现和验证方式；本阶段的文件与执行权限保持不变。
+
 ## 目的
 
 `x4-e2e-test` 是当前唯一的 E2E 测试编排入口，负责从 E2E 文档到实现和运行的完整链路。

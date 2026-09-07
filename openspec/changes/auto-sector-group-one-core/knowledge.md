@@ -199,19 +199,7 @@ expect(groups[0].tradeStation).toEqual(expectedTradeStation)
 
 ### 拖拽测试（vuedraggable）
 
-参考 x4-drag-test skill。vuedraggable 使用 Sortable.js，需要用 Playwright Mouse API 模拟：
-
-```ts
-// 拖拽 group card 排序
-const source = page.locator('.sector-group-card').first()
-const target = page.locator('.sector-group-card').nth(2)
-const sourceBox = await source.boundingBox()
-const targetBox = await target.boundingBox()
-await page.mouse.move(sourceBox.x + sourceBox.width/2, sourceBox.y + sourceBox.height/2)
-await page.mouse.down()
-await page.mouse.move(targetBox.x + targetBox.width/2, targetBox.y + targetBox.height/2, { steps: 10 })
-await page.mouse.up()
-```
+参考 [x4-drag](../../../.trae/skills/x4-drag/SKILL.md) 的列表配方。优先复用 `tests/e2e/auto-sector-group-one-map/auto-sector-group-one-map.spec.ts` 中 group handle 排序用例：稳定 ID 定位源/目标，真实鼠标按下并启动，释放前检查 placeholder，释放后检查精确顺序及业务内容，按合同确认保存。占位可见不能证明移动过程中不跳动；不再复制依赖 `.first()` 和固定中心点的通用拖动代码。
 
 ## 关键领域规则
 

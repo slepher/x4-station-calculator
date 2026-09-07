@@ -5,6 +5,8 @@ description: "Implement Playwright E2E tests from `e2e_test_tasks.md` and valida
 
 # X4 E2E Test Implementation
 
+涉及拖拽（含 shadow、占位与 hover 稳定性）时，在方案设计、实现、测试或排障前读取 [x4-drag](../x4-drag/SKILL.md)，并将该要求带入子任务派发说明。按其场景配方选择实现和验证方式；本阶段的文件与执行权限保持不变。
+
 ## 目的
 
 根据 `openspec/changes/<change-name>/e2e_test_tasks.md` 与 `knowledge.md` 实现或补充 Playwright E2E 测试。

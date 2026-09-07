@@ -60,6 +60,8 @@ Deprecated and out of active workflow scope:
 - `/x4:verify` -> `x4-verify`
 - `/x4:archive` -> `x4-archive`
 
+`x4-drag` 是设计、实现和 E2E 阶段共享的拖拽能力，按相关任务条件加载，不新增独立 change 编排命令。具体读取和派发要求由各阶段 skill 定义。
+
 ## Shared Change Name Resolution Reference
 
 For commands that accept `change-name`, phase skills should use the shared resolver policy:

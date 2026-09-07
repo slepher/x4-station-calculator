@@ -67,7 +67,7 @@ Implement and supplement Unit/E2E/Bug/Bug-fix test code based on `test_tasks.md`
 - E2E 使用项目 `test-setup` 与 `knowledge.md` 提供的定位语义。
 - 断言必须是可观测结果断言，禁止低信息量布尔旗标式断言。
 - 多分支任务（A/B）必须分别落地断言。
-- 拖拽类场景遵循 `x4-drag-test` 规范，优先稳定 identity locator（`data-*`）。
+- 拖拽类场景遵循 `x4-drag` 规范，优先稳定 identity locator（`data-*`）；本 legacy skill 不因此恢复为 active workflow。
 
 #### A.3 State/Transition Authoring (MANDATORY)
 
