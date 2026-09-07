@@ -1,0 +1,5 @@
+# 设计
+
+复用activeViewStore现有持久化activeEmpireId setter；save成功时与savedEmpires.activeId一致，不调用switchToEmpire改变当前模块，不调用loadEmpire重置活动站点。审查save、saveAs、load、create、delete、initialize所有身份路径，保持未保存草案和已有保存数据的区别。
+
+saveAs重新生成全部站点ID；检查活动站点映射及Map缓存是否仍引用旧ID，若触达此同一事务问题，明确按原活动站点映射新ID并刷新必要派生。不要借机重构整个初始化/存储方案，不新增fallback链，不改共享DLC修复，不删debug。

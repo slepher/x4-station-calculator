@@ -1,0 +1,5 @@
+# 设计
+
+handleAddHubDraft创建group后调用applyTradeStationDefaultsToResult。tradeStationCandidates对无玩家候选显式给[]，该入口只在undefined时设virtual，却对[]直接跳过；handleResetTradeStations对[]已经设virtual。
+
+最小修复该已知空集合分支，维持已有选择和savedTradeStationCode retain的优先级。追踪全部默认入口（初始化、重算、手动新增等）；不要把“候选未准备”与“已知为空”用fallback链混为一谈，不改变determineDefaultTradeStation普通玩家评分规则。不抽象新层或重构整个presenter。

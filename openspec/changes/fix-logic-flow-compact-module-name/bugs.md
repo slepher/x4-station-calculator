@@ -1,0 +1,11 @@
+## Bug: Compact view confuses modules producing the same ware
+- **ID**: BUG-001
+- **Description**: 同组两个 manual hullparts 节点分别使用通用与 Teladi 模块，紧凑视图却都显示通用模块名。
+- **Steps to Reproduce**: 通过 Logic Flow UI 创建同组不同 lineage 的 hullparts 节点；拖动合法武器产物进入 compact view。
+- **Expected Behavior**: 每个节点使用自己的 moduleId 显示模块名；两个生产者与武器节点的连接保持正确。
+- **Actual Behavior**: 两个名称均为“船体部件产线”。当前实现按 wareId 查找 group 首节点，丢失模块身份。
+- **Status**: Verified（focused Unit 6/6、构建、原失败 E2E 1/1 与 M5.2 完整 49/49 全部通过）
+- **Related Verification**: `tasks.md` 的 focused Unit；`tests/e2e/logic-flow/logic-flow-bug-regression.spec.ts` 的 cross-two-selected-lineages 用例，迁移合同 M5.2。
+- **Evidence**: `/tmp/x4-migration-M5.2/focused.log`（48 passed / 1 failed）、`/tmp/x4-migration-M5.2/coexist-evidence.log`（同一名称失败，release 和双端点断言通过）。
+- **Unit Evidence**: `npm run test:unit -- tests/unit/logic-flow/logic-flow-compact-module-name.spec.ts`；修复前 exit 1，1 failed / 5 passed（精确重现 Teladi 被显示为通用）；修复后 exit 0，6 passed。日志 `/tmp/x4-migration-FIX-M5.2/unit-{red,green}.log`。包含同 ware 不同 moduleId、raw、无模块占位、锁定/未锁定 preview、无生产者 preview 对照。
+- **Post-fix Verification**: 独占窗口内 `npm run build` exit 0（`/tmp/x4-migration-FIX-M5.2/build.log`）。随后切回 M5.2 E2E 阶段，fresh dist：精确 coexist 用例 exit 0，1 passed（`/tmp/x4-migration-M5.2/post-fix-coexist.log`）；三个原 spec 完整 exit 0，49 passed / 0 failed / 0 skipped，1.7m（`/tmp/x4-migration-M5.2/post-fix-full.log`）。对应 trace 保留在各同名输出目录。没有 retries。

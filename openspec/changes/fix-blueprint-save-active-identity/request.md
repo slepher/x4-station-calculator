@@ -1,0 +1,3 @@
+# 需求
+
+M15.1多帝国fixture复现NEW→新站→Save/SaveAs后storage的activeId为新帝国，但reload由旧activeView.activeEmpireId选回首个帝国。保存成功必须持久化一致的活动身份；不得用空帝国列表fixture掩盖此问题。保存/另存保留当前工作台与有效活动站点，不重载丢弃当前状态。
