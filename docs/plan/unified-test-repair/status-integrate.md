@@ -4,7 +4,7 @@
 
 - Name: `integrate`
 - State: `working`
-- Active task: `task-test-4`
-- Candidate: `0bfd04c9`
-- Next action: `final reviewer runs bounded gap focused gate; accept only with real pass, otherwise record unavailable/blocked`
-- Blocker: `none`
+- Active task: `none`
+- Candidate: `none`
+- Next action: `run parent review and focused/collection/build/diff validation for the eight candidates merged into develop`
+- Blocker: `the eight merged candidates remain incomplete until parent review closes their recorded contract issues; task-test-10.4 baseline remains interrupted and requires port/setup diagnostics`
