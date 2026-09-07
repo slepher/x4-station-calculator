@@ -19,6 +19,12 @@ async function readSelectedArchive(page: import('@playwright/test').Page) {
   })
 }
 
+async function readStationArchiveId(page: import('@playwright/test').Page) {
+  return page.evaluate(() => (window as any).liveStore.playerStationRecords.find(
+    (record: any) => record.code === 'KXN-018' && record.type === 'station'
+  )?.archiveId)
+}
+
 test.describe('binding selects latest valid archive', () => {
   test.beforeEach(async ({ page }) => {
     await page.addStyleTag({
@@ -83,9 +89,11 @@ test.describe('binding selects latest valid archive', () => {
       isValid: true,
       isCompatible: true
     })
+    await expect.poll(() => readStationArchiveId(page)).toBe(`${GAME_GUID}_700000`)
 
     const save008 = group.locator('.save-filename').getByText('save_008', { exact: true }).locator('..').locator('..').locator('..')
     await expect(save008).toHaveCount(1)
+    await expect(save008).not.toHaveClass(/save-item-active/)
     await save008.locator('.save-info').click()
     await expect(save008).toHaveClass(/save-item-active/)
     await expect.poll(() => readSelectedArchive(page)).toEqual({
@@ -95,8 +103,10 @@ test.describe('binding selects latest valid archive', () => {
       isValid: true,
       isCompatible: true
     })
+    await expect.poll(() => readStationArchiveId(page)).toBe(`${GAME_GUID}_667632.933`)
 
     const save008Later = group.locator('.save-item').filter({ hasText: 'save_008_later' })
+    await expect(save008Later).not.toHaveClass(/save-item-active/)
     await save008Later.locator('.save-info').click()
     await expect(save008Later).toHaveClass(/save-item-active/)
     await expect.poll(() => readSelectedArchive(page)).toEqual({
@@ -106,6 +116,7 @@ test.describe('binding selects latest valid archive', () => {
       isValid: true,
       isCompatible: true
     })
+    await expect.poll(() => readStationArchiveId(page)).toBe(`${GAME_GUID}_700000`)
 
     await page.reload()
     await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 2000 })
@@ -159,5 +170,6 @@ test.describe('binding selects latest valid archive', () => {
       },
       hasKxn018: true
     })
+    await expect.poll(() => readStationArchiveId(page)).toBe(`${GAME_GUID}_700000`)
   })
 })

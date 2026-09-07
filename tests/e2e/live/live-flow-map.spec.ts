@@ -16,7 +16,7 @@ async function setLanguage(page: Page, lang: string) {
 
 async function switchToLiveProduction(page: Page) {
   await page.getByTestId('top-view-btn-live-production').click()
-  await page.waitForTimeout(200)
+
 }
 
 async function selectStationInSector(page: Page, sectorName: string, stationName: string) {
@@ -28,13 +28,12 @@ async function selectStationInSector(page: Page, sectorName: string, stationName
   const supplyTab = page.locator(`[data-testid="sidebar-sector"][data-sector-id="${sectorIds[sectorName]}"]`)
   await expect(supplyTab).toBeVisible({ timeout: 5000 })
   await supplyTab.click()
-  await page.waitForTimeout(500)
 
   const stationIds: Record<string, string> = { '地球人': 'KXN-018', '新建空间站': 'f36126e5-7798-ed14-3c03-938b961efa0b' }
-  const stationTab = page.locator(`[data-testid="sidebar-station"][data-station-id="${stationIds[stationName] || stationName}"]`)
+  const stationTab = page.locator(`[data-testid="sidebar-station"][data-station-id="${stationIds[stationName]}"]`)
   await expect(stationTab).toBeVisible({ timeout: 5000 })
   await stationTab.click()
-  await page.waitForTimeout(300)
+
 }
 
 test.describe('Live Flow Map - 模块列表验证', () => {
@@ -52,6 +51,8 @@ test.describe('Live Flow Map - 模块列表验证', () => {
     await expect(plannedLabel).toContainText(/规划|Planned/)
 
     const plannedModules = plannedSection.locator('.module-row')
+    await expect(plannedModules).toHaveCount(3)
+    expect((await plannedModules.locator('.module-name-text').allTextContents()).sort()).toEqual(['电子基质生产线', '碳化硅产线', '金属微晶产线'].sort())
     const plannedCount = await plannedModules.count()
 
     const plannedModuleNames: string[] = []
@@ -104,7 +105,6 @@ test.describe('Live Flow Map - 模块列表验证', () => {
     await expect(modeBtn).toBeEnabled()
 
     await modeBtn.click()
-    await page.waitForTimeout(500)
 
     await expect(modeBtn).toHaveClass(/active-live/)
 
@@ -123,7 +123,7 @@ test.describe('Live Flow Map - 模块列表验证', () => {
 
       const valueEl = flowWrapper.first().locator('.value')
       const valueText = await valueEl.textContent()
-      const netRate = parseFloat(valueText?.replace(/[+Cr\s]/g, '') || '0')
+      const netRate = parseFloat(valueText!.replace(/[+Cr,\s]/g, ''))
 
       if (expectedNetRate === 'positive') {
         expect(netRate).toBeGreaterThan(0)
@@ -133,10 +133,12 @@ test.describe('Live Flow Map - 模块列表验证', () => {
     }
 
     const energycellsFlow = page.locator('.flow-wrapper[data-resource-id="energycells"]')
-    const detailRows = energycellsFlow.locator('.detail-row')
+    await energycellsFlow.locator('.main-row').click()
+    await expect(energycellsFlow.locator('.list-box')).toBeVisible()
+    const detailRows = energycellsFlow.locator('.list-item')
     const detailCount = await detailRows.count()
 
-    expect(detailCount).toBeLessThanOrEqual(3)
+    expect(detailCount).toBe(3)
 
     const detailNames: string[] = []
     for (let i = 0; i < detailCount; i++) {
@@ -157,7 +159,6 @@ test.describe('Live Flow Map - Transit Hub 切换规则验证', () => {
     const transitTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_715_sector001_macro"]')
     await expect(transitTab).toBeVisible({ timeout: 5000 })
     await transitTab.click()
-    await page.waitForTimeout(500)
 
     const modeToggle = page.locator('.mode-toggle-chip')
     await expect(modeToggle).toBeVisible({ timeout: 1000 })
@@ -167,7 +168,6 @@ test.describe('Live Flow Map - Transit Hub 切换规则验证', () => {
     expect(chipStatus).toContain('规划')
 
     await modeToggle.click()
-    await page.waitForTimeout(500)
 
     const liveChipStatus = await modeToggle.locator('.chip-status').textContent()
     expect(liveChipStatus).toContain('实时')
@@ -178,7 +178,6 @@ test.describe('Live Flow Map - Transit Hub 切换规则验证', () => {
     const transitTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_100_sector001_macro"]')
     await expect(transitTab).toBeVisible({ timeout: 5000 })
     await transitTab.click()
-    await page.waitForTimeout(500)
 
     const modeToggle = page.locator('.mode-toggle-chip')
     await expect(modeToggle).toBeVisible({ timeout: 1000 })
@@ -187,7 +186,6 @@ test.describe('Live Flow Map - Transit Hub 切换规则验证', () => {
     expect(chipStatus).toContain('规划')
 
     await modeToggle.click()
-    await page.waitForTimeout(500)
 
     const liveChipStatus = await modeToggle.locator('.chip-status').textContent()
     expect(liveChipStatus).toContain('实时')
@@ -200,14 +198,12 @@ test.describe('Live Flow Map - Transit Hub 切换规则验证', () => {
     const transitTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_715_sector001_macro"]')
     await expect(transitTab).toBeVisible({ timeout: 5000 })
     await transitTab.click()
-    await page.waitForTimeout(500)
 
     const buildPanel = page.locator('.tier-section.tier-auto')
     await expect(buildPanel).toBeVisible({ timeout: 2000 })
 
     const modeToggle = page.locator('.mode-toggle-chip')
     await modeToggle.click()
-    await page.waitForTimeout(500)
 
     const archiveList = page.locator('.archive-module-list')
     await expect(archiveList).toBeVisible()
@@ -217,7 +213,6 @@ test.describe('Live Flow Map - Transit Hub 切换规则验证', () => {
     const transitTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_100_sector001_macro"]')
     await expect(transitTab).toBeVisible({ timeout: 5000 })
     await transitTab.click()
-    await page.waitForTimeout(500)
 
     const buildPanel = page.locator('.tier-section.tier-auto')
     await expect(buildPanel).toBeVisible({ timeout: 2000 })
@@ -226,7 +221,6 @@ test.describe('Live Flow Map - Transit Hub 切换规则验证', () => {
 
     const modeToggle = page.locator('.mode-toggle-chip')
     await modeToggle.click()
-    await page.waitForTimeout(500)
 
     const liveContent = await buildPanel.textContent()
 
@@ -238,7 +232,6 @@ test.describe('Live Flow Map - Transit Hub 切换规则验证', () => {
 
     const modeBtn = page.locator('.mode-toggle-chip')
     await modeBtn.click()
-    await page.waitForTimeout(500)
 
     const dashboard = page.locator('[data-testid="station-dashboard"]')
     await expect(dashboard).toBeVisible({ timeout: 2000 })
@@ -255,11 +248,9 @@ test.describe('Live Flow Map - Transit Hub 切换规则验证', () => {
     const transitTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_715_sector001_macro"]')
     await expect(transitTab).toBeVisible({ timeout: 5000 })
     await transitTab.click()
-    await page.waitForTimeout(500)
 
     const modeToggle = page.locator('.mode-toggle-chip')
     await modeToggle.click()
-    await page.waitForTimeout(500)
 
     await expect(modeToggle).toHaveClass(/active-live/)
 
@@ -273,32 +264,39 @@ test.describe('Live Flow Map - Transit Hub 切换规则验证', () => {
   })
 
   test('transit hub center dashboard 在 live mode 下切换数据源', async ({ page }) => {
+    await page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_715_sector001_macro"]').click()
+    await page.locator('[data-testid="sidebar-station"][data-station-id="RWC-785"]').click()
+    const clay = page.locator('.module-row--draggable').filter({ has: page.locator('.module-name-text').filter({ hasText: /电子黏土/ }) }).locator('input')
+    await clay.fill('100')
+    await clay.press('Tab')
+    await expect(clay).toHaveValue('100')
     const transitTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_715_sector001_macro"]')
     await expect(transitTab).toBeVisible({ timeout: 5000 })
     await transitTab.click()
-    await page.waitForTimeout(500)
 
     const centerDashboard = page.locator('[data-testid="transit-hub-center-dashboard"]')
     await expect(centerDashboard).toBeVisible({ timeout: 2000 })
 
-    const planningFlows = centerDashboard.locator('.ware-flow-row')
-    const planningCount = await planningFlows.count()
+    const clayFlow = centerDashboard.locator('[data-resource-id="claytronics"] .value')
+    await expect(clayFlow).toBeVisible()
+    const planningText = (await clayFlow.innerText()).replace(/[+,\s]/g, '')
 
     const modeToggle = page.locator('.mode-toggle-chip')
     await modeToggle.click()
-    await page.waitForTimeout(500)
 
-    const liveFlows = centerDashboard.locator('.ware-flow-row')
-    const liveCount = await liveFlows.count()
-
-    expect(liveCount).toBeGreaterThanOrEqual(0)
+    await expect(modeToggle).toHaveClass(/active-live/)
+    await expect(clayFlow).toBeVisible()
+    const liveText = (await clayFlow.innerText()).replace(/[+,\s]/g, '')
+    expect(Number(liveText)).toBeLessThan(Number(planningText))
+    await modeToggle.click()
+    await expect(modeToggle).toHaveClass(/active-planning/)
+    await expect.poll(async () => (await clayFlow.innerText()).replace(/[+,\s]/g, '')).toBe(planningText)
   })
 
   test('transit hub materials panel 在无 archive 时保持 planning 数据', async ({ page }) => {
     const transitTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_100_sector001_macro"]')
     await expect(transitTab).toBeVisible({ timeout: 5000 })
     await transitTab.click()
-    await page.waitForTimeout(500)
 
     const materialsPanel = page.locator('[data-testid="transit-hub-build-panel"]')
     await expect(materialsPanel).toBeVisible({ timeout: 2000 })
@@ -307,7 +305,6 @@ test.describe('Live Flow Map - Transit Hub 切换规则验证', () => {
 
     const modeToggle = page.locator('.mode-toggle-chip')
     await modeToggle.click()
-    await page.waitForTimeout(500)
 
     const liveMaterials = await materialsPanel.locator('.module-row').count()
 
@@ -318,7 +315,6 @@ test.describe('Live Flow Map - Transit Hub 切换规则验证', () => {
     const transitTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_715_sector001_macro"]')
     await expect(transitTab).toBeVisible({ timeout: 5000 })
     await transitTab.click()
-    await page.waitForTimeout(500)
 
     const toolbar = page.locator('.live-toolbar')
     await expect(toolbar).toBeVisible({ timeout: 1000 })
@@ -333,15 +329,13 @@ test.describe('Live Flow Map - Transit Hub 切换规则验证', () => {
     expect(sunlightValue).not.toBe('100')
 
     const sunlightNum = parseInt(sunlightValue || '0')
-    expect(sunlightNum).toBeGreaterThan(100)
-    expect(sunlightNum).toBeLessThan(200)
+    expect(sunlightNum).toBe(141)
   })
 
   test('transit hub 扇区信息显示正确的扇区资源数量', async ({ page }) => {
     const transitTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_715_sector001_macro"]')
     await expect(transitTab).toBeVisible({ timeout: 5000 })
     await transitTab.click()
-    await page.waitForTimeout(500)
 
     const toolbar = page.locator('.live-toolbar')
     await expect(toolbar).toBeVisible({ timeout: 1000 })
@@ -353,29 +347,26 @@ test.describe('Live Flow Map - Transit Hub 切换规则验证', () => {
 
     expect(resourceValue).toBeTruthy()
     const count = parseInt(resourceValue || '0')
-    expect(count).toBeGreaterThan(0)
+    expect(count).toBe(6)
   })
 
   test('transit hub 扇区 popover 显示正确的扇区名称', async ({ page }) => {
     const transitTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_715_sector001_macro"]')
     await expect(transitTab).toBeVisible({ timeout: 5000 })
     await transitTab.click()
-    await page.waitForTimeout(500)
 
     const toolbar = page.locator('.live-toolbar')
     await expect(toolbar).toBeVisible({ timeout: 1000 })
 
     const sectorPill = toolbar.locator('[data-testid="sector-pill"]')
     await sectorPill.click()
-    await page.waitForTimeout(300)
 
     const popover = page.locator('.sector-popover')
     await expect(popover).toBeVisible({ timeout: 1000 })
 
     const popoverHeader = await popover.locator('.popover-header').textContent()
 
-    expect(popoverHeader).toBeTruthy()
-    expect(popoverHeader).not.toBe('-')
+    expect(popoverHeader).toContain('阿尔忒弥斯的朦胧')
 
     await page.keyboard.press('Escape')
   })

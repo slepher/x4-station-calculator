@@ -1,726 +1,255 @@
-import { expect } from '@playwright/test';
-import { test } from '../../test-setup';
+import { expect, type Page, type Locator } from '@playwright/test'
+import { test } from '../../test-setup'
 
-async function addModule(page: any, name: string) {
-  const searchInput = page.locator('[data-testid="candidate-search-input"]').first();
-  await searchInput.click();
-  await searchInput.fill('');
-  await page.keyboard.type(name, { delay: 30 });
-  await page.waitForTimeout(800);
-  const candidate = page.locator('[data-testid^="grouped-candidate-item-"]').first();
-  await expect(candidate).toBeVisible({ timeout: 5000 });
-  await candidate.click();
-  await page.waitForTimeout(300);
+const ENERGY = 'module_gen_prod_energycells_01'
+const HULL = 'module_gen_prod_hullparts_01'
+const dashboard = (page: Page) => page.getByTestId('station-dashboard')
+const summary = (page: Page) => dashboard(page).locator('.module-detail').filter({ has: page.locator('.variant-summary') })
+const energyModule = (page: Page) => dashboard(page).locator('.module-detail').filter({ has: page.locator('.variant-module .name').filter({ hasText: /^能量电池产线$/ }) })
+const allocation = (page: Page) => page.locator('.allocation-view .item-container').filter({ has: page.locator('.header-name[title="能量电池"]') })
+const buffer = (page: Page, label: string) => page.locator('.volume-controls-section .slider-container').filter({ has: page.locator('.slider-label').filter({ hasText: label }) }).locator('input')
+async function range(slider: Locator, value: number) {
+  await slider.focus()
+  await slider.press('Home')
+  for (let i = 0; i < value; i++) await slider.press('ArrowRight')
+  await expect(slider).toHaveValue(String(value))
 }
+async function addModule(page: Page, id = ENERGY) {
+  await page.getByTestId('candidate-search-input').fill(id)
+  await page.getByTestId(`grouped-candidate-item-${id}`).click()
+}
+async function volume(page: Page) {
+  await page.getByTestId('view-tab-btn-station-wareflow-volume').click()
+  await expect(allocation(page).locator('.recommended-count')).toHaveText('126,000')
+}
+async function doubledBuffer(page: Page) {
+  await volume(page)
+  await range(buffer(page, '主产物缓冲时间'), 24)
+  await expect(allocation(page).locator('.recommended-count')).toHaveText('252,000')
+}
+function numeric(text: string) { return Number(text.replace(/[^\d.-]/g, '')) }
+
+test.beforeEach(async ({ page }) => {
+  await page.setViewportSize({ width: 1920, height: 1080 })
+  await page.goto('/')
+  const fixture = await import('../../fixtures/db.json', { with: { type: 'json' } })
+  const data = JSON.parse(JSON.stringify(fixture.default))
+  delete data.vsn
+  data.x4_game_version = { version: '9.0', beta: false }
+  data.x4_empire_data_v9 = { version: 5, activeId: null, list: [] }
+  await page.evaluate(data => {
+    Object.entries(data).forEach(([key, value]) => localStorage.setItem(key, JSON.stringify(value)))
+    localStorage.setItem('isTestEnv', 'true')
+  }, data)
+  await page.reload()
+  await page.getByTestId('language-select').selectOption('zh-CN')
+  await page.addStyleTag({ content: '*, *::before, *::after { transition: none !important; animation: none !important; }' })
+  await page.getByTestId('sidebar-add-station').click()
+  await expect(page.getByTestId('sidebar-station')).toHaveCount(1)
+})
 
 test.describe('Station Dashboard - Basic Rendering', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/');
-    await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 10000 });
-    await page.waitForTimeout(500);
-  });
-
   test('should render dashboard container with header title and view mode switcher', async ({ page }) => {
-    const dashboard = page.locator('.dashboard-container');
-    await expect(dashboard).toBeVisible();
-
-    const header = page.locator('.dashboard-header');
-    const title = header.locator('.header-title');
-    const switcher = page.locator('.dashboard-container .view-mode-switcher');
-
-    await expect(title).toBeVisible();
-    await expect(switcher).toBeVisible();
-
-    const titleBox = await title.boundingBox();
-    const switcherBox = await switcher.boundingBox();
-    if (titleBox && switcherBox) {
-      expect(titleBox.x).toBeLessThan(switcherBox.x);
-    }
-
-    const unitBadge = header.locator('.unit-badge');
-    await expect(unitBadge).not.toBeVisible();
-  });
-
+    await expect(dashboard(page)).toBeVisible()
+    const title = dashboard(page).locator('.header-title')
+    const tabs = page.getByTestId('view-tab-btn-station-dashboard-materials')
+    await expect(title).toBeVisible()
+    await expect(tabs).toBeVisible()
+    const a = await title.boundingBox(), b = await tabs.boundingBox()
+    expect(a).not.toBeNull(); expect(b).not.toBeNull()
+    expect(a!.x + a!.width).toBeLessThanOrEqual(b!.x)
+  })
   test('should show Cost tab as active by default', async ({ page }) => {
-    const switcher = page.locator('.dashboard-container .view-mode-switcher');
-    const materialsBtn = switcher.locator('button').filter({ hasText: /成本|Cost/ });
-    const timeBtn = switcher.locator('button').filter({ hasText: /时间|Time/ });
-    const workersBtn = switcher.locator('button').filter({ hasText: /工人|Workers/ });
-
-    await expect(materialsBtn).toHaveClass(/active/);
-    await expect(timeBtn).not.toHaveClass(/active/);
-    await expect(workersBtn).not.toHaveClass(/active/);
-  });
-
+    await expect(page.getByTestId('view-tab-btn-station-dashboard-materials')).toHaveClass(/active/)
+    await expect(page.getByTestId('view-tab-btn-station-dashboard-time')).not.toHaveClass(/active/)
+    await expect(page.getByTestId('view-tab-btn-station-dashboard-workers')).not.toHaveClass(/active/)
+  })
   test('should display visual consistency for dashboard elements', async ({ page }) => {
-    await addModule(page, 'Silicon Wafer Production');
-
-    const summaryContainer = page.locator('.item-container').filter({ has: page.locator('.variant-summary') });
-    const totalVal = summaryContainer.locator('.total-value');
-    await expect(totalVal).toBeVisible();
-
-    const color = await totalVal.evaluate((el) => window.getComputedStyle(el).color);
-    expect(color).toMatch(/rgb\(248, 113, 113\)/);
-
-    const moduleTitle = page.locator('.variant-module').first();
-    const symbol = moduleTitle.locator('.symbol');
-    await expect(symbol).toBeVisible();
-    const opacity = await symbol.evaluate((el) => window.getComputedStyle(el).opacity);
-    expect(parseFloat(opacity)).toBeLessThan(0.4);
-  });
-});
+    await addModule(page)
+    await expect(summary(page).locator('.total-value')).toHaveCSS('color', 'rgb(248, 113, 113)')
+    await expect(dashboard(page).locator('.variant-module .symbol').first()).toHaveCSS('opacity', '0.3')
+  })
+})
 
 test.describe('Station Dashboard - Build Cost', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/');
-    await page.waitForSelector('.dashboard-container');
-    const langSelect = page.locator('.toolbar-panel select').first();
-    if (await langSelect.isVisible()) {
-      await langSelect.selectOption('zh-CN');
-      await page.waitForTimeout(200);
-    }
-    const newButton = page.locator('.btn-tool').filter({ hasText: /新建|New/ }).first();
-    if (await newButton.isVisible()) {
-      await newButton.click();
-      const discardButton = page.locator('button').filter({ hasText: /丢弃并新建|Discard & New/ }).first();
-      if (await discardButton.isVisible()) {
-        await discardButton.click();
-      }
-      await page.waitForTimeout(200);
-    }
-  });
-
+  test.beforeEach(async ({ page }) => { await addModule(page) })
   test('should display cost summary with total value and material list', async ({ page }) => {
-    await addModule(page, 'Silicon Wafer Production');
-
-    const totalCostTitle = page.locator('.variant-summary');
-    await expect(totalCostTitle).toBeVisible();
-
-    const priceVal = page.locator('.item-container').filter({ has: totalCostTitle }).locator('.total-value');
-    const priceText = await priceVal.innerText();
-    const priceNum = parseInt(priceText.replace(/,/g, ''));
-    expect(priceNum).toBeGreaterThan(0);
-
-    await totalCostTitle.click();
-    const materialList = page.locator('.material-row');
-    await expect(materialList.first()).toBeVisible();
-
-    const energyCells = materialList.filter({ hasText: /能量电池|Energy Cells/ });
-    await expect(energyCells.first()).toBeVisible();
-  });
-
+    expect(numeric(await summary(page).locator('.total-value').innerText())).toBeGreaterThan(0)
+    await summary(page).locator('.main-row').click()
+    await expect(summary(page).locator('.material-name .name')).toHaveText(['电子黏土', '船体部件', '能量电池'])
+  })
   test('should group modules with quantity and allow expansion', async ({ page }) => {
-    await addModule(page, 'Silicon Wafer Production');
-
-    const moduleGroup = page.locator('.variant-module').filter({ hasText: /Silicon Wafer|硅晶片/ });
-    await expect(moduleGroup).toBeVisible();
-    await expect(moduleGroup).toContainText('1');
-
-    const groupPrice = page.locator('.item-container').filter({ has: moduleGroup }).locator('.total-value');
-    const priceText = await groupPrice.innerText();
-    expect(parseInt(priceText.replace(/,/g, ''))).toBeGreaterThan(0);
-
-    await moduleGroup.click();
-    const detailItems = page.locator('.material-row');
-    await expect(detailItems.first()).toBeVisible();
-  });
-
+    await expect(energyModule(page).locator('.count')).toHaveText('1')
+    await energyModule(page).locator('.main-row').click()
+    // Independent static 9.0 recipe: 260 claytronics, 951 hull parts, 520 energy cells.
+    await expect(energyModule(page).locator('.material-name .qty')).toHaveText(['260', '951', '520'])
+  })
   test('should update total cost when price multiplier slider changes', async ({ page }) => {
-    await addModule(page, 'Silicon Wafer Production');
-
-    const totalVal = page.locator('.item-container').filter({ has: page.locator('.variant-summary') }).locator('.total-value');
-    const initialPrice = await totalVal.innerText();
-
-    const slider = page.locator('.custom-range').first();
-    await slider.fill('1');
-    await page.waitForTimeout(300);
-
-    const newPrice = await totalVal.innerText();
-    expect(newPrice).not.toBe(initialPrice);
-  });
-
-  test.skip('should merge identical modules and maintain addition order', async ({ page }) => {
-    await addModule(page, 'Silicon Wafer Production');
-    await addModule(page, 'Silicon Wafer Production');
-
-    const waferGroup = page.locator('.variant-module').filter({ hasText: /Silicon Wafer|硅晶片/ });
-    await expect(waferGroup).toContainText('2');
-
-    await addModule(page, 'Claytronics Production');
-    await page.waitForTimeout(1000);
-
-    const titles = page.locator('.variant-module');
-    const allTitles = await titles.allInnerTexts();
-
-    await expect(titles.first()).toContainText(/Silicon Wafer|硅晶片/);
-
-    const waferIdx = allTitles.findIndex(t => t.includes('Silicon Wafer') || t.includes('硅晶片'));
-    const clayIdx = allTitles.findIndex(t => t.includes('Claytronics') || t.includes('电子黏土'));
-    expect(waferIdx).toBeLessThan(clayIdx);
-  });
-
+    const old = numeric(await summary(page).locator('.total-value').innerText())
+    await dashboard(page).locator('.dashboard-footer input[type=range]').press('End')
+    await expect.poll(async () => numeric(await summary(page).locator('.total-value').innerText())).toBeGreaterThan(old)
+  })
+  test('should merge identical modules and maintain addition order', async ({ page }) => {
+    await addModule(page); await addModule(page, HULL)
+    await expect(energyModule(page).locator('.count')).toHaveText('2')
+    const names = await dashboard(page).locator('.variant-module .name').allTextContents()
+    expect(names.indexOf('能量电池产线')).toBeLessThan(names.indexOf('船体部件产线'))
+    expect(names.filter(n => n === '能量电池产线')).toHaveLength(1)
+  })
   test('should sort materials by tier with Energy Cells at end', async ({ page }) => {
-    await addModule(page, 'Claytronics Production');
-
-    const summary = page.locator('.variant-summary');
-    await summary.click();
-
-    const materialItems = page.locator('.material-row .name');
-    const materialNames = await materialItems.allInnerTexts();
-
-    expect(materialNames[materialNames.length - 1]).toMatch(/能量电池|Energy Cells/);
-
-    for (const name of materialNames) {
-      expect(name).not.toMatch(/!!id/);
-      expect(name.trim()).not.toBe('');
-    }
-  });
-
-  test.skip('should aggregate identical modules with correct summary', async ({ page }) => {
-    const searchInput = page.locator('input[placeholder*="搜索"], input[placeholder*="Search"]').first();
-    await searchInput.fill('energy cell');
-    await page.waitForTimeout(200);
-
-    const moduleResult = page.locator('.result-item').first();
-    await moduleResult.click();
-    await page.waitForTimeout(200);
-    await moduleResult.click();
-    await page.waitForTimeout(200);
-
-    const moduleDetails = page.locator('.module-detail');
-    const groupCount = await moduleDetails.count();
-    expect(groupCount).toBe(2);
-
-    const moduleGroup = moduleDetails.nth(1);
-    const totalValue = await moduleGroup.locator('.total-value').innerText();
-    expect(totalValue).toMatch(/\d+/);
-  });
-
+    await summary(page).locator('.main-row').click()
+    await expect(summary(page).locator('.material-name .name')).toHaveText(['电子黏土', '船体部件', '能量电池'])
+  })
+  test('should aggregate identical modules with correct summary', async ({ page }) => {
+    await addModule(page)
+    await expect(energyModule(page).locator('.count')).toHaveText('2')
+    await energyModule(page).locator('.main-row').click()
+    await expect(energyModule(page).locator('.material-name .qty')).toHaveText(['520', '1,902', '1,040'])
+    const moduleValues = await dashboard(page).locator('.module-detail').filter({ has: page.locator('.variant-module') }).locator('.total-value').allTextContents()
+    expect(numeric(await summary(page).locator('.total-value').innerText())).toBe(moduleValues.map(numeric).reduce((a, b) => a + b, 0))
+  })
   test('should sort materials by tier descending with valid quantities', async ({ page }) => {
-    const searchInput = page.locator('input[placeholder*="搜索"], input[placeholder*="Search"]').first();
-    await searchInput.fill('advanced electronics');
-    await page.waitForTimeout(300);
-    await page.locator('.result-item').first().click();
-    await page.waitForTimeout(300);
-
-    const summaryGroup = page.locator('.module-detail').first();
-    await summaryGroup.locator('.main-row').click();
-
-    const names = await summaryGroup.locator('.material-name .name').allInnerTexts();
-    expect(names.length).toBeGreaterThan(1);
-
-    const firstQty = await summaryGroup.locator('.material-name .qty').first().innerText();
-    expect(firstQty).not.toBe('NaN');
-  });
-
+    await energyModule(page).locator('.main-row').click()
+    await expect(energyModule(page).locator('.material-name .name')).toHaveText(['电子黏土', '船体部件', '能量电池'])
+    await expect(energyModule(page).locator('.material-name .qty')).toHaveText(['260', '951', '520'])
+  })
   test('should display economy view price sliders in flex-row layout', async ({ page }) => {
-    await addModule(page, 'claytronics');
-
-    const dashboard = page.locator('.list-wrapper').first();
-    const economyViewBtn = dashboard.locator('.view-mode-btn').nth(1);
-    await economyViewBtn.click();
-
-    const profitSection = page.locator('.profit-section').first();
-    await expect(profitSection).toBeVisible();
-
-    const priceSliders = profitSection.locator('.slider-container');
-    const sliderCount = await priceSliders.count();
-    expect(sliderCount).toBe(2);
-
-    const simulationControls = profitSection.locator('.simulation-controls').first();
-    await expect(simulationControls).toHaveClass(/flex-row/);
-  });
-});
+    await page.getByTestId('view-tab-btn-station-wareflow-economy').click()
+    await expect(page.locator('.profit-section .slider-container')).toHaveCount(2)
+    await expect(page.locator('.profit-section .simulation-controls')).toHaveCSS('flex-direction', 'row')
+  })
+})
 
 test.describe('Station Dashboard - Volume Analysis', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.setViewportSize({ width: 1920, height: 1080 });
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(1000);
-
-    const languageSelector = page.locator('select').first();
-    if (await languageSelector.isVisible()) {
-      await languageSelector.selectOption('zh-CN');
-      await page.waitForTimeout(500);
-    }
-
-    const newButton = page.locator('button:has-text("新建"), button:has-text("New")').first();
-    await newButton.click();
-    const discardButton = page.locator('button:has-text("丢弃并新建"), button:has-text("Discard & New")').first();
-    if (await discardButton.isVisible()) {
-      await discardButton.click();
-    }
-    await page.waitForTimeout(500);
-
-    await addModule(page, 'claytronics');
-  });
-
+  test.beforeEach(async ({ page }) => { await addModule(page) })
   test('should switch to volume view and display volume controls section', async ({ page }) => {
-    const dashboard = page.locator('.list-wrapper').first();
-    await expect(dashboard).toBeVisible();
-
-    const volumeViewBtn = dashboard.locator('.view-mode-btn').nth(2);
-    await volumeViewBtn.click();
-
-    const volumeControlsSection = page.locator('.volume-controls-section').first();
-    await expect(volumeControlsSection).toBeVisible();
-  });
-
+    await volume(page); await expect(page.locator('.volume-controls-section')).toBeVisible()
+  })
   test('should display volume data with sliders indicating buffer calculation', async ({ page }) => {
-    const dashboard = page.locator('.list-wrapper').first();
-    const volumeViewBtn = dashboard.locator('.view-mode-btn').nth(1);
-    await volumeViewBtn.click();
-    await page.waitForTimeout(1000);
-
-    const sliders = page.locator('input[type="range"]');
-    const sliderCount = await sliders.count();
-    expect(sliderCount).toBeGreaterThanOrEqual(3);
-  });
-
-  test('should update volume when buffer time changes', async ({ page }) => {
-    const dashboard = page.locator('.list-wrapper').first();
-    const volumeViewBtn = dashboard.locator('.view-mode-btn').nth(1);
-    await volumeViewBtn.click();
-    await page.waitForTimeout(1000);
-
-    const volumeTexts = page.locator('.text-ware-volume');
-    if (await volumeTexts.count() > 0) {
-      const initialVolume = await volumeTexts.first().textContent();
-
-      const sliders = page.locator('input[type="range"]');
-      if (await sliders.count() >= 2) {
-        const primarySlider = sliders.nth(1);
-        await primarySlider.fill('20');
-        await page.waitForTimeout(500);
-
-        const newVolume = await volumeTexts.first().textContent();
-        expect(newVolume).toBeTruthy();
-      }
-    }
-  });
-
+    await volume(page)
+    await expect(page.locator('.volume-controls-section input')).toHaveCount(3)
+    await expect(buffer(page, '主产物缓冲时间')).toHaveValue('12')
+  })
+  test('should update volume when buffer time changes', async ({ page }) => { await doubledBuffer(page) })
   test('should display total occupied volume with priority-based buffer', async ({ page }) => {
-    const dashboard = page.locator('.list-wrapper').first();
-    const volumeViewBtn = dashboard.locator('.view-mode-btn').nth(1);
-    await volumeViewBtn.click();
-    await page.waitForTimeout(1000);
-
-    const totalVolumeElements = page.locator('.text-total-occupied-volume, .total-volume');
-    if (await totalVolumeElements.count() > 0) {
-      const totalVolume = await totalVolumeElements.first().textContent();
-      expect(totalVolume).toBeTruthy();
-    }
-  });
-
+    await volume(page)
+    // Single energy output: 10,500 / h × 12 h × 1 m³.
+    await expect(allocation(page).locator('.recommended-count')).toHaveText('126,000')
+  })
   test('should affect volume when priority changes', async ({ page }) => {
-    const dashboard = page.locator('.list-wrapper').first();
-    const volumeViewBtn = dashboard.locator('.view-mode-btn').nth(1);
-    await volumeViewBtn.click();
-    await page.waitForTimeout(1000);
-
-    const volumeTexts = page.locator('.text-ware-volume');
-    if (await volumeTexts.count() > 0) {
-      const initialVolume = await volumeTexts.first().textContent();
-
-      const quantityViewBtn = dashboard.locator('.view-mode-btn').first();
-      await quantityViewBtn.click();
-      await page.waitForTimeout(500);
-
-      const favoriteBtns = page.locator('.favorite-btn:not(.disabled)');
-      if (await favoriteBtns.count() > 0) {
-        await favoriteBtns.first().click();
-        await page.waitForTimeout(300);
-
-        await volumeViewBtn.click();
-        await page.waitForTimeout(1000);
-
-        const newVolume = await volumeTexts.first().textContent();
-        expect(newVolume).toBeTruthy();
-      }
-    }
-  });
-
+    await volume(page)
+    await allocation(page).locator('.favorite-btn').click()
+    await expect(allocation(page).locator('.recommended-count')).toHaveText('21,000')
+  })
   test('should maintain consistent flex-row layout between volume and economy views', async ({ page }) => {
-    const dashboard = page.locator('.list-wrapper').first();
-
-    const volumeViewBtn = dashboard.locator('.view-mode-btn').nth(2);
-    await volumeViewBtn.click();
-
-    const volumeControlsSection = page.locator('.volume-controls-section').first();
-    const volumeSimulationControls = volumeControlsSection.locator('.simulation-controls').first();
-    await expect(volumeSimulationControls).toHaveClass(/flex-row/);
-
-    const economyViewBtn = dashboard.locator('.view-mode-btn').nth(1);
-    await economyViewBtn.click();
-
-    const profitSection = page.locator('.profit-section').first();
-    const profitSimulationControls = profitSection.locator('.simulation-controls').first();
-    await expect(profitSimulationControls).toHaveClass(/flex-row/);
-  });
-});
+    await volume(page)
+    await expect(page.locator('.volume-controls-section .simulation-controls')).toHaveCSS('flex-direction', 'row')
+    await page.getByTestId('view-tab-btn-station-wareflow-economy').click()
+    await expect(page.locator('.profit-section .simulation-controls')).toHaveCSS('flex-direction', 'row')
+  })
+})
 
 test.describe('Station Dashboard - Workforce', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/');
-    await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 10000 });
-    await page.waitForTimeout(500);
-  });
-
   test('should display workforce stats bar with workers needed', async ({ page }) => {
-    await addModule(page, 'claytronics');
-
-    const workersNeeded = page.locator('[data-testid="station-dashboard"] .stat-item').filter({ hasText: /工人|Workers/ }).first();
-    await expect(workersNeeded).toBeVisible();
-  });
-
+    await addModule(page)
+    await expect(dashboard(page).locator('.stat-item').filter({ hasText: '工人需求' }).locator('.stat-value')).toHaveText('90')
+  })
   test('should show workforce option in auto-industry header', async ({ page }) => {
-    await addModule(page, 'claytronics');
-
-    const industryHeader = page.locator('.tier-section.tier-auto .tier-header').first();
-    await expect(industryHeader).toBeVisible();
-  });
-});
+    await addModule(page)
+    // station-tabs moves this control to the module toolbar; exercise the same option there.
+    const toggle = page.locator('.toggle-chip').first()
+    await expect(toggle).toContainText('OFF')
+    await toggle.click()
+    await expect(toggle).toContainText('ON')
+    await expect.poll(() => page.evaluate(() => (window as any).blueprintStore.stationState.settings.considerWorkforceForAutoFill)).toBe(true)
+  })
+})
 
 test.describe('Station Dashboard - Time View', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/');
-    await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 10000 });
-    await page.waitForTimeout(500);
-  });
-
   test('should display build time in XD HH:MM:SS format', async ({ page }) => {
-    await addModule(page, 'claytronics');
-
-    const totalTimeLoc = page.locator('[data-testid="station-dashboard"] .stat-item').filter({ hasText: /时间|Time/ }).first();
-    await expect(totalTimeLoc).toBeVisible();
-  });
-});
+    await addModule(page)
+    await page.getByTestId('view-tab-btn-station-dashboard-time').click()
+    // Energy module: 756 seconds. The module total is unaffected by auto infrastructure.
+    await expect(energyModule(page).locator('.total-value')).toHaveText('00:12:36')
+    const manual = page.locator('.tier-section').first().locator('.module-row input')
+    await manual.fill('300'); await manual.press('Tab')
+    await expect(energyModule(page).locator('.total-value')).toHaveText('2D 15:00:00')
+  })
+})
 
 test.describe('Station Dashboard - Storage Planning', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/');
-    await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 10000 });
-    await page.waitForTimeout(500);
-    await addModule(page, 'claytronics');
-  });
-
-  test('should display storage planning volume count in volume view', async ({ page }) => {
-    const volumeViewBtn = page.locator('[data-testid="view-tab-btn-station-wareflow-volume"]');
-    await volumeViewBtn.click();
-
-    const volumeCountMain = page.locator('[data-testid="volume-count"]').first();
-    await expect(volumeCountMain).toBeVisible();
-
-    const countText = await volumeCountMain.textContent();
-    expect(Number(countText)).toBeGreaterThanOrEqual(0);
-  });
-
+  test.beforeEach(async ({ page }) => { await addModule(page) })
+  test('should display storage planning volume count in volume view', async ({ page }) => { await volume(page) })
   test('should show planning details in volume tooltip', async ({ page }) => {
-    const volumeViewBtn = page.locator('[data-testid="view-tab-btn-station-wareflow-volume"]');
-    await volumeViewBtn.click();
-
-    const volumeTrigger = page.locator('[data-testid="volume-count"]').first();
-    await volumeTrigger.hover();
-
-    const tooltip = page.locator('.tippy-box');
-    await expect(tooltip).toBeVisible();
-  });
-
+    await volume(page)
+    // Current allocation UI exposes the same planning explanation by expanding the row.
+    await allocation(page).locator('.main-row').click()
+    await expect(allocation(page).locator('.detail-row')).toContainText(['10,500/h'])
+    await expect(allocation(page).locator('.list-box')).toContainText('12h 0m')
+  })
   test('should increase storage slots when buffer time increases', async ({ page }) => {
-    const volumeViewBtn = page.locator('[data-testid="view-tab-btn-station-wareflow-volume"]');
-    await volumeViewBtn.click();
+    const manual = page.locator('.tier-section').first().locator('.module-row input')
+    await manual.fill('10'); await manual.press('Tab')
+    await page.getByTestId('view-tab-btn-station-wareflow-volume').click()
+    await expect(allocation(page).locator('.recommended-count')).toHaveText('1,260,000')
+    const storage = page.locator('.module-row').filter({ hasText: '集装仓储' }).getByTitle('点击转移到用户规划区')
+    await expect(storage).toHaveText('2')
+    await range(buffer(page, '主产物缓冲时间'), 24)
+    await expect(allocation(page).locator('.recommended-count')).toHaveText('2,520,000')
+    await expect(storage).toHaveText('3')
+  })
+})
 
-    const volumeCountMain = page.locator('[data-testid="volume-count"]').first();
-    const initialCount = await volumeCountMain.textContent();
-
-    const volumeControls = page.locator('.volume-controls-section');
-    if (await volumeControls.isVisible()) {
-      const sliders = volumeControls.locator('input[type="range"]');
-      const sliderCount = await sliders.count();
-      if (sliderCount > 0) {
-        const firstSlider = sliders.first();
-        for (let i = 0; i < 10; i++) {
-          await firstSlider.focus();
-          await page.keyboard.press('ArrowRight');
-        }
-        await page.waitForTimeout(500);
-      }
-    }
-  });
-});
-
-test.describe.skip('Station Dashboard - Buffer Controls', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.setViewportSize({ width: 1920, height: 1080 });
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(2000);
-
-    const languageSelector = page.locator('select').first();
-    if (await languageSelector.isVisible()) {
-      await languageSelector.selectOption('zh-CN');
-      await page.waitForLoadState('networkidle');
-      await page.waitForTimeout(500);
-    }
-
-    const newButton = page.locator('button:has-text("新建"), button:has-text("New")').first();
-    await newButton.click();
-    const discardButton = page.locator('button:has-text("丢弃并新建"), button:has-text("Discard & New")').first();
-    if (await discardButton.isVisible()) {
-      await discardButton.click();
-    }
-    await page.waitForTimeout(500);
-
-    const searchInput = page.locator('.search-input').first();
-    await searchInput.fill('claytronics');
-    await page.waitForTimeout(200);
-
-    const firstResult = page.locator('.result-item').first();
-    await firstResult.click();
-    await page.waitForTimeout(200);
-  });
-
+test.describe('Station Dashboard - Buffer Controls', () => {
+  test.beforeEach(async ({ page }) => { await addModule(page); await volume(page) })
   test('should display three buffer sliders in volume view', async ({ page }) => {
-    const dashboard = page.locator('.list-wrapper').first();
-
-    const volumeViewBtn = dashboard.locator('.view-mode-btn').nth(2);
-    await volumeViewBtn.click();
-
-    const volumeControlsSection = page.locator('.volume-controls-section').first();
-    const sliders = volumeControlsSection.locator('input[type="range"]');
-    const sliderCount = await sliders.count();
-    expect(sliderCount).toBe(3);
-  });
-
+    await expect(page.locator('.volume-controls-section input[type=range]')).toHaveCount(3)
+  })
   test('should have correct range attributes on resource buffer slider', async ({ page }) => {
-    const dashboard = page.locator('.list-wrapper').first();
-
-    const volumeViewBtn = dashboard.locator('.view-mode-btn').nth(2);
-    await volumeViewBtn.click();
-
-    const volumeControlsSection = page.locator('.volume-controls-section').first();
-    const sliders = volumeControlsSection.locator('input[type="range"]');
-
-    const resourceSlider = sliders.first();
-    await expect(resourceSlider).toHaveAttribute('min', '0');
-    await expect(resourceSlider).toHaveAttribute('max', '24');
-  });
-
+    await expect(buffer(page, '资源缓冲时间')).toHaveAttribute('min', '0')
+    await expect(buffer(page, '资源缓冲时间')).toHaveAttribute('max', '24')
+    await expect(buffer(page, '资源缓冲时间')).toHaveAttribute('step', '1')
+  })
   test('should have functional primary product buffer slider', async ({ page }) => {
-    await page.setViewportSize({ width: 1920, height: 1080 });
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(2000);
-
-    const searchInput = page.locator('.search-input').first();
-    await searchInput.fill('plasma');
-    await page.waitForTimeout(500);
-
-    const firstModule = page.locator('.result-item').first();
-    await firstModule.click();
-    await page.waitForTimeout(1000);
-
-    const dashboard = page.locator('.list-wrapper').first();
-    const volumeViewBtn = dashboard.locator('.view-mode-btn').nth(1);
-    await volumeViewBtn.click();
-    await page.waitForTimeout(1000);
-
-    const sliders = page.locator('input[type="range"]');
-    const count = await sliders.count();
-    expect(count).toBeGreaterThanOrEqual(2);
-
-    if (count >= 2) {
-      const primarySlider = sliders.nth(1);
-
-      const min = await primarySlider.getAttribute('min');
-      const max = await primarySlider.getAttribute('max');
-
-      expect(min).toBe('0');
-      expect(parseInt(max || '0')).toBeGreaterThanOrEqual(1);
-
-      const maxVal = parseFloat(max || '1');
-      const testValue = Math.min(0.5, maxVal).toString();
-      await primarySlider.fill(testValue);
-      await page.waitForTimeout(300);
-
-      const value = await primarySlider.inputValue();
-      expect(value).toBeTruthy();
-    }
-  });
-
+    await range(buffer(page, '主产物缓冲时间'), 8)
+    await expect(allocation(page).locator('.recommended-count')).toHaveText('84,000')
+  })
   test('should have functional secondary product buffer slider', async ({ page }) => {
-    await page.setViewportSize({ width: 1920, height: 1080 });
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(2000);
-
-    const searchInput = page.locator('.search-input').first();
-    await searchInput.fill('plasma');
-    await page.waitForTimeout(500);
-
-    const firstModule = page.locator('.result-item').first();
-    await firstModule.click();
-    await page.waitForTimeout(1000);
-
-    const dashboard = page.locator('.list-wrapper').first();
-    const volumeViewBtn = dashboard.locator('.view-mode-btn').nth(1);
-    await volumeViewBtn.click();
-    await page.waitForTimeout(1000);
-
-    const sliders = page.locator('input[type="range"]');
-    const count = await sliders.count();
-    expect(count).toBeGreaterThanOrEqual(3);
-
-    if (count >= 3) {
-      const secondarySlider = sliders.nth(2);
-
-      const min = await secondarySlider.getAttribute('min');
-      const max = await secondarySlider.getAttribute('max');
-
-      expect(min).toBe('0');
-      expect(parseInt(max || '0')).toBeGreaterThanOrEqual(1);
-
-      const maxVal = parseFloat(max || '1');
-      const testValue = Math.min(0.3, maxVal).toString();
-      await secondarySlider.fill(testValue);
-      await page.waitForTimeout(300);
-
-      const value = await secondarySlider.inputValue();
-      expect(value).toBeTruthy();
-    }
-  });
-
+    await allocation(page).locator('.favorite-btn').click()
+    await range(buffer(page, '副产物缓冲时间'), 4)
+    await expect(allocation(page).locator('.recommended-count')).toHaveText('42,000')
+  })
   test('should have buffer slider labels with i18n text content', async ({ page }) => {
-    const dashboard = page.locator('.list-wrapper').first();
-
-    const volumeViewBtn = dashboard.locator('.view-mode-btn').nth(1);
-    await volumeViewBtn.click();
-    await page.waitForTimeout(1000);
-
-    const sliderLabels = page.locator('.slider-label, .control-label');
-    const count = await sliderLabels.count();
-
-    if (count > 0) {
-      for (let i = 0; i < Math.min(count, 3); i++) {
-        const labelText = await sliderLabels.nth(i).textContent();
-        expect(labelText).toBeTruthy();
-        expect(labelText!.length).toBeGreaterThan(0);
-      }
-    }
-  });
-
+    await page.getByTestId('language-select').selectOption('en')
+    await expect(page.locator('.volume-controls-section .slider-label')).toHaveText(['Resource Buffer Hours', 'Primary Product Buffer Hours', 'Secondary Product Buffer Hours'])
+  })
   test('should have slider labels with resource and product buffer text', async ({ page }) => {
-    const dashboard = page.locator('.list-wrapper').first();
-
-    const volumeViewBtn = dashboard.locator('.view-mode-btn').nth(2);
-    await volumeViewBtn.click();
-
-    const volumeControlsSection = page.locator('.volume-controls-section').first();
-    await expect(volumeControlsSection).toBeVisible();
-
-    const sectionText = await volumeControlsSection.textContent();
-    expect(sectionText).toMatch(/资源缓冲时间|Resource Buffer Hours/);
-    expect(sectionText).toMatch(/主产物缓冲时间|Primary Product Buffer Hours/);
-  });
-
+    await expect(page.locator('.volume-controls-section .slider-label')).toHaveText(['资源缓冲时间', '主产物缓冲时间', '副产物缓冲时间'])
+  })
   test('should affect volume calculation when buffer slider changes', async ({ page }) => {
-    await page.setViewportSize({ width: 1920, height: 1080 });
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(2000);
-
-    const searchInput = page.locator('.search-input').first();
-    await searchInput.fill('plasma');
-    await page.waitForTimeout(500);
-
-    const firstModule = page.locator('.result-item').first();
-    await firstModule.click();
-    await page.waitForTimeout(1000);
-
-    const dashboard = page.locator('.list-wrapper').first();
-    const volumeViewBtn = dashboard.locator('.view-mode-btn').nth(1);
-    await volumeViewBtn.click();
-    await page.waitForTimeout(1000);
-
-    const volumeTexts = page.locator('.text-ware-volume');
-    if (await volumeTexts.count() > 0) {
-      const initialVolume = await volumeTexts.first().textContent();
-
-      const sliders = page.locator('input[type="range"]');
-      if (await sliders.count() >= 2) {
-        const primarySlider = sliders.nth(1);
-        await primarySlider.fill('20');
-        await page.waitForTimeout(500);
-
-        const newVolume = await volumeTexts.first().textContent();
-        expect(newVolume).toBeTruthy();
-      }
-    }
-  });
-});
+    await range(buffer(page, '主产物缓冲时间'), 20)
+    await expect(allocation(page).locator('.recommended-count')).toHaveText('210,000')
+  })
+})
 
 test.describe('Station Dashboard - i18n', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/');
-    await page.waitForSelector('.dashboard-container');
-    const langSelect = page.locator('.toolbar-panel select').first();
-    if (await langSelect.isVisible()) {
-      await langSelect.selectOption('zh-CN');
-      await page.waitForTimeout(200);
-    }
-    const newButton = page.locator('.btn-tool').filter({ hasText: /新建|New/ }).first();
-    if (await newButton.isVisible()) {
-      await newButton.click();
-      const discardButton = page.locator('button').filter({ hasText: /丢弃并新建|Discard & New/ }).first();
-      if (await discardButton.isVisible()) {
-        await discardButton.click();
-      }
-      await page.waitForTimeout(200);
-    }
-  });
-
+  test.beforeEach(async ({ page }) => { await addModule(page); await page.getByTestId('language-select').selectOption('en') })
   test('should display English labels on dashboard', async ({ page }) => {
-    await addModule(page, 'Silicon Wafer Production');
-
-    const langSelect = page.locator('.toolbar-panel select').first();
-    await langSelect.selectOption('en');
-    await page.waitForTimeout(500);
-
-    const switcher = page.locator('.dashboard-container .view-mode-switcher');
-    await expect(switcher).toContainText('Cost');
-    await expect(switcher).toContainText('Time');
-    await expect(switcher).toContainText('Workers');
-
-    const summary = page.locator('.variant-summary');
-    await expect(summary).toContainText(/Total Build Cost/i);
-
-    const moduleTitle = page.locator('.variant-module').first();
-    const titleText = await moduleTitle.innerText();
-    expect(titleText).not.toMatch(/!!id/);
-    expect(titleText).toContain('Silicon Wafer');
-
-    await expect(page.locator('body')).not.toContainText(/ui\./);
-  });
-
-  test.skip('should display English stats bar labels', async ({ page }) => {
-    await addModule(page, 'hab_arg_l_01_macro');
-
-    const langSelect = page.locator('.toolbar-panel select').first();
-    await langSelect.selectOption('en');
-    await page.waitForTimeout(500);
-
-    await expect(page.locator('.stat-item').filter({ hasText: 'Build Cost' })).toBeVisible();
-    await expect(page.locator('.stat-item').filter({ hasText: 'Workers Needed' })).toBeVisible();
-    await expect(page.locator('.stat-item').filter({ hasText: 'WORKFORCE EFFICIENCY' })).toBeVisible();
-  });
-
-  test.skip('should display credits symbol with i18n', async ({ page }) => {
-    await addModule(page, 'Silicon Wafer Production');
-
-    const unitBadge = page.locator('.unit-badge');
-    await expect(unitBadge).toBeVisible();
-    const badgeText = await unitBadge.innerText();
-    expect(badgeText.toUpperCase()).toContain('CR');
-  });
-});
+    await expect(page.getByTestId('view-tab-btn-station-dashboard-materials')).toHaveText('Cost')
+    await expect(page.getByTestId('view-tab-btn-station-dashboard-time')).toHaveText('Time')
+    await expect(page.getByTestId('view-tab-btn-station-dashboard-workers')).toHaveText('Workers')
+    await expect(summary(page)).toContainText('Total Build Cost')
+    await expect(dashboard(page).locator('.variant-module .name').first()).toHaveText('Energy Cell Production')
+  })
+  test('should display English stats bar labels', async ({ page }) => {
+    await expect(dashboard(page).locator('.stat-label')).toHaveCount(6)
+    await expect(dashboard(page)).toContainText('Build Cost')
+    await expect(dashboard(page)).toContainText('Workers Needed')
+    await expect(dashboard(page)).toContainText(/Workforce Efficiency/i)
+  })
+  test('should display credits symbol with i18n', async ({ page }) => {
+    await expect(summary(page).locator('.total-value')).toHaveText(/[\d,]+ Cr/)
+    await page.getByTestId('language-select').selectOption('zh-CN')
+    await expect(summary(page).locator('.total-value')).toHaveText(/[\d,]+ Cr/)
+  })
+})

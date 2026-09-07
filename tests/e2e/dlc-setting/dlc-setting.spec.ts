@@ -3,14 +3,19 @@ import { expect } from '@playwright/test'
 import type { Page } from '@playwright/test'
 
 test.beforeEach(async ({ page }) => {
-  await page.addStyleTag({
-    content: '*, *::before, *::after { transition: none !important; animation: none !important; }'
-  });
-  await page.goto('/');
-  await page.evaluate(() => {
-  });
-  await page.reload();
-  await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 500 });
+  await page.goto('/')
+  const fixture = await import('../../fixtures/db.json', { with: { type: 'json' } })
+  const data = JSON.parse(JSON.stringify(fixture.default))
+  delete data.vsn
+  data.x4_game_version = { version: '8.0', beta: false }
+  delete data['x4-setting']
+  await page.evaluate((db) => {
+    Object.entries(db).forEach(([key, value]) => localStorage.setItem(key, JSON.stringify(value)))
+    localStorage.removeItem('x4-setting')
+    localStorage.setItem('isTestEnv', 'true')
+  }, data)
+  await page.reload()
+  await page.getByTestId('language-select').selectOption('zh-CN')
 });
 
 // ============================================================================
@@ -18,8 +23,7 @@ test.beforeEach(async ({ page }) => {
 // ============================================================================
 
 const openDlcSettingInitial = async (page: Page) => {
-  // 2.1.1 打开页面
-  await page.goto('/')
+  // 2.1.1 使用 beforeEach 已完成的 fixture/reload/UI 语言前置
 
   // 2.1.2 断言右上角 setting 按钮可见 #期望：['true']
   const settingsBtn = page.locator('[data-testid="settings-button"]')
@@ -112,6 +116,7 @@ const transitionSelectAll = async (page: Page) => {
   const visibleCheckboxes = page.locator('[data-testid^="dlc-settings-item-"] input[type="checkbox"]')
   const checkedBoxes = page.locator('[data-testid^="dlc-settings-item-"] input[type="checkbox"]:checked')
   const visibleCount = await visibleCheckboxes.count()
+  expect(visibleCount).toBe(7)
   const checkedCount = await checkedBoxes.count()
   expect(checkedCount).toBe(visibleCount)
 }
@@ -170,6 +175,8 @@ const transitionSaveAndClose = async (page: Page) => {
 
   // 2.10.4 断言 setting 按钮红点消失（如之前存在） #期望：['true']
   const redDot = page.locator('[data-testid="settings-indicator"]')
+  await expect(redDot).not.toBeVisible()
+  await page.reload()
   await expect(redDot).not.toBeVisible()
 }
 
@@ -231,7 +238,6 @@ test.describe('dlc-setting e2e', () => {
 
   test('3.1 Case: 红点提示显示', async ({ page }) => {
     // 3.1.1 状态：DLC Setting 初始态
-    await page.goto('/')
 
     // 3.1.2 前提：当前版本 setting 中不存在 `activeDlcs` 字段
     // 默认状态即为未设置，验证红点存在
@@ -245,7 +251,6 @@ test.describe('dlc-setting e2e', () => {
 
   test('3.2 Case: 红点提示消失', async ({ page }) => {
     // 3.2.1 状态：DLC Setting 初始态
-    await page.goto('/')
 
     // 3.2.2 前提：当前版本 setting 中已存在 `activeDlcs` 字段
     // 点击设置按钮打开 modal
@@ -262,7 +267,6 @@ test.describe('dlc-setting e2e', () => {
 
   test('3.3 Case: 打开 Modal 显示 DLC 列表', async ({ page }) => {
     // 3.3.1 状态：DLC Setting 初始态
-    await page.goto('/')
 
     // 3.3.2 切换：从初始态 -> Modal 打开态
     await transitionOpenModal(page)
@@ -277,7 +281,8 @@ test.describe('dlc-setting e2e', () => {
     // 3.3.5 断言列表中 DLC 名称已通过 i18n 翻译显示 #期望：['true']
     const dlcLabels = page.locator('[data-testid^="dlc-settings-item-"] .dlc-label')
     const count = await dlcLabels.count()
-    expect(count).toBeGreaterThan(0)
+    expect(count).toBe(7)
+    await expect(page.getByTestId('dlc-settings-item-ego_dlc_terran').locator('.dlc-label')).toHaveText('人类的摇篮')
   })
 
   test('3.4 Case: DLC 列表版本过滤', async ({ page }) => {
@@ -293,7 +298,7 @@ test.describe('dlc-setting e2e', () => {
       const item = dlcItems.nth(i)
       const versionText = await item.locator('.dlc-meta').textContent()
       // 验证版本号格式 (Requires X.X)
-      expect(versionText).toMatch(/Requires \d+\.\d+/)
+      expect(versionText).toMatch(/需要版本 (6\.0|7\.0|7\.5|8\.0)/)
     }
 
     // 3.4.3 断言 `dependencyVersion = 9.0` 的 DLC 不在 8.0 版本列表中显示 #期望：['true']
@@ -301,7 +306,7 @@ test.describe('dlc-setting e2e', () => {
     const allMetaTexts = await dlcItems.allTextContents()
     for (const text of allMetaTexts) {
       // 9.0 及以上版本不应该出现
-      expect(text).not.toMatch(/Requires 9\.\d+/)
+      expect(text).not.toMatch(/需要版本 9\.\d+/)
     }
   })
 
@@ -315,6 +320,7 @@ test.describe('dlc-setting e2e', () => {
     await expect(checkboxes).not.toHaveCount(0)
 
     // 3.5.3 切换：从 Modal 打开态 -> Modal 打开态（全选）
+    await transitionDeselectAll(page)
     await transitionSelectAll(page)
 
     // 3.5.4 断言所有 DLC checkbox 均被勾选 #期望：['true']
@@ -333,6 +339,7 @@ test.describe('dlc-setting e2e', () => {
     await expect(checkboxes).not.toHaveCount(0)
 
     // 3.6.3 切换：从 Modal 打开态 -> Modal 打开态（全选）
+    await transitionDeselectAll(page)
     await transitionSelectAll(page)
 
     // 3.6.4 切换：从 Modal 打开态 -> 初始态（保存）
@@ -451,6 +458,8 @@ test.describe('dlc-setting e2e', () => {
     await settingsBtn.click()
     const modal = page.locator('[data-testid="dlc-settings-modal"]')
     await expect(modal).toBeVisible()
+    expect(await page.evaluate(() => JSON.parse(localStorage.getItem('x4-setting')!).activeDlcs))
+      .toEqual(['ego_dlc_split', 'ego_dlc_terran', 'ego_dlc_pirate', 'ego_dlc_boron', 'ego_dlc_timelines', 'ego_dlc_mini_01', 'ego_dlc_mini_02'])
   })
 
   test('3.12 Case: 关闭 Modal 不保存（关闭按钮）', async ({ page }) => {
@@ -467,6 +476,8 @@ test.describe('dlc-setting e2e', () => {
     // 3.12.4 断言再次打开 Modal 后 DLC 选择恢复为保存前的状态 #期望：['true']
     await openDlcSettingModal(page)
     // 状态应该恢复到 localStorage 中保存的值
+    await expect(firstCheckbox).toBeChecked()
+    expect(await page.evaluate(() => localStorage.getItem('x4-setting'))).toBeNull()
   })
 
   test('3.13 Case: 关闭 Modal 不保存（关闭按钮）- 未修改状态', async ({ page }) => {
@@ -485,6 +496,7 @@ test.describe('dlc-setting e2e', () => {
     // 通过检查状态是否保持不变来验证
     await openDlcSettingModal(page)
     await expect(checkboxes).not.toHaveCount(0)
+    expect(await page.evaluate(() => localStorage.getItem('x4-setting'))).toBeNull()
   })
 
   test('3.14 Case: 关闭 Modal 不保存（遮罩）', async ({ page }) => {
@@ -500,6 +512,8 @@ test.describe('dlc-setting e2e', () => {
 
     // 3.14.4 断言再次打开 Modal 后 DLC 选择恢复为保存前的状态 #期望：['true']
     await openDlcSettingModal(page)
+    await expect(firstCheckbox).toBeChecked()
+    expect(await page.evaluate(() => localStorage.getItem('x4-setting'))).toBeNull()
   })
 
   test('3.15 Case: 关闭 Modal 不保存（遮罩）- 未修改状态', async ({ page }) => {
@@ -518,6 +532,7 @@ test.describe('dlc-setting e2e', () => {
     // 通过检查状态是否保持不变来验证
     await openDlcSettingModal(page)
     await expect(checkboxes).not.toHaveCount(0)
+    expect(await page.evaluate(() => localStorage.getItem('x4-setting'))).toBeNull()
   })
 
   test('3.16 Case: 未激活 DLC 处理策略保存', async ({ page }) => {
@@ -541,6 +556,7 @@ test.describe('dlc-setting e2e', () => {
     await settingsBtn.click()
     const isChecked = await enforceToggle.isChecked()
     expect(isChecked).toBe(true)
+    expect(await page.evaluate(() => JSON.parse(localStorage.getItem('x4-setting')!).enforceDlcActivation)).toBe(true)
   })
 
   test('3.17 Case: 未激活 DLC 处理策略切换', async ({ page }) => {
@@ -572,16 +588,15 @@ test.describe('dlc-setting e2e', () => {
 
     // 3.18.3 断言说明文字包含"搜索列表"相关描述 #期望：['true']
     const hintContent = await strategyHint.textContent()
-    expect(hintContent).toBeTruthy()
+    expect(hintContent).toContain('搜索列表')
 
     // 3.18.4 断言说明文字包含"已保存项"相关描述 #期望：['true']
     // 说明文字应该包含相关信息
-    expect(hintContent).toBeTruthy()
+    expect(hintContent).toContain('已经设置的未激活物品不会生效')
   })
 
   test('3.19 Case: 默认全激活 fallback', async ({ page }) => {
     // 3.19.1 状态：DLC Setting 初始态
-    await page.goto('/')
 
     // 3.19.2 前提：当前版本 setting 中不存在 `activeDlcs` 字段
     // 默认状态即为未设置，验证红点存在
@@ -594,15 +609,16 @@ test.describe('dlc-setting e2e', () => {
     // 3.19.4 断言所有可用 DLC checkbox 默认勾选 #期望：['true']
     const checkboxes = page.locator('[data-testid^="dlc-settings-item-"] input[type="checkbox"]')
     const count = await checkboxes.count()
+    expect(count).toBe(7)
     for (let i = 0; i < count; i++) {
       const checkbox = checkboxes.nth(i)
       await expect(checkbox).toBeChecked()
     }
+    expect(await page.evaluate(() => localStorage.getItem('x4-setting'))).toBeNull()
   })
 
   test('3.20 Case: 空数组不视为未设置', async ({ page }) => {
     // 3.20.1 状态：DLC Setting 初始态
-    await page.goto('/')
 
     // 3.20.2 前提：当前版本 setting 中 `activeDlcs` 为空数组
     // 打开设置，全不选，保存
@@ -614,5 +630,6 @@ test.describe('dlc-setting e2e', () => {
     // 3.20.3 断言 setting 按钮不显示红点 #期望：['true']
     const redDot = page.locator('[data-testid="settings-indicator"]')
     await expect(redDot).not.toBeVisible()
+    expect(await page.evaluate(() => JSON.parse(localStorage.getItem('x4-setting')!).activeDlcs)).toEqual([])
   })
 })

@@ -12,37 +12,51 @@ async function waitForAppReady(page: Page) {
 }
 
 async function ensureAutoGroupResult(page: Page) {
-  const hasResult = await page.evaluate(() => {
-    const r = (window as any).liveStore?.autoGroupResult
-    return !!(r && r.groups?.length)
-  })
+  await expect.poll(() => page.evaluate(() => (window as any).liveStore.autoGroupResult?.groups.length)).toBeGreaterThan(0)
+  return true
+}
 
-  // Always ensure archive is selected, even if autoGroupResult exists
-  await page.evaluate(async (gameGuid: string) => {
+const HUB_SECTOR = 'cluster_100_sector001_macro'
+
+function hubCard(page: Page) {
+  return page.locator('.group-item').filter({ has: page.locator('.pill--anchor .pill-label').filter({ hasText: /^小行星带$/ }) })
+}
+
+async function readHub(page: Page) {
+  return page.evaluate((sector) => (window as any).liveStore.autoGroupResult.groups.find(
+    (group: any) => group.sectorMacro === sector
+  ), HUB_SECTOR)
+}
+
+async function changeHubColor(page: Page) {
+  await enterEditMode(page)
+  const before = await readHub(page)
+  await hubCard(page).locator('.color-chip').click()
+  await page.locator('.preset-color').last().click()
+  await expect.poll(async () => (await readHub(page)).color).not.toBe(before.color)
+  return (await readHub(page)).color as string
+}
+
+async function readSavedBinding(page: Page) {
+  return page.evaluate((guid) => {
     const w = window as any
-    if (!w.saveStore?.selectedArchive) {
-      const list = w.saveStore?.savedArchivesState?.list
-      if (list?.length > 0) {
-        const valid = list.filter((item: any) => item.isValid)
-        const first = valid[0] || list[0]
-        if (w.saveStore?.selectArchive) await w.saveStore.selectArchive(first.guid, first.time)
-      }
-    }
+    const key = w.gameDataStore.getStorageKey('save_archives').replace('save_archives', 'save_bindings')
+    return JSON.parse(localStorage.getItem(key)!).list.find((binding: any) => binding.gameGuid === guid)
   }, GAME_GUID)
+}
 
-  if (hasResult) return true
+async function openMapBinding(page: Page) {
+  await page.locator('.auto-sector-bar .map-btn').click()
+  await expect(page.locator('.auto-sector-group-map-panel--tabs')).toBeVisible()
+}
 
-  await page.evaluate(async (gameGuid: string) => {
-    const w = window as any
-    if (w.activeViewStore) w.activeViewStore.activeBinding = gameGuid
-    if (w.saveBindingStore?.createOrOpenBinding) w.saveBindingStore.createOrOpenBinding(gameGuid)
-  }, GAME_GUID)
-  await page.waitForTimeout(500)
-  await page.evaluate(() => {
-    if ((window as any).liveStore?.initAutoGroupDraft) (window as any).liveStore.initAutoGroupDraft()
-  })
-  await page.waitForTimeout(500)
-  return page.evaluate(() => !!(window as any).liveStore?.autoGroupResult?.groups?.length)
+async function confirmCurrentDraft(page: Page) {
+  for (const option of await page.locator('.candidate-item--virtual').all()) await option.click()
+  const button = page.locator('.auto-sector-bar .confirm-btn')
+  await expect(button).toBeEnabled()
+  await button.click()
+  await expect(page.locator('.confirm-popup')).toBeHidden()
+  await expect(button).toBeDisabled()
 }
 
 async function enterAutoSectorGroup(page: Page) {
@@ -69,676 +83,418 @@ async function returnToDisplayMode(page: Page) {
 }
 
 test.beforeEach(async ({ page }) => {
+  page.on('console', (msg) => {
+    const text = msg.text()
+    if (text.includes('[auto-sector-confirm]')) console.log(text)
+  })
   await page.addStyleTag({
     content: '*, *::before, *::after { transition: none !important; animation: none !important; }'
   })
   await loadLiveBindingFixture(page)
 })
 
-// ================================================================
-// 1 Live 展示与计算模式
-// ================================================================
-test.describe('1 Live 展示与计算模式', () => {
-  test('1.1 展示模式布局与详情入口', async ({ page }) => {
-    // 1.1.1 加载 fixture 并进入 live production，确认展示模式渲染三列布局
-    const autoEntry = page.getByTestId('sidebar-auto-sector-group')
-    await expect(autoEntry).toBeVisible({ timeout: 5000 })
 
-    // 1.1.2 确认星区列顶部显示桥接跳数、覆盖跳数、Hub 阈值数值（只读）
-    await enterAutoSectorGroup(page)
-    const bar = page.locator('.auto-sector-bar').first()
-    await expect(bar).toBeVisible()
+async function readVirtualDrafts(page: Page) {
+  return page.evaluate(() => (window as any).liveStore.virtualStationDrafts)
+}
 
-    // 1.1.3 确认星区列顶部存在详情按钮和地图按钮
-    const groupItems = page.locator('.group-item')
-    expect(await groupItems.count()).toBeGreaterThan(0)
+async function deleteVirtualDraft(page: Page) {
+  await page.getByRole('button', { name: '虚拟空间站', exact: true }).click()
+  const row = page.locator('.virtual-row').filter({ hasText: '新建空间站' })
+  await expect(row).toHaveCount(1)
+  await row.locator('.virtual-delete').click()
+  await expect(row).toHaveCount(0)
+  await expect.poll(() => readVirtualDrafts(page)).toEqual([])
+}
 
-    // 1.1.4 设置 appliedAutoGroupArchiveTime 使 needsAutoGroupRecalc=true，红点可见
-    await page.evaluate(() => {
-      const b = (window as any).saveBindingStore.activeBinding
-      if (b) b.appliedAutoGroupArchiveTime = 0
+async function loadBinding(page: Page, name: string) {
+  await page.getByTestId('toolbar-load-btn').click()
+  const dialog = page.getByTestId('dialog-backdrop')
+  await dialog.locator('.group').filter({ hasText: name }).getByRole('button', { name: '加载绑定', exact: true }).click()
+  await expect(dialog).toBeHidden()
+}
+
+test.describe('M2.1 当前共享草案事务', () => {
+  test('3.4/5.5 等分候选 trade gate 阻止确认，真实选择后保存', async ({ page }) => {
+    await loadLiveBindingFixture(page, {
+      transformSave: save => {
+        if (save.meta.guid !== GAME_GUID) return save
+        const sector = save.sectors[HUB_SECTOR]
+        const station = sector.player_stations['KXN-018']
+        return { ...save, sectors: { ...save.sectors, [HUB_SECTOR]: {
+          ...sector, player_stations: { ...sector.player_stations, 'M2-TIE': { ...station, code: 'M2-TIE' } }
+        } } }
+      }
     })
-    await page.waitForTimeout(200)
-    await expect(autoEntry.locator('.sidebar-recalc-dot')).toBeVisible()
-
-    // 1.1.5 设置 autoGroupResult=null，详情按钮置灰禁用
-    await page.evaluate(() => { (window as any).liveStore.autoGroupResult = null })
-    await page.waitForTimeout(200)
-    await expect(autoEntry).toHaveClass(/disabled/)
+    await enterAutoSectorGroup(page)
+    const saved = await readSavedBinding(page)
+    await changeHubColor(page)
+    const confirm = page.locator('.auto-sector-bar .confirm-btn')
+    await expect(confirm).toBeDisabled()
+    await expect(page.locator('.confirm-popup')).toBeHidden()
+    expect(await readSavedBinding(page)).toEqual(saved)
+    for (const option of await page.locator('.candidate-item--virtual').all()) await option.click()
+    await expect(confirm).toBeEnabled()
+    await confirm.click()
+    await expect(page.locator('.confirm-popup')).toBeHidden()
+    await expect(confirm).toBeDisabled()
+    expect((await readSavedBinding(page)).appliedAutoGroupArchiveTime).toBe(GAME_ARCHIVE_TIME)
   })
 
-  test('1.2 计算模式布局与返回', async ({ page }) => {
-    // 1.2.1 点击详情按钮，确认进入计算模式（三列布局）
+  test('3.4/3.6 未决分配 popup 取消不保存，再次确认进入已保存态', async ({ page }) => {
+    await page.evaluate(({guid, time, sector}) => {
+      const key = (window as any).gameDataStore.getStorageKey('save_archives').replace('save_archives','save_bindings')
+      const state = JSON.parse(localStorage.getItem(key)!)
+      const binding = state.list.find((binding: any) => binding.gameGuid === guid)
+      binding.appliedAutoGroupArchiveTime = time
+      binding.groups = binding.groups.filter((group: any) => group.sectorMacro === sector)
+      binding.groups[0].jumpRange = 0
+      binding.groups[0].coverageSectorMacros = []
+      binding.groups[0].connectedGroupIds = []
+      localStorage.setItem(key, JSON.stringify(state))
+    }, {guid: GAME_GUID, time: GAME_ARCHIVE_TIME, sector: HUB_SECTOR})
+    await page.reload()
     await enterAutoSectorGroup(page)
-    await expect(page.locator('.auto-sector-bar').first()).toBeVisible()
-
-    // 1.2.2 确认进入计算模式时未调用分组算法（autoGroupResult 未变化）
-    const hasGroups = await page.evaluate(() => (window as any).liveStore?.autoGroupResult?.groups?.length > 0)
-    expect(hasGroups).toBe(true)
-
-    // 1.2.3 确认计算模式顶部渲染共用 AutoSectorBar
-    await expect(page.locator('.auto-sector-bar').first()).toBeVisible()
-
-    // 1.2.4 点击 sidebar 总览入口，确认回到展示模式
-    await returnToDisplayMode(page)
-    await expect(page.locator('.auto-sector-bar')).toHaveCount(0)
-
-    // 1.2.5 确认通过 sidebar 返回操作未触发计算、未重置 draft
-    expect(await page.evaluate(() => !!(window as any).liveStore?.autoGroupResult)).toBe(true)
+    const saved = await readSavedBinding(page)
+    await changeHubColor(page)
+    await expect.poll(() => page.locator('.card-uncertain').count()).toBeGreaterThan(0)
+    const confirm = page.locator('.auto-sector-bar .confirm-btn')
+    await expect(confirm).toBeEnabled()
+    await confirm.click()
+    const popup = page.locator('.confirm-popup')
+    await expect(popup).toBeVisible()
+    await popup.locator('.confirm-popup-button--secondary').click()
+    await expect(popup).toBeHidden()
+    expect(await readSavedBinding(page)).toEqual(saved)
+    await confirm.click()
+    await expect(popup).toBeVisible()
+    await popup.locator('.confirm-popup-button--primary').click()
+    await expect(popup).toBeHidden()
+    await expect(confirm).toBeDisabled()
+    expect((await readSavedBinding(page)).appliedAutoGroupArchiveTime).toBe(GAME_ARCHIVE_TIME)
+    await expect(page.locator('.group-item--new')).toHaveCount(0)
   })
 
-  test('1.3 Sidebar 星区编辑详情入口', async ({ page }) => {
-    // 1.3.1 确认 sidebar 分隔线区域存在星区编辑详情入口
-    const autoEntry = page.getByTestId('sidebar-auto-sector-group')
-    await expect(autoEntry).toBeVisible()
-
-    // 1.3.2 点击 sidebar 入口，确认 activeBindingWorkbench 设为 auto-sector-group
+  test('4.4 coverage 丢失保留未分组 virtual，Reset 恢复归属', async ({ page }) => {
+    await page.evaluate(({guid, time, sector}) => {
+      const key = (window as any).gameDataStore.getStorageKey('save_archives').replace('save_archives','save_bindings')
+      const state = JSON.parse(localStorage.getItem(key)!)
+      const binding = state.list.find((binding: any) => binding.gameGuid === guid)
+      binding.appliedAutoGroupArchiveTime = time
+      binding.groups = binding.groups.filter((group: any) => group.sectorMacro === sector)
+      binding.groups[0].connectedGroupIds = []
+      binding.stationPlans.find((plan: any) => plan.id === 'f36126e5-7798-ed14-3c03-938b961efa0b').sectorMacro = 'cluster_106_sector001_macro'
+      localStorage.setItem(key, JSON.stringify(state))
+    }, {guid: GAME_GUID, time: GAME_ARCHIVE_TIME, sector: HUB_SECTOR})
+    await page.reload()
     await enterAutoSectorGroup(page)
-    expect(await page.evaluate(() => (window as any).activeViewStore?.activeBindingWorkbench)).toBe('auto-sector-group')
-
-    // 1.3.3 通过 sidebar 切换 workbench 后持久化恢复
-    await page.getByTestId('sidebar-overview').click()
-    await page.waitForTimeout(300)
-    expect(await page.evaluate(() => (window as any).activeViewStore?.activeBindingWorkbench)).toBe('overview')
-    // Click back to auto-sector-group
-    await enterAutoSectorGroup(page)
-    expect(await page.evaluate(() => (window as any).activeViewStore?.activeBindingWorkbench)).toBe('auto-sector-group')
-
-    // 1.3.4 确认恢复 workbench 时未调用分组算法或 initAutoGroupDraft()
-    expect(await page.evaluate(() => !!(window as any).liveStore?.autoGroupResult?.groups?.length)).toBe(true)
-
-    // 1.3.5 通过 sidebar 在 overview 和 auto-sector-group 之间切换，状态稳定
-    await page.getByTestId('sidebar-overview').click()
-    await page.waitForTimeout(200)
-    await autoEntry.click()
-    await page.waitForTimeout(300)
-    expect(await page.evaluate(() => (window as any).activeViewStore?.activeBindingWorkbench)).toBe('auto-sector-group')
-
-    // 1.3.6 当 autoGroupResult 存在时 sidebar 入口不可见 disabled 状态
-    await expect(autoEntry).not.toHaveClass(/disabled/)
-
-    // 1.3.7 needsAutoGroupRecalc 对应的红点状态可观察
-    const needsRecalc = await page.evaluate(() => (window as any).liveStore?.needsAutoGroupRecalc)
-    if (needsRecalc) {
-      await expect(autoEntry.locator('.sidebar-recalc-dot')).toBeVisible()
-    } else {
-      await expect(autoEntry.locator('.sidebar-recalc-dot')).toHaveCount(0)
-    }
-  })
-
-  test('1.4 确认成功后确认按钮置灰，不跳转', async ({ page }) => {
-    // 1.4.1 进入计算模式后通过 store 验证确认行为
-    await enterAutoSectorGroup(page)
-    await expect(page.locator('.auto-sector-bar').first()).toBeVisible()
-
-    // 1.4.2 确认后 hasChanges 应为 false（binding 与 draft 一致）
-    const hasChangesBefore = await page.evaluate(() => {
-      const result = (window as any).liveStore?.autoGroupResult
-      const binding = (window as any).saveBindingStore?.activeBinding
-      if (!result || !binding || result.groups.length !== binding.groups.length) return true
-      return false
-    })
-    // Initial state: may or may not have changes (depends on fixture)
-    expect(typeof hasChangesBefore).toBe('boolean')
-
-    // 1.4.3 确认后 calculationBaseline 和 calcBaselinePillState 存在
-    const baseline = await page.evaluate(() => !!(window as any).liveStore?.autoGroupResult)
-    expect(baseline).toBe(true)
-    const pillState = await page.evaluate(() => !!(window as any).liveStore?.calcBaselinePillState)
-    expect(pillState).toBe(true)
-
-    // 1.4.4 确认后不跳转，workbench 仍为 auto-sector-group
-    const workbench = await page.evaluate(() => (window as any).activeViewStore?.activeBindingWorkbench)
-    expect(workbench).toBe('auto-sector-group')
-  })
-})
-
-// ================================================================
-// 2 Shared Draft 生命周期
-// ================================================================
-test.describe('2 Shared Draft 生命周期', () => {
-  test('2.1 初始载入 shared draft', async ({ page }) => {
-    // 2.1.1 确认 autoGroupResult 非 null 且 groups 非空 (ensure via init)
-    await ensureAutoGroupResult(page)
-    expect(await page.evaluate(() => !!(window as any).liveStore?.autoGroupResult?.groups?.length)).toBe(true)
-
-    // 2.1.2 needsAutoGroupRecalc 状态反映 archive 是否被 applied
-    const needsRecalc = await page.evaluate(() => (window as any).liveStore?.needsAutoGroupRecalc)
-    expect(typeof needsRecalc).toBe('boolean')
-
-    // 2.1.3 确认 calcBaselinePillState 在初始化时写入
-    expect(await page.evaluate(() => !!(window as any).liveStore?.calcBaselinePillState)).toBe(true)
-  })
-
-  test('2.2 Live/Map 共享同一 draft', async ({ page }) => {
-    // 2.2.1 在 Live 计算模式中访问 draft
-    await enterAutoSectorGroup(page)
-    expect(await page.evaluate(() => (window as any).liveStore?.autoGroupResult?.groups?.length)).toBeGreaterThan(0)
-
-    // 2.2.2 Map 中确认颜色修改可见（共享同一 autoGroupResult）
-    const draftRef = await page.evaluate(() => !!(window as any).liveStore?.autoGroupResult)
-    expect(draftRef).toBe(true)
-
-    // 2.2.3 Map 修改后 Live 可见（双向共享通过 liveStore 验证）
-    expect(draftRef).toBe(true)
-
-    // 2.2.4 通过 store 确认两个面板读写同一份 virtualStationDrafts
-    expect(await page.evaluate(() => Array.isArray((window as any).liveStore?.virtualStationDrafts))).toBe(true)
-  })
-
-  test('2.3 context 切换重置 draft', async ({ page }) => {
-    test.setTimeout(60000)
-    // Use the fixture's authoritative archive metadata: G1 and G2.
-    await loadLiveBindingFixture(page)
-
-    // 2.3.1 在 Live 计算模式中记录当前 draft
-    await page.evaluate(async ({ gameGuid, archiveTime }) => {
-      await (window as any).saveStore.selectArchive(gameGuid, archiveTime)
-      ;(window as any).activeViewStore.activeBinding = gameGuid
-    }, { gameGuid: GAME_GUID, archiveTime: GAME_ARCHIVE_TIME })
-    await page.waitForTimeout(300)
-    await enterAutoSectorGroup(page)
+    expect((await readVirtualDrafts(page))[0].groupId).toBe(HUB_SECTOR)
+    await openMapBinding(page)
     await enterEditMode(page)
-    const initialColor = await page.evaluate(() => (window as any).liveStore.autoGroupResult.groups[0].color)
-    await page.locator('.color-chip').first().click()
+    await hubCard(page).locator('.jump-input').fill('0')
+    await expect.poll(async () => (await readVirtualDrafts(page))[0].groupId).toBeNull()
+    await page.getByRole('button', {name:'虚拟空间站', exact:true}).click()
+    await expect(page.locator('.virtual-group--ungrouped .virtual-row')).toHaveCount(1)
+    await page.getByRole('button', {name:'重置', exact:true}).click()
+    await expect.poll(async () => (await readVirtualDrafts(page))[0].groupId).toBe(HUB_SECTOR)
+  })
+
+  test('1.1-1.3/2.1/2.4/3.2 三态与 sidebar 保留修改并恢复菜单', async ({ page }) => {
+    const overview = page.locator('.main-layout').filter({ has: page.locator('.overview-left-panel') })
+    await expect(overview.locator(':scope > div')).toHaveCount(3)
+    await expect(overview.locator(':scope > div').nth(0)).toHaveClass(/lg:col-span-3/)
+    await expect(overview.locator(':scope > div').nth(1)).toHaveClass(/lg:col-span-4/)
+    await expect(overview.locator(':scope > div').nth(2)).toHaveClass(/lg:col-span-5/)
+    const entry = page.getByTestId('sidebar-auto-sector-group')
+    await expect(entry).not.toHaveClass(/disabled/)
+    await expect(entry.locator('.sidebar-recalc-dot')).toBeVisible()
+    const initial = await readVirtualDrafts(page)
+    expect(initial.map((draft: any) => draft.id)).toEqual(['f36126e5-7798-ed14-3c03-938b961efa0b'])
+    expect(initial[0].saveStationCode).toBeUndefined()
+    await enterAutoSectorGroup(page)
+    await expect(page.locator('.columns-layout > .column')).toHaveCount(3)
+    await expect(page.locator('.trade-station-list')).toBeVisible()
+    await expect(page.locator('.generate-card')).toBeHidden()
+    const color = await changeHubColor(page)
+    await expect(page.getByRole('button', { name: '退出', exact: true })).toHaveCount(0)
+    await page.getByRole('button', { name: '查看', exact: true }).click()
+    await expect(hubCard(page).locator('.color-chip')).toBeDisabled()
+    await page.getByRole('button', { name: '重算', exact: true }).click()
+    await expect(page.locator('.generate-card')).toBeVisible()
+    await page.getByRole('button', { name: '查看', exact: true }).click()
+    await returnToDisplayMode(page)
+    await enterAutoSectorGroup(page)
+    expect((await readHub(page)).color).toBe(color)
+    expect(await readVirtualDrafts(page)).toEqual(initial)
+    await page.reload()
+    await expect(page.locator('.auto-sector-bar')).toBeVisible()
+    expect(await page.evaluate(() => (window as any).activeViewStore.activeBindingWorkbench)).toBe('auto-sector-group')
+    expect((await readHub(page)).color).not.toBe(color)
+  })
+
+  test('2.2/4.1/4.2/5.1 Live Map 双向共享颜色与 virtual 删除草案', async ({ page }) => {
+    await enterAutoSectorGroup(page)
+    const saved = await readSavedBinding(page)
+    const color = await changeHubColor(page)
+    await openMapBinding(page)
+    expect((await readHub(page)).color).toBe(color)
+    await expect(hubCard(page).locator('.color-chip')).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)')
+    await enterEditMode(page)
+    await hubCard(page).locator('.color-chip').click()
     await page.locator('.preset-color').first().click()
-    const mutatedColor = await page.evaluate(() => (window as any).liveStore?.autoGroupResult?.groups?.[0]?.color)
-    expect(mutatedColor).not.toBe(initialColor)
-    const before = await page.evaluate(() => ({
-      guid: (window as any).activeViewStore?.activeBinding,
-      archiveTime: (window as any).saveStore?.selectedArchive?.meta?.time,
-      color: (window as any).liveStore?.autoGroupResult?.groups?.[0]?.color
-    }))
-    expect(before.color).toBe(mutatedColor)
+    const mapColor = (await readHub(page)).color
+    expect(mapColor).not.toBe(color)
+    await deleteVirtualDraft(page)
+    expect(await readSavedBinding(page)).toEqual(saved)
+    await page.getByTestId('top-view-btn-live-production').click()
+    await enterAutoSectorGroup(page)
+    expect((await readHub(page)).color).toBe(mapColor)
+    expect(await readVirtualDrafts(page)).toEqual([])
+    await openMapBinding(page)
+    await page.getByRole('button', { name: '虚拟空间站', exact: true }).click()
+    await expect(page.locator('.virtual-row')).toHaveCount(0)
+    await page.reload()
+    expect((await readSavedBinding(page)).stationPlans.some((plan: any) => plan.id === 'f36126e5-7798-ed14-3c03-938b961efa0b')).toBe(true)
+  })
 
-    // 2.3.2 切换到另一个 active binding，确认旧 context 修改不残留
-    await page.evaluate(async ({ guid, time }) => {
-      const w = window as any
-      await w.saveStore.selectArchive(guid, time)
-      w.activeViewStore.activeBinding = guid
-      w.saveBindingStore.createOrOpenBinding(guid, time)
-      w.liveStore.initAutoGroupDraft?.()
-    }, { guid: SECOND_GAME_GUID, time: SECOND_ARCHIVE_TIME })
-    await expect.poll(() => page.evaluate(() => (window as any).saveStore?.selectedArchive?.meta?.time), { timeout: 30000 }).toBe(SECOND_ARCHIVE_TIME)
-    const after = await page.evaluate(() => ({
-      guid: (window as any).activeViewStore?.activeBinding,
-      archiveTime: (window as any).saveStore?.selectedArchive?.meta?.time,
-      color: (window as any).liveStore?.autoGroupResult?.groups?.[0]?.color,
-      groups: (window as any).liveStore?.autoGroupResult?.groups?.length
-    }))
-    expect(before.guid).toBe(GAME_GUID)
-    expect(after.guid).toBe(SECOND_GAME_GUID)
-    expect(after.archiveTime).toBe(SECOND_ARCHIVE_TIME)
-    expect(after.groups).toBeGreaterThan(0)
-    expect(after.color).not.toBe(before.color)
+  test('2.3 binding context 切换丢弃旧草案，删除当前 binding 清空详情入口', async ({ page }) => {
+    // Fixture initialization only; subsequent activation and deletion use public UI.
+    await page.evaluate(({guid}) => {
+      const game = (window as any).gameDataStore
+      const key = game.getStorageKey('save_archives').replace('save_archives', 'save_bindings')
+      const state = JSON.parse(localStorage.getItem(key)!)
+      state.list.push({gameGuid: guid, bindingName: 'M2 Context B', selectedArchiveTime: null, groups: [], stationPlans: [], updatedAt: 1})
+      localStorage.setItem(key, JSON.stringify(state))
+    }, {guid: SECOND_GAME_GUID})
+    await page.reload()
+    await enterAutoSectorGroup(page)
+    const original = await readHub(page)
+    await changeHubColor(page)
+    await loadBinding(page, 'M2 Context B')
+    await expect.poll(() => page.evaluate(() => (window as any).activeViewStore.activeBinding)).toBe(SECOND_GAME_GUID)
+    expect(await page.evaluate(() => (window as any).saveStore.selectedArchive.meta.time)).toBe(SECOND_ARCHIVE_TIME)
+    expect(await readVirtualDrafts(page)).toEqual([])
+    await loadBinding(page, 'slepher')
+    await expect.poll(async () => (await readHub(page)).color).toBe(original.color)
+    expect(await page.evaluate(() => (window as any).saveStore.selectedArchive.meta.time)).toBe(GAME_ARCHIVE_TIME)
+    await page.getByTestId('toolbar-load-btn').click()
+    page.once('dialog', dialog => dialog.accept())
+    await page.getByTestId('dialog-backdrop').locator('.group').filter({hasText: 'M2 Context B'}).getByRole('button', {name:'删除', exact:true}).click()
+    page.once('dialog', dialog => dialog.accept())
+    await page.getByTestId('dialog-backdrop').locator('.group').filter({hasText: 'slepher'}).getByRole('button', {name:'删除', exact:true}).click()
+    await page.reload()
+    await expect(page.getByTestId('sidebar-auto-sector-group')).toHaveClass(/disabled/)
+    expect(await page.evaluate(() => (window as any).activeViewStore.activeBinding)).toBeNull()
+    expect(await page.evaluate(() => (window as any).liveStore.autoGroupResult)).toBeNull()
+  })
 
-    // 2.3.3 清空 active binding，确认 draft 被重置
-    await page.evaluate(() => { (window as any).activeViewStore.activeBinding = null })
-    await page.waitForTimeout(500)
-    // After clearing active binding, liveStore may still hold old result;
-    // next initAutoGroupDraft() should produce empty result for null context
-    await page.evaluate(() => { (window as any).liveStore.initAutoGroupDraft?.() })
-    await page.waitForTimeout(500)
-    const hasNull = await page.evaluate(() => {
-      const r = (window as any).liveStore?.autoGroupResult
-      return !r || !r.groups?.length
+  test('2.3 同 GUID archive time UI 切换重新初始化唯一 draft', async ({ page }) => {
+    const patch = await import('./fixtures/context-switch-save.patch.json', { with: { type: 'json' } })
+    await loadLiveBindingFixture(page, {
+      transformSaves: saves => {
+        const source = saves.find(save => save.meta.guid === GAME_GUID)
+        if (!source) throw new Error('G1 fixture missing')
+        return [...saves, {...source, meta: {...source.meta, ...patch.default.$merge.meta}}]
+      }, initialArchiveId: GAME_GUID + '_' + GAME_ARCHIVE_TIME
     })
-    expect(hasNull).toBe(true)
-  })
-
-  test('2.4 面板切换不自动计算', async ({ page }) => {
-    // 2.4.1 初始进入 auto sector group，记录首次计算结果
+    await page.evaluate(({guid, time}) => {
+      const key = (window as any).gameDataStore.getStorageKey('save_archives').replace('save_archives','save_bindings')
+      const state = JSON.parse(localStorage.getItem(key)!)
+      state.list.find((binding: any) => binding.gameGuid === guid).selectedArchiveTime = time
+      localStorage.setItem(key, JSON.stringify(state))
+    }, {guid: GAME_GUID, time: GAME_ARCHIVE_TIME})
+    await page.reload()
+    await waitForAppReady(page)
+    await expect.poll(() => page.evaluate(() => (window as any).saveStore.selectedArchive?.meta.time)).toBe(GAME_ARCHIVE_TIME)
     await enterAutoSectorGroup(page)
-    const resultBefore = await page.evaluate(() => JSON.stringify((window as any).liveStore?.autoGroupResult))
-
-    // 2.4.2 Live 展示模式与计算模式间多次切换，确认每次不运行算法
-    await returnToDisplayMode(page)
-    await enterAutoSectorGroup(page)
-
-    // 2.4.3 确认组件挂载时不调用 initAutoGroupDraft()，结果不变
-    const resultAfter = await page.evaluate(() => JSON.stringify((window as any).liveStore?.autoGroupResult))
-    expect(resultAfter).toBe(resultBefore)
+    const color = await changeHubColor(page)
+    await page.getByTestId('top-view-btn-maps').click()
+    await page.getByTestId('map-save-panel-tab').click()
+    await page.getByTestId('map-save-panel').locator('.save-item').filter({hasText:'M2 later'}).locator('.save-info').click()
+    await expect.poll(() => page.evaluate(() => (window as any).saveStore.selectedArchive.meta.time)).toBe(700000)
+    await expect.poll(async () => (await readHub(page)).color).not.toBe(color)
+    expect(await page.evaluate(() => (window as any).activeViewStore.activeBinding)).toBe(GAME_GUID)
   })
-})
-
-// ================================================================
-// 3 计算、重置与提交
-// ================================================================
-test.describe('3 计算、重置与确认', () => {
   test('3.1 显式计算', async ({ page }) => {
-    // 3.1.1 在计算模式中修改跳数或阈值后点击计算按钮
     await enterAutoSectorGroup(page)
-    expect(await page.evaluate(() => (window as any).liveStore?.autoGroupResult?.groups?.length ?? 0)).toBeGreaterThan(0)
-
-    // 3.1.2 确认 autoGroupResult 更新为新的分组结果
-    await page.getByRole('button', { name: /计算|Calculate/ }).first().click()
-    await page.waitForTimeout(1000)
-
-    // 3.1.3 确认 calculationBaseline 更新为最新计算结果
-    expect(await page.evaluate(() => !!(window as any).liveStore?.autoGroupResult)).toBe(true)
-
-    // 3.1.4 在 result 模式点击计算按钮（触发 quick-calculate emit），确认执行计算路径
-    await page.getByRole('button', { name: /计算|Calculate/ }).first().click()
-    await page.waitForTimeout(1000)
-
-    // 3.1.5 确认显式计算后自动切换到首个未解决 tab
-    expect(await page.evaluate(() => (window as any).liveStore?.autoGroupResult?.groups?.length ?? 0)).toBeGreaterThan(0)
-  })
-
-  test('3.2 编辑后查看', async ({ page }) => {
-    // 3.2.1 在 result 模式点击编辑按钮，确认进入 edit 模式
-    await enterAutoSectorGroup(page)
-    await enterEditMode(page)
-    const originalColor = await page.evaluate(() => (window as any).liveStore.autoGroupResult.groups[0].color)
-    await page.locator('.color-chip').first().click()
-    await page.locator('.preset-color').last().click()
-    const editedColor = await page.evaluate(() => (window as any).liveStore.autoGroupResult.groups[0].color)
-    expect(editedColor).not.toBe(originalColor)
-    expect(await page.evaluate(() => (window as any).liveStore?.calculationMode)).toBe('edit')
-
-    // 3.2.2 在 edit 模式下点击当前查看按钮，确认切回 result 模式
-    await page.getByRole('button', { name: /查看|Preview/ }).click()
-    await page.waitForTimeout(300)
-
-    // 3.2.3 确认切换后 draft 修改保留（不恢复 snapshot）
-    expect(await page.evaluate(() => (window as any).liveStore?.calculationMode)).toBe('result')
-
-    // 3.2.4 确认切换操作不调用 snapshot 恢复逻辑
-    expect(await page.evaluate(() => (window as any).liveStore.autoGroupResult.groups[0].color)).toBe(editedColor)
+    const saved = await readSavedBinding(page)
+    const baseline = await page.evaluate(() => (window as any).liveStore.calcBaselinePillState)
+    await page.getByRole('button', { name: '重算', exact: true }).click()
+    await expect(page.locator('.generate-card')).toBeVisible()
+    await page.locator('.generate-card .param-field').filter({ hasText: '交易站' }).locator('select').selectOption('20000000')
+    await page.getByRole('button', { name: '重新计算', exact: true }).click()
+    await expect(page.locator('.generate-card')).toBeHidden()
+    await expect(page.getByRole('button', { name: '查看', exact: true })).toHaveClass(/active/)
+    expect(await page.evaluate(() => (window as any).liveStore.prefThreshold)).toBe(20000000)
+    expect(await readSavedBinding(page)).toEqual(saved)
+    expect(await page.evaluate(() => (window as any).liveStore.calcBaselinePillState)).toEqual(baseline)
+    await expect.poll(() => page.locator('.group-item').count()).toBeGreaterThan(0)
   })
 
   test('3.3 重置', async ({ page }) => {
-    // 3.3.1 在计算模式中修改 draft，点击重置按钮
     await enterAutoSectorGroup(page)
-    await enterEditMode(page)
-    await page.waitForTimeout(200)
-
-    const savedState = await page.evaluate(() => ({
-      groups: JSON.parse(JSON.stringify((window as any).saveBindingStore?.activeBinding?.groups ?? [])),
-      result: JSON.parse(JSON.stringify((window as any).liveStore?.autoGroupResult ?? null)),
-      parameters: {
-        prefJumpRange: (window as any).liveStore?.prefJumpRange,
-        bridgeSearchJumpRange: (window as any).liveStore?.bridgeSearchJumpRange,
-        prefThreshold: (window as any).liveStore?.prefThreshold
-      },
-      context: {
-        bindingGuid: (window as any).saveBindingStore?.activeBinding?.gameGuid,
-        archiveTime: (window as any).saveStore?.selectedArchive?.meta?.time,
-        bindingArchiveTime: (window as any).saveBindingStore?.activeBinding?.selectedArchiveTime
-      }
-    }))
-    const originalColor = savedState.result.groups[0].color
-    await page.locator('.color-chip').first().click()
-    await page.locator('.preset-color').last().click()
-    const mutatedColor = await page.evaluate(() => (window as any).liveStore.autoGroupResult.groups[0].color)
-    expect(mutatedColor).not.toBe(originalColor)
-
-    // 3.3.2 确认重置从 saved binding 重建 groups 与 live result
-    await page.getByRole('button', { name: /重置|Reset/ }).click()
-    await page.waitForTimeout(500)
-    const afterReset = await page.evaluate(() => ({
-      groups: (window as any).saveBindingStore?.activeBinding?.groups ?? [],
-      result: (window as any).liveStore?.autoGroupResult ?? null,
-      parameters: {
-        prefJumpRange: (window as any).liveStore?.prefJumpRange,
-        bridgeSearchJumpRange: (window as any).liveStore?.bridgeSearchJumpRange,
-        prefThreshold: (window as any).liveStore?.prefThreshold
-      },
-      context: {
-        bindingGuid: (window as any).saveBindingStore?.activeBinding?.gameGuid,
-        archiveTime: (window as any).saveStore?.selectedArchive?.meta?.time,
-        bindingArchiveTime: (window as any).saveBindingStore?.activeBinding?.selectedArchiveTime
-      }
-    }))
-    expect(afterReset.groups).toEqual(savedState.groups)
-    expect(afterReset.result).toEqual(savedState.result)
-    expect(afterReset.parameters).toEqual(savedState.parameters)
-
-    // 3.3.4 确认重置不切换 active binding 或 selected archive
-    expect(await page.evaluate(() => (window as any).activeViewStore?.activeBinding)).toBe(GAME_GUID)
-
-    // 3.3.5 确认重置保持当前 archive/binding context
-    expect(afterReset.context).toEqual(savedState.context)
-  })
-
-  test('3.4 确认 gate', async ({ page }) => {
-    // 3.4.1 edit 模式下确认不再被拦截，按正常 gate 流程处理
-    await enterAutoSectorGroup(page)
-    await enterEditMode(page)
-    await page.locator('.confirm-btn').click()
-    await page.waitForTimeout(500)
-    // Confirm 在 edit 模式下不再因为 mode=edit 直接返回 false，走正常 gate
-    expect(await page.evaluate(() => (window as any).liveStore?.autoGroupResult)).toBeTruthy()
-
-    // 3.4.2 在无 result 时确认按钮不可用（panel 仅在有结果时展示确认按钮）
-    await page.evaluate(() => { (window as any).liveStore.autoGroupResult = null })
-    await page.waitForTimeout(200)
-    // Confirm button should be hidden/removed when no result
-    const btnVisible = await page.getByRole('button', { name: /确定|Confirm/ }).isVisible().catch(() => false)
-    expect(btnVisible).toBe(false)
-
-    // 3.4.3 存在未解决 trade station 时被拦截且不打开 popup
-    expect(await page.locator('[role="dialog"]').count()).toBe(0)
-
-    // 3.4.4 存在 uncertain assignment 时打开二次确认 popup
-    expect(await page.locator('[role="dialog"]').count()).toBe(0)
-
-    // 3.4.5 在二次确认 popup 中再次点击确认，所有 gate 通过
-    expect(await page.locator('[role="dialog"]').count()).toBe(0)
+    const saved = await readSavedBinding(page)
+    const original = await readHub(page)
+    const virtualBefore = await page.evaluate(() => (window as any).liveStore.virtualStationDrafts)
+    const baseline = await page.evaluate(() => (window as any).liveStore.calcBaselinePillState)
+    const color = await changeHubColor(page)
+    await page.getByRole('button', { name: '重算', exact: true }).click()
+    await page.locator('.generate-card .param-field').filter({ hasText: '交易站' }).locator('select').selectOption('20000000')
+    await expect.poll(() => page.evaluate(() => (window as any).liveStore.prefThreshold)).toBe(20000000)
+    await page.getByRole('button', { name: '重置', exact: true }).click()
+    await expect.poll(async () => (await readHub(page)).color).toBe(original.color)
+    expect((await readHub(page)).color).not.toBe(color)
+    expect((await readHub(page)).sectorMacro).toBe(HUB_SECTOR)
+    expect(await readSavedBinding(page)).toEqual(saved)
+    expect(await page.evaluate(() => (window as any).liveStore.prefThreshold)).toBe(20000000)
+    expect(await page.evaluate(() => (window as any).liveStore.calcBaselinePillState)).toEqual(baseline)
+    expect(await page.evaluate(() => (window as any).liveStore.virtualStationDrafts)).toEqual(virtualBefore)
+    expect(await page.evaluate(() => ({
+      guid: (window as any).activeViewStore.activeBinding,
+      time: (window as any).saveStore.selectedArchive.meta.time
+    }))).toEqual({ guid: GAME_GUID, time: GAME_ARCHIVE_TIME })
   })
 
   test('3.5 确认成功', async ({ page }) => {
-    // 3.5.1 进入计算模式
     await enterAutoSectorGroup(page)
-
-    // 3.5.2 确认后 binding 中 groups 已写入（store 级别验证）
-    expect(await page.evaluate(() => !!(window as any).saveBindingStore?.activeBinding)).toBe(true)
-
-    // 3.5.3 确认 appliedAutoGroupArchiveTime 记录为当前 selected archive time
-    expect(await page.evaluate(() => !!(window as any).saveBindingStore?.activeBinding)).toBe(true)
-
-    // 3.5.4 确认 live flow 已同步
-    expect(await page.evaluate(() => !!(window as any).saveBindingStore?.activeBinding)).toBe(true)
-
-    // 3.5.5 确认 calcBaselinePillState 更新为确认后的 groups
-    expect(await page.evaluate(() => !!(window as any).liveStore?.calcBaselinePillState)).toBe(true)
-
-    // 3.5.6 确认 calculationBaseline 更新为确认后的 draft
-    expect(await page.evaluate(() => !!(window as any).liveStore?.autoGroupResult)).toBe(true)
-
-    // 3.5.7 确认后 workbench 不跳转，仍为 auto-sector-group
-    const workbench = await page.evaluate(() => (window as any).activeViewStore?.activeBindingWorkbench)
-    expect(workbench).toBe('auto-sector-group')
-  })
-
-  test('3.6 二次确认保存后进入已保存 UI 状态', async ({ page }) => {
-    page.on('console', (msg) => {
-      const text = msg.text()
-      if (text.includes('[auto-sector-confirm]')) console.log(text)
-    })
-
-    await enterAutoSectorGroup(page)
-
-    await page.evaluate(() => {
-      const w = window as any
-      const result = w.liveStore?.autoGroupResult
-      if (!result?.groups?.length) throw new Error('autoGroupResult is required')
-      const groups = result.groups.map((group: any, index: number) => ({
-        ...group,
-        isNew: index === 0 ? true : group.isNew,
-        color: index === 0 ? '#22c55e' : group.color,
-        selectedTradeStation: group.selectedTradeStation ?? { type: 'virtual', stationCode: '__virtual__' }
-      }))
-      const first = groups[0]
-      const sectorMacro = first.coverageSectorMacros.find((macro: string) => macro !== first.sectorMacro) ?? first.sectorMacro
-      w.liveStore.autoGroupResult = {
-        ...result,
-        groups,
-        assignments: [{
-          sectorMacro,
-          status: 'uncertain_tie',
-          displayBucket: 'unresolved',
-          selectedOptionIndex: null,
-          options: [{
-            type: 'absorb',
-            targetGroupId: first.id,
-            distance: 1,
-            extendsRange: false,
-            resultingGroupSize: first.coverageSectorMacros.length
-          }]
-        }]
-      }
-    })
-    await page.waitForTimeout(300)
-
-    const topConfirm = page.locator('.auto-sector-bar .confirm-btn').first()
-    await expect(topConfirm).toBeEnabled()
-    await expect(page.locator('.group-item--new').first()).toBeVisible()
-
-    await topConfirm.click()
-    const popup = page.locator('.confirm-popup')
-    await expect(popup).toBeVisible()
-    await expect(popup.locator('.confirm-popup-button--secondary')).toBeVisible()
-    await expect(popup.locator('.confirm-popup-button--primary')).toBeVisible()
-
-    await popup.locator('.confirm-popup-button--primary').click()
-    await expect(popup).toHaveCount(0)
-    await expect(topConfirm).toBeDisabled()
-    await expect(page.locator('.group-item--new')).toHaveCount(0)
-
-    const postConfirmState = await page.evaluate(() => {
-      const w = window as any
-      return {
-        workbench: w.activeViewStore?.activeBindingWorkbench,
-        hasTransientNew: w.liveStore?.autoGroupResult?.groups?.some((group: any) => group.isNew) ?? true,
-        hasPillBaseline: !!w.liveStore?.calcBaselinePillState
-      }
-    })
-    expect(postConfirmState.workbench).toBe('auto-sector-group')
-    expect(postConfirmState.hasTransientNew).toBe(false)
-    expect(postConfirmState.hasPillBaseline).toBe(true)
-  })
-})
-
-// ================================================================
-// 4 Virtual Station Draft
-// ================================================================
-test.describe('4 Virtual Station Draft', () => {
-  test('4.1 初始化', async ({ page }) => {
-    // 4.1.1 确认 fixture binding 中存在无 saveStationCode 的 BindingStationPlan
-    await enterAutoSectorGroup(page)
-    expect(await page.evaluate(() => ((window as any).liveStore?.virtualStationDrafts ?? []).length)).toBeGreaterThan(0)
-
-    // 4.1.2 确认 autoGroupResult.groups 生成后 virtualStationDrafts 从 binding clone
-    expect(await page.evaluate(() => Array.isArray((window as any).liveStore?.virtualStationDrafts))).toBe(true)
-
-    // 4.1.3 确认带 saveStationCode 的 station plans 未被纳入 virtualStationDrafts
-    const hasSaveCode = await page.evaluate(() => {
-      return ((window as any).liveStore?.virtualStationDrafts ?? []).some((d: any) => d.saveStationCode)
-    })
-    expect(hasSaveCode).toBe(false)
-
-    // 4.1.4 确认 virtualStationDraftInitializedKey 记录当前 context key
-    expect(await page.evaluate(() => (window as any).liveStore?.virtualStationDraftInitializedKey)).toBeTruthy()
-  })
-
-  test('4.2 保留', async ({ page }) => {
-    // 4.2.1 在 Live 中修改 virtual station draft
-    await enterAutoSectorGroup(page)
-    const draftsBefore = await page.evaluate(() => JSON.stringify((window as any).liveStore?.virtualStationDrafts))
-
-    // 4.2.2 通过 sidebar 总览回到展示模式再进入，确认 drafts 未被重置或覆盖
-    await returnToDisplayMode(page)
-    await enterAutoSectorGroup(page)
-
-    // 4.2.3 打开 Virtual Station tab 再关闭，确认 drafts 不变
-    const draftsMid = await page.evaluate(() => JSON.stringify((window as any).liveStore?.virtualStationDrafts))
-    expect(draftsMid).toBe(draftsBefore)
-
-    // 4.2.4 同 context 下反复进出计算模式，确认 drafts 保留
-    const draftsAfter = await page.evaluate(() => JSON.stringify((window as any).liveStore?.virtualStationDrafts))
-    expect(draftsAfter).toBe(draftsBefore)
-  })
-
-  test('4.3 重新计算', async ({ page }) => {
-    // 4.3.1 在已有 virtual station drafts 的状态下点击计算
-    await enterAutoSectorGroup(page)
-    const draftsBefore = await page.evaluate(() => (window as any).liveStore?.virtualStationDrafts?.length ?? 0)
-
-    // 4.3.2 确认 virtualStationDrafts 内容保留
-    await page.getByRole('button', { name: /计算|Calculate/ }).first().click()
-    await page.waitForTimeout(1000)
-
-    // 4.3.3 确认按新 groups 重算了归属（groupId 更新）
-    expect(await page.evaluate(() => (window as any).liveStore?.virtualStationDrafts?.length ?? 0)).toBe(draftsBefore)
-
-    // 4.3.4 确认无当前 group 归属的 draft 保留为未分组状态
-    expect(await page.evaluate(() => Array.isArray((window as any).liveStore?.virtualStationDrafts))).toBe(true)
-  })
-
-  test('4.4 未分组', async ({ page }) => {
-    // 4.4.1 修改 groups 或 coverage 导致 virtual station draft 失去 group 归属
-    await enterAutoSectorGroup(page)
-
-    // 4.4.2 确认该 draft 进入未分组状态（groupId 为 null/undefined）
-    const drafts = await page.evaluate(() => {
-      return ((window as any).liveStore?.virtualStationDrafts ?? []).map((d: any) => ({ name: d.name, groupId: d.groupId }))
-    })
-    expect(drafts.length).toBeGreaterThan(0)
-
-    // 4.4.3 确认未分组 drafts 在 UI 中可见且可编辑
-    expect(drafts.length).toBeGreaterThan(0)
-  })
-
-  test('4.5 确认应用', async ({ page }) => {
-    // 4.5.1 确认后，确认先应用 auto groups
-    await enterAutoSectorGroup(page)
-    expect(await page.evaluate(() => !!(window as any).liveStore?.autoGroupResult?.groups?.length)).toBe(true)
-
-    // 4.5.2 确认再同步 virtual station drafts：创建、更新、删除
-    expect(await page.evaluate(() => Array.isArray((window as any).liveStore?.virtualStationDrafts))).toBe(true)
-
-    // 4.5.3 确认未分组 drafts 不写回 binding
-    expect(await page.evaluate(() => Array.isArray((window as any).liveStore?.virtualStationDrafts))).toBe(true)
-
-    // 4.5.4 确认带 saveStationCode 的 save station plans 不被 virtual station 同步修改
-    const savePlans = await page.evaluate(() => {
-      return ((window as any).saveBindingStore?.activeBinding?.stationPlans ?? []).filter((p: any) => p.saveStationCode)
-    })
-    expect(savePlans.length).toBeGreaterThan(0)
-  })
-})
-
-// ================================================================
-// 5 回归风险
-// ================================================================
-test.describe('5 回归风险', () => {
-  test('5.1 防止组件挂载或 tab 切换覆盖用户未确认 draft', async ({ page }) => {
-    // 5.1.1 用户编辑 draft 后，组件重新挂载
-    await enterAutoSectorGroup(page)
-    const before = await page.evaluate(() => JSON.stringify((window as any).liveStore?.autoGroupResult))
-    await returnToDisplayMode(page)
-    await enterAutoSectorGroup(page)
-
-    // 5.1.2 确认 autoGroupResult 保留编辑内容
-    const after = await page.evaluate(() => JSON.stringify((window as any).liveStore?.autoGroupResult))
-    expect(after).toBe(before)
-
-    // 5.1.3 确认 virtualStationDrafts 保留编辑内容
-    expect(await page.evaluate(() => JSON.stringify((window as any).liveStore?.virtualStationDrafts))).toBeTruthy()
+    const color = await changeHubColor(page)
+    const draftGroups = await page.evaluate(() => (window as any).liveStore.autoGroupResult.groups.map((group: any) => ({
+      sectorMacro: group.sectorMacro,
+      coverage: [...group.coverageSectorMacros].sort(),
+      connections: [...group.connectedGroupIds].sort(),
+      color: group.color,
+      jumpRange: group.jumpRange
+    })))
+    await confirmCurrentDraft(page)
+    const saved = await readSavedBinding(page)
+    expect(saved.appliedAutoGroupArchiveTime).toBe(GAME_ARCHIVE_TIME)
+    expect(saved.groups.find((group: any) => group.sectorMacro === HUB_SECTOR).color).toBe(color)
+    expect(saved.groups.every((group: any) => !Object.hasOwn(group, 'id'))).toBe(true)
+    expect(saved.groups.map((group: any) => ({
+      sectorMacro: group.sectorMacro,
+      coverage: group.coverageSectorMacros.map((sector: any) => sector.ref).sort(),
+      connections: [...group.connectedGroupIds].sort(),
+      color: group.color,
+      jumpRange: group.jumpRange
+    }))).toEqual(draftGroups)
+    expect(await page.evaluate(() => (window as any).activeViewStore.activeBindingWorkbench)).toBe('auto-sector-group')
+    await page.reload()
+    await expect(page.locator('.auto-sector-bar')).toBeVisible()
+    expect((await readSavedBinding(page)).groups).toEqual(saved.groups)
+    expect((await readHub(page)).color).toBe(color)
   })
 
   test('5.2 防止 handleColorChange 直接写入持久化 binding', async ({ page }) => {
-    // 5.2.1 在编辑模式中修改 group 颜色
     await enterAutoSectorGroup(page)
-    const bindingBefore = await page.evaluate(() => JSON.stringify((window as any).saveBindingStore?.activeBinding))
-
-    // 5.2.2 确认颜色修改只写入 shared draft 而非 binding
-    expect(bindingBefore).toBeTruthy()
-
-    // 5.2.3 在未确认状态下 refresh 页面，确认 binding 中颜色未改变
-    expect(bindingBefore).toBeTruthy()
+    const saved = await readSavedBinding(page)
+    const color = await changeHubColor(page)
+    expect(await readSavedBinding(page)).toEqual(saved)
+    await page.reload()
+    await enterAutoSectorGroup(page)
+    expect(await readSavedBinding(page)).toEqual(saved)
+    expect((await readHub(page)).color).not.toBe(color)
   })
 
-  test('5.4 防止 normalizeState() 丢弃新增 SaveBindingPlan 字段', async ({ page }) => {
-    // 5.4.1 在 binding 中设置 appliedAutoGroupArchiveTime 等新字段
-    await enterAutoSectorGroup(page)
-    await page.evaluate(() => {
-      const b = (window as any).saveBindingStore.activeBinding
-      if (b) {
-        b.appliedAutoGroupArchiveTime = 1345095294
-        b.prefJumpRange = 2
-        b.bridgeSearchJumpRange = 5
-        b.prefThreshold = 500
-      }
-    })
 
-    // 5.4.2 通过 localStorage 保存并触发 store 重载
-    await page.evaluate(() => { (window as any).saveBindingStore.saveBinding() })
-    await page.waitForTimeout(300)
+  test('4.3 重算保留未确认 virtual 删除内容', async ({ page }) => {
+    await enterAutoSectorGroup(page)
+    const saved = await readSavedBinding(page)
+    await openMapBinding(page)
+    await deleteVirtualDraft(page)
+    await page.getByRole('button', {name:'枢纽', exact:true}).click()
+    await page.getByRole('button', {name:'重算', exact:true}).click()
+    await page.getByRole('button', {name:'重新计算', exact:true}).click()
+    await expect(page.locator('.generate-card')).toBeHidden()
+    expect(await readVirtualDrafts(page)).toEqual([])
+    expect(await readSavedBinding(page)).toEqual(saved)
+  })
+
+  test('3.3/5.3 Reset 同时恢复 virtual 与颜色草案', async ({ page }) => {
+    await enterAutoSectorGroup(page)
+    const before = await readVirtualDrafts(page)
+    const original = await readHub(page)
+    await changeHubColor(page)
+    await openMapBinding(page)
+    await deleteVirtualDraft(page)
+    await page.getByRole('button', {name:'重置', exact:true}).click()
+    await expect.poll(() => readVirtualDrafts(page)).toEqual(before)
+    expect((await readHub(page)).color).toBe(original.color)
+  })
+
+  test('4.5 virtual 删除确认仅移除无 saveStationCode 计划并持久化', async ({ page }) => {
+    await enterAutoSectorGroup(page)
+    const before = await page.evaluate(() => (window as any).saveBindingStore.activeBinding.stationPlans.filter((plan: any) => plan.saveStationCode))
+    await openMapBinding(page)
+    await deleteVirtualDraft(page)
+    await page.getByTestId('top-view-btn-live-production').click()
+    await enterAutoSectorGroup(page)
+    await confirmCurrentDraft(page)
+    const saved = await readSavedBinding(page)
+    expect(saved.stationPlans.filter((plan: any) => !plan.saveStationCode)).toEqual([])
+    const content = (plans: any[]) => plans.map(({saveStationCode, name, modules, settings}) => ({saveStationCode, name, modules, settings}))
+    expect(content(saved.stationPlans)).toEqual(content(before))
+    await page.reload()
+    expect(await readVirtualDrafts(page)).toEqual([])
+    expect((await readSavedBinding(page)).stationPlans).toEqual(saved.stationPlans)
+  })
+
+  test('5.4 normalizeState 保留新增字段与迁移 sectorMacro 引用', async ({ page }) => {
+    const patch = await import('./fixtures/normalize-fields-db.patch.json', {with:{type:'json'}})
+    await page.evaluate((fixture) => {
+      const key = (window as any).gameDataStore.getStorageKey('save_archives').replace('save_archives','save_bindings')
+      localStorage.setItem(key, JSON.stringify({version:1,list:fixture.$append['x4_save_bindings.list']}))
+    }, patch.default)
+    await page.reload()
+    await enterAutoSectorGroup(page)
+    const binding = await page.evaluate(() => (window as any).saveBindingStore.activeBinding)
+    expect(binding.appliedAutoGroupArchiveTime).toBe(1345095294)
+    expect(binding.prefJumpRange).toBe(2)
+    expect(binding.bridgeSearchJumpRange).toBe(5)
+    expect(binding.prefThreshold).toBe(500)
+    expect(binding.groups.every((group: any) => !Object.hasOwn(group,'id'))).toBe(true)
+    expect(binding.stationPlans.find((plan: any) => plan.id==='KXN-018').groupId).toBe(HUB_SECTOR)
+    expect(binding.groups.find((group: any) => group.sectorMacro===HUB_SECTOR).connectedGroupIds).toEqual(['cluster_48_sector001_macro'])
+  })
+  test('4.5 Map pointer 创建并移动 virtual，确认后刷新恢复', async ({ page }) => {
+    await enterAutoSectorGroup(page)
+    const saved = await readSavedBinding(page)
+    await openMapBinding(page)
+    await page.getByRole('button', {name:'虚拟空间站', exact:true}).click()
+    await page.locator('.virtual-group').filter({has: page.locator('.virtual-row').filter({hasText:'新建空间站'})}).locator('.virtual-group-title').click()
+    const target = page.locator('.sector-hover-target[data-map-sector-id="cluster_100_sector001_macro"] .sector-polygon')
+    await expect(target).toBeVisible()
+    async function drag(source: import('@playwright/test').Locator, fraction: number) {
+      const box = await source.boundingBox()
+      const end = await target.boundingBox()
+      expect(box).not.toBeNull()
+      expect(end).not.toBeNull()
+      const point = {x: end!.x + end!.width * fraction, y: end!.y + end!.height * .6}
+      await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2)
+      await page.mouse.down()
+      await page.mouse.move(box!.x + box!.width / 2 + 12, box!.y + box!.height / 2, {steps:4})
+      await expect(source).toHaveClass(/dragging/)
+      await page.mouse.move(point.x, point.y, {steps:20})
+      await expect(page.locator('.placement-preview--binding')).toBeVisible()
+      await page.mouse.up()
+    }
+    await drag(page.locator('.free-station-item--virtual'), .65)
+    await expect.poll(async () => (await readVirtualDrafts(page)).length).toBe(2)
+    const created = (await readVirtualDrafts(page)).find((draft: any) => draft.id !== 'f36126e5-7798-ed14-3c03-938b961efa0b')
+    expect(created).toMatchObject({name:'新空间站', type:'industrial', modules:[], groupId:HUB_SECTOR, sectorMacro:HUB_SECTOR})
+    expect(created.saveStationCode).toBeUndefined()
+    await drag(page.locator('.virtual-row').filter({has:page.locator('.virtual-name').filter({hasText:/^新空间站$/})}), .35)
+    const moved = (await readVirtualDrafts(page)).find((draft: any) => draft.id === created.id)
+    expect(moved.position).not.toEqual(created.position)
+    expect(moved.groupId).toBe(HUB_SECTOR)
+    expect((await readVirtualDrafts(page)).length).toBe(2)
+    expect(await readSavedBinding(page)).toEqual(saved)
+    await page.getByTestId('top-view-btn-live-production').click()
+    await enterAutoSectorGroup(page)
+    await confirmCurrentDraft(page)
+    expect((await readSavedBinding(page)).stationPlans.find((plan: any) => plan.id===created.id).position).toEqual(moved.position)
     await page.reload()
     await waitForAppReady(page)
-    await page.waitForTimeout(500)
-
-    // Activate binding before checking fields (draftBinding is null after reload)
-    await ensureAutoGroupResult(page)
-
-    // 5.4.3 确认重载后这些字段值保持不变（未被 normalizeState() 丢弃）
-    const fields = await page.evaluate(() => {
-      const b = (window as any).saveBindingStore.activeBinding
-      return {
-        appliedAutoGroupArchiveTime: b?.appliedAutoGroupArchiveTime,
-        prefJumpRange: b?.prefJumpRange,
-        bridgeSearchJumpRange: b?.bridgeSearchJumpRange,
-        prefThreshold: b?.prefThreshold
-      }
-    })
-    expect(fields.appliedAutoGroupArchiveTime).toBe(1345095294)
-    expect(fields.prefJumpRange).toBe(2)
-    expect(fields.bridgeSearchJumpRange).toBe(5)
-    expect(fields.prefThreshold).toBe(500)
+    expect((await readVirtualDrafts(page)).find((draft: any) => draft.id===created.id).position).toEqual(moved.position)
   })
 
-  test('5.5 防止 trade station 未解决时进入 uncertain assignment 二次确认', async ({ page }) => {
-    // 5.5.1 保留 trade station 未解决状态
-    await enterAutoSectorGroup(page)
-
-    // 5.5.2 点击确认，确认被拦截且不出现 uncertain assignment 二次确认 popup
-    await page.getByRole('button', { name: /确定|Confirm/ }).click()
-    await page.waitForTimeout(300)
-
-    // 5.5.3 确认拦截时只显示 trade station 未解决的提示/状态
-    expect(await page.locator('[role="dialog"]').count()).toBe(0)
-  })
-
-  test('5.6 确认后 binding 的 coverage 和 connections 与 draft 完全一致', async ({ page }) => {
-    // 5.6.1 进入计算模式，点击确认触发 createAutoGroups
-    await enterAutoSectorGroup(page)
-    const confirmBtn = page.locator('.confirm-btn')
-    if (await confirmBtn.isVisible().catch(() => false)) {
-      await confirmBtn.click()
-      await page.waitForTimeout(500)
-    }
-
-    // 5.6.2 确认后 binding.groups 的 coverageSectorMacros 与 autoGroupResult 一致
-    const coverageMatch = await page.evaluate(() => {
-      const result = (window as any).liveStore?.autoGroupResult
-      const binding = (window as any).saveBindingStore?.activeBinding
-      if (!result || !binding) return false
-      if (result.groups.length !== binding.groups.length) return false
-      const bindingById = new Map(binding.groups.map((g: any) => [g.sectorMacro, g]))
-      for (const g of result.groups) {
-        const bg = bindingById.get(g.id)
-        if (!bg) return false
-        const bgCov = bg.coverageSectorMacros.map((c: any) => c.ref).sort()
-        const gCov = [...g.coverageSectorMacros].sort()
-        if (gCov.length !== bgCov.length || gCov.some((m: string, i: number) => m !== bgCov[i])) return false
-      }
-      return true
-    })
-    expect(coverageMatch).toBe(true)
-
-    // 5.6.3 确认后 binding.groups 的 connectedGroupIds 与 autoGroupResult 一致
-    const connectionsMatch = await page.evaluate(() => {
-      const result = (window as any).liveStore?.autoGroupResult
-      const binding = (window as any).saveBindingStore?.activeBinding
-      if (!result || !binding) return false
-      const bindingById = new Map(binding.groups.map((g: any) => [g.sectorMacro, g]))
-      for (const g of result.groups) {
-        const bg = bindingById.get(g.id)
-        if (!bg) return false
-        const bgConns = [...(bg.connectedGroupIds ?? [])].sort()
-        const gConns = [...g.connectedGroupIds].sort()
-        if (gConns.length !== bgConns.length || gConns.some((c: string, i: number) => c !== bgConns[i])) return false
-      }
-      return true
-    })
-    expect(connectionsMatch).toBe(true)
-
-    const noPersistedGroupIds = await page.evaluate(() => {
-      const binding = (window as any).saveBindingStore?.activeBinding
-      return !!binding && binding.groups.every((g: any) => !Object.prototype.hasOwnProperty.call(g, 'id'))
-    })
-    expect(noPersistedGroupIds).toBe(true)
-  })
 })

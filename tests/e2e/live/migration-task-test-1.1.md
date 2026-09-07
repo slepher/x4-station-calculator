@@ -13,7 +13,7 @@
 - 原始 `tests/fixtures/save/save_old.json`：GUID `CB8837FE-98C1-42F8-9D6A-ED0ADC539111`，time `667632.933`，filename `save_008`；测试副本改为 time `700000`、filename `save_008_later`，内容仍来自同一实际 save，避免依赖目录枚举顺序。
 - helper 只对副本数组调用 `saveArchiveDB.saveArchiveToDB`；测试行为通过 UI 触发，`page.evaluate` 仅读取最终 `selectedArchive` 领域状态。
 
-## 本轮执行证据
+## 历史执行证据（保留，不作为当前通过依据）
 
 - CWD：`/home/slepher/project/x4-station-calculator/.worktree/integrate`；browser：Chromium `Google Chrome for Testing 143.0.7499.4`；Playwright `1.57.0`。
 - 真实冻结 base：`97194f1a4ef2c8f971545a3f2e32a921ebd3a0d4`；本 correction candidate 为该 base 上的未提交工作树，待 dispatcher 提交/冻结新 candidate，不宣称当前 candidate SHA。
@@ -24,3 +24,12 @@
 - 差异校验：`git diff --check`；exit `0`。
 - helper cross-consumer：`npm exec playwright test -- tests/e2e/live tests/e2e/binding tests/e2e/auto-sector-group-one-binding tests/e2e/auto-sector-group-one-core tests/e2e/auto-sector-group-one-map --project=chromium --workers=1 --retries=0 --trace=on`；exit `1`；140 tests，138 passed，2 failed。失败均在未授权路径：`auto-sector-group-one-binding.spec.ts:394`（3.3 重置结果对象差异，trace `test-results/auto-sector-group-one-bind-0ea6c-e-binding-3-计算、重置与确认-3-3-重置-chromium/trace.zip`）；`auto-sector-group-one-core.spec.ts:903`（`.placement-preview--binding` 未出现，trace `test-results/auto-sector-group-one-core-4f1cc-m-写入-5-3-station-plan-归属重分配-chromium/trace.zip`）。分类候选：外部 test-owned / reviewer 裁决；不归因于本 helper。
 - focused correction 的最终行为证据因 webServer 连续不可用而 unavailable；保留初始弱 witness、测试-owned locator 失败和 runner 失败，不计为通过。
+
+## M1.1 当前迁移证据（2026-09-07）
+
+- 当前工作目录为仓库根，基线 `d590ede41d41913ab18f5c5a18247bf956a4685a`，运行依赖 ENV 的 preview 就绪修复及已验证构建。helper 本轮无修改，接口已交接主 agent，消费者独立验证。
+- 原 1.1 / 第一个用例：保留 invalid/disabled 标记、两项有效归档的 GUID/time/filename/valid/compatible 和 reload 断言；补充两个点击目标事前非 active，及 KXN-018 记录的 `archiveId` 随 UI 操作从 `CB8837FE-98C1-42F8-9D6A-ED0ADC539111_700000` 变为 `_667632.933` 再变回 `_700000`。独立 expected 为 fixture 身份常量，未调用被测选择算法。
+- 原 1.1 / 第二个用例：保持展开星区、点击 KXN-018、显示 dashboard 的 UI witness，补充该站记录 `archiveId` 精确等于上述 `_700000`，明确站点来源。每个用例使用独立 browser context；原映射表的“同一 browser context”只适用于各用例内部动作。
+- 读取实际链路：MapSaveArchiveList → MapSavePanel → useSaveStore.selectArchive → scoped IndexedDB restore；Live 的 selectedArchive watcher 按 GUID/time 重新载入 playerStationRecords。该 Map UI 目前直接使用 store 属历史代码，本任务不改产品层。
+- 本人基线 focused：exit 0，2 passed / 0 failed / 0 skipped（12.3s）。增强后 focused：exit 0，2 passed / 0 failed / 0 skipped（12.0s）。collection：exit 0，2 tests / 1 file。完整命令与 trace 见 `docs/plan/unified-test-repair/direct-migration/results/M1.1.md`。
+- 历史弱 witness 由当前双向转变排除，历史 runner failure 由 ENV 修复后两次 focused 排除；本轮未发现产品候选。未运行 helper consumers 或额外 build，分别交主 agent 派发与 ENV 负责；未将历史 138/140 当成本轮证据。

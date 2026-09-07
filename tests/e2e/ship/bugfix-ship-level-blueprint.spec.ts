@@ -1,75 +1,56 @@
 import { expect, type Page } from '@playwright/test'
 import { test } from '../../test-setup'
 
-const loadModalTitleRe = /Load Ship Blueprint|载入飞船配装|载入蓝图|加载飞船配装/i
-
-const toolbarButtons = (page: Page) => {
-  const toolbar = page.locator('.toolbar-panel')
-  return {
-    loadBtn: toolbar.getByRole('button', { name: /Load|载入|加载/i }),
-    newBtn: toolbar.getByRole('button', { name: /New|新建/i })
-  }
+const shipId = 'ship_ter_m_corvette_02_a'
+const blueprint = (page: Page) => page.evaluate(() => JSON.parse(JSON.stringify((window as any).shipBuildStore.blueprint)))
+const persisted = (page: Page) => page.evaluate(() => JSON.parse(localStorage.getItem('x4_ship_blueprints_v9')!))
+const fit = (page: Page) => page.getByTestId('ship-build-panel-fit')
+async function selectOdachi(page: Page) {
+  await page.getByTestId('ship-build-filter-class-btn-ship_m').click()
+  await page.getByTestId('ship-build-filter-race-btn-terran').click()
+  await page.getByTestId('ship-build-ship-name').filter({ hasText: /^大太刀$/ }).click()
+  await page.getByTestId('ship-build-confirm-ship').click()
+  await expect(fit(page)).toBeVisible()
 }
-
-async function gotoNoSelectedShipState(page: Page) {
-  await page.getByTestId('top-view-btn-ship-build').click()
-  const selectorFilters = page.getByTestId('ship-build-filters')
-  if (!(await selectorFilters.isVisible().catch(() => false))) {
-    await expect(page.getByTestId('ship-build-panels')).toBeVisible()
-    const switchBtn = page.getByTestId('ship-build-change-ship-fit-header')
-    if (await switchBtn.isVisible().catch(() => false)) {
-      await switchBtn.click()
-    }
-    await expect(selectorFilters).toBeVisible()
-  }
-
-  const buttons = toolbarButtons(page)
-  if (await buttons.newBtn.isEnabled().catch(() => false)) {
-    await buttons.newBtn.click()
-  }
-
-  const filters = page.getByTestId('ship-build-filters')
-  await filters.getByTestId('ship-build-cancel-ship-change').click({ force: true })
-  await expect(page.getByTestId('ship-build-panels')).toBeHidden()
+async function equip(page: Page, type = 'engine') {
+  await page.getByTestId(`slot-type-${type}`).click()
+  await fit(page).locator('.slot-row').first().click()
+  await page.locator(`[data-testid^="candidate-${type}_"]`).first().click()
+  await page.getByTestId('picker-confirm').click()
+}
+async function saveAs(page: Page, name: string) {
+  await page.getByTestId('toolbar-save-as-btn').click()
+  await page.locator('.dialog-input').fill(name)
+  await page.locator('.dialog-input').press('Enter')
+  await expect(page.locator('.dialog-input')).toBeHidden()
+  await expect(page.getByTestId('ship-build-blueprint-menu-trigger')).toContainText(name)
+}
+async function load(page: Page, name: string) {
+  await page.getByTestId('ship-build-blueprint-menu-trigger').click()
+  await page.getByTestId('ship-build-blueprint-menu').locator('.ship-blueprint-menu-item-text').filter({ hasText: new RegExp(`^${name}$`) }).click()
+  await expect(page.getByTestId('ship-build-blueprint-menu')).toBeHidden()
 }
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/')
-
-  const dbFixture = await import('../../fixtures/db.json', { with: { type: 'json' } })
-  const dbData = JSON.parse(JSON.stringify(dbFixture.default))
-  delete dbData.vsn
-
-  await page.evaluate((data) => {
-    Object.entries(data).forEach(([key, value]) => {
-      localStorage.setItem(key, JSON.stringify(value))
-    })
+  const fixture = await import('../../fixtures/db.json', { with: { type: 'json' } })
+  const data = JSON.parse(JSON.stringify(fixture.default))
+  delete data.vsn
+  data.x4_game_version = { version: '9.0', beta: false }
+  data.x4_ship_blueprints_v9 = { version: 5, activeShipId: null, activeBlueprintId: null, ships: [] }
+  await page.evaluate((db) => {
+    Object.entries(db).forEach(([key, value]) => localStorage.setItem(key, JSON.stringify(value)))
     localStorage.setItem('isTestEnv', 'true')
-  }, dbData)
-
+  }, data)
   await page.reload()
-
-  const langSelect = page.locator('select').filter({ hasText: /简体中文|English/ })
-  await langSelect.selectOption('zh-CN')
+  await page.getByTestId('language-select').selectOption('zh-CN')
+  await page.getByTestId('top-view-btn-ship-build').click()
 })
 
-test('4.1 BUG-001: 未选 ship 时强制点击载入按钮仍可能出现载入弹窗 - 修复后', async ({ page }) => {
-  // 4.1.1 状态: ship-toolbar-no-selected-ship
-  await gotoNoSelectedShipState(page)
-
-  const buttons = toolbarButtons(page)
-
-  // 4.1.2 在 `.toolbar-panel` 对 `Load|载入` 执行 `click({ force: true })` 并统计 `Load Ship Blueprint|载入蓝图` 标题与 `.blueprint-item` 数量
-  await buttons.loadBtn.click({ force: true }).catch(() => undefined)
-  const titleVisible = await page.getByText(loadModalTitleRe).isVisible().catch(() => false)
-  const itemCount = await page.locator('.blueprint-item').count()
-
-  // 4.1.3 修复后：在当前页面断言不可见载入弹窗标题且 `.blueprint-item` 数量保持 `0` #期望: ['load modal hidden', 0]
-  expect(titleVisible).toBe(false)
-  expect(itemCount).toBe(0)
-  expect('load modal hidden').toBe('load modal hidden')
-
-  // 4.1.4 在 `.toolbar-panel` 断言 `Load|载入` 按钮仍为 disabled #期望: [true]
-  expect(await buttons.loadBtn.isDisabled()).toBe(true)
-  expect(true).toBe(true)
+test('4.1 BUG-001 no selected ship has no reachable blueprint load control', async ({ page }) => {
+  await expect(page.getByTestId('ship-build-view')).toHaveAttribute('data-selected-ship-id', '')
+  await expect(page.getByTestId('toolbar-load-btn')).toHaveCount(0)
+  await expect(page.getByTestId('ship-build-blueprint-menu-trigger')).toBeHidden()
+  await expect(page.getByTestId('ship-build-blueprint-menu')).toHaveCount(0)
+  await expect(page.locator('.blueprint-item')).toHaveCount(0)
 })

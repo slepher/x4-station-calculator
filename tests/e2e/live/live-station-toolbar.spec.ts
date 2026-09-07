@@ -16,7 +16,7 @@ async function setLanguage(page: Page, lang: string) {
 
 async function switchToLiveProduction(page: Page) {
   await page.getByTestId('top-view-btn-live-production').click()
-  await page.waitForTimeout(200)
+
 }
 
 async function selectStationInSector(page: Page, sectorName: string, stationName: string) {
@@ -27,17 +27,17 @@ async function selectStationInSector(page: Page, sectorName: string, stationName
   }
   const stationIds: Record<string, string> = {
     '地球人': 'KXN-018',
-    '新建空间站': 'f36126e5-7798-ed14-3c03-938b961efa0b'
+    '新建空间站': 'f36126e5-7798-ed14-3c03-938b961efa0b',
+    'PPW-916': 'PPW-916'
   }
   const supplyTab = page.locator(`[data-testid="sidebar-sector"][data-sector-id="${sectorIds[sectorName]}"]`)
   await expect(supplyTab).toBeVisible({ timeout: 5000 })
   await supplyTab.click()
-  await page.waitForTimeout(500)
 
-  const stationTab = page.locator(`[data-testid="sidebar-station"][data-station-id="${stationIds[stationName] || stationName}"]`)
+  const stationTab = page.locator(`[data-testid="sidebar-station"][data-station-id="${stationIds[stationName]}"]`)
   await expect(stationTab).toBeVisible({ timeout: 5000 })
   await stationTab.click()
-  await page.waitForTimeout(300)
+
 }
 
 test.describe('Live Station Fixture Load', () => {
@@ -50,6 +50,39 @@ test.describe('Live Station Fixture Load', () => {
     await expect(archiveStationTab).toBeVisible({ timeout: 5000 })
   })
 })
+
+for (const mode of ['planning', 'live'] as const) {
+  test(`站点名称在${mode}模式保存并reload，仅更新KXN当前plan`, async ({ page }) => {
+    await selectStationInSector(page, '小行星', '地球人')
+    await expect(page.locator('.mode-toggle-chip')).toHaveClass(/active-planning/)
+    if (mode === 'live') await page.locator('.mode-toggle-chip').click()
+    await expect(page.locator('.mode-toggle-chip')).toHaveClass(new RegExp(`active-${mode}`))
+    const before = await page.evaluate(() => ({
+      binding: (window as any).saveBindingStore.activeBinding,
+      archive: (window as any).saveStore.selectedArchive.sectors.cluster_100_sector001_macro.player_stations['KXN-018']
+    }))
+    const name = `KXN-${mode}-renamed`
+    const input = page.locator('.live-toolbar .ghost-input')
+    await input.fill(name)
+    await input.press('Tab')
+    await expect(page.locator('[data-testid="sidebar-station"][data-station-id="KXN-018"] .sidebar-item-label')).toHaveText(name)
+    await page.getByTestId('toolbar-save-btn').click()
+    const saved = await page.evaluate(() => {
+      const key = (window as any).gameDataStore.getStorageKey('save_archives').replace('save_archives', 'save_bindings')
+      return JSON.parse(localStorage.getItem(key)!).list.find((b: any) => b.gameGuid === 'CB8837FE-98C1-42F8-9D6A-ED0ADC539111')
+    })
+    expect(saved.stationPlans.find((p: any) => p.id === 'KXN-018')).toEqual({ ...before.binding.stationPlans.find((p: any) => p.id === 'KXN-018'), name })
+    expect(saved.stationPlans.filter((p: any) => p.id !== 'KXN-018')).toEqual(before.binding.stationPlans.filter((p: any) => p.id !== 'KXN-018'))
+    expect(saved.groups).toEqual(before.binding.groups)
+    expect(saved.bindingName).toBe('slepher')
+    expect(await page.evaluate(() => (window as any).saveStore.selectedArchive.sectors.cluster_100_sector001_macro.player_stations['KXN-018'])).toEqual(before.archive)
+    await page.reload()
+    await page.getByTestId('top-view-btn-live-production').click()
+    await selectStationInSector(page, '小行星', '地球人')
+    await expect(page.locator('.live-toolbar .ghost-input')).toHaveValue(name)
+    await expect(page.locator('.readonly-pill')).toHaveText('KXN-018')
+  })
+}
 
 test.describe('3 E2E 测试场景', () => {
   test('3.1 Case: 站点"地球人"双数据源-规划模式可切换', async ({ page }) => {
@@ -97,7 +130,6 @@ test.describe('3 E2E 测试场景', () => {
     expect(resourcesText).toBe('7')
 
     await sectorField.click()
-    await page.waitForTimeout(100)
 
     await expect(page.locator('.sector-popover')).toBeVisible({ timeout: 500 })
 
@@ -120,10 +152,8 @@ test.describe('3 E2E 测试场景', () => {
     expect(zValue).toBe('81.3')
 
     await page.locator('.sector-popover .fixed').click()
-    await page.waitForTimeout(100)
 
     await resourcesField.click()
-    await page.waitForTimeout(100)
 
     const resourcesPopover = page.locator('.resources-popover')
     await expect(resourcesPopover).toBeVisible({ timeout: 500 })
@@ -154,13 +184,13 @@ test.describe('3 E2E 测试场景', () => {
     await expect(modeBtn).toBeVisible({ timeout: 1000 })
     await expect(modeBtn).toHaveClass(/active-planning/)
     await modeBtn.click()
-    await page.waitForTimeout(300)
+
     await expect(modeBtn).toHaveClass(/active-live/)
     const modeText1 = await modeBtn.locator('.chip-status').textContent()
     expect(modeText1).toContain('实时')
     await expect(page.locator('.race-select')).toBeHidden({ timeout: 500 })
     await modeBtn.click()
-    await page.waitForTimeout(300)
+
     await expect(modeBtn).toHaveClass(/active-planning/)
     const modeText2 = await modeBtn.locator('.chip-status').textContent()
     expect(modeText2).toContain('规划')
@@ -171,6 +201,7 @@ test.describe('3 E2E 测试场景', () => {
     await selectStationInSector(page, '小行星', '地球人')
     await expect(page.locator('.mode-toggle-chip')).toBeVisible({ timeout: 1000 })
     await expect(page.locator('.readonly-pill')).toBeVisible({ timeout: 500 })
+    await expect(page.locator('.readonly-pill')).toHaveText('KXN-018')
     const sectorField = page.locator('.live-toolbar .toolbar-section .input-group').filter({ hasText: /^星区|Sector$/ }).first()
     await expect(sectorField).toBeVisible({ timeout: 500 })
     await expect(page.locator('.live-toolbar').locator('.count-pill').first()).toBeVisible({ timeout: 500 })
@@ -181,7 +212,7 @@ test.describe('3 E2E 测试场景', () => {
     await selectStationInSector(page, '神圣眼光', 'PPW-916')
     const sectorField = page.locator('.input-group').filter({ hasText: /星区|Sector/ }).first()
     await sectorField.click()
-    await page.waitForTimeout(100)
+
     await expect(page.locator('.sector-popover')).toBeVisible({ timeout: 500 })
     const popoverContent = page.locator('.sector-popover .popover-content')
     const positionRows = popoverContent.locator('.position-row')
@@ -204,9 +235,10 @@ test.describe('3 E2E 测试场景', () => {
     await selectStationInSector(page, '神圣眼光', 'PPW-916')
     const resourcesField = page.locator('.input-group').filter({ hasText: /星区资源|Sector Resources/ }).first()
     await resourcesField.click()
-    await page.waitForTimeout(100)
+
     await expect(page.locator('.resources-popover')).toBeVisible({ timeout: 500 })
     await expect(page.locator('.resources-popover .popover-content')).toBeVisible({ timeout: 500 })
+    await expect(page.locator('.resources-popover input')).toHaveCount(0)
   })
 
   test('3.8 Case: 规划模式下控件可编辑', async ({ page }) => {
@@ -214,15 +246,24 @@ test.describe('3 E2E 测试场景', () => {
     const raceSelect = page.locator('.race-select')
     await expect(raceSelect).toBeVisible({ timeout: 500 })
     await expect(raceSelect).toBeEnabled()
+    await raceSelect.selectOption('teladi')
     const workforceBtn = page.locator('.toolbar-section .toggle-chip').filter({ hasText: /ON|OFF/ }).first()
     await expect(workforceBtn).toBeVisible({ timeout: 500 })
     const gapsBtn = page.locator('[data-testid="toggle-show-empire-gaps"]')
     await expect(gapsBtn).toBeVisible({ timeout: 500 })
     const initialText = await workforceBtn.locator('.chip-status').textContent()
     await workforceBtn.click()
-    await page.waitForTimeout(100)
+
     const afterText = await workforceBtn.locator('.chip-status').textContent()
     expect(initialText).not.toBe(afterText)
+    await gapsBtn.click()
+    expect(await page.evaluate(() => (window as any).saveBindingStore.activeBinding.stationPlans.find((p: any) => p.id === 'KXN-018').settings)).toMatchObject({ racePreference: 'teladi', considerWorkforceForAutoFill: true, showEmpireGaps: true })
+    await page.getByTestId('toolbar-save-btn').click()
+    await page.reload()
+    await page.getByTestId('top-view-btn-live-production').click()
+    await selectStationInSector(page, '小行星', '地球人')
+    await expect(page.locator('.race-select')).toHaveValue('teladi')
+    expect(await page.evaluate(() => (window as any).saveBindingStore.activeBinding.stationPlans.find((p: any) => p.id === 'KXN-018').settings)).toMatchObject({ racePreference: 'teladi', considerWorkforceForAutoFill: true, showEmpireGaps: true })
   })
 
   test('3.9 Case: 实时模式下规划控件隐藏', async ({ page }) => {
@@ -237,7 +278,6 @@ test.describe('3 E2E 测试场景', () => {
     const sectorTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_715_sector001_macro"]')
     await expect(sectorTab).toBeVisible({ timeout: 5000 })
     await sectorTab.click()
-    await page.waitForTimeout(500)
 
     const stationRWC = page.locator('[data-testid="sidebar-station"][data-station-id="RWC-785"]')
     await expect(stationRWC).toBeVisible({ timeout: 3000 })
@@ -251,7 +291,6 @@ test.describe('3 E2E 测试场景', () => {
     const sectorTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_715_sector001_macro"]')
     await expect(sectorTab).toBeVisible({ timeout: 5000 })
     await sectorTab.click()
-    await page.waitForTimeout(500)
 
     const stationRWC = page.locator('[data-testid="sidebar-station"][data-station-id="RWC-785"]')
     await expect(stationRWC).toBeVisible({ timeout: 3000 })

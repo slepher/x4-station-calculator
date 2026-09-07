@@ -1,58 +1,24 @@
 import { expect } from '@playwright/test'
 import { test } from '../../test-setup'
 
-const loadModalTitleRe = /Load Ship Blueprint|载入飞船配装|载入蓝图|加载飞船配装/i
-
-const gotoShipBuild = async (page: any) => {
-  await page.getByTestId('top-view-btn-ship-build').click()
-  const filters = page.getByTestId('ship-build-selector-grid')
-  if (await filters.isVisible().catch(() => false)) return
-  await expect(page.getByTestId('ship-build-panels')).toBeVisible()
-}
-
-const ensureSelectorOpen = async (page: any) => {
-  if (await page.getByTestId('ship-build-selector-grid').isVisible().catch(() => false)) {
-    return
-  }
-  const switchBtn = page.getByTestId('ship-build-change-ship-fit-header')
-  if (await switchBtn.isVisible().catch(() => false)) {
-    await switchBtn.click()
-  }
-  await expect(page.getByTestId('ship-build-selector-grid')).toBeVisible()
-}
-
 const selectOsakaAndEnterWorkspace = async (page: any) => {
-  await gotoShipBuild(page)
-
-  await page.evaluate(() => {
-    const store = (window as any).shipBuildStore
-    store.setSelectedShipId('ship_ter_l_destroyer_01_a')
-  })
-
+  await page.getByTestId('top-view-btn-ship-build').click()
+  await page.getByTestId('ship-build-filter-class-btn-ship_l').click()
+  await page.getByTestId('ship-build-filter-race-btn-terran').click()
+  await page.getByTestId('ship-build-ship-name').filter({ hasText: /^大阪$/ }).click()
+  await page.getByTestId('ship-build-confirm-ship').click()
   await expect(page.getByTestId('ship-build-panels')).toBeVisible()
 }
 
 const loadBuiltInPreset = async (page: any, presetName: '低配' | '中配' | '高配') => {
-  const toolbar = page.locator('.toolbar-panel')
-  const loadBtn = toolbar.getByRole('button', { name: /Load|载入|加载/i })
-  await expect(loadBtn).toBeEnabled()
-  await loadBtn.click()
-
-  await expect(page.getByText(loadModalTitleRe)).toBeVisible()
-  const item = page
-    .locator('.blueprint-item')
-    .filter({ hasText: presetName })
-    .filter({ hasNot: page.locator('.blueprint-delete-btn') })
-    .first()
-  await expect(item).toBeVisible()
-
-  // 载入前先校验预设卡片摘要里包含“引擎”信息（不接受“推进器”替代）
-  const summaryText = await item.locator('.text-sm.text-slate-400').first().innerText()
-  expect(summaryText).toMatch(/引擎|Engine/i)
-
-  await item.getByRole('button', { name: /Load|载入|加载/i }).click()
-
-  await expect(page.getByText(loadModalTitleRe)).toBeHidden()
+  await page.getByTestId('ship-build-blueprint-menu-trigger').click()
+  const menu = page.getByTestId('ship-build-blueprint-menu')
+  await expect(menu).toContainText('预设配装')
+  await menu.locator('.ship-blueprint-menu-item-built-in').filter({ hasText: new RegExp('^' + presetName + '$') }).click()
+  await expect(menu).toBeHidden()
+  const result = await page.evaluate(() => (window as any).shipBuildStore.blueprint.connections.flatMap((c: any) => c.group))
+  expect(result.filter((g: any) => g.equipment_id?.startsWith('engine_') && g.count > 0).length).toBeGreaterThan(0)
+  expect(result.filter((g: any) => g.equipment_id?.startsWith('turret_') && g.count > 0).length).toBeGreaterThan(0)
 }
 
 const hasVisibleNonEmptySlotInCurrentType = async (page: any) => {
@@ -91,6 +57,8 @@ const applyFixture = async (page: any, fixturePath: '../../fixtures/db.json' | '
   const dbFixture = await import(fixturePath, { with: { type: 'json' } })
   const dbData = JSON.parse(JSON.stringify(dbFixture.default))
   delete dbData.vsn
+  dbData.x4_game_version = { version: '9.0', beta: false }
+  dbData.x4_ship_blueprints_v9 = { version: 5, activeShipId: null, activeBlueprintId: null, ships: [] }
 
   await page.evaluate((data) => {
     Object.entries(data).forEach(([key, value]) => {

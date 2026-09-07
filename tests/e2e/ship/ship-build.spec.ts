@@ -1,229 +1,166 @@
-import { test, expect } from '@playwright/test'
+import { test, expect, type Page } from '@playwright/test'
+
+const cards = (page: Page) => page.getByTestId('ship-build-list-column').locator('.list-item')
+const names = (page: Page) => page.getByTestId('ship-build-ship-name')
+async function filterTerranM(page: Page) {
+  await page.getByTestId('ship-build-filter-class-btn-ship_m').click()
+  await page.getByTestId('ship-build-filter-race-btn-terran').click()
+  await expect(cards(page)).toHaveCount(7)
+}
+async function chooseKatana(page: Page) {
+  await filterTerranM(page)
+  await names(page).filter({ hasText: /^武士刀$/ }).click()
+}
+async function confirmKatana(page: Page) {
+  await chooseKatana(page)
+  await page.getByTestId('ship-build-confirm-ship').click()
+  await expect(page.getByTestId('ship-build-view')).toHaveAttribute('data-selected-ship-id', 'ship_ter_m_corvette_01_a')
+  await expect(page.getByTestId('ship-build-panels')).toBeVisible()
+}
 
 test.describe('Ship Build View', () => {
-  const shipBuildButton = (page: any) => page.getByRole('button', { name: /Ship Build|船只建造/ })
-  const productionButton = (page: any) => page.getByRole('button', { name: /Quantified|量化生产/ })
-
   test.beforeEach(async ({ page }) => {
     await page.goto('/')
-    await page.evaluate(() => {
-    })
+    const fixture = await import('../../fixtures/db.json', { with: { type: 'json' } })
+    const data = JSON.parse(JSON.stringify(fixture.default))
+    delete data.vsn
+    data.x4_game_version = { version: '9.0', beta: false }
+    data.x4_ship_blueprints_v9 = { version: 5, activeShipId: null, activeBlueprintId: null, ships: [] }
+    await page.evaluate((db) => {
+      Object.entries(db).forEach(([key, value]) => localStorage.setItem(key, JSON.stringify(value)))
+      localStorage.setItem('isTestEnv', 'true')
+    }, data)
     await page.reload()
-    await page.addStyleTag({ content: '*, *::before, *::after { transition: none !important; animation: none !important; }' })
-    await page.waitForSelector('.toolbar-panel', { state: 'visible' })
+    await page.getByTestId('language-select').selectOption('zh-CN')
+    await page.getByTestId('top-view-btn-ship-build').click()
+    await expect(page.getByTestId('ship-build-selector-grid')).toBeVisible()
   })
 
   test('状态：船只建造视图', async ({ page }) => {
-    await shipBuildButton(page).click()
-    await expect(page.getByTestId('ship-build-filters')).toBeVisible()
     await expect(page.getByTestId('ship-build-panels')).toHaveCount(0)
-
-    const newBtn = page.getByRole('button', { name: /New|新建/ })
-    const saveBtn = page.getByRole('button', { name: /^Save$|^保存$/ })
-    const loadBtn = page.getByRole('button', { name: /Load|加载/ })
-    await expect(newBtn).toHaveClass(/btn-emerald/)
-    await expect(saveBtn).toHaveClass(/btn-green/)
-    await expect(loadBtn).toHaveClass(/btn-emerald/)
+    await expect(page.getByTestId('toolbar-new-btn')).toHaveClass(/btn-emerald/)
+    await expect(page.getByTestId('toolbar-save-btn')).toHaveClass(/btn-green/)
+    await expect(page.getByTestId('toolbar-load-btn')).toHaveCount(0)
+    for (const action of ['new', 'save', 'save-as']) {
+      await expect(page.getByTestId(`toolbar-${action}-btn`)).toBeDisabled()
+    }
   })
 
   test('切换：量化生产->船只建造', async ({ page }) => {
-    await productionButton(page).click()
-    await shipBuildButton(page).click()
-    await expect(page.getByTestId('ship-build-filters')).toBeVisible()
+    await page.getByTestId('top-view-btn-blueprint-production').click()
+    await expect(page.getByTestId('ship-build-selector-grid')).toHaveCount(0)
+    await page.getByTestId('top-view-btn-ship-build').click()
+    await expect(page.getByTestId('ship-build-selector-grid')).toBeVisible()
   })
 
   test('场景：未选择 class 不显示列表', async ({ page }) => {
-    await shipBuildButton(page).click()
     await expect(page.getByTestId('ship-build-list-empty')).toBeVisible()
+    await expect(cards(page)).toHaveCount(0)
   })
 
   test('场景：未选择 race/type 不显示列表', async ({ page }) => {
-    await shipBuildButton(page).click()
-    const classFilter = page.getByTestId('ship-build-filter-class')
-    await classFilter.getByRole('button', { name: 'M' }).click()
+    await page.getByTestId('ship-build-filter-class-btn-ship_m').click()
     await expect(page.getByTestId('ship-build-list-empty')).toBeVisible()
+    await expect(cards(page)).toHaveCount(0)
   })
 
   test('场景：选择 class + race 显示列表', async ({ page }) => {
-    await shipBuildButton(page).click()
-    const classFilter = page.getByTestId('ship-build-filter-class')
-    await classFilter.getByRole('button', { name: 'M' }).click()
-    const raceFilter = page.getByTestId('ship-build-filter-race')
-    await raceFilter.getByRole('button', { name: /terran/i }).click()
-
-    const listItems = page.locator('.list-item')
-    await expect(listItems.first()).toBeVisible()
+    await filterTerranM(page)
+    await expect(names(page).filter({ hasText: /^武士刀$/ })).toBeVisible()
+    await expect(names(page).filter({ hasText: /^大太刀$/ })).toBeVisible()
   })
 
   test('场景：选择 class + type 显示列表', async ({ page }) => {
-    await shipBuildButton(page).click()
-    const classFilter = page.getByTestId('ship-build-filter-class')
-    await classFilter.getByRole('button', { name: 'M' }).click()
-    const typeFilter = page.getByTestId('ship-build-filter-type')
-    await typeFilter.locator('button').first().click()
-
-    const listItems = page.locator('.list-item')
-    await expect(listItems.first()).toBeVisible()
+    await page.getByTestId('ship-build-filter-class-btn-ship_m').click()
+    await page.getByTestId('ship-build-filter-type-btn-corvette').click()
+    await expect(cards(page)).toHaveCount(10)
+    await expect(page.getByTestId('ship-build-page-2')).toBeVisible()
   })
 
   test('场景：race + type 同时选择取交集', async ({ page }) => {
-    await shipBuildButton(page).click()
-    const classFilter = page.getByTestId('ship-build-filter-class')
-    await classFilter.getByRole('button', { name: 'M' }).click()
-    const raceFilter = page.getByTestId('ship-build-filter-race')
-    await raceFilter.getByRole('button', { name: /terran/i }).click()
-    const typeFilter = page.getByTestId('ship-build-filter-type')
-    await typeFilter.locator('button').first().click()
-
-    const listItems = page.locator('.list-item')
-    const count = await listItems.count()
-    expect(count).toBeGreaterThan(0)
-    for (let i = 0; i < count; i += 1) {
-      const text = await listItems.nth(i).innerText()
-      expect(text).toContain('terran')
-      expect(text.toLowerCase()).not.toContain('teladi')
-    }
+    await filterTerranM(page)
+    await page.getByTestId('ship-build-filter-type-btn-corvette').click()
+    await expect(names(page)).toHaveText(['武士刀', '大太刀'])
   })
 
   test('场景：type 选项随 class 联动', async ({ page }) => {
-    await shipBuildButton(page).click()
-    const classFilter = page.getByTestId('ship-build-filter-class')
-    await classFilter.getByRole('button', { name: 'S' }).click()
-    const typeFilter = page.getByTestId('ship-build-filter-type')
-    await expect(typeFilter.getByRole('button', { name: /Destroyer/i })).toHaveCount(0)
+    await page.getByTestId('ship-build-filter-class-btn-ship_l').click()
+    await expect(page.getByTestId('ship-build-filter-type-btn-destroyer')).toBeVisible()
+    await page.getByTestId('ship-build-filter-class-btn-ship_s').click()
+    await expect(page.getByTestId('ship-build-filter-type-btn-destroyer')).toHaveCount(0)
+    await expect(page.getByTestId('ship-build-filter-type-btn-fighter')).toBeVisible()
   })
 
   test('场景：飞船名称本地化展示', async ({ page }) => {
-    await shipBuildButton(page).click()
-    const classFilter = page.getByTestId('ship-build-filter-class')
-    await classFilter.getByRole('button', { name: 'M' }).click()
-    const raceFilter = page.getByTestId('ship-build-filter-race')
-    await raceFilter.getByRole('button', { name: /terran/i }).click()
-
-    const shipName = page.getByTestId('ship-build-ship-name').first()
-    await expect(shipName).toBeVisible()
-    await expect(shipName).not.toHaveText('')
+    await filterTerranM(page)
+    await expect(names(page).filter({ hasText: /^武士刀$/ })).toBeVisible()
+    await page.getByTestId('language-select').selectOption('en')
+    await expect(names(page).filter({ hasText: /^Katana$/ })).toBeVisible()
   })
 
   test('场景：race 标签显示计数', async ({ page }) => {
-    await shipBuildButton(page).click()
-    const classFilter = page.getByTestId('ship-build-filter-class')
-    await classFilter.getByRole('button', { name: 'M' }).click()
-    const typeFilter = page.getByTestId('ship-build-filter-type')
-    await typeFilter.locator('button').first().click()
-
-    const raceButton = page.getByTestId('ship-build-filter-race').locator('button').first()
-    await expect(raceButton).toContainText(/\(\d+\)/)
+    await page.getByTestId('ship-build-filter-class-btn-ship_m').click()
+    await page.getByTestId('ship-build-filter-type-btn-corvette').click()
+    await expect(page.getByTestId('ship-build-filter-race-btn-terran')).toHaveText('terran(2)')
   })
 
   test('场景：type 标签显示计数', async ({ page }) => {
-    await shipBuildButton(page).click()
-    const classFilter = page.getByTestId('ship-build-filter-class')
-    await classFilter.getByRole('button', { name: 'M' }).click()
-    const raceFilter = page.getByTestId('ship-build-filter-race')
-    await raceFilter.locator('button').first().click()
-
-    const typeButton = page.getByTestId('ship-build-filter-type').locator('button').first()
-    await expect(typeButton).toContainText(/\(\d+\)/)
+    await filterTerranM(page)
+    await expect(page.getByTestId('ship-build-filter-type-btn-corvette').getByTestId('ship-build-type-count')).toHaveText('(2)')
+    await expect(page.getByTestId('ship-build-filter-type-btn-miner').getByTestId('ship-build-type-count')).toHaveText('(2)')
   })
 
-  test('场景：筛选与结果 4:6 布局', async ({ page }) => {
-    await shipBuildButton(page).click()
-    const panelBody = page.getByTestId('ship-build-filters').locator('.panel-body')
-    const filterCol = panelBody.locator(':scope > div').first()
-    const resultCol = panelBody.locator(':scope > div').nth(1)
-
-    const filterBox = await filterCol.boundingBox()
-    const resultBox = await resultCol.boundingBox()
-    expect(filterBox).not.toBeNull()
-    expect(resultBox).not.toBeNull()
-    if (filterBox && resultBox) {
-      const ratio = filterBox.width / (filterBox.width + resultBox.width)
-      expect(ratio).toBeGreaterThan(0.34)
-      expect(ratio).toBeLessThan(0.46)
-    }
+  test('场景：筛选与结果 4:6 布局 → 当前 selector 三栏 1:1:1', async ({ page }) => {
+    const filter = await page.getByTestId('ship-build-filter-column').boundingBox()
+    const list = await page.getByTestId('ship-build-list-column').boundingBox()
+    const stats = await page.getByTestId('ship-build-panel-ship').boundingBox()
+    expect(filter).not.toBeNull()
+    expect(list).not.toBeNull()
+    expect(stats).not.toBeNull()
+    expect(Math.abs(filter!.width - list!.width)).toBeLessThan(2)
+    expect(Math.abs(list!.width - stats!.width)).toBeLessThan(2)
+    expect(filter!.x).toBeLessThan(list!.x)
+    expect(list!.x).toBeLessThan(stats!.x)
   })
 
-  test('场景：结果区 3 列固定宽度', async ({ page }) => {
-    await shipBuildButton(page).click()
-    const classFilter = page.getByTestId('ship-build-filter-class')
-    await classFilter.getByRole('button', { name: 'M' }).click()
-    const raceFilter = page.getByTestId('ship-build-filter-race')
-    await raceFilter.locator('button').first().click()
-
-    const items = page.locator('.list-item')
-    await expect(items.first()).toBeVisible()
-    const count = await items.count()
-    if (count >= 3) {
-      const box1 = await items.nth(0).boundingBox()
-      const box2 = await items.nth(1).boundingBox()
-      const box3 = await items.nth(2).boundingBox()
-      expect(box1 && box2 && box3).toBeTruthy()
-      if (box1 && box2 && box3) {
-        expect(Math.abs(box1.width - box2.width)).toBeLessThan(6)
-        expect(Math.abs(box2.width - box3.width)).toBeLessThan(6)
-        expect(box1.height).toBeLessThan(100)
-      }
-    }
+  test('场景：结果区 3 列固定宽度 → 当前中栏等宽候选', async ({ page }) => {
+    await filterTerranM(page)
+    const first = await cards(page).nth(0).boundingBox()
+    const second = await cards(page).nth(1).boundingBox()
+    expect(first).not.toBeNull()
+    expect(second).not.toBeNull()
+    expect(first!.width).toBeCloseTo(second!.width, 0)
+    expect(first!.x).toBeCloseTo(second!.x, 0)
+    expect(second!.y).toBeGreaterThan(first!.y)
   })
 
   test('场景：列表单选与选择展示', async ({ page }) => {
-    await shipBuildButton(page).click()
-    const classFilter = page.getByTestId('ship-build-filter-class')
-    await classFilter.getByRole('button', { name: 'M' }).click()
-    const raceFilter = page.getByTestId('ship-build-filter-race')
-    await raceFilter.locator('button').first().click()
-
-    const items = page.locator('.list-item')
-    const firstItem = items.first()
-    const firstName = await firstItem.locator('[data-testid=\"ship-build-ship-name\"]').innerText()
-    await firstItem.click()
-    const selection = page.locator('.selection-expanded')
-    await expect(selection).toBeVisible()
-    await expect(selection).toContainText(firstName)
+    await chooseKatana(page)
+    await expect(page.locator('.list-item-pending')).toHaveCount(1)
+    await expect(page.locator('.list-item-pending')).toContainText('武士刀')
+    await expect(page.getByTestId('ship-build-panel-ship').getByTestId('metric-value-hull')).toHaveText('12,200MJ')
+    await expect(page.getByTestId('ship-build-view')).toHaveAttribute('data-selected-ship-id', '')
+    await expect(page.getByTestId('ship-build-panels')).toHaveCount(0)
   })
 
   test('场景：选择区切换与更换', async ({ page }) => {
-    await shipBuildButton(page).click()
-    const classFilter = page.getByTestId('ship-build-filter-class')
-    await classFilter.getByRole('button', { name: 'M' }).click()
-    const raceFilter = page.getByTestId('ship-build-filter-race')
-    await raceFilter.locator('button').first().click()
-
-    const items = page.locator('.list-item')
-    await items.first().click()
-
-    await expect(page.locator('.selection-expanded')).toBeVisible()
-    await expect(page.getByTestId('ship-build-list')).toHaveCount(0)
-
-    await page.getByRole('button', { name: /Change Ship|更换飞船/ }).click()
-    await expect(page.getByTestId('ship-build-list')).toBeVisible()
+    await confirmKatana(page)
+    await page.getByTestId('ship-build-change-ship-fit-header').click()
+    await expect(page.getByTestId('ship-build-selector-grid')).toBeVisible()
+    await expect(page.getByTestId('ship-build-view')).toHaveAttribute('data-selected-ship-id', 'ship_ter_m_corvette_01_a')
   })
 
   test('场景：下方三列显示规则', async ({ page }) => {
-    await shipBuildButton(page).click()
     await expect(page.getByTestId('ship-build-panels')).toHaveCount(0)
-
-    const classFilter = page.getByTestId('ship-build-filter-class')
-    await classFilter.getByRole('button', { name: 'M' }).click()
-    const raceFilter = page.getByTestId('ship-build-filter-race')
-    await raceFilter.locator('button').first().click()
-    await page.locator('.list-item').first().click()
-
-    await expect(page.getByTestId('ship-build-panels')).toBeVisible()
+    await confirmKatana(page)
+    for (const panel of ['fit', 'stats', 'materials']) await expect(page.getByTestId(`ship-build-panel-${panel}`)).toBeVisible()
   })
 
   test('场景：已选详情高度自适应', async ({ page }) => {
-    await shipBuildButton(page).click()
-    const classFilter = page.getByTestId('ship-build-filter-class')
-    await classFilter.getByRole('button', { name: 'M' }).click()
-    const raceFilter = page.getByTestId('ship-build-filter-race')
-    await raceFilter.locator('button').first().click()
-    await page.locator('.list-item').first().click()
-
-    const selection = page.locator('.selection-expanded')
-    await expect(selection).toBeVisible()
-    const style = await selection.getAttribute('style')
-    expect(style || '').not.toContain('72px')
+    await chooseKatana(page)
+    const panel = page.getByTestId('ship-build-panel-ship')
+    await expect(panel).toBeVisible()
+    await expect(panel).toHaveCSS('max-height', 'none')
+    expect(await panel.evaluate(el => el.clientHeight >= el.scrollHeight)).toBe(true)
   })
 })

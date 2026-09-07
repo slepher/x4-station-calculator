@@ -39,6 +39,7 @@ export default defineConfig({
   ],
 
   webServer: {
+    wait: { stdout: /Local:/ },
     command: `npm run build && vite preview --port ${port} --host 127.0.0.1 --strictPort`,
     reuseExistingServer: false,
     timeout: 30000,

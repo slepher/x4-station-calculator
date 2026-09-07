@@ -1,168 +1,42 @@
-# task-test-5.1 迁移映射与证据
+# M5.1 拖放反馈迁移
 
-## 执行身份
+本轮基线为 `d590ede41d41913ab18f5c5a18247bf956a4685a` 加 ENV 共享配置；工作目录 `/home/slepher/project/x4-station-calculator`。旧 integrate 分支、旧候选通过叙述不作为当前验收。产品 T0 修复已在当前基线，本轮未改 src。
 
-- cwd: `/home/slepher/project/x4-station-calculator/.worktree/integrate`
-- branch: `workflow/unified-test-repair-integrate`
-- immutable base SHA: `da05d84514c90428fd4e51907df9b6424fa5ccff`
-- candidate SHA: `365ef5cc6102c086830b27cee14faaca6dd92cfe`
-- runner: Playwright + Chromium，`--workers=1 --retries=0`
-- fixture: `tests/fixtures/db.json` 副本；`setupLogicFlow(page, 'clean')` 删除 `vsn`，写入 `x4_game_version = 8.0`，reload，再通过 `language-select` UI 选择 `zh-CN`，进入 Logic Flow。
+## 旧编号到当前验收
 
-## 场景映射
-
-| 原任务/场景 | 当前规则与用户动作 | 稳定锚点与精确 oracle | 迁移结果 |
-| --- | --- | --- | --- |
-| 4.1 New Line Ghosting | clean + 8.0；真实 Mouse API 拖 `hullparts` 到新建区并保持 hover | `compact-view`、`.compact-group:last`、`.compact-node.animate-pulse`；标题与模块名、T0 资源数、ghost 可见 | 保留并通过 |
-| 4.2 T0 Header Updates | 先拖 `siliconwafers` 建组，再以该组真实 `groupId` 拖 `microchips`、`hullparts` | `data-ware-id` 资源锚点；新增资源 pulse 数量精确为 2 | 目标由 index `0` 改为 group identity；通过 |
-| 4.5 Final State | 真实拖放到现有组与新建区，释放后观察节点/组数量 | `.flow-node[data-ware-id]`、`.production-group`、只读最终计数 | 目标由 index `0` 改为 group identity；通过 |
-| 4.6 T0 restriction | clean + 8.0；检查 ore 无 preview 后用真实 Mouse API 尝试拖放 | `.ware-card-wrapper[data-ware-id="ore"]`、`draggable=false`/无 preview、释放后不得出现 compact preview 且组不应变化 | UI 实际打开 `compact-view`，与规范 T0 禁止拖拽冲突，保留为 product-owned candidate；未弱化断言、未改 src |
-| 4.7 Dependency-Follow Sorting | 两个排序方向分别使用独立 browser context；真实拖放后悬停目标组 | `data-ware-id` 资源 header 顺序精确为 `['ore','silicon']` / `['silicon','ore']` | 目标由 index `0` 改为 group identity；旧 toolbar 清空假设移除；通过 |
-| 4.16 Unlocked incompatible target | clean + 8.0；UI 取消默认锁定，切换农业/Teladi，真实拖 `spaceweed` 到目标组 | `.tab-btn` 语义分类、`.race-btn` Teladi、group identity、`expectedStatus: normal`、节点出现且无 rejected border | 旧 `nth(1)` 与不可见卡片定位改为语义/visible 锚点；通过 |
-| 4.17 Locked rejected target | clean + 8.0；保持锁定，UI 切换农业/Teladi，真实拖 `spaceweed` | group identity、`expectedStatus: rejected`、`rejected-label`/红框/无 preview、节点总数不变 | 同上；通过 |
-
-## 运行证据
-
-冻结 base baseline：
-
-```text
-npm exec playwright test -- tests/e2e/logic-flow/logic-flow-drag-feedback.spec.ts tests/e2e/logic-flow/logic-flow-incompatible-drag.spec.ts --project=chromium --workers=1 --retries=0 --trace=on
-exit 1; 7 tests: 3 passed, 4 failed (4.6, 4.7, 4.16, 4.17)
-```
-
-原始失败为 compact-view 旧 T0 预期、锁定组 Auto 边框颜色、`spaceweed` 不存在/旧分类定位。
-
-candidate focused 的稳定有效运行（同 exact command，随后因 WebServer 生命周期出现过两次 `ERR_CONNECTION_REFUSED`；该环境问题不计作行为通过）：
-
-```text
-npm exec playwright test -- tests/e2e/logic-flow/logic-flow-drag-feedback.spec.ts tests/e2e/logic-flow/logic-flow-incompatible-drag.spec.ts --project=chromium --workers=1 --retries=0 --trace=on
-exit 1; 有效运行 5 passed, 2 failed（4.6 与旧 4.7）；随后修正 4.7 后 exact run 因前四个 setup 收到 ERR_CONNECTION_REFUSED，后 4.7 两用例、4.16、4.17 passed。
-```
-
-补充前四用例运行：
-
-```text
-npm exec playwright test -- tests/e2e/logic-flow/logic-flow-drag-feedback.spec.ts --project=chromium --workers=1 --retries=0 --trace=on --grep "4\\.1|4\\.2|4\\.5|4\\.6"
-exit 1; 3 passed, 1 failed（4.6）
-```
-
-最终单用例补充确认：
-
-```text
-npm exec playwright test -- tests/e2e/logic-flow/logic-flow-drag-feedback.spec.ts --project=chromium --workers=1 --retries=0 --trace=on --grep "4.7"
-exit 1; 4.7 的两个独立用例均 passed（1 test containing 2 cases）
-```
-
-collection：
-
-```text
-npm exec playwright test -- tests/e2e/logic-flow/logic-flow-drag-feedback.spec.ts tests/e2e/logic-flow/logic-flow-incompatible-drag.spec.ts --list --reporter=list
-exit 0; 8 tests in 2 files
-```
-
-helper cross-consumer：
-
-```text
-npm exec playwright test -- tests/e2e/logic-flow tests/e2e/compact-drag-view.spec.ts tests/e2e/vue-drag-test.spec.ts tests/e2e/build-flow --project=chromium --workers=1 --retries=0 --trace=on
-exit 1; 164 tests: 122 passed, 42 failed
-```
-
-cross-consumer 失败均在本任务之外的 `build-flow`、其他 Logic Flow spec、`vue-drag-test` 既有 direct-store 演示或 `ui-adjust` 等路径；本任务新增/修改 helper 的消费者中，`compact-drag-view` 2/2、`logic-flow-bug-regression` 及大部分 Logic Flow 消费者通过。未修改其余路径。
-
-build 与差异检查：
-
-```text
-npm run build
-exit 0
-
-git diff --check
-exit 0
-```
-
-## Trace 输出
-
-Playwright 生成于 `test-results/`，包括：
-
-- `logic-flow-logic-flow-drag-a5b00-on-draggable-and-No-Preview-chromium/trace.zip`（4.6 T0 failure）
-- `logic-flow-logic-flow-drag-68f4c-l-Dependency-Follow-Sorting-chromium/trace.zip`（4.7 旧断言与最终通过运行复用目录）
-- `logic-flow-logic-flow-inco-8ea21--Visibility-Unlocked-Group--chromium/trace.zip`（4.16）
-- `logic-flow-logic-flow-inco-d5172-lict-Feedback-Locked-Group--chromium/trace.zip`（4.17）
-- 多轮 WebServer `ERR_CONNECTION_REFUSED` 的 trace/error-context 同样保留在 `test-results/`。
-
-## 变更边界
-
-只修改了本子任务 owned paths 中的两份 spec、`dragLogicFlow.ts` 与本迁移文档；未修改 source、fixture 原件、其他 spec、配置、计划/状态或 Git metadata。未使用 skip/fixme/only、direct store mutation、伪造拖拽状态或默认 target index `0`。
-
-## 正式 post-fix rerun（target 已进入 integrate）
-
-核对：
-
-```text
-git log -5 --oneline --decorate
-7a4a601c (HEAD -> workflow/unified-test-repair-integrate) resume task-test-5.1 migration
-76131026 (develop) merge task-test-5-fix-1 candidate
-d309409c (workflow/unified-test-repair-coding) fix logic flow candidate drag restrictions
-b2060a45 (workflow/unified-test-repair-retained-task-test-5) docs: bind logic flow evidence to checkpoint
-365ef5cc test: migrate logic flow drag behavior
-
-git status --short --branch
-## workflow/unified-test-repair-integrate
-```
-
-focused 正式命令：
-
-```text
-npm exec playwright test -- tests/e2e/logic-flow/logic-flow-drag-feedback.spec.ts tests/e2e/logic-flow/logic-flow-incompatible-drag.spec.ts --project=chromium --workers=1 --retries=0 --trace=on
-exit 1; 8 tests: 3 passed, 5 failed
-```
-
-逐用例结果与分类：
-
-| 用例 | 结果 | 分类与证据 |
+| 编号 | 当前行为与真实用户动作 | 独立 expected / 新用例 |
 | --- | --- | --- |
-| 4.1 New Line Ghosting | passed | test-owned oracle 通过 |
-| 4.2 Real-time T0 Resource Header Updates | passed | test-owned oracle 通过 |
-| 4.5 Final State Verification | passed | test-owned oracle 通过 |
-| 4.6 T0 Ware Behavior | failed | product-owned candidate：`dragLogicFlow.ts:14` 预期 `compact-view` count 0，实际 count 1；Ore 拖动期间 compact-view 未隐藏，trace `test-results/logic-flow-logic-flow-drag-a5b00-on-draggable-and-No-Preview-chromium/trace.zip` |
-| 4.7 Refined Metals first | failed | product-owned candidate：`dragLogicFlow.ts:60` 预期合法拖动中 compact-view visible，实际 hidden；trace `test-results/logic-flow-logic-flow-drag-92ab5-ting---Refined-Metals-first-chromium/trace.zip` |
-| 4.7 Silicon Wafers first | failed | product-owned candidate：同一 helper signature，compact-view 实际 hidden；trace `test-results/logic-flow-logic-flow-drag-6b381-ting---Silicon-Wafers-first-chromium/trace.zip` |
-| 4.16 Unlocked incompatible target | failed | product-owned candidate：同一 helper signature，compact-view 实际 hidden；trace `test-results/logic-flow-logic-flow-inco-8ea21--Visibility-Unlocked-Group--chromium/trace.zip` |
-| 4.17 Locked group conflict | failed | product-owned candidate：同一 helper signature，compact-view 实际 hidden；trace `test-results/logic-flow-logic-flow-inco-d5172-lict-Feedback-Locked-Group--chromium/trace.zip` |
+| 4.1 | 从 clean 画布拖 hullparts 到新建区，保持悬停再释放 | 模块名称为 Hull Part Production；header 精确为 methane、ore；一个可见 phantom；释放后一个组、default/manual/module_gen_prod_hullparts_01；同编号用例 |
+| 4.2 | siliconwafers 建组；依该 manual ware 找唯一 groupId；microchips、hullparts 逐次悬停并投放 | locked 琥珀反馈；原 header 仅 silicon；新增 pulse 精确 methane、ore；两个投放产物均为各自固定 module_gen_prod_*_01、default/manual；同编号用例 |
+| 4.5 | scanningarrays 建组；microchips 投放到该 groupId；再次拖 scanningarrays 到新建区 | scanningarrays 输入为 refinedmetals/siliconwafers，microchips 为新加入 locked 状态；现有组 microchips 为固定模块/manual；新建后两个不同 groupId 且保留原组，各组 scanningarrays 为固定模块/manual；同编号用例 |
+| 4.6 | 分别真实按下、移动、释放 Ore 与 Energy Cells；合法 siliconwafers 拖放；已有组中重复两项禁止操作 | 两张禁拖卡均 draggable=false、无 +；按住及释放均无 Sortable chosen/ghost/drag、compact hidden、store drag 状态全 idle、完整 groups/nodes 不变；普通卡初始 draggable=true、有 + 和资源预览，真实成功建组；同编号扩展用例 |
+| 4.7 两方向 | refinedmetals/siliconwafers 按不同顺序建同组；拖已手动存在的合法产物到该组显示紧凑视图 | duplicate 红框和标签；header 精确为 ore→silicon 或 silicon→ore；释放完整 groups/nodes 不变；保留两个独立同编号用例 |
+| 4.16 | UI 关闭候选锁，siliconwafers 建组；UI 选择农业/Teladi；spaceweed 拖入该 groupId | normal 蓝框；仍一个组；spaceweed 恰为一个 module_tel_prod_spaceweed_01、teladi/manual 节点；同编号用例 |
+| 4.17 | UI 开启候选锁，siliconwafers 建组；同样农业/Teladi 拖 spaceweed | rejected 红框、禁止标签、零 phantom；释放完整 groups/nodes 快照不变，spaceweed 节点为零；同编号用例 |
 
-这些失败均发生在真实 Mouse API pointer down/move 路径，未修改产品源码；未把失败改写为通过，也未重复 focused rerun。
+fixture 沿用 `setupLogicFlow(page, 'clean')`：db.json 副本排除 vsn；明确 8.0 与 x4_logic_flow_plans；reload 后通过 language-select 设中文，再点击 Logic Flow。seeded 入口保持兼容，未改 fixture 原件。
 
-collection/list：
+## 失败分类与修正
 
-```text
-npm exec playwright test -- tests/e2e/logic-flow/logic-flow-drag-feedback.spec.ts tests/e2e/logic-flow/logic-flow-incompatible-drag.spec.ts --list --reporter=list
-exit 0; 8 tests in 2 files
+- 本轮 baseline：8 collected，3 passed / 5 failed / 0 skipped，exit 1。4.6 把 v-show 隐藏节点错误认成应不存在，是 test-owned；4.7 两方向和 4.16/4.17 用禁止拖拽的 Energy Cells 触发操作，是 stale，不是新的产品缺陷。
+- 第一次迁移 candidate：5 passed / 3 failed / 0 skipped，exit 1。4.5 手写的 auto 预期不正确：静态 8.0 modules.json 显示 scanningarrays 并不依赖 microchips，应为 locked 新增。4.7 两方向被 helper 的原生 draggable=true 前置阻断：Sortable 在释放时重置该属性，源码 node_modules/sortablejs/Sortable.js 的 _disableDraggable 与本轮 trace 的 is-draggable-tier/data-draggable=true 证明此为 test-owned 生命周期预期错误。改以候选可拖样式与实际 chosen/store/compact 激活证明，普通初次拖放仍验原生属性。
+- corrected focused：8 passed / 0 failed / 0 skipped，exit 0。稳定复验与 bounded consumers 的最终结果见本轮 results/M5.1.md。
+
+## helper 边界
+
+`dragWareToTarget` 保留原参数和 numeric target 兼容。groupId 先解析到确切现有组；不存在立即报错。owned spec 只用 groupId；`getGroupIdForWare` 要求唯一 manual ware 所属组，多个候选会报错。
+
+helper 不再调用 getWareGroupStatus/findModuleForWare 来生成 expected，不使用 fallback。提供 expectedStatus 时验证对应 UI；未提供时仅执行真实鼠标与通用生命周期，业务断言由调用 spec 承担。模块/血统预期在 owned spec 使用固定游戏数据常量。rejected/duplicate 的完整 groups 快照只作为不变性 oracle。返回 sourceBox/targetBox/targetLocator，未有消费者读取旧 effectiveLineage 字段。
+
+所有 helper 调用点已扫描：compact-drag-view、interaction、bug-regression、new-feat、plans、ui-adjust，以及两个 owned spec；startWareDrag/attemptWareDrag 消费者为 interaction。其他消费者的旧 Energy Cells 操作、groups[0] 与缺独立业务断言仍由后续合同处理，本轮不宣称全体消费者迁移完成。
+
+## 可复现命令与日志
+
+以下各浏览器命令使用 `PORT=22251`、正常 `chromiumSandbox: true` ENV preview 配置，按精确命令经 sandbox escalation 执行；未绕过 Chromium sandbox。
+
+```bash
+PORT=22251 npm exec playwright test -- --config=/tmp/x4-test-migration-env/preview-only.config.ts tests/e2e/logic-flow/logic-flow-drag-feedback.spec.ts tests/e2e/logic-flow/logic-flow-incompatible-drag.spec.ts --project=chromium --workers=1 --retries=0 --trace=on --output=/tmp/x4-migration-M5.1/focused
+PORT=22251 npm exec playwright test -- --config=/tmp/x4-test-migration-env/preview-only.config.ts tests/e2e/logic-flow/logic-flow-drag-feedback.spec.ts tests/e2e/logic-flow/logic-flow-incompatible-drag.spec.ts --list --reporter=list
 ```
 
-build 与差异检查：
-
-```text
-npm run build
-exit 0
-
-git diff --check
-exit 0
-```
-
-helper cross-consumer 正式命令：
-
-```text
-npm exec playwright test -- tests/e2e/logic-flow tests/e2e/compact-drag-view.spec.ts tests/e2e/vue-drag-test.spec.ts tests/e2e/build-flow --project=chromium --workers=1 --retries=0 --trace=on
-exit 130; runner 人工中止；已观测 64/165：34 passed, 29 failed, 1 interrupted, 101 did not run
-```
-
-cross-consumer signature 归属：
-
-| signature | 结果 | 分类 |
-| --- | --- | --- |
-| `build-flow/*` 27 cases `page.goto: net::ERR_CONNECTION_REFUSED` | failed | unavailable/environment；WebServer 生命周期失效，未归因本任务 |
-| `compact-drag-view.spec.ts` 2 cases | failed | product-owned candidate；共享 helper 的 compact-view drag-state 断言失败 |
-| `logic-flow-bug-regression.spec.ts` isolating node | interrupted | unknown；中止时无完整独立结果 |
-| `logic-flow/import-logic-flow.spec.ts` cases 2.0–3.19 | passed | cross-consumer 观察到通过 |
-| 其余 101 cases | did not run | unavailable due to requested stop |
-
-本轮未写入非 owned path；未提交 Git。当前完整 HEAD SHA：`7a4a601c3844f8359040eca00f666e3f8042b1be`。
+`/tmp/x4-migration-M5.1/{baseline,candidate,focused}.log` 与同名结果目录保留全部对应 trace.zip/error-context。collection.log：exit 0，8 tests / 2 files。本轮仅测试变更，复用 ENV 验证构建；未运行 build-rust。

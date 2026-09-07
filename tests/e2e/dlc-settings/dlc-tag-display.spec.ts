@@ -1,229 +1,136 @@
 import { test, expect, type Page } from '@playwright/test'
 
-/**
- * E2E tests for dlc-tag display in station planning
- *
- * Test file: tests/e2e/dlc-settings/dlc-tag-display.spec.ts
- * Maps to: openspec/changes/station-dlc-tag/test_tasks.md
- */
+const terranId = 'module_ter_prod_energycells_01'
+const baseId = 'module_gen_prod_energycells_01'
+const candidate = (page: Page, id: string) => page.getByTestId(`grouped-candidate-item-${id}`)
+const terranRow = (page: Page) => page.locator('.module-row').filter({ has: page.locator('.module-name-text', { hasText: /^Terran 能量电池产线$/ }) })
 
-// Helper: 打开 DLC 设置 modal
-async function openDlcSettings(page: Page) {
-  await page.getByTestId('settings-button').click()
-  await page.waitForTimeout(200)
+async function search(page: Page, query = '能量电池') {
+  await page.getByTestId('candidate-search-input').fill(query)
+  await expect(page.getByTestId('grouped-candidate-popover')).toBeVisible()
 }
 
-// Helper: 保存按钮
-const saveButton = (page: Page) => page.getByTestId('dlc-settings-save')
-const cancelButton = (page: Page) => page.getByTestId('dlc-settings-cancel')
-const enforceToggle = (page: Page) => page.getByTestId('dlc-settings-enforce-toggle')
+async function setDlcs(page: Page, active: boolean, enforce: boolean) {
+  await page.getByTestId('settings-button').click()
+  await page.getByTestId(active ? 'dlc-settings-select-all' : 'dlc-settings-clear-all').click()
+  await page.getByTestId('dlc-settings-enforce-toggle').getByRole('checkbox').setChecked(enforce)
+  await page.getByTestId('dlc-settings-save').click()
+  await expect(page.getByTestId('dlc-settings-modal')).toBeHidden()
+}
+
+async function addTerranModule(page: Page) {
+  await search(page)
+  await candidate(page, terranId).click()
+  await expect(terranRow(page)).toHaveCount(1)
+  await expect(terranRow(page)).toBeVisible()
+}
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/')
-
-  // 加载 fixture（排除 vsn 字段）
-  const dbFixture = await import('../../fixtures/db.json', { with: { type: 'json' } })
-  const dbData = JSON.parse(JSON.stringify(dbFixture.default))
-  delete dbData.vsn
-
-  // 直接设置语言到 fixture 数据中
-  await page.evaluate((data) => {
-    Object.entries(data).forEach(([key, value]) => {
-      localStorage.setItem(key, JSON.stringify(value))
-    })
+  const fixture = await import('../../fixtures/db.json', { with: { type: 'json' } })
+  const data = JSON.parse(JSON.stringify(fixture.default))
+  delete data.vsn
+  data.x4_game_version = { version: '9.0', beta: false }
+  data.x4_empire_data_v9 = { version: 5, activeId: null, list: [] }
+  delete data['x4-setting_v9']
+  await page.evaluate((db) => {
+    Object.entries(db).forEach(([key, value]) => localStorage.setItem(key, JSON.stringify(value)))
+    localStorage.removeItem('x4-setting_v9')
     localStorage.setItem('isTestEnv', 'true')
-    // 设置语言为中文
-  }, dbData)
-
+  }, data)
   await page.reload()
-  await page.waitForTimeout(200)
+  await page.getByTestId('language-select').selectOption('zh-CN')
+  await page.getByTestId('sidebar-add-station').click()
+  await expect(page.getByTestId('sidebar-station')).toHaveCount(1)
 })
 
 test.describe('DLC Tag 显示 - 搜索候选列表', () => {
   test('搜索候选模块显示 DLC 标签', async ({ page }) => {
-    // 聚焦搜索框以打开候选列表
-    const searchInput = page.getByTestId('candidate-search-input')
-    await searchInput.click()
-    await page.waitForTimeout(300)
-
-    // 等待候选列表出现
-    const popover = page.getByTestId('grouped-candidate-popover')
-    await expect(popover).toBeVisible()
-
-    // 检查是否有 DLC 标签（可能有也可能没有，取决于数据）
-    // 至少验证候选列表正常渲染
-    const groups = page.locator('[data-testid^="grouped-candidate-group-"]')
-    await expect(groups.first()).toBeVisible()
+    await search(page)
+    await expect(candidate(page, terranId).locator('.item-tag')).toHaveText('人类的摇篮')
+    await expect(candidate(page, baseId)).toBeVisible()
+    await expect(candidate(page, baseId).locator('.item-tag')).toHaveCount(0)
   })
 
   test('DLC 标签样式 - 激活状态', async ({ page }) => {
-    // 确保所有 DLC 激活（默认状态）
-    await openDlcSettings(page)
-    await page.getByTestId('dlc-settings-select-all').click()
-    await saveButton(page).click()
-    await page.waitForTimeout(200)
-
-    // 打开搜索
-    const searchInput = page.getByTestId('candidate-search-input')
-    await searchInput.click()
-    await page.waitForTimeout(300)
-
-    // 查找 DLC 标签（激活状态应为绿色）
-    const popover = page.getByTestId('grouped-candidate-popover')
-    const activeTags = popover.locator('.item-tag--active')
-
-    // 至少验证标签存在且样式正确
-    const count = await activeTags.count()
-    if (count > 0) {
-      const firstTag = activeTags.first()
-      await expect(firstTag).toBeVisible()
-      // 验证样式类
-      await expect(firstTag).toHaveClass(/item-tag--active/)
-    }
+    await setDlcs(page, true, false)
+    await search(page)
+    await expect(candidate(page, terranId).locator('.item-tag')).toHaveClass(/item-tag--active/)
+    await candidate(page, terranId).click()
+    await expect(terranRow(page).locator('.dlc-tag')).toHaveClass(/dlc-tag--active/)
   })
 })
 
 test.describe('DLC Tag 显示 - 已添加模块列表', () => {
   test('已添加模块显示 DLC 标签', async ({ page }) => {
-    // 添加一个模块
-    const searchInput = page.getByTestId('candidate-search-input')
-    await searchInput.click()
-    await page.waitForTimeout(300)
-
-    // 选择第一个候选模块
-    const popover = page.getByTestId('grouped-candidate-popover')
-    const firstModule = popover.locator('[data-testid^="grouped-candidate-item-"]').first()
-    await firstModule.click()
-    await page.waitForTimeout(200)
-
-    // 验证模块已添加到规划列表
-    const moduleRows = page.locator('.module-row')
-    await expect(moduleRows.first()).toBeVisible()
-
-    // 检查 DLC 标签是否存在（如果有 DLC 模块）
-    const dlcTags = moduleRows.first().locator('.dlc-tag')
-    const tagCount = await dlcTags.count()
-
-    // 注意：base 模块不显示标签，所以 tagCount 可能为 0
-    // 这个测试主要验证标签渲染逻辑存在
-    if (tagCount > 0) {
-      await expect(dlcTags.first()).toBeVisible()
-    }
+    await addTerranModule(page)
+    // station-dlc-tag requires the translated DLC name as the visible label.
+    await expect.soft(terranRow(page).locator('.dlc-tag')).toHaveText('人类的摇篮')
+    await search(page)
+    await candidate(page, baseId).click()
+    const baseRow = page.locator('.module-row').filter({ has: page.locator('.module-name-text', { hasText: /^能量电池产线$/ }) })
+    await expect(baseRow).toHaveCount(1)
+    await expect(baseRow.locator('.dlc-tag')).toHaveCount(0)
   })
 
   test('DLC 标签 - 未激活状态样式', async ({ page }) => {
-    // 首先取消所有 DLC
-    await openDlcSettings(page)
-    await page.getByTestId('dlc-settings-clear-all').click()
-    await enforceToggle(page).check() // 启用限制策略
-    await saveButton(page).click()
-    await page.waitForTimeout(200)
-
-    // 添加一个模块（可能是 base 或 DLC 模块）
-    const searchInput = page.getByTestId('candidate-search-input')
-    await searchInput.click()
-    await page.waitForTimeout(300)
-
-    const popover = page.getByTestId('grouped-candidate-popover')
-    const modules = popover.locator('[data-testid^="grouped-candidate-item-"]')
-    const count = await modules.count()
-
-    // 寻找非 base 模块
-    let foundNonBase = false
-    for (let i = 0; i < count; i++) {
-      const module = modules.nth(i)
-      const text = await module.textContent()
-      // 检查是否有 DLC 标签（非 base 模块会显示 DLC 标签）
-      const hasDlcTag = text?.includes('DLC') || text?.includes('Kingdom') || text?.includes('Cradle')
-      if (hasDlcTag) {
-        await module.click()
-        foundNonBase = true
-        break
-      }
-    }
-
-    // 如果没有找到非 base 模块，跳过后续测试
-    test.skip(!foundNonBase, '没有可用的非 base DLC 模块')
-
-    await page.waitForTimeout(200)
-
-    // 验证模块行处于未激活状态
-    const moduleRows = page.locator('.module-row')
-    const firstRow = moduleRows.first()
-    // 检查模块行是否有 inactive 类或者 opacity 样式
-    const opacity = await firstRow.evaluate(el => getComputedStyle(el).opacity)
-    expect(parseFloat(opacity)).toBeLessThan(1)
+    // Add while active, then restrict: filtered candidates cannot create an existing inactive module.
+    await addTerranModule(page)
+    await setDlcs(page, false, true)
+    const row = terranRow(page)
+    await expect(row).toBeVisible()
+    await expect(row).toHaveCSS('opacity', '0.5')
+    await expect(row.locator('.dlc-tag')).toHaveClass(/dlc-tag--inactive/)
+    await expect.soft(row.locator('input')).toBeDisabled()
+    await expect(row.locator('.remove-btn')).toBeEnabled()
+    await row.locator('.remove-btn').click()
+    await expect(row).toHaveCount(0)
   })
 })
 
 test.describe('enforceDlcActivation - 搜索过滤', () => {
   test('关闭限制策略时显示全部模块', async ({ page }) => {
-    // 确保限制策略关闭
-    await openDlcSettings(page)
-    await page.getByTestId('dlc-settings-clear-all').click()
-    await enforceToggle(page).uncheck() // 关闭限制
-    await saveButton(page).click()
-    await page.waitForTimeout(200)
-
-    // 打开搜索
-    const searchInput = page.getByTestId('candidate-search-input')
-    await searchInput.click()
-    await page.waitForTimeout(300)
-
-    // 候选列表应该显示所有模块（包括未激活 DLC）
-    const popover = page.getByTestId('grouped-candidate-popover')
-    await expect(popover).toBeVisible()
-
-    const modules = popover.locator('[data-testid^="grouped-candidate-item-"]')
-    const count = await modules.count()
-    expect(count).toBeGreaterThan(0)
+    await setDlcs(page, false, false)
+    await search(page)
+    await expect(candidate(page, terranId)).toBeVisible()
+    await expect(candidate(page, terranId).locator('.item-tag')).toHaveClass(/item-tag--inactive/)
+    await expect(candidate(page, baseId)).toBeVisible()
   })
 
   test('开启限制策略时隐藏未激活 DLC 模块', async ({ page }) => {
-    // 取消所有 DLC 并启用限制
-    await openDlcSettings(page)
-    await page.getByTestId('dlc-settings-clear-all').click()
-    await enforceToggle(page).check() // 启用限制
-    await saveButton(page).click()
-    await page.waitForTimeout(200)
-
-    // 打开搜索
-    const searchInput = page.getByTestId('candidate-search-input')
-    await searchInput.click()
-    await page.waitForTimeout(300)
-
-    const popover = page.getByTestId('grouped-candidate-popover')
-    await expect(popover).toBeVisible()
-
-    // 检查未激活 DLC 标签的数量
-    const inactiveTags = popover.locator('.item-tag--inactive')
-    const inactiveCount = await inactiveTags.count()
-
-    // 开启限制后，不应该看到未激活的 DLC 标签
-    expect(inactiveCount).toBe(0)
+    await search(page)
+    await expect(candidate(page, terranId)).toBeVisible()
+    await page.keyboard.press('Escape')
+    await setDlcs(page, false, true)
+    await search(page)
+    await expect(candidate(page, terranId)).toHaveCount(0)
+    await expect(candidate(page, baseId)).toBeVisible()
+    await search(page, terranId)
+    await expect(page.locator('[data-testid^="grouped-candidate-group-"]')).toHaveCount(0)
+    await page.reload()
+    await page.getByTestId('sidebar-add-station').click()
+    await search(page)
+    await expect(candidate(page, terranId)).toHaveCount(0)
+    await expect(candidate(page, baseId)).toBeVisible()
   })
 })
 
 test.describe('DLC 设置变化触发重算', () => {
   test('DLC 设置保存后触发重算', async ({ page }) => {
-    // 添加一些模块
-    const searchInput = page.getByTestId('candidate-search-input')
-    await searchInput.click()
-    await page.waitForTimeout(300)
-
-    const popover = page.getByTestId('grouped-candidate-popover')
-    const firstModule = popover.locator('[data-testid^="grouped-candidate-item-"]').first()
-    await firstModule.click()
-    await page.waitForTimeout(200)
-
-    // 修改 DLC 设置
-    await openDlcSettings(page)
-    await page.getByTestId('dlc-settings-select-all').click()
-    await saveButton(page).click()
-    await page.waitForTimeout(200)
-
-    // 验证模块列表仍然可见
-    const moduleRows = page.locator('.module-row')
-    await expect(moduleRows.first()).toBeVisible()
+    await addTerranModule(page)
+    const energyFlow = page.locator('[data-testid="flow-wrapper"][data-resource-id="energycells"]')
+    await expect(energyFlow).toBeVisible()
+    const before = await energyFlow.getByTestId('flow-value').innerText()
+    expect(before).toMatch(/[1-9]/)
+    await setDlcs(page, false, true)
+    await expect(terranRow(page)).toBeVisible()
+    await expect.configure({ soft: true }).poll(() => page.evaluate(() => (window as any).blueprintStore.stationState.productionFlows
+      .filter((flow: { wareId: string }) => flow.wareId === 'energycells')
+      .reduce((total: number, flow: { production: number }) => total + flow.production, 0)))
+      .toBe(0)
+    expect.soft((await energyFlow.getByTestId('flow-value').allTextContents()).join('')).not.toMatch(/[1-9]/)
+    await setDlcs(page, false, false)
+    await expect(energyFlow).toBeVisible()
+    await expect(energyFlow.getByTestId('flow-value')).toHaveText(before)
   })
 })

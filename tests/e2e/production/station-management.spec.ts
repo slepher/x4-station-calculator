@@ -7,88 +7,96 @@ async function getStationNames(page: Page) {
 }
 
 async function getStationIds(page: Page) {
-  return page.locator('[data-testid="sidebar-station"][data-station-id]').evaluateAll((nodes) =>
-    nodes
-      .map((node) => node.getAttribute('data-station-id') || '')
-      .filter(Boolean)
-  )
-}
-
-async function getStationPositionSnapshot(page: Page) {
-  return page.locator('[data-testid="sidebar-station"][data-station-id]').evaluateAll((nodes) =>
-    nodes.map((node) => {
-      const el = node as HTMLElement
-      const rect = el.getBoundingClientRect()
-      return {
-        id: node.getAttribute('data-station-id') || '',
-        x: Math.round(rect.left + rect.width / 2)
-      }
-    })
-  )
+  return page.getByTestId('sidebar-station').evaluateAll(nodes => nodes.map(node => {
+    const id = node.getAttribute('data-station-id')
+    if (!id) throw new Error('Station has no identity')
+    return id
+  }))
 }
 
 async function waitForStationCount(page: Page, count: number) {
-  await expect.poll(async () => {
-    return page.locator('[data-testid="sidebar-station"][data-station-id]').count()
-  }, { timeout: 5000 }).toBe(count)
+  await expect(page.getByTestId('sidebar-station')).toHaveCount(count)
 }
 
 async function createNamedStations(page: Page, names: string[]) {
-  const addBtn = page.getByTestId('sidebar-add-station')
-
-  for (let i = 0; i < names.length; i++) {
-    await addBtn.click({ timeout: 500 })
-    await page.waitForTimeout(150)
-
-    const currentTab = page.locator('[data-testid="sidebar-station"]').nth(i)
-    await currentTab.click({ timeout: 500 })
-
-    const nameInput = page.locator('.ghost-input.w-32').first()
-    await expect(nameInput).toBeVisible({ timeout: 500 })
-    await nameInput.fill(names[i]!, { timeout: 500 })
-    await page.keyboard.press('Tab')
-    await page.waitForTimeout(100)
+  for (const name of names) {
+    await page.getByTestId('sidebar-add-station').click()
+    const input = page.locator('.ghost-input.w-32').first()
+    await input.fill(name)
+    await input.press('Tab')
+    await expect(page.getByTestId('sidebar-station').last()).toContainText(name)
   }
 }
 
 async function dragStationBeforeStation(page: Page, sourceId: string, targetId: string) {
-  const source = page.locator(`[data-testid="sidebar-station"][data-station-id="${sourceId}"]`).first()
-  const target = page.locator(`[data-testid="sidebar-station"][data-station-id="${targetId}"]`).first()
-
+  const source = page.locator('[data-testid="sidebar-station"][data-station-id="' + sourceId + '"]')
+  const target = page.locator('[data-testid="sidebar-station"][data-station-id="' + targetId + '"]')
   const s = await source.boundingBox()
   const t = await target.boundingBox()
-  if (!s || !t) throw new Error('missing tab box')
-
+  if (!s || !t) throw new Error('Missing station box')
   await page.mouse.move(s.x + s.width / 2, s.y + s.height / 2)
   await page.mouse.down()
-  await page.mouse.move(s.x + s.width / 2 + 10, s.y + s.height / 2 + 4)
-  await page.mouse.move(t.x + t.width / 2, t.y + t.height / 2, { steps: 20 })
-  await page.mouse.up()
-  await page.waitForTimeout(2000)
-}
-
-async function clickSaveAndAssertStatusMonitor(page: Page) {
-  const saveBtn = page.locator('.btn-tool').filter({ hasText: /保存|Save/ }).first()
-  await saveBtn.click({ timeout: 500 })
-
-  const monitor = page.locator('div.fixed.bottom-6.right-6.z-\\[9999\\]')
-  await expect(monitor).toBeVisible({ timeout: 5000 })
-
-  const latestCard = monitor.locator('div.pointer-events-auto').first()
-  await expect(latestCard.locator('span.text-\\[10px\\].font-black.uppercase')).toContainText(/save/i)
-  await expect(latestCard.locator('div.text-xs.font-mono')).toContainText(/保存|save/i)
-}
-
-async function addOneModuleToMakePlanSavable(page: Page) {
-  const searchInput = page.locator('.search-box .search-input').first()
-  await searchInput.focus()
-  await searchInput.fill('Energy Cell')
-  const resultItem = page.locator('.results-popover .result-item').first()
-  await expect(resultItem).toBeVisible({ timeout: 1000 })
-  await resultItem.click({ timeout: 500 })
+  await page.mouse.move(s.x + s.width / 2 + 10, s.y + s.height / 2, { steps: 5 })
+  await expect(source).toHaveClass(/sortable-chosen/)
+  // Move outside the list first so intermediate stations cannot consume the drop hover.
+  const outsideX = s.x + s.width + 80
+  await page.mouse.move(outsideX, s.y + s.height / 2, { steps: 10 })
+  await expect(source).toHaveClass(/sortable-ghost/)
+  await page.mouse.move(outsideX, t.y + 2, { steps: 20 })
+  await page.mouse.move(t.x + t.width / 2, t.y + 2, { steps: 20 })
   await expect.poll(async () => {
-    return page.locator('.module-row').count()
-  }, { timeout: 3000 }).toBeGreaterThan(0)
+    const sourceBox = await source.boundingBox()
+    const targetBox = await target.boundingBox()
+    if (!sourceBox || !targetBox) throw new Error('Missing drag hover box')
+    return sourceBox.y < targetBox.y
+  }).toBe(true)
+  await page.mouse.up()
+  await expect(source).not.toHaveClass(/sortable-chosen|sortable-ghost/)
+}
+
+async function cancelStationDrag(page: Page, sourceId: string) {
+  const source = page.locator('[data-testid="sidebar-station"][data-station-id="' + sourceId + '"]')
+  const box = await source.boundingBox()
+  if (!box) throw new Error('Missing station box')
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
+  await page.mouse.down()
+  await page.mouse.move(box.x + box.width / 2 + 10, box.y + box.height / 2, { steps: 5 })
+  await expect(source).toHaveClass(/sortable-chosen/)
+  // Leave horizontally without hovering a different station in the vertical list.
+  await page.mouse.move(box.x + box.width + 150, box.y + box.height / 2, { steps: 20 })
+  await expect(source).toHaveClass(/sortable-ghost/)
+  await page.mouse.up()
+  await expect(source).not.toHaveClass(/sortable-chosen|sortable-ghost/)
+}
+
+async function readSavedEmpire(page: Page) {
+  return page.evaluate(() => {
+    const raw = localStorage.getItem('x4_empire_data_v9')
+    if (!raw) throw new Error('Missing saved empire storage')
+    const state = JSON.parse(raw)
+    const empire = state.list.find((item: { id: string }) => item.id === state.activeId)
+    if (!empire) throw new Error('Missing active saved empire')
+    return empire as { id: string, name: string, stations: Array<{ id: string, name: string, modules: Array<{ id: string, count: number }> }> }
+  })
+}
+
+async function saveNewEmpire(page: Page, name: string) {
+  await page.getByTestId('toolbar-save-btn').click()
+  const dialog = page.getByTestId('dialog-backdrop')
+  await expect(dialog).toBeVisible()
+  await dialog.locator('.dialog-input').fill(name)
+  await dialog.getByRole('button', { name: '保存', exact: true }).click()
+  await expect(dialog).toBeHidden()
+  await expect.poll(async () => (await readSavedEmpire(page)).name).toBe(name)
+  const saved = await readSavedEmpire(page)
+  await expect.poll(() => getStationIds(page)).toEqual(saved.stations.map(station => station.id))
+  return saved
+}
+
+async function addEnergyCellModule(page: Page) {
+  await page.getByTestId('candidate-search-input').fill('Energy Cell')
+  await page.getByTestId('grouped-candidate-item-module_gen_prod_energycells_01').click()
+  await expect(page.locator('.tier-section').first().locator('.module-row')).toHaveCount(1)
 }
 
 async function setupBase(page: Page) {
@@ -99,6 +107,8 @@ async function setupBase(page: Page) {
   const dbFixture = await import('../../fixtures/db.json', { with: { type: 'json' } })
   const dbData = JSON.parse(JSON.stringify(dbFixture.default))
   delete dbData.vsn
+  dbData.x4_game_version = { version: '9.0', beta: false }
+  dbData.x4_empire_data_v9 = { version: 5, activeId: null, list: [] }
   await page.evaluate((data) => {
     Object.entries(data).forEach(([key, value]) => localStorage.setItem(key, JSON.stringify(value)))
     localStorage.setItem('isTestEnv', 'true')
@@ -258,216 +268,90 @@ test.describe('多空间站帝国规划 - 标签拖拽重排', () => {
     await setupBase(page)
   })
 
-  const addStations = async (page: any, count: number) => {
-    const addBtn = page.getByTestId('sidebar-add-station')
-    for (let i = 0; i < count; i++) {
-      await addBtn.click()
-      await page.waitForTimeout(120)
-    }
-  }
-
-  const getStationOrder = async (page: any) => {
-    return await page.locator('[data-testid="sidebar-station"]').evaluateAll((els: Element[]) =>
-      els.map((el) => (el as HTMLElement).dataset.stationId || '')
-    )
-  }
-
-  const dragStationTab = async (page: any, fromIndex: number, toIndex: number) => {
-    const source = page.locator('[data-testid="sidebar-station"]').nth(fromIndex)
-    const target = page.locator('[data-testid="sidebar-station"]').nth(toIndex)
-
-    const sourceBox = await source.boundingBox()
-    const targetBox = await target.boundingBox()
-    if (!sourceBox || !targetBox) {
-      throw new Error('missing station tab bounding box')
-    }
-
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2)
-    await page.mouse.down()
-    await page.mouse.move(targetBox.x + targetBox.width / 2, targetBox.y + targetBox.height / 2, { steps: 20 })
-    await page.mouse.up()
-    await page.waitForTimeout(2000)
-  }
-
-  const dragWithRetry = async (page: any, fromIndex: number, toIndex: number) => {
-    const initialOrder = await getStationOrder(page)
-    for (let attempt = 0; attempt < 3; attempt++) {
-      await dragStationTab(page, fromIndex, toIndex)
-      const currentOrder = await getStationOrder(page)
-      if (currentOrder.join('|') !== initialOrder.join('|')) return
-    }
-    throw new Error('drag did not change station order after 3 attempts')
-  }
-
-  const getSavedEmpires = async (page: any) => {
-    return await page.evaluate(() => {
-      const data = localStorage.getItem('x4_empire_data')
-      if (!data) return null
-      return JSON.parse(data)
-    })
-  }
-
   test('标签拖拽重排成功', async ({ page }) => {
-    await addStations(page, 2)
-    const beforeOrder = await getStationOrder(page)
-    expect(beforeOrder).toHaveLength(3)
-
-    await dragWithRetry(page, 2, 0)
-
-    const afterOrder = await getStationOrder(page)
-    expect(afterOrder).toHaveLength(3)
-    expect(afterOrder[0]).toBe(beforeOrder[2])
-    expect(afterOrder.join('|')).not.toBe(beforeOrder.join('|'))
+    await createNamedStations(page, ['Alpha', 'Beta'])
+    const [first, alpha, beta] = await getStationIds(page)
+    const activeId = await page.locator('[data-testid="sidebar-station"].active').getAttribute('data-station-id')
+    await dragStationBeforeStation(page, beta!, first!)
+    await expect.poll(() => getStationIds(page)).toEqual([beta, first, alpha])
+    await expect(page.locator('[data-testid="sidebar-station"].active')).toHaveAttribute('data-station-id', activeId!)
+    await expect.poll(() => page.evaluate(() => (window as any).blueprintStore.activeEmpire.stations.map((s: { id: string }) => s.id))).toEqual([beta, first, alpha])
   })
 
   test('标签拖拽后第一个标签是空间站', async ({ page }) => {
-    await addStations(page, 2)
-
-    const firstTab = page.locator('[data-testid="sidebar-station"]').first()
-    await expect(firstTab).toBeVisible()
+    await createNamedStations(page, ['Alpha', 'Beta'])
+    const ids = await getStationIds(page)
+    await dragStationBeforeStation(page, ids[2]!, ids[0]!)
+    await expect(page.getByTestId('sidebar-station').first()).toHaveAttribute('data-station-id', ids[2]!)
   })
 
   test('保存并刷新后顺序保持', async ({ page }) => {
-    await addStations(page, 2)
-    await dragWithRetry(page, 2, 0)
-    const orderBeforeSave = await getStationOrder(page)
-
-    const saveBtn = page.locator('.btn-tool').filter({ hasText: /保存|Save/i }).first()
-    await saveBtn.click()
-    await page.waitForTimeout(200)
-
-    const savedEmpires = await getSavedEmpires(page)
-    const savedOrder = (savedEmpires?.list?.[0]?.stations ?? []).map((s: { id: string }) => s.id)
-    expect(savedOrder).toEqual(orderBeforeSave)
-
+    await createNamedStations(page, ['Alpha', 'Beta'])
+    const saved = await saveNewEmpire(page, 'Order Empire')
+    const [first, alpha, beta] = saved.stations.map(station => station.id)
+    const expected = [beta, first, alpha]
+    await dragStationBeforeStation(page, beta!, first!)
+    await expect.poll(() => getStationIds(page)).toEqual(expected)
+    await page.getByTestId('toolbar-save-btn').click()
+    await expect.poll(async () => (await readSavedEmpire(page)).stations.map(station => station.id)).toEqual(expected)
     await page.reload()
-    await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 10000 })
-
-    const orderAfterReload = await getStationOrder(page)
-    expect(orderAfterReload).toEqual(orderBeforeSave)
+    await expect.poll(() => getStationIds(page)).toEqual(expected)
+    expect((await readSavedEmpire(page)).id).toBe(saved.id)
   })
 
   test('取消拖拽不改变顺序', async ({ page }) => {
-    await addStations(page, 3)
-    const beforeOrder = await getStationOrder(page)
-
-    const source = page.locator('[data-testid="sidebar-station"]').nth(2)
-    const sourceBox = await source.boundingBox()
-    if (!sourceBox) {
-      throw new Error('missing source station tab bounding box')
-    }
-
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2)
-    await page.mouse.down()
-    await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 40, sourceBox.y + sourceBox.height / 2 + 120, { steps: 12 })
-    await page.mouse.up()
-    await page.waitForTimeout(300)
-
-    const afterOrder = await getStationOrder(page)
-    expect(afterOrder).toEqual(beforeOrder)
+    await createNamedStations(page, ['Alpha', 'Beta', 'Gamma'])
+    const before = await getStationIds(page)
+    await cancelStationDrag(page, before[2]!)
+    await expect.poll(() => getStationIds(page)).toEqual(before)
+    await expect.poll(() => page.evaluate(() => (window as any).blueprintStore.activeEmpire.stations.map((s: { id: string }) => s.id))).toEqual(before)
   })
 })
 
 test.describe('station-tab-drag web integration', () => {
-  test.beforeEach(async ({ page }) => {
-    await setupBase(page)
-  })
+  test.beforeEach(async ({ page }) => setupBase(page))
 
   test('W1: 标签拖拽重排成功', async ({ page }) => {
     await createNamedStations(page, ['Alpha', 'Beta'])
-    await waitForStationCount(page, 3)
-
-    const initial = await getStationNames(page)
-    const initialIds = await getStationIds(page)
-    const betaId = initialIds[2]!
-    const alphaId = initialIds[0]!
-    const expectedIds = [initialIds[0]!, initialIds[2]!, initialIds[1]!]
-
-    const attempts: Array<{ attempt: number, ids: string[], pos: Array<{ id: string, x: number }> }> = []
-    let finalIds = await getStationIds(page)
-    for (let attempt = 0; attempt < 3; attempt++) {
-      await dragStationBeforeStation(page, betaId, alphaId)
-      finalIds = await getStationIds(page)
-      attempts.push({
-        attempt: attempt + 1,
-        ids: finalIds,
-        pos: await getStationPositionSnapshot(page)
-      })
-      if (JSON.stringify(finalIds) === JSON.stringify(expectedIds)) {
-        break
-      }
-    }
-
-    expect(initial.length).toBe(3)
-    expect(
-      finalIds,
-      `拖拽后顺序未达到目标。expected=${JSON.stringify(expectedIds)} attempts=${JSON.stringify(attempts)}`
-    ).toEqual(expectedIds)
+    const ids = await getStationIds(page)
+    await dragStationBeforeStation(page, ids[2]!, ids[1]!)
+    await expect.poll(() => getStationIds(page)).toEqual([ids[0], ids[2], ids[1]])
+    await expect.poll(() => getStationNames(page)).toEqual(['新建空间站', 'Beta', 'Alpha'])
   })
 
   test('W2: 空间站标签首位', async ({ page }) => {
     await createNamedStations(page, ['Alpha', 'Beta'])
-    const firstTab = page.locator('[data-testid="sidebar-station"]').first()
-    await expect(firstTab).toBeVisible()
+    await waitForStationCount(page, 3)
+    await expect(page.getByTestId('sidebar-station').first()).toContainText('新建空间站')
+    await expect(page.getByTestId('sidebar-overview')).toBeVisible()
   })
 
   test('W3: 保存并刷新后顺序保持', async ({ page }) => {
     await createNamedStations(page, ['Alpha', 'Beta'])
-    await waitForStationCount(page, 3)
-    const initialIds = await getStationIds(page)
-    const betaId = initialIds[2]!
-    const alphaId = initialIds[0]!
-    const expected = [initialIds[0]!, initialIds[2]!, initialIds[1]!]
-
-    const attempts: Array<{ attempt: number, ids: string[], pos: Array<{ id: string, x: number }> }> = []
-    let finalIds = await getStationIds(page)
-    for (let attempt = 0; attempt < 3; attempt++) {
-      await dragStationBeforeStation(page, betaId, alphaId)
-      finalIds = await getStationIds(page)
-      attempts.push({
-        attempt: attempt + 1,
-        ids: finalIds,
-        pos: await getStationPositionSnapshot(page)
-      })
-      if (JSON.stringify(finalIds) === JSON.stringify(expected)) {
-        break
-      }
-    }
-    expect(
-      finalIds,
-      `保存前拖拽重排未达成。expected=${JSON.stringify(expected)} attempts=${JSON.stringify(attempts)}`
-    ).toEqual(expected)
-
-    await addOneModuleToMakePlanSavable(page)
-    await clickSaveAndAssertStatusMonitor(page)
-
+    await addEnergyCellModule(page)
+    const saved = await saveNewEmpire(page, 'Named Order Empire')
+    const ids = saved.stations.map(station => station.id)
+    const expected = [ids[0], ids[2], ids[1]]
+    await dragStationBeforeStation(page, ids[2]!, ids[1]!)
+    await expect.poll(() => getStationIds(page)).toEqual(expected)
+    await page.getByTestId('toolbar-save-btn').click()
+    await expect.poll(async () => (await readSavedEmpire(page)).stations.map(station => station.id)).toEqual(expected)
     await page.reload()
-    await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 10000 })
-
-    await waitForStationCount(page, 3)
-    const reloaded = await getStationIds(page)
-    expect(reloaded).toEqual(expected)
-
-    await expect(page.locator('[data-testid="sidebar-station"][data-station-id]')).toHaveCount(3)
+    await expect.poll(() => getStationIds(page)).toEqual(expected)
+    await expect.poll(() => getStationNames(page)).toEqual(['新建空间站', 'Beta', 'Alpha'])
+    const restored = await readSavedEmpire(page)
+    expect(restored.id).toBe(saved.id)
+    expect(restored.stations.find(station => station.id === ids[2])!.modules).toEqual([{ id: 'module_gen_prod_energycells_01', count: 1 }])
   })
 
   test('W4: 取消拖拽不改变顺序', async ({ page }) => {
     await createNamedStations(page, ['Alpha', 'Beta'])
-    const before = await getStationNames(page)
-
-    const source = page.locator('[data-testid="sidebar-station"]').nth(2)
-    const s = await source.boundingBox()
-    if (!s) throw new Error('missing source tab box')
-
-    await page.mouse.move(s.x + s.width / 2, s.y + s.height / 2)
-    await page.mouse.down()
-    await page.mouse.move(s.x + s.width / 2 + 12, s.y + s.height / 2 + 6)
-    await page.mouse.move(20, 20, { steps: 10 })
-    await page.mouse.up()
-    await page.waitForTimeout(300)
-
-    const after = await getStationNames(page)
-    expect(after).toEqual(before)
+    const beforeIds = await getStationIds(page)
+    const beforeNames = ['新建空间站', 'Alpha', 'Beta']
+    await expect.poll(() => getStationNames(page)).toEqual(beforeNames)
+    await cancelStationDrag(page, beforeIds[2]!)
+    await expect.poll(() => getStationIds(page)).toEqual(beforeIds)
+    await expect.poll(() => getStationNames(page)).toEqual(beforeNames)
   })
 })
 
@@ -475,17 +359,17 @@ test.describe('帝国数据持久化', () => {
   test.beforeEach(async ({ page }) => setupBase(page))
 
   test('保存的帝国数据在刷新后保留', async ({ page }) => {
-    const stationTab = page.locator('[data-testid="sidebar-station"]').first()
-    await expect(stationTab).toBeVisible()
-    const stationName = await stationTab.textContent()
-
-    await page.getByTestId('toolbar-save-btn').click()
+    const input = page.locator('.ghost-input.w-32').first()
+    await input.fill('Persistent Station')
+    await input.press('Tab')
+    const saved = await saveNewEmpire(page, 'Persistent Empire')
+    expect(saved.stations.map(station => station.name)).toEqual(['Persistent Station'])
     await page.reload()
-    await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 10000 })
-
-    const afterReload = page.locator('[data-testid="sidebar-station"]').first()
-    await expect(afterReload).toBeVisible()
-    await expect(afterReload).toContainText(stationName || '')
+    await expect.poll(() => getStationIds(page)).toEqual([saved.stations[0]!.id])
+    await expect.poll(() => getStationNames(page)).toEqual(['Persistent Station'])
+    await expect.poll(() => page.evaluate(() => (window as any).blueprintStore.activeEmpire.id)).toBe(saved.id)
+    await page.getByTestId('sidebar-station').click()
+    await expect(page.locator('.ghost-input.w-32').first()).toHaveValue('Persistent Station')
   })
 })
 

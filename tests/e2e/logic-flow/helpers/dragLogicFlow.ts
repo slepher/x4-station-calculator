@@ -3,38 +3,62 @@ import { expect, type Page } from '@playwright/test'
 type DropTarget = 'new' | number | { groupId: string }
 type DropStatus = 'normal' | 'duplicated' | 'auto' | 'isolated' | 'replace' | 'locked' | 'rejected'
 
+export async function expectDragIdle(page: Page): Promise<void> {
+  await expect(page.getByTestId('compact-view')).toBeHidden()
+  await expect(page.locator('.sortable-chosen, .sortable-ghost, .sortable-drag')).toHaveCount(0)
+  await expect.poll(() => page.evaluate(() => {
+    const store = (window as any).logicFlowStore
+    return [store.isDragging, store.draggingWareId, store.draggingLineage, store.hoveredGroupId, store.isHoveringNewZone, store.previewNodes.size]
+  })).toEqual([false, null, null, null, false, 0])
+}
+
 export async function attemptWareDrag(page: Page, wareId: string): Promise<void> {
-  const source = page.locator(`.ware-card-wrapper[data-ware-id="${wareId}"]:visible`).first()
-  await expect(source).toBeVisible()
+  await expectDragIdle(page)
+  const before = await page.evaluate(() => (window as any).logicFlowStore.groups)
+  const source = page.locator(`.ware-card-wrapper[data-ware-id="${wareId}"]:visible`)
+  await source.scrollIntoViewIfNeeded()
+  await expect(source).toHaveAttribute('draggable', 'false')
+  await expect(source.locator('.ware-card-add-btn')).toHaveCount(0)
   const box = await source.boundingBox()
   if (!box) throw new Error(`Source ware ${wareId} not found`)
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2, { steps: 5 })
   await page.mouse.down()
-  await page.mouse.move(box.x + box.width / 2 + 100, box.y + box.height / 2 + 100, { steps: 10 })
-  await expect(page.getByTestId('compact-view')).toHaveCount(0)
-  await page.mouse.up()
+  try {
+    await page.mouse.move(box.x + box.width / 2 + 100, box.y + box.height / 2 + 100, { steps: 10 })
+    await expectDragIdle(page)
+    await expect.poll(() => page.evaluate(() => (window as any).logicFlowStore.groups)).toEqual(before)
+  } finally {
+    await page.mouse.up()
+  }
+  await expectDragIdle(page)
+  await expect.poll(() => page.evaluate(() => (window as any).logicFlowStore.groups)).toEqual(before)
 }
 
 export async function startWareDrag(page: Page, wareId: string): Promise<void> {
-  const source = page.locator(`.ware-card-wrapper[data-ware-id="${wareId}"]:visible`).first()
-  await expect(source).toBeVisible()
+  await expectDragIdle(page)
+  const source = page.locator(`.ware-card-wrapper[data-ware-id="${wareId}"]:visible`)
+  await source.scrollIntoViewIfNeeded()
+  // Sortable resets the native draggable attribute on release and sets it on the next press.
+  await expect(source).toHaveClass(/is-draggable-tier/)
   const box = await source.boundingBox()
   if (!box) throw new Error(`Source ware ${wareId} not found`)
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2, { steps: 5 })
   await page.mouse.down()
-  await page.mouse.move(box.x + box.width / 2 + 5, box.y + box.height / 2 + 5, { steps: 5 })
-  await expect(page.getByTestId('compact-view')).toBeVisible({ timeout: 5000 })
+  await page.mouse.move(box.x + box.width / 2 + 30, box.y + box.height / 2 + 30, { steps: 10 })
+  await expect(page.getByTestId('compact-view')).toBeVisible()
+  await expect(source).toHaveClass(/sortable-chosen/)
+  await expect.poll(() => page.evaluate(() => {
+    const store = (window as any).logicFlowStore
+    return { active: store.isDragging, wareId: store.draggingWareId }
+  })).toEqual({ active: true, wareId })
 }
 
 export async function getGroupIdForWare(page: Page, wareId: string): Promise<string> {
-  const groupId = await page.evaluate((id) => {
-    const group = (window as any).logicFlowStore.groups.find((item: any) =>
-      item.nodes.some((node: any) => node.wareId === id)
-    )
-    return group?.id
-  }, wareId)
-  if (!groupId) throw new Error(`Group containing ${wareId} not found`)
-  return groupId
+  const ids = await page.evaluate((id) => (window as any).logicFlowStore.groups
+    .filter((group: any) => group.nodes.some((node: any) => node.wareId === id && node.source === 'manual'))
+    .map((group: any) => group.id), wareId)
+  expect(ids, `Unique group with manual ${wareId}`).toHaveLength(1)
+  return ids[0]
 }
 
 export async function dragWareToTarget(
@@ -44,199 +68,65 @@ export async function dragWareToTarget(
   options: { drop?: boolean; expectRejected?: boolean; expectedStatus?: DropStatus } = {}
 ) {
   const { drop = true, expectRejected = false } = options
-  const source = page.locator(`.ware-card-wrapper[data-ware-id="${wareId}"]:visible`).first()
-  await expect(page.getByTestId('compact-view')).toBeHidden()
-  await page.mouse.move(50, 50, { steps: 10 })
-  await source.scrollIntoViewIfNeeded()
-  await expect(source).toBeVisible()
-  const sourceBox = await source.boundingBox()
-  if (!sourceBox) throw new Error(`Source ware ${wareId} not found`)
-
-  const compactView = page.getByTestId('compact-view')
-  await source.hover()
-  await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, { steps: 5 })
-  await page.mouse.down()
-  await page.mouse.move(sourceBox.x + sourceBox.width / 2 + 30, sourceBox.y + sourceBox.height / 2 + 30, { steps: 10 })
-  await expect(compactView).toBeVisible()
-
+  let expectedStatus = options.expectedStatus
+  if (expectRejected) {
+    if (expectedStatus !== undefined) expect(expectedStatus).toBe('rejected')
+    expectedStatus = 'rejected'
+  }
+  const beforeGroups = await page.evaluate(() => (window as any).logicFlowStore.groups)
   const targetIndex = typeof target === 'object'
-    ? await page.evaluate((id) => (window as any).logicFlowStore.groups.findIndex((item: any) => item.id === id), target.groupId)
+    ? beforeGroups.findIndex((group: any) => group.id === target.groupId)
     : target
-  if (target !== 'new' && targetIndex === -1) throw new Error(`Logic Flow group ${target.groupId} not found`)
-  const targetLocator = target === 'new'
+  if (targetIndex !== 'new' && (!Number.isInteger(targetIndex) || targetIndex < 0 || targetIndex >= beforeGroups.length)) {
+    throw new Error(`Logic Flow drop target ${JSON.stringify(target)} not found`)
+  }
+  const groupId = targetIndex === 'new' ? 'new' : beforeGroups[targetIndex].id
+  await startWareDrag(page, wareId)
+  const sourceBox = await page.locator(`.ware-card-wrapper[data-ware-id="${wareId}"].sortable-chosen`).boundingBox()
+  const compactView = page.getByTestId('compact-view')
+  const targetLocator = targetIndex === 'new'
     ? compactView.locator('.compact-group').last()
-    : compactView.locator('.compact-group').nth(targetIndex as number)
-  await expect(targetLocator).toBeVisible()
+    : compactView.locator('.compact-group').nth(targetIndex)
   await targetLocator.scrollIntoViewIfNeeded()
   const targetBox = await targetLocator.boundingBox()
-  if (!targetBox) throw new Error('Logic Flow drop target not found')
   const compactBox = await compactView.boundingBox()
-  if (!compactBox) throw new Error('Compact view not found')
+  if (!targetBox || !compactBox) throw new Error('Logic Flow drop target not visible')
   await page.mouse.move(compactBox.x + 5, compactBox.y + 5, { steps: 10 })
   await page.mouse.move(targetBox.x + targetBox.width / 2, targetBox.y + targetBox.height / 2, { steps: 20 })
-  await expect.poll(() => page.evaluate(() => (window as any).logicFlowStore.isDragging)).toBe(true)
+  await expect.poll(() => page.evaluate(() => {
+    const store = (window as any).logicFlowStore
+    return { groupId: store.hoveredGroupId, newZone: store.isHoveringNewZone }
+  })).toEqual({ groupId: groupId === 'new' ? null : groupId, newZone: groupId === 'new' })
 
-  let groupId: string | undefined
-  let beforeWareCount: number | undefined
-  let beforeLineage: string | undefined
-  let effectiveLineage: string | undefined
-  let expectedModuleId: string | undefined
-  let beforeNodes: unknown
-  let resolvedStatus: DropStatus = 'normal'
-  if (target === 'new') {
-    await expect.poll(() => page.evaluate(() => (window as any).logicFlowStore.isHoveringNewZone)).toBe(true)
+  if (groupId === 'new') {
     await expect(targetLocator).toHaveClass(/border-blue-500\/50/)
-  } else {
-    groupId = typeof target === 'object'
-      ? target.groupId
-      : await page.evaluate((index) => (window as any).logicFlowStore.groups[index]?.id, target)
-    await expect.poll(() => page.evaluate(() => (window as any).logicFlowStore.hoveredGroupId)).toBe(groupId)
-    const state = await page.evaluate(({ id, ware }) => {
-      const store = (window as any).logicFlowStore
-      const group = store.groups.find((item: any) => item.id === id)
-      const lineage = group?.isLocked ? group.lockedLineage : store.draggingLineage || 'default'
-      return {
-        status: store.getWareGroupStatus(id, ware, lineage),
-        isLocked: group?.isLocked,
-        lineage,
-        moduleId: (window as any).gameDataStore?.findModuleForWare(ware, lineage)?.id,
-      }
-    }, { id: groupId, ware: wareId })
-    const actualStatus = state.status as string
-    effectiveLineage = state.lineage
-    expectedModuleId = state.moduleId
-    resolvedStatus = actualStatus === 'available'
-      ? (state.isLocked ? 'locked' : 'normal')
-      : actualStatus as DropStatus
-    if (options.expectedStatus) {
-      expect(resolvedStatus).toBe(options.expectedStatus)
-    }
-    beforeWareCount = await page.evaluate(({ id, ware }) => {
-      const group = (window as any).logicFlowStore.groups.find((item: any) => item.id === id)
-      return group?.nodes.filter((node: any) => node.wareId === ware).length
-    }, { id: groupId, ware: wareId })
-    beforeLineage = await page.evaluate(({ id, ware }) => {
-      const group = (window as any).logicFlowStore.groups.find((item: any) => item.id === id)
-      return group?.nodes.find((node: any) => node.wareId === ware)?.lineage
-    }, { id: groupId, ware: wareId })
-    beforeNodes = await page.evaluate((id) => {
-      const group = (window as any).logicFlowStore.groups.find((item: any) => item.id === id)
-      return group?.nodes.map((node: any) => ({
-        wareId: node.wareId,
-        moduleId: node.moduleId,
-        lineage: node.lineage,
-        source: node.source,
-        isIsolated: node.isIsolated,
-      }))
-    }, groupId)
-    if (resolvedStatus === 'rejected' || expectRejected) {
-      await expect(targetLocator).toHaveClass(/border-red-600/)
-      await expect(targetLocator.getByTestId('rejected-label')).toBeVisible()
-      await expect(targetLocator.locator('.compact-node.animate-pulse')).toHaveCount(0)
-    } else if (resolvedStatus === 'duplicated') {
-      await expect(targetLocator).toHaveClass(/border-red-500/)
-      await expect(targetLocator.getByTestId('duplicate-label')).toBeVisible()
-    } else if (resolvedStatus === 'isolated') {
-      await expect(targetLocator).toContainText(/连接|Connect/i)
-    } else if (resolvedStatus === 'auto') {
-      await expect(targetLocator).toContainText(/手动|Manual/i)
-      await expect(targetLocator.getByTestId('auto-label').locator('span')).toHaveClass(/text-blue-400/)
-    } else if (resolvedStatus === 'replace') {
-      await expect(targetLocator).toContainText(/替换|Replace/i)
-      await expect(targetLocator.getByTestId('replace-label').locator('span')).toHaveClass(/text-blue-400/)
-    } else if (resolvedStatus === 'locked') {
-      await expect(targetLocator).toHaveClass(/border-amber-500\/50/)
-    } else {
-      await expect(targetLocator).toHaveClass(/border-blue-500/)
-    }
+  } else if (expectedStatus === 'rejected') {
+    await expect(targetLocator).toHaveClass(/border-red-600/)
+    await expect(targetLocator.getByTestId('rejected-label')).toBeVisible()
+    await expect(targetLocator.locator('.compact-node.animate-pulse')).toHaveCount(0)
+  } else if (expectedStatus === 'duplicated') {
+    await expect(targetLocator).toHaveClass(/border-red-500/)
+    await expect(targetLocator.getByTestId('duplicate-label')).toBeVisible()
+  } else if (expectedStatus === 'isolated') {
+    await expect(targetLocator).toContainText(/连接|Connect/i)
+  } else if (expectedStatus === 'auto' || expectedStatus === 'replace') {
+    await expect(targetLocator.getByTestId(`${expectedStatus}-label`).locator('span')).toHaveClass(/text-blue-400/)
+    await expect(targetLocator).toContainText(expectedStatus === 'auto' ? /手动|Manual/i : /替换|Replace/i)
+  } else if (expectedStatus === 'locked') {
+    await expect(targetLocator).toHaveClass(/border-amber-500\/50/)
+  } else if (expectedStatus === 'normal') {
+    await expect(targetLocator).toHaveClass(/border-blue-500/)
   }
 
+  // Business outcomes belong to callers; an omitted status never derives its own oracle.
   if (drop) {
-    const beforeGroups = await page.locator('.production-group').count()
     await page.mouse.up()
-    await expect(compactView).toBeHidden()
-    if (target === 'new') {
-      await expect(page.locator('.production-group')).toHaveCount(beforeGroups + 1)
-    } else if (resolvedStatus === 'rejected' || resolvedStatus === 'duplicated' || expectRejected) {
-      await expect.poll(() => page.evaluate(({ id, ware }) => {
-        const group = (window as any).logicFlowStore.groups.find((item: any) => item.id === id)
-        return group?.nodes.filter((node: any) => node.wareId === ware).length
-      }, { id: groupId, ware: wareId })).toBe(beforeWareCount)
-    } else if (resolvedStatus === 'isolated') {
-      expect(expectedModuleId).toBeTruthy()
-      await expect.poll(() => page.evaluate(({ id, ware }) => {
-        const group = (window as any).logicFlowStore.groups.find((item: any) => item.id === id)
-        return group?.nodes.filter((node: any) => node.wareId === ware).length
-      }, { id: groupId, ware: wareId })).toBe(beforeWareCount)
-      await expect.poll(() => page.evaluate(({ id, ware }) => {
-        const group = (window as any).logicFlowStore.groups.find((item: any) => item.id === id)
-        return group?.nodes.find((node: any) => node.wareId === ware)?.isIsolated
-      }, { id: groupId, ware: wareId })).toBe(false)
-      await expect.poll(() => page.evaluate(({ id, ware, moduleId }) => {
-        const group = (window as any).logicFlowStore.groups.find((item: any) => item.id === id)
-        return group?.nodes.find((node: any) => node.wareId === ware)?.moduleId
-      }, { id: groupId, ware: wareId, moduleId: expectedModuleId })).toBe(expectedModuleId)
-      await expect.poll(() => page.evaluate(({ id, ware }) => {
-        const group = (window as any).logicFlowStore.groups.find((item: any) => item.id === id)
-        return group?.nodes.some((node: any) => node.wareId !== ware && node.source === 'auto' && !node.isIsolated)
-      }, { id: groupId, ware: wareId })).toBe(true)
-    } else if (resolvedStatus === 'auto') {
-      await expect.poll(() => page.evaluate(({ id, ware }) => {
-        const group = (window as any).logicFlowStore.groups.find((item: any) => item.id === id)
-        return group?.nodes.filter((node: any) => node.wareId === ware).length
-      }, { id: groupId, ware: wareId })).toBe(beforeWareCount)
-      await expect.poll(() => page.evaluate(({ id, ware }) => {
-        const group = (window as any).logicFlowStore.groups.find((item: any) => item.id === id)
-        return group?.nodes.find((node: any) => node.wareId === ware)?.source
-      }, { id: groupId, ware: wareId })).toBe('manual')
-    } else if (resolvedStatus === 'replace') {
-      await expect.poll(() => page.evaluate(({ id, ware }) => {
-        const group = (window as any).logicFlowStore.groups.find((item: any) => item.id === id)
-        return group?.nodes.filter((node: any) => node.wareId === ware).length
-      }, { id: groupId, ware: wareId })).toBe(beforeWareCount)
-      await expect.poll(() => page.evaluate(({ id, ware, previous }) => {
-        const group = (window as any).logicFlowStore.groups.find((item: any) => item.id === id)
-        return group?.nodes.find((node: any) => node.wareId === ware)?.lineage
-          !== previous
-      }, { id: groupId, ware: wareId, previous: beforeLineage })).toBe(true)
-    } else if (resolvedStatus === 'locked') {
-      expect(effectiveLineage).toBeTruthy()
-      expect(expectedModuleId).toBeTruthy()
-      await expect.poll(() => page.evaluate(({ id, ware, lineage }) => {
-        const group = (window as any).logicFlowStore.groups.find((item: any) => item.id === id)
-        const node = group?.nodes.find((item: any) => item.wareId === ware && item.source === 'manual')
-        return { count: group?.nodes.filter((item: any) => item.wareId === ware).length, lineage: node?.lineage, moduleId: node?.moduleId }
-      }, { id: groupId, ware: wareId, lineage: effectiveLineage })).toMatchObject({
-        count: (beforeWareCount ?? 0) + 1,
-        lineage: effectiveLineage,
-      })
-      await expect.poll(() => page.evaluate(({ id, ware, moduleId }) => {
-        const group = (window as any).logicFlowStore.groups.find((item: any) => item.id === id)
-        return group?.nodes.find((item: any) => item.wareId === ware && item.source === 'manual')?.moduleId
-      }, { id: groupId, ware: wareId, moduleId: expectedModuleId })).toBe(expectedModuleId)
-    } else if (resolvedStatus === 'normal') {
-      await expect.poll(() => page.evaluate(({ id, ware }) => {
-        const group = (window as any).logicFlowStore.groups.find((item: any) => item.id === id)
-        return group?.nodes.filter((node: any) => node.wareId === ware).length
-      }, { id: groupId, ware: wareId })).toBe((beforeWareCount ?? 0) + 1)
-    } else {
-      await expect.poll(() => page.evaluate(({ id, ware }) => {
-        const group = (window as any).logicFlowStore.groups.find((item: any) => item.id === id)
-        return group?.nodes.filter((node: any) => node.wareId === ware).length
-      }, { id: groupId, ware: wareId })).toBe((beforeWareCount ?? 0) + 1)
-    }
-    if (resolvedStatus === 'rejected' || resolvedStatus === 'duplicated' || expectRejected) {
-      await expect.poll(() => page.evaluate((id) => {
-        const group = (window as any).logicFlowStore.groups.find((item: any) => item.id === id)
-        return group?.nodes.map((node: any) => ({
-          wareId: node.wareId,
-          moduleId: node.moduleId,
-          lineage: node.lineage,
-          source: node.source,
-          isIsolated: node.isIsolated,
-        }))
-      }, groupId)).toEqual(beforeNodes)
+    await expectDragIdle(page)
+    if (groupId === 'new') {
+      await expect.poll(() => page.evaluate(() => (window as any).logicFlowStore.groups.length)).toBe(beforeGroups.length + 1)
+    } else if (expectedStatus === 'rejected' || expectedStatus === 'duplicated') {
+      await expect.poll(() => page.evaluate(() => (window as any).logicFlowStore.groups)).toEqual(beforeGroups)
     }
   }
-  return { sourceBox, targetBox, targetLocator, effectiveLineage }
+  return { sourceBox, targetBox, targetLocator }
 }

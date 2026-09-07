@@ -1,1124 +1,439 @@
 import { test } from '../../test-setup'
-import { expect, type Page } from '@playwright/test'
+import { expect, type Page, type Locator } from '@playwright/test'
 import { loadLiveBindingFixture } from '../live/helpers/loadLiveBindingFixture'
 
-const GAME_GUID = 'CB8837FE-98C1-42F8-9D6A-ED0ADC539111'
+const GUID = 'CB8837FE-98C1-42F8-9D6A-ED0ADC539111'
+const HUB = 'cluster_100_sector001_macro'
+const MERCURY = 'cluster_106_sector001_macro'
+const VIRTUAL = 'f36126e5-7798-ed14-3c03-938b961efa0b'
 
-async function waitForAppReady(page: Page) {
-  await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 15000 })
+async function ready(page: Page) {
+  await expect.poll(() => page.evaluate(() => (window as any).liveStore.autoGroupResult?.groups.length)).toBeGreaterThan(0)
 }
-
-async function migrateStorageKeys(page: Page, gameGuid: string) {
-  await page.evaluate(({ gameGuid }: { gameGuid: string }) => {
-    const pairs = [
-      ['x4_save_bindings', 'x4_save_bindings_v9'],
-      ['x4_save_archives', 'x4_save_archives_v9'],
-      ['x4_empire_data', 'x4_empire_data_v9'],
-    ]
-    for (const [oldKey, newKey] of pairs) {
-      const val = localStorage.getItem(oldKey)
-      if (val) localStorage.setItem(newKey, val)
+async function openMap(page: Page) {
+  await ready(page)
+  await page.getByTestId('top-view-btn-live-production').click()
+  await page.getByTestId('sidebar-auto-sector-group').click()
+  await page.locator('.auto-sector-bar .map-btn').click()
+  await expect(page.locator('.auto-sector-group-map-panel--tabs')).toBeVisible()
+}
+const tab = (page: Page, name: string) => page.locator('.tab-btn').filter({ hasText: new RegExp(`^${name}$`) })
+const hub = (page: Page) => page.locator('.group-item').filter({ has: page.locator('.pill--anchor .pill-label').filter({ hasText: /^小行星带$/ }) })
+const sector = (page: Page, id: string) => page.locator(`.sector-hover-target[data-map-sector-id="${id}"] .sector-polygon`)
+const existing = (page: Page) => page.locator('.virtual-row').filter({ has: page.locator('.virtual-name').filter({ hasText: /^新建空间站$/ }) })
+const virtualOverlay = (page: Page) => page.locator(`[data-placement-key="binding:station:${VIRTUAL}"]`)
+async function groups(page: Page) { return page.evaluate(() => (window as any).liveStore.autoGroupResult.groups) }
+async function drafts(page: Page) { return page.evaluate(() => (window as any).liveStore.virtualStationDrafts) }
+async function saved(page: Page) {
+  return page.evaluate(guid => {
+    const key = (window as any).gameDataStore.getStorageKey('save_archives').replace('save_archives', 'save_bindings')
+    return JSON.parse(localStorage.getItem(key)!).list.find((b: any) => b.gameGuid === guid)
+  }, GUID)
+}
+async function focusHub(page: Page) {
+  await tab(page, '枢纽').click()
+  await hub(page).locator('.pill--anchor .pill-label').click()
+}
+async function startDrag(page: Page, source: Locator) {
+  const point = await source.evaluate(el => {
+    const box = el.getBoundingClientRect()
+    for (const fx of [0.5, 0.35, 0.65]) for (const fy of [0.5, 0.35, 0.65]) {
+      const p = { x: box.x + box.width * fx, y: box.y + box.height * fy }
+      const hit = document.elementFromPoint(p.x, p.y)
+      if (hit && (el === hit || el.contains(hit))) return p
     }
-    localStorage.setItem('x4_station_active_view', JSON.stringify({
-      activeBinding: gameGuid,
-      activeView: 'live-production'
-    }))
-  }, { gameGuid })
-}
-
-async function navigateToMapBinding(page: Page) {
-  await page.getByTestId('top-view-btn-maps').click()
-  await page.waitForTimeout(1000)
-  const saveTab = page.getByTestId('map-save-panel-tab')
-  await expect(saveTab).toBeVisible({ timeout: 5000 })
-  await saveTab.click()
-  await page.waitForTimeout(1000)
-  await expect(page.getByTestId('map-save-panel')).toBeVisible({ timeout: 5000 })
-  const layer = await page.evaluate(() => (window as any).activeViewStore?.mapSavePanelLayer)
-  if (layer !== 'binding-sector') {
-    const bindBtn = page.getByTestId('save-group-bind-active')
-    if (await bindBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
-      await bindBtn.click()
-      await page.waitForTimeout(1000)
-    } else {
-      const bindBtn2 = page.getByTestId('save-group-bind')
-      if (await bindBtn2.isVisible({ timeout: 2000 }).catch(() => false)) {
-        await bindBtn2.click()
-        await page.waitForTimeout(1000)
-      }
-    }
-    // Re-init autoGroupResult after binding (watcher may clear it if archive invalid)
-    await page.waitForTimeout(500)
-    await ensureLiveAutoGroupResult(page)
-    await page.waitForTimeout(500)
-  }
-}
-
-async function enterEditMode(page: Page) {
-  await page.waitForTimeout(500)
-  // The edit button is in SectorGroupStatBar (bar-btn with t('sector.edit'))
-  const editBtn = page.locator('button').filter({ hasText: /编辑|Edit/ }).first()
-  if (await editBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
-    await editBtn.click()
-    await page.waitForTimeout(500)
-    return
-  }
-}
-
-async function getFirstGroupSector(page: Page): Promise<string | null> {
-  return page.evaluate(() => {
-    const result = (window as any).liveStore?.autoGroupResult
-    if (!result?.groups?.length) return null
-    return result.groups[0].coverageSectorMacros?.[0] || result.groups[0].sectorMacro || null
+    return null
   })
+  expect(point, 'drag source must receive actual pointer input').not.toBeNull()
+  await page.mouse.move(point!.x, point!.y, { steps: 5 })
+  await page.mouse.down()
+  await page.mouse.move(point!.x + 12, point!.y + 12, { steps: 4 })
+  await expect(source).toHaveClass(/dragging/)
 }
-
-async function snapshotGroups(page: Page) {
-  return page.evaluate(() => {
-    const r = (window as any).liveStore?.autoGroupResult
-    if (!r?.groups) return null
-    return {
-      count: r.groups.length,
-      ids: r.groups.map((g: any) => g.id),
-      coverageJson: JSON.stringify(r.groups.map((g: any) => g.coverage ?? [])),
-      connectionsJson: JSON.stringify(r.groups.map((g: any) => g.connectedGroupIds ?? [])),
-      jumpRanges: r.groups.map((g: any) => g.jumpRange),
+async function hoverSector(page: Page, id: string, fraction = 0.65) {
+  const point = await sector(page, id).evaluate((el, preferred) => {
+    const box = el.getBoundingClientRect()
+    const parent = el.closest('.sector-hover-target')!
+    for (const fx of [preferred, 0.2, 0.8, 0.35, 0.5]) for (const fy of [0.6, 0.35, 0.75]) {
+      const p = { x: box.x + box.width * fx, y: box.y + box.height * fy }
+      if (document.elementFromPoint(p.x, p.y)?.closest('.sector-hover-target') === parent) return p
     }
-  })
+    return null
+  }, fraction)
+  expect(point, 'drop target must hit the intended sector rather than a station overlay').not.toBeNull()
+  await page.mouse.move(point!.x, point!.y, { steps: 20 })
+  console.log('[M3.2-drag-target]', JSON.stringify({ id, point, hit: await page.evaluate(p => document.elementFromPoint(p!.x, p!.y)?.outerHTML.slice(0, 350), point) }))
+}
+async function drop(page: Page, source: Locator, id: string, fraction = 0.65) {
+  await startDrag(page, source)
+  await hoverSector(page, id, fraction)
+  await expect(page.locator('.placement-preview--binding')).toBeVisible()
+  await page.mouse.up()
+}
+async function confirm(page: Page) {
+  await tab(page, '交易站').click()
+  for (const option of await page.locator('.candidate-item--virtual').all()) await option.click()
+  const button = page.locator('.auto-sector-bar .confirm-btn')
+  await expect(button).toBeEnabled()
+  await button.click()
+  await expect(page.locator('.confirm-popup')).toBeHidden()
+  await expect(button).toBeDisabled()
 }
 
 test.beforeEach(async ({ page }) => {
-  await page.addStyleTag({
-    content: '*, *::before, *::after { transition: none !important; animation: none !important; }'
-  })
   await loadLiveBindingFixture(page)
-  await migrateStorageKeys(page, GAME_GUID)
+  await page.evaluate(guid => {
+    const key = (window as any).gameDataStore.getStorageKey('save_archives').replace('save_archives', 'save_bindings')
+    const state = JSON.parse(localStorage.getItem(key)!)
+    state.list.find((b: any) => b.gameGuid === guid).appliedAutoGroupArchiveTime = 667632.933
+    localStorage.setItem(key, JSON.stringify(state))
+  }, GUID)
   await page.reload()
-  await waitForAppReady(page)
+  await ready(page)
+})
+
+test('1.1/1.2/1.3/1.4/4.1/4.5/7.1/7.2 四页签中英切换与关闭重开保留真实 draft', async ({ page }) => {
+  await page.getByTestId('sidebar-auto-sector-group').click()
+  await expect(tab(page, '虚拟空间站')).toHaveCount(0)
+  await page.locator('.auto-sector-bar .map-btn').click()
+  await expect(page.locator('.auto-sector-group-map-panel--tabs')).toBeVisible()
+  await expect(page.locator('.binding-sector-group')).toHaveCount(0)
+  await page.getByRole('button', { name: '编辑', exact: true }).click()
+  await hub(page).locator('.color-chip').click()
+  await page.locator('.preset-color').first().click()
+  expect((await groups(page)).find((g: any) => g.sectorMacro === HUB).color).toBe('#f44e3b')
+  const before = await groups(page)
+  for (const [name, content] of [['分配方案', '.allocation-card'], ['交易站', '.trade-station-card'], ['虚拟空间站', '.virtual-station-tab'], ['枢纽', '.group-item']]) {
+    await tab(page, name!).click()
+    await expect(tab(page, name!)).toHaveClass(/active/)
+    await expect(page.locator(content!).first()).toBeVisible()
+    await expect(page.locator('.auto-sector-bar')).toBeVisible()
+  }
+  expect(await groups(page)).toEqual(before)
+  await page.getByRole('button', { name: '查看', exact: true }).click()
+  await tab(page, '虚拟空间站').click()
+  await expect(existing(page).locator('.virtual-delete')).toBeEnabled()
+  const language = page.locator('select').filter({ hasText: /简体中文|English/ })
+  await language.selectOption('en')
+  for (const label of ['Hub', 'Allocation', 'Trade Station', 'Virtual Station']) await expect(tab(page, label)).toBeVisible()
+  await language.selectOption('zh-CN')
+  await page.getByTestId('map-save-panel-close').click()
+  await expect(page.getByTestId('map-save-panel')).toBeHidden()
+  await page.getByTestId('map-save-panel-tab').click()
+  await expect(page.getByTestId('map-save-panel')).toBeVisible()
+  expect(await groups(page)).toEqual(before)
+})
+
+test('2.1/2.2/2.3 地图coverage和anchor定位，Live点击保留视口', async ({ page }) => {
+  await openMap(page)
+  const mercuryBefore = await sector(page, MERCURY).boundingBox()
+  await hub(page).locator('.pill--coverage .pill-label').filter({ hasText: /^水星$/ }).click()
+  const mercury = await sector(page, MERCURY).boundingBox()
+  expect(mercury).not.toBeNull()
+  expect(mercury).not.toEqual(mercuryBefore)
+  const asteroidBefore = await sector(page, HUB).boundingBox()
+  await hub(page).locator('.pill--anchor .pill-label').click()
+  const asteroid = await sector(page, HUB).boundingBox()
+  expect(asteroid).not.toBeNull()
+  expect(asteroid).not.toEqual(asteroidBefore)
+  expect(Math.abs(asteroid!.x - mercury!.x)).toBeLessThan(30)
+  const panelBox = await page.getByTestId('map-save-panel').boundingBox()
+  expect(panelBox).not.toBeNull()
+  expect(panelBox!.width).toBeLessThanOrEqual(360)
+  const cardBox = await hub(page).boundingBox()
+  expect(cardBox).not.toBeNull()
+  for (const pill of await hub(page).locator('.pill:visible').all()) {
+    const box = await pill.boundingBox()
+    expect(box).not.toBeNull()
+    expect(box!.x + box!.width).toBeLessThanOrEqual(cardBox!.x + cardBox!.width + 1)
+  }
+  const viewport = await page.evaluate(() => (window as any).mapStore.viewportState)
   await page.getByTestId('top-view-btn-live-production').click()
-  await page.waitForTimeout(200)
-  const langSelect = page.locator('select').filter({ hasText: /简体中文|English/ })
-  await langSelect.selectOption('zh-CN')
-  await page.waitForTimeout(500)
-
-  // Ensure autoGroupResult is initialized in live context, then propagate to map
-  await ensureLiveAutoGroupResult(page)
+  await page.getByTestId('sidebar-auto-sector-group').click()
+  await hub(page).locator('.pill--anchor .pill-label').click()
+  expect(await page.evaluate(() => (window as any).mapStore.viewportState)).toEqual(viewport)
 })
 
-async function ensureLiveAutoGroupResult(page: Page) {
-  const hasResult = await page.evaluate(() => {
-    const r = (window as any).liveStore?.autoGroupResult
-    return !!(r && r.groups?.length)
-  })
-  if (hasResult) return
-
-  await page.evaluate(async (gameGuid: string) => {
-    const w = window as any
-    if (w.activeViewStore) w.activeViewStore.activeBinding = gameGuid
-    if (w.saveBindingStore?.createOrOpenBinding) w.saveBindingStore.createOrOpenBinding(gameGuid)
-    const list = w.saveStore?.savedArchivesState?.list
-    if (list?.length > 0) {
-      const first = list[0]
-      if (w.saveStore?.selectArchive) await w.saveStore.selectArchive(first.guid, first.time)
-    }
-  }, GAME_GUID)
-  await page.waitForTimeout(500)
-  await page.evaluate(() => {
-    if ((window as any).liveStore?.initAutoGroupDraft) (window as any).liveStore.initAutoGroupDraft()
-  })
-  await page.waitForTimeout(500)
-}
-
-// ============================================================================
-// 1 Map 面板集成
-// ============================================================================
-test.describe('1 Map 面板集成', () => {
-
-  test('1.1 Map binding-sector 入口', async ({ page }) => {
-    // 1.1.1
-    await navigateToMapBinding(page)
-    const panel = page.locator('.auto-sector-group-map-panel')
-    await expect(panel.first()).toBeVisible({ timeout: 5000 })
-
-    // 1.1.2
-    const oldPanel = page.locator('.binding-sector-group')
-    await expect(oldPanel).not.toBeVisible()
-
-    // 1.1.3
-    const closeBtn = page.getByTestId('map-save-panel-close')
-    await expect(closeBtn).toBeVisible()
-    await closeBtn.click()
-    await page.waitForTimeout(500)
-    await expect(page.getByTestId('map-save-panel')).not.toBeVisible()
-  })
-
-  test('1.2 四个 Map tab', async ({ page }) => {
-    await navigateToMapBinding(page)
-    const editBtn = page.locator('.auto-sector-bar').getByRole('button', { name: /编辑|Edit/ })
-    if (await editBtn.isVisible()) { await editBtn.click(); await page.waitForTimeout(300) }
-
-    // 1.2.1
-    await expect(page.locator('.tab-bar')).toBeVisible()
-    const hubTab = page.locator('.tab-btn:has-text("枢纽")')
-    await expect(hubTab).toHaveClass(/active/)
-    await expect(page.locator('.group-item').first()).toBeVisible()
-
-    // 1.2.2
-    const allocTab = page.locator('.tab-btn:has-text("分配方案")')
-    await allocTab.click()
-    await page.waitForTimeout(300)
-    await expect(allocTab).toHaveClass(/active/)
-    await expect(page.locator('.tab-content')).toBeVisible()
-
-    // 1.2.3
-    const tsTab = page.locator('.tab-btn:has-text("交易站")')
-    await tsTab.click()
-    await page.waitForTimeout(300)
-    await expect(tsTab).toHaveClass(/active/)
-
-    // 1.2.4
-    const vsTab = page.locator('.tab-btn:has-text("虚拟空间站")')
-    await vsTab.click()
-    await page.waitForTimeout(300)
-    await expect(vsTab).toHaveClass(/active/)
-    await expect(page.locator('.virtual-station-tab')).toBeVisible()
-  })
-
-  test('1.3 Map tab 切换不计算', async ({ page }) => {
-    await navigateToMapBinding(page)
-    const editBtn = page.locator('.auto-sector-bar').getByRole('button', { name: /编辑|Edit/ })
-    if (await editBtn.isVisible()) { await editBtn.click(); await page.waitForTimeout(300) }
-
-    // 1.3.1
-    const before = await snapshotGroups(page)
-    expect(before).not.toBeNull()
-    const tabs = ['分配方案', '交易站', '虚拟空间站', '枢纽']
-    for (const tabName of tabs) {
-      await page.locator('.tab-btn', { hasText: new RegExp(tabName) }).click()
-      await page.waitForTimeout(200)
-    }
-    const after = await snapshotGroups(page)
-    expect(after?.count).toBe(before!.count)
-    expect(after?.coverageJson).toBe(before!.coverageJson)
-    expect(after?.connectionsJson).toBe(before!.connectionsJson)
-
-    // 1.3.2
-    const closeBtn = page.getByTestId('map-save-panel-close')
-    await closeBtn.click()
-    await page.waitForTimeout(500)
-    const saveTab = page.getByTestId('map-save-panel-tab')
-    await saveTab.click()
-    await page.waitForTimeout(1000)
-    const reopened = await snapshotGroups(page)
-    expect(reopened?.count).toBe(before!.count)
-
-    // 1.3.3
-    await expect(page.getByTestId('map-save-panel')).toBeVisible()
-  })
-
-  test('1.4 Virtual Station 不受状态限制', async ({ page }) => {
-    await navigateToMapBinding(page)
-    await enterEditMode(page)
-
-    // 1.4.1
-    const vsTab = page.locator('.tab-btn:has-text("虚拟空间站")')
-    await expect(vsTab).not.toBeDisabled()
-    await vsTab.click()
-    await page.waitForTimeout(300)
-    await expect(vsTab).toHaveClass(/active/)
-    await expect(page.locator('.virtual-station-tab')).toBeVisible()
-
-    // 1.4.2 Exit edit mode, verify Virtual Station still available
-    const exitBtn = page.locator('button').filter({ hasText: /退出|Exit/ }).first()
-    if (await exitBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
-      await exitBtn.click()
-      await page.waitForTimeout(500)
-    }
-    await expect(page.locator('.tab-btn:has-text("虚拟空间站")')).toBeVisible()
-  })
-
-  test('1.5 确认态', async ({ page }) => {
-    await navigateToMapBinding(page)
-
-    // 1.5.1 Enter edit mode then exit to show confirm button
-    await enterEditMode(page)
-    const exitBtn = page.locator('button').filter({ hasText: /退出|Exit/ }).first()
-    if (await exitBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
-      await exitBtn.click()
-      await page.waitForTimeout(500)
-    }
-    // Find and click confirm button (may be disabled if no changes)
-    const confirmBtn = page.locator('button').filter({ hasText: /确定|Confirm/ }).first()
-    if (await confirmBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
-      const isDisabled = await confirmBtn.isDisabled()
-      // Only proceed if confirm is enabled
-      if (!isDisabled) {
-        await confirmBtn.click()
-        await page.waitForTimeout(500)
-        const popupConfirmBtn = page.locator('.confirm-popup .confirm-btn')
-        if (await popupConfirmBtn.isVisible({ timeout: 1000 }).catch(() => false)) {
-          await popupConfirmBtn.click()
-          await page.waitForTimeout(500)
-        }
-      }
-    }
-
-    // 1.5.2
-    const panelVisible = await page.getByTestId('map-save-panel').isVisible()
-    expect(panelVisible).toBe(true)
-
-    // 1.5.3
-    const hasResult = await page.evaluate(() => {
-      return !!(window as any).liveStore?.autoGroupResult?.groups?.length
-    })
-    expect(hasResult).toBe(true)
-  })
+test('3.1/3.2/3.3/1.5 色卡预设与透明色提交刷新保持工作台', async ({ page }) => {
+  await openMap(page)
+  await expect(hub(page).locator('.color-chip')).toBeDisabled()
+  await expect(hub(page).locator('.color-chip')).toHaveCSS('width', '16px')
+  await expect(hub(page).locator('.color-chip')).toHaveCSS('height', '16px')
+  await page.getByRole('button', { name: '编辑', exact: true }).click()
+  await expect(page.locator('.auto-sector-bar .confirm-btn')).toBeVisible()
+  await hub(page).locator('.color-chip').click()
+  await page.locator('.preset-color').first().click()
+  await expect(page.locator('.preset-color')).toHaveCount(0)
+  expect((await groups(page)).find((g: any) => g.sectorMacro === HUB).color).toBe('#f44e3b')
+  await expect(hub(page).locator('.color-chip')).toHaveCSS('background-color', 'rgb(244, 78, 59)')
+  await expect(page.locator('.sector-group-color-layer polygon[fill="#f44e3b"]')).toHaveCount(2)
+  await hub(page).locator('.color-chip').click()
+  await page.locator('.preset-color').last().click()
+  await expect(hub(page).locator('.color-chip')).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)')
+  await expect.soft(hub(page).locator('.color-chip')).toHaveCSS('border-style', 'dashed')
+  expect.soft((await groups(page)).find((g: any) => g.sectorMacro === HUB).color).toBeUndefined()
+  await confirm(page)
+  expect.soft((await saved(page)).groups.find((g: any) => g.sectorMacro === HUB).color).toBeUndefined()
+  await expect(tab(page, '枢纽')).toBeVisible()
+  await expect(page.locator('.virtual-station-tab')).toBeHidden()
+  await page.reload()
+  await ready(page)
+  expect.soft((await groups(page)).find((g: any) => g.sectorMacro === HUB).color).toBeUndefined()
 })
 
-// ============================================================================
-// 2 地图联动与布局
-// ============================================================================
-test.describe('2 地图联动与布局', () => {
-
-  test('2.1 focus-sector', async ({ page }) => {
-    await navigateToMapBinding(page)
-
-    // 2.1.1 Coverage pill click emits focus-sector
-    const coveragePill = page.locator('.pill--coverage').first()
-    if (await coveragePill.isVisible({ timeout: 3000 }).catch(() => false)) {
-      // Record viewport transform before click
-      const beforeTransform = await page.evaluate(() => {
-        const vp = document.querySelector('.map-viewport')
-        return vp?.getAttribute('style') || ''
-      })
-      await coveragePill.click()
-      await page.waitForTimeout(500)
-      const afterTransform = await page.evaluate(() => {
-        const vp = document.querySelector('.map-viewport')
-        return vp?.getAttribute('style') || ''
-      })
-      // Viewport should respond — at minimum the element is present
-      expect(typeof beforeTransform).toBe('string')
-      expect(typeof afterTransform).toBe('string')
-    }
-
-    // 2.1.2 Anchor pill click
-    const anchorPill = page.locator('.pill--anchor').first()
-    if (await anchorPill.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await anchorPill.click()
-      await page.waitForTimeout(300)
-    }
-
-    // 2.1.3 Assignment sector name click
-    const allocTab = page.locator('.tab-btn:has-text("分配方案")')
-    if (await allocTab.isVisible() && !(await allocTab.isDisabled())) {
-      await allocTab.click()
-      await page.waitForTimeout(300)
-    }
-    await expect(page.getByTestId('map-save-panel')).toBeVisible()
-  })
-
-  test('2.2 Live 不触发地图事件', async ({ page }) => {
-    // 2.2.1
-    const sidebarEntry = page.getByTestId('sidebar-auto-sector-group')
-    await expect(sidebarEntry).toBeVisible({ timeout: 5000 })
-
-    // 2.2.2
-    await sidebarEntry.click()
-    await page.waitForTimeout(500)
-    await expect(page.getByTestId('sidebar-auto-sector-group')).toBeVisible()
-  })
-
-  test('2.3 compact 样式', async ({ page }) => {
-    // 2.3.1
-    await navigateToMapBinding(page)
-    const savePanel = page.getByTestId('map-save-panel')
-    const panelBox = await savePanel.boundingBox()
-    expect(panelBox).not.toBeNull()
-    expect(panelBox!.width).toBeLessThanOrEqual(370)
-
-    // 2.3.2
-    const groupItem = page.locator('.group-item').first()
-    if (await groupItem.isVisible({ timeout: 3000 }).catch(() => false)) {
-      const groupBox = await groupItem.boundingBox()
-      expect(groupBox).not.toBeNull()
-      expect(groupBox!.width).toBeLessThanOrEqual(panelBox!.width)
-    }
-
-    // 2.3.3
-    if (await groupItem.isVisible({ timeout: 1000 }).catch(() => false)) {
-      const groupBox = await groupItem.boundingBox()
-      expect(groupBox).not.toBeNull()
-    }
-  })
-
-  test('2.4 HubAddMenu context', async ({ page }) => {
-    await navigateToMapBinding(page)
-    await enterEditMode(page)
-
-    // 2.4.1
-    const addHubBtn = page.locator('.auto-sector-bar, .group-stat-bar').getByRole('button', { name: /添加|Add/ }).first()
-    if (await addHubBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await addHubBtn.click()
-      await page.waitForTimeout(300)
-      await expect(page.locator('.hub-add-menu')).toBeVisible({ timeout: 3000 })
-    }
-
-    // 2.4.2
-    const closeMenuBtn = page.locator('.hub-add-menu-close').first()
-    if (await closeMenuBtn.isVisible().catch(() => false)) {
-      await closeMenuBtn.click()
-      await page.waitForTimeout(300)
-    }
-
-    // 2.4.3
-    await expect(page.getByTestId('map-save-panel')).toBeVisible()
-  })
-
-  test('2.5 drag sort', async ({ page }) => {
-    await navigateToMapBinding(page)
-    await enterEditMode(page)
-
-    // 2.5.1
-    const groupItems = page.locator('.group-item')
-    const groupCount = await groupItems.count()
-    expect(groupCount).toBeGreaterThanOrEqual(1)
-
-    // 2.5.2
-    const before = await snapshotGroups(page)
-    expect(before).not.toBeNull()
-    if (before!.count >= 2) {
-      const beforeIds = before!.ids.join(',')
-      const firstCard = groupItems.first()
-      const lastCard = groupItems.last()
-      const firstBox = await firstCard.boundingBox()
-      const lastBox = await lastCard.boundingBox()
-      if (firstBox && lastBox) {
-        // 2.5.4 Drag via Playwright Mouse API
-        await page.mouse.move(firstBox.x + firstBox.width / 2, firstBox.y + firstBox.height / 2)
-        await page.mouse.down()
-        await page.mouse.move(firstBox.x + firstBox.width / 2 + 5, firstBox.y + firstBox.height / 2 + 5)
-        await page.mouse.move(lastBox.x + lastBox.width / 2, lastBox.y + lastBox.height / 2, { steps: 20 })
-        await page.mouse.up()
-        await page.waitForTimeout(500)
-      }
-    }
-
-    // 2.5.3 Verify group data not corrupted
-    const after = await snapshotGroups(page)
-    expect(after?.count).toBe(before!.count)
-    expect(after?.coverageJson).toBe(before!.coverageJson)
-    expect(after?.connectionsJson).toBe(before!.connectionsJson)
-  })
+test('4.2/4.3/5.2/5.3/5.5/5.6/7.4 空白真实创建、移动与删除保持草案边界', async ({ page }) => {
+  await openMap(page)
+  await focusHub(page)
+  await tab(page, '虚拟空间站').click()
+  await page.locator('.virtual-group').filter({ has: existing(page) }).locator('.virtual-group-title').click()
+  await expect(page.locator('.virtual-group-title')).toHaveText((await groups(page)).map((g: any) => g.name))
+  await expect(page.locator('.blueprint-empire-button')).toBeVisible()
+  const before = await saved(page)
+  expect(await drafts(page)).toHaveLength(1)
+  await expect(existing(page).locator('.virtual-sub')).toContainText('小行星带')
+  await expect(existing(page).locator('.virtual-sub')).toContainText('x:')
+  await drop(page, page.locator('.free-station-item--virtual'), HUB)
+  await expect.poll(() => drafts(page)).toHaveLength(2)
+  const created = (await drafts(page)).find((p: any) => p.id !== VIRTUAL)
+  expect(created).toMatchObject({ name: '新空间站', type: 'industrial', modules: [], lockedWares: [], warePriority: {}, sectorMacro: HUB, groupId: HUB })
+  expect(created.saveStationCode).toBeUndefined()
+  const row = page.locator('.virtual-row').filter({ has: page.locator('.virtual-name').filter({ hasText: /^新空间站$/ }) })
+  await drop(page, row, HUB, 0.35)
+  expect(await drafts(page)).toHaveLength(2)
+  expect((await drafts(page)).find((p: any) => p.id === created.id).position).not.toEqual(created.position)
+  expect((await saved(page)).stationPlans).toEqual(before.stationPlans)
+  await tab(page, '枢纽').click()
+  await expect(virtualOverlay(page)).toBeVisible()
+  await tab(page, '虚拟空间站').click()
+  await row.locator('.virtual-delete').click()
+  await expect(row).toHaveCount(0)
+  expect((await drafts(page)).map((p: any) => p.id)).toEqual([VIRTUAL])
+  expect((await saved(page)).stationPlans).toEqual(before.stationPlans)
 })
 
-// ============================================================================
-// 3 Hub Color 与 Overlay
-// ============================================================================
-test.describe('3 Hub Color 与 Overlay', () => {
-
-  test('3.1 色卡交互', async ({ page }) => {
-    await navigateToMapBinding(page)
-    await enterEditMode(page)
-
-    // Ensure we're actually in edit mode by checking store state
-    const inEditMode = await page.evaluate(() => {
-      return (window as any).liveStore?.calculationMode === 'edit'
-    })
-
-    // 3.1.1 Color swatch visible
-    const groupCard = page.locator('.group-item').first()
-    await expect(groupCard).toBeVisible({ timeout: 5000 })
-
-    // Find color-related element within group card
-    const swatchSelector = groupCard.locator('[class*="color"]').first()
-    await expect(swatchSelector).toBeVisible({ timeout: 3000 })
-
-    // 3.1.2 Swatch has dimensions
-    const swatchBox = await swatchSelector.boundingBox()
-    expect(swatchBox).not.toBeNull()
-    expect(swatchBox!.width).toBeGreaterThan(0)
-    expect(swatchBox!.height).toBeGreaterThan(0)
-
-    // 3.1.3 Swatch has style attribute
-    const swatchStyle = await swatchSelector.getAttribute('style')
-    expect(swatchStyle).not.toBeNull()
-
-    // 3.1.4 Click opens color picker (only if in edit mode and swatch is enabled)
-    if (inEditMode) {
-      const isSwatchDisabled = await swatchSelector.isDisabled().catch(() => true)
-      if (!isSwatchDisabled) {
-        await swatchSelector.click({ timeout: 3000 }).catch(() => {})
-        await page.waitForTimeout(500)
-
-        // 3.1.5 Check if SketchPicker opened
-        const picker = page.locator('[class*="sketch-picker"], [class*="color-picker"]').first()
-        const pickerVisible = await picker.isVisible({ timeout: 2000 }).catch(() => false)
-        if (pickerVisible) {
-          // Click a preset color
-          const preset = picker.locator('[class*="preset"], [style*="background"]').first()
-          if (await preset.isVisible({ timeout: 1000 }).catch(() => false)) {
-            await preset.click()
-            await page.waitForTimeout(500)
-          }
-        }
-      }
-    }
-
-    // 3.1.6 Swatch still exists after interaction
-    await expect(swatchSelector).toBeVisible({ timeout: 2000 })
-
-    // 3.1.7 Exit edit mode and verify swatch is not clickable
-    const exitBtn = page.locator('button').filter({ hasText: /退出|Exit/ }).first()
-    if (await exitBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
-      await exitBtn.click({ timeout: 3000 }).catch(() => {})
-      await page.waitForTimeout(300)
-    }
-    await expect(swatchSelector).toBeVisible({ timeout: 2000 })
-  })
-
-  test('3.2 颜色持久化', async ({ page }) => {
-    await navigateToMapBinding(page)
-    await enterEditMode(page)
-
-    // 3.2.1 Read existing group colors
-    const beforeColors = await page.evaluate(() => {
-      const groups = (window as any).liveStore?.autoGroupResult?.groups
-      return groups?.map((g: any) => g.color ?? null) ?? []
-    })
-    expect(beforeColors.length).toBeGreaterThan(0)
-
-    // Confirm changes (exit edit mode first so confirm button appears)
-    const exitBtn = page.locator('button').filter({ hasText: /退出|Exit/ }).first()
-    if (await exitBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
-      await exitBtn.click()
-      await page.waitForTimeout(500)
-    }
-    const confirmBtn = page.locator('button').filter({ hasText: /确定|Confirm/ }).first()
-    if (await confirmBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
-      const isDisabled = await confirmBtn.isDisabled()
-      if (!isDisabled) {
-        await confirmBtn.click()
-        await page.waitForTimeout(500)
-        const popupConfirmBtn = page.locator('.confirm-popup .confirm-btn')
-        if (await popupConfirmBtn.isVisible({ timeout: 1000 }).catch(() => false)) {
-          await popupConfirmBtn.click()
-          await page.waitForTimeout(500)
-        }
-      }
-    }
-
-    // 3.2.2 Verify no transparent color persisted
-    const persistedColors = await page.evaluate(() => {
-      const binding = (window as any).saveBindingStore?.activeBinding
-      return binding?.groups?.map((g: any) => g.color ?? null) ?? []
-    })
-    for (const c of persistedColors) {
-      if (c !== null && c !== undefined) {
-        expect(c).not.toBe('#00000000')
-        expect(c).not.toBe('0x00000000')
-        expect(c).not.toBe('transparent')
-      }
-    }
-
-    // 3.2.3 Reload and verify colors preserved
-    await page.reload()
-    await waitForAppReady(page)
-    await page.getByTestId('top-view-btn-live-production').click()
-    await page.waitForTimeout(200)
-    await ensureLiveAutoGroupResult(page)
-    await navigateToMapBinding(page)
-    const afterColors = await page.evaluate(() => {
-      const groups = (window as any).liveStore?.autoGroupResult?.groups
-      return groups?.map((g: any) => g.color ?? null) ?? []
-    })
-    expect(afterColors.length).toBe(beforeColors.length)
-  })
-
-  test('3.3 map binding edit mode keeps confirm visible', async ({ page }) => {
-    await navigateToMapBinding(page)
-    await enterEditMode(page)
-
-    const confirmBtn = page.getByRole('button', { name: /确定|Confirm/ })
-    await expect(confirmBtn).toBeVisible({ timeout: 3000 })
-  })
-
-  test('3.4 calculate preserves edited group color by anchor sector', async ({ page }) => {
-    await navigateToMapBinding(page)
-    await enterEditMode(page)
-
-    const edited = await page.evaluate(() => {
-      const liveStore = (window as any).liveStore
-      const result = liveStore?.autoGroupResult
-      const group = result?.groups?.find((item: any) => item.sectorMacro)
-      if (!liveStore || !result || !group) return null
-      const color = '#123456'
-      liveStore.autoGroupResult = {
-        ...result,
-        groups: result.groups.map((item: any) =>
-          item.id === group.id ? { ...item, color } : item
-        )
-      }
-      return { sectorMacro: group.sectorMacro, color }
-    })
-    expect(edited).toBeTruthy()
-
-    await page.getByRole('button', { name: /计算|Calculate/ }).first().click()
-    await page.waitForTimeout(500)
-
-    const afterColor = await page.evaluate((expected) => {
-      const groups = (window as any).liveStore?.autoGroupResult?.groups ?? []
-      return groups.find((group: any) => group.sectorMacro === expected.sectorMacro)?.color ?? null
-    }, edited)
-    expect(afterColor).toBe(edited!.color)
-
-    const svgContent = await page.getByTestId('map-svg-canvas').innerHTML()
-    expect(svgContent).toContain('#123456')
-  })
-
-  test('3.5 地图颜色来源', async ({ page }) => {
-    // 3.3.1 Navigate to map binding-sector and check map canvas
-    await navigateToMapBinding(page)
-    const mapCanvas = page.locator('[data-testid="map-svg-canvas"]')
-    const canvasVisible = await mapCanvas.isVisible({ timeout: 5000 }).catch(() => false)
-    expect(canvasVisible).toBe(true)
-
-    // 3.3.1 Map SVG should contain sector elements with color overlays
-    const svgContent = await mapCanvas.innerHTML()
-    expect(svgContent.length).toBeGreaterThan(0)
-
-    // 3.3.2 Close panel, map still renders colors from persisted binding
-    const closeBtn = page.getByTestId('map-save-panel-close')
-    await closeBtn.click()
-    await page.waitForTimeout(500)
-    await expect(page.getByTestId('map-save-panel')).not.toBeVisible()
-    // Map canvas should still be visible
-    await expect(page.locator('[data-testid="map-svg-canvas"]')).toBeVisible({ timeout: 3000 })
-  })
-
-  test('3.6 overlay 层级', async ({ page }) => {
-    // 3.4.1 Navigate and check map rendering
-    await navigateToMapBinding(page)
-    const mapCanvas = page.locator('[data-testid="map-svg-canvas"]')
-    const canvasVisible = await mapCanvas.isVisible({ timeout: 5000 }).catch(() => false)
-    expect(canvasVisible).toBe(true)
-
-    // 3.4.2
-    const hexElements = mapCanvas.locator('polygon, path, [class*="hex"], [class*="sector"]').first()
-    const hexVisible = await hexElements.isVisible({ timeout: 3000 }).catch(() => false)
-    // Hex elements may use various shapes; verify SVG is not empty regardless
-    const svgContent = await mapCanvas.innerHTML()
-    expect(svgContent.length).toBeGreaterThan(0)
-
-    // 3.4.3 Panel is still visible
-    await expect(page.getByTestId('map-save-panel')).toBeVisible()
-  })
+test('5.4/7.3 无覆盖sector拒绝真实drop，不使用fallback group', async ({ page }) => {
+  await openMap(page)
+  await page.getByRole('button', { name: '编辑', exact: true }).click()
+  await hub(page).locator('.pill--coverage .pill-label').filter({ hasText: /^水星$/ }).click()
+  await hub(page).locator('.jump-input').fill('0')
+  expect((await groups(page)).flatMap((g: any) => [g.sectorMacro, ...g.coverageSectorMacros])).not.toContain(MERCURY)
+  await tab(page, '虚拟空间站').click()
+  const before = await drafts(page)
+  await startDrag(page, existing(page))
+  await hoverSector(page, MERCURY)
+  await expect(page.locator('.placement-preview--binding')).toHaveCount(0)
+  await page.mouse.up()
+  expect(await drafts(page)).toEqual(before)
 })
 
-// ============================================================================
-// 4 Virtual Station Tab
-// ============================================================================
-test.describe('4 Virtual Station Tab', () => {
-
-  test('4.1 Map-only tab', async ({ page }) => {
-    // 4.1.1
-    await navigateToMapBinding(page)
-    await enterEditMode(page)
-    await expect(page.locator('.tab-btn:has-text("虚拟空间站")')).toBeVisible({ timeout: 5000 })
-    await page.locator('.tab-btn:has-text("虚拟空间站")').click()
-    await page.waitForTimeout(300)
-    await expect(page.locator('.virtual-station-tab')).toBeVisible()
-
-    // 4.1.2
-    await expect(page.locator('.tab-btn:has-text("虚拟空间站")')).toBeVisible()
-  })
-
-  test('4.2 blueprint 来源', async ({ page }) => {
-    // 4.2.1
-    await navigateToMapBinding(page)
-    await enterEditMode(page)
-    await page.locator('.tab-btn:has-text("虚拟空间站")').click()
-    await page.waitForTimeout(300)
-    await expect(page.locator('.virtual-station-tab')).toBeVisible()
-
-    // 4.2.2
-    const freeItems = page.locator('.free-station-item')
-    const freeCount = await freeItems.count()
-    expect(freeCount).toBeGreaterThanOrEqual(0)
-
-    // 4.2.3
-    await expect(page.locator('.virtual-station-tab')).toBeVisible()
-  })
-
-  test('4.3 grouped list', async ({ page }) => {
-    // 4.3.1 Virtual groups rendered in order matching autoGroupResult.groups
-    await navigateToMapBinding(page)
-    await enterEditMode(page)
-    await page.locator('.tab-btn:has-text("虚拟空间站")').click()
-    await page.waitForTimeout(300)
-    const virtualGroups = page.locator('.virtual-group')
-    const vgCount = await virtualGroups.count()
-
-    // 4.3.2 Each virtual-row shows content
-    const virtualRows = page.locator('.virtual-row')
-    const rowCount = await virtualRows.count()
-    if (rowCount > 0) {
-      const firstRowText = await virtualRows.first().innerText()
-      expect(firstRowText.length).toBeGreaterThan(0)
-    }
-
-    // 4.3.3 Virtual station tab content visible
-    await expect(page.locator('.virtual-station-tab')).toBeVisible()
-  })
-
-  test('4.4 ungrouped list', async ({ page }) => {
-    // 4.4.1
-    await navigateToMapBinding(page)
-    await enterEditMode(page)
-    await page.locator('.tab-btn:has-text("虚拟空间站")').click()
-    await page.waitForTimeout(300)
-    await expect(page.locator('.virtual-station-tab')).toBeVisible()
-
-    // 4.4.2
-    const tabText = await page.locator('.virtual-station-tab').innerText()
-    expect(typeof tabText).toBe('string')
-  })
-
-  test('4.5 文案本地化', async ({ page }) => {
-    // 4.5.1
-    await navigateToMapBinding(page)
-    await expect(page.locator('.tab-btn:has-text("枢纽")')).toBeVisible()
-    await expect(page.locator('.tab-btn:has-text("分配方案")')).toBeVisible()
-    await expect(page.locator('.tab-btn:has-text("交易站")')).toBeVisible()
-    await expect(page.locator('.tab-btn:has-text("虚拟空间站")')).toBeVisible()
-
-    // 4.5.2
-    const langSelect = page.locator('select').filter({ hasText: /简体中文|English/ })
-    await langSelect.selectOption('en')
-    await page.waitForTimeout(500)
-    await expect(page.locator('.tab-btn:has-text("Hub")')).toBeVisible()
-    await expect(page.locator('.tab-btn:has-text("Allocation")')).toBeVisible()
-    await expect(page.locator('.tab-btn:has-text("Trade Station")')).toBeVisible()
-    await expect(page.locator('.tab-btn:has-text("Virtual Station")')).toBeVisible()
-
-    // 4.5.3
-    await langSelect.selectOption('zh-CN')
-    await page.waitForTimeout(500)
-    await expect(page.locator('.tab-btn:has-text("虚拟空间站")')).toBeVisible()
-  })
+test('5.4.2/7.3.1 多group覆盖拒绝真实drop且不选择fallback', async ({ page }) => {
+  await page.evaluate(({ guid, mercury }) => {
+    const key = (window as any).gameDataStore.getStorageKey('save_archives').replace('save_archives', 'save_bindings')
+    const state = JSON.parse(localStorage.getItem(key)!)
+    const binding = state.list.find((b: any) => b.gameGuid === guid)
+    binding.groups = binding.groups.slice(0, 2).map((g: any) => ({ ...g, coverageSectorMacros: [{ ref: mercury, jump: 3 }], connectedGroupIds: [] }))
+    localStorage.setItem(key, JSON.stringify(state))
+  }, { guid: GUID, mercury: MERCURY })
+  await page.reload()
+  await openMap(page)
+  expect((await groups(page)).filter((g: any) => g.coverageSectorMacros.includes(MERCURY))).toHaveLength(2)
+  await hub(page).locator('.pill--coverage .pill-label').filter({ hasText: /^水星$/ }).click()
+  await tab(page, '虚拟空间站').click()
+  const before = await drafts(page)
+  await startDrag(page, existing(page))
+  await hoverSector(page, MERCURY)
+  // Coverage union permits a preview; unique group ownership is validated on release.
+  await expect(page.locator('.placement-preview--binding')).toBeVisible()
+  await page.mouse.up()
+  expect(await drafts(page)).toEqual(before)
 })
 
-// ============================================================================
-// 5 Virtual Station Drag 与 Overlay
-// ============================================================================
-test.describe('5 Virtual Station Drag 与 Overlay', () => {
-
-  test('5.1 blueprint 创建', async ({ page }) => {
-    await navigateToMapBinding(page)
-    await enterEditMode(page)
-    await page.locator('.tab-btn:has-text("虚拟空间站")').click()
-    await page.waitForTimeout(300)
-
-    // 5.1.1
-    const freeItems = page.locator('.free-station-item')
-    const freeCount = await freeItems.count()
-    expect(freeCount).toBeGreaterThanOrEqual(0)
-
-    // Get valid sectorMacro from existing groups
-    const sectorMacro = await getFirstGroupSector(page)
-
-    // 5.1.2
-    if (sectorMacro) {
-      const beforeCount = await page.evaluate(() => (window as any).liveStore?.virtualStationDrafts?.length ?? 0)
-      await page.evaluate((sector: string) => {
-        const liveStore = (window as any).liveStore
-        if (liveStore?.createBlankVirtualStationDraft) {
-          liveStore.createBlankVirtualStationDraft({ sectorMacro: sector, position: { x: 0, y: 0, z: 0 } })
-        }
-      }, sectorMacro)
-      await page.waitForTimeout(300)
-      const afterCount = await page.evaluate(() => (window as any).liveStore?.virtualStationDrafts?.length ?? 0)
-      expect(afterCount).toBeGreaterThanOrEqual(beforeCount)
-
-      // 5.1.3
-      const draft = await page.evaluate((sector: string) => {
-        const drafts = (window as any).liveStore?.virtualStationDrafts ?? []
-        return drafts.find((d: any) => d.sectorMacro === sector) ?? null
-      }, sectorMacro)
-      expect(draft).not.toBeNull()
-      if (draft) {
-        expect(draft.type).toBe('industrial')
-        expect(draft.modules).toEqual([])
-      }
-
-      // 5.1.4
-      if (draft) {
-        expect(draft.saveStationCode).toBeUndefined()
-      }
-    }
-  })
-
-  test('5.2 blank 创建', async ({ page }) => {
-    // 5.2.1
-    await navigateToMapBinding(page)
-    await enterEditMode(page)
-    await page.locator('.tab-btn:has-text("虚拟空间站")').click()
-    await page.waitForTimeout(300)
-    await expect(page.locator('.virtual-station-tab')).toBeVisible()
-
-    const sectorMacro = await getFirstGroupSector(page)
-
-    // 5.2.2
-    if (sectorMacro) {
-      await page.evaluate((sector: string) => {
-        const liveStore = (window as any).liveStore
-        if (liveStore?.createBlankVirtualStationDraft) {
-          liveStore.createBlankVirtualStationDraft({ sectorMacro: sector, position: { x: 100, y: 200, z: 0 } })
-        }
-      }, sectorMacro)
-      await page.waitForTimeout(300)
-      const blankDraft = await page.evaluate((sector: string) => {
-        const drafts = (window as any).liveStore?.virtualStationDrafts ?? []
-        return drafts.find((d: any) => d.sectorMacro === sector) ?? null
-      }, sectorMacro)
-      expect(blankDraft).not.toBeNull()
-      if (blankDraft) {
-        expect(blankDraft.type).toBe('industrial')
-        expect(blankDraft.modules).toEqual([])
-        expect(blankDraft.lockedWares).toEqual([])
-        expect(blankDraft.saveStationCode).toBeUndefined()
-      }
-    }
-  })
-
-  test('5.3 existing draft 移动', async ({ page }) => {
-    // 5.3.1
-    await navigateToMapBinding(page)
-    await enterEditMode(page)
-    await page.locator('.tab-btn:has-text("虚拟空间站")').click()
-    await page.waitForTimeout(300)
-
-    const sectorMacro = await getFirstGroupSector(page)
-    expect(sectorMacro).not.toBeNull()
-
-    const draftId = await page.evaluate((sector: string) => {
-      const liveStore = (window as any).liveStore
-      if (liveStore?.createBlankVirtualStationDraft) {
-        const draft = liveStore.createBlankVirtualStationDraft({ sectorMacro: sector, position: { x: 10, y: 20, z: 0 } })
-        return draft?.id ?? null
-      }
-      return null
-    }, sectorMacro!)
-    await page.waitForTimeout(300)
-    expect(draftId).not.toBeNull()
-
-    // 5.3.2
-    if (draftId) {
-      const beforeCount = await page.evaluate(() => (window as any).liveStore?.virtualStationDrafts?.length ?? 0)
-      await page.evaluate(({ draftId, sector }: { draftId: string; sector: string }) => {
-        const drafts = (window as any).liveStore?.virtualStationDrafts ?? []
-        const draft = drafts.find((d: any) => d.id === draftId)
-        if (draft) {
-          draft.sectorMacro = sector
-          draft.position = { x: 50, y: 60, z: 0 }
-        }
-      }, { draftId, sector: sectorMacro! })
-      await page.waitForTimeout(300)
-      const afterCount = await page.evaluate(() => (window as any).liveStore?.virtualStationDrafts?.length ?? 0)
-      expect(afterCount).toBe(beforeCount)
-    }
-  })
-
-  test('5.4 drop 拒绝', async ({ page }) => {
-    // 5.4.1
-    await navigateToMapBinding(page)
-    const coverage = await page.evaluate(() => {
-      const result = (window as any).liveStore?.autoGroupResult
-      if (!result?.groups) return null
-      const covered = new Set<string>()
-      for (const g of result.groups) {
-        covered.add(g.sectorMacro)
-        for (const c of (g.coverage ?? [])) { covered.add(c) }
-      }
-      return { coveredCount: covered.size }
-    })
-    expect(coverage).not.toBeNull()
-    expect(coverage!.coveredCount).toBeGreaterThan(0)
-
-    // 5.4.2
-    const multiCoverage = await page.evaluate(() => {
-      const result = (window as any).liveStore?.autoGroupResult
-      if (!result?.groups) return null
-      const sectorMap = new Map<string, string[]>()
-      for (const g of result.groups) {
-        const all = [g.sectorMacro, ...(g.coverage ?? [])]
-        for (const s of all) {
-          if (!sectorMap.has(s)) sectorMap.set(s, [])
-          sectorMap.get(s)!.push(g.id)
-        }
-      }
-      const multi: string[] = []
-      for (const [s, ids] of sectorMap) { if (ids.length > 1) multi.push(s) }
-      return multi.length
-    })
-    expect(multiCoverage).toBe(0)
-  })
-
-  test('5.5 删除', async ({ page }) => {
-    // 5.5.1
-    await navigateToMapBinding(page)
-    await enterEditMode(page)
-    await page.locator('.tab-btn:has-text("虚拟空间站")').click()
-    await page.waitForTimeout(300)
-
-    const sectorMacro = await getFirstGroupSector(page)
-    expect(sectorMacro).not.toBeNull()
-
-    const draftId = await page.evaluate((sector: string) => {
-      const liveStore = (window as any).liveStore
-      if (liveStore?.createBlankVirtualStationDraft) {
-        const draft = liveStore.createBlankVirtualStationDraft({ sectorMacro: sector, position: { x: 0, y: 0, z: 0 } })
-        return draft?.id ?? null
-      }
-      return null
-    }, sectorMacro!)
-    await page.waitForTimeout(300)
-    expect(draftId).not.toBeNull()
-
-    // 5.5.2
-    if (draftId) {
-      const beforeCount = await page.evaluate(() => (window as any).liveStore?.virtualStationDrafts?.length ?? 0)
-      await page.evaluate(({ draftId }: { draftId: string }) => {
-        const liveStore = (window as any).liveStore
-        if (liveStore?.virtualStationDrafts) {
-          liveStore.virtualStationDrafts = liveStore.virtualStationDrafts.filter((d: any) => d.id !== draftId)
-        }
-      }, { draftId })
-      await page.waitForTimeout(300)
-      const afterCount = await page.evaluate(() => (window as any).liveStore?.virtualStationDrafts?.length ?? 0)
-      expect(afterCount).toBeLessThan(beforeCount)
-    }
-  })
-
-  test('5.6 overlay 激活', async ({ page }) => {
-    // 5.6.1
-    await navigateToMapBinding(page)
-    await enterEditMode(page)
-
-    const sectorMacro = await getFirstGroupSector(page)
-    if (sectorMacro) {
-      await page.evaluate((sector: string) => {
-        const liveStore = (window as any).liveStore
-        if (liveStore?.createBlankVirtualStationDraft) {
-          liveStore.createBlankVirtualStationDraft({ sectorMacro: sector, position: { x: 30, y: 40, z: 0 } })
-        }
-      }, sectorMacro)
-    }
-    await page.waitForTimeout(500)
-    await expect(page.getByTestId('map-save-panel')).toBeVisible()
-
-    // 5.6.2
-    await page.locator('.tab-btn:has-text("枢纽")').click()
-    await page.waitForTimeout(300)
-    const hubActive = await page.locator('.tab-btn:has-text("枢纽")').evaluate(el => el.classList.contains('active'))
-    expect(hubActive).toBe(true)
-  })
+test('3.2.1/3.2.3 预设非透明颜色确认并reload保持', async ({ page }) => {
+  await openMap(page)
+  await page.getByRole('button', { name: '编辑', exact: true }).click()
+  await hub(page).locator('.color-chip').click()
+  await page.locator('.preset-color').first().click()
+  await confirm(page)
+  expect((await saved(page)).groups.find((g: any) => g.sectorMacro === HUB).color).toBe('#f44e3b')
+  await page.reload()
+  await openMap(page)
+  expect((await groups(page)).find((g: any) => g.sectorMacro === HUB).color).toBe('#f44e3b')
+  await expect(hub(page).locator('.color-chip')).toHaveCSS('background-color', 'rgb(244, 78, 59)')
+  await expect(page.locator('.sector-group-color-layer polygon[fill="#f44e3b"]')).toHaveCount(2)
 })
 
-// ============================================================================
-// 6 Virtual Trade Station Drag
-// ============================================================================
-test.describe('6 Virtual Trade Station Drag', () => {
-
-  test('6.1 overlay 渲染', async ({ page }) => {
-    // 6.1.1
-    await navigateToMapBinding(page)
-    await enterEditMode(page)
-    const tsTab = page.locator('.tab-btn:has-text("交易站")')
-    if (!(await tsTab.isDisabled())) { await tsTab.click(); await page.waitForTimeout(300) }
-
-    // 6.1.2 Trade station cards visible with content
-    const tsCards = page.locator('.trade-station-card')
-    const cardCount = await tsCards.count()
-    expect(cardCount).toBeGreaterThanOrEqual(0)
-    // Verify at least one card has meaningful content
-    if (cardCount > 0) {
-      const firstCardText = await tsCards.first().innerText()
-      expect(firstCardText.length).toBeGreaterThan(0)
-    }
+test('4.2/5.1 从蓝图真实拖放复制模块设置且不复制身份', async ({ page }) => {
+  await openMap(page)
+  await tab(page, '虚拟空间站').click()
+  await page.locator('.virtual-group').filter({ has: existing(page) }).locator('.virtual-group-title').click()
+  await page.locator('.blueprint-empire-button').click()
+  await page.locator('.bind-menu-item').filter({ has: page.locator('.bind-menu-item-name').filter({ hasText: /^Empire 1$/ }) }).click()
+  const source = page.locator('.free-station-item').filter({ has: page.locator('.station-name').filter({ hasText: /^E1-S1$/ }) })
+  await expect(source).toBeVisible()
+  const before = await saved(page)
+  await drop(page, source, HUB)
+  await expect.poll(() => drafts(page)).toHaveLength(2)
+  const created = (await drafts(page)).find((p: any) => p.id !== VIRTUAL)
+  expect(created.id).not.toBe('empire-1-station-1')
+  expect(created).toMatchObject({
+    name: 'E1-S1', type: 'industrial', sectorMacro: HUB, groupId: HUB,
+    modules: [{ id: 'module_gen_prod_claytronics_01', count: 6 }, { id: 'module_gen_prod_hullparts_01', count: 12 }],
+    settings: { sunlight: 100, racePreference: 'argon', resourceBufferHours: 1, showEmpireGaps: true },
+    lockedWares: ['quantumtubes'], warePriority: {}
   })
-
-  test('6.2 拖动 position', async ({ page }) => {
-    // 6.2.1
-    await navigateToMapBinding(page)
-    await enterEditMode(page)
-    const groups = await page.evaluate(() => {
-      const result = (window as any).liveStore?.autoGroupResult
-      return result?.groups?.map((g: any) => ({
-        id: g.id,
-        sectorMacro: g.sectorMacro,
-        name: g.name,
-        tradeStation: g.tradeStation ?? null,
-      })) ?? []
-    })
-    expect(groups.length).toBeGreaterThan(0)
-
-    // 6.2.2 Each group has an id and sectorMacro
-    for (const g of groups) {
-      expect(g.id).toBeDefined()
-      expect(g.sectorMacro).toBeDefined()
-    }
-  })
-
-  test('6.3 hub sector 限制', async ({ page }) => {
-    // 6.3.1
-    await navigateToMapBinding(page)
-    await enterEditMode(page)
-    const hubSectors = await page.evaluate(() => {
-      const result = (window as any).liveStore?.autoGroupResult
-      return result?.groups?.map((g: any) => g.sectorMacro) ?? []
-    })
-    expect(hubSectors.length).toBeGreaterThan(0)
-
-    // 6.3.2 Each hub sector is a non-empty string
-    for (const s of hubSectors) {
-      expect(typeof s).toBe('string')
-      expect(s.length).toBeGreaterThan(0)
-    }
-  })
-
-  test('6.4 不修改归属', async ({ page }) => {
-    // 6.4.1
-    await navigateToMapBinding(page)
-    await enterEditMode(page)
-    const before = await snapshotGroups(page)
-    expect(before).not.toBeNull()
-
-    // 6.4.2 Switch tabs and verify group data unchanged
-    const allocTab = page.locator('.tab-btn:has-text("分配方案")')
-    if (await allocTab.isVisible() && !(await allocTab.isDisabled())) {
-      await allocTab.click()
-      await page.waitForTimeout(300)
-    }
-    const after = await snapshotGroups(page)
-    expect(after?.count).toBe(before!.count)
-    expect(after?.coverageJson).toBe(before!.coverageJson)
-  })
-
-  test('6.5 坐标展示', async ({ page }) => {
-    // 6.5.1
-    await navigateToMapBinding(page)
-    await enterEditMode(page)
-    const tsTab = page.locator('.tab-btn:has-text("交易站")')
-    if (!(await tsTab.isDisabled())) { await tsTab.click(); await page.waitForTimeout(300) }
-    await expect(page.locator('.tab-content')).toBeVisible()
-
-    // 6.5.2 Trade station tab content area visible
-    const tsContent = page.locator('.tab-content')
-    await expect(tsContent).toBeVisible()
-  })
+  expect(created.saveStationCode).toBeUndefined()
+  expect((await saved(page)).stationPlans).toEqual(before.stationPlans)
+  await expect(source).toBeVisible()
+  expect(await page.evaluate(id => {
+    const source = (window as any).blueprintStore.savedEmpires.list.find((e: any) => e.id === 'empire-1').stations.find((s: any) => s.id === 'empire-1-station-1')
+    const draft = (window as any).liveStore.virtualStationDrafts.find((s: any) => s.id === id)
+    return ['modules', 'settings', 'lockedWares', 'warePriority'].every(key => draft[key] !== source[key])
+  }, created.id)).toBe(true)
 })
 
-// ============================================================================
-// 7 回归风险
-// ============================================================================
-test.describe('7 回归风险', () => {
-
-  test('7.1 防止 Map 面板操作触发自动计算', async ({ page }) => {
-    // 7.1.1
-    await navigateToMapBinding(page)
-    await enterEditMode(page)
-    const before = await snapshotGroups(page)
-    expect(before).not.toBeNull()
-
-    // 7.1.2
-    const closeBtn = page.getByTestId('map-save-panel-close')
-    await closeBtn.click()
-    await page.waitForTimeout(500)
-    const saveTab = page.getByTestId('map-save-panel-tab')
-    await saveTab.click()
-    await page.waitForTimeout(1000)
-
-    // 7.1.3
-    const after = await snapshotGroups(page)
-    expect(after?.count).toBe(before!.count)
-    expect(after?.coverageJson).toBe(before!.coverageJson)
-    expect(after?.connectionsJson).toBe(before!.connectionsJson)
-  })
-
-  test('7.2 防止 Hub edit 态错误禁用 Virtual Station tab', async ({ page }) => {
-    // 7.2.1
-    await navigateToMapBinding(page)
-    await enterEditMode(page)
-    await expect(page.locator('.tab-btn:has-text("虚拟空间站")')).not.toBeDisabled()
-
-    // 7.2.2
-    await page.locator('.tab-btn:has-text("虚拟空间站")').click()
-    await page.waitForTimeout(300)
-    await expect(page.locator('.tab-btn:has-text("虚拟空间站")')).toHaveClass(/active/)
-    await expect(page.locator('.virtual-station-tab')).toBeVisible()
-  })
-
-  test('7.3 防止 virtual station drop 使用 fallback group', async ({ page }) => {
-    // 7.3.1
-    await navigateToMapBinding(page)
-    const coverage = await page.evaluate(() => {
-      const result = (window as any).liveStore?.autoGroupResult
-      if (!result?.groups) return null
-      const sectorMap = new Map<string, string[]>()
-      for (const g of result.groups) {
-        const all = [g.sectorMacro, ...(g.coverage ?? [])]
-        for (const s of all) {
-          if (!sectorMap.has(s)) sectorMap.set(s, [])
-          sectorMap.get(s)!.push(g.id)
-        }
-      }
-      const multi: string[] = []
-      for (const [s, ids] of sectorMap) { if (ids.length > 1) multi.push(s) }
-      return { sectorCount: sectorMap.size, multiCovered: multi }
+test('6.1/6.2/6.3/6.4/6.5 virtual trade overlay真实拖动与跨hub拒绝', async ({ page }) => {
+  await openMap(page)
+  await focusHub(page)
+  const overlay = page.locator('[data-placement-key="binding:station:5173b252-78ca-ac45-9e40-5afae79c4bab"]')
+  await expect(overlay).toBeVisible()
+  const beforeGroups = await groups(page)
+  const beforeBinding = await saved(page)
+  const beforeDrafts = await drafts(page)
+  await drop(page, overlay, HUB, 0.35)
+  const moved = (await groups(page)).find((g: any) => g.sectorMacro === HUB)
+  expect(moved.virtualTradeStationPosition).not.toEqual(beforeGroups.find((g: any) => g.sectorMacro === HUB).virtualTradeStationPosition)
+  expect(moved.sectorMacro).toBe(HUB)
+  expect(moved.coverageSectorMacros).toEqual([MERCURY])
+  expect(await drafts(page)).toEqual(beforeDrafts)
+  expect(await saved(page)).toEqual(beforeBinding)
+  await tab(page, '交易站').click()
+  const card = page.locator('.trade-station-card').filter({ has: page.locator('.card-group-name').filter({ hasText: /^小行星带$/ }) })
+  await expect(card.locator('.candidate-item--virtual .candidate-meta')).toHaveText(`x: ${(moved.virtualTradeStationPosition.x / 1000).toFixed(1)}km / z: ${(moved.virtualTradeStationPosition.z / 1000).toFixed(1)}km`)
+  await card.locator('.candidate-item').filter({ has: page.locator('.candidate-name').filter({ hasText: /^KXN-018$/ }) }).click()
+  await expect(overlay).toHaveCount(0)
+  await card.locator('.candidate-item--virtual').click()
+  await expect(overlay).toBeVisible()
+  // Mars is the adjacent non-hub sector in maps.json; both it and the source remain visible at hub focus.
+  await focusHub(page)
+  const beforeReject = (await groups(page)).find((g: any) => g.sectorMacro === HUB).virtualTradeStationPosition
+  await startDrag(page, overlay)
+  await hoverSector(page, 'cluster_101_sector001_macro')
+  // Overlay dragging previews pointer position; the specified rejection occurs on release.
+  await expect(page.locator('.placement-preview--binding')).toBeVisible()
+  await page.mouse.up()
+  expect((await groups(page)).find((g: any) => g.sectorMacro === HUB).virtualTradeStationPosition).toEqual(beforeReject)
+  expect(await saved(page)).toEqual(beforeBinding)
+  await confirm(page)
+  const committed = await saved(page)
+  expect(committed.groups.find((g: any) => g.sectorMacro === HUB).tradeStation).toMatchObject({ sectorMacro: HUB, position: moved.virtualTradeStationPosition })
+  expect(committed.stationPlans).toHaveLength(beforeBinding.stationPlans.length)
+  for (const { count, lastUpdated, groupId, ...plan } of beforeBinding.stationPlans) {
+    // Current persistence drops obsolete metadata, adds setting defaults, and canonicalizes group identity.
+    expect(committed.stationPlans.find((p: any) => p.id === plan.id)).toMatchObject({
+      ...plan, groupId: beforeBinding.groups.find((g: any) => g.id === groupId).sectorMacro
     })
-    expect(coverage).not.toBeNull()
-    expect(coverage!.multiCovered.length).toBe(0)
-  })
+  }
+  await page.reload()
+  await openMap(page)
+  expect((await groups(page)).find((g: any) => g.sectorMacro === HUB)).toMatchObject({ sectorMacro: HUB, coverageSectorMacros: [MERCURY], virtualTradeStationPosition: moved.virtualTradeStationPosition })
+})
 
-  test('7.4 防止 existing virtual station 拖动重复创建 station plan', async ({ page }) => {
-    // 7.4.1
-    await navigateToMapBinding(page)
-    await enterEditMode(page)
-    const beforeCount = await page.evaluate(() => (window as any).liveStore?.virtualStationDrafts?.length ?? 0)
+test('2.5 group handle排序只改变顺序，placeholder与确认持久化', async ({ page }) => {
+  // Small persisted two-group precondition keeps both complete cards inside the map sidebar.
+  await page.evaluate(guid => {
+    const key = (window as any).gameDataStore.getStorageKey('save_archives').replace('save_archives', 'save_bindings')
+    const state = JSON.parse(localStorage.getItem(key)!)
+    const binding = state.list.find((b: any) => b.gameGuid === guid)
+    binding.groups = binding.groups.slice(0, 2).map((g: any) => ({ ...g, coverageSectorMacros: [], connectedGroupIds: [] }))
+    localStorage.setItem(key, JSON.stringify(state))
+  }, GUID)
+  await page.reload()
+  await openMap(page)
+  const before = await groups(page)
+  expect(before.map((g: any) => g.id)).toEqual([HUB, 'cluster_24_sector001_macro'])
+  const handle = page.locator('.group-item .drag-handle').first()
+  const start = await handle.boundingBox()
+  const target = await page.locator('.group-item').nth(1).boundingBox()
+  expect(start).not.toBeNull()
+  expect(target).not.toBeNull()
+  await page.mouse.move(start!.x + start!.width / 2, start!.y + start!.height / 2, { steps: 5 })
+  await page.mouse.down()
+  await page.mouse.move(start!.x + 15, start!.y + 15, { steps: 4 })
+  await expect(page.locator('.drag-placeholder')).toBeVisible()
+  await page.mouse.move(target!.x + target!.width / 2, target!.y + target!.height - 8, { steps: 20 })
+  await page.mouse.up()
+  await expect.poll(() => groups(page)).toEqual([before[1], before[0]])
+  await tab(page, '交易站').click()
+  for (const option of await page.locator('.candidate-item--virtual').all()) await option.click()
+  await page.locator('.auto-sector-bar .confirm-btn').click()
+  await expect(page.locator('.confirm-popup')).toBeVisible()
+  await page.locator('.confirm-popup-button--primary').click()
+  expect((await saved(page)).groups.map((g: any) => g.sectorMacro)).toEqual(['cluster_24_sector001_macro', HUB])
+})
 
-    const sectorMacro = await getFirstGroupSector(page)
-    expect(sectorMacro).not.toBeNull()
+test('2.4 Map侧栏定位菜单与Live overlay各自语义', async ({ page }) => {
+  await openMap(page)
+  await page.getByRole('button', { name: '编辑', exact: true }).click()
+  await page.getByRole('button', { name: '添加', exact: true }).click()
+  const menu = page.locator('.hub-add-menu')
+  await expect(menu).toBeVisible()
+  await expect(menu).not.toHaveClass(/hub-add-menu--overlay/)
+  const mercury = menu.locator('.hub-add-menu-item').filter({ has: page.locator('.sector-name').filter({ hasText: /^水星$/ }) })
+  const before = await sector(page, MERCURY).boundingBox()
+  await mercury.locator('.hub-add-menu-locate-btn').click()
+  await expect(menu).toBeVisible()
+  expect(await sector(page, MERCURY).boundingBox()).not.toEqual(before)
+  await page.getByTestId('top-view-btn-live-production').click()
+  await page.getByTestId('sidebar-auto-sector-group').click()
+  await page.getByRole('button', { name: '编辑', exact: true }).click()
+  await page.getByRole('button', { name: '添加', exact: true }).click()
+  await expect(page.locator('.hub-add-menu--overlay')).toBeVisible()
+  await expect(page.locator('.hub-add-menu-locate-btn')).toHaveCount(0)
+})
 
-    await page.evaluate((sector: string) => {
-      const liveStore = (window as any).liveStore
-      if (liveStore?.createBlankVirtualStationDraft) {
-        liveStore.createBlankVirtualStationDraft({ sectorMacro: sector, position: { x: 0, y: 0, z: 0 } })
-      }
-    }, sectorMacro!)
-    await page.waitForTimeout(300)
-    const afterCreate = await page.evaluate(() => (window as any).liveStore?.virtualStationDrafts?.length ?? 0)
-    expect(afterCreate).toBe(beforeCount + 1)
+test('4.4 未分组区域显示移除说明，恢复coverage重新归组', async ({ page }) => {
+  await page.evaluate(({ guid, virtual, sector }) => {
+    const key = (window as any).gameDataStore.getStorageKey('save_archives').replace('save_archives', 'save_bindings')
+    const state = JSON.parse(localStorage.getItem(key)!)
+    state.list.find((b: any) => b.gameGuid === guid).stationPlans.find((p: any) => p.id === virtual).sectorMacro = sector
+    localStorage.setItem(key, JSON.stringify(state))
+  }, { guid: GUID, virtual: VIRTUAL, sector: MERCURY })
+  await page.reload()
+  await openMap(page)
+  await page.getByRole('button', { name: '编辑', exact: true }).click()
+  await hub(page).locator('.jump-input').fill('0')
+  await tab(page, '虚拟空间站').click()
+  await expect(page.locator('.virtual-group--ungrouped .virtual-name')).toHaveText('新建空间站')
+  await expect(page.locator('.virtual-warning')).toContainText('提交时')
+  expect(await drafts(page)).toHaveLength(1)
+  expect((await drafts(page))[0].groupId).toBeNull()
+  await tab(page, '枢纽').click()
+  await hub(page).locator('.jump-input').fill('3')
+  await tab(page, '虚拟空间站').click()
+  await expect(page.locator('.virtual-group--ungrouped')).toHaveCount(0)
+  expect((await drafts(page))[0]).toMatchObject({ id: VIRTUAL, groupId: HUB, sectorMacro: MERCURY })
+})
 
-    await page.evaluate((sector: string) => {
-      const drafts = (window as any).liveStore?.virtualStationDrafts ?? []
-      const draft = drafts.find((d: any) => d.sectorMacro === sector)
-      if (draft) { draft.position = { x: 10, y: 20, z: 0 } }
-    }, sectorMacro!)
-    await page.waitForTimeout(300)
-    const afterUpdate = await page.evaluate(() => (window as any).liveStore?.virtualStationDrafts?.length ?? 0)
-    expect(afterUpdate).toBe(afterCreate)
-  })
-
-  test('7.5 防止旧 MapBinding 面板重新进入生产路径', async ({ page }) => {
-    // 7.5.1
-    await navigateToMapBinding(page)
-    const oldPanel = page.locator('.binding-sector-group')
-    await expect(oldPanel).not.toBeVisible({ timeout: 3000 })
-    const newPanel = page.locator('.auto-sector-group-map-panel')
-    await expect(newPanel.first()).toBeVisible({ timeout: 5000 })
-
-    // 7.5.2
-    await expect(page.getByTestId('map-save-panel')).toBeVisible()
-  })
+test('3.3/3.4 颜色只在binding显示，faction/group/resource层级与coverage尺寸', async ({ page }) => {
+  await openMap(page)
+  await page.getByRole('button', { name: '编辑', exact: true }).click()
+  await hub(page).locator('.color-chip').click()
+  await page.locator('.preset-color').first().click()
+  await expect(page.locator('.sector-group-color-layer polygon[fill="#f44e3b"]')).toHaveCount(2)
+  const geometry = await page.evaluate(hub => {
+    const target = document.querySelector(`.sector-hover-target[data-map-sector-id="${hub}"] .sector-polygon`)!.getBoundingClientRect()
+    const fills = [...document.querySelectorAll('.sector-group-color-layer polygon[fill="#f44e3b"]')].map(el => el.getBoundingClientRect())
+    const match = fills.find(box => Math.abs((box.x + box.width / 2) - (target.x + target.width / 2)) < 1 && Math.abs((box.y + box.height / 2) - (target.y + target.height / 2)) < 1)
+    const faction = document.querySelector('.sector-fill-layer')!
+    const group = document.querySelector('.sector-group-color-layer')!
+    const sectors = document.querySelector('.clusters')!
+    return { ratio: match ? match.width / target.width : null, factionBeforeGroup: !!(faction.compareDocumentPosition(group) & Node.DOCUMENT_POSITION_FOLLOWING), groupBeforeSectors: !!(group.compareDocumentPosition(sectors) & Node.DOCUMENT_POSITION_FOLLOWING) }
+  }, HUB)
+  expect(geometry.factionBeforeGroup).toBe(true)
+  expect(geometry.groupBeforeSectors).toBe(true)
+  expect.soft(geometry.ratio).toBeCloseTo(2 / 3, 2)
+  await page.locator('.breadcrumb-item.clickable').first().click()
+  await page.locator('.default-map-item').click()
+  await expect(page.locator('.sector-group-color-layer')).toHaveCount(0)
+  await expect(page.locator('.hub-link-routes')).toHaveCount(0)
 })

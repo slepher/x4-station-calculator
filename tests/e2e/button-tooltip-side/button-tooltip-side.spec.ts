@@ -1,128 +1,92 @@
 import { test } from '../../test-setup'
 import { expect } from '@playwright/test'
-import fs from 'fs'
-import path from 'path'
-
-type StorageEntry = [string, string]
-
-function loadFixtureStorage(): StorageEntry[] {
-  const fixturePath = path.join(process.cwd(), 'tests', 'fixtures', 'db.json')
-  const raw = fs.readFileSync(fixturePath, 'utf-8')
-  const data = JSON.parse(raw) as Record<string, unknown>
-  return Object.entries(data)
-    .filter(([key]) => key !== 'vsn')
-    .map(([key, value]) => [key, typeof value === 'string' ? value : JSON.stringify(value)])
-}
-
-const fixtureStorage = loadFixtureStorage()
+import dbFixture from '../../fixtures/db.json' with { type: 'json' }
 
 test.describe('button-tooltip-side web integration', () => {
   test.beforeEach(async ({ page }) => {
-    await page.addInitScript((entries: StorageEntry[]) => {
-      for (const [key, value] of entries) {
-        window.localStorage.setItem(key, value)
-      }
-      window.localStorage.setItem('isTestEnv', 'true')
-      window.localStorage.setItem('x4_station_active_view', 'production')
-    }, fixtureStorage)
-
     await page.goto('/')
-    await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 10000 })
-    const stationTab = page.locator('[data-testid="sidebar-station"][data-station-id]').first()
-    await expect(stationTab).toBeVisible({ timeout: 10000 })
-    await stationTab.click()
-    await page.waitForSelector('.flow-wrapper', { timeout: 10000 })
+    await page.evaluate((fixture) => {
+      for (const [key, value] of Object.entries(fixture)) {
+        if (key !== 'vsn') localStorage.setItem(key, JSON.stringify(value))
+      }
+      localStorage.setItem('isTestEnv', 'true')
+      localStorage.setItem('x4_game_version', JSON.stringify({ version: '8.0', beta: false }))
+    }, dbFixture)
+    await page.reload()
+    await page.getByTestId('language-select').selectOption('en')
+    await page.locator('[data-testid="sidebar-station"][data-station-id="empire-1-station-1"]').click()
+    await expect(page.locator('[data-testid="flow-wrapper"][data-resource-id="hullparts"]')).toBeVisible()
   })
 
   test('2.0 测试启动与页面可达性', async ({ page }) => {
-    const flowWrapper = page.locator('.flow-wrapper').first()
-    await expect(flowWrapper).toBeVisible({ timeout: 10000 })
-
-    const actionRail = flowWrapper.locator('.flow-action-rail')
-    await expect(actionRail).toBeVisible()
-
-    await expect(actionRail.locator('.favorite-btn')).toBeVisible()
-    await expect(actionRail.locator('.lock-btn')).toBeVisible()
+    const rail = page.locator('[data-resource-id="hullparts"] .flow-action-rail')
+    await expect(rail).toBeVisible()
+    await expect(rail.locator('.favorite-btn')).toBeVisible()
+    await expect(rail.locator('.lock-btn')).toBeVisible()
   })
 
   test('3.1 收藏按钮 tooltip 向左弹出', async ({ page }) => {
-    const flowWrapper = page.locator('.flow-wrapper').first()
-    const favButton = flowWrapper.locator('.favorite-btn')
-
-    await expect(favButton).toBeVisible()
-    await favButton.hover()
-
-    const tooltip = page.locator('div.tippy-box[data-theme="x4"][data-placement="left"]')
+    const button = page.locator('[data-resource-id="hullparts"] .favorite-btn')
+    await button.hover()
+    const tooltip = page.locator('.tippy-box[data-theme~="x4"]')
     await expect(tooltip).toBeVisible()
-
-    const rows = tooltip.locator('.priority-tooltip-row')
-    await expect(rows.first()).toBeVisible()
-
-    await expect(tooltip.locator('.icon-cell').first()).toBeVisible()
-    await expect(tooltip.locator('.label-cell').first()).toBeVisible()
-    await expect(tooltip.locator('.hours-cell').first()).toBeVisible()
-    await expect(tooltip.locator('.desc-cell').first()).toBeVisible()
-
-    const labelText = (await tooltip.locator('.label-cell').first().innerText()).trim()
-    const descText = (await tooltip.locator('.desc-cell').first().innerText()).trim()
-    expect(labelText.length).toBeGreaterThan(0)
-    expect(descText.length).toBeGreaterThan(0)
+    await expect(tooltip).toHaveAttribute('data-placement', 'left')
+    const buttonBox = await button.boundingBox()
+    const tooltipBox = await tooltip.boundingBox()
+    expect(buttonBox).not.toBeNull()
+    expect(tooltipBox).not.toBeNull()
+    expect(tooltipBox!.x + tooltipBox!.width).toBeLessThanOrEqual(buttonBox!.x)
+    await expect(tooltip.locator('.priority-tooltip-row')).toHaveCount(2)
+    for (const cell of ['icon', 'label', 'hours', 'desc']) {
+      await expect(tooltip.locator(`.${cell}-cell`).first()).toBeVisible()
+    }
+    await expect(tooltip.locator('.label-cell')).toHaveText(['Primary', 'Secondary'])
+    await expect(tooltip.locator('.desc-cell')).toHaveText(['Long', 'Short'])
+    await page.mouse.move(0, 0)
+    await expect(tooltip).toBeHidden()
   })
 
   test('3.2 锁定按钮 tooltip 向右弹出', async ({ page }) => {
-    const flowWrapper = page.locator('.flow-wrapper').first()
-    const lockButton = flowWrapper.locator('.lock-btn')
-
-    await expect(lockButton).toBeVisible()
-    await lockButton.hover()
-
-    const tooltip = page.locator('div.tippy-box[data-theme="x4"][data-placement="right"]')
+    const button = page.locator('[data-resource-id="hullparts"] .lock-btn')
+    await button.hover()
+    const tooltip = page.locator('.tippy-box[data-theme~="x4"]')
     await expect(tooltip).toBeVisible()
-
-    const rows = tooltip.locator('.lock-tooltip-row')
-    await expect(rows.first()).toBeVisible()
-
-    await expect(tooltip.locator('.icon-cell').first()).toBeVisible()
-    await expect(tooltip.locator('.label-cell').first()).toBeVisible()
-    await expect(tooltip.locator('.desc-cell').first()).toBeVisible()
-
-    const labelText = (await tooltip.locator('.label-cell').first().innerText()).trim()
-    const descText = (await tooltip.locator('.desc-cell').first().innerText()).trim()
-    expect(labelText.length).toBeGreaterThan(0)
-    expect(descText.length).toBeGreaterThan(0)
+    await expect(tooltip).toHaveAttribute('data-placement', 'right')
+    const buttonBox = await button.boundingBox()
+    const tooltipBox = await tooltip.boundingBox()
+    expect(buttonBox).not.toBeNull()
+    expect(tooltipBox).not.toBeNull()
+    expect(tooltipBox!.x).toBeGreaterThanOrEqual(buttonBox!.x + buttonBox!.width)
+    await expect(tooltip.locator('.lock-tooltip-row')).toHaveCount(2)
+    for (const cell of ['icon', 'label', 'desc']) {
+      await expect(tooltip.locator(`.${cell}-cell`).first()).toBeVisible()
+    }
+    await expect(tooltip.locator('.label-cell')).toHaveText(['Unlocked', 'Locked'])
+    await expect(tooltip.locator('.desc-cell')).toHaveText(['Auto Fill', 'Keep Current'])
+    await page.mouse.move(0, 0)
+    await expect(tooltip).toBeHidden()
   })
 
   test('3.3 按钮交互回归', async ({ page }) => {
-    const flowWrapper = page.locator('.flow-wrapper').first()
-    const favButton = flowWrapper.locator('.favorite-btn')
-    const lockButton = flowWrapper.locator('.lock-btn')
-
-    await expect(favButton).toBeVisible()
-    await expect(lockButton).toBeVisible()
-
-    const favClassBefore = await favButton.getAttribute('class')
-    const favDisabled = await favButton.evaluate((el) => el.classList.contains('disabled'))
-
-    await favButton.click()
-    await page.waitForTimeout(150)
-
-    const favClassAfter = await favButton.getAttribute('class')
-    if (favDisabled) {
-      expect(favClassAfter).toEqual(favClassBefore)
-    } else {
-      expect(favClassAfter).not.toEqual(favClassBefore)
-    }
-
-    const lockClassBefore = await lockButton.getAttribute('class')
-    await lockButton.click()
-    await page.waitForTimeout(150)
-    const lockClassAfter = await lockButton.getAttribute('class')
-    expect(lockClassAfter).not.toEqual(lockClassBefore)
-
-    const disabledButtons = page.locator('.flow-action-rail .favorite-btn.disabled, .flow-action-rail .lock-btn.non-operable')
-    const disabledCount = await disabledButtons.count()
-    if (disabledCount > 0) {
-      await expect(disabledButtons.first()).toBeVisible()
-    }
+    const favorite = page.locator('[data-resource-id="hullparts"] .favorite-btn')
+    const lock = page.locator('[data-resource-id="hullparts"] .lock-btn')
+    await expect(favorite).toHaveClass(/level-2/)
+    await favorite.click()
+    await expect(favorite).toHaveClass(/level-1/)
+    await favorite.click()
+    await expect(favorite).toHaveClass(/level-2/)
+    await expect(lock).not.toHaveClass(/is-locked/)
+    await lock.click()
+    await expect(lock).toHaveClass(/is-locked/)
+    await lock.click()
+    await expect(lock).not.toHaveClass(/is-locked/)
+    const disabled = page.locator('[data-resource-id="ore"] .favorite-btn')
+    await expect(disabled).toHaveClass(/disabled/)
+    await expect(disabled).toHaveClass(/level-0/)
+    await disabled.click()
+    await expect(disabled).toHaveClass(/level-0/)
+    const resourceLock = page.locator('[data-resource-id="ore"] .lock-btn')
+    await expect(resourceLock).toHaveClass(/non-operable/)
+    await expect(resourceLock).toHaveCSS('pointer-events', 'none')
   })
 })
