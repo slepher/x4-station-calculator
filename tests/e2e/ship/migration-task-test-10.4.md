@@ -1,4 +1,4 @@
-# M10.4 migration — failed / incomplete
+# M10.4 migration — complete focused verification
 
 Owned four specs: ship-build-material, ship-build-stat, metric-panel-ui, bugfix-ship-status-diff; this doc and results/M10.4 only. No src/helper/base-fixture/git write. Keep original material console diagnostics (now attached to real nested slot/candidate/material rows; historical “wall sections” wording retained).
 
@@ -39,6 +39,10 @@ Root /tmp/x4-migration-M10.4. baselinecollection62exit0. Representativebaseline6
 
 Unresolved stat: sourcePanelStats:130 divides averageDPS by6, contrary archivedship-build-stat/design.md average total/count and existing snapshots; boost_recharge renders100s vs acceptedrequest23/design475 1%/s. No newer normative replacement found in canonical/archive search. Hull sourceanalyzeShipBlueprintBuild never consumes blueprint.hull.materials; blueprintconfig remains100 but total2197 onlyproduction+engine, expected2297. No unchangedproductroute retry.
 
-## Final full evidence
+## Final verification
 
-Parentfresh FIT/DETAILS/saveidentity dist: focused.log **20passed/3failed/0skipped**,23cases,exit1. Three test-owned material failures corrected andpassed; groupedengine exactdoubledcost andstatic hull/max ratios also passed. Onlyexplicit hull-material calculation andtwo fullstat snapshot cases fail; the latterboth exposeaverageDPS/6 andboostrecharge100s. Collection-final.log23exit0, diff-check.logexit0. Completefailed-run evidence, notcompositepass. Parentproductfix+freshdist+fullrerun required.
+On candidate HEAD `6d14c05dfbfea5042745c781342c5c12e0d152ac`, finite consumers passed (4 files / 32 tests), then the four specs ran with the required preview-only config, `PORT=22504`, one worker, zero retries, and trace enabled: **23 passed / 0 failed / 0 skipped**, exit 0. Osaka's settled one-decimal `turret_avg` mapping (`301.105 MW` snapshot → `301.1 MW` rendered) is owned by the stat spec. Collection `--list` reported 23 tests in 4 files, exit 0; `git diff --check` exit 0. Logs and traces are under `/tmp/x4-test-repair-M10.4/`.
+
+## Historical pre-fix evidence
+
+Parentfresh FIT/DETAILS/saveidentity dist: focused.log **20passed/3failed/0skipped**,23cases,exit1. This predates the current product fixes and final consumer verification and is retained for failure provenance only.

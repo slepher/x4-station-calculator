@@ -24,6 +24,8 @@ export type MapStationPanelItem = {
       x: number
       z: number
     }
+    sunlight: number
+    resources: string[]
   }
 }
 

@@ -1,6 +1,8 @@
 # FIX-M3.2：fix-auto-sector-color-display
 
-状态：T1 implemented / Unit-ready，待主agent审查并协调build/E2E。Resolved change为fix-auto-sector-color-display，BUG-001保持Confirmed，尚未Verified。不自执行build/browser/fullUnit，不改冻结M3.2原13事务。
+状态：Verified。Resolved change 为 fix-auto-sector-color-display；当前固定候选已完成 build、全量 Unit、focused 及完整 M3.2 浏览器复验。
+
+透明色首次浏览器复验发现 reload 恢复链仍由 `initAutoGroupDraft()` 无条件稳定化颜色，将 `undefined` 改为 `#194D33`。最终修复在 `enrichAutoGroupResult()` 增加必传 `stabilizeColors`，由 `initAutoGroupDraft()` 仅在 `needsAutoGroupRecalc === true` 时启用：恢复保存状态保留透明，真实计算仍为缺色/冲突色分配颜色。`autoGroup.spec.ts` 直接覆盖两个分支；独立审查通过。
 
 ## 最小根因与修改
 
@@ -23,6 +25,6 @@ MapSectorGroupColorLayer将单/多sector统一为同一polygon路径，使用实
 
 命令：`npm run test:unit -- tests/unit/current/auto-sector-group/autoSectorColorDisplay.spec.ts`。消费者额外同命令路径为sectorGroupCardStructureLock.spec.ts、sectorGroupListDragHandle.spec.ts、tests/unit/current/map/mapSvgLayerOrder.spec.ts。非全Unit；Browserslist提示未处理。
 
-## 待执行
+## 最终验证
 
-T2由主agent协调build；再独立派发原透明/尺寸严格2项与当前13完整事务。M3.2-UI补充合同独立继续，不能用修复13通过关闭尚未执行细项。无helper/基础fixture/其他src/E2E改动，未删console/debug、未git写；报告不代表用户确认或提交。
+当前 patch 的 `npm run build` exit 0，canonical Unit 175 files / 1000 tests passed；透明/覆盖层 focused 4/4，完整 M3.2 13/13 passed、0 skipped。日志与 trace 位于 `/tmp/x4-test-repair-current2/`。M3.2-UI 补充合同独立继续，不能用当前 13 项关闭尚未执行细项；本报告不代表提交授权。

@@ -86,6 +86,8 @@ test.describe('x4-map-tooltip', () => {
   // 3.1 Case: Hover sector 显示 tooltip
   test('3.1 Case: Hover sector 显示 tooltip', async ({ page }) => {
     // 3.1.1 状态: 地图-sector-hover
+    await page.getByTestId('language-select').selectOption('zh-CN')
+    await page.waitForTimeout(300)
     await buildMapSectorHover(page)
 
     // 3.1.2 断言 `.sector-tooltip-title` 文本内容为 sector 本地化名称
@@ -101,25 +103,33 @@ test.describe('x4-map-tooltip', () => {
     await expect(sunlight).toHaveText('日光')
     await expect(page.locator('.sector-tooltip-grid .resource-value').first()).toHaveText('123%')
 
-    // 3.1.5 断言资源列表按固定顺序显示，每项包含名称、丰度、颜色块 #期望: [ore, silicon, ice, hydrogen, nividium 顺序]
+    // 3.1.5 断言资源列表按固定顺序显示，每项包含名称、丰度、颜色块 #期望: [ore, silicon, hydrogen, ice, nividium 顺序]
     const resourceNames = page.locator('.sector-tooltip-grid .resource-name')
-    const count = await resourceNames.count()
-    expect(count).toBeGreaterThan(0)
+    const expectedResources = [
+      ['日光', 'rgb(250, 204, 21)'],
+      ['金属矿石', 'rgb(179, 97, 0)'],
+      ['硅', 'rgb(0, 175, 179)'],
+      ['氢', 'rgb(77, 252, 255)'],
+      ['冰', 'rgb(153, 213, 255)'],
+      ['N矿', 'rgb(179, 0, 179)']
+    ] as const
+    expect(await resourceNames.allTextContents()).toEqual(expectedResources.map(([name]) => name))
 
     // Verify each resource has name, value, and color
-    for (let i = 0; i < count; i++) {
+    for (let i = 0; i < expectedResources.length; i++) {
       const name = resourceNames.nth(i)
       const value = page.locator('.sector-tooltip-grid .resource-value').nth(i)
-      const color = name
       await expect(name).toBeVisible()
       await expect(value).toBeVisible()
-      await expect(color).toBeVisible()
+      expect(await name.evaluate(el => getComputedStyle(el).color)).toBe(expectedResources[i]![1])
     }
   })
 
   // 3.2 Case: Tooltip 内容本地化
   test('3.2 Case: Tooltip 内容本地化', async ({ page }) => {
-    // 3.2.1 状态: 地图-sector-hover
+    // 3.2.1 状态: English 下的地图-sector-hover
+    await page.getByTestId('language-select').selectOption('en')
+    await page.waitForTimeout(300)
     await buildMapSectorHover(page)
 
     // 3.2.2 记录 `.sector-tooltip-title` 和 `.sector-tooltip-owner` 当前文本
@@ -128,7 +138,7 @@ test.describe('x4-map-tooltip', () => {
     const titleTextBefore = await title.textContent()
     const ownerTextBefore = await owner.textContent()
 
-    // 3.2.3 通过语言选择器切换到 `zh-CN`
+    // 3.2.3 通过语言选择器从 en 切换到 `zh-CN`
     const langSelect = page.locator('select').filter({ hasText: /简体中文|English/ })
     await langSelect.selectOption('zh-CN')
     await page.waitForTimeout(500)
@@ -159,9 +169,7 @@ test.describe('x4-map-tooltip', () => {
     expect(box).not.toBeNull()
 
     // 3.3.3 将鼠标从 sector 移动到 tooltip 元素上
-    if (box) {
-      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
-    }
+    await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2)
     await page.waitForTimeout(100)
 
     // 3.3.4 断言 `.map-sector-tooltip-layer` 保持可见 #期望: [可见]
@@ -184,15 +192,14 @@ test.describe('x4-map-tooltip', () => {
 
     // 3.4.2 在 `.map-viewport` 执行鼠标按下并拖动操作
     const viewportBox = await viewport.boundingBox()
-    if (viewportBox) {
-      const startX = viewportBox.x + viewportBox.width / 2
-      const startY = viewportBox.y + viewportBox.height / 2
-      await page.mouse.move(startX, startY)
-      await page.mouse.down()
-      await page.mouse.move(startX + 100, startY)
-      await page.waitForTimeout(100)
-      await page.mouse.up()
-    }
+    expect(viewportBox).not.toBeNull()
+    const startX = viewportBox!.x + viewportBox!.width / 2
+    const startY = viewportBox!.y + viewportBox!.height / 2
+    await page.mouse.move(startX, startY)
+    await page.mouse.down()
+    await page.mouse.move(startX + 100, startY, { steps: 8 })
+    await page.waitForTimeout(100)
+    await page.mouse.up()
 
     // 3.4.3 切换: 地图-sector-hover -> 地图-sector-leave
     await transitionMapSectorHoverToLeave(page)
@@ -210,14 +217,10 @@ test.describe('x4-map-tooltip', () => {
     const viewport = page.locator('.map-viewport')
 
     // 3.5.2 在 `.map-viewport` 执行鼠标滚轮缩放操作
-    const viewportBox = await viewport.boundingBox()
-    if (viewportBox) {
-      const centerX = viewportBox.x + viewportBox.width / 2
-      const centerY = viewportBox.y + viewportBox.height / 2
-      await page.mouse.move(centerX, centerY)
-      // Simulate wheel zoom (scroll down to zoom in)
-      await viewport.dispatchEvent('wheel', { deltaY: -100 })
-    }
+    const sectorBox = await page.locator('.sector-hover-target[data-sector-hover-id="cluster_01_sector001_macro"]').boundingBox()
+    expect(sectorBox).not.toBeNull()
+    await page.mouse.move(sectorBox!.x + sectorBox!.width / 2, sectorBox!.y + sectorBox!.height / 2)
+    await page.mouse.wheel(0, -100)
     await expect(tooltipLayer).not.toBeVisible({ timeout: 1000 })
 
     // 3.5.3 等待缩放防抖结束，tooltip 恢复显示

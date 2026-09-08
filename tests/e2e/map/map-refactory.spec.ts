@@ -1,4 +1,5 @@
 import { test, expect, Page } from '@playwright/test'
+import { loadLiveBindingFixture } from '../live/helpers/loadLiveBindingFixture'
 
 // ============================================================
 // Chapter 2 Helpers
@@ -18,30 +19,7 @@ async function buildMapRenderDefaultView(page: Page) {
   // 2.1.3 等待 500ms 以确保地图布局稳定
   await page.waitForTimeout(500)
   
-  // 2.1.4 断言 `.sector-links` 组存在 #期望: [组存在]
-  await expect(page.locator('.sector-links')).toBeVisible()
-  
-  // 2.1.5 断言 `.sector-links` 组包含 line 元素 #期望: [line 元素集合非空]
-  const sectorLinksLines = page.locator('.sector-links line')
-  await expect(sectorLinksLines.first()).toBeVisible()
-  
-  // 2.1.6 断言 `.highways` 组存在 #期望: [组存在]
-  await expect(page.locator('.highways')).toBeVisible()
-  
-  // 2.1.7 断言 `.highways` 组包含 path 或 line 元素 #期望: [path 或 line 元素集合非空]
-  const highwaysPaths = page.locator('.highways path')
-  const highwaysLines = page.locator('.highways line')
-  const hasHighwayElements = await highwaysPaths.count() > 0 || await highwaysLines.count() > 0
-  expect(hasHighwayElements).toBe(true)
-  
-  // 2.1.8 断言 `.gates` 组存在 #期望: [组存在]
-  await expect(page.locator('.gates')).toBeVisible()
-  
-  // 2.1.9 断言 `.gates` 组包含 circle.gate-circle 元素 #期望: [circle.gate-circle 元素集合非空]
-  const gateCircles = page.locator('.gates circle.gate-circle')
-  await expect(gateCircles.first()).toBeVisible()
-  
-  // 2.1.10 断言 `.sector-hover-target` 元素存在 #期望: [元素集合非空]
+  // 2.1.4 断言固定 sector hover 入口存在，几何图元由各自场景独立验证
   const sectorHoverTargets = page.locator('.sector-hover-target')
   await expect(sectorHoverTargets.first()).toBeVisible()
 }
@@ -51,38 +29,16 @@ async function buildMapRenderDefaultView(page: Page) {
  * 进入地图视图并验证 overlay 元素
  */
 async function buildMapRenderOverlayVisible(page: Page) {
-  // 2.2.1 在页面导航至 `/?router=maps` 视图
-  await page.goto('/?router=maps')
-  
-  // 加载 fixture 到 localStorage（排除 vsn 字段）
-  const dbFixture = await import('../../fixtures/db.json', { with: { type: 'json' } })
-  const dbData = JSON.parse(JSON.stringify(dbFixture.default))
-  delete dbData.vsn
-  
-  await page.evaluate((data) => {
-    Object.entries(data).forEach(([key, value]) => {
-      localStorage.setItem(key, JSON.stringify(value))
-    })
-    localStorage.setItem('isTestEnv', 'true')
-  }, dbData)
-  
-  // reload 以应用 localStorage 数据
-  await page.reload()
-  
-  // 通过 UI 设置语言（必须通过 UI 触发翻译更新）
-  const langSelect = page.locator('select').filter({ hasText: /简体中文|English/ })
-  await langSelect.selectOption('zh-CN')
+  await loadLiveBindingFixture(page)
+  await page.getByTestId('top-view-btn-maps').click()
+  await page.getByTestId('map-save-panel-tab').click()
+  await expect(page.getByTestId('map-save-panel')).toBeVisible()
   
   // 2.2.2 在 `.map-viewport` 等待 `svg[data-testid="map-svg-canvas"]` 渲染完成
   await page.waitForSelector('.map-viewport svg[data-testid="map-svg-canvas"]', { timeout: 10000 })
   
   // 2.2.3 等待 500ms 以确保地图布局稳定
   await page.waitForTimeout(500)
-  
-  // 2.2.4 打开 station panel 以触发 overlay 渲染
-  const stationPanelButton = page.locator('[data-testid="map-station-entry-button"]')
-  await stationPanelButton.click()
-  await page.waitForTimeout(300)
   
   // 2.2.5 断言 `.station-overlays` 组存在 #期望: [组存在]
   await expect(page.locator('.station-overlays')).toBeVisible()
@@ -93,7 +49,7 @@ async function buildMapRenderOverlayVisible(page: Page) {
   // 2.2.7 断言 `.placement-overlay` 元素存在且 CSS pointer-events 为 auto #期望: [元素存在且有 pointer-events: auto]
   const placementOverlay = page.locator('.placement-overlay').first()
   await expect(placementOverlay).toBeVisible()
-  const pointerEvents = await placementOverlay.evaluate(el => el.style.pointerEvents)
+  const pointerEvents = await placementOverlay.evaluate(el => getComputedStyle(el).pointerEvents)
   expect(pointerEvents).toBe('auto')
 }
 
@@ -291,20 +247,22 @@ test.describe('map-refactory', () => {
     await buildMapRenderDefaultView(page)
     
     // 3.3.2 获取 `.gates circle.gate-circle` 元素数量
-    const gateCircles = page.locator('.gates circle.gate-circle')
+    const gateCircles = page.locator('.gates image.gate-circle')
     const count = await gateCircles.count()
     expect(count).toBeGreaterThan(0)
     
-    // 3.3.3 断言每个 gate-circle 有 cx, cy, r 属性 #期望: [属性值为数值字符串]
+    // 3.3.3 断言每个 gate-circle 有 data ids、x/y/width/height，图标尺寸为 icon config 的 6 倍半径
     for (let i = 0; i < Math.min(count, 5); i++) {
       const circle = gateCircles.nth(i)
-      const cx = await circle.getAttribute('cx')
-      const cy = await circle.getAttribute('cy')
-      const r = await circle.getAttribute('r')
-      expect(cx).not.toBeNull()
-      expect(cy).not.toBeNull()
-      expect(r).not.toBeNull()
-      expect(parseFloat(cx!)).not.toBeNaN()
+      expect(await circle.getAttribute('data-gate-id')).not.toBeNull()
+      expect(await circle.getAttribute('data-cluster-id')).not.toBeNull()
+      for (const attribute of ['x', 'y', 'width', 'height']) {
+        const value = await circle.getAttribute(attribute)
+        expect(value).not.toBeNull()
+        expect(Number(value)).not.toBeNaN()
+      }
+      expect(await circle.getAttribute('width')).toBe('4.0')
+      expect(await circle.getAttribute('height')).toBe('4.0')
     }
     
     // 3.3.4 断言每个 gate-circle 有 data-gate-id 和 data-cluster-id 属性 #期望: [属性非空]
@@ -314,11 +272,9 @@ test.describe('map-refactory', () => {
     expect(gateId).not.toBeNull()
     expect(clusterId).not.toBeNull()
     
-    // 3.3.5 断言 gate-circle stroke-width 与 stargateVisualScale 关联 #期望: [stroke-width 约为 0.3 * 1.5 = 0.45]
-    const strokeWidth = await firstCircle.getAttribute('stroke-width')
-    expect(strokeWidth).not.toBeNull()
-    const swValue = parseFloat(strokeWidth!)
-    expect(swValue).toBeCloseTo(0.45, 1)
+    // 3.3.5 断言 gate 图标尺寸使用 icon config 的固定直径
+    expect(await firstCircle.getAttribute('width')).toBe('4.0')
+    expect(await firstCircle.getAttribute('height')).toBe('4.0')
   })
   
   // 3.4 Case: Cross-cluster gate line 渲染验证
@@ -351,7 +307,8 @@ test.describe('map-refactory', () => {
     const ids: string[] = []
     for (let i = 0; i < count; i++) {
       const id = await clipPaths.nth(i).getAttribute('id')
-      if (id) ids.push(id)
+      expect(id).not.toBeNull()
+      ids.push(id!)
     }
     const uniqueIds = new Set(ids)
     expect(ids.length).toBe(uniqueIds.size)
@@ -424,7 +381,7 @@ test.describe('map-refactory', () => {
     await expect(placementOverlay).toBeVisible()
     
     // 3.9.3 断言 `.placement-overlay` pointer-events 为 auto #期望: [pointer-events: auto]
-    const pointerEvents = await placementOverlay.evaluate(el => el.style.pointerEvents)
+    const pointerEvents = await placementOverlay.evaluate(el => getComputedStyle(el).pointerEvents)
     expect(pointerEvents).toBe('auto')
   })
   
@@ -439,10 +396,9 @@ test.describe('map-refactory', () => {
     
     // 3.10.3 断言 `.save-poi-marker` pointer-events 为 auto #期望: [pointer-events: auto]
     const marker = page.locator('.save-poi-marker').first()
-    if (await marker.count() > 0) {
-      const pointerEvents = await marker.evaluate(el => el.style.pointerEvents)
-      expect(pointerEvents).toBe('auto')
-    }
+    await expect(marker).toBeVisible()
+    const pointerEvents = await marker.evaluate(el => getComputedStyle(el).pointerEvents)
+    expect(pointerEvents).toBe('auto')
   })
   
   // 3.11 Case: Tooltip 不闪烁消失
@@ -460,9 +416,8 @@ test.describe('map-refactory', () => {
     expect(box).not.toBeNull()
     
     // 3.11.4 将鼠标从 sector 移动到 tooltip 元素中心位置
-    if (box) {
-      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
-    }
+    expect(box).not.toBeNull()
+    await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2)
     await page.waitForTimeout(100)
     
     // 3.11.5 断言 `.map-sector-tooltip-layer` 保持可见 #期望: [可见]
@@ -490,12 +445,11 @@ test.describe('map-refactory', () => {
     
     // 3.12.3 在 `.map-viewport` 执行鼠标滚轮缩放操作 (deltaY: -100)
     const viewportBox = await viewport.boundingBox()
-    if (viewportBox) {
-      const centerX = viewportBox.x + viewportBox.width / 2
-      const centerY = viewportBox.y + viewportBox.height / 2
-      await page.mouse.move(centerX, centerY)
-      await viewport.dispatchEvent('wheel', { deltaY: -100 })
-    }
+    expect(viewportBox).not.toBeNull()
+    const centerX = viewportBox!.x + viewportBox!.width / 2
+    const centerY = viewportBox!.y + viewportBox!.height / 2
+    await page.mouse.move(centerX, centerY)
+    await page.mouse.wheel(0, -100)
     
     // 3.12.4 断言 `.map-sector-tooltip-layer` 因缩放暂时不可见 #期望: [不可见]
     await expect(tooltipLayer).not.toBeVisible({ timeout: 1000 })
@@ -511,6 +465,8 @@ test.describe('map-refactory', () => {
   // 3.13 Case: Tooltip 内容完整性验证
   test('3.13 Case: Tooltip 内容完整性验证', async ({ page }) => {
     // 3.13.1 状态: 地图-sector-hover-激活
+    await page.getByTestId('language-select').selectOption('zh-CN')
+    await page.waitForTimeout(300)
     await buildMapSectorHoverActive(page)
     
     // 3.13.2 断言 `.sector-tooltip-title` 显示 sector 本地化名称 #期望: [文本非空且非英文 ID]
@@ -527,15 +483,16 @@ test.describe('map-refactory', () => {
     const sunlightName = page.locator('.sunlight-name')
     await expect(sunlightName).toBeVisible()
     
-    // 3.13.5 断言资源列表按固定顺序显示 #期望: [ore, silicon, ice, hydrogen, nividium 顺序]
+    // 3.13.5 断言资源列表按固定顺序显示 #期望: [ore, silicon, hydrogen, ice, nividium 顺序]
     const resourceNames = page.locator('.sector-tooltip-grid .resource-name')
-    const count = await resourceNames.count()
-    expect(count).toBeGreaterThan(0)
+    expect(await resourceNames.allTextContents()).toEqual(['日光', '金属矿石', '硅', '氢', '冰', 'N矿'])
   })
   
   // 3.14 Case: Tooltip 内容本地化验证
   test('3.14 Case: Tooltip 内容本地化验证', async ({ page }) => {
-    // 3.14.1 状态: 地图-sector-hover-激活
+    // 3.14.1 状态: 地图-sector-hover-激活，先以 English 建立对照
+    await page.getByTestId('language-select').selectOption('en')
+    await page.waitForTimeout(300)
     await buildMapSectorHoverActive(page)
     
     // 3.14.2 记录 `.sector-tooltip-title` 和 `.sector-tooltip-owner` 当前文本内容
@@ -544,7 +501,7 @@ test.describe('map-refactory', () => {
     const titleTextBefore = await title.textContent() || ''
     const ownerTextBefore = await owner.textContent() || ''
     
-    // 3.14.3 通过语言选择器切换到 `zh-CN`
+    // 3.14.3 通过语言选择器从 en 切换到 `zh-CN`
     const langSelect = page.locator('select').filter({ hasText: /简体中文|English/ })
     await langSelect.selectOption('zh-CN')
     await page.waitForTimeout(500)

@@ -10,6 +10,9 @@ import MapSavePoiVisibilityControl from './MapSavePoiVisibilityControl.vue'
 import MapSvgDiagnosticVisibilityControl from './MapSvgDiagnosticVisibilityControl.vue'
 import { getEffectiveVisibleSavePoiCategories } from './savePoiVisibility'
 import MapSavePoiTooltip from './MapSavePoiTooltip.vue'
+import MapStationPanel from './MapStationPanel.vue'
+import type { MapStationPanelItem } from './MapStationPanel.vue'
+import { useMapStationPresenter } from './presenters/useMapStationPresenter'
 import { focusOverlayInViewport } from './focusOverlayInViewport'
 import { getSectorScalePerRadius, getSectorZoneBoundingCenter, sectorLocalRatioToRawPointWithScale, sectorPointToLocalRatioWithScale } from '@/components/map/utils/coordinates'
 import { hexVertices } from '@/components/map/utils/geometry'
@@ -181,6 +184,8 @@ const mapDiagnosticVisibility = ref({
   sectorFactionFill: true
 })
 const activeControlPanel = ref<'diagnostic' | 'poi' | null>(null)
+const isStationPanelOpen = ref(false)
+const mapStationPresenter = useMapStationPresenter()
 
 function buildColorMap(groups: { color?: string; sectorMacro?: string; coverageSectorMacros: string[] | { ref: string }[] }[]): Record<string, string> {
   const map: Record<string, string> = {}
@@ -709,6 +714,28 @@ const bindingOverlays = computed<PlacementOverlayItem[]>(() => {
   }
 
   return overlays
+})
+
+const blueprintPlacementOverlays = computed<PlacementOverlayItem[]>(() => {
+  return mapStationPresenter.items.value.flatMap((item) => {
+    if (!item.location) return []
+    return [{
+      key: `blueprint:${item.kind}:${item.id}`,
+      id: item.id,
+      kind: item.kind,
+      name: item.name,
+      icon: item.icon,
+      location: {
+        cluster_id: item.location.cluster_id,
+        sector_id: item.location.sector_id,
+        pos: item.location.pos,
+        sunlight: item.location.sunlight ?? 0,
+        resources: item.location.resources ?? []
+      },
+      draggable: isStationPanelOpen.value,
+      binding: undefined
+    }]
+  })
 })
 
 const activeMapArchive = computed<SaveArchive | null>(() => {
@@ -1317,6 +1344,29 @@ const applyLocationToItem = (item: DraggingPlacementItem, location: EntityLocati
     }
     return
   }
+  blueprintStore.setSectorLocation(item.id, location)
+}
+
+const onStationPanelDragStart = (item: MapStationPanelItem) => {
+  draggingPlacementItem.value = {
+    id: item.id,
+    kind: item.kind,
+    name: item.name,
+    icon: item.icon
+  }
+  draggingOverlayKey.value = null
+  draggingBindingKey.value = null
+  draggingSectorGroupId.value = null
+  draggingCoverageSectorMacros.value = new Set()
+}
+
+const onStationPanelFocus = (item: MapStationPanelItem) => {
+  if (!item.location) return
+  focusSector(item.location.sector_id)
+}
+
+const onStationPanelClear = (item: MapStationPanelItem) => {
+  mapStationPresenter.setLocation(item, null)
 }
 
 const closeTooltip = () => {
@@ -1866,7 +1916,7 @@ const onMouseDown = (event: MouseEvent) => {
 
 const onMouseMove = (event: MouseEvent) => {
   lastMousePos.value = { x: event.clientX, y: event.clientY }
-  if (draggingPlacementItem.value && isBindingPanelOpen.value) {
+  if (draggingPlacementItem.value && (isBindingPanelOpen.value || isStationPanelOpen.value)) {
     if (draggingBindingKey.value) {
       const bindingSampleResult = resolveBindingLocationSampleAtPointer(event.clientX, event.clientY)
       const sample = bindingSampleResult?.sample || null
@@ -2002,7 +2052,7 @@ const onResize = () => {
 }
 
 const onViewportDragOver = (event: DragEvent) => {
-  if (!isBindingPanelOpen.value) return
+  if (!isBindingPanelOpen.value && !isStationPanelOpen.value) return
   event.preventDefault()
 
   if (draggingPlacementItem.value && !draggingBindingKey.value) {
@@ -2027,7 +2077,7 @@ const onViewportDragOver = (event: DragEvent) => {
 }
 
 const onViewportDrop = (event: DragEvent) => {
-  if (!isBindingPanelOpen.value) return
+  if (!isBindingPanelOpen.value && !isStationPanelOpen.value) return
   event.preventDefault()
   
   const location = resolveLocationAtPointer(event.clientX, event.clientY)
@@ -2174,7 +2224,7 @@ onBeforeUnmount(() => {
         @panel-close="onResourcePanelClose"
       />
 
-      <MapSavePanel
+          <MapSavePanel
         :open="isSavePanelOpen"
         :archive="activeMapArchive"
         @close="onSavePanelClose"
@@ -2215,8 +2265,8 @@ onBeforeUnmount(() => {
               :resource-sector-group-badges="resourceSectorGroupBadges"
               :resource-fill-color-override="resourcePrimaryColor"
               :selected-sector-id="selectedSectorId"
-              :placement-overlays="bindingOverlays"
-              :placement-preview="isBindingPanelOpen ? placementPreview : null"
+              :placement-overlays="[...bindingOverlays, ...blueprintPlacementOverlays]"
+              :placement-preview="(isBindingPanelOpen || isStationPanelOpen) ? placementPreview : null"
               :is-dragging="isDragging"
               :is-zooming="isZooming"
               :dragging-overlay-key="draggingOverlayKey"
@@ -2279,6 +2329,15 @@ onBeforeUnmount(() => {
             :expanded="activeControlPanel === 'diagnostic'"
             @visibility-change="onMapDiagnosticVisibilityChange"
             @toggle="activeControlPanel = activeControlPanel === 'diagnostic' ? null : 'diagnostic'"
+          />
+
+          <MapStationPanel
+            :open="isStationPanelOpen"
+            :items="mapStationPresenter.items.value"
+            @close="isStationPanelOpen = false"
+            @drag-start="onStationPanelDragStart"
+            @clear-location="onStationPanelClear"
+            @focus-item="onStationPanelFocus"
           />
 
           <MapSavePoiVisibilityControl
@@ -2378,6 +2437,16 @@ onBeforeUnmount(() => {
                 stroke-width="1.8"
               />
             </svg>
+          </button>
+
+          <button
+            type="button"
+            class="map-panel-tab"
+            :class="{ active: isStationPanelOpen }"
+            data-testid="map-station-panel-tab"
+            @click="isStationPanelOpen = !isStationPanelOpen"
+          >
+            <span class="map-panel-tab-label">{{ t('map.station_panel_title') }}</span>
           </button>
 
           <button

@@ -20,18 +20,22 @@ export interface DragEvent {
 export type DropStatus = 'normal' | 'duplicated' | 'auto' | 'isolate' | 'locked' | 'rejected'
 
 export const useDragTestStore = defineStore('dragTest', () => {
-  const items = ref<DragTestItem[]>([
+  const initialItems: DragTestItem[] = [
     { id: 'item-1', name: 'Item 1', zone: 'A' },
     { id: 'item-2', name: 'Item 2', zone: 'A' },
     { id: 'item-3', name: 'Item 3', zone: 'A' },
     { id: 'item-4', name: 'Item 4', zone: 'A', lineage: 'terran' },
     { id: 'item-5', name: 'Item 5', zone: 'A', lineage: 'argon' },
-  ])
+  ]
+  const items = ref<DragTestItem[]>(initialItems.map(item => ({ ...item })))
 
   const events = ref<DragEvent[]>([])
   const isDragging = ref(false)
   const draggingItemId = ref<string | null>(null)
   const hoveredZoneId = ref<string | null>(null)
+  const draggingSnapshot = ref<DragTestItem | null>(null)
+  const itemsSnapshot = ref<DragTestItem[]>([])
+  const dropCommitted = ref(false)
   const isZoneBLocked = ref(false)
   const zoneBLineage = ref<string>('terran')
 
@@ -42,12 +46,13 @@ export const useDragTestStore = defineStore('dragTest', () => {
   const zoneBItemIds = computed(() => new Set(zoneBItems.value.map(item => item.id)))
 
   function getDropStatus(itemId: string, targetZone: 'A' | 'B'): DropStatus {
-    const item = items.value.find(i => i.id === itemId)
+    const sourceItems = isDragging.value && itemsSnapshot.value.length > 0 ? itemsSnapshot.value : items.value
+    const item = sourceItems.find(i => i.id === itemId)
     if (!item) return 'normal'
 
     if (targetZone === 'A') return 'normal'
 
-    const targetItems = zoneBItems.value
+    const targetItems = sourceItems.filter(i => i.zone === 'B')
     const existingItem = targetItems.find(i => i.id === itemId)
 
     if (existingItem) {
@@ -76,21 +81,34 @@ export const useDragTestStore = defineStore('dragTest', () => {
   function startDragging(itemId: string) {
     isDragging.value = true
     draggingItemId.value = itemId
+    itemsSnapshot.value = items.value.map(item => ({ ...item }))
+    const source = items.value.find(item => item.id === itemId) ?? initialItems.find(item => item.id === itemId)
+    draggingSnapshot.value = source ? { ...source } : null
+    dropCommitted.value = false
     recordEvent('dragstart', itemId)
   }
 
   function stopDragging() {
-    if (draggingItemId.value) {
-      recordEvent('dragend', draggingItemId.value)
-    }
+    const itemId = draggingItemId.value ?? draggingSnapshot.value?.id
+    const sourceStillPresent = draggingSnapshot.value
+      ? items.value.some(item => item.id === draggingSnapshot.value?.id)
+      : true
+    if (!dropCommitted.value || !sourceStillPresent) items.value = itemsSnapshot.value.map(item => ({ ...item }))
+    if (itemId) recordEvent('dragend', itemId)
     isDragging.value = false
     draggingItemId.value = null
     hoveredZoneId.value = null
+    draggingSnapshot.value = null
+    dropCommitted.value = false
   }
 
   function enterZone(zoneId: string) {
     hoveredZoneId.value = zoneId
     recordEvent('dragenter', draggingItemId.value ?? undefined, zoneId)
+  }
+
+  function overZone(zoneId: string) {
+    recordEvent('dragover', draggingItemId.value ?? undefined, zoneId)
   }
 
   function leaveZone(zoneId: string) {
@@ -100,31 +118,40 @@ export const useDragTestStore = defineStore('dragTest', () => {
     recordEvent('dragleave', draggingItemId.value ?? undefined, zoneId)
   }
 
+  function clearHover() {
+    hoveredZoneId.value = null
+  }
+
   function moveItem(itemId: string, targetZone: 'A' | 'B'): boolean {
+    if (!hoveredZoneId.value || hoveredZoneId.value !== targetZone || !draggingSnapshot.value) return false
     const status = getDropStatus(itemId, targetZone)
     
     if (status === 'duplicated' || status === 'rejected') {
       return false
     }
 
-    const item = items.value.find(i => i.id === itemId)
+    const nextItems = itemsSnapshot.value.map(item => ({ ...item }))
+    const sourceIndex = nextItems.findIndex(i => i.id === itemId && i.zone !== targetZone)
+    const item = sourceIndex >= 0 ? nextItems[sourceIndex] : undefined
     if (!item) return false
 
     if (status === 'auto') {
-      const existingItem = items.value.find(i => i.id === itemId && i.zone === targetZone)
-      if (existingItem) {
-        existingItem.isAuto = false
-      }
+      const existingItem = nextItems.find(i => i.id === itemId && i.zone === targetZone)
+      if (!existingItem) return false
+      existingItem.isAuto = false
+      nextItems.splice(sourceIndex, 1)
     } else if (status === 'isolate') {
-      const existingItem = items.value.find(i => i.id === itemId && i.zone === targetZone)
-      if (existingItem) {
-        existingItem.isIsolated = false
-      }
+      const existingItem = nextItems.find(i => i.id === itemId && i.zone === targetZone)
+      if (!existingItem) return false
+      existingItem.isIsolated = false
+      nextItems.splice(sourceIndex, 1)
     } else {
       item.zone = targetZone
     }
 
+    items.value = nextItems
     recordEvent('drop', itemId, targetZone)
+    dropCommitted.value = true
     return true
   }
 
@@ -177,6 +204,9 @@ export const useDragTestStore = defineStore('dragTest', () => {
     isDragging.value = false
     draggingItemId.value = null
     hoveredZoneId.value = null
+    draggingSnapshot.value = null
+    itemsSnapshot.value = []
+    dropCommitted.value = false
     isZoneBLocked.value = false
     zoneBLineage.value = 'terran'
   }
@@ -198,7 +228,9 @@ export const useDragTestStore = defineStore('dragTest', () => {
     startDragging,
     stopDragging,
     enterZone,
+    overZone,
     leaveZone,
+    clearHover,
     moveItem,
     addAutoItem,
     addIsolatedItem,

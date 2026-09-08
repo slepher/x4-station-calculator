@@ -419,6 +419,9 @@ function rebuildAssignmentsFromGroups() {
   const result = autoGroupResult.value
   if (!result) return
   const { sectorGraph, sectorClusterMap } = sectorGraphInfo.value
+  const baselineCoverageByGroupId = calcBaselinePillState.value
+    ? calcBaselinePillState.value.coverageByGroupId
+    : undefined
 
   const assignedSectors = new Map<string, string>()
   for (const group of result.groups) {
@@ -431,7 +434,15 @@ function rebuildAssignmentsFromGroups() {
   const unassigned = result.playerSectorMacros.filter((m) => !assignedSectors.has(m))
   const newAssignments = preserveEditAssignmentSelections(
     result.assignments,
-    buildAssignmentResult(unassigned, assignedSectors, result.groups, sectorGraph, sectorClusterMap, gameDataStore.sectorReachability)
+    buildAssignmentResult(
+      unassigned,
+      assignedSectors,
+      result.groups,
+      sectorGraph,
+      sectorClusterMap,
+      gameDataStore.sectorReachability,
+      baselineCoverageByGroupId
+    )
   )
 
   autoGroupResult.value = { ...result, assignments: newAssignments }
@@ -538,9 +549,20 @@ function handleUpdateJumpRange(groupId: string, range: number) {
   }
 
   const withCoverage = { ...result, groups, assignments: result.assignments }
+  const baselineCoverageByGroupId = calcBaselinePillState.value
+    ? calcBaselinePillState.value.coverageByGroupId
+    : undefined
   // Then incrementally rebuild affected assignments
   autoGroupResult.value = rebuildAssignmentsForJumpRangeChange(
-    withCoverage, groupId, Math.max(0, Math.min(5, range)), sectorGraph, sectorClusterMap, undefined, false, gameDataStore.sectorReachability
+    withCoverage,
+    groupId,
+    Math.max(0, Math.min(5, range)),
+    sectorGraph,
+    sectorClusterMap,
+    prevRange,
+    false,
+    gameDataStore.sectorReachability,
+    baselineCoverageByGroupId
   )
 }
 

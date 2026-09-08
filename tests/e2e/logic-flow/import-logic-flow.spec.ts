@@ -78,9 +78,11 @@ const buildInjectedPlansFromFixture = () => {
         id: 'g_mixed_non_empty',
         category: 'industrial',
         subCategory: 'default',
-        nodes: [
-          { module: 'module_gen_prod_microchips_01' },
-        ],
+      nodes: [
+        { module: 'module_gen_prod_microchips_01' },
+        { module: 'module_gen_prod_hullparts_01' },
+        { module: 'module_gen_prod_claytronics_01' },
+      ],
       },
       {
         id: 'g_mixed_empty',
@@ -127,26 +129,31 @@ const buildInjectedPlansFromFixture = () => {
     ],
   }
 
+  const ilfPreviewMany = {
+    id: 'ilf_preview_many',
+    name: 'ILF Preview Many',
+    lastUpdated: now,
+    settings: { isDefaultLocked: true },
+    groups: [
+      { id: 'g_preview_1', category: 'industrial', subCategory: 'default', nodes: [{ module: 'module_gen_prod_hullparts_01' }, { module: 'module_gen_prod_microchips_01' }, { module: 'module_gen_prod_claytronics_01' }] },
+      { id: 'g_preview_2', category: 'industrial', subCategory: 'default', nodes: [{ module: 'module_gen_prod_hullparts_01' }] },
+      { id: 'g_preview_3', category: 'industrial', subCategory: 'default', nodes: [{ module: 'module_gen_prod_microchips_01' }] },
+    ],
+  }
+
   return {
     version: 3,
     activeId: 'ilf_valid_single_group',
-    list: [ilfValid, ilfMixed, ilfEmpty, ilfNonContainerIsolated, ...mapped],
+    list: [ilfValid, ilfMixed, ilfEmpty, ilfNonContainerIsolated, ilfPreviewMany, ...mapped],
   }
 }
 
 const ensureStationContext = async (page: any) => {
-  await page.evaluate(() => {
-    const empireStore = (window as any).blueprintStore
-    if (!empireStore.activeEmpire || !Array.isArray(empireStore.activeEmpire.stations)) {
-      empireStore.createEmpire('ILF E2E Empire')
-    }
-    if (!empireStore.activeEmpire.stations.length) {
-      empireStore.createStation('ILF E2E Station', 'industrial')
-    }
-    if (!empireStore.activeStationId) {
-      empireStore.selectStation(empireStore.activeEmpire.stations[0].id)
-    }
-  })
+  const stations = page.locator('[data-testid="sidebar-station"]')
+  if (await stations.count() === 0) {
+    await page.getByTestId('sidebar-add-station').click()
+    await expect(stations).toHaveCount(1)
+  }
   const firstStationTab = page.locator('[data-testid="sidebar-station"]').first()
   await expect(firstStationTab).toBeVisible()
   await firstStationTab.click({ force: true })
@@ -207,40 +214,39 @@ const assertNoParseErrorHint = async (page: any) => {
   expect(bodyText).not.toMatch(/解析错误|异常提示|parse error|failed to parse/i)
 }
 
+const expectImportEntryRightAligned = async (page: any, testId: string) => {
+  const toolbar = page.locator('.context-toolbar')
+  const entry = page.getByTestId(testId)
+  const toolbarBox = await toolbar.boundingBox()
+  const entryBox = await entry.boundingBox()
+  expect(toolbarBox).not.toBeNull()
+  expect(entryBox).not.toBeNull()
+  expect(entryBox!.x + entryBox!.width).toBeGreaterThan(toolbarBox!.x + toolbarBox!.width - 80)
+}
+
 const makeEmpireSavedBaseline = async (page: any) => {
-  await page.evaluate(() => {
-    const stationStore = (window as any).stationStore
-    if (stationStore) stationStore.activeView = 'production'
-  })
   await ensureStationContext(page)
-  await page.evaluate(() => {
-    const empireStore = (window as any).blueprintStore
-    if (!empireStore.activeEmpire) {
-      empireStore.createEmpire('ILF E2E Empire')
-    }
-    if (empireStore.activeEmpire.stations.length === 0) {
-      empireStore.createStation('ILF E2E Station', 'industrial')
-    }
-    const station = empireStore.activeStation || empireStore.activeEmpire.stations[0]
-    if (!station.modules || station.modules.length === 0) {
-      empireStore.moduleActions.updatePlannedModules([{ id: 'module_gen_prod_hullparts_01', count: 1 }])
-      station.lastUpdated = Date.now()
-    }
-  })
+  const hullRow = page.locator('.module-row').filter({ hasText: /船体部件|Hull Parts/i }).first()
+  await expect(hullRow).toBeVisible()
+  const countInput = hullRow.locator('input.x4-num-input')
+  await countInput.fill('13')
+  await countInput.press('Tab')
   await page.getByRole('button', { name: /Save|保存/i }).first().click({ force: true })
 }
 
 const makeEmpireDirtyWithoutSave = async (page: any) => {
-  await page.evaluate(() => {
-    const stationStore = (window as any).stationStore
-    if (stationStore) stationStore.activeView = 'production'
-  })
   await ensureStationContext(page)
-  await page.evaluate(() => {
-    const empireStore = (window as any).blueprintStore
-    if (!empireStore.activeEmpire) throw new Error('active empire is missing')
-    empireStore.moduleActions.addModule('module_gen_prod_hullparts_01')
-  })
+  await page.getByTestId('top-view-btn-blueprint-production').click()
+  await page.getByTestId('candidate-search-input').fill('module_gen_prod_hullparts_01')
+  await expect(page.getByTestId('grouped-candidate-item-module_gen_prod_hullparts_01')).toBeVisible()
+  await page.getByTestId('grouped-candidate-item-module_gen_prod_hullparts_01').click()
+}
+
+const clearPlannedModulesViaUi = async (page: any) => {
+  const rows = page.locator('.tier-section').first().locator('.module-row')
+  while (await rows.count() > 0) {
+    await rows.first().locator('.remove-btn').click()
+  }
 }
 
 const getNewSmartSaveDialog = (page: any) =>
@@ -330,12 +336,18 @@ test.describe('import-logic-flow e2e (test implementation)', () => {
 
     const loadedSummaryA = await page.evaluate(() => {
       const groups = (window as any).logicFlowStore?.groups || []
-      const manualNodeCount = groups.flatMap((g: any) => g.nodes || []).filter((n: any) => n?.source === 'manual').length
-      return { groupsCount: groups.length, manualNodeCount }
+      return {
+        groups: groups.map((group: any) => ({
+          id: group.id,
+          manualModules: (group.nodes || []).filter((node: any) => node?.source === 'manual').map((node: any) => node.moduleId),
+          isolatedWares: (group.nodes || []).filter((node: any) => node?.source === 'isolated').map((node: any) => node.wareId)
+        }))
+      }
     })
 
-    expect(loadedSummaryA.groupsCount).toBeGreaterThan(0)
-    expect(loadedSummaryA.manualNodeCount).toBeGreaterThan(0)
+    expect(loadedSummaryA.groups).toEqual([
+      expect.objectContaining({ id: 'g_valid_1', manualModules: ['module_gen_prod_hullparts_01'] })
+    ])
     await expect(page.locator('.production-group').first()).toBeVisible()
     await expect(page.locator('.flow-node').first()).toBeVisible()
     await assertNoParseErrorHint(page)
@@ -348,12 +360,16 @@ test.describe('import-logic-flow e2e (test implementation)', () => {
 
     const loadedSummaryB = await page.evaluate(() => {
       const groups = (window as any).logicFlowStore?.groups || []
-      const manualNodeCount = groups.flatMap((g: any) => g.nodes || []).filter((n: any) => n?.source === 'manual').length
-      return { groupsCount: groups.length, manualNodeCount }
+      return groups.map((group: any) => ({
+        id: group.id,
+        manualModules: (group.nodes || []).filter((node: any) => node?.source === 'manual').map((node: any) => node.moduleId)
+      }))
     })
 
-    expect(loadedSummaryB.groupsCount).toBeGreaterThan(0)
-    expect(loadedSummaryB.manualNodeCount).toBeGreaterThan(0)
+    expect(loadedSummaryB).toEqual([
+      expect.objectContaining({ id: 'g_mixed_non_empty', manualModules: ['module_gen_prod_claytronics_01', 'module_gen_prod_microchips_01', 'module_gen_prod_hullparts_01'] }),
+      expect.objectContaining({ id: 'g_mixed_empty', manualModules: [] })
+    ])
     await expect(page.locator('.production-group').first()).toBeVisible()
     await expect(page.locator('.flow-node').first()).toBeVisible()
     await assertNoParseErrorHint(page)
@@ -434,13 +450,6 @@ test.describe('import-logic-flow e2e (test implementation)', () => {
 
   test('2.3 空间站页面入口与确认流程（覆盖导入）', async ({ page }) => {
     await ensureStationContext(page)
-    await page.evaluate(() => {
-      const empireStore = (window as any).blueprintStore
-      const station = empireStore.activeStation
-      empireStore.moduleActions.updatePlannedModules([{ id: 'module_gen_prod_hullparts_01', count: 9 }])
-      station.lockedWares = []
-      station.lastUpdated = Date.now()
-    })
 
     await openImportModal(page, 'station')
     await directImportFromStationGroupCard(page, 'ilf_valid_single_group', 'g_valid_1')
@@ -560,14 +569,8 @@ test.describe('import-logic-flow e2e (test implementation)', () => {
 
   test('2.9 导入后不自动保存，手动保存后持久化', async ({ page }) => {
     await ensureStationContext(page)
-
-    await page.evaluate(() => {
-      const empireStore = (window as any).blueprintStore
-      const station = empireStore.activeStation
-      empireStore.moduleActions.clearAllModules()
-      station.lockedWares = []
-      empireStore.saveEmpire()
-    })
+    await clearPlannedModulesViaUi(page)
+    await page.getByTestId('toolbar-save-btn').click({ force: true })
 
     await openImportModal(page, 'station')
     await directImportFromStationGroupCard(page, 'ilf_valid_single_group', 'g_valid_1')
@@ -596,12 +599,12 @@ test.describe('import-logic-flow e2e (test implementation)', () => {
     await ensureStationContext(page)
     const stationEntry = page.locator('[data-testid="logicflow-import-entry-station"]')
     await expect(stationEntry).toBeVisible()
-    await expect(stationEntry).toBeVisible()
+    await expectImportEntryRightAligned(page, 'logicflow-import-entry-station')
 
     await ensureEmpireOverview(page)
     const empireEntry = page.locator('[data-testid="logicflow-import-entry-empire"]')
     await expect(empireEntry).toBeVisible()
-    await expect(empireEntry).toBeVisible()
+    await expectImportEntryRightAligned(page, 'logicflow-import-entry-empire')
   })
 
   test('2.11 增量需求：帝国导入切换为“加载帝国”形态（改当前模板）', async ({ page }) => {
@@ -707,27 +710,27 @@ test.describe('import-logic-flow e2e (test implementation)', () => {
   test('2.18 增量需求：详情预览信息保留（帝国/空间站）', async ({ page }) => {
     // 帝国导入界面
     await openImportModal(page, 'empire')
-    const empirePlanCard = page.locator('[data-testid="logicflow-import-plan-item-ilf_mixed_groups"]')
+    const empirePlanCard = page.locator('[data-testid="logicflow-import-plan-item-ilf_preview_many"]')
     await expect(empirePlanCard).toBeVisible()
     // 统计摘要：组数和可导入组数
     await expect(empirePlanCard).toContainText(/groups|组/i)
     await expect(empirePlanCard).toContainText(/importable|可导入/i)
     // 更新时间
     await expect(empirePlanCard).toContainText(/\d{1,2}\/\d{1,2}\/\d{4}|20\d{2}/i)
-    // +N more 提示（通过 data-testid 定位）
+    await expect(page.getByTestId('logicflow-import-plan-more-ilf_preview_many')).toContainText('+1')
     // 关闭弹窗
     await page.locator('[data-testid="import-view-modal"] button', { hasText: /Cancel|取消/i }).first().click()
     await expect(page.locator('[data-testid="import-view-modal"]')).toHaveCount(0)
 
     // 空间站导入界面
     await openImportModal(page, 'station')
-    await page.locator('[data-testid="logicflow-import-plan-select"]').selectOption('ilf_mixed_groups')
-    const stationGroupCard = page.locator('[data-testid="logicflow-import-group-item-g_mixed_non_empty"]')
+    await page.locator('[data-testid="logicflow-import-plan-select"]').selectOption('ilf_preview_many')
+    const stationGroupCard = page.locator('[data-testid="logicflow-import-group-item-g_preview_1"]')
     await expect(stationGroupCard).toBeVisible()
     // 节点统计
     await expect(stationGroupCard).toContainText(/nodes|节点/i)
     await expect(stationGroupCard).toContainText(/manual|手动/i)
-    // +N more 提示（通过 data-testid 定位）
+    await expect(page.getByTestId('logicflow-import-group-more-g_preview_1')).toContainText('+1')
   })
 
   test('2.19 增量需求：移除底部继续流程按钮', async ({ page }) => {
@@ -784,13 +787,6 @@ test.describe('import-logic-flow e2e (test implementation)', () => {
 
   test('3.1 空间站页面入口与确认流程（覆盖导入）', async ({ page }) => {
     await ensureStationContext(page)
-    await page.evaluate(() => {
-      const empireStore = (window as any).blueprintStore
-      const station = empireStore.activeStation
-      empireStore.moduleActions.updatePlannedModules([{ id: 'module_gen_prod_hullparts_01', count: 5 }])
-      station.lockedWares = []
-      station.lastUpdated = Date.now()
-    })
 
     await openImportModal(page, 'station')
     await directImportFromStationGroupCard(page, 'ilf_valid_single_group', 'g_valid_1')

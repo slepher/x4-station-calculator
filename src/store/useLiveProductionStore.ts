@@ -520,7 +520,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       modulesByMacroId: gameData.modulesByMacroId,
       containerThreshold: prefThreshold.value,
       prefJumpRange: prefJumpRange.value
-    }, sectorGraph, sectorClusterMap)
+    }, sectorGraph, sectorClusterMap, gameData.sectorReachability, needsAutoGroupRecalc.value)
     setAutoGroupResult(enrichedResult)
     calculationMode.value = 'result'
   }

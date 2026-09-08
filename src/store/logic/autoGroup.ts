@@ -30,9 +30,11 @@ export interface AssignmentOption {
   distance: number
   extendsRange: boolean
   resultingGroupSize: number
-  source?: 'derived_standalone'
+  source?: 'derived_standalone' | 'baseline'
   sourceGroupId?: string
 }
+
+export type BaselineCoverageByGroupId = Readonly<Record<string, readonly string[]>>
 
 export interface SectorAssignment {
   sectorMacro: string
@@ -367,7 +369,8 @@ function buildBridgeUnits(
   sectorHubMap: Map<string, StationHubInfo[]>,
   sectorGraph: Record<string, string[]>,
   sectorClusterMap: Record<string, string>,
-  excludedSectorMacros: Set<string> = new Set()
+  excludedSectorMacros: Set<string> = new Set(),
+  sectorReachability?: SectorReachability
 ): BridgePlanUnit[] {
   const anchorSectors = new Set(groups.map((g) => g.sectorMacro).filter(Boolean) as string[])
 
@@ -390,6 +393,10 @@ function buildBridgeUnits(
     if (!hubs || hubs.length === 0) return true
     // Check if any hub in same cluster is reachable within the cluster
     for (const hub of hubs) {
+      if (sectorReachability) {
+        if (getReachableDistance(sectorReachability, sector, hub) === 0) return false
+        continue
+      }
       // BFS within same cluster to check reachability
       const visitedBfs = new Set<string>()
       const queue = [sector]
@@ -427,6 +434,16 @@ function buildBridgeUnits(
     while (queue.length > 0) {
       const current = queue.shift()!
       component.push(current)
+      if (sectorReachability) {
+        for (const next of candidates) {
+          if (visited.has(next)) continue
+          if ((sectorClusterMap[next] || next) !== clusterId) continue
+          if (getReachableDistance(sectorReachability, current, next) !== 0) continue
+          visited.add(next)
+          queue.push(next)
+        }
+        continue
+      }
       for (const next of sectorGraph[current] || []) {
         if (!candidateSet.has(next) || visited.has(next)) continue
         if ((sectorClusterMap[next] || next) !== clusterId) continue
@@ -610,7 +627,15 @@ export function buildBridgePlanOptions(
   const components = collectConnectedComponents(groups)
   if (components.length <= 1) return []
 
-  const units = buildBridgeUnits(groups, playerSectorMacros, sectorHubMap, sectorGraph, sectorClusterMap, new Set(excludedSectorMacros))
+  const units = buildBridgeUnits(
+    groups,
+    playerSectorMacros,
+    sectorHubMap,
+    sectorGraph,
+    sectorClusterMap,
+    new Set(excludedSectorMacros),
+    sectorReachability
+  )
   if (units.length === 0) return []
 
   const combos = enumerateUnitCombos(units, Math.min(components.length, 4))
@@ -1317,7 +1342,8 @@ export function buildAssignmentResult(
   groups: GroupDraftInfo[],
   sectorGraph: Record<string, string[]>,
   sectorClusterMap: Record<string, string>,
-  sectorReachability?: SectorReachability
+  sectorReachability?: SectorReachability,
+  baselineCoverageByGroupId?: BaselineCoverageByGroupId
 ): SectorAssignment[] {
   const assignments: SectorAssignment[] = []
   const allSectors = [...unassignedSectors, ...Array.from(assignedSectors.keys())]
@@ -1343,22 +1369,6 @@ export function buildAssignmentResult(
       }
     }
 
-    if (candidates.length === 0) {
-      assignments.push(withDisplayBucket({
-        sectorMacro,
-        status: 'unresolved_no_candidate',
-        options: [{
-          type: 'standalone' as const,
-          distance: 0,
-          extendsRange: false,
-          resultingGroupSize: 1
-        }],
-        selectedSectorMacro: null,
-        selectedOptionIndex: null
-      }))
-      continue
-    }
-
     // Split candidates: current-range hits vs extension hits
     const currentRangeHits = candidates.filter((g) => g.distance <= g.jumpRange)
     let optionsSource = currentRangeHits
@@ -1380,6 +1390,25 @@ export function buildAssignmentResult(
       extendsRange: g.distance > g.jumpRange,
       resultingGroupSize: uniqueSectors.length
     }))
+
+    if (currentRangeHits.length === 0 && optionsSource.length === 0 && baselineCoverageByGroupId) {
+      for (const group of groups) {
+        if (!group.sectorMacro) continue
+        const baselineCoverage = baselineCoverageByGroupId[group.id]
+        if (!baselineCoverage?.includes(sectorMacro)) continue
+        const distance = getDistance(group.sectorMacro, sectorMacro, sectorGraph, sectorClusterMap)
+        if (distance === null) continue
+        options.push({
+          type: 'absorb',
+          targetGroupId: group.id,
+          distance,
+          extendsRange: false,
+          resultingGroupSize: uniqueSectors.length,
+          source: 'baseline'
+        })
+        break
+      }
+    }
 
     // Add standalone as last option
     const noStandalone = !options.some((o) => o.type === 'standalone')
@@ -2017,7 +2046,8 @@ export function rebuildAssignmentsForJumpRangeChange(
   sectorClusterMap: Record<string, string>,
   oldRangeOverride?: number,
   autoSelect: boolean = true,
-  sectorReachability?: SectorReachability
+  sectorReachability?: SectorReachability,
+  baselineCoverageByGroupId?: BaselineCoverageByGroupId
 ): AutoGroupResult {
   const group = result.groups.find((g) => g.id === groupId)
   if (!group?.sectorMacro) return result
@@ -2040,10 +2070,17 @@ export function rebuildAssignmentsForJumpRangeChange(
     const a = assignments[i]!
     if (anchorSectors.has(a.sectorMacro)) continue
 
-    const dist = getTransportDistance(sectorMacro, a.sectorMacro, sectorGraph, sectorClusterMap, sectorReachability)
+    const baselineCoverage = baselineCoverageByGroupId?.[groupId]
+    const baselineOwnedByChangedGroup = baselineCoverage?.includes(a.sectorMacro) === true
+    let dist = getTransportDistance(sectorMacro, a.sectorMacro, sectorGraph, sectorClusterMap, sectorReachability)
+    if (dist === null && baselineOwnedByChangedGroup) {
+      dist = getDistance(sectorMacro, a.sectorMacro, sectorGraph, sectorClusterMap)
+    }
     if (dist === null) continue
-    if (dist <= minRange) continue
-    if (dist > maxRange) continue
+    if (!baselineOwnedByChangedGroup) {
+      if (dist <= minRange) continue
+      if (dist > maxRange) continue
+    }
 
     const assignedSectors = new Map<string, string>()
     for (const g of groups) {
@@ -2053,7 +2090,15 @@ export function rebuildAssignmentsForJumpRangeChange(
       }
     }
     const unassigned = result.playerSectorMacros.filter((m) => !assignedSectors.has(m))
-    const rebuilt = buildAssignmentResult(unassigned, assignedSectors, groups, sectorGraph, sectorClusterMap, sectorReachability)
+    const rebuilt = buildAssignmentResult(
+      unassigned,
+      assignedSectors,
+      groups,
+      sectorGraph,
+      sectorClusterMap,
+      sectorReachability,
+      baselineCoverageByGroupId
+    )
     const rebuiltAssignment = rebuilt.find((r) => r.sectorMacro === a.sectorMacro)
     if (!rebuiltAssignment) continue
 
@@ -2072,9 +2117,14 @@ export function rebuildAssignmentsForJumpRangeChange(
     const hubOpt = rebuiltAssignment.options.find((o) => o.targetGroupId === groupId)
     if (!autoSelect) {
       if (previousSelectedOption) {
-        if (previousSelectedOption.type === 'absorb' && previousSelectedOption.targetGroupId === groupId && previousSelectedOption.extendsRange === false && hubOpt?.extendsRange === true) {
+        if (
+          previousSelectedOption.type === 'absorb' &&
+          previousSelectedOption.targetGroupId === groupId &&
+          previousSelectedOption.extendsRange === false &&
+          (hubOpt?.extendsRange === true || hubOpt?.source === 'baseline')
+        ) {
           nextSelected = null
-          nextStatus = 'uncertain_extend'
+          nextStatus = rebuiltAssignment.status
         } else if (previousSelectedOption.type === 'standalone') {
           const mappedIdx = rebuiltAssignment.options.findIndex((o) => o.type === 'standalone')
           nextSelected = mappedIdx >= 0 ? mappedIdx : null
@@ -2098,7 +2148,10 @@ export function rebuildAssignmentsForJumpRangeChange(
       continue
     }
 
-    if (hubOpt) {
+    if (hubOpt?.source === 'baseline') {
+      nextSelected = rebuiltAssignment.selectedOptionIndex
+      nextStatus = rebuiltAssignment.status
+    } else if (hubOpt) {
       const hubOptIdx = rebuiltAssignment.options.indexOf(hubOpt)
       if (!hubOpt.extendsRange) {
         if (prevSelectedTarget === groupId || prevWasExtension === true) {
@@ -2215,6 +2268,9 @@ export function preserveEditAssignmentSelections(
     if (mappedIndex < 0) {
       return { ...assignment, selectedSectorMacro: null, selectedOptionIndex: null }
     }
+    if (assignment.options[mappedIndex]?.source === 'baseline') {
+      return { ...assignment, selectedSectorMacro: null, selectedOptionIndex: null }
+    }
 
     return {
       ...assignment,
@@ -2237,7 +2293,8 @@ export function enrichAutoGroupResult(
   },
   sectorGraph: Record<string, string[]>,
   sectorClusterMap: Record<string, string>,
-  sectorReachability?: SectorReachability
+  sectorReachability: SectorReachability | undefined,
+  stabilizeColors: boolean
 ): AutoGroupResult {
   const enrichedGroups = result.groups.map((g) => {
     let name = g.name
@@ -2275,7 +2332,7 @@ export function enrichAutoGroupResult(
     maxHop: 5
   }
 
-  stabilizeHubColors(enrichedGroups, colorCtx)
+  if (stabilizeColors) stabilizeHubColors(enrichedGroups, colorCtx)
 
   const sectorStationMap = new Map<string, PlayerStationEntry[]>()
   for (const s of getSaveSectorsWithPlayerStations(deps.archive)) {

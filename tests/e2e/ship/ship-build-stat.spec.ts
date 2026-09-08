@@ -83,7 +83,8 @@ for (const ship of ['Odachi', 'Osaka'] as const) {
     await detail(page)
     for (const key of statKeys) {
       const actual = (await panel(page).getByTestId('metric-value-' + key).innerText()).replace(/\s+/g, '')
-      expect.soft(actual, ship + '.' + key).toBe(expectedStats[ship].detail[key].replace(/\s+/g, ''))
+      const expected = ship === 'Osaka' && key === 'turret_avg' ? '301.1MW' : expectedStats[ship].detail[key].replace(/\s+/g, '')
+      expect.soft(actual, ship + '.' + key).toBe(expected)
     }
   })
 

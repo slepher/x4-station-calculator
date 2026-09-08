@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import draggable from 'vuedraggable'
-import { useDragTestStore } from '@/store/useDragTestStore'
+import { useDragTestPresenter } from './presenters/useDragTestPresenter'
 
-const store = useDragTestStore()
+const presenter = useDragTestPresenter()
 
 const isTestEnv = ref(false)
 
@@ -12,7 +12,7 @@ const dragEnterCounter = ref<{ A: number; B: number }>({ A: 0, B: 0 })
 onMounted(() => {
   isTestEnv.value = localStorage.getItem('isTestEnv') === 'true' || (window as any).isTestEnv
   if (isTestEnv.value) {
-    (window as any).dragTestStore = store
+    (window as any).dragTestStore = presenter.debugStore
   }
 })
 
@@ -23,20 +23,20 @@ onUnmounted(() => {
 })
 
 const zoneAList = computed({
-  get: () => store.zoneAItems,
+  get: () => presenter.zoneAItems.value,
   set: () => {}
 })
 
 const zoneBList = computed({
-  get: () => store.zoneBItems,
+  get: () => presenter.zoneBItems.value,
   set: () => {}
 })
 
 const getZoneStatusClass = (zoneId: 'A' | 'B'): string => {
-  if (!store.isDragging || !store.draggingItemId) return ''
+  if (!presenter.isDragging.value || !presenter.draggingItemId.value) return ''
   
-  const status = store.getDropStatus(store.draggingItemId, zoneId)
-  const isHovered = store.hoveredZoneId === zoneId
+  const status = presenter.getDropStatus(presenter.draggingItemId.value, zoneId)
+  const isHovered = presenter.hoveredZoneId.value === zoneId
   
   const classes: string[] = []
   
@@ -65,10 +65,10 @@ const getZoneStatusClass = (zoneId: 'A' | 'B'): string => {
 }
 
 const getStatusLabel = (zoneId: 'A' | 'B'): string => {
-  if (!store.isDragging || !store.draggingItemId) return ''
+  if (!presenter.isDragging.value || !presenter.draggingItemId.value) return ''
   
-  const status = store.getDropStatus(store.draggingItemId, zoneId)
-  const isHovered = store.hoveredZoneId === zoneId
+  const status = presenter.getDropStatus(presenter.draggingItemId.value, zoneId)
+  const isHovered = presenter.hoveredZoneId.value === zoneId
   
   switch (status) {
     case 'duplicated':
@@ -89,29 +89,33 @@ const getStatusLabel = (zoneId: 'A' | 'B'): string => {
 const handleDragStart = (evt: any) => {
   const itemId = evt.item.getAttribute('data-item-id')
   if (itemId) {
-    store.startDragging(itemId)
+    presenter.startDragging(itemId)
   }
 }
 
 const handleDragEnd = () => {
   dragEnterCounter.value = { A: 0, B: 0 }
-  store.stopDragging()
+  presenter.stopDragging()
 }
 
 const handleDragEnter = (zoneId: 'A' | 'B') => {
-  if (store.isDragging) {
+  if (presenter.isDragging.value) {
     dragEnterCounter.value[zoneId]++
     if (dragEnterCounter.value[zoneId] === 1) {
-      store.enterZone(zoneId)
+      presenter.enterZone(zoneId)
     }
   }
 }
 
+const handleDragOver = (zoneId: 'A' | 'B') => {
+  if (presenter.isDragging.value) presenter.overZone(zoneId)
+}
+
 const handleDragLeave = (zoneId: 'A' | 'B') => {
-  if (store.isDragging) {
+  if (presenter.isDragging.value) {
     dragEnterCounter.value[zoneId]--
     if (dragEnterCounter.value[zoneId] === 0) {
-      store.leaveZone(zoneId)
+      presenter.leaveZone(zoneId)
     }
   }
 }
@@ -121,7 +125,7 @@ const handleAddToZoneB = (evt: any) => {
   const itemId = item?.id || evt.item.getAttribute('data-item-id')
   
   if (itemId) {
-    const success = store.moveItem(itemId, 'B')
+    const success = presenter.moveItem(itemId, 'B')
     if (!success) {
       if (evt.item && evt.item.parentNode) {
         evt.item.parentNode.removeChild(evt.item)
@@ -129,7 +133,7 @@ const handleAddToZoneB = (evt: any) => {
     }
   }
   
-  store.hoveredZoneId = null
+  presenter.clearHover()
 }
 
 const handleAddToZoneA = (evt: any) => {
@@ -137,27 +141,29 @@ const handleAddToZoneA = (evt: any) => {
   const itemId = item?.id || evt.item.getAttribute('data-item-id')
   
   if (itemId) {
-    store.moveItem(itemId, 'A')
+    presenter.moveItem(itemId, 'A')
   }
   
-  store.hoveredZoneId = null
+  presenter.clearHover()
 }
 
 const toggleZoneBLock = () => {
-  store.setZoneBLocked(!store.isZoneBLocked, 'terran')
+  presenter.setZoneBLocked(!presenter.isZoneBLocked.value, 'terran')
 }
 
 const addAutoItemToZoneB = () => {
-  store.addAutoItem('item-1', 'Item 1 (Auto)', 'B')
+  presenter.addAutoItem('item-1', 'Item 1 (Auto)', 'B')
 }
 
 const addIsolatedItemToZoneB = () => {
-  store.addIsolatedItem('item-2', 'Item 2 (Isolated)', 'B')
+  presenter.addIsolatedItem('item-2', 'Item 2 (Isolated)', 'B')
 }
 
 const resetTest = () => {
-  store.resetState()
+  presenter.resetState()
 }
+
+const dragKey = (item: { zone: string; id: string }) => `${item.zone}:${item.id}`
 </script>
 
 <template>
@@ -172,11 +178,11 @@ const resetTest = () => {
         <button 
           @click="toggleZoneBLock"
           class="px-4 py-2 rounded-lg text-sm font-medium transition-all"
-          :class="store.isZoneBLocked 
+          :class="presenter.isZoneBLocked
             ? 'bg-amber-500/20 text-amber-400 border border-amber-500/50' 
             : 'bg-white/5 text-white/60 border border-white/10'"
         >
-          Zone B: {{ store.isZoneBLocked ? `Locked (${store.zoneBLineage})` : 'Unlocked' }}
+          Zone B: {{ presenter.isZoneBLocked ? `Locked (${presenter.zoneBLineage})` : 'Unlocked' }}
         </button>
         <button 
           @click="addAutoItemToZoneB"
@@ -204,24 +210,25 @@ const resetTest = () => {
           :class="getZoneStatusClass('A')"
           data-zone-id="A"
           @dragenter="handleDragEnter('A')"
+          @dragover="handleDragOver('A')"
           @dragleave="handleDragLeave('A')"
         >
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-bold text-white">Zone A</h2>
-            <span class="text-xs text-white/40">{{ store.zoneAItems.length }} items</span>
+            <span class="text-xs text-white/40">{{ presenter.zoneAItems.value.length }} items</span>
           </div>
           
-          <div v-if="store.isDragging && store.draggingItemId && getStatusLabel('A')" 
+          <div v-if="presenter.isDragging && presenter.draggingItemId && getStatusLabel('A')"
                class="status-label mb-2 text-xs font-bold uppercase tracking-widest"
-               :class="store.getDropStatus(store.draggingItemId, 'A') === 'duplicated' ? 'text-red-400' : 'text-blue-400'">
+               :class="presenter.getDropStatus(presenter.draggingItemId.value!, 'A') === 'duplicated' ? 'text-red-400' : 'text-blue-400'">
             {{ getStatusLabel('A') }}
           </div>
 
           <draggable
             class="draggable-area min-h-[200px] flex flex-col gap-2"
-            :list="zoneAList"
+            :model-value="zoneAList"
             :group="{ name: 'test-items', pull: true, put: true }"
-            item-key="id"
+            :item-key="dragKey"
             @start="handleDragStart"
             @end="handleDragEnd"
             @add="handleAddToZoneA"
@@ -254,29 +261,30 @@ const resetTest = () => {
           :class="getZoneStatusClass('B')"
           data-zone-id="B"
           @dragenter="handleDragEnter('B')"
+          @dragover="handleDragOver('B')"
           @dragleave="handleDragLeave('B')"
         >
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-bold text-white">Zone B</h2>
-            <span class="text-xs text-white/40">{{ store.zoneBItems.length }} items</span>
+            <span class="text-xs text-white/40">{{ presenter.zoneBItems.value.length }} items</span>
           </div>
           
-          <div v-if="store.isDragging && store.draggingItemId && getStatusLabel('B')" 
+          <div v-if="presenter.isDragging && presenter.draggingItemId && getStatusLabel('B')"
                class="status-label mb-2 text-xs font-bold uppercase tracking-widest"
                :class="{
-                 'text-red-400': ['duplicated', 'rejected'].includes(store.getDropStatus(store.draggingItemId, 'B')),
-                 'text-blue-400': ['auto', 'isolate', 'normal'].includes(store.getDropStatus(store.draggingItemId, 'B')) && store.hoveredZoneId === 'B',
-                 'text-emerald-400': store.getDropStatus(store.draggingItemId, 'B') === 'auto' && store.hoveredZoneId !== 'B',
-                 'text-amber-400': ['isolate', 'locked'].includes(store.getDropStatus(store.draggingItemId, 'B')) && store.hoveredZoneId !== 'B'
+                 'text-red-400': ['duplicated', 'rejected'].includes(presenter.getDropStatus(presenter.draggingItemId.value!, 'B')),
+                 'text-blue-400': ['auto', 'isolate', 'normal'].includes(presenter.getDropStatus(presenter.draggingItemId.value!, 'B')) && presenter.hoveredZoneId.value === 'B',
+                 'text-emerald-400': presenter.getDropStatus(presenter.draggingItemId.value!, 'B') === 'auto' && presenter.hoveredZoneId.value !== 'B',
+                 'text-amber-400': ['isolate', 'locked'].includes(presenter.getDropStatus(presenter.draggingItemId.value!, 'B')) && presenter.hoveredZoneId.value !== 'B'
                }">
             {{ getStatusLabel('B') }}
           </div>
 
           <draggable
             class="draggable-area min-h-[200px] flex flex-col gap-2"
-            :list="zoneBList"
+            :model-value="zoneBList"
             :group="{ name: 'test-items', pull: true, put: true }"
-            item-key="id"
+            :item-key="dragKey"
             @start="handleDragStart"
             @end="handleDragEnd"
             @add="handleAddToZoneB"
@@ -303,7 +311,7 @@ const resetTest = () => {
             </template>
           </draggable>
 
-          <div v-if="store.zoneBItems.length === 0" class="empty-state text-center py-8 text-white/30">
+          <div v-if="presenter.zoneBItems.value.length === 0" class="empty-state text-center py-8 text-white/30">
             Drop items here
           </div>
         </div>
@@ -312,10 +320,10 @@ const resetTest = () => {
       <div class="mt-8 p-4 rounded-xl bg-white/5 border border-white/10">
         <h3 class="text-sm font-bold text-white/60 mb-2">Event History (Last 10)</h3>
         <div class="text-xs font-mono text-white/40 space-y-1">
-          <div v-for="(event, index) in store.getEventHistory().slice(-10)" :key="index">
+          <div v-for="(event, index) in presenter.getEventHistory().slice(-10)" :key="index">
             {{ event.type }}: itemId={{ event.itemId }}, zoneId={{ event.zoneId }}
           </div>
-          <div v-if="store.events.length === 0" class="text-white/20">
+          <div v-if="presenter.events.value.length === 0" class="text-white/20">
             No events recorded
           </div>
         </div>

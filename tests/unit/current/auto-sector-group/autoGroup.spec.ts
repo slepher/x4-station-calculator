@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import fixture from '../../../fixtures/auto-group/save_009_minimal.json'
-import { groupCleanSlate, groupIncremental, applyAbsorbToResult, applyStandaloneToResult, applyBridgePlanToDraft, buildBridgePlanOptions, collectConnectedComponents, type AutoGroupResult, type GroupDraftInfo } from '@/store/logic/autoGroup'
+import { groupCleanSlate, groupIncremental, enrichAutoGroupResult, applyAbsorbToResult, applyStandaloneToResult, applyBridgePlanToDraft, buildBridgePlanOptions, collectConnectedComponents, type AutoGroupResult, type GroupDraftInfo } from '@/store/logic/autoGroup'
 import { buildSectorGraphFromMaps } from '@/store/logic/saveBindingUtils'
 import type { SaveArchive, PlayerStationEntry } from '@/types/saveArchive'
 import type { X4Module } from '@/types/x4'
@@ -248,6 +248,28 @@ describe('autoGroup - recalculation with pinned hubs', () => {
       group.isNew &&
       !pinnedGroups.some((pinned) => pinned.sectorMacro === group.sectorMacro)
     )).toBe(true)
+  })
+})
+
+describe('autoGroup - restore color policy', () => {
+  it('preserves transparent restored colors and stabilizes colors only for calculation', () => {
+    const archive = buildArchive(fixture as CompactFixture)
+    const modulesByMacroId = buildModulesByMacroId()
+    const { sectorGraph, sectorClusterMap } = buildSectorData()
+    const source = runCleanSlate()
+    source.groups[0]!.color = undefined
+    const deps = {
+      getSectorName: (macro: string) => macro,
+      getFactionColor: () => undefined,
+      archive,
+      modulesByMacroId,
+      containerThreshold: 0.8,
+      prefJumpRange: 3
+    }
+    const restored = enrichAutoGroupResult(source, deps, sectorGraph, sectorClusterMap, undefined, false)
+    expect(restored.groups[0]!.color).toBeUndefined()
+    const calculated = enrichAutoGroupResult(source, deps, sectorGraph, sectorClusterMap, undefined, true)
+    expect(calculated.groups[0]!.color).toBeTruthy()
   })
 })
 

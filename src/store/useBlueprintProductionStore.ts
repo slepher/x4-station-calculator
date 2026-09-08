@@ -587,6 +587,10 @@ function updateStationModules(stationId: string, modules: SavedModule[]) {
     return empireDataStore.setStationLocationInEmpire(activeEmpire.value, stationId, location)
   }
 
+  function setSectorLocation(sectorId: string, location: EntityLocation | null): boolean {
+    return empireDataStore.setSectorLocationInEmpire(activeEmpire.value, sectorId, location)
+  }
+
   function applyImportedStationPayload(
     stationId: string,
     payload: { modules: SavedModule[]; lockedWares: string[]; warePriority: Record<string, number> }
@@ -1090,6 +1094,7 @@ function updateStationModules(stationId: string, modules: SavedModule[]) {
     updateStationCount: updateStationCountFromActive,
     updateStationMinerals,
     setStationLocation,
+    setSectorLocation,
     applyImportedStationPayload,
     updateEmpireName,
     takeSnapshot,

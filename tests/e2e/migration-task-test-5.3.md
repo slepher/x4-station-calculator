@@ -19,4 +19,16 @@ Owned compact2 + demo20旧项合并成当前10事务。正式LogicFlow与独立d
 
 基线3项1fail/2pass，T0旧expect失败。迁移中expect错误从test-setup导入及JSON缺attribute导致两次collection错误（没有browser验收count）；修正后完整8项失败，两个compact locator/status错误及cancel过强顺序oracle已修。取消可以改变列表顺序但仍保持原区成员，旧目的未要求禁排序；采用完整ID集合，未降成只看count。
 
-最终collection10。当前合成4满足/6失败：compact2+cancel1于test-owned-correction3/3；Reset于independent1/2。demo正常/placeholder/locked/duplicate失败未删除或skip，具体源码归属/权威及恢复见results/M5.3.md。原demo直接store方法的成功不作为真实UI通过。
+最终collection10。当前完整复验为 **6满足/4失败**：compact2、normal、Auto、Argon reject、Reset通过；cancel、Isolate、Terran accept、duplicate失败。失败未删除或skip，具体源码归属/权威及恢复见results/M5.3.md。原demo直接store方法的成功不作为真实UI通过。
+
+## 2026-09-08 fresh dist 复验
+
+PORT=22753、preview-only、workers=1、retries=0、trace=on；命令输出和 trace 保留在 `/tmp/x4-test-repair-M5.3/`。当前 10 项 collection 成功，单次结果 **4 passed / 6 failed / 0 skipped，exit 1，44.5s**。未发现可在 owned spec 内修复的 stale locator 或 fixture schema；失败动作和独立 expected 继续保留。未执行 build、Unit、Rust 或 full suite。
+
+## 独立 demo 产品修复复验
+
+授权范围内修复了独立 demo 的受控 `model-value`/authoritative `items`、normal move、Auto promote、dragover 事件、locked accept/reject 和稳定 item key；正式 Logic Flow/helper 未改。`npm run build` exit 0（`/tmp/x4-test-repair-M5.3/product-fix-build-latest2.log`）。最新完整单次为 **6 passed / 4 failed / 0 skipped**，详见 results/M5.3.md。
+
+Sol follow-up：新增独立 demo presenter，store 改为完整 ordered snapshot 与事务式 nextItems 提交，并将鼠标目标锚定实际 draggable-area 空白。build exit 0（`/tmp/x4-test-repair-M5.3/product-fix2/build-final2.log`）；最新完整单次 **7 passed / 3 failed / 0 skipped，exit 1**，证据位于 `/tmp/x4-test-repair-M5.3/product-fix2/`。剩余失败逐项保留。
+
+Current-source final build exit 0（`/tmp/x4-test-repair-M5.3/product-fix2/build-current-final.log`）；最终完整单次 **8 passed / 2 failed / 0 skipped，exit 1，46.1s**，日志 `/tmp/x4-test-repair-M5.3/product-fix2/final-current2.log`。剩余仅 Argon reject 与 Terran accept hover，合同保持 incomplete。

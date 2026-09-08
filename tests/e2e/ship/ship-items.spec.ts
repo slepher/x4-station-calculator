@@ -125,7 +125,7 @@ test('3.8 drag into unavailable range clamps to remaining shared deployable capa
   await page.mouse.down()
   await page.mouse.move(box!.x + box!.width - 2, box!.y + box!.height / 2, { steps: 10 })
   await page.mouse.up()
-  await expect.soft(inputs.nth(1)).toHaveValue('220')
+  await expect(inputs.nth(1)).toHaveValue('220')
   await expect(deployable.locator('.storage-section-info')).toHaveText('250 / 250')
   expect((await storage(page)).deployables).toMatchObject([
     { id: 'waypointmarker_01', count: 30 }, { id: 'resourceprobe_01', count: 220 }

@@ -45,6 +45,7 @@ describe('map highway ring gate highlighting', () => {
   it('marks a cross-cluster gate line as highway ring only when both endpoints are ring gates', () => {
     const bothEndpoints = useMapSvgLinks({
       clusters,
+      allClusters: clusters,
       sectors,
       regionIds,
       layoutState: computed(() => layoutState({ cluster_a: { x: 200, y: 300 }, cluster_b: { x: 600, y: 300 } })),
@@ -70,6 +71,7 @@ describe('map highway ring gate highlighting', () => {
 
     const oneEndpoint = useMapSvgLinks({
       clusters,
+      allClusters: clusters,
       sectors,
       regionIds,
       layoutState: computed(() => layoutState({ cluster_a: { x: 200, y: 300 }, cluster_b: { x: 600, y: 300 } })),

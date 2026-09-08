@@ -80,14 +80,12 @@ test.describe('map-resource-filter', () => {
     // 3.1.3 对 `data-testid="map-resource-tag-silicon"` 执行点击操作选中 silicon
     await page.locator('[data-testid="map-resource-tag-silicon"]').click()
     // 3.1.4 对 `[data-sector-hover-id="Cluster_01_Sector001_macro"]` 内的 SVG 断言存在多个 `data-testid="resource-pie-slice"` 子元素 #期望: [pie-slice 数量 >= 2]
-    const sector = page.locator('[data-sector-hover-id="Cluster_01_Sector001_macro"]')
+    const sector = page.locator('[data-sector-hover-id="cluster_01_sector001_macro"]')
     const slices = sector.locator('[data-testid="resource-pie-slice"]')
     await expect(slices.first()).toBeVisible({ timeout: 3000 })
-    const sliceCount = await slices.count()
-    expect(sliceCount).toBeGreaterThanOrEqual(2)
-    // 3.1.5 对第一个饼图切片断言 `fill` 属性为 `#CF7F54` (ore 颜色) #期望: [fill='#CF7F54']
-    const firstSlice = slices.first()
-    await expect(firstSlice).toHaveAttribute('fill', '#CF7F54')
+    await expect(slices).toHaveCount(2)
+    await expect(slices.nth(0)).toHaveAttribute('fill', '#B36100')
+    await expect(slices.nth(1)).toHaveAttribute('fill', '#00AFB3')
   })
 
   // 3.2 Case: 单资源单色填充
@@ -97,13 +95,13 @@ test.describe('map-resource-filter', () => {
     // 3.2.2 对 `data-testid="map-resource-tag-ore"` 执行点击操作选中 ore
     await page.locator('[data-testid="map-resource-tag-ore"]').click()
     // 3.2.3 对 `[data-sector-hover-id="Cluster_01_Sector001_macro"]` 内断言不存在 `data-testid="resource-pie-slice"` 元素 #期望: [无 pie-slice 元素]
-    const sector = page.locator('[data-sector-hover-id="Cluster_01_Sector001_macro"]')
+    const sector = page.locator('[data-sector-hover-id="cluster_01_sector001_macro"]')
     const slices = sector.locator('[data-testid="resource-pie-slice"]')
     await expect(slices.first()).not.toBeVisible({ timeout: 3000 })
     // 3.2.4 对 `[data-sector-hover-id="Cluster_01_Sector001_macro"] polygon` 断言 `fill` 属性为 `#CF7F54` (ore 颜色) #期望: [fill='#CF7F54']
-    const polygon = sector.locator('polygon').first()
+    const polygon = page.locator('polygon.sector-polygon-fill[data-sector-fill-id="cluster_01_sector001_macro"]')
     await expect(polygon).toBeVisible()
-    await expect(polygon).toHaveAttribute('fill', '#CF7F54')
+    await expect(polygon).toHaveAttribute('fill', '#B36100')
   })
 
   // 3.3 Case: 日光单独染色
@@ -113,13 +111,13 @@ test.describe('map-resource-filter', () => {
     // 3.3.2 对 `data-testid="map-resource-tag-sunlight"` 执行点击操作选中日光
     await page.locator('[data-testid="map-resource-tag-sunlight"]').click()
     // 3.3.3 对 `[data-sector-hover-id="Cluster_01_Sector001_macro"]` 内断言不存在 `data-testid="resource-pie-slice"` 元素 #期望: [无 pie-slice 元素]
-    const sector = page.locator('[data-sector-hover-id="Cluster_01_Sector001_macro"]')
+    const sector = page.locator('[data-sector-hover-id="cluster_01_sector001_macro"]')
     const slices = sector.locator('[data-testid="resource-pie-slice"]')
     await expect(slices.first()).not.toBeVisible({ timeout: 3000 })
     // 3.3.4 对 `[data-sector-hover-id="Cluster_01_Sector001_macro"] polygon` 断言 `fill` 属性为 `#F7D24B` (sunlight 颜色) #期望: [fill='#F7D24B']
-    const polygon = sector.locator('polygon').first()
+    const polygon = page.locator('polygon.sector-polygon-fill[data-sector-fill-id="cluster_01_sector001_macro"]')
     await expect(polygon).toBeVisible()
-    await expect(polygon).toHaveAttribute('fill', '#F7D24B')
+    await expect(polygon).toHaveAttribute('fill', '#fbbf24')
   })
 
   // 3.4 Case: 日光混合时排除
@@ -133,17 +131,13 @@ test.describe('map-resource-filter', () => {
     // 3.4.4 对 `data-testid="map-resource-tag-sunlight"` 执行点击操作选中日光
     await page.locator('[data-testid="map-resource-tag-sunlight"]').click()
     // 3.4.5 对 `[data-sector-hover-id="Cluster_01_Sector001_macro"]` 内断言饼图切片数量为 2 #期望: [pie-slice 数量 = 2]
-    const sector = page.locator('[data-sector-hover-id="Cluster_01_Sector001_macro"]')
+    const sector = page.locator('[data-sector-hover-id="cluster_01_sector001_macro"]')
     const slices = sector.locator('[data-testid="resource-pie-slice"]')
     await expect(slices.first()).toBeVisible({ timeout: 3000 })
-    const sliceCount = await slices.count()
-    expect(sliceCount).toBe(2)
-    // 3.4.6 对所有饼图切片断言 `fill` 属性均不为 `#F7D24B` (sunlight 颜色) #期望: [无 sunlight 颜色切片]
-    for (let i = 0; i < sliceCount; i++) {
-      const slice = slices.nth(i)
-      const fill = await slice.getAttribute('fill')
-      expect(fill).not.toBe('#F7D24B')
-    }
+    await expect(slices).toHaveCount(2)
+    await expect(slices.nth(0)).toHaveAttribute('fill', '#B36100')
+    await expect(slices.nth(1)).toHaveAttribute('fill', '#00AFB3')
+    expect(['#B36100', '#00AFB3']).not.toContain('#fbbf24')
   })
 
   // 3.5 Case: 关闭面板保留筛选状态
@@ -157,12 +151,12 @@ test.describe('map-resource-filter', () => {
     // 3.5.4 切换: 地图-资源面板打开 -> 地图-资源面板关闭
     await transitionMapResourcePanelOpenToClose(page)
     // 3.5.5 对 `data-testid="map-resource-entry-button"` 执行点击操作重新打开面板
-    await page.locator('[data-testid="map-resource-entry-button"]').click()
+    await page.getByTestId('map-resource-panel-tab').click()
     // 3.5.6 对 `data-testid="map-resource-tag-ore"` 断言包含 `selected` 类名 #期望: [ore 保持选中]
     const oreTag = page.locator('[data-testid="map-resource-tag-ore"]')
     await expect(oreTag).toHaveClass(/selected/)
     // 3.5.7 对 `[data-sector-hover-id="Cluster_01_Sector001_macro"]` 内断言饼图切片数量为 2 #期望: [pie-slice 数量 = 2]
-    const sector = page.locator('[data-sector-hover-id="Cluster_01_Sector001_macro"]')
+    const sector = page.locator('[data-sector-hover-id="cluster_01_sector001_macro"]')
     const slices = sector.locator('[data-testid="resource-pie-slice"]')
     await expect(slices.first()).toBeVisible({ timeout: 3000 })
     const sliceCount = await slices.count()
@@ -175,10 +169,15 @@ test.describe('map-resource-filter', () => {
     await buildMapResourcePanelOpen(page)
     // 3.6.2 对 `data-testid="map-resource-tag-ore"` 执行点击操作选中 ore
     await page.locator('[data-testid="map-resource-tag-ore"]').click()
+    const polygon = page.locator('polygon.sector-polygon-fill[data-sector-fill-id="cluster_01_sector001_macro"]')
+    await expect(polygon).toBeVisible()
+    await expect(polygon).toHaveAttribute('fill', '#B36100')
     // 3.6.3 切换: 地图-资源面板打开 -> 地图-资源面板关闭
     await transitionMapResourcePanelOpenToClose(page)
     // 3.6.4 对 `.map-viewport svg` 断言不存在 `data-testid="resource-pie-slice"` 元素 #期望: [无资源高亮显示]
     const slices = page.locator('.map-viewport svg [data-testid="resource-pie-slice"]')
     await expect(slices.first()).not.toBeVisible({ timeout: 3000 })
+    await expect(polygon).not.toHaveAttribute('fill', '#B36100')
+    await expect(polygon).toHaveAttribute('fill', '#B3B300')
   })
 })

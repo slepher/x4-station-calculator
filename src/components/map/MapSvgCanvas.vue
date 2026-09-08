@@ -220,6 +220,7 @@ const focusedSavePoiKeyRef = toRef(props, 'focusedSavePoiKey')
 
 const {
   clusters,
+  allClusters,
   sectors,
   regionIds,
   layoutState,
@@ -285,6 +286,7 @@ const {
   crossClusterGateLines
 } = useMapSvgLinks({
   clusters,
+  allClusters,
   sectors,
   saveSectors: saveSectorsRef,
   highwayRings: computed(() => gameData.maps.highwayRings),

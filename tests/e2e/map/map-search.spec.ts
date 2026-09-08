@@ -75,6 +75,30 @@ async function transitionMapsToSearchPopover(page: Page) {
   await expect(searchPopover(page)).toBeVisible()
 }
 
+// The production 9.0 map has cluster_01 but no cluster_011.  Add one
+// current-schema record in memory so the exact-prefix assertion exercises
+// both sides of the boundary without changing the application fixture.
+async function injectPrefixBoundaryFixture(page: Page) {
+  await page.evaluate(() => {
+    const store = (window as any).gameDataStore
+    const sourceCluster = JSON.parse(JSON.stringify(store.maps.clusters.cluster_01_macro))
+    const sourceSector = JSON.parse(JSON.stringify(store.maps.sectors.cluster_01_sector001_macro))
+    sourceCluster.id = 'cluster_011_macro'
+    sourceCluster.nameId = ''
+    sourceCluster.name = 'Prefix sentinel'
+    sourceCluster.sectors = ['cluster_011_sector001_macro']
+    sourceCluster.sector_links = {}
+    sourceCluster.normalized = { axial: { q: 99, r: 99 }, pixel_basis: { x: 999, y: 999 } }
+    sourceSector.id = 'cluster_011_sector001_macro'
+    sourceSector.cluster_id = 'cluster_011_macro'
+    sourceSector.nameId = ''
+    sourceSector.name = 'Prefix sentinel'
+    store.maps.clusters.cluster_011_macro = sourceCluster
+    store.maps.sectors.cluster_011_sector001_macro = sourceSector
+  })
+  await page.waitForTimeout(200)
+}
+
 // Helper to get highlighted polygon count
 async function getHighlightedPolygonCount(page: Page): Promise<number> {
   return await page.locator('polygon[filter="url(#map-search-sector-glow)"]').count()
@@ -143,8 +167,10 @@ test.describe('map-search e2e', () => {
     await searchInput(page).fill('大交易')
     await page.waitForTimeout(200)
 
-    // 3.3.3 切换: maps-view-ready -> search-popover-visible
-    await transitionMapsToSearchPopover(page)
+    // 3.3.3 直接以 localeName 输入打开候选列表
+    await searchInput(page).focus()
+    await searchInput(page).fill('大交易')
+    await page.waitForTimeout(200)
 
     // 3.3.4 断言候选列表包含 `大交易所` 相关结果项 #期望: ['大交易所']
     const popover = searchPopover(page)
@@ -195,18 +221,26 @@ test.describe('map-search e2e', () => {
   test('3.6 Case: cluster id 不允许前缀误命中', async ({ page }) => {
     // 3.6.1 状态: maps-view-ready
     await stateMapsViewReady(page)
+    await injectPrefixBoundaryFixture(page)
 
     // 3.6.2 切换: maps-view-ready -> search-popover-visible
     await transitionMapsToSearchPopover(page)
 
-    // 3.6.3 在搜索框输入 `"cluster 01"`
+    // 3.6.3 在搜索框输入小写 `"cluster 01"`
     await searchInput(page).fill('cluster 01')
     await page.waitForTimeout(200)
 
-    // 3.6.4 断言候选列表不包含 `Cluster_011` 或 `Cluster_011_macro` 相关结果 #期望: [false]
+    // 3.6.4 断言候选列表只返回静态 cluster_01 sector 宏，不误命中注入的 cluster_011
     const popover = searchPopover(page)
-    const text = await popover.innerText()
-    expect(text).not.toContain('Cluster_011')
+    const resultIds = await popover.locator('[data-testid^="map-sector-search-result-"]').evaluateAll(elements =>
+      elements.map(element => element.getAttribute('data-testid')?.replace('map-sector-search-result-', '') ?? '').sort()
+    )
+    expect(resultIds).toEqual([
+      'cluster_01_sector001_macro',
+      'cluster_01_sector002_macro',
+      'cluster_01_sector003_macro'
+    ])
+    expect(resultIds).not.toContain('cluster_011_sector001_macro')
   })
 
   test('3.7 Case: 少量结果触发地图批量高亮', async ({ page }) => {
@@ -237,6 +271,8 @@ test.describe('map-search e2e', () => {
     const count = await getHighlightedPolygonCount(page)
 
     // 3.8.4 断言高亮 sector 数量为 0 #期望: [0]
+    const resultCount = await searchPopover(page).locator('[data-testid^="map-sector-search-result-"]').count()
+    expect(resultCount).toBeGreaterThanOrEqual(10)
     expect(count).toBe(0)
   })
 
@@ -248,6 +284,12 @@ test.describe('map-search e2e', () => {
     await zoomSlider(page).fill('0')
     await page.waitForTimeout(100)
 
+    const viewport = page.locator('.map-viewport')
+    const viewportBox = await viewport.boundingBox()
+    expect(viewportBox).not.toBeNull()
+    const svg = page.locator('svg[data-testid="map-svg-canvas"]')
+    const lowScaleViewBox = await svg.getAttribute('viewBox')
+
     // 3.9.3 切换: maps-view-ready -> search-popover-visible
     await transitionMapsToSearchPopover(page)
 
@@ -258,10 +300,43 @@ test.describe('map-search e2e', () => {
     await firstResult.click()
     await page.waitForTimeout(300)
 
-    // 3.9.5 断言缩放值显示为 `"100%"` 或更高 #期望: ['100%']
-    const scaleText = await zoomValue(page).innerText()
-    const scalePercent = parseInt(scaleText.replace('%', ''), 10)
-    expect(scalePercent).toBeGreaterThanOrEqual(100)
+    // 3.9.5 <100 分支校正到至少 100%，且具体目标 sector 聚焦到 viewport 中心
+    const lowScaleText = await zoomValue(page).innerText()
+    expect(parseInt(lowScaleText.replace('%', ''), 10)).toBeGreaterThanOrEqual(100)
+    const lowScaleTarget = page.locator('polygon[filter="url(#map-search-sector-selected-glow)"]').first()
+    const lowScaleTargetBox = await lowScaleTarget.boundingBox()
+    expect(lowScaleTargetBox).not.toBeNull()
+    expect(Math.abs(lowScaleTargetBox!.x + lowScaleTargetBox!.width / 2 - (viewportBox!.x + viewportBox!.width / 2))).toBeLessThan(viewportBox!.width * 0.25)
+    expect(Math.abs(lowScaleTargetBox!.y + lowScaleTargetBox!.height / 2 - (viewportBox!.y + viewportBox!.height / 2))).toBeLessThan(viewportBox!.height * 0.25)
+    expect(await svg.getAttribute('viewBox')).not.toBe(lowScaleViewBox)
+
+    // 3.9.6 >=100 分支保持原 scale；先用真实拖拽制造明确的平移，再点击同一目标
+    await clearBtn(page).click()
+    await zoomSlider(page).fill('100')
+    await page.waitForTimeout(150)
+    const highScaleText = await zoomValue(page).innerText()
+    const highScaleViewBoxBeforeDrag = await svg.getAttribute('viewBox')
+    const highScaleViewportBox = await viewport.boundingBox()
+    expect(highScaleViewportBox).not.toBeNull()
+    const dragX = highScaleViewportBox!.x + highScaleViewportBox!.width / 2
+    const dragY = highScaleViewportBox!.y + highScaleViewportBox!.height / 2
+    await page.mouse.move(dragX, dragY)
+    await page.mouse.down()
+    await page.mouse.move(dragX + 90, dragY + 35, { steps: 8 })
+    await page.mouse.up()
+    const highScaleViewBoxBeforeClick = await svg.getAttribute('viewBox')
+    expect(highScaleViewBoxBeforeClick).not.toBe(highScaleViewBoxBeforeDrag)
+    await searchInput(page).fill('Grand')
+    await page.waitForTimeout(200)
+    await searchPopover(page).locator('[data-testid^="map-sector-search-result-"]').first().click()
+    await page.waitForTimeout(300)
+    expect(await zoomValue(page).innerText()).toBe(highScaleText)
+    const highScaleTarget = page.locator('polygon[filter="url(#map-search-sector-selected-glow)"]').first()
+    const highScaleTargetBox = await highScaleTarget.boundingBox()
+    expect(highScaleTargetBox).not.toBeNull()
+    expect(Math.abs(highScaleTargetBox!.x + highScaleTargetBox!.width / 2 - (highScaleViewportBox!.x + highScaleViewportBox!.width / 2))).toBeLessThan(highScaleViewportBox!.width * 0.25)
+    expect(Math.abs(highScaleTargetBox!.y + highScaleTargetBox!.height / 2 - (highScaleViewportBox!.y + highScaleViewportBox!.height / 2))).toBeLessThan(highScaleViewportBox!.height * 0.25)
+    expect(await svg.getAttribute('viewBox')).not.toBe(highScaleViewBoxBeforeClick)
   })
 
   test('3.10 Case: 点击候选后保持明确选中态', async ({ page }) => {
@@ -280,9 +355,12 @@ test.describe('map-search e2e', () => {
 
     // 3.10.4 在 SVG 地图中读取应用了 `url(#map-search-sector-selected-glow)` 滤镜的 polygon 元素数量
     const count = await getSelectedPolygonCount(page)
+    const target = page.locator('polygon[filter="url(#map-search-sector-selected-glow)"]').first()
+    const targetBox = await target.boundingBox()
 
     // 3.10.5 断言选中态 sector 数量为 1 #期望: [1]
     expect(count).toBe(1)
+    expect(targetBox).not.toBeNull()
   })
 
   test('3.11 Case: 点击候选后不改写搜索框输入', async ({ page }) => {
@@ -355,8 +433,23 @@ test.describe('map-search e2e', () => {
     // 3.14.1 状态: maps-view-ready
     await stateMapsViewReady(page)
 
-    // 3.14.2 记录当前缩放值与平移位置
+    // 3.14.2 通过真实缩放和平移建立当前视图
+    await zoomSlider(page).fill('40')
+    await page.waitForTimeout(200)
     const initialScaleText = await zoomValue(page).innerText()
+    const svg = page.locator('svg[data-testid="map-svg-canvas"]')
+    const initialViewBox = await svg.getAttribute('viewBox')
+    const viewport = page.locator('.map-viewport')
+    const viewportBox = await viewport.boundingBox()
+    expect(viewportBox).not.toBeNull()
+    const centerX = viewportBox!.x + viewportBox!.width / 2
+    const centerY = viewportBox!.y + viewportBox!.height / 2
+    await page.mouse.move(centerX, centerY)
+    await page.mouse.down()
+    await page.mouse.move(centerX + 80, centerY + 40, { steps: 8 })
+    await page.mouse.up()
+    const pannedViewBox = await svg.getAttribute('viewBox')
+    expect(pannedViewBox).not.toBe(initialViewBox)
 
     // 3.14.3 切换: maps-view-ready -> search-popover-visible
     await transitionMapsToSearchPopover(page)
@@ -371,6 +464,7 @@ test.describe('map-search e2e', () => {
     // 3.14.5 断言缩放值与平移位置与记录值一致 #期望: [true]
     const finalScaleText = await zoomValue(page).innerText()
     expect(finalScaleText).toBe(initialScaleText)
+    expect(await svg.getAttribute('viewBox')).toBe(pannedViewBox)
   })
 
   test('3.15 Case: 候选项主显示按语言规则', async ({ page }) => {

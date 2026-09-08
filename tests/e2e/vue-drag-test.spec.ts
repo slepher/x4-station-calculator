@@ -5,7 +5,7 @@ import db from '../fixtures/db.json' with { type: 'json' }
 const zone = (page: Page, id: string) => page.locator(`[data-zone-id="${id}"]`)
 const state = (page: Page) => page.evaluate(() => {
   const s = (window as any).dragTestStore
-  return { a: s.zoneAItems, b: s.zoneBItems, active: s.isDragging, item: s.draggingItemId, hover: s.hoveredZoneId, events: s.events.map((e: any) => e.type) }
+  return { items: s.items, a: s.zoneAItems, b: s.zoneBItems, active: s.isDragging, item: s.draggingItemId, hover: s.hoveredZoneId, events: s.events.map((e: any) => ({ type: e.type, zoneId: e.zoneId })) }
 })
 async function start(page: Page, id = 'item-1', source = 'A') {
   const item = zone(page, source).locator(`[data-item-id="${id}"]`)
@@ -17,14 +17,20 @@ async function start(page: Page, id = 'item-1', source = 'A') {
   await expect.poll(async () => (await state(page)).active).toBe(true)
   expect((await state(page)).item).toBe(id)
 }
-async function hoverB(page: Page) {
-  const box = await page.getByTestId('zone-b').boundingBox()
+async function hoverB(page: Page, nested = false) {
+  const target = page.getByTestId('zone-b')
+  const box = await target.boundingBox()
   expect(box).not.toBeNull()
-  await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height - 10, { steps: 20 })
+  if (nested) await page.mouse.move(box!.x + 12, box!.y + 12, { steps: 10 })
+  const hasItems = await target.locator('[data-item-id]').count()
+  const x = hasItems === 0 ? box!.x + box!.width / 2 : box!.x + box!.width - 12
+  const y = hasItems === 0 ? box!.y + box!.height / 2 : box!.y + box!.height - 12
+  await page.mouse.move(x, y, { steps: 20 })
   await expect.poll(async () => (await state(page)).hover).toBe('B')
 }
 async function idle(page: Page) {
   await expect.poll(async () => { const s = await state(page); return [s.active, s.item, s.hover] }).toEqual([false, null, null])
+  await page.waitForTimeout(20)
   await expect(page.locator('.sortable-chosen, .sortable-ghost, .sortable-drag')).toHaveCount(0)
 }
 test.beforeEach(async ({ page }) => {
@@ -53,11 +59,18 @@ test('A.1/B.1/C.1/ST.1/ST.2/E.1 real mouse moves one item and records the comple
   const s = await state(page)
   expect(s.a.map((i: any) => i.id)).toEqual(['item-2', 'item-3', 'item-4', 'item-5'])
   expect(s.b.map((i: any) => i.id)).toEqual(['item-1'])
-  expect(s.events[0]).toBe('dragstart')
-  expect(s.events).toContain('dragenter')
-  expect(s.events).toContain('drop')
-  expect(s.events.at(-1)).toBe('dragend')
+  const types = s.events.map((event: any) => event.type)
+  expect(types[0]).toBe('dragstart')
+  expect(types).toContain('dragenter')
+  expect(types).toContain('dragover')
+  expect(types).toContain('drop')
+  expect(types.at(-1)).toBe('dragend')
+  const bEvents = s.events.filter((event: any) => event.zoneId === 'B').map((event: any) => event.type)
+  expect(bEvents.indexOf('dragenter')).toBeLessThan(bEvents.indexOf('dragover'))
+  expect(bEvents.indexOf('dragover')).toBeLessThan(bEvents.indexOf('drop'))
   await expect(zone(page, 'B').locator('[data-item-id="item-1"]')).toHaveCount(1)
+  expect(new Set(s.items.map((i: any) => i.id)).size).toBe(s.items.length)
+  expect(s.items.filter((i: any) => i.id === 'item-1').map((i: any) => i.zone)).toEqual(['B'])
   // Retain original diagnostic logs; historical store-manipulation recommendations are superseded by this real UI test.
   console.log('Historical method-comparison diagnostics below are retained; current acceptance uses real mouse actions only.')
   console.log('FINDING: dispatchEvent does NOT trigger vuedraggable events')
@@ -79,13 +92,14 @@ test('C.2/S.1/H.1/H.2/H.3/E.2/E.3 hover, leave and cancel retain all items', asy
   await page.mouse.up()
   await idle(page)
   const s = await state(page)
-  expect(s.a.map((i: any) => i.id).sort()).toEqual(['item-1', 'item-2', 'item-3', 'item-4', 'item-5'])
+  expect(s.a.map((i: any) => i.id)).toEqual(['item-1', 'item-2', 'item-3', 'item-4', 'item-5'])
   expect(s.b).toEqual([])
-  expect(s.events).toContain('dragenter')
-  expect(s.events).toContain('dragleave')
-  expect(s.events).not.toContain('drop')
-  expect(s.events[0]).toBe('dragstart')
-  expect(s.events.at(-1)).toBe('dragend')
+  const types = s.events.map((event: any) => event.type)
+  expect(types).toContain('dragenter')
+  expect(types).toContain('dragleave')
+  expect(types).not.toContain('drop')
+  expect(types[0]).toBe('dragstart')
+  expect(types.at(-1)).toBe('dragend')
 })
 
 for (const [button, item, before, after, flag] of [
@@ -103,6 +117,9 @@ for (const [button, item, before, after, flag] of [
     const matches = (await state(page)).b.filter((i: any) => i.id === item)
     expect(matches).toHaveLength(1)
     expect(matches[0][flag!]).toBe(false)
+    const current = await state(page)
+    expect(current.a.some((i: any) => i.id === item)).toBe(false)
+    expect(new Set(current.items.map((i: any) => i.id)).size).toBe(current.items.length)
   })
 }
 
@@ -111,7 +128,7 @@ test('S.6 locked lineage rejects Argon without moving it', async ({ page }) => {
   await start(page, 'item-5')
   await expect(zone(page, 'B')).toHaveClass(/border-red-600/)
   await expect(zone(page, 'B').locator('.status-label')).toContainText('Rejected')
-  await hoverB(page)
+  await hoverB(page, true)
   await page.mouse.up()
   await idle(page)
   expect((await state(page)).b).toEqual([])
@@ -122,7 +139,7 @@ test('S.5 locked lineage permits Terran', async ({ page }) => {
   await page.getByRole('button', { name: 'Zone B: Unlocked', exact: true }).click()
   await start(page, 'item-4')
   await expect(zone(page, 'B')).toHaveClass(/border-amber-500/)
-  await hoverB(page)
+  await hoverB(page, true)
   await page.mouse.up()
   await idle(page)
   expect((await state(page)).b.map((i: any) => i.id)).toEqual(['item-4'])
@@ -133,6 +150,7 @@ test('S.2/ST.4 same-zone duplicate remains unique', async ({ page }) => {
   await hoverB(page)
   await page.mouse.up()
   await idle(page)
+  await expect(zone(page, 'B').locator('[data-item-id="item-1"]')).toHaveCount(1)
   await start(page, 'item-1', 'B')
   await expect(zone(page, 'B')).toHaveClass(/border-red-500/)
   await expect(zone(page, 'B').locator('.status-label')).toHaveText('Duplicated')

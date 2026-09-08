@@ -16,6 +16,7 @@ import {
 import type { SearchState } from './savePoiSearchFilter'
 import type { SaveArchive, SavePoiCategory, SavePoiOverlayItem, StationEntry } from '@/types/saveArchive'
 import { getStationPoiLabel } from './savePoiLabel'
+import { useMapSavePanelPresenter } from './presenters/useMapSavePanelPresenter'
 
 const props = defineProps<{
   archive: SaveArchive | null
@@ -31,6 +32,7 @@ const mapStore = useMapStore()
 const saveStore = useSaveStore()
 const gameData = useGameDataStore()
 const { translateShip } = useX4I18n()
+const { presentAddressGroup } = useMapSavePanelPresenter()
 
 const searchQuery = ref('')
 const searchState = ref<SearchState & { sectorJumpLimit?: number }>({
@@ -56,6 +58,7 @@ interface SectorPoiGroup {
   rawSectorName: string
   sectorName: string
   showRawSectorName: boolean
+  isAddressInactive: boolean
   pois: SavePoiOverlayItem[]
   rawItems?: StationEntry[]
 }
@@ -75,14 +78,14 @@ const poiGroups = computed<SectorPoiGroup[]>(() => {
     .map((group) => {
       const searchNames = getSectorSearchNames(group.sectorMacro, group.sectorName)
 
-      return {
+      return presentAddressGroup({
         sectorMacro: group.sectorMacro,
         rawSectorName: searchNames.rawName,
         sectorName: searchNames.displayName,
         showRawSectorName: false,
         pois: group.items.map((item) => createOverlayItem(props.category, group.sectorMacro, searchNames.displayName, item)),
         rawItems: group.items as StationEntry[]
-      }
+      })
     })
     .filter((group) => group.pois.length > 0)
     .sort((a, b) => a.sectorName.localeCompare(b.sectorName))
@@ -230,7 +233,10 @@ function getPoiLabel(poi: SavePoiOverlayItem): string {
         :key="group.sectorMacro"
         class="poi-group"
       >
-        <div class="group-header">
+        <div
+          class="group-header"
+          :class="{ 'group-header--inactive-address': group.isAddressInactive }"
+        >
           {{ group.sectorName }}
           <span v-if="group.showRawSectorName" class="group-header-raw">({{ group.rawSectorName }})</span>
         </div>
@@ -298,6 +304,10 @@ function getPoiLabel(poi: SavePoiOverlayItem): string {
 
 .group-header {
   @apply text-xs font-semibold uppercase tracking-wider text-amber-200/80 px-2;
+}
+
+.group-header--inactive-address {
+  color: rgb(239, 68, 68);
 }
 
 .group-header-raw {

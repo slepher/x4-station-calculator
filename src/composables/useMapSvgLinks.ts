@@ -18,6 +18,7 @@ const HIGHWAY_DENSE_POINT_THRESHOLD_PX = 4
 
 export function useMapSvgLinks(args: {
   clusters: ComputedRef<Record<string, Cluster>>
+  allClusters: ComputedRef<Record<string, Cluster>>
   sectors: ComputedRef<Record<string, Sector>>
   saveSectors?: Ref<Record<string, SectorData> | undefined>
   highwayRings?: ComputedRef<X4MapHighwayRing[] | undefined>
@@ -197,11 +198,14 @@ export function useMapSvgLinks(args: {
     return rows
   })
 
-  const gateCircles = computed<MapGateCircle[]>(() => {
+  const buildGateCircles = (
+    clusterIds: string[],
+    clusters: Record<string, Cluster>
+  ): MapGateCircle[] => {
     const rows: MapGateCircle[] = []
     const { centers, clusterRadius } = args.layoutState.value
-    args.regionIds.value.forEach((clusterId) => {
-      const cluster = args.clusters.value[clusterId]
+    clusterIds.forEach((clusterId) => {
+      const cluster = clusters[clusterId]
       const center = centers[clusterId]
       if (!cluster || !center) return
       const clusterSectors = (cluster.sectors || [])
@@ -211,7 +215,8 @@ export function useMapSvgLinks(args: {
         const sectorColor = args.resolveOwnerColor(sector, sector.id, clusterId)
         const savedSector = args.saveSectors?.value?.[sector.id]
         Object.entries(sector.cluster_gates || {}).forEach(([gateId, gate]) => {
-          const ratio = getSavedClusterGateRatio(savedSector, gateId, sector) || gateClusterRatioFromRaw(gate, sector)
+          let ratio = getSavedClusterGateRatio(savedSector, gateId, sector)
+          if (!ratio) ratio = gateClusterRatioFromRaw(gate, sector)
           if (!ratio) return
           rows.push({
             id: `${clusterId}:${sector.id}:${gateId}`,
@@ -230,12 +235,21 @@ export function useMapSvgLinks(args: {
       })
     })
     return rows
+  }
+
+  const gateCircles = computed<MapGateCircle[]>(() => {
+    return buildGateCircles(args.regionIds.value, args.clusters.value)
+  })
+
+  const allGateCircles = computed<MapGateCircle[]>(() => {
+    const clusters = args.allClusters.value
+    return buildGateCircles(Object.keys(clusters), clusters)
   })
 
   const crossClusterGateLines = computed<MapCrossClusterGateLine[]>(() => {
     const rows: MapCrossClusterGateLine[] = []
     const gateIndex: Record<string, { clusterId: string; sectorId: string; gateId: string; targetClusterId?: string; point: Vec2; r: number }> = {}
-    gateCircles.value.forEach((gate) => {
+    allGateCircles.value.forEach((gate) => {
       gateIndex[gate.id] = {
         clusterId: gate.clusterId,
         sectorId: gate.sectorId,
@@ -247,6 +261,7 @@ export function useMapSvgLinks(args: {
     })
 
     const used = new Set<string>()
+    const visibleClusterIds = new Set(args.regionIds.value)
     Object.entries(gateIndex).forEach(([gateId, gate]) => {
       if (used.has(gateId)) return
       const reverseId = Object.entries(gateIndex).find(([otherId, other]) =>
@@ -257,6 +272,9 @@ export function useMapSvgLinks(args: {
       if (!reverseId) return
       const reverseGate = gateIndex[reverseId]
       if (!reverseGate) return
+      used.add(gateId)
+      used.add(reverseId)
+      if (!visibleClusterIds.has(gate.clusterId) && !visibleClusterIds.has(reverseGate.clusterId)) return
       const dx = reverseGate.point.x - gate.point.x
       const dy = reverseGate.point.y - gate.point.y
       const length = Math.hypot(dx, dy)
@@ -280,8 +298,6 @@ export function useMapSvgLinks(args: {
         },
         isHighwayRingGate
       })
-      used.add(gateId)
-      used.add(reverseId)
     })
     return rows
   })

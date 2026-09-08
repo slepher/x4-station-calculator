@@ -32,27 +32,30 @@ test('4.1 BUG-001: 跨 cluster 候选缺失 (修复后验证)', async ({ page })
   await page.getByTestId('map-resource-tab-advanced').click()
   await page.waitForTimeout(100)
 
-  // Configure tag groups that would require cross-cluster candidates
+  // Configure two groups and require a fixed cross-cluster witness.
   const oreTag = page.locator('[data-testid^="map-resource-advanced-tag-"][data-testid$="-ore"]').first()
   await oreTag.click()
+  await page.getByTestId('map-resource-advanced-add-group').click()
+  const siliconTag = page.locator('[data-testid^="map-resource-advanced-tag-"][data-testid$="-silicon"]').first()
+  await siliconTag.click()
 
   // 4.1.2 设置跳数为 2，勾选允许中转，点击刷新
   const jumpInput = page.getByTestId('map-resource-advanced-jump-limit')
   await jumpInput.fill('2')
 
   const allowTransit = page.getByTestId('map-resource-advanced-allow-transit')
-  if (!await allowTransit.isChecked()) {
-    await allowTransit.click()
-  }
+  await expect(allowTransit).toBeChecked()
 
   await page.getByTestId('map-resource-advanced-refresh').click()
   await page.waitForTimeout(200)
 
-  // 4.1.3 修复后验证跨 cluster 候选正确进入结果 #期望: [存在跨 cluster 候选]
-  // After fix, cross-cluster candidates should be found
+  // 4.1.3 修复后验证结果含 cluster_01 与 cluster_06 的固定跨 cluster witness
   const candidateList = page.getByTestId('map-resource-advanced-candidate-list')
   const candidates = candidateList.locator('.advanced-candidate-item')
-
-  // Verify candidates exist
-  await expect(candidates.first()).toBeVisible()
+  const firstCandidate = candidates.first()
+  await expect(firstCandidate).toBeVisible()
+  await expect(firstCandidate.getByTestId('map-resource-advanced-resource-chip-cluster_01_sector001_macro')).toBeVisible()
+  const witnessIds = await firstCandidate.locator('[data-testid^="map-resource-advanced-resource-chip-"]').evaluateAll(nodes => nodes.map(node => node.getAttribute('data-testid')!.replace('map-resource-advanced-resource-chip-', '')))
+  expect(witnessIds).toContain('cluster_01_sector001_macro')
+  expect(witnessIds).toContain('cluster_06_sector001_macro')
 })

@@ -473,6 +473,87 @@ describe('autoGroup assignment state after user selection', () => {
     expect(assignment.status).not.toBe('auto')
   })
 
+  it('adds a persisted baseline owner before standalone when no current or extension option exists', () => {
+    const graph = {
+      H: ['M1'],
+      M1: ['H', 'M2'],
+      M2: ['M1', 'M3'],
+      M3: ['M2', 'M4'],
+      M4: ['M3', 'M5'],
+      M5: ['M4', 'T'],
+      T: ['M5']
+    }
+    const clusterMap = { H: 'H', M1: 'M1', M2: 'M2', M3: 'M3', M4: 'M4', M5: 'M5', T: 'T' }
+    const group = {
+      ...buildResult().groups[0]!,
+      id: 'H',
+      sectorMacro: 'H',
+      jumpRange: 2,
+      originalJumpRange: 2
+    }
+
+    const assignments = buildAssignmentResult(
+      ['T'],
+      new Map([['H', 'H']]),
+      [group],
+      graph,
+      clusterMap,
+      undefined,
+      { H: ['T'] }
+    )
+    const assignment = assignments.find((candidate) => candidate.sectorMacro === 'T')!
+
+    expect(assignment.options).toEqual([
+      {
+        type: 'absorb',
+        targetGroupId: 'H',
+        distance: 6,
+        extendsRange: false,
+        resultingGroupSize: 2,
+        source: 'baseline'
+      },
+      { type: 'standalone', distance: 0, extendsRange: false, resultingGroupSize: 1 }
+    ])
+    expect(assignment.selectedSectorMacro).toBeNull()
+    expect(assignment.selectedOptionIndex).toBeNull()
+  })
+
+  it('keeps the nearest extension layer ahead of persisted baseline ownership', () => {
+    const graph = {
+      B: ['B1'],
+      B1: ['B', 'B2'],
+      B2: ['B1', 'B3'],
+      B3: ['B2', 'B4'],
+      B4: ['B3', 'B5'],
+      B5: ['B4', 'T'],
+      E: ['E1'],
+      E1: ['E', 'E2'],
+      E2: ['E1', 'E3'],
+      E3: ['E2', 'T'],
+      T: ['B5', 'E3']
+    }
+    const clusterMap = Object.fromEntries(Object.keys(graph).map((macro) => [macro, macro]))
+    const baseGroup = buildResult().groups[0]!
+    const groups = [
+      { ...baseGroup, id: 'B', sectorMacro: 'B', jumpRange: 1, originalJumpRange: 1 },
+      { ...baseGroup, id: 'E', sectorMacro: 'E', jumpRange: 1, originalJumpRange: 1 }
+    ]
+
+    const assignments = buildAssignmentResult(
+      ['T'],
+      new Map([['B', 'B'], ['E', 'E']]),
+      groups,
+      graph,
+      clusterMap,
+      undefined,
+      { B: ['T'] }
+    )
+    const assignment = assignments.find((candidate) => candidate.sectorMacro === 'T')!
+
+    expect(assignment.options.map((option) => option.targetGroupId)).toEqual(['E', undefined])
+    expect(assignment.options[0]).toMatchObject({ distance: 4, extendsRange: true })
+  })
+
   it('uses standalone-only unresolved assignments when no hub exists', () => {
     const assignments = buildAssignmentResult(['A', 'B'], new Map(), [], sectorGraph, sectorClusterMap)
 
@@ -1242,6 +1323,63 @@ describe('autoGroup assignment state after user selection', () => {
         playerSectorMacros: [hubId, ...unassigned]
       }
     }
+
+    it('clears an invalid current selection when only baseline reabsorb remains', () => {
+      const longGraph = {
+        H: ['M1'],
+        M1: ['H', 'M2'],
+        M2: ['M1', 'M3'],
+        M3: ['M2', 'M4'],
+        M4: ['M3', 'M5'],
+        M5: ['M4', 'D'],
+        D: ['M5']
+      }
+      const longClusterMap = { H: 'H', M1: 'M1', M2: 'M2', M3: 'M3', M4: 'M4', M5: 'M5', D: 'D' }
+      const baseGroup = buildResult().groups[0]!
+      const result: AutoGroupResult = {
+        groups: [
+          { ...baseGroup, id: 'H', sectorMacro: 'H', jumpRange: 6, originalJumpRange: 6 }
+        ],
+        assignments: [
+          {
+            sectorMacro: 'D',
+            status: 'auto',
+            displayBucket: 'resolved',
+            selectedSectorMacro: 'H',
+            selectedOptionIndex: 0,
+            options: [
+              { type: 'absorb', targetGroupId: 'H', distance: 6, extendsRange: false, resultingGroupSize: 2 },
+              { type: 'standalone', distance: 0, extendsRange: false, resultingGroupSize: 1 }
+            ]
+          }
+        ],
+        bridgePlans: [],
+        playerSectorMacros: ['H', 'D']
+      }
+
+      const updated = rebuildAssignmentsForJumpRangeChange(
+        result,
+        'H',
+        2,
+        longGraph,
+        longClusterMap,
+        undefined,
+        false,
+        undefined,
+        { H: ['D'] }
+      )
+      const assignment = updated.assignments.find((candidate) => candidate.sectorMacro === 'D')!
+
+      expect(assignment.options.map((option) => option.type)).toEqual(['absorb', 'standalone'])
+      expect(assignment.options[0]).toMatchObject({
+        targetGroupId: 'H',
+        distance: 6,
+        extendsRange: false,
+        source: 'baseline'
+      })
+      expect(assignment.selectedSectorMacro).toBeNull()
+      expect(assignment.selectedOptionIndex).toBeNull()
+    })
 
     it('recalculates affected sector options when jumpRange increases', () => {
       const result = buildHubResult('H', 3, ['D'])

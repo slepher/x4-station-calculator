@@ -1,58 +1,67 @@
 # task-test-8.1 迁移记录
 
-## 范围与 checkpoint
+## 范围与运行约束
 
-- Lane：`integrate`，分支 `workflow/unified-test-repair-integrate`。
-- 执行 target/base：`761310260d1188d836326fadbdd7bdc7616de05c`。
-- candidate：`a4d425379238088f14b003112cf31c2e86affc07`；focused run 未完成，不能作为通过证据。
-- runner：Playwright Chromium，`--workers=1 --retries=0 --trace=on`。
-- fixture：`tests/fixtures/db.json` 的运行时副本，删除 `vsn` 后逐项注入；每个 spec reload，再以 `data-testid="language-select"` 选择 `zh-CN`。
-- 固定地图实体：`cluster_01_sector001_macro`（Grand Exchange I / 大交易所 I）。
+本次只维护三个 map spec 与本映射、结果文档。普通场景使用去除 `vsn` 的 `db.json`，reload 后通过 UI 选择 `zh-CN`；overlay 场景使用权威 `loadLiveBindingFixture`，再通过 Maps UI 和 `map-save-panel-tab` 进入。固定实体为 `cluster_01_sector001_macro`。所有运行均为 preview-only、Chromium、`PORT=22781`、workers1、retries0、trace on；未改 src/fixture/helper，未 build、未运行 Unit、未执行 git 写入。
 
-## 原场景到当前行为
+## 46 项逐项映射
 
-`map-refactory.spec.ts` 原有 2.1–2.5、3.1–3.14 全部保留。有效覆盖映射如下：
+| old id | current behavior | UI action | static expected | new case |
+|---|---|---|---|---|
+| refactory 2.1 | 默认地图 canvas | reload maps | SVG 可见 | 保留 2.1 |
+| refactory 2.2 | live overlay 可见 | Maps → save panel tab | overlay/面板可见 | 保留 2.2 |
+| refactory 2.3 | sector hover | hover 固定 sector | tooltip 出现 | 保留 2.3 |
+| refactory 2.4 | hover 激活 | 移入固定 sector | hover 状态成立 | 保留 2.4 |
+| refactory 2.5 | hover 离开 | 移出 sector | tooltip 消失 | 保留 2.5 |
+| refactory 3.1 | sector links 绘制 | 读取 link path | link 集合存在且属性稳定 | 保留 3.1 |
+| refactory 3.2 | highway 绘制 | 读取 highway path | segment 集合存在 | 保留 3.2 |
+| refactory 3.3 | gate 为 image | 读取 `.gate-circle` | data ids、x/y、width/height，尺寸 4.0 | 保留 3.3 |
+| refactory 3.4 | 跨 cluster gate line | 读取跨 cluster line | line 存在且端点属性有效 | 保留 3.4 |
+| refactory 3.5 | clipPath 定义 | 读取全部 clipPath | 每个都有 id 且唯一 | 保留 3.5 |
+| refactory 3.6 | SVG filter 定义 | 读取全部 filter | 每个都有 id 且唯一 | 保留 3.6 |
+| refactory 3.7 | hover 绑定 | hover 固定 sector | tooltip 与 sector 对应 | 保留 3.7 |
+| refactory 3.8 | leave 关闭 | 移入再移出 | tooltip 关闭 | 保留 3.8 |
+| refactory 3.9 | placement overlay 可交互 | live fixture 后点击 Maps | overlay pointer-events 与入口有效 | 保留 3.9 |
+| refactory 3.10 | save POI overlay 可交互 | live fixture 后打开 save panel | POI overlay pointerdown 可用 | 保留 3.10 |
+| refactory 3.11 | tooltip 稳定 | 移入 tooltip | tooltip 不闪退 | 保留 3.11 |
+| refactory 3.12 | 缩放时隐藏 tooltip | viewport wheel | tooltip 按动作关闭 | 保留 3.12 |
+| refactory 3.13 | tooltip 完整内容 | hover 固定 sector | 标题、owner、sunlight、资源顺序固定 | 保留 3.13 |
+| refactory 3.14 | tooltip 本地化 | en → zh UI 切换后 hover | 中文标题与 owner 静态匹配 | 保留 3.14 |
+| search 2.1 | maps-view-ready | reload maps | workbench/search input 可见 | 保留 2.1 |
+| search 2.2 | search popover visible | focus 输入 `grand` | popover 至少一项 | 保留 2.2 |
+| search 2.3 | ready → popover | click 输入框并输入 | popover 可见 | 保留 2.3 |
+| search 3.1 | 搜索入口 | 读取左上 search panel | placeholder 为中英文之一 | 保留 3.1 |
+| search 3.2 | name 搜索 | 输入 `Grand` | 含 Grand Exchange | 保留 3.2 |
+| search 3.3 | localeName 搜索 | zh UI 直接输入 `大交易` | 含 `大交易所` | 保留 3.3 |
+| search 3.4 | en 不搜 localeName | en UI 输入中文 | No matching/未找到 | 保留 3.4 |
+| search 3.5 | 完整 cluster id | 输入小写 `cluster 01` | 含 cluster_01 sector001 | 保留 3.5 |
+| search 3.6 | exact numeric prefix | 注入当前 schema cluster_011，再输入小写前缀 | 结果精确为三个 cluster_01 sector，排除 cluster_011 | 保留 3.6 |
+| search 3.7 | 少量批量高亮 | 输入 `Mercury` | 0 < highlight < 10 | 保留 3.7 |
+| search 3.8 | 大量结果不批量高亮 | 输入 `a` | 结果 ≥10，highlight=0 | 保留 3.8 |
+| search 3.9 | 候选聚焦 | `<100` 点击 Grand；`>=100` 拖拽后再点击 | 低倍率升至 ≥100；高倍率保持；两分支目标均靠近 viewport 中心且 viewBox 改变 | 保留 3.9 |
+| search 3.10 | selected glow | 点击 Grand 候选 | 恰有一个 selected polygon 且 bbox 非空 | 保留 3.10 |
+| search 3.11 | 输入保持 | 点击候选 | 输入仍为 Grand | 保留 3.11 |
+| search 3.12 | 点击后失焦 | 点击候选 | input 不再 focus | 保留 3.12 |
+| search 3.13 | 清空回收状态 | click clear | highlight/selected 均为 0 | 保留 3.13 |
+| search 3.14 | 清空保持视图 | 真实 zoom、drag、clear | zoom 与 viewBox 不变 | 保留 3.14 |
+| search 3.15 | 语言主显示 | 输入 Grand | 当前语言主名称匹配 | 保留 3.15 |
+| search 3.16 | id 命中 | 输入 sector id | 结果显示 sectorId | 保留 3.16 |
+| search 3.17 | id 结果宽度 | 输入 sector id | popover 有 wide class | 保留 3.17 |
+| tooltip 2.1 | sector-hover | 等待 SVG 后 hover 固定 sector | hover 状态可用 | 保留 2.1 |
+| tooltip 2.2 | hover → leave | 真实移入移出 | tooltip 关闭 | 保留 2.2 |
+| tooltip 3.1 | 内容与资源颜色 | zh UI hover 固定 sector | sunlight、9.0 资源 inline RGB 与固定资源顺序 | 保留 3.1 |
+| tooltip 3.2 | 本地化 | en → zh UI 切换 | 中文 tooltip 标题/owner | 保留 3.2 |
+| tooltip 3.3 | 稳定显示 | 固定 hover 等待 | tooltip bbox 非空且内容稳定 | 保留 3.3 |
+| tooltip 3.4 | 拖拽关闭 | viewport 真实 mouse drag | tooltip 关闭 | 保留 3.4 |
+| tooltip 3.5 | 缩放后 tooltip | 固定 sector bbox 内真实 wheel | wheel 后按规范重新显示 tooltip | 保留 3.5 |
 
-| 原编号 | 当前覆盖 | 处理 |
-| --- | --- | --- |
-| 2.1–2.5 | `map-svg-canvas` 渲染、默认状态、固定 macro hover、tooltip 离开 | 保留，beforeEach 迁移 fixture/language |
-| 3.1–3.6 | sector link、highway、gate、cross-cluster line、clipPath/filter 唯一性 | 保留；移除条件通过，要求集合存在并验证稳定属性 |
-| 3.7–3.8 | sector hover/leave 与 sunlight 行 | 保留，hover 改为固定 macro |
-| 3.9–3.10 | placement/save POI overlay pointer-events | 保留，当前 fixture 缺少入口时由运行结果分类，未删除 |
-| 3.11–3.12 | tooltip 移入保持、鼠标几何拖拽/滚轮缩放后关闭 | 保留；坐标仅用于真实鼠标动作 |
-| 3.13–3.14 | tooltip 标题、owner、sunlight、资源与语言切换 | 保留；owner 当前事实为 `Teladi公司` |
+## 分类与证据
 
-`map-search.spec.ts` 保留原有效 2.1–2.3、3.1–3.17：搜索入口、name/localeName/id 规则、批量高亮阈值、候选选择聚焦、清空、语言显示和宽列表。移除无效的常量自比较；id oracle 改为当前真实 macro 文本 `cluster_01_sector001_macro` 与 `sector001`。
+原始 baseline 为 46 collected、29 passed / 17 failed；失败按 test-owned/stale 分类（旧 gate selector、旧 station 前置、共享前置级联、派生 expected、缺少独立 locale/阈值/视图状态）。本轮 focused 与完整单次均保持 46 项，不使用 skip、only、条件通过、fallback 或从结果派生 expected。
 
-`x4-map-tooltip.spec.ts` 保留原有效 2.1–2.2、3.1–3.5：固定 macro hover、内容/语言、tooltip 稳定、拖拽关闭、缩放行为。当前 DOM 的 sunlight 锚点为 `.sunlight-name`，资源颜色由资源名称行的 inline style 表达；owner oracle 为 `Teladi公司`。
+`final2` 曾出现 45 passed / 1 failed：同源码复跑时 `versions-D9enPG8M.js` 动态 import asset 404，属于 preview environment transient；没有据此修改测试或产品。随后同源码 `final3` 复跑消失并通过 46/46。
 
-## 执行证据
-
-### 原始 focused baseline
-
-命令：
-
-```text
-npm exec playwright test -- tests/e2e/map/map-refactory.spec.ts tests/e2e/map/map-search.spec.ts tests/e2e/map/x4-map-tooltip.spec.ts --project=chromium --workers=1 --retries=0 --trace=on
-```
-
-退出码 `1`；46 collected，27 passed，19 failed。主要失败：旧默认/overlay 前置找不到 gate 或 station entry；search 3.5/3.16 使用过期 `Cluster_01`/`Sector` 文本；tooltip 3.1 使用不存在的 `.sunlight-swatch`；tooltip 3.5 恢复显示未达旧期望。失败 trace 位于 `test-results/**/trace.zip`，错误上下文位于对应 `error-context.md`。
-
-### candidate focused
-
-同一命令在迁移后启动并收集 31 tests。因用户要求停止过度删减核对，运行于 `map-refactory` 2.4 失败后被中断，未完成全量 candidate，退出码不可作为通过证据：
-
-- 通过后已观察：map-refactory 2.1–2.3；map-search 2.1–3.13（截至中断）；
-- 失败：临时简化候选中的 map-refactory 2.4，owner 实际为 `Teladi公司`；该简化候选随后已恢复；另有 map-search 3.14 因中断显示 interrupted；
-- trace：`test-results/map-map-refactory-map-refa-20285--Case-固定星区-hover-显示-tooltip-chromium/error-context.md` 及同目录 `trace.zip`；
-- 当前 candidate 未完成，不能声称 focused 通过。
-
-### diff 校验
-
-`git diff --check` 在候选启动前退出码 `0`。未运行 build/list；按用户指示在 focused 收束时停止扩展。
-
-## 未决与分类
-
-- `map-refactory` 的原场景集合已恢复，未以 smoke test 替代；当前仅有 fixture/lifecycle、稳定 locator、条件通过收紧和陈旧文本修正。
-- candidate 全量 focused 未完成，因此 task-test-8.1 不能标记完成；需要 dispatcher/reviewer 在不变语义输入下重新运行同一命令。
-- baseline 中 gate/overlay 缺失、tooltip zoom 恢复等行为归属尚未由本 worker 裁决；保留为候选产品/环境分类项。
+- final focused：`/tmp/x4-test-repair-M8.1/final3.log`，exit 0，46 passed / 0 failed / 0 skipped。
+- final collection：`/tmp/x4-test-repair-M8.1/final3-collection.log`，exit 0，46 tests in 3 files。
+- 变更后的最终复核：`/tmp/x4-test-repair-M8.1/final4.log`，exit 0，46 passed / 0 failed / 0 skipped；collection `/tmp/x4-test-repair-M8.1/final4-collection.log`，46 tests in 3 files。
+- `git diff --check`：exit 0。

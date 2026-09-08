@@ -559,7 +559,7 @@ defineExpose({ handleAddWare, activeCategory, activeSubCategory })
 }
 
 .group:hover .ware-card-bg {
-  width: calc(100% + 28px);
+  width: calc(100% + 32px);
 }
 
 .ware-card-add-btn {
@@ -638,8 +638,12 @@ defineExpose({ handleAddWare, activeCategory, activeSubCategory })
 
 /* --- Resource Preview with Gradient Mask --- */
 .resource-preview-container {
-  @apply flex items-center gap-1 h-full pl-2 pr-0;
-  @apply transition-opacity duration-300 hover:opacity-0;
+  @apply flex items-center gap-1 h-full pl-2 pr-0 opacity-100;
+  @apply transition-opacity duration-300;
+}
+
+.group:hover .resource-preview-container {
+  opacity: 0;
 }
 
 .resource-tag {
@@ -652,7 +656,7 @@ defineExpose({ handleAddWare, activeCategory, activeSubCategory })
 
 /* --- Compression Rate --- */
 .compression-rate-container {
-  @apply flex items-center gap-0.5 shrink-0 h-full px-1;
+  @apply flex items-center gap-0.5 shrink-0 h-full px-1 opacity-100;
   @apply transition-opacity duration-300;
 }
 
