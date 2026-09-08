@@ -108,6 +108,7 @@ export const useDragTestStore = defineStore('dragTest', () => {
   }
 
   function overZone(zoneId: string) {
+    hoveredZoneId.value = zoneId
     recordEvent('dragover', draggingItemId.value ?? undefined, zoneId)
   }
 

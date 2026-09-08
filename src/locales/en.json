@@ -1008,7 +1008,7 @@
     "yaki": "Yaki"
   },
   "tooltip": {
-    "priority_level_0_label": "Resource",
+    "priority_level_0_label": "No Demand",
     "priority_level_1_label": "Secondary",
     "priority_level_2_label": "Primary",
     "buffer_resource": "Res",

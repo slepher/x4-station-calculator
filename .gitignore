@@ -82,6 +82,9 @@ backupspecs
 playwright-report/
 test-results/
 
+# Playwright trace 归档（单个 ~1-10MB，不入库）
+trace.zip
+
 # Worktrees
 worktrees/
 

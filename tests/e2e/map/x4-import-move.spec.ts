@@ -11,6 +11,17 @@ const loadDbFixtureWithoutVsn = () => {
 }
 const importFullFixturePath = path.join(process.cwd(), 'tests', 'fixtures', 'import-export', 'import-full.json')
 const logicFlowImportFixturePath = path.join(process.cwd(), 'tests', 'fixtures', 'x4-export.json')
+const placementSectorId = 'empire-1-sector-placement'
+const placementSectorMacro = 'cluster_01_sector001_macro'
+const expectedPlacement = {
+  cluster_id: 'cluster_01_macro',
+  sector_id: placementSectorMacro,
+  pos: { x: 192000, z: -128000 },
+  sunlight: 123,
+  resources: ['hydrogen', 'ice', 'nividium', 'ore', 'silicon']
+}
+const POSITION_TOLERANCE = 6000
+const PLACEMENT_SCALE_PER_RADIUS = 1.4073989167353207e-6
 
 const applyFixture = async (page: any, data: Record<string, unknown>) => {
   await page.evaluate((dbData: Record<string, unknown>) => {
@@ -19,6 +30,82 @@ const applyFixture = async (page: any, data: Record<string, unknown>) => {
     })
     localStorage.setItem('isTestEnv', 'true')
   }, data)
+}
+
+const readEmpireState = async (page: any) => page.evaluate(() => {
+  const store = (window as any).blueprintStore
+  const empire = store.activeEmpire
+  return {
+    activeEmpireId: store.savedEmpires.activeId,
+    activeEmpireObjectId: empire?.id,
+    isDirty: store.isDirty,
+    storageKey: (window as any).gameDataStore.getStorageKey('empire'),
+    stations: empire?.stations.map((station: any) => ({ id: station.id, location: station.location })),
+    sectors: empire?.sectors?.map((sector: any) => ({ id: sector.id, location: sector.location })) || []
+  }
+})
+
+const expectPlacement = (location: any, expectedPos: { x: number; z: number }) => {
+  expect(location.cluster_id).toBe(expectedPlacement.cluster_id)
+  expect(location.sector_id).toBe(expectedPlacement.sector_id)
+  expect(location.sunlight).toBe(expectedPlacement.sunlight)
+  expect(location.resources).toEqual(expectedPlacement.resources)
+  expect(Math.abs(location.pos.x - expectedPos.x)).toBeLessThan(POSITION_TOLERANCE)
+  expect(Math.abs(location.pos.z - expectedPos.z)).toBeLessThan(POSITION_TOLERANCE)
+}
+
+const dragPanelItemToSector = async (page: any, item: any) => {
+  const sector = page.locator(`[data-map-sector-id="${placementSectorMacro}"] .sector-polygon`).first()
+  await expect(sector).toBeVisible()
+  const source = await item.boundingBox()
+  const target = await sector.boundingBox()
+  expect(source).not.toBeNull()
+  expect(target).not.toBeNull()
+  const center = {
+    x: target!.x + target!.width / 2,
+    y: target!.y + target!.height / 2
+  }
+  const pointer = { x: Math.floor(center.x), y: Math.floor(center.y) }
+  const screenRadius = target!.width / 2
+  expect(screenRadius).toBeGreaterThan(0)
+  const rawPerPixel = 1 / (screenRadius * PLACEMENT_SCALE_PER_RADIUS)
+  const expectedPos = {
+    x: Math.round(expectedPlacement.pos.x + (pointer.x - center.x) * rawPerPixel),
+    z: Math.round(expectedPlacement.pos.z - (pointer.y - center.y) * rawPerPixel)
+  }
+  await page.mouse.move(source!.x + source!.width / 2, source!.y + source!.height / 2)
+  await page.mouse.down()
+  await page.mouse.move(pointer.x, pointer.y, { steps: 4 })
+  await page.mouse.up()
+  return expectedPos
+}
+
+const saveAndReload = async (page: any) => {
+  await expect.poll(() => page.evaluate(() => (window as any).blueprintStore.isDirty)).toBe(true)
+  await page.getByTestId('top-view-btn-blueprint-production').click()
+  await page.getByTestId('toolbar-save-btn').click()
+  const dialog = page.locator('[data-testid="dialog-backdrop"]')
+  if (await dialog.isVisible().catch(() => false)) {
+    await dialog.locator('button.btn-base').last().click()
+  }
+  await expect.poll(() => page.evaluate(() => (window as any).blueprintStore.isDirty)).toBe(false)
+  const saved = await readEmpireState(page)
+  expect(saved.storageKey).toBe('x4_empire_data')
+  expect(saved.activeEmpireId).toBe('empire-1')
+  expect(saved.activeEmpireObjectId).toBe('empire-1')
+
+  await page.reload()
+  await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 10000 })
+  await setLanguageByUi(page)
+  await page.getByTestId('top-view-btn-maps').click()
+  await page.getByTestId('map-station-panel-tab').click()
+  await expect.poll(() => page.evaluate(() => (window as any).blueprintStore.isDirty)).toBe(false)
+  const reloaded = await readEmpireState(page)
+  expect(reloaded.storageKey).toBe('x4_empire_data')
+  expect(reloaded.activeEmpireId).toBe('empire-1')
+  expect(reloaded.activeEmpireObjectId).toBe('empire-1')
+  expect(reloaded.isDirty).toBe(false)
+  return reloaded
 }
 
 const setLanguageByUi = async (page: any) => {
@@ -90,11 +177,24 @@ const importLogicFlowPlan = async (page: any) => {
   await addNonEmptyStationModule(page)
 }
 
+// T016-A6 mapping: old 7 items -> new 8 items.
+// 3.1–3.6 retain the original six import scenarios; old item 7, station placement, is retained and strengthened;
+// new item 8 adds sector placement. Both placement items retain real pointer, entity-identity, and Save/reload assertions.
+// For both placement items, the pointer comes from the `.sector-polygon` polygon geometry center and is quantized
+// to integer client coordinates; before the action, expected is independently computed from the fixed 8.0 raw
+// center `{x: 192000, z: -128000}`, fixed scale `1.4073989167353207e-6`, and that integer pointer. It does not
+// call the tested conversion function or use observed raw coordinates as the oracle.
 test.describe('x4-import-move e2e mapping', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/')
 
     const dbData = loadDbFixtureWithoutVsn()
+    dbData.x4_game_version = { version: '8.0', beta: false }
+    const empireData = dbData.x4_empire_data as { list: Array<{ id: string; stations?: unknown[]; sectors?: unknown[] }> }
+    const activeEmpire = empireData.list.find((empire) => empire.id === 'empire-1')
+    if (!activeEmpire) throw new Error('fixture missing empire-1')
+    activeEmpire.stations = []
+    activeEmpire.sectors = [{ id: placementSectorId, name: 'Placement Sector', order: 0 }]
     await applyFixture(page, dbData)
 
     await page.reload()
@@ -234,27 +334,69 @@ test('3.1 Case: StationToolbar Import 打开 storage-import 向导', async ({ pa
     await expect(page.locator('[data-testid="blueprint-strategy-new"]')).toBeVisible()
   })
 
-  test('M9.1 placement: station panel uses real pointer placement and renders persisted identity', async ({ page }) => {
+  test('M9.1 placement: station uses real pointer placement and Save/reload preserves full spatial identity', async ({ page }) => {
     await addNonEmptyStationModule(page)
+    const stationId = await page.evaluate(() => (window as any).blueprintStore.activeStationId)
+    expect(stationId).toEqual(expect.any(String))
     await page.getByTestId('top-view-btn-maps').click()
     await expect(page.getByTestId('map-workbench-view')).toBeVisible()
     await page.getByTestId('map-station-panel-tab').click()
     await expect(page.getByTestId('map-station-panel')).toBeVisible()
 
-    const stationItem = page.locator('[data-testid^="station-item-"]').first()
+    const stationItem = page.locator(`[data-testid="station-item-${stationId}"]`)
     await expect(stationItem).toBeVisible()
-    const sector = page.locator('[data-map-sector-id="cluster_01_sector001_macro"]').first()
-    await expect(sector).toBeVisible()
-    const source = await stationItem.boundingBox()
-    const target = await sector.boundingBox()
-    expect(source).not.toBeNull()
-    expect(target).not.toBeNull()
-    await page.mouse.move(source!.x + source!.width / 2, source!.y + source!.height / 2)
-    await page.mouse.down()
-    await page.mouse.move(target!.x + target!.width / 2, target!.y + target!.height / 2, { steps: 4 })
-    await page.mouse.up()
+    const expectedPos = await dragPanelItemToSector(page, stationItem)
 
     await expect(stationItem).toHaveClass(/placed/)
-    await expect(page.locator('[data-placement-key^="blueprint:"]').first()).toBeVisible()
+    await expect(page.locator(`[data-placement-key="blueprint:station:${stationId}"]`)).toBeVisible()
+    const placed = await readEmpireState(page)
+    const station = placed.stations.find((item: any) => item.id === stationId)
+    const untouchedSector = placed.sectors.find((item: any) => item.id === placementSectorId)
+    expect(station).toBeDefined()
+    expect(untouchedSector?.location).toBeUndefined()
+    expectPlacement(station.location, expectedPos)
+
+    const afterReload = await saveAndReload(page)
+    const reloadedStation = afterReload.stations.find((item: any) => item.id === stationId)
+    const reloadedSector = afterReload.sectors.find((item: any) => item.id === placementSectorId)
+    expect(reloadedStation).toBeDefined()
+    expect(reloadedSector?.location).toBeUndefined()
+    expectPlacement(reloadedStation.location, expectedPos)
+    await expect(page.getByTestId('map-station-panel')).toBeVisible()
+    await expect(page.locator(`[data-testid="station-item-${stationId}"]`)).toHaveClass(/placed/)
+  })
+
+  test('M9.1 placement: sector uses real pointer placement and Save/reload preserves station contrast', async ({ page }) => {
+    await addNonEmptyStationModule(page)
+    const stationId = await page.evaluate(() => (window as any).blueprintStore.activeStationId)
+    expect(stationId).toEqual(expect.any(String))
+    await page.getByTestId('top-view-btn-maps').click()
+    await expect(page.getByTestId('map-workbench-view')).toBeVisible()
+    await page.getByTestId('map-station-panel-tab').click()
+    await expect(page.getByTestId('map-station-panel')).toBeVisible()
+
+    const sectorItem = page.locator(`[data-testid="station-item-${placementSectorId}"]`)
+    const stationItem = page.locator(`[data-testid="station-item-${stationId}"]`)
+    await expect(sectorItem).toBeVisible()
+    await expect(stationItem).toBeVisible()
+    const expectedPos = await dragPanelItemToSector(page, sectorItem)
+
+    await expect(sectorItem).toHaveClass(/placed/)
+    await expect(page.locator(`[data-placement-key="blueprint:sector:${placementSectorId}"]`)).toBeVisible()
+    const placed = await readEmpireState(page)
+    const sector = placed.sectors.find((item: any) => item.id === placementSectorId)
+    const untouchedStation = placed.stations.find((item: any) => item.id === stationId)
+    expect(sector).toBeDefined()
+    expect(untouchedStation?.location).toBeUndefined()
+    expectPlacement(sector.location, expectedPos)
+
+    const afterReload = await saveAndReload(page)
+    const reloadedSector = afterReload.sectors.find((item: any) => item.id === placementSectorId)
+    const reloadedStation = afterReload.stations.find((item: any) => item.id === stationId)
+    expect(reloadedSector).toBeDefined()
+    expect(reloadedStation?.location).toBeUndefined()
+    expectPlacement(reloadedSector.location, expectedPos)
+    await expect(page.getByTestId('map-station-panel')).toBeVisible()
+    await expect(page.locator(`[data-testid="station-item-${placementSectorId}"]`)).toHaveClass(/placed/)
   })
 })

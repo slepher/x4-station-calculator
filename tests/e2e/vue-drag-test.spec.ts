@@ -42,6 +42,7 @@ test.beforeEach(async ({ page }) => {
     localStorage.setItem('isTestEnv', 'true')
   }, fixture)
   await page.reload()
+  await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 10000 })
   await page.getByTestId('language-select').selectOption('en')
   await page.goto('/?view=drag-test&test=true')
   await expect(page.getByRole('heading', { name: 'Vue Drag Test Page' })).toBeVisible()
@@ -124,25 +125,33 @@ for (const [button, item, before, after, flag] of [
 }
 
 test('S.6 locked lineage rejects Argon without moving it', async ({ page }) => {
-  await page.getByRole('button', { name: 'Zone B: Unlocked', exact: true }).click()
+  await page.getByRole('button', { name: /^Zone B:/ }).click()
   await start(page, 'item-5')
   await expect(zone(page, 'B')).toHaveClass(/border-red-600/)
   await expect(zone(page, 'B').locator('.status-label')).toContainText('Rejected')
   await hoverB(page, true)
   await page.mouse.up()
   await idle(page)
-  expect((await state(page)).b).toEqual([])
-  expect((await state(page)).a.map((i: any) => i.id)).toContain('item-5')
+  const s = await state(page)
+  expect(s.b).toEqual([])
+  expect(s.a.map((i: any) => i.id)).toContain('item-5')
+  const bEvents = s.events.filter((event: any) => event.zoneId === 'B').map((event: any) => event.type)
+  expect(bEvents).toContain('dragover')
+  expect(bEvents).not.toContain('drop')
 })
 
 test('S.5 locked lineage permits Terran', async ({ page }) => {
-  await page.getByRole('button', { name: 'Zone B: Unlocked', exact: true }).click()
+  await page.getByRole('button', { name: /^Zone B:/ }).click()
   await start(page, 'item-4')
   await expect(zone(page, 'B')).toHaveClass(/border-amber-500/)
   await hoverB(page, true)
   await page.mouse.up()
   await idle(page)
-  expect((await state(page)).b.map((i: any) => i.id)).toEqual(['item-4'])
+  const s = await state(page)
+  expect(s.b.map((i: any) => i.id)).toEqual(['item-4'])
+  const bEvents = s.events.filter((event: any) => event.zoneId === 'B').map((event: any) => event.type)
+  expect(bEvents).toContain('dragover')
+  expect(bEvents.indexOf('dragover')).toBeLessThan(bEvents.indexOf('drop'))
 })
 
 test('S.2/ST.4 same-zone duplicate remains unique', async ({ page }) => {

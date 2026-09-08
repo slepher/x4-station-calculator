@@ -256,7 +256,7 @@ const tooltipLines = computed(() => {
 }
 
 .priority-tooltip-row .icon-cell { @apply justify-center w-8; }
-.priority-tooltip-row .label-cell { @apply font-medium; }
-.priority-tooltip-row .hours-cell { @apply text-left opacity-80; }
+.priority-tooltip-row .label-cell { min-width: 80px; @apply font-medium; }
+.priority-tooltip-row .hours-cell { min-width: 70px; @apply text-left opacity-80; }
 .priority-tooltip-row .desc-cell { @apply opacity-60 text-left; }
 </style>

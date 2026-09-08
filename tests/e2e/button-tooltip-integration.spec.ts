@@ -2,6 +2,8 @@ import { test } from '../test-setup'
 import { expect } from '@playwright/test'
 import dbFixture from '../fixtures/db.json' with { type: 'json' }
 
+test.use({ viewport: { width: 1280, height: 720 } })
+
 test.describe('Button Tooltip Integration', () => {
   test.beforeEach(async ({ page }) => {
     page.on('console', msg => console.log(`[Browser Console]: ${msg.text()}`))
@@ -68,6 +70,12 @@ test.describe('Button Tooltip Integration', () => {
     await expect(rows.locator('.hours-cell')).toHaveText(['12h', '2h'])
     await expect(rows.locator('.desc-cell')).toHaveText(['Long', 'Short'])
     await expect(tooltip.locator('.priority-tooltip-container')).toHaveCSS('grid-template-columns', /^\S+ \S+ \S+ \S+$/)
+    const labelBox = await rows.first().locator('.label-cell').boundingBox()
+    const hoursBox = await rows.first().locator('.hours-cell').boundingBox()
+    expect(labelBox?.width).toBeGreaterThanOrEqual(80)
+    expect(hoursBox?.width).toBeGreaterThanOrEqual(70)
+    await expect(rows.first().locator('.label-cell')).toHaveCSS('white-space', 'nowrap')
+    await expect(rows.first().locator('.hours-cell')).toHaveCSS('white-space', 'nowrap')
   })
 
   test('Pure Consumption Resource Interaction', async ({ page }) => {
@@ -80,7 +88,7 @@ test.describe('Button Tooltip Integration', () => {
     const tooltip = page.locator('.tippy-box[data-theme~="x4"]')
     await expect(tooltip).toBeVisible()
     await expect(tooltip.locator('.priority-tooltip-row')).toHaveCount(1)
-    await expect.soft(tooltip.locator('.label-cell')).toHaveText('No Demand')
+    await expect(tooltip.locator('.label-cell')).toHaveText('No Demand')
     await expect(tooltip.locator('.hours-cell')).toHaveText('1h')
     await expect(tooltip.locator('.desc-cell')).toHaveText('Res')
     await button.click()

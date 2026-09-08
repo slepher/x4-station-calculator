@@ -7,8 +7,6 @@ const presenter = useDragTestPresenter()
 
 const isTestEnv = ref(false)
 
-const dragEnterCounter = ref<{ A: number; B: number }>({ A: 0, B: 0 })
-
 onMounted(() => {
   isTestEnv.value = localStorage.getItem('isTestEnv') === 'true' || (window as any).isTestEnv
   if (isTestEnv.value) {
@@ -94,30 +92,33 @@ const handleDragStart = (evt: any) => {
 }
 
 const handleDragEnd = () => {
-  dragEnterCounter.value = { A: 0, B: 0 }
   presenter.stopDragging()
 }
 
-const handleDragEnter = (zoneId: 'A' | 'B') => {
-  if (presenter.isDragging.value) {
-    dragEnterCounter.value[zoneId]++
-    if (dragEnterCounter.value[zoneId] === 1) {
-      presenter.enterZone(zoneId)
-    }
-  }
+const isInsideZone = (evt: DragEvent) => {
+  const { left, right, top, bottom } = (evt.currentTarget as HTMLElement).getBoundingClientRect()
+  return evt.clientX >= left && evt.clientX <= right && evt.clientY >= top && evt.clientY <= bottom
 }
 
-const handleDragOver = (zoneId: 'A' | 'B') => {
-  if (presenter.isDragging.value) presenter.overZone(zoneId)
+const handleDragEnter = (zoneId: 'A' | 'B', evt: DragEvent) => {
+  if (presenter.isDragging.value && isInsideZone(evt)) presenter.enterZone(zoneId)
 }
 
-const handleDragLeave = (zoneId: 'A' | 'B') => {
-  if (presenter.isDragging.value) {
-    dragEnterCounter.value[zoneId]--
-    if (dragEnterCounter.value[zoneId] === 0) {
-      presenter.leaveZone(zoneId)
-    }
-  }
+const handleDragOver = (zoneId: 'A' | 'B', evt: DragEvent) => {
+  if (presenter.isDragging.value && isInsideZone(evt)) presenter.overZone(zoneId)
+}
+
+const handleDragLeave = (zoneId: 'A' | 'B', evt: DragEvent) => {
+  if (presenter.isDragging.value && !isInsideZone(evt)) presenter.leaveZone(zoneId)
+}
+
+const canMoveToZone = (evt: any) => {
+  const item = evt.draggedContext?.element
+  const target = evt.to?.getAttribute('data-testid')
+  if (target !== 'zone-a' && target !== 'zone-b') return false
+  const zoneId = target === 'zone-a' ? 'A' : 'B'
+  if (!item || item.zone === zoneId) return false
+  return !['duplicated', 'rejected'].includes(presenter.getDropStatus(item.id, zoneId))
 }
 
 const handleAddToZoneB = (evt: any) => {
@@ -125,12 +126,7 @@ const handleAddToZoneB = (evt: any) => {
   const itemId = item?.id || evt.item.getAttribute('data-item-id')
   
   if (itemId) {
-    const success = presenter.moveItem(itemId, 'B')
-    if (!success) {
-      if (evt.item && evt.item.parentNode) {
-        evt.item.parentNode.removeChild(evt.item)
-      }
-    }
+    presenter.moveItem(itemId, 'B')
   }
   
   presenter.clearHover()
@@ -209,9 +205,9 @@ const dragKey = (item: { zone: string; id: string }) => `${item.zone}:${item.id}
           class="zone-container rounded-2xl p-6 border-2 transition-all duration-200"
           :class="getZoneStatusClass('A')"
           data-zone-id="A"
-          @dragenter="handleDragEnter('A')"
-          @dragover="handleDragOver('A')"
-          @dragleave="handleDragLeave('A')"
+          @dragenter="handleDragEnter('A', $event)"
+          @dragover.capture="handleDragOver('A', $event)"
+          @dragleave="handleDragLeave('A', $event)"
         >
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-bold text-white">Zone A</h2>
@@ -229,6 +225,7 @@ const dragKey = (item: { zone: string; id: string }) => `${item.zone}:${item.id}
             :model-value="zoneAList"
             :group="{ name: 'test-items', pull: true, put: true }"
             :item-key="dragKey"
+            :move="canMoveToZone"
             @start="handleDragStart"
             @end="handleDragEnd"
             @add="handleAddToZoneA"
@@ -260,9 +257,9 @@ const dragKey = (item: { zone: string; id: string }) => `${item.zone}:${item.id}
           class="zone-container rounded-2xl p-6 border-2 transition-all duration-200"
           :class="getZoneStatusClass('B')"
           data-zone-id="B"
-          @dragenter="handleDragEnter('B')"
-          @dragover="handleDragOver('B')"
-          @dragleave="handleDragLeave('B')"
+          @dragenter="handleDragEnter('B', $event)"
+          @dragover.capture="handleDragOver('B', $event)"
+          @dragleave="handleDragLeave('B', $event)"
         >
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-bold text-white">Zone B</h2>
@@ -285,6 +282,7 @@ const dragKey = (item: { zone: string; id: string }) => `${item.zone}:${item.id}
             :model-value="zoneBList"
             :group="{ name: 'test-items', pull: true, put: true }"
             :item-key="dragKey"
+            :move="canMoveToZone"
             @start="handleDragStart"
             @end="handleDragEnd"
             @add="handleAddToZoneB"

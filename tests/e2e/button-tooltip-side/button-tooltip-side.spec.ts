@@ -2,6 +2,8 @@ import { test } from '../../test-setup'
 import { expect } from '@playwright/test'
 import dbFixture from '../../fixtures/db.json' with { type: 'json' }
 
+test.use({ viewport: { width: 1280, height: 720 } })
+
 test.describe('button-tooltip-side web integration', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/')
@@ -42,6 +44,12 @@ test.describe('button-tooltip-side web integration', () => {
     }
     await expect(tooltip.locator('.label-cell')).toHaveText(['Primary', 'Secondary'])
     await expect(tooltip.locator('.desc-cell')).toHaveText(['Long', 'Short'])
+    const labelBox = await tooltip.locator('.label-cell').first().boundingBox()
+    const hoursBox = await tooltip.locator('.hours-cell').first().boundingBox()
+    expect(labelBox?.width).toBeGreaterThanOrEqual(80)
+    expect(hoursBox?.width).toBeGreaterThanOrEqual(70)
+    await expect(tooltip.locator('.label-cell').first()).toHaveCSS('white-space', 'nowrap')
+    await expect(tooltip.locator('.hours-cell').first()).toHaveCSS('white-space', 'nowrap')
     await page.mouse.move(0, 0)
     await expect(tooltip).toBeHidden()
   })
