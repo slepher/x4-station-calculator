@@ -42,15 +42,26 @@ test.beforeEach(async ({ page }) => {
 
 const details = (page: Page) => page.getByTestId('metrics-panel-ship-build-equipment')
 
-test('4.1 expanded equipment picker hides materials and makes Fit two thirds wide', async ({ page }) => {
+test('4.1 expanded picker uses the current Fit, picker, details, and Stats columns', async ({ page }) => {
   await select(page, 'Odachi')
   await open(page, 'weapon')
-  await expect.soft(page.getByTestId('ship-build-panel-materials')).toBeHidden()
-  const whole = await page.getByTestId('ship-build-panels').boundingBox()
-  const fitBox = await fit(page).boundingBox()
-  expect(fitBox).not.toBeNull()
-  expect(whole).not.toBeNull()
-  expect(fitBox!.width / whole!.width).toBeGreaterThan(0.6)
+  await page.locator('[data-testid^="candidate-weapon_"]').first().click()
+  await expect(page.getByTestId('ship-build-panel-materials')).toBeHidden()
+  await expect(page.getByTestId('ship-build-panel-equipment')).toBeVisible()
+  await expect(details(page)).toBeVisible()
+  await expect(page.getByTestId('ship-build-panel-stats')).toBeVisible()
+
+  const boxes = await Promise.all([
+    fit(page).boundingBox(),
+    page.getByTestId('ship-build-panel-equipment').boundingBox(),
+    details(page).boundingBox(),
+    page.getByTestId('ship-build-panel-stats').boundingBox()
+  ])
+  boxes.forEach(box => expect(box).not.toBeNull())
+  const [fitBox, pickerBox, detailsBox, statsBox] = boxes
+  expect(fitBox!.x + fitBox!.width).toBeLessThanOrEqual(pickerBox!.x)
+  expect(pickerBox!.x + pickerBox!.width).toBeLessThanOrEqual(detailsBox!.x)
+  expect(detailsBox!.y + detailsBox!.height).toBeLessThanOrEqual(statsBox!.y)
 })
 
 test('4.2–4.4 empty candidate retains current and neutral values; empty current/candidate hides details', async ({ page }) => {

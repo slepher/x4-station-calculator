@@ -1,0 +1,308 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e4]:
+  - generic [ref=e5]:
+    - generic [ref=e6]:
+      - button "New" [ref=e7] [cursor=pointer]:
+        - img [ref=e8]
+        - generic [ref=e11]: New
+      - button "Save" [ref=e12] [cursor=pointer]:
+        - img [ref=e13]
+        - generic [ref=e17]: Save
+      - button "Save As" [ref=e18] [cursor=pointer]:
+        - img [ref=e19]
+        - generic [ref=e21]: Save As
+    - generic [ref=e23]:
+      - button "Blueprint" [ref=e24] [cursor=pointer]: Blueprint
+      - button "Live" [ref=e26] [cursor=pointer]: Live
+      - button "Sector Map" [ref=e28] [cursor=pointer]: Sector Map
+      - button "Logical Flow" [ref=e30] [cursor=pointer]: Logical Flow
+      - button "Ship Build" [ref=e32] [cursor=pointer]: Ship Build
+    - generic [ref=e34]:
+      - button "Import" [ref=e35] [cursor=pointer]:
+        - img [ref=e36]
+        - generic [ref=e39]: Import
+      - button "Export" [ref=e40] [cursor=pointer]:
+        - img [ref=e41]
+        - generic [ref=e44]: Export
+      - button "9.0" [ref=e45] [cursor=pointer]:
+        - img [ref=e46]
+        - generic [ref=e55]: "9.0"
+      - generic [ref=e56]:
+        - img [ref=e57]
+        - combobox [ref=e59] [cursor=pointer]:
+          - option "English" [selected]
+          - option "简体中文"
+          - option "繁體中文"
+          - option "Deutsch"
+          - option "Français"
+          - option "Italiano"
+          - option "Español"
+          - option "Русский"
+          - option "日本語"
+          - option "한국어"
+          - option "Português (Brasil)"
+          - option "Polski"
+      - button [ref=e60] [cursor=pointer]:
+        - img [ref=e61]
+  - generic [ref=e67]:
+    - generic [ref=e68]:
+      - generic [ref=e69]:
+        - button "Change Ship" [ref=e70] [cursor=pointer]:
+          - generic [ref=e72]: Odachi
+          - img [ref=e74]
+        - generic [ref=e78]:
+          - button "Add to Favorites" [ref=e79] [cursor=pointer]:
+            - img [ref=e80]
+          - button "Empty" [ref=e82] [cursor=pointer]:
+            - generic [ref=e83]: Empty
+            - img [ref=e85]
+      - generic [ref=e87]:
+        - complementary [ref=e88]:
+          - button "E" [ref=e90] [cursor=pointer]
+          - button "R" [ref=e92] [cursor=pointer]
+          - button "S" [ref=e94] [cursor=pointer]
+          - button "W" [ref=e96] [cursor=pointer]
+          - button "T" [ref=e98] [cursor=pointer]
+          - button "C" [ref=e100] [cursor=pointer]
+          - button "U" [ref=e102] [cursor=pointer]
+        - main [ref=e104]:
+          - generic [ref=e106]:
+            - button "Standard" [ref=e107] [cursor=pointer]
+            - button "Simplified" [ref=e108] [cursor=pointer]
+          - generic [ref=e110]:
+            - button "M1" [ref=e111] [cursor=pointer]
+            - button "M2" [ref=e112] [cursor=pointer]
+            - button "M3" [ref=e113] [cursor=pointer]
+            - button "M4" [ref=e114] [cursor=pointer]
+          - generic [ref=e115]:
+            - generic [ref=e116]: "Equipment Compatibility:"
+            - generic [ref=e117]: Advanced
+            - generic [ref=e118]: M Weapon x1
+          - generic [ref=e120]:
+            - slider [disabled] [ref=e123]: "0"
+            - button "M Weapon Empty Slot 0/1" [active] [ref=e125] [cursor=pointer]:
+              - generic [ref=e126]:
+                - generic [ref=e127]: M Weapon
+                - generic [ref=e129]: Empty Slot
+              - generic [ref=e131]: 0/1
+    - generic [ref=e133]:
+      - generic [ref=e134]:
+        - generic [ref=e135]: Equipment Picker
+        - generic [ref=e136]:
+          - button "Cancel" [ref=e137] [cursor=pointer]
+          - button "Confirm" [ref=e138] [cursor=pointer]
+      - generic [ref=e139]:
+        - generic [ref=e140]:
+          - generic [ref=e141]:
+            - generic [ref=e142]: RACE
+            - generic [ref=e143]:
+              - button "ARGON 2" [ref=e144] [cursor=pointer]
+              - button "BORON 3" [ref=e145] [cursor=pointer]
+              - button "GEN 10" [ref=e146] [cursor=pointer]
+              - button "PARANID 2" [ref=e147] [cursor=pointer]
+              - button "SPLIT 8" [ref=e148] [cursor=pointer]
+              - button "TELADI 2" [ref=e149] [cursor=pointer]
+              - button "TERRAN 3" [ref=e150] [cursor=pointer]
+          - generic [ref=e151]:
+            - generic [ref=e152]: MK
+            - button "MK1 17" [ref=e153] [cursor=pointer]
+            - button "MK2 13" [ref=e154] [cursor=pointer]
+        - generic [ref=e155]:
+          - button "<" [disabled] [ref=e156]
+          - button "1" [ref=e157] [cursor=pointer]
+          - button "2" [ref=e158] [cursor=pointer]
+          - button "3" [ref=e159] [cursor=pointer]
+          - button "4" [ref=e160] [cursor=pointer]
+          - button ">" [ref=e161] [cursor=pointer]
+        - generic [ref=e162]:
+          - button "Empty Slot -" [ref=e163] [cursor=pointer]:
+            - generic [ref=e164]:
+              - generic [ref=e166]: Empty Slot
+              - generic [ref=e167]: "-"
+          - button "ARG M Ion Blaster Mk1 argon · MK1 Burst DPS 51 MW Range 4900 m" [ref=e168] [cursor=pointer]:
+            - generic [ref=e169]:
+              - generic [ref=e171]: ARG M Ion Blaster Mk1
+              - generic [ref=e172]: argon · MK1
+            - generic [ref=e173]:
+              - generic [ref=e174]:
+                - generic [ref=e175]: Burst DPS
+                - generic [ref=e176]: "51"
+                - generic [ref=e177]: MW
+              - generic [ref=e178]:
+                - generic [ref=e179]: Range
+                - generic [ref=e180]: "4900"
+                - generic [ref=e181]: m
+          - button "ARG M Ion Blaster Mk2 argon · MK2 Burst DPS 69 MW Range 4900 m" [ref=e182] [cursor=pointer]:
+            - generic [ref=e183]:
+              - generic [ref=e185]: ARG M Ion Blaster Mk2
+              - generic [ref=e186]: argon · MK2
+            - generic [ref=e187]:
+              - generic [ref=e188]:
+                - generic [ref=e189]: Burst DPS
+                - generic [ref=e190]: "69"
+                - generic [ref=e191]: MW
+              - generic [ref=e192]:
+                - generic [ref=e193]: Range
+                - generic [ref=e194]: "4900"
+                - generic [ref=e195]: m
+          - button "BOR M Ion Atomiser Mk1 Kingdom End boron · MK1 Burst DPS 0 MW Range 5400 m" [ref=e196] [cursor=pointer]:
+            - generic [ref=e197]:
+              - generic [ref=e198]:
+                - generic [ref=e199]: BOR M Ion Atomiser Mk1
+                - generic [ref=e200]: Kingdom End
+              - generic [ref=e201]: boron · MK1
+            - generic [ref=e202]:
+              - generic [ref=e203]:
+                - generic [ref=e204]: Burst DPS
+                - generic [ref=e205]: "0"
+                - generic [ref=e206]: MW
+              - generic [ref=e207]:
+                - generic [ref=e208]: Range
+                - generic [ref=e209]: "5400"
+                - generic [ref=e210]: m
+          - button "BOR M Phase Cannon Mk1 Kingdom End boron · MK1 Burst DPS 168 MW Range 4080 m" [ref=e211] [cursor=pointer]:
+            - generic [ref=e212]:
+              - generic [ref=e213]:
+                - generic [ref=e214]: BOR M Phase Cannon Mk1
+                - generic [ref=e215]: Kingdom End
+              - generic [ref=e216]: boron · MK1
+            - generic [ref=e217]:
+              - generic [ref=e218]:
+                - generic [ref=e219]: Burst DPS
+                - generic [ref=e220]: "168"
+                - generic [ref=e221]: MW
+              - generic [ref=e222]:
+                - generic [ref=e223]: Range
+                - generic [ref=e224]: "4080"
+                - generic [ref=e225]: m
+          - button "BOR M Ion Pulse Railgun Mk1 Kingdom End boron · MK1 Burst DPS 1004 MW Range 10800 m" [ref=e226] [cursor=pointer]:
+            - generic [ref=e227]:
+              - generic [ref=e228]:
+                - generic [ref=e229]: BOR M Ion Pulse Railgun Mk1
+                - generic [ref=e230]: Kingdom End
+              - generic [ref=e231]: boron · MK1
+            - generic [ref=e232]:
+              - generic [ref=e233]:
+                - generic [ref=e234]: Burst DPS
+                - generic [ref=e235]: "1004"
+                - generic [ref=e236]: MW
+              - generic [ref=e237]:
+                - generic [ref=e238]: Range
+                - generic [ref=e239]: "10800"
+                - generic [ref=e240]: m
+          - button "M Beam Emitter Mk1 GEN · MK1 Burst DPS 135 MW Range 5200 m" [ref=e241] [cursor=pointer]:
+            - generic [ref=e242]:
+              - generic [ref=e244]: M Beam Emitter Mk1
+              - generic [ref=e245]: GEN · MK1
+            - generic [ref=e246]:
+              - generic [ref=e247]:
+                - generic [ref=e248]: Burst DPS
+                - generic [ref=e249]: "135"
+                - generic [ref=e250]: MW
+              - generic [ref=e251]:
+                - generic [ref=e252]: Range
+                - generic [ref=e253]: "5200"
+                - generic [ref=e254]: m
+          - button "M Beam Emitter Mk2 GEN · MK2 Burst DPS 188 MW Range 5600 m" [ref=e255] [cursor=pointer]:
+            - generic [ref=e256]:
+              - generic [ref=e258]: M Beam Emitter Mk2
+              - generic [ref=e259]: GEN · MK2
+            - generic [ref=e260]:
+              - generic [ref=e261]:
+                - generic [ref=e262]: Burst DPS
+                - generic [ref=e263]: "188"
+                - generic [ref=e264]: MW
+              - generic [ref=e265]:
+                - generic [ref=e266]: Range
+                - generic [ref=e267]: "5600"
+                - generic [ref=e268]: m
+          - button "M Bolt Repeater Mk1 GEN · MK1 Burst DPS 220 MW Range 3570 m" [ref=e269] [cursor=pointer]:
+            - generic [ref=e270]:
+              - generic [ref=e272]: M Bolt Repeater Mk1
+              - generic [ref=e273]: GEN · MK1
+            - generic [ref=e274]:
+              - generic [ref=e275]:
+                - generic [ref=e276]: Burst DPS
+                - generic [ref=e277]: "220"
+                - generic [ref=e278]: MW
+              - generic [ref=e279]:
+                - generic [ref=e280]: Range
+                - generic [ref=e281]: "3570"
+                - generic [ref=e282]: m
+          - button "M Bolt Repeater Mk2 GEN · MK2 Burst DPS 318 MW Range 3570 m" [ref=e283] [cursor=pointer]:
+            - generic [ref=e284]:
+              - generic [ref=e286]: M Bolt Repeater Mk2
+              - generic [ref=e287]: GEN · MK2
+            - generic [ref=e288]:
+              - generic [ref=e289]:
+                - generic [ref=e290]: Burst DPS
+                - generic [ref=e291]: "318"
+                - generic [ref=e292]: MW
+              - generic [ref=e293]:
+                - generic [ref=e294]: Range
+                - generic [ref=e295]: "3570"
+                - generic [ref=e296]: m
+    - generic [ref=e299]:
+      - generic [ref=e300]:
+        - generic [ref=e301]: Post-Loadout Hull Stats
+        - generic [ref=e302]:
+          - button "Summary" [ref=e303] [cursor=pointer]
+          - button "Detail" [ref=e304] [cursor=pointer]
+      - generic [ref=e306]:
+        - generic [ref=e307]:
+          - generic [ref=e308]: Hull
+          - generic [ref=e309]: 16,100MJ
+        - generic [ref=e312]:
+          - generic [ref=e313]: Weapon Burst Output
+          - generic [ref=e314]: 0MW
+        - generic [ref=e316]:
+          - generic [ref=e317]: Shield
+          - generic [ref=e318]: 0MJ
+        - generic [ref=e320]:
+          - generic [ref=e321]: Turret Avg Output
+          - generic [ref=e322]: 0MW
+        - generic [ref=e324]:
+          - generic [ref=e325]: Speed
+          - generic [ref=e326]: 0m/s
+        - generic [ref=e328]:
+          - generic [ref=e329]: Container Storage
+          - generic [ref=e330]: 400m3
+        - generic [ref=e333]:
+          - generic [ref=e334]: Boost Speed
+          - generic [ref=e335]: 0m/s
+        - generic [ref=e337]:
+          - generic [ref=e338]: Travel Speed
+          - generic [ref=e339]: 0m/s
+        - generic [ref=e341]:
+          - generic [ref=e342]: Radar Range
+          - generic [ref=e343]: 40km
+        - generic [ref=e346]:
+          - generic [ref=e347]: Crew
+          - generic [ref=e348]: "4"
+        - generic [ref=e351]:
+          - generic [ref=e352]: Drone Storage
+          - generic [ref=e353]: "0"
+        - generic [ref=e355]:
+          - generic [ref=e356]: M Dock Count
+          - generic [ref=e357]: "0"
+        - generic [ref=e359]:
+          - generic [ref=e360]: Missile Capacity
+          - generic [ref=e361]: "0"
+        - generic [ref=e363]:
+          - generic [ref=e364]: M Ship Capacity
+          - generic [ref=e365]: "0"
+        - generic [ref=e367]:
+          - generic [ref=e368]: Deployable
+          - generic [ref=e369]: "100"
+        - generic [ref=e372]:
+          - generic [ref=e373]: S Dock Count
+          - generic [ref=e374]: "0"
+        - generic [ref=e376]:
+          - generic [ref=e377]: Countermeasure
+          - generic [ref=e378]: "8"
+        - generic [ref=e381]:
+          - generic [ref=e382]: S Ship Capacity
+          - generic [ref=e383]: "0"
+```

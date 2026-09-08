@@ -1,4 +1,5 @@
-import { expect, test } from '@playwright/test'
+import { test } from '../../test-setup'
+import { expect } from '@playwright/test'
 import type { Page } from '@playwright/test'
 
 const ENERGY_CELLS = 'energycells'
@@ -37,7 +38,7 @@ const panel = (page: Page) => page.locator('.panel-card').filter({ has: page.get
 const planMenu = (page: Page) => page.getByTestId('build-plan-plan-menu')
 const planTitle = (page: Page) => panel(page).locator('.panel-header > span.cursor-pointer')
 const planItem = (page: Page, name: string) => planMenu(page).getByRole('button', { name, exact: true })
-const planWrapper = (page: Page, name: string) => planMenu(page).locator('.plan-menu-item-wrapper').filter({ has: planItem(page, name) })
+const planWrapper = (page: Page, name: string) => planMenu(page).locator('.plan-menu-item-wrapper').filter({ hasText: name })
 
 async function storedPlans(page: Page): Promise<StoredPlans> {
   const state = await page.evaluate(() => JSON.parse(localStorage.getItem('x4_build_plan_goals') || 'null'))
@@ -139,7 +140,7 @@ test.describe('build-plan-goal', () => {
     await goal.locator('input').fill('2400')
     await goal.locator('input').blur()
     expect((await storedPlans(page)).list[0].buildGoals).toEqual([{ type: 'production-rate', wareId: ENERGY_CELLS, ratePerHour: 2400 }])
-    await goal.getByRole('button').click()
+    await goal.locator('.remove-btn').click()
     await expect(goal).toHaveCount(0)
     expect((await storedPlans(page)).list[0].buildGoals).toEqual([])
   })
@@ -148,7 +149,11 @@ test.describe('build-plan-goal', () => {
     await buildPanelLoaded(page)
     await addKatana(page)
     const fleet = page.getByTestId('fleet-goal-card')
-    await expect(fleet.locator('.fleet-group')).toHaveCount(1)
+    const groups = fleet.locator('.fleet-group')
+    await expect(groups).toHaveCount(3)
+    await expect(groups.nth(0)).toBeHidden()
+    await expect(groups.nth(1)).toBeHidden()
+    await expect(groups.nth(2)).toBeVisible()
     await expect(fleet.getByTestId(`fleet-entry-qty-${KATANA_BLUEPRINT}`)).toBeVisible()
     const state = await storedPlans(page)
     expect(state.list[0].buildGoals).toEqual([{
@@ -242,7 +247,7 @@ test.describe('build-plan-goal', () => {
     await title.dblclick()
     const nameInput = panel(page).locator('.panel-header input')
     await nameInput.fill('Reloadable Plan')
-    await nameInput.press('Enter')
+    await nameInput.blur()
     await expect(planTitle(page)).toHaveText('Reloadable Plan')
     await switchPlan(page, PLAN_1)
     await expect(page.getByTestId('goal-item-energycells')).toBeVisible()
@@ -267,8 +272,12 @@ test.describe('build-plan-goal', () => {
   test('3.4 Case: Fleet 条目添加与分组展示', async ({ page }) => {
     await addKatana(page)
     const fleet = page.getByTestId('fleet-goal-card')
-    await expect(fleet.locator('.fleet-group')).toHaveCount(1)
-    await expect(fleet.locator('.fleet-group')).toContainText('Wharf')
+    const groups = fleet.locator('.fleet-group')
+    await expect(groups).toHaveCount(3)
+    await expect(groups.nth(0)).toBeHidden()
+    await expect(groups.nth(1)).toBeHidden()
+    await expect(groups.nth(2)).toBeVisible()
+    await expect(groups.nth(2)).toContainText('Wharf')
     const quantity = fleet.getByTestId(`fleet-entry-qty-${KATANA_BLUEPRINT}`).locator('input')
     await quantity.fill('2')
     await quantity.blur()
@@ -300,7 +309,7 @@ test.describe('build-plan-goal', () => {
     await expect(page.getByTestId('ship-build-panel-fit')).toBeVisible()
     await page.getByTestId('ship-build-blueprint-menu-trigger').click()
     const menu = page.getByTestId('ship-build-blueprint-menu')
-    const katanaRow = menu.locator('.ship-blueprint-menu-row').filter({ has: menu.getByText('Katana', { exact: true }) })
+    const katanaRow = menu.locator('.ship-blueprint-menu-row').filter({ hasText: 'Katana' })
     await expect(katanaRow).toHaveCount(1)
     page.once('dialog', dialog => dialog.accept())
     await katanaRow.locator('.ship-blueprint-delete-btn').click()
@@ -326,8 +335,9 @@ test.describe('build-plan-goal', () => {
   test('3.8 Case: 同 active 逻辑产线绑定', async ({ page }) => {
     await addGoal(page, HULL_PARTS)
     await selectFlow(page, LOGIC_FLOW)
-    await expect(page.getByTestId('allocation-section')).toBeVisible()
-    await expect(page.getByTestId('allocation-section').locator('.allocation-group:not(.allocation-group--unmatched)')).toHaveCount(1)
+    const preview = page.getByTestId('preview-section')
+    await expect(preview).toBeVisible()
+    await expect(preview.locator('.allocation-group:not(.allocation-group--unmatched)')).toHaveCount(1)
     const logicState = await page.evaluate(() => JSON.parse(localStorage.getItem('x4_logic_flow_plans') || 'null'))
     expect(logicState.activeId).toBe(LOGIC_FLOW)
     expect((await storedPlans(page)).list[0].logicFlowPlanId).toBe(LOGIC_FLOW)
@@ -353,7 +363,7 @@ test.describe('build-plan-goal', () => {
     await addGoal(page, ENERGY_CELLS)
     await selectFlow(page, 'unplanned')
     await expect(page.getByTestId('build-plan-flow-menu-label')).toHaveText('Unplanned')
-    await expect(page.getByTestId('allocation-section')).toContainText('Unmatched')
+    await expect(page.getByTestId('preview-section')).toContainText('Unmatched')
     const compute = page.getByRole('button', { name: 'Compute Plan', exact: true })
     await expect(compute).toBeEnabled()
     await compute.click()
@@ -364,7 +374,7 @@ test.describe('build-plan-goal', () => {
   test('3.11 Case: 产线自动分配展示', async ({ page }) => {
     await addGoal(page, HULL_PARTS)
     await selectFlow(page, LOGIC_FLOW)
-    const allocation = page.getByTestId('allocation-section')
+    const allocation = page.getByTestId('preview-section')
     await expect(allocation).toBeVisible()
     await expect(allocation.locator('.allocation-group:not(.allocation-group--unmatched)')).toHaveCount(1)
     await expect(allocation.locator('.allocation-group--unmatched')).toHaveCount(0)

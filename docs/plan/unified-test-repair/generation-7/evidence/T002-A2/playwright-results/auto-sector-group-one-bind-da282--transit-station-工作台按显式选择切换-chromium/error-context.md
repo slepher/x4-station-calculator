@@ -1,0 +1,241 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e4]:
+  - generic [ref=e5]:
+    - generic [ref=e6]:
+      - button "新建" [disabled] [ref=e7]:
+        - img [ref=e8]
+        - generic [ref=e11]: 新建
+      - button "保存" [ref=e12] [cursor=pointer]:
+        - img [ref=e13]
+        - generic [ref=e17]: 保存
+      - button "另存为" [disabled] [ref=e18]:
+        - img [ref=e19]
+        - generic [ref=e21]: 另存为
+      - button "加载" [ref=e22] [cursor=pointer]:
+        - img [ref=e23]
+        - generic [ref=e25]: 加载
+    - generic [ref=e27]:
+      - button "蓝图产能" [ref=e28] [cursor=pointer]: 蓝图产能
+      - button "实况产能" [ref=e30] [cursor=pointer]: 实况产能
+      - button "星区地图" [ref=e32] [cursor=pointer]: 星区地图
+      - button "逻辑组网" [ref=e34] [cursor=pointer]: 逻辑组网
+      - button "船只建造" [ref=e36] [cursor=pointer]: 船只建造
+    - generic [ref=e38]:
+      - button "导入" [ref=e39] [cursor=pointer]:
+        - img [ref=e40]
+        - generic [ref=e43]: 导入
+      - button "导出" [ref=e44] [cursor=pointer]:
+        - img [ref=e45]
+        - generic [ref=e48]: 导出
+      - button "9.0" [ref=e49] [cursor=pointer]:
+        - img [ref=e50]
+        - generic [ref=e59]: "9.0"
+      - generic [ref=e61]:
+        - img [ref=e62]
+        - combobox [ref=e64] [cursor=pointer]:
+          - option "English"
+          - option "简体中文" [selected]
+          - option "繁體中文"
+          - option "Deutsch"
+          - option "Français"
+          - option "Italiano"
+          - option "Español"
+          - option "Русский"
+          - option "日本語"
+          - option "한국어"
+          - option "Português (Brasil)"
+          - option "Polski"
+      - button [ref=e65] [cursor=pointer]:
+        - img [ref=e66]
+  - generic [ref=e70]:
+    - generic [ref=e71]:
+      - button "收起侧栏" [ref=e72] [cursor=pointer]:
+        - img [ref=e73]
+      - generic [ref=e75]:
+        - generic [ref=e76]:
+          - button "总览" [ref=e77] [cursor=pointer]:
+            - generic [ref=e80]: 总览
+          - button "市场报价" [ref=e81] [cursor=pointer]:
+            - generic [ref=e84]: 市场报价
+          - button "蓝图配方" [ref=e85] [cursor=pointer]:
+            - generic [ref=e88]: 蓝图配方
+          - button "研究" [ref=e89] [cursor=pointer]:
+            - generic [ref=e92]: 研究
+          - button "地球化" [ref=e93] [cursor=pointer]:
+            - generic [ref=e95]:
+              - button [ref=e96]:
+                - img [ref=e97]
+              - generic [ref=e99]: 地球化
+        - generic "星区编辑" [ref=e102] [cursor=pointer]:
+          - generic [ref=e107]: 星区编辑
+        - generic [ref=e109]:
+          - generic [active] [ref=e110] [cursor=pointer]:
+            - button [ref=e112]:
+              - img [ref=e113]
+            - generic [ref=e116]: 小行星
+          - generic [ref=e117]:
+            - generic [ref=e121] [cursor=pointer]: 地球人
+            - generic [ref=e125] [cursor=pointer]: MGO-010
+            - generic [ref=e129] [cursor=pointer]: 新建空间站
+          - generic [ref=e130] [cursor=pointer]:
+            - button [ref=e132]:
+              - img [ref=e133]
+            - generic [ref=e136]: 神圣眼光
+          - generic [ref=e137] [cursor=pointer]:
+            - button [ref=e139]:
+              - img [ref=e140]
+            - generic [ref=e143]: 阿尔忒弥斯的朦胧
+          - generic [ref=e144] [cursor=pointer]:
+            - button [ref=e146]:
+              - img [ref=e147]
+            - generic [ref=e150]: 月之舟
+          - generic [ref=e151] [cursor=pointer]:
+            - button [ref=e153]:
+              - img [ref=e154]
+            - generic [ref=e157]: 警惕凝视
+    - generic [ref=e158]:
+      - generic [ref=e160]:
+        - generic [ref=e161]:
+          - generic [ref=e162]:
+            - generic [ref=e163]: 绑定名称
+            - textbox "新绑定" [ref=e164]: 小行星
+          - generic [ref=e165]:
+            - generic [ref=e166]: 编码
+            - generic [ref=e167]: "-"
+          - generic [ref=e168]:
+            - generic [ref=e169]: 模式
+            - button "📝 规划" [ref=e170] [cursor=pointer]:
+              - generic [ref=e171]: 📝
+              - generic [ref=e172]: 规划
+        - generic [ref=e174]:
+          - generic [ref=e176] [cursor=pointer]:
+            - generic [ref=e177]: 星区
+            - generic [ref=e179]: 小行星带
+          - generic [ref=e181] [cursor=pointer]:
+            - generic [ref=e182]: 星区资源
+            - generic [ref=e183]:
+              - generic [ref=e184]: 💎
+              - generic [ref=e185]: "7"
+          - generic [ref=e186]:
+            - generic [ref=e187]: 光伏效率
+            - generic [ref=e188]:
+              - generic [ref=e189]: "13"
+              - generic [ref=e190]: "%"
+          - generic [ref=e191]:
+            - generic [ref=e192]: 单泊位吞吐量
+            - generic [ref=e193]:
+              - generic [ref=e194]: 930,000.0
+              - generic [ref=e195]: m³/h
+        - generic [ref=e198]:
+          - generic [ref=e199]: 偏好种族
+          - combobox [ref=e200] [cursor=pointer]:
+            - option "🛡️ Argon" [selected]
+            - option "🌏 Terran"
+            - option "💰 Teladi"
+            - option "👁️ Paranid"
+            - option "🐲 Split"
+      - generic [ref=e201]:
+        - generic [ref=e202]:
+          - generic [ref=e204]:
+            - generic [ref=e206] [cursor=pointer]: 建筑区
+            - generic [ref=e208]:
+              - generic [ref=e209]:
+                - generic "Argon L 集装仓储" [ref=e213]:
+                  - generic [ref=e214]: Argon L 集装仓储
+                - generic [ref=e217]: "10"
+              - generic [ref=e218]:
+                - generic "Argon E型-3x大型泊位 码头" [ref=e222]:
+                  - generic [ref=e223]: Argon E型-3x大型泊位 码头
+                - generic [ref=e226]: "1"
+          - generic [ref=e227]:
+            - heading "运输船" [level=3] [ref=e229]
+            - generic [ref=e231]:
+              - paragraph [ref=e232]: 请先在船只建造中收藏运输船或货船蓝图，用于计算路线耗时。
+              - button "前往船只建造" [ref=e233] [cursor=pointer]
+        - generic [ref=e235]:
+          - generic [ref=e236]:
+            - heading "资源视图" [level=3] [ref=e237]
+            - generic [ref=e239]:
+              - button "数量视图" [ref=e240] [cursor=pointer]
+              - button "经济视图" [ref=e241] [cursor=pointer]
+              - button "仓储视图" [ref=e242] [cursor=pointer]
+              - button "运输视图" [ref=e243] [cursor=pointer]
+          - generic [ref=e246]:
+            - heading "产品" [level=4] [ref=e250]
+            - generic [ref=e254] [cursor=pointer]:
+              - generic [ref=e255]:
+                - img [ref=e257]
+                - generic [ref=e259]: 反物质转换器
+              - generic [ref=e261]: +3,192.0
+            - generic [ref=e265] [cursor=pointer]:
+              - generic [ref=e266]:
+                - img [ref=e268]
+                - generic [ref=e270]: 励磁线圈
+              - generic [ref=e272]: +2,100.0
+            - generic [ref=e276] [cursor=pointer]:
+              - generic [ref=e277]:
+                - img [ref=e279]
+                - generic [ref=e281]: 电子基质
+              - generic [ref=e283]: +5,880.0
+            - generic [ref=e287] [cursor=pointer]:
+              - generic [ref=e288]:
+                - img [ref=e290]
+                - generic [ref=e292]: 碳化硅
+              - generic [ref=e294]: +5,760.0
+            - generic [ref=e298] [cursor=pointer]:
+              - generic [ref=e299]:
+                - img [ref=e301]
+                - generic [ref=e303]: 能量电池
+              - generic [ref=e305]: +254,100.0
+            - generic [ref=e309] [cursor=pointer]:
+              - generic [ref=e310]:
+                - img [ref=e312]
+                - generic [ref=e314]: 金属微晶
+              - generic [ref=e316]: +37,760.0
+            - generic [ref=e320] [cursor=pointer]:
+              - generic [ref=e321]:
+                - img [ref=e323]
+                - generic [ref=e325]: 量子管
+              - generic [ref=e327]: "+0.0"
+        - generic [ref=e330]:
+          - heading "运输路线" [level=3] [ref=e332]
+          - generic [ref=e333]:
+            - generic [ref=e334]:
+              - heading "星区组" [level=4] [ref=e335]
+              - article [ref=e336]:
+                - button "月之舟 366.4 km 1 星门" [ref=e337] [cursor=pointer]:
+                  - generic [ref=e338]: 月之舟
+                  - generic [ref=e339]:
+                    - generic [ref=e340]: 366.4 km
+                    - generic [ref=e341]: 1 星门
+            - generic [ref=e342]:
+              - heading "空间站" [level=4] [ref=e343]
+              - article [ref=e344]:
+                - button "小行星带 2 座空间站" [ref=e345]:
+                  - generic [ref=e346]: 小行星带
+                  - generic [ref=e348]: 2 座空间站
+                - generic [ref=e349]:
+                  - button "新建空间站 f36126e5-7798-ed14-3c03-938b961efa0b 励磁线圈, 反物质转换器 137.0 km" [ref=e351] [cursor=pointer]:
+                    - generic [ref=e352]: 新建空间站
+                    - generic [ref=e353]: f36126e5-7798-ed14-3c03-938b961efa0b
+                    - generic [ref=e354]: 励磁线圈, 反物质转换器
+                    - generic [ref=e356]: 137.0 km
+                  - button "地球人 KXN-018 电子基质, 碳化硅 +1 97.3 km" [ref=e358] [cursor=pointer]:
+                    - generic [ref=e359]: 地球人
+                    - generic [ref=e360]: KXN-018
+                    - generic [ref=e361]: 电子基质, 碳化硅 +1
+                    - generic [ref=e363]: 97.3 km
+              - article [ref=e364]:
+                - button "水星 880.3 km 3 星门 1 座空间站" [ref=e365] [cursor=pointer]:
+                  - generic [ref=e366]: 水星
+                  - generic [ref=e367]:
+                    - generic [ref=e368]: 880.3 km
+                    - generic [ref=e369]: 3 星门
+                    - generic [ref=e370]: 1 座空间站
+                - button "MGO-010 励磁线圈, 能量电池 983.9 km" [ref=e373] [cursor=pointer]:
+                  - generic [ref=e374]: MGO-010
+                  - generic [ref=e375]: 励磁线圈, 能量电池
+                  - generic [ref=e377]: 983.9 km
+```

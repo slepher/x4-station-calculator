@@ -1,0 +1,152 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e4]:
+  - generic [ref=e5]:
+    - generic [ref=e6]:
+      - button "新建" [ref=e7] [cursor=pointer]:
+        - img [ref=e8]
+        - generic [ref=e11]: 新建
+      - button "保存" [ref=e12] [cursor=pointer]:
+        - img [ref=e13]
+        - generic [ref=e17]: 保存
+      - button "另存为" [ref=e18] [cursor=pointer]:
+        - img [ref=e19]
+        - generic [ref=e21]: 另存为
+    - generic [ref=e23]:
+      - button "蓝图产能" [ref=e24] [cursor=pointer]: 蓝图产能
+      - button "实况产能" [ref=e26] [cursor=pointer]: 实况产能
+      - button "星区地图" [ref=e28] [cursor=pointer]: 星区地图
+      - button "逻辑组网" [ref=e30] [cursor=pointer]: 逻辑组网
+      - button "船只建造" [ref=e32] [cursor=pointer]: 船只建造
+    - generic [ref=e34]:
+      - button "导入" [ref=e35] [cursor=pointer]:
+        - img [ref=e36]
+        - generic [ref=e39]: 导入
+      - button "导出" [ref=e40] [cursor=pointer]:
+        - img [ref=e41]
+        - generic [ref=e44]: 导出
+      - button "9.0" [ref=e45] [cursor=pointer]:
+        - img [ref=e46]
+        - generic [ref=e55]: "9.0"
+      - generic [ref=e56]:
+        - img [ref=e57]
+        - combobox [ref=e59] [cursor=pointer]:
+          - option "English"
+          - option "简体中文" [selected]
+          - option "繁體中文"
+          - option "Deutsch"
+          - option "Français"
+          - option "Italiano"
+          - option "Español"
+          - option "Русский"
+          - option "日本語"
+          - option "한국어"
+          - option "Português (Brasil)"
+          - option "Polski"
+      - button [ref=e60] [cursor=pointer]:
+        - img [ref=e61]
+  - generic [ref=e67]:
+    - generic [ref=e68]:
+      - generic [ref=e69]:
+        - generic [ref=e70]: 大小必选
+        - generic [ref=e72]:
+          - button "S" [ref=e73] [cursor=pointer]
+          - button "M" [ref=e74] [cursor=pointer]
+          - button "L" [ref=e75] [cursor=pointer]
+          - button "XL" [ref=e76] [cursor=pointer]
+      - generic [ref=e77]:
+        - generic [ref=e78]: 种族
+        - generic [ref=e80]:
+          - button "argon(13)" [ref=e81] [cursor=pointer]
+          - button "boron(6)" [ref=e82] [cursor=pointer]
+          - button "generic(4)" [ref=e83] [cursor=pointer]
+          - button "paranid(13)" [ref=e84] [cursor=pointer]
+          - button "pirates(0)" [ref=e85] [cursor=pointer]
+          - button "split(6)" [ref=e86] [cursor=pointer]
+          - button "teladi(13)" [ref=e87] [cursor=pointer]
+          - button "terran(7)" [active] [ref=e88] [cursor=pointer]
+          - button "xenon(3)" [ref=e89] [cursor=pointer]
+          - button "yaki(1)" [ref=e90] [cursor=pointer]
+      - generic [ref=e91]:
+        - generic [ref=e92]: 类型
+        - generic [ref=e94]:
+          - button "炮艇(6)" [ref=e95] [cursor=pointer]
+          - button "掠夺舰(1)" [ref=e96] [cursor=pointer]
+          - button "护卫舰(8)" [ref=e97] [cursor=pointer]
+          - button "采矿船(19)" [ref=e98] [cursor=pointer]
+          - button "运输船(18)" [ref=e99] [cursor=pointer]
+          - button "轻型护卫舰(11)" [ref=e100] [cursor=pointer]
+          - button "特使(2)" [ref=e101] [cursor=pointer]
+          - button "拖船(1)" [ref=e102] [cursor=pointer]
+    - generic [ref=e104]:
+      - generic [ref=e105]:
+        - generic [ref=e107]: 飞船列表
+        - generic [ref=e108]:
+          - button "取消" [ref=e109] [cursor=pointer]
+          - button "确认" [ref=e110] [cursor=pointer]
+      - generic [ref=e111]: 请选择大小，并在种族或类型中至少选择一个。
+    - generic [ref=e113]:
+      - generic [ref=e115]: 飞船状态
+      - generic [ref=e117]:
+        - generic [ref=e118]:
+          - generic [ref=e119]: 船体
+          - generic [ref=e120]: 104,000MJ
+        - generic [ref=e123]:
+          - generic [ref=e124]: 集装箱仓储
+          - generic [ref=e125]: 2,800m3
+        - generic [ref=e128]:
+          - generic [ref=e129]: 雷达范围
+          - generic [ref=e130]: 40km
+        - generic [ref=e133]:
+          - generic [ref=e134]: 固体仓储
+          - generic [ref=e135]: 0m3
+        - generic [ref=e137]:
+          - generic [ref=e138]: 船员
+          - generic [ref=e139]: "75"
+        - generic [ref=e142]:
+          - generic [ref=e143]: 液体仓储
+          - generic [ref=e144]: 0m3
+        - generic [ref=e146]:
+          - generic [ref=e147]: 引擎位 (L)
+          - generic [ref=e148]: "2"
+        - generic [ref=e151]:
+          - generic [ref=e152]: 无人机单位仓储
+          - generic [ref=e153]: "10"
+        - generic [ref=e156]:
+          - generic [ref=e157]: 护盾位 (L)
+          - generic [ref=e158]: "3"
+        - generic [ref=e161]:
+          - generic [ref=e162]: 导弹容量
+          - generic [ref=e163]: "160"
+        - generic [ref=e166]:
+          - generic [ref=e167]: 推进器位 (L)
+          - generic [ref=e168]: "1"
+        - generic [ref=e171]:
+          - generic [ref=e172]: 可投放设备
+          - generic [ref=e173]: "250"
+        - generic [ref=e176]:
+          - generic [ref=e177]: 炮塔位 (M)
+          - generic [ref=e178]: "10"
+        - generic [ref=e181]:
+          - generic [ref=e182]: 干扰弹
+          - generic [ref=e183]: "20"
+        - generic [ref=e186]:
+          - generic [ref=e187]: 炮塔位 (L)
+          - generic [ref=e188]: "3"
+        - generic [ref=e191]:
+          - generic [ref=e192]: M级泊位数量
+          - generic [ref=e193]: "0"
+        - generic [ref=e195]:
+          - generic [ref=e196]: 武器位 (L)
+          - generic [ref=e197]: "2"
+        - generic [ref=e200]:
+          - generic [ref=e201]: M级飞船容量
+          - generic [ref=e202]: "0"
+        - generic [ref=e204]:
+          - generic [ref=e205]: S级泊位数量
+          - generic [ref=e206]: "1"
+        - generic [ref=e209]:
+          - generic [ref=e210]: S级飞船容量
+          - generic [ref=e211]: "2"
+```

@@ -1,4 +1,5 @@
-import { test, expect, type Page } from '@playwright/test'
+import { test } from '../../test-setup'
+import { expect, type Page } from '@playwright/test'
 import { setupLogicFlow } from '../logic-flow/helpers/setupLogicFlow'
 
 /**
@@ -16,6 +17,9 @@ test.beforeEach(async ({ page }) => {
     const fixture = JSON.parse(localStorage.getItem('x4_logic_flow_plans')!)
     fixture.list.push({ id: 'm7-empty-plan', name: 'M7 Empty Plan', groups: [], settings: { isDefaultLocked: true }, lastUpdated: 1772453451902 })
     localStorage.setItem('x4_logic_flow_plans', JSON.stringify(fixture))
+    const empireFixture = JSON.parse(localStorage.getItem('x4_empire_data')!)
+    empireFixture.list.push({ id: 'm7-empty-empire', name: 'M7 Empty Empire', stations: [] })
+    localStorage.setItem('x4_empire_data', JSON.stringify(empireFixture))
   })
   await page.reload()
   await page.getByTestId('language-select').selectOption('zh-CN')
@@ -80,6 +84,12 @@ async function transitionLoaderMenuOpenToClosed(page: Page) {
   await expect(page.getByTestId('map-resource-advanced-loader-menu')).not.toBeVisible()
 }
 
+async function summaryResourceIds(page: Page, groupIndex: number) {
+  return page.locator('.advanced-group-card').nth(groupIndex).locator('.summary-tag').evaluateAll(nodes =>
+    nodes.map(node => node.getAttribute('data-testid')!.split('-').at(-1)).sort()
+  )
+}
+
 // Chapter 2 tests
 
 test('2.1 状态: 高级模式载入按钮可见', async ({ page }) => {
@@ -118,28 +128,32 @@ test('3.1 Case: 显示载入按钮', async ({ page }) => {
 test('3.2 Case: 打开载入菜单', async ({ page }) => {
   // 3.2.1 状态: 载入菜单打开态
   await buildLoaderMenuOpen(page)
-  // 3.2.2 断言星区列表包含 sector-1 项 #期望： [sector-1项可见]
-  await expect(page.getByTestId('map-resource-advanced-loader-sector-sector-1')).toBeVisible()
-  // 3.2.3 断言逻辑组网存档列表包含 logic-flow-1 项 #期望： [logic-flow-1项可见]
+  // 3.2.2 断言当前有资源需求的已保存帝国按固定身份显示
+  await expect(page.getByRole('button', { name: 'Empire 1', exact: true })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Empire 2', exact: true })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Empire 3 - 双星区中转测试', exact: true })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'M7 Empty Empire', exact: true })).toHaveCount(0)
+  await expect(page.locator('[data-testid^="map-resource-advanced-loader-sector-"]')).toHaveCount(0)
+  // 3.2.3 断言逻辑组网存档列表包含 logic-flow-1 项
   await expect(page.getByTestId('map-resource-advanced-loader-logicflow-logic-flow-1')).toBeVisible()
 })
 
-test('3.3 Case: 载入星区空间站为组', async ({ page }) => {
+test('3.3 Case: 载入已保存帝国空间站资源为组', async ({ page }) => {
   // 3.3.1 状态: 载入菜单打开态
   await buildLoaderMenuOpen(page)
-  // 3.3.2 点击星区列表中第一个星区项
-  await page.getByTestId('map-resource-advanced-loader-sector-sector-1').click()
+  // 3.3.2 点击固定已保存帝国
+  await page.getByRole('button', { name: 'Empire 1', exact: true }).click()
   // 3.3.3 断言菜单已关闭 #期望： [菜单不可见]
   await expect(page.getByTestId('map-resource-advanced-loader-menu')).not.toBeVisible()
-  // 3.3.4 断言载入按钮显示星区名称 #期望： [按钮文本=星区名称]
+  // 3.3.4 断言载入按钮显示帝国名称
   const loaderTrigger = page.getByTestId('map-resource-advanced-loader-trigger')
-  await expect(loaderTrigger.locator('.loader-trigger-label')).toHaveText(/星区 1/)
-  // 3.3.5 断言组列表被替换为新组 #期望： [组数量=该星区空间站数量]
+  await expect(loaderTrigger.locator('.loader-trigger-label')).toHaveText('Empire 1')
+  // 3.3.5 仅为有资源需求的三个站点生成组
   const groupCards = page.locator('.advanced-group-card')
   await expect(groupCards).toHaveCount(3)
-  // 3.3.6 断言每个组的标签包含空间站消耗的资源 #期望： [组标签=资源wareId列表]
-  const summaryTags = page.locator('.summary-tag')
-  await expect(summaryTags.first()).toBeVisible()
+  await expect(await summaryResourceIds(page, 0)).toEqual(['hydrogen', 'methane', 'ore', 'silicon'])
+  await expect(await summaryResourceIds(page, 1)).toEqual(['helium', 'methane'])
+  await expect(await summaryResourceIds(page, 2)).toEqual(['ice'])
 })
 
 test('3.4 Case: 载入逻辑组网存档为组', async ({ page }) => {
@@ -158,9 +172,9 @@ test('3.4 Case: 载入逻辑组网存档为组', async ({ page }) => {
   // 3.4.6 断言每个组的标签为 tier0 资源 #期望： [组标签=tier0资源列表]
   const summaryTags = page.locator('.summary-tag')
   await expect(summaryTags).toHaveCount(7)
-  const ids = await groupCards.nth(1).locator('.summary-tag').evaluateAll(nodes => nodes.map(n => n.getAttribute('data-testid')!.split('-').at(-1)).sort())
-  expect(ids).toEqual(['helium', 'methane'])
-  await expect(groupCards.nth(2).locator('.summary-tag')).toHaveAttribute('data-testid', /-ice$/)
+  expect(await summaryResourceIds(page, 0)).toEqual(['hydrogen', 'methane', 'ore', 'silicon'])
+  expect(await summaryResourceIds(page, 1)).toEqual(['helium', 'methane'])
+  expect(await summaryResourceIds(page, 2)).toEqual(['ice'])
 })
 
 test('3.5 Case: 点击外部关闭菜单', async ({ page }) => {
@@ -216,14 +230,15 @@ test('3.8 Case: 载入后候选自动刷新', async ({ page }) => {
   await expect(candidateCount).toBeGreaterThanOrEqual(1)
 })
 
-test('3.9 Case: 空星区过滤', async ({ page }) => {
+test('3.9 Case: 已保存帝国过滤无资源需求的空间站', async ({ page }) => {
   // 3.9.1 状态: 载入菜单打开态
   await buildLoaderMenuOpen(page)
-  // 3.9.2 断言星区列表仅包含有资源需求的星区 #期望： [无无资源需求星区]
-  const sectorItems = page.locator('[data-testid^="map-resource-advanced-loader-sector-"]')
-  const sectorCount = await sectorItems.count()
-  await expect(sectorCount).toBeGreaterThan(0)
-  await expect(page.locator('.loader-menu-empty').filter({ hasText: /没有资源需求的星区/ })).not.toBeVisible()
+  // 3.9.2 Empire 2 的首站资源均被 lockedWares 排除，只有第二站生成组
+  await page.getByRole('button', { name: 'Empire 2', exact: true }).click()
+  await expect(page.getByTestId('map-resource-advanced-loader-menu')).not.toBeVisible()
+  await expect(page.getByTestId('map-resource-advanced-loader-trigger').locator('.loader-trigger-label')).toHaveText('Empire 2')
+  await expect(page.locator('.advanced-group-card')).toHaveCount(1)
+  await expect(await summaryResourceIds(page, 0)).toEqual(['helium', 'hydrogen', 'methane', 'ore', 'silicon'])
 })
 
 test('3.10 Case: 空逻辑组网存档过滤', async ({ page }) => {
@@ -245,14 +260,14 @@ test('3.11 Case: 关闭面板时菜单同步关闭', async ({ page }) => {
   await expect(page.getByTestId('map-resource-advanced-loader-menu')).not.toBeVisible()
 })
 
-test('3.12 Case: 载入项高亮显示', async ({ page }) => {
+test('3.12 Case: 载入逻辑组网项高亮显示', async ({ page }) => {
   // 3.12.1 状态: 载入菜单打开态
   await buildLoaderMenuOpen(page)
-  // 3.12.2 点击星区列表中第一个星区项
-  await page.getByTestId('map-resource-advanced-loader-sector-sector-1').click()
+  // 3.12.2 点击逻辑组网存档
+  await page.getByTestId('map-resource-advanced-loader-logicflow-logic-flow-1').click()
   // 3.12.3 再次打开载入菜单
   await page.getByTestId('map-resource-advanced-loader-trigger').click()
-  // 3.12.4 断言已载入星区项有 active 样式 #期望： [active类存在]
-  const sectorItem = page.getByTestId('map-resource-advanced-loader-sector-sector-1')
-  await expect(sectorItem).toHaveClass(/active/)
+  // 3.12.4 断言已载入逻辑组网项有 active 样式
+  await expect(page.getByTestId('map-resource-advanced-loader-logicflow-logic-flow-1')).toHaveClass(/active/)
+  await expect(page.getByRole('button', { name: 'Empire 1', exact: true })).not.toHaveClass(/active/)
 })

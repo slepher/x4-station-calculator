@@ -1,0 +1,304 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e4]:
+  - generic [ref=e5]:
+    - generic [ref=e6]:
+      - button "新建" [ref=e7] [cursor=pointer]:
+        - img [ref=e8]
+        - generic [ref=e11]: 新建
+      - button "保存" [ref=e12] [cursor=pointer]:
+        - img [ref=e13]
+        - generic [ref=e17]: 保存
+      - button "另存为" [ref=e18] [cursor=pointer]:
+        - img [ref=e19]
+        - generic [ref=e21]: 另存为
+    - generic [ref=e23]:
+      - button "蓝图产能" [ref=e24] [cursor=pointer]: 蓝图产能
+      - button "实况产能" [ref=e26] [cursor=pointer]: 实况产能
+      - button "星区地图" [ref=e28] [cursor=pointer]: 星区地图
+      - button "逻辑组网" [ref=e30] [cursor=pointer]: 逻辑组网
+      - button "船只建造" [ref=e32] [cursor=pointer]: 船只建造
+    - generic [ref=e34]:
+      - button "导入" [ref=e35] [cursor=pointer]:
+        - img [ref=e36]
+        - generic [ref=e39]: 导入
+      - button "导出" [ref=e40] [cursor=pointer]:
+        - img [ref=e41]
+        - generic [ref=e44]: 导出
+      - button "9.0" [ref=e45] [cursor=pointer]:
+        - img [ref=e46]
+        - generic [ref=e55]: "9.0"
+      - generic [ref=e56]:
+        - img [ref=e57]
+        - combobox [ref=e59] [cursor=pointer]:
+          - option "English"
+          - option "简体中文" [selected]
+          - option "繁體中文"
+          - option "Deutsch"
+          - option "Français"
+          - option "Italiano"
+          - option "Español"
+          - option "Русский"
+          - option "日本語"
+          - option "한국어"
+          - option "Português (Brasil)"
+          - option "Polski"
+      - button [ref=e60] [cursor=pointer]:
+        - img [ref=e61]
+  - generic [ref=e67]:
+    - generic [ref=e68]:
+      - generic [ref=e69]:
+        - button "更换飞船" [ref=e70] [cursor=pointer]:
+          - generic [ref=e72]: 大阪
+          - img [ref=e74]
+        - generic [ref=e78]:
+          - button "添加到收藏" [ref=e79] [cursor=pointer]:
+            - img [ref=e80]
+          - button "空配" [ref=e82] [cursor=pointer]:
+            - generic [ref=e83]: 空配
+            - img [ref=e85]
+      - generic [ref=e87]:
+        - complementary [ref=e88]:
+          - button "E" [ref=e90] [cursor=pointer]
+          - button "R" [ref=e92] [cursor=pointer]
+          - button "S" [ref=e94] [cursor=pointer]
+          - button "W" [ref=e96] [cursor=pointer]
+          - button "T" [ref=e98] [cursor=pointer]
+          - button "C" [ref=e100] [cursor=pointer]
+          - button "U" [ref=e102] [cursor=pointer]
+        - main [ref=e104]:
+          - generic [ref=e106]:
+            - button "标准" [ref=e107] [cursor=pointer]
+            - button "简化" [ref=e108] [cursor=pointer]
+          - button "L" [ref=e111] [cursor=pointer]
+          - generic [ref=e112]:
+            - generic [ref=e113]: "装备兼容性:"
+            - generic [ref=e114]: 标准
+            - generic [ref=e115]: L 引擎 x2
+            - generic [ref=e116]: M 护盾生成器 x4
+          - generic [ref=e117]:
+            - generic [ref=e118]:
+              - slider [disabled] [ref=e121]: "0"
+              - button "L 引擎 空槽位 0/2" [active] [ref=e123] [cursor=pointer]:
+                - generic [ref=e124]:
+                  - generic [ref=e125]: L 引擎
+                  - generic [ref=e127]: 空槽位
+                - generic [ref=e129]: 0/2
+            - generic [ref=e130]:
+              - slider [disabled] [ref=e133]: "0"
+              - button "M 护盾生成器 空槽位 0/4" [ref=e135] [cursor=pointer]:
+                - generic [ref=e136]:
+                  - generic [ref=e137]: M 护盾生成器
+                  - generic [ref=e139]: 空槽位
+                - generic [ref=e141]: 0/4
+    - generic [ref=e143]:
+      - generic [ref=e144]:
+        - generic [ref=e145]: 装备选择器
+        - generic [ref=e146]:
+          - button "取消" [ref=e147] [cursor=pointer]
+          - button "确认" [ref=e148] [cursor=pointer]
+      - generic [ref=e149]:
+        - generic [ref=e151]:
+          - generic [ref=e152]: RACE
+          - generic [ref=e153]:
+            - button "ARGON 2" [ref=e154] [cursor=pointer]
+            - button "PARANID 2" [ref=e155] [cursor=pointer]
+            - button "SPLIT 2" [ref=e156] [cursor=pointer]
+            - button "TELADI 2" [ref=e157] [cursor=pointer]
+            - button "TERRAN 2" [ref=e158] [cursor=pointer]
+        - generic [ref=e159]:
+          - button "<" [disabled] [ref=e160]
+          - button "1" [ref=e161] [cursor=pointer]
+          - button "2" [ref=e162] [cursor=pointer]
+          - button ">" [ref=e163] [cursor=pointer]
+        - generic [ref=e164]:
+          - button "空槽位 -" [ref=e165] [cursor=pointer]:
+            - generic [ref=e166]:
+              - generic [ref=e168]: 空槽位
+              - generic [ref=e169]: "-"
+          - button "ARG L 均衡引擎 Mk1 argon · MK1 速度 76 m/s 巡航速度 2332:18 m/s:s" [ref=e170] [cursor=pointer]:
+            - generic [ref=e171]:
+              - generic [ref=e173]: ARG L 均衡引擎 Mk1
+              - generic [ref=e174]: argon · MK1
+            - generic [ref=e175]:
+              - generic [ref=e176]:
+                - generic [ref=e177]: 速度
+                - generic [ref=e178]: "76"
+                - generic [ref=e179]: m/s
+              - generic [ref=e180]:
+                - generic [ref=e181]: 巡航速度
+                - generic [ref=e182]: 2332:18
+                - generic [ref=e183]: m/s:s
+          - button "ARG L 巡航引擎 Mk1 argon · MK1 速度 62 m/s 巡航速度 2623:16 m/s:s" [ref=e184] [cursor=pointer]:
+            - generic [ref=e185]:
+              - generic [ref=e187]: ARG L 巡航引擎 Mk1
+              - generic [ref=e188]: argon · MK1
+            - generic [ref=e189]:
+              - generic [ref=e190]:
+                - generic [ref=e191]: 速度
+                - generic [ref=e192]: "62"
+                - generic [ref=e193]: m/s
+              - generic [ref=e194]:
+                - generic [ref=e195]: 巡航速度
+                - generic [ref=e196]: 2623:16
+                - generic [ref=e197]: m/s:s
+          - button "PAR L 均衡引擎 Mk1 paranid · MK1 速度 87 m/s 巡航速度 2649:14 m/s:s" [ref=e198] [cursor=pointer]:
+            - generic [ref=e199]:
+              - generic [ref=e201]: PAR L 均衡引擎 Mk1
+              - generic [ref=e202]: paranid · MK1
+            - generic [ref=e203]:
+              - generic [ref=e204]:
+                - generic [ref=e205]: 速度
+                - generic [ref=e206]: "87"
+                - generic [ref=e207]: m/s
+              - generic [ref=e208]:
+                - generic [ref=e209]: 巡航速度
+                - generic [ref=e210]: 2649:14
+                - generic [ref=e211]: m/s:s
+          - button "PAR L 巡航引擎 Mk1 paranid · MK1 速度 69 m/s 巡航速度 3098:12 m/s:s" [ref=e212] [cursor=pointer]:
+            - generic [ref=e213]:
+              - generic [ref=e215]: PAR L 巡航引擎 Mk1
+              - generic [ref=e216]: paranid · MK1
+            - generic [ref=e217]:
+              - generic [ref=e218]:
+                - generic [ref=e219]: 速度
+                - generic [ref=e220]: "69"
+                - generic [ref=e221]: m/s
+              - generic [ref=e222]:
+                - generic [ref=e223]: 巡航速度
+                - generic [ref=e224]: 3098:12
+                - generic [ref=e225]: m/s:s
+          - button "SPL L 均衡引擎 Mk1 分道扬镳 split · MK1 速度 102 m/s 巡航速度 1708:15 m/s:s" [ref=e226] [cursor=pointer]:
+            - generic [ref=e227]:
+              - generic [ref=e228]:
+                - generic [ref=e229]: SPL L 均衡引擎 Mk1
+                - generic [ref=e230]: 分道扬镳
+              - generic [ref=e231]: split · MK1
+            - generic [ref=e232]:
+              - generic [ref=e233]:
+                - generic [ref=e234]: 速度
+                - generic [ref=e235]: "102"
+                - generic [ref=e236]: m/s
+              - generic [ref=e237]:
+                - generic [ref=e238]: 巡航速度
+                - generic [ref=e239]: 1708:15
+                - generic [ref=e240]: m/s:s
+          - button "SPL L 巡航引擎 Mk1 分道扬镳 split · MK1 速度 82 m/s 巡航速度 1921:15 m/s:s" [ref=e241] [cursor=pointer]:
+            - generic [ref=e242]:
+              - generic [ref=e243]:
+                - generic [ref=e244]: SPL L 巡航引擎 Mk1
+                - generic [ref=e245]: 分道扬镳
+              - generic [ref=e246]: split · MK1
+            - generic [ref=e247]:
+              - generic [ref=e248]:
+                - generic [ref=e249]: 速度
+                - generic [ref=e250]: "82"
+                - generic [ref=e251]: m/s
+              - generic [ref=e252]:
+                - generic [ref=e253]: 巡航速度
+                - generic [ref=e254]: 1921:15
+                - generic [ref=e255]: m/s:s
+          - button "TEL L 均衡引擎 Mk1 teladi · MK1 速度 78 m/s 巡航速度 2241:9 m/s:s" [ref=e256] [cursor=pointer]:
+            - generic [ref=e257]:
+              - generic [ref=e259]: TEL L 均衡引擎 Mk1
+              - generic [ref=e260]: teladi · MK1
+            - generic [ref=e261]:
+              - generic [ref=e262]:
+                - generic [ref=e263]: 速度
+                - generic [ref=e264]: "78"
+                - generic [ref=e265]: m/s
+              - generic [ref=e266]:
+                - generic [ref=e267]: 巡航速度
+                - generic [ref=e268]: 2241:9
+                - generic [ref=e269]: m/s:s
+          - button "TEL L 巡航引擎 Mk1 teladi · MK1 速度 66 m/s 巡航速度 2485:8 m/s:s" [ref=e270] [cursor=pointer]:
+            - generic [ref=e271]:
+              - generic [ref=e273]: TEL L 巡航引擎 Mk1
+              - generic [ref=e274]: teladi · MK1
+            - generic [ref=e275]:
+              - generic [ref=e276]:
+                - generic [ref=e277]: 速度
+                - generic [ref=e278]: "66"
+                - generic [ref=e279]: m/s
+              - generic [ref=e280]:
+                - generic [ref=e281]: 巡航速度
+                - generic [ref=e282]: 2485:8
+                - generic [ref=e283]: m/s:s
+          - button "TER L 均衡引擎 Mk1 人类的摇篮 terran · MK1 速度 72 m/s 巡航速度 2018:5 m/s:s" [ref=e284] [cursor=pointer]:
+            - generic [ref=e285]:
+              - generic [ref=e286]:
+                - generic [ref=e287]: TER L 均衡引擎 Mk1
+                - generic [ref=e288]: 人类的摇篮
+              - generic [ref=e289]: terran · MK1
+            - generic [ref=e290]:
+              - generic [ref=e291]:
+                - generic [ref=e292]: 速度
+                - generic [ref=e293]: "72"
+                - generic [ref=e294]: m/s
+              - generic [ref=e295]:
+                - generic [ref=e296]: 巡航速度
+                - generic [ref=e297]: 2018:5
+                - generic [ref=e298]: m/s:s
+    - generic [ref=e301]:
+      - generic [ref=e302]:
+        - generic [ref=e303]: 配装后船体属性
+        - generic [ref=e304]:
+          - button "简略" [ref=e305] [cursor=pointer]
+          - button "详细" [ref=e306] [cursor=pointer]
+      - generic [ref=e308]:
+        - generic [ref=e309]:
+          - generic [ref=e310]: 船体
+          - generic [ref=e311]: 104,000MJ
+        - generic [ref=e314]:
+          - generic [ref=e315]: 武器爆发输出值
+          - generic [ref=e316]: 0MW
+        - generic [ref=e318]:
+          - generic [ref=e319]: 护盾
+          - generic [ref=e320]: 0MJ
+        - generic [ref=e322]:
+          - generic [ref=e323]: 炮塔平均输出值
+          - generic [ref=e324]: 0MW
+        - generic [ref=e326]:
+          - generic [ref=e327]: 速度
+          - generic [ref=e328]: 0m/s
+        - generic [ref=e330]:
+          - generic [ref=e331]: 集装箱仓储
+          - generic [ref=e332]: 2,800m3
+        - generic [ref=e335]:
+          - generic [ref=e336]: 助推速度
+          - generic [ref=e337]: 0m/s
+        - generic [ref=e339]:
+          - generic [ref=e340]: 巡航速度
+          - generic [ref=e341]: 0m/s
+        - generic [ref=e343]:
+          - generic [ref=e344]: 雷达范围
+          - generic [ref=e345]: 40km
+        - generic [ref=e348]:
+          - generic [ref=e349]: 船员
+          - generic [ref=e350]: "75"
+        - generic [ref=e353]:
+          - generic [ref=e354]: 无人机单位仓储
+          - generic [ref=e355]: "10"
+        - generic [ref=e358]:
+          - generic [ref=e359]: M级泊位数量
+          - generic [ref=e360]: "0"
+        - generic [ref=e362]:
+          - generic [ref=e363]: 导弹容量
+          - generic [ref=e364]: "160"
+        - generic [ref=e367]:
+          - generic [ref=e368]: M级飞船容量
+          - generic [ref=e369]: "0"
+        - generic [ref=e371]:
+          - generic [ref=e372]: 可投放设备
+          - generic [ref=e373]: "250"
+        - generic [ref=e376]:
+          - generic [ref=e377]: S级泊位数量
+          - generic [ref=e378]: "1"
+        - generic [ref=e381]:
+          - generic [ref=e382]: 干扰弹
+          - generic [ref=e383]: "20"
+        - generic [ref=e386]:
+          - generic [ref=e387]: S级飞船容量
+          - generic [ref=e388]: "2"
+```

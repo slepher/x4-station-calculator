@@ -1,0 +1,177 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e4]:
+  - generic [ref=e5]:
+    - generic [ref=e6]:
+      - button "新建" [ref=e7] [cursor=pointer]:
+        - img [ref=e8]
+        - generic [ref=e11]: 新建
+      - button "保存" [ref=e12] [cursor=pointer]:
+        - img [ref=e13]
+        - generic [ref=e17]: 保存
+      - button "另存为" [ref=e18] [cursor=pointer]:
+        - img [ref=e19]
+        - generic [ref=e21]: 另存为
+      - button "加载" [ref=e22] [cursor=pointer]:
+        - img [ref=e23]
+        - generic [ref=e25]: 加载
+    - generic [ref=e27]:
+      - button "蓝图产能" [ref=e28] [cursor=pointer]: 蓝图产能
+      - button "实况产能" [ref=e30] [cursor=pointer]: 实况产能
+      - button "星区地图" [ref=e32] [cursor=pointer]: 星区地图
+      - button "逻辑组网" [ref=e34] [cursor=pointer]: 逻辑组网
+      - button "船只建造" [ref=e36] [cursor=pointer]: 船只建造
+    - generic [ref=e38]:
+      - button "导入" [ref=e39] [cursor=pointer]:
+        - img [ref=e40]
+        - generic [ref=e43]: 导入
+      - button "导出" [ref=e44] [cursor=pointer]:
+        - img [ref=e45]
+        - generic [ref=e48]: 导出
+      - button "9.0" [ref=e49] [cursor=pointer]:
+        - img [ref=e50]
+        - generic [ref=e59]: "9.0"
+      - generic [ref=e61]:
+        - img [ref=e62]
+        - combobox [ref=e64] [cursor=pointer]:
+          - option "English"
+          - option "简体中文" [selected]
+          - option "繁體中文"
+          - option "Deutsch"
+          - option "Français"
+          - option "Italiano"
+          - option "Español"
+          - option "Русский"
+          - option "日本語"
+          - option "한국어"
+          - option "Português (Brasil)"
+          - option "Polski"
+      - button [ref=e65] [cursor=pointer]:
+        - img [ref=e66]
+  - generic [ref=e70]:
+    - generic [ref=e71]:
+      - button "收起侧栏" [ref=e72] [cursor=pointer]:
+        - img [ref=e73]
+      - generic [ref=e75]:
+        - generic [ref=e76]:
+          - button "总览" [ref=e77] [cursor=pointer]:
+            - generic [ref=e80]: 总览
+          - button "蓝图配方" [ref=e81] [cursor=pointer]:
+            - generic [ref=e84]: 蓝图配方
+          - button "研究" [ref=e85] [cursor=pointer]:
+            - generic [ref=e88]: 研究
+          - button "地球化" [ref=e89] [cursor=pointer]:
+            - generic [ref=e91]:
+              - button [ref=e92]:
+                - img [ref=e93]
+              - generic [ref=e95]: 地球化
+        - button "添加空间站" [ref=e99] [cursor=pointer]:
+          - img [ref=e100]
+          - generic [ref=e101]: 添加空间站
+    - generic [ref=e102]:
+      - generic [ref=e103]:
+        - generic [ref=e104]:
+          - generic [ref=e106]:
+            - generic [ref=e107]: 蓝图名称
+            - textbox "新建蓝图" [ref=e108]
+          - generic [ref=e111]:
+            - generic [ref=e112]: 偏好种族
+            - combobox [ref=e113] [cursor=pointer]:
+              - option "🛡️ Argon" [selected]
+              - option "🌏 Terran"
+              - option "💰 Teladi"
+              - option "👁️ Paranid"
+              - option "🐲 Split"
+        - button "导入逻辑组网" [ref=e115] [cursor=pointer]:
+          - img [ref=e116]
+      - generic [ref=e118]:
+        - generic [ref=e120]:
+          - generic [ref=e121]:
+            - generic [ref=e122] [cursor=pointer]: 建造规划 1
+            - button "建造规划 1" [ref=e124] [cursor=pointer]:
+              - generic [ref=e125]: 建造规划 1
+              - img [ref=e126]
+          - generic [ref=e128]:
+            - generic [ref=e131]:
+              - searchbox "搜索商品或模块..." [ref=e132]
+              - combobox [ref=e133] [cursor=pointer]:
+                - option "商品" [selected]
+                - option "模块"
+                - option "舰队"
+            - generic [ref=e134]:
+              - generic [ref=e135]: 建造目标
+              - generic [ref=e137]:
+                - generic "船体部件" [ref=e141]
+                - generic [ref=e142]:
+                  - generic [ref=e143]:
+                    - spinbutton [ref=e144]: "1176"
+                    - generic:
+                      - button:
+                        - img
+                      - button:
+                        - img
+                  - button "×" [ref=e145] [cursor=pointer]
+            - generic [ref=e146]:
+              - generic [ref=e147]: 生产产线
+              - generic [ref=e148]:
+                - generic [ref=e149]:
+                  - generic [ref=e150]: 待规划产线
+                  - generic [ref=e151]: "1"
+                - generic [ref=e153]:
+                  - generic [ref=e157]: 船体部件产线
+                  - generic [ref=e158]:
+                    - generic [ref=e159]: 目标
+                    - generic "自动生成，数量由计算阶段确定" [ref=e160]:
+                      - img [ref=e161]
+            - generic [ref=e164]:
+              - generic [ref=e165] [cursor=pointer]:
+                - checkbox "建材产线" [checked] [ref=e166]
+                - generic [ref=e167]: 建材产线
+              - button "无规划" [ref=e170] [cursor=pointer]:
+                - generic [ref=e171]: 无规划
+                - img [ref=e172]
+            - button "计算建造方案" [active] [ref=e174] [cursor=pointer]
+        - generic [ref=e176]:
+          - generic [ref=e177]:
+            - generic [ref=e178]: 建造方案
+            - button "导出到空间站" [ref=e180] [cursor=pointer]:
+              - text: 导出到空间站
+              - img [ref=e181]
+          - generic [ref=e185] [cursor=pointer]:
+            - generic [ref=e186]:
+              - generic [ref=e187]:
+                - generic [ref=e188]: "1"
+                - generic [ref=e189]: 待规划产线
+              - generic [ref=e190]: 43m │ 2.66M
+            - generic [ref=e191]:
+              - generic [ref=e192]: 主要模块
+              - generic [ref=e194]: 船体部件产线 ×1
+            - generic [ref=e195]:
+              - generic [ref=e196]: 配套模块
+              - generic [ref=e197]:
+                - generic [ref=e198]: 能量电池产线 ×1
+                - generic [ref=e199]: 石墨烯生产线 ×1
+                - generic [ref=e200]: 精炼金属产线 ×1
+            - generic [ref=e201]:
+              - generic [ref=e202]: 主要产出
+              - generic [ref=e204]: 船体部件 1176.0/h
+            - generic [ref=e205]:
+              - generic [ref=e206]: 建材消耗
+              - generic [ref=e207]:
+                - generic [ref=e208]: 能量电池 ×2007
+                - generic [ref=e209]: 等离子导体 ×1228
+                - generic [ref=e210]: 船体部件 ×1190
+                - generic [ref=e211]: 先进复合材料 ×853
+                - generic [ref=e212]: 电子黏土 ×324
+        - generic [ref=e214]:
+          - generic [ref=e215]:
+            - heading "资源视图" [level=3] [ref=e216]
+            - generic [ref=e218]:
+              - button "数量视图" [ref=e219] [cursor=pointer]
+              - button "经济视图" [ref=e220] [cursor=pointer]
+          - generic [ref=e223]:
+            - generic [ref=e225]: "!"
+            - paragraph [ref=e226]: 暂无活跃生产周期
+            - paragraph [ref=e227]: 请添加生产模块以查看数据
+```

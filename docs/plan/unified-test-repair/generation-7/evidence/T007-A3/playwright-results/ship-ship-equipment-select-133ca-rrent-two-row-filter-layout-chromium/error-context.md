@@ -1,0 +1,182 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e4]:
+  - generic [ref=e5]:
+    - generic [ref=e6]:
+      - button "新建" [ref=e7] [cursor=pointer]:
+        - img [ref=e8]
+        - generic [ref=e11]: 新建
+      - button "保存" [ref=e12] [cursor=pointer]:
+        - img [ref=e13]
+        - generic [ref=e17]: 保存
+      - button "另存为" [ref=e18] [cursor=pointer]:
+        - img [ref=e19]
+        - generic [ref=e21]: 另存为
+    - generic [ref=e23]:
+      - button "蓝图产能" [ref=e24] [cursor=pointer]: 蓝图产能
+      - button "实况产能" [ref=e26] [cursor=pointer]: 实况产能
+      - button "星区地图" [ref=e28] [cursor=pointer]: 星区地图
+      - button "逻辑组网" [ref=e30] [cursor=pointer]: 逻辑组网
+      - button "船只建造" [ref=e32] [cursor=pointer]: 船只建造
+    - generic [ref=e34]:
+      - button "导入" [ref=e35] [cursor=pointer]:
+        - img [ref=e36]
+        - generic [ref=e39]: 导入
+      - button "导出" [ref=e40] [cursor=pointer]:
+        - img [ref=e41]
+        - generic [ref=e44]: 导出
+      - button "9.0" [ref=e45] [cursor=pointer]:
+        - img [ref=e46]
+        - generic [ref=e55]: "9.0"
+      - generic [ref=e56]:
+        - img [ref=e57]
+        - combobox [ref=e59] [cursor=pointer]:
+          - option "English"
+          - option "简体中文" [selected]
+          - option "繁體中文"
+          - option "Deutsch"
+          - option "Français"
+          - option "Italiano"
+          - option "Español"
+          - option "Русский"
+          - option "日本語"
+          - option "한국어"
+          - option "Português (Brasil)"
+          - option "Polski"
+      - button [ref=e60] [cursor=pointer]:
+        - img [ref=e61]
+  - generic [ref=e67]:
+    - generic [ref=e68]:
+      - generic [ref=e69]:
+        - button "更换飞船" [ref=e70] [cursor=pointer]:
+          - generic [ref=e72]: 大阪
+          - img [ref=e74]
+        - generic [ref=e78]:
+          - button "添加到收藏" [ref=e79] [cursor=pointer]:
+            - img [ref=e80]
+          - button "自定义" [ref=e82] [cursor=pointer]:
+            - generic [ref=e83]: 自定义
+            - img [ref=e86]
+      - generic [ref=e88]:
+        - complementary [ref=e89]:
+          - button "E" [ref=e91] [cursor=pointer]
+          - button "R" [ref=e93] [cursor=pointer]
+          - button "S" [ref=e95] [cursor=pointer]
+          - button "W" [ref=e97] [cursor=pointer]
+          - button "T" [ref=e99] [cursor=pointer]
+          - button "C" [ref=e101] [cursor=pointer]
+          - button "U" [ref=e103] [cursor=pointer]
+        - main [ref=e105]:
+          - generic [ref=e107]:
+            - button "标准" [ref=e108] [cursor=pointer]
+            - button "简化" [ref=e109] [cursor=pointer]
+          - generic [ref=e111]:
+            - button "L1" [ref=e112] [cursor=pointer]
+            - button "L2" [ref=e113] [cursor=pointer]
+          - generic [ref=e115]:
+            - slider [ref=e118] [cursor=pointer]: "1"
+            - button "L 武器 Terran主炮 人类的摇篮 1/1" [active] [ref=e121] [cursor=pointer]:
+              - generic [ref=e122]:
+                - generic [ref=e123]: L 武器
+                - generic [ref=e124]:
+                  - generic [ref=e125]: Terran主炮
+                  - generic [ref=e126]: 人类的摇篮
+              - generic [ref=e128]: 1/1
+    - generic [ref=e130]:
+      - generic [ref=e131]:
+        - generic [ref=e132]: 配装后船体属性
+        - generic [ref=e133]:
+          - button "简略" [ref=e134] [cursor=pointer]
+          - button "详细" [ref=e135] [cursor=pointer]
+      - generic [ref=e137]:
+        - generic [ref=e138]:
+          - generic [ref=e139]: 船体
+          - generic [ref=e140]: 104,000MJ
+        - generic [ref=e143]:
+          - generic [ref=e144]: 武器爆发输出值
+          - generic [ref=e145]: 2,279MW
+        - generic [ref=e148]:
+          - generic [ref=e149]: 护盾
+          - generic [ref=e150]: 0MJ
+        - generic [ref=e152]:
+          - generic [ref=e153]: 炮塔平均输出值
+          - generic [ref=e154]: 0MW
+        - generic [ref=e156]:
+          - generic [ref=e157]: 速度
+          - generic [ref=e158]: 0m/s
+        - generic [ref=e160]:
+          - generic [ref=e161]: 集装箱仓储
+          - generic [ref=e162]: 2,800m3
+        - generic [ref=e165]:
+          - generic [ref=e166]: 助推速度
+          - generic [ref=e167]: 0m/s
+        - generic [ref=e169]:
+          - generic [ref=e170]: 巡航速度
+          - generic [ref=e171]: 0m/s
+        - generic [ref=e173]:
+          - generic [ref=e174]: 雷达范围
+          - generic [ref=e175]: 40km
+        - generic [ref=e178]:
+          - generic [ref=e179]: 船员
+          - generic [ref=e180]: "75"
+        - generic [ref=e183]:
+          - generic [ref=e184]: 无人机单位仓储
+          - generic [ref=e185]: "10"
+        - generic [ref=e188]:
+          - generic [ref=e189]: M级泊位数量
+          - generic [ref=e190]: "0"
+        - generic [ref=e192]:
+          - generic [ref=e193]: 导弹容量
+          - generic [ref=e194]: "160"
+        - generic [ref=e197]:
+          - generic [ref=e198]: M级飞船容量
+          - generic [ref=e199]: "0"
+        - generic [ref=e201]:
+          - generic [ref=e202]: 可投放设备
+          - generic [ref=e203]: "250"
+        - generic [ref=e206]:
+          - generic [ref=e207]: S级泊位数量
+          - generic [ref=e208]: "1"
+        - generic [ref=e211]:
+          - generic [ref=e212]: 干扰弹
+          - generic [ref=e213]: "20"
+        - generic [ref=e216]:
+          - generic [ref=e217]: S级飞船容量
+          - generic [ref=e218]: "2"
+    - generic [ref=e221]:
+      - generic [ref=e222]:
+        - generic [ref=e223]: 建造材料
+        - generic [ref=e224]:
+          - button "总材料" [ref=e225] [cursor=pointer]
+          - button "时间视图" [ref=e226] [cursor=pointer]
+      - generic [ref=e227]:
+        - generic [ref=e228]:
+          - generic [ref=e230] [cursor=pointer]:
+            - generic [ref=e231]:
+              - img [ref=e233]
+              - generic [ref=e235]: 总材料
+            - generic [ref=e237]: 3,662,286 Cr
+          - generic [ref=e239] [cursor=pointer]:
+            - generic [ref=e240]:
+              - img [ref=e242]
+              - generic [ref=e244]:
+                - generic [ref=e245]: 大阪
+                - generic [ref=e246]: x 1
+            - generic [ref=e248]: 2,714,306 Cr
+          - generic [ref=e250] [cursor=pointer]:
+            - generic [ref=e251]:
+              - img [ref=e253]
+              - generic [ref=e255]:
+                - generic [ref=e256]: Terran主炮
+                - generic [ref=e257]: x 1
+            - generic [ref=e259]: 947,980 Cr
+        - generic [ref=e261]:
+          - generic [ref=e263]:
+            - generic [ref=e264]:
+              - generic [ref=e265]: 船只建造材料价格
+              - generic [ref=e266]: 平均
+            - slider [ref=e267] [cursor=pointer]: "0.5"
+          - combobox [ref=e268]:
+            - option "default" [selected]
+```

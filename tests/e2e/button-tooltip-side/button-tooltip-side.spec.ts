@@ -30,7 +30,7 @@ test.describe('button-tooltip-side web integration', () => {
   test('3.1 收藏按钮 tooltip 向左弹出', async ({ page }) => {
     const button = page.locator('[data-resource-id="hullparts"] .favorite-btn')
     await button.hover()
-    const tooltip = page.locator('.tippy-box[data-theme~="x4"]')
+    const tooltip = page.locator('.tippy-box[data-theme~="x4"]').filter({ has: page.locator('.priority-tooltip-container') })
     await expect(tooltip).toBeVisible()
     await expect(tooltip).toHaveAttribute('data-placement', 'left')
     const buttonBox = await button.boundingBox()
@@ -57,7 +57,7 @@ test.describe('button-tooltip-side web integration', () => {
   test('3.2 锁定按钮 tooltip 向右弹出', async ({ page }) => {
     const button = page.locator('[data-resource-id="hullparts"] .lock-btn')
     await button.hover()
-    const tooltip = page.locator('.tippy-box[data-theme~="x4"]')
+    const tooltip = page.locator('.tippy-box[data-theme~="x4"]').filter({ has: page.locator('.lock-tooltip-container') })
     await expect(tooltip).toBeVisible()
     await expect(tooltip).toHaveAttribute('data-placement', 'right')
     const buttonBox = await button.boundingBox()

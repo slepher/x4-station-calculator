@@ -1,0 +1,23 @@
+- Task: T002
+- Contract revision: 1
+- Result: T002-A1.md
+- Candidate snapshot: HEAD `8b5894bc85a7de3d608efa8db74357d942764519` plus the retained generation-7 planning tree and the T002 spec candidate blob `e6ff4e7f404dcb792051f504c2972b63db3984b5` (base blob `2aa5194e979c26cd7e97e30bf3f707aa294416de`)
+- Verdict: changes-required
+
+## Findings
+
+1. **Blocking — the transit workbench oracle asserts a state the public action does not produce.** In `tests/e2e/auto-sector-group-one-binding/auto-sector-group-one-binding.spec.ts:471-474`, the candidate expects `activeViewStore.activeBindingWorkbench === 'transit'`. `selectTransitSector()` first clears auto mode to `overview`, then writes `activeStationId = 'transit:<sector>'` (`src/store/useLiveProductionStore.ts:1931-1945`). The active-station setter changes the persisted workbench to `station` (`src/store/useActiveViewStore.ts:112-123`); no source writer assigns `activeBindingWorkbench = 'transit'`. The public/rendered mode is instead derived as `transit` from `activeTransitSectorId` (`src/store/useLiveProductionStore.ts:873-876,962-970`). **Correction owner:** T002 implementation worker. **Allowed correction:** use the current presenter/session mode, such as `liveStore.session.workbenchMode`, as the workbench oracle while retaining the exact `activeStationId`, panel, and active-row assertions; keep the auto and station checks semantically consistent. **Verification:** inspect the corrected diff against this call chain, run collection, then run the contract’s focused Playwright command successfully.
+
+2. **Medium — A1 does not retain an exact candidate patch.** `evidence/T002-A1/patch.diff` is a prose summary rather than the unified diff, while `T002-A1.md` describes a mutable “current candidate.” That does not independently bind the failed run to the dirty candidate as required by the evidence contract. **Correction owner:** T002 implementation worker for the correction attempt; dispatcher verifies identity. **Allowed correction:** preserve A1 and make the next attempt retain the actual patch plus the candidate file blob and relevant input identity. **Verification:** the retained patch applies to the stated base and hashes to the candidate used by collection and focused execution.
+
+3. **Validation remains failed, independently of the semantic verdict.** The focused command exited 1 because the configured web server failed to start; both `.last-run.json` files report `failed`, with no browser test, failed-test identity, trace, or other browser artifact. Collection passed with 17 tests and `git diff --check` passed, but neither establishes runtime acceptance. **Correction owner:** dispatcher for mechanical web-server recovery, returning any discovered code/config defect to its authorized owner. **Allowed correction:** after the semantic correction is frozen, rerun the exact focused command in the assigned `e2e-build-browser` resource and retain its real result. **Verification:** a successful web-server start and browser execution of all 17 focused tests; otherwise preserve the new failure or unavailable coverage.
+
+## Acceptance
+
+The current public route and retirement rationale are accepted: the sidebar emits real `selectAutoSectorGroup`, `selectTransit`, and `selectStation` actions; explicit transit/station selection clears auto mode; D04 therefore correctly retires the old automatic station/transit A→B witness instead of inventing a focus entry. The candidate’s UI actions, exact sector/station identities, visible panel witnesses, and active-row assertions are otherwise appropriate. Existing binding and archive-switch scenarios remain in the same spec and cover binding identity changes, draft disposal/restoration, and same-GUID archive selection; no reload is required for the temporary navigation selection added here.
+
+The tracked candidate change is confined to the owned E2E spec, with result/evidence files under the assigned generation-7 paths; no product, Unit, helper, fixture, or configuration change was found. Semantic acceptance is withheld for Finding 1. Browser acceptance is separately unproved because the focused command failed before execution. This review is independent of the implementation worker.
+
+## Explanation
+
+The candidate chose the correct current behavior and a useful UI sequence, but it confused the persisted workbench discriminator with the derived public mode for transit. Correct that oracle and retain an exact next-attempt patch. The A1 focused run remains failed and must not be reported as a pass; a corrected candidate still needs successful focused browser evidence before acceptance.

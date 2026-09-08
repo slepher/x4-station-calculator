@@ -58,7 +58,7 @@ test.describe('Button Tooltip Integration', () => {
 
   test('Tooltip Layout and Content Filtering', async ({ page }) => {
     await page.locator('[data-resource-id="hullparts"] .favorite-btn').hover()
-    const tooltip = page.locator('.tippy-box[data-theme~="x4"]')
+    const tooltip = page.locator('.tippy-box[data-theme~="x4"]').filter({ has: page.locator('.priority-tooltip-container') })
     await expect(tooltip).toBeVisible()
     await expect(tooltip.locator('.priority-tooltip-container')).toHaveCSS('display', 'grid')
     const rows = tooltip.locator('.priority-tooltip-row')

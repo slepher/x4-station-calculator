@@ -1,0 +1,270 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e4]:
+  - generic [ref=e5]:
+    - generic [ref=e6]:
+      - button "新建" [ref=e7] [cursor=pointer]:
+        - img [ref=e8]
+        - generic [ref=e11]: 新建
+      - button "保存" [ref=e12] [cursor=pointer]:
+        - img [ref=e13]
+        - generic [ref=e17]: 保存
+      - button "另存为" [ref=e18] [cursor=pointer]:
+        - img [ref=e19]
+        - generic [ref=e21]: 另存为
+      - button "加载" [ref=e22] [cursor=pointer]:
+        - img [ref=e23]
+        - generic [ref=e25]: 加载
+    - generic [ref=e27]:
+      - button "蓝图产能" [ref=e28] [cursor=pointer]: 蓝图产能
+      - button "实况产能" [ref=e30] [cursor=pointer]: 实况产能
+      - button "星区地图" [ref=e32] [cursor=pointer]: 星区地图
+      - button "逻辑组网" [ref=e34] [cursor=pointer]: 逻辑组网
+      - button "船只建造" [ref=e36] [cursor=pointer]: 船只建造
+    - generic [ref=e38]:
+      - button "导入" [ref=e39] [cursor=pointer]:
+        - img [ref=e40]
+        - generic [ref=e43]: 导入
+      - button "导出" [ref=e44] [cursor=pointer]:
+        - img [ref=e45]
+        - generic [ref=e48]: 导出
+      - button "9.0" [ref=e49] [cursor=pointer]:
+        - img [ref=e50]
+        - generic [ref=e59]: "9.0"
+      - generic [ref=e60]:
+        - img [ref=e61]
+        - combobox [ref=e63] [cursor=pointer]:
+          - option "English"
+          - option "简体中文" [selected]
+          - option "繁體中文"
+          - option "Deutsch"
+          - option "Français"
+          - option "Italiano"
+          - option "Español"
+          - option "Русский"
+          - option "日本語"
+          - option "한국어"
+          - option "Português (Brasil)"
+          - option "Polski"
+      - button [ref=e64] [cursor=pointer]:
+        - img [ref=e65]
+  - generic [ref=e69]:
+    - generic [ref=e70]:
+      - button "收起侧栏" [ref=e71] [cursor=pointer]:
+        - img [ref=e72]
+      - generic [ref=e74]:
+        - generic [ref=e75]:
+          - button "总览" [ref=e76] [cursor=pointer]:
+            - generic [ref=e79]: 总览
+          - button "蓝图配方" [ref=e80] [cursor=pointer]:
+            - generic [ref=e83]: 蓝图配方
+          - button "研究" [ref=e84] [cursor=pointer]:
+            - generic [ref=e87]: 研究
+          - button "地球化" [ref=e88] [cursor=pointer]:
+            - generic [ref=e90]:
+              - button [ref=e91]:
+                - img [ref=e92]
+              - generic [ref=e94]: 地球化
+        - generic [ref=e97]:
+          - generic [ref=e101] [cursor=pointer]: 新建空间站
+          - button "添加空间站" [ref=e102] [cursor=pointer]:
+            - img [ref=e103]
+            - generic [ref=e104]: 添加空间站
+    - generic [ref=e105]:
+      - generic [ref=e106]:
+        - generic [ref=e107]:
+          - generic [ref=e108]:
+            - generic [ref=e109]:
+              - generic [ref=e110]: 名称
+              - textbox "分站名称" [ref=e111]: 新建空间站
+            - generic [ref=e112]:
+              - generic [ref=e113]: 类型
+              - combobox [ref=e114] [cursor=pointer]:
+                - option "🏭 Industrial" [selected]
+                - option "📦 Supply"
+                - option "🚚 Transit"
+                - option "⚓ Shipyard"
+            - generic [ref=e115]:
+              - generic [ref=e116]: 数量
+              - generic [ref=e117]:
+                - spinbutton [ref=e118]: "1"
+                - generic:
+                  - button:
+                    - img
+                  - button:
+                    - img
+          - generic [ref=e120]:
+            - generic [ref=e122] [cursor=pointer]:
+              - generic [ref=e123]: 星区资源
+              - generic [ref=e125]: 无资源
+            - generic [ref=e126]:
+              - generic [ref=e127]: 光伏效率
+              - generic [ref=e128]:
+                - generic [ref=e129]:
+                  - spinbutton [ref=e130]: "100"
+                  - generic:
+                    - button:
+                      - img
+                    - button:
+                      - img
+                - generic [ref=e131]: "%"
+            - generic [ref=e132]:
+              - generic [ref=e133]: 运输时间
+              - generic [ref=e134]:
+                - generic [ref=e135]:
+                  - spinbutton [ref=e136]: "30"
+                  - generic:
+                    - button:
+                      - img
+                    - button:
+                      - img
+                - generic [ref=e137]: 分钟
+            - generic [ref=e138]:
+              - generic [ref=e139]: 单泊位吞吐量
+              - generic [ref=e140]:
+                - generic [ref=e141]: 930,000.0
+                - generic [ref=e142]: m³/h
+          - generic [ref=e144]:
+            - generic [ref=e145]:
+              - generic [ref=e146]: 偏好种族
+              - combobox [ref=e147] [cursor=pointer]:
+                - option "🛡️ Argon" [selected]
+                - option "🌏 Terran"
+                - option "💰 Teladi"
+                - option "👁️ Paranid"
+                - option "🐲 Split"
+            - generic [ref=e148]:
+              - generic [ref=e149]: 工人运算
+              - button "👥 OFF" [ref=e150] [cursor=pointer]:
+                - generic [ref=e151]: 👥
+                - generic [ref=e152]: "OFF"
+            - generic [ref=e153]:
+              - generic [ref=e154]: 显示缺口
+              - button "显示缺口 📊 OFF" [ref=e155] [cursor=pointer]:
+                - generic [ref=e156]: 显示缺口
+                - generic [ref=e157]: 📊
+                - generic [ref=e158]: "OFF"
+        - button "导入逻辑组网" [ref=e160] [cursor=pointer]:
+          - img [ref=e161]
+      - generic [ref=e163]:
+        - generic [ref=e165]:
+          - generic [ref=e168]:
+            - generic [ref=e169]: 🔍
+            - searchbox "搜索模块 ID 或名称..." [ref=e170]: module_gen_prod_energycells_01
+            - button "Clear search" [ref=e171] [cursor=pointer]: ×
+          - generic [ref=e172]:
+            - generic [ref=e173]:
+              - generic [ref=e174]: 用户规划区
+              - generic [ref=e175]:
+                - button "1/5" [ref=e176] [cursor=pointer]
+                - button "1/3" [ref=e177] [cursor=pointer]
+                - button "1/2" [ref=e178] [cursor=pointer]
+                - button "2x" [ref=e179] [cursor=pointer]
+                - button "3x" [ref=e180] [cursor=pointer]
+                - button "5x" [ref=e181] [cursor=pointer]
+            - generic [ref=e184]:
+              - generic "能量电池产线" [ref=e188]:
+                - generic [ref=e189]: 能量电池产线
+              - generic [ref=e190]:
+                - generic [ref=e192]:
+                  - spinbutton [ref=e193]: "1"
+                  - generic:
+                    - button:
+                      - img
+                    - button:
+                      - img
+                - button "×" [ref=e194] [cursor=pointer]
+          - generic [ref=e195]:
+            - generic [ref=e197]: 自动基础设施
+            - generic [ref=e199]:
+              - generic [ref=e200]:
+                - generic "Argon L 集装仓储" [ref=e204]:
+                  - generic [ref=e205]: Argon L 集装仓储
+                - generic "点击转移到用户规划区" [ref=e208] [cursor=pointer]: "1"
+              - generic [ref=e209]:
+                - generic "Argon E型-3x大型泊位 码头" [ref=e213]:
+                  - generic [ref=e214]: Argon E型-3x大型泊位 码头
+                - generic "点击转移到用户规划区" [ref=e217] [cursor=pointer]: "1"
+        - generic [ref=e219]:
+          - generic [ref=e220]:
+            - heading "资源视图" [level=3] [ref=e221]
+            - generic [ref=e223]:
+              - button "数量视图" [ref=e224] [cursor=pointer]
+              - button "经济视图" [ref=e225] [cursor=pointer]
+              - button "仓储视图" [ref=e226] [cursor=pointer]
+              - button "运输视图" [ref=e227] [cursor=pointer]
+          - generic [ref=e230]:
+            - heading "产品" [level=4] [ref=e234]
+            - generic [ref=e235]:
+              - generic [ref=e238] [cursor=pointer]:
+                - generic [ref=e239]:
+                  - img [ref=e241]
+                  - generic [ref=e243]: 能量电池
+                - generic [ref=e245]: +10,500.0
+              - generic [ref=e246]:
+                - img [ref=e249] [cursor=pointer]
+                - img [ref=e253] [cursor=pointer]
+        - generic [ref=e256]:
+          - generic [ref=e257]:
+            - heading "建设成本" [level=3] [ref=e258]
+            - generic [ref=e260]:
+              - button "成本视图" [ref=e261] [cursor=pointer]
+              - button "运输视图" [ref=e262] [cursor=pointer]
+              - button "时间视图" [ref=e263] [cursor=pointer]
+              - button "工人视图" [ref=e264] [cursor=pointer]
+          - generic [ref=e265]:
+            - generic [ref=e266]:
+              - generic [ref=e267]: 建设总成本
+              - generic [ref=e268]: 2.84M Cr
+            - generic [ref=e269]:
+              - generic [ref=e270]: 材料总体积
+              - generic [ref=e271]: 69.91K m³
+            - generic [ref=e272]:
+              - generic [ref=e273]: 工人需求
+              - generic [ref=e274]: "90"
+            - generic [ref=e275]:
+              - generic [ref=e276]: 建造总用时
+              - generic [ref=e277]: 00:36:44
+            - generic [ref=e278]:
+              - generic [ref=e279]: 运输船次
+              - generic [ref=e280]: 2 (62K)
+            - generic [ref=e281]:
+              - generic [ref=e282]: 工人效率
+              - generic [ref=e283]: 0%
+          - generic [ref=e285]:
+            - generic [ref=e288] [cursor=pointer]:
+              - generic [ref=e289]:
+                - img [ref=e291]
+                - generic [ref=e293]: 建设总成本
+              - generic [ref=e295]: 2,836,731 Cr
+            - generic [ref=e298] [cursor=pointer]:
+              - generic [ref=e299]:
+                - img [ref=e301]
+                - generic [ref=e303]:
+                  - generic [ref=e304]: 能量电池产线
+                  - generic [ref=e305]: x
+                  - generic [ref=e306]: "1"
+              - generic [ref=e308]: 737,479 Cr
+            - generic [ref=e311] [cursor=pointer]:
+              - generic [ref=e312]:
+                - img [ref=e314]
+                - generic [ref=e316]:
+                  - generic [ref=e317]: Argon L 集装仓储
+                  - generic [ref=e318]: x
+                  - generic [ref=e319]: "1"
+              - generic [ref=e321]: 326,269 Cr
+            - generic [ref=e324] [cursor=pointer]:
+              - generic [ref=e325]:
+                - img [ref=e327]
+                - generic [ref=e329]:
+                  - generic [ref=e330]: Argon E型-3x大型泊位 码头
+                  - generic [ref=e331]: x
+                  - generic [ref=e332]: "1"
+              - generic [ref=e334]: 1,772,983 Cr
+          - generic [ref=e338]:
+            - generic [ref=e339]:
+              - generic [ref=e340]: 建设资源价格
+              - generic [ref=e341]: 平均
+            - slider [ref=e342] [cursor=pointer]: "0.5"
+```

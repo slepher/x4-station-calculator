@@ -1,0 +1,231 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e4]:
+  - generic [ref=e5]:
+    - generic [ref=e6]:
+      - button "New" [ref=e7] [cursor=pointer]:
+        - img [ref=e8]
+        - generic [ref=e11]: New
+      - button "Save" [ref=e12] [cursor=pointer]:
+        - img [ref=e13]
+        - generic [ref=e17]: Save
+      - button "Save As" [ref=e18] [cursor=pointer]:
+        - img [ref=e19]
+        - generic [ref=e21]: Save As
+    - generic [ref=e23]:
+      - button "Blueprint" [ref=e24] [cursor=pointer]: Blueprint
+      - button "Live" [ref=e26] [cursor=pointer]: Live
+      - button "Sector Map" [ref=e28] [cursor=pointer]: Sector Map
+      - button "Logical Flow" [ref=e30] [cursor=pointer]: Logical Flow
+      - button "Ship Build" [ref=e32] [cursor=pointer]: Ship Build
+    - generic [ref=e34]:
+      - button "Import" [ref=e35] [cursor=pointer]:
+        - img [ref=e36]
+        - generic [ref=e39]: Import
+      - button "Export" [ref=e40] [cursor=pointer]:
+        - img [ref=e41]
+        - generic [ref=e44]: Export
+      - button "8.0" [ref=e45] [cursor=pointer]:
+        - img [ref=e46]
+        - generic [ref=e55]: "8.0"
+      - generic [ref=e56]:
+        - img [ref=e57]
+        - combobox [ref=e59] [cursor=pointer]:
+          - option "English" [selected]
+          - option "简体中文"
+          - option "繁體中文"
+          - option "Deutsch"
+          - option "Français"
+          - option "Italiano"
+          - option "Español"
+          - option "Русский"
+          - option "日本語"
+          - option "한국어"
+          - option "Português (Brasil)"
+          - option "Polski"
+      - button [ref=e60] [cursor=pointer]:
+        - img [ref=e61]
+  - generic [ref=e67]:
+    - generic [ref=e68]:
+      - generic [ref=e69]:
+        - button "Change Ship" [ref=e70] [cursor=pointer]:
+          - generic [ref=e72]: Katana
+          - img [ref=e74]
+        - generic [ref=e78]:
+          - button "Add to Favorites" [ref=e79] [cursor=pointer]:
+            - img [ref=e80]
+          - button "Katana" [active] [ref=e82] [cursor=pointer]:
+            - generic [ref=e83]: Katana
+            - img [ref=e85]
+          - generic [ref=e87]:
+            - generic [ref=e88]:
+              - generic [ref=e89]: Preset Loadouts
+              - generic [ref=e91] [cursor=pointer]: Empty
+              - generic [ref=e93] [cursor=pointer]: Low
+              - generic [ref=e95] [cursor=pointer]: Mid
+              - generic [ref=e97] [cursor=pointer]: High
+            - generic [ref=e98]:
+              - generic [ref=e99]: Blueprint Loadouts
+              - generic [ref=e100]:
+                - generic [ref=e101] [cursor=pointer]: Katana
+                - button "Add to Favorites" [ref=e102] [cursor=pointer]:
+                  - img [ref=e103]
+                - button "Delete" [ref=e105] [cursor=pointer]:
+                  - img [ref=e106]
+      - generic [ref=e108]:
+        - complementary [ref=e109]:
+          - button "E" [ref=e111] [cursor=pointer]
+          - button "R" [ref=e113] [cursor=pointer]
+          - button "S" [ref=e115] [cursor=pointer]
+          - button "W" [ref=e117] [cursor=pointer]
+          - button "T" [ref=e119] [cursor=pointer]
+          - button "C" [ref=e121] [cursor=pointer]
+          - button "U" [ref=e123] [cursor=pointer]
+        - main [ref=e125]:
+          - generic [ref=e127]:
+            - button "Standard" [ref=e128] [cursor=pointer]
+            - button "Simplified" [ref=e129] [cursor=pointer]
+          - generic [ref=e131]:
+            - button "M1" [ref=e132] [cursor=pointer]
+            - button "M2" [ref=e133] [cursor=pointer]
+          - generic [ref=e134]:
+            - generic [ref=e135]: "Equipment Compatibility:"
+            - generic [ref=e136]: Standard
+            - generic [ref=e137]: M Engine x1
+          - generic [ref=e139]:
+            - slider [ref=e142] [cursor=pointer]: "1"
+            - button "M Engine TER M Combat Engine Mk3 Cradle of Humanity 1/1" [ref=e145] [cursor=pointer]:
+              - generic [ref=e146]:
+                - generic [ref=e147]: M Engine
+                - generic [ref=e148]:
+                  - generic [ref=e149]: TER M Combat Engine Mk3
+                  - generic [ref=e150]: Cradle of Humanity
+              - generic [ref=e152]: 1/1
+    - generic [ref=e154]:
+      - generic [ref=e155]:
+        - generic [ref=e156]: Post-Loadout Hull Stats
+        - generic [ref=e157]:
+          - button "Summary" [ref=e158] [cursor=pointer]
+          - button "Detail" [ref=e159] [cursor=pointer]
+      - generic [ref=e161]:
+        - generic [ref=e162]:
+          - generic [ref=e163]: Hull
+          - generic [ref=e164]: 11,000MJ
+        - generic [ref=e167]:
+          - generic [ref=e168]: Weapon Burst Output
+          - generic [ref=e169]: 23,902.4MW
+        - generic [ref=e172]:
+          - generic [ref=e173]: Shield
+          - generic [ref=e174]: 18,398MJ
+        - generic [ref=e177]:
+          - generic [ref=e178]: Turret Avg Output
+          - generic [ref=e179]: 82.5MW
+        - generic [ref=e182]:
+          - generic [ref=e183]: Speed
+          - generic [ref=e184]: 652m/s
+        - generic [ref=e187]:
+          - generic [ref=e188]: Container Storage
+          - generic [ref=e189]: 560m3
+        - generic [ref=e192]:
+          - generic [ref=e193]: Boost Speed
+          - generic [ref=e194]: 4,039m/s
+        - generic [ref=e197]:
+          - generic [ref=e198]: Travel Speed
+          - generic [ref=e199]: 4,385m/s
+        - generic [ref=e202]:
+          - generic [ref=e203]: Radar Range
+          - generic [ref=e204]: 40km
+        - generic [ref=e207]:
+          - generic [ref=e208]: Crew
+          - generic [ref=e209]: "6"
+        - generic [ref=e212]:
+          - generic [ref=e213]: Drone Storage
+          - generic [ref=e214]: "0"
+        - generic [ref=e216]:
+          - generic [ref=e217]: M Dock Count
+          - generic [ref=e218]: "0"
+        - generic [ref=e220]:
+          - generic [ref=e221]: Missile Capacity
+          - generic [ref=e222]: "40"
+        - generic [ref=e225]:
+          - generic [ref=e226]: M Ship Capacity
+          - generic [ref=e227]: "0"
+        - generic [ref=e229]:
+          - generic [ref=e230]: Deployable
+          - generic [ref=e231]: "100"
+        - generic [ref=e234]:
+          - generic [ref=e235]: S Dock Count
+          - generic [ref=e236]: "0"
+        - generic [ref=e238]:
+          - generic [ref=e239]: Countermeasure
+          - generic [ref=e240]: "8"
+        - generic [ref=e243]:
+          - generic [ref=e244]: S Ship Capacity
+          - generic [ref=e245]: "0"
+    - generic [ref=e247]:
+      - generic [ref=e248]:
+        - generic [ref=e249]: Build Materials
+        - generic [ref=e250]:
+          - button "Total Materials" [ref=e251] [cursor=pointer]
+          - button "Time" [ref=e252] [cursor=pointer]
+      - generic [ref=e253]:
+        - generic [ref=e254]:
+          - generic [ref=e256] [cursor=pointer]:
+            - generic [ref=e257]:
+              - img [ref=e259]
+              - generic [ref=e261]: Total Materials
+            - generic [ref=e263]: 7,378,792 Cr
+          - generic [ref=e265] [cursor=pointer]:
+            - generic [ref=e266]:
+              - img [ref=e268]
+              - generic [ref=e270]:
+                - generic [ref=e271]: Katana
+                - generic [ref=e272]: x 1
+            - generic [ref=e274]: 352,708 Cr
+          - generic [ref=e276] [cursor=pointer]:
+            - generic [ref=e277]:
+              - img [ref=e279]
+              - generic [ref=e281]:
+                - generic [ref=e282]: ARG M Flak Turret Mk1
+                - generic [ref=e283]: x 2
+            - generic [ref=e285]: 22,224 Cr
+          - generic [ref=e287] [cursor=pointer]:
+            - generic [ref=e288]:
+              - img [ref=e290]
+              - generic [ref=e292]:
+                - generic [ref=e293]: M Combat Thrusters Mk3
+                - generic [ref=e294]: x 1
+            - generic [ref=e296]: 71,870 Cr
+          - generic [ref=e298] [cursor=pointer]:
+            - generic [ref=e299]:
+              - img [ref=e301]
+              - generic [ref=e303]:
+                - generic [ref=e304]: TER M Combat Engine Mk3
+                - generic [ref=e305]: x 2
+            - generic [ref=e307]: 767,930 Cr
+          - generic [ref=e309] [cursor=pointer]:
+            - generic [ref=e310]:
+              - img [ref=e312]
+              - generic [ref=e314]:
+                - generic [ref=e315]: TER M Meson Stream Mk2
+                - generic [ref=e316]: x 4
+            - generic [ref=e318]: 5,503,780 Cr
+          - generic [ref=e320] [cursor=pointer]:
+            - generic [ref=e321]:
+              - img [ref=e323]
+              - generic [ref=e325]:
+                - generic [ref=e326]: TER M Shield Generator Mk3
+                - generic [ref=e327]: x 2
+            - generic [ref=e329]: 660,280 Cr
+        - generic [ref=e331]:
+          - generic [ref=e333]:
+            - generic [ref=e334]:
+              - generic [ref=e335]: SHIP BUILD MATERIAL PRICE
+              - generic [ref=e336]: AVERAGE
+            - slider [ref=e337] [cursor=pointer]: "0.5"
+          - combobox [ref=e338]:
+            - option "default" [selected]
+            - option "terran"
+            - option "closedloop"
+```

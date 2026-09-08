@@ -28,11 +28,11 @@ async function readHub(page: Page) {
   ), HUB_SECTOR)
 }
 
-async function changeHubColor(page: Page) {
+async function changeHubColor(page: Page, paletteIndex = -1) {
   await enterEditMode(page)
   const before = await readHub(page)
   await hubCard(page).locator('.color-chip').click()
-  await page.locator('.preset-color').last().click()
+  await page.locator('.preset-color').nth(paletteIndex).click()
   await expect.poll(async () => (await readHub(page)).color).not.toBe(before.color)
   return (await readHub(page)).color as string
 }
@@ -156,7 +156,7 @@ test.describe('M2.1 当前共享草案事务', () => {
     await page.reload()
     await enterAutoSectorGroup(page)
     const saved = await readSavedBinding(page)
-    await changeHubColor(page)
+    await changeHubColor(page, 0)
     await expect.poll(() => page.locator('.card-uncertain').count()).toBeGreaterThan(0)
     const confirm = page.locator('.auto-sector-bar .confirm-btn')
     await expect(confirm).toBeEnabled()
@@ -455,6 +455,35 @@ test.describe('M2.1 当前共享草案事务', () => {
     expect(binding.stationPlans.find((plan: any) => plan.id==='KXN-018').groupId).toBe(HUB_SECTOR)
     expect(binding.groups.find((group: any) => group.sectorMacro===HUB_SECTOR).connectedGroupIds).toEqual(['cluster_48_sector001_macro'])
   })
+
+  test('当前公开导航：auto-sector-group 与 transit/station 工作台按显式选择切换', async ({ page }) => {
+    await enterAutoSectorGroup(page)
+    await expect(page.locator('.auto-sector-bar')).toBeVisible()
+    expect(await page.evaluate(() => ({
+      workbench: (window as any).activeViewStore.activeBindingWorkbench,
+      station: (window as any).activeViewStore.activeStationId
+    }))).toEqual({ workbench: 'auto-sector-group', station: null })
+
+    const sector = page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_100_sector001_macro"]')
+    await sector.click()
+    await expect(page.locator('[data-testid="transit-hub-build-panel"]')).toBeVisible()
+    await expect(sector).toHaveClass(/active/)
+    expect(await page.evaluate(() => ({
+      workbench: (window as any).activeViewStore.activeBindingWorkbench,
+      station: (window as any).activeViewStore.activeStationId
+    }))).toEqual({ workbench: 'station', station: 'transit:cluster_100_sector001_macro' })
+
+    const station = page.locator('[data-testid="sidebar-station"][data-station-id="KXN-018"]')
+    await expect(station).toBeVisible()
+    await station.click()
+    await expect(page.locator('[data-testid="station-dashboard"]')).toBeVisible()
+    await expect(station).toHaveClass(/active/)
+    expect(await page.evaluate(() => ({
+      workbench: (window as any).activeViewStore.activeBindingWorkbench,
+      station: (window as any).activeViewStore.activeStationId
+    }))).toEqual({ workbench: 'station', station: 'KXN-018' })
+  })
+
   test('4.5 Map pointer 创建并移动 virtual，确认后刷新恢复', async ({ page }) => {
     await enterAutoSectorGroup(page)
     const saved = await readSavedBinding(page)

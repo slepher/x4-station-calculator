@@ -1,0 +1,151 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e4]:
+  - generic [ref=e5]:
+    - generic [ref=e6]:
+      - button "新建" [disabled] [ref=e7]:
+        - img [ref=e8]
+        - generic [ref=e11]: 新建
+      - button "保存" [ref=e12] [cursor=pointer]:
+        - img [ref=e13]
+        - generic [ref=e17]: 保存
+      - button "另存为" [disabled] [ref=e18]:
+        - img [ref=e19]
+        - generic [ref=e21]: 另存为
+      - button "加载" [ref=e22] [cursor=pointer]:
+        - img [ref=e23]
+        - generic [ref=e25]: 加载
+    - generic [ref=e27]:
+      - button "蓝图产能" [ref=e28] [cursor=pointer]: 蓝图产能
+      - button "实况产能" [ref=e30] [cursor=pointer]: 实况产能
+      - button "星区地图" [ref=e32] [cursor=pointer]: 星区地图
+      - button "逻辑组网" [ref=e34] [cursor=pointer]: 逻辑组网
+      - button "船只建造" [ref=e36] [cursor=pointer]: 船只建造
+    - generic [ref=e38]:
+      - button "导入" [ref=e39] [cursor=pointer]:
+        - img [ref=e40]
+        - generic [ref=e43]: 导入
+      - button "导出" [ref=e44] [cursor=pointer]:
+        - img [ref=e45]
+        - generic [ref=e48]: 导出
+      - button "9.0" [ref=e49] [cursor=pointer]:
+        - img [ref=e50]
+        - generic [ref=e59]: "9.0"
+      - generic [ref=e61]:
+        - img [ref=e62]
+        - combobox [ref=e64] [cursor=pointer]:
+          - option "English"
+          - option "简体中文" [selected]
+          - option "繁體中文"
+          - option "Deutsch"
+          - option "Français"
+          - option "Italiano"
+          - option "Español"
+          - option "Русский"
+          - option "日本語"
+          - option "한국어"
+          - option "Português (Brasil)"
+          - option "Polski"
+      - button [ref=e65] [cursor=pointer]:
+        - img [ref=e66]
+  - generic [ref=e72]:
+    - generic [ref=e74]:
+      - generic [ref=e75]:
+        - tablist "资源过滤模式" [ref=e76]:
+          - button "简单" [ref=e77] [cursor=pointer]
+          - button "高级" [ref=e78] [cursor=pointer]
+        - button "×" [ref=e79] [cursor=pointer]
+      - generic [ref=e81]:
+        - generic [ref=e82]:
+          - button "矿" [ref=e83] [cursor=pointer]
+          - button "硅" [active] [ref=e84] [cursor=pointer]
+          - button "烷" [ref=e85] [cursor=pointer]
+          - button "氢" [ref=e86] [cursor=pointer]
+          - button "氦" [ref=e87] [cursor=pointer]
+          - button "冰" [ref=e88] [cursor=pointer]
+          - button "废" [ref=e89] [cursor=pointer]
+          - button "炔" [ref=e90] [cursor=pointer]
+          - button "N" [ref=e91] [cursor=pointer]
+          - button "电" [ref=e92] [cursor=pointer]
+        - generic [ref=e93]:
+          - generic [ref=e94]:
+            - generic [ref=e95]: 所有项
+            - combobox [ref=e96]:
+              - option "低" [selected]
+              - option "中低"
+              - option "中"
+              - option "中高"
+              - option "高"
+          - generic [ref=e97]:
+            - generic [ref=e98]: 矿
+            - combobox [ref=e99]:
+              - option "低(0K-10K)" [selected]
+              - option "中低(10K-30K)"
+              - option "中(30K-100K)"
+              - option "中高(100K-300K)"
+              - option "高(300K+)"
+          - generic [ref=e100]:
+            - generic [ref=e101]: 硅
+            - combobox [ref=e102]:
+              - option "低(0K-10K)" [selected]
+              - option "中低(10K-30K)"
+              - option "中(30K-100K)"
+              - option "中高(100K-300K)"
+              - option "高(300K+)"
+        - generic [ref=e103]:
+          - generic [ref=e104]:
+            - generic [ref=e105]: 命中候选
+            - generic [ref=e106]: "82"
+          - generic [ref=e107]:
+            - button "一百八十亿 10" [ref=e108] [cursor=pointer]:
+              - generic [ref=e109]: 一百八十亿
+              - generic [ref=e110]: "10"
+            - button "三圣殿 VII 10" [ref=e111] [cursor=pointer]:
+              - generic [ref=e112]: 三圣殿 VII
+              - generic [ref=e113]: "10"
+            - button "三津野的反抗 10" [ref=e114] [cursor=pointer]:
+              - generic [ref=e115]: 三津野的反抗
+              - generic [ref=e116]: "10"
+            - button "三津野的牺牲 10" [ref=e117] [cursor=pointer]:
+              - generic [ref=e118]: 三津野的牺牲
+              - generic [ref=e119]: "10"
+            - button "两千元大钞 10" [ref=e120] [cursor=pointer]:
+              - generic [ref=e121]: 两千元大钞
+              - generic [ref=e122]: "10"
+            - button "主教的平反 10" [ref=e123] [cursor=pointer]:
+              - generic [ref=e124]: 主教的平反
+              - generic [ref=e125]: "10"
+            - button "主教的领地 10" [ref=e126] [cursor=pointer]:
+              - generic [ref=e127]: 主教的领地
+              - generic [ref=e128]: "10"
+            - button "依阿那姆斯祖拉 VII 10" [ref=e129] [cursor=pointer]:
+              - generic [ref=e130]: 依阿那姆斯祖拉 VII
+              - generic [ref=e131]: "10"
+            - button "冒险的承诺 10" [ref=e132] [cursor=pointer]:
+              - generic [ref=e133]: 冒险的承诺
+              - generic [ref=e134]: "10"
+    - generic [ref=e135]:
+      - generic [ref=e138]:
+        - img
+      - button "地图图层" [ref=e691] [cursor=pointer]:
+        - img [ref=e692]
+        - generic [ref=e697]: 地图图层
+      - generic [ref=e699]:
+        - img [ref=e700]
+        - textbox "搜索星区" [ref=e703]
+      - generic [ref=e704]:
+        - button "资源" [ref=e705] [cursor=pointer]:
+          - generic [ref=e706]: 资源
+          - img [ref=e707]
+        - button "空间站" [ref=e709] [cursor=pointer]:
+          - generic [ref=e710]: 空间站
+        - button "存档" [ref=e711] [cursor=pointer]:
+          - generic [ref=e712]: 存档
+          - img [ref=e713]
+      - generic [ref=e716]:
+        - generic [ref=e717]:
+          - generic [ref=e718]: 缩放
+          - generic [ref=e719]: 19%
+        - slider [ref=e720]: "1"
+```

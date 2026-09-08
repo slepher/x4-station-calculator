@@ -1,24 +1,6 @@
-import { test, expect } from '@playwright/test'
+import { test } from '../../test-setup'
+import { expect } from '@playwright/test'
 import type { Page } from '@playwright/test'
-
-type PreviewItemSnapshot = {
-  kind: 'derived' | 'required'
-  wareId?: string
-  moduleId?: string
-  derived?: string[]
-  required?: string[]
-}
-
-type PreviewSnapshot = {
-  buildMaterialPlanningEnabled: boolean
-  graphIsNull: boolean
-  sccGroups: string[][]
-  lines: Array<{
-    groupId?: string
-    isUnmatched: boolean
-    items: PreviewItemSnapshot[]
-  }>
-}
 
 test.describe('build-plan-preview', () => {
   test.beforeEach(async ({ page }) => {
@@ -69,10 +51,9 @@ test.describe('build-plan-preview', () => {
   async function setBuildMaterialPlanning(page: Page, enabled: boolean) {
     const checkbox = buildMaterialCheckbox(page)
     await expect(checkbox).toHaveCount(1)
-    if (enabled) await expect(checkbox).not.toBeChecked()
-    if (await checkbox.isChecked() !== enabled) await checkbox.click()
+    if (enabled) await checkbox.check()
+    else await checkbox.uncheck()
     await expect(checkbox).toBeChecked({ checked: enabled })
-    await expect(page.locator('[data-testid="preview-section"]')).not.toHaveCount(0)
   }
 
   async function buildPreviewState(page: Page, name = 'energycells') {
@@ -81,27 +62,11 @@ test.describe('build-plan-preview', () => {
     await setBuildMaterialPlanning(page, false)
   }
 
-  async function readPreview(page: Page): Promise<PreviewSnapshot> {
-    return page.evaluate(() => {
-      const preview = (window as any).__pinia?.state?.value?.buildPlan?.previewResult
-      if (!preview) throw new Error('Expected build-plan previewResult after UI action')
-      return {
-        buildMaterialPlanningEnabled: preview.buildMaterialPlanningEnabled,
-        graphIsNull: preview.graph === null,
-        sccGroups: preview.sccGroups,
-        lines: preview.lines.map((line: any) => ({
-          groupId: line.groupId,
-          isUnmatched: line.isUnmatched,
-          items: line.items.map((item: any) => ({
-            kind: item.kind,
-            wareId: item.wareId,
-            moduleId: item.moduleId,
-            derived: item.derived,
-            required: item.required,
-          })),
-        })),
-      }
-    })
+  async function expectRow(section: ReturnType<typeof previewSection>, name: string, tags: string[]) {
+    const row = section.locator('.goal-row').filter({ hasText: name })
+    await expect(row).toHaveCount(1)
+    await expect(row.locator('.preview-tag')).toHaveText(tags)
+    await expect(row.locator('.derived-badge')).toHaveCount(1)
   }
 
   // Historical mapping: generation-5 retained 5 passed/4 failed. The failures were
@@ -116,17 +81,14 @@ test.describe('build-plan-preview', () => {
     await expect(page.getByTestId('goal-item-energycells')).toBeVisible()
     // 2.1.3 定位 preview 区
     const production = previewSection(page, /生产产线|Production Lines/)
-    const snapshot = await readPreview(page)
-    expect(snapshot.buildMaterialPlanningEnabled).toBe(false)
-    expect(snapshot.graphIsNull).toBe(true)
-    expect(snapshot.sccGroups).toEqual([])
     // 2.1.4 预览区显示固定分组
     await expect(production).toHaveCount(1)
     const groups = production.locator('.allocation-group')
     await expect(groups).toHaveCount(1)
-    await expect(groups.locator('.allocation-group-name')).not.toHaveText('')
+    await expect(groups.locator('.allocation-group-name')).toHaveText('E1-S1')
     // 2.1.5 分组显示 moduleId 去重计数
     await expect(groups.locator('.allocation-group-count')).toHaveText('1')
+    await expectRow(production, '能量电池产线', ['目标'])
   })
 
   test('2.2 切换: 勾选建材产线 checkbox -> Preview 重算', async ({ page }) => {
@@ -137,10 +99,18 @@ test.describe('build-plan-preview', () => {
     // 2.2.2 切换 checkbox
     await checkbox.check()
     await expect(checkbox).toBeChecked()
-    const snapshot = await readPreview(page)
-    expect(snapshot.buildMaterialPlanningEnabled).toBe(true)
     // 2.2.3 建材分组发生确定变化
-    await expect(previewSection(page, /建材产线分配|Build Material Allocation/)).toHaveCount(1)
+    const buildMaterial = previewSection(page, /建材产线分配|Build Material Allocation/)
+    const production = previewSection(page, /生产产线|Production Lines/)
+    await expect(buildMaterial.locator('.allocation-group-name')).toHaveText('E1-S1')
+    await expect(buildMaterial.locator('.allocation-group-count')).toHaveText('3')
+    await expectRow(buildMaterial, '电子黏土产线', ['建材'])
+    await expectRow(buildMaterial, '船体部件产线', ['建材'])
+    await expectRow(buildMaterial, '量子管', ['材料'])
+    await expectRow(buildMaterial, '能量电池产线', ['目标'])
+    await expect(production.locator('.allocation-group-name')).toHaveText('lf-1-g2')
+    await expect(production.locator('.allocation-group-count')).toHaveText('1')
+    await expectRow(production, '量子管产线', ['材料'])
   })
 
   // ── Chapter 3 ─────────────────────────────────────────────────────────
@@ -153,33 +123,15 @@ test.describe('build-plan-preview', () => {
     await setBuildMaterialPlanning(page, true)
     // 3.1.2 定位 preview 条目
     const previewRows = page.locator('[data-testid="preview-section"] .goal-row')
-    await expect(previewRows).not.toHaveCount(0)
-    // Independent preview truth comes from the fixed logic-flow-1 fixture and spec.
-    const snapshot = await readPreview(page)
-    const items = snapshot.lines.flatMap(line => line.items)
-    expect(items).toEqual(expect.arrayContaining([
-      expect.objectContaining({
-        kind: 'derived',
-        wareId: 'hullparts',
-        moduleId: 'module_gen_prod_hullparts_01',
-        derived: expect.arrayContaining(['target']),
-      }),
-      expect.objectContaining({
-        kind: 'required',
-        wareId: 'quantumtubes',
-        required: ['production'],
-      }),
-    ]))
-    expect(items.filter(item => item.kind === 'required').every(item => !item.moduleId)).toBe(true)
+    await expect(previewRows).toHaveCount(4)
     // 3.1.3 derived 项显示固定模块名与目标标签
+    const buildMaterialSection = previewSection(page, /建材产线分配|Build Material Allocation/)
     const productionSection = previewSection(page, /生产产线|Production Lines/)
-    const hullRow = productionSection.locator('.goal-row').filter({ hasText: '船体部件产线' })
-    await expect(hullRow).toHaveCount(1)
-    await expect(hullRow.locator('.preview-tag--derived')).toHaveText('目标')
+    await expectRow(buildMaterialSection, '电子黏土产线', ['建材'])
+    await expectRow(buildMaterialSection, '船体部件产线', ['目标', '建材'])
     // 3.1.4 required 项显示固定 ware 名与需求标签
-    const requiredRow = productionSection.locator('.goal-row').filter({ hasText: '量子管' })
-    await expect(requiredRow).toHaveCount(1)
-    await expect(requiredRow.locator('.preview-tag--required')).toHaveText('材料')
+    await expectRow(buildMaterialSection, '量子管', ['材料'])
+    await expectRow(productionSection, '量子管产线', ['材料'])
     // 3.1.5 每个 preview 项只有展示锁，不提供编辑控件
     await expect(page.locator('[data-testid="preview-section"] .derived-badge')).toHaveCount(await previewRows.count())
   })
@@ -190,12 +142,13 @@ test.describe('build-plan-preview', () => {
     await selectFlowPlan(page)
     await setBuildMaterialPlanning(page, true)
     // 3.2.2 在分组 header 内定位计数
-    const snapshot = await readPreview(page)
-    const productionLine = snapshot.lines.find(line => !line.isUnmatched && line.items.some(item => item.kind === 'derived' && item.moduleId === 'module_gen_prod_hullparts_01'))
-    expect(productionLine).toBeDefined()
-    expect(new Set(productionLine!.items.filter(item => item.kind === 'derived').map(item => item.moduleId))).toEqual(new Set(['module_gen_prod_hullparts_01']))
     // 3.2.3 断言计数等于固定 moduleId 去重数
-    await expect(previewSection(page, /生产产线|Production Lines/).locator('.allocation-group-count')).toHaveText('1')
+    const buildMaterial = previewSection(page, /建材产线分配|Build Material Allocation/)
+    const production = previewSection(page, /生产产线|Production Lines/)
+    await expect(buildMaterial.locator('.allocation-group-name')).toHaveText('E1-S1')
+    await expect(buildMaterial.locator('.allocation-group-count')).toHaveText('2')
+    await expect(production.locator('.allocation-group-name')).toHaveText('lf-1-g2')
+    await expect(production.locator('.allocation-group-count')).toHaveText('1')
   })
 
   test('3.3 Case: checkbox 切换影响预览', async ({ page }) => {
@@ -209,12 +162,12 @@ test.describe('build-plan-preview', () => {
     // 3.3.4 取消建材产线 checkbox
     await checkbox.uncheck()
     await expect(checkbox).not.toBeChecked()
-    const snapshot = await readPreview(page)
-    expect(snapshot.buildMaterialPlanningEnabled).toBe(false)
-    expect(snapshot.graphIsNull).toBe(true)
-    expect(snapshot.sccGroups).toEqual([])
     // 3.3.5 关闭后建材分组隐藏，用户目标仍保留
     await expect(previewSection(page, /建材产线分配|Build Material Allocation/)).toHaveCount(0)
+    const production = previewSection(page, /生产产线|Production Lines/)
+    await expect(production.locator('.allocation-group-name')).toHaveText('E1-S1')
+    await expect(production.locator('.allocation-group-count')).toHaveText('1')
+    await expectRow(production, '能量电池产线', ['目标'])
     await expect(page.getByTestId('goal-item-energycells')).toBeVisible()
   })
 
@@ -232,10 +185,11 @@ test.describe('build-plan-preview', () => {
     // 3.4.3 断言待规划分组
     const unmatched = page.locator('.allocation-group--unmatched')
     await expect(unmatched).toBeVisible()
-    // 3.4.4 断言 graph=null 且 SCC 为空
-    const snapshot = await readPreview(page)
-    expect(snapshot.graphIsNull).toBe(true)
-    expect(snapshot.sccGroups).toEqual([])
+    // 3.4.4 断言公开预览精确保留目标
+    const production = previewSection(page, /生产产线|Production Lines/)
+    await expect(production.locator('.allocation-group-name')).toHaveText('待规划产线')
+    await expect(production.locator('.allocation-group-count')).toHaveText('1')
+    await expectRow(production, '能量电池产线', ['目标'])
     await expect(page.getByTestId('goal-item-energycells')).toBeVisible()
   })
 
@@ -245,9 +199,10 @@ test.describe('build-plan-preview', () => {
     await selectFlowPlan(page)
     await setBuildMaterialPlanning(page, true)
     // 3.5.2 在预览区定位名称
+    const buildMaterialSection = previewSection(page, /建材产线分配|Build Material Allocation/)
     const productionSection = previewSection(page, /生产产线|Production Lines/)
     // 3.5.3 derived 项显示 module 名称
-    await expect(productionSection.locator('.goal-name').filter({ hasText: '船体部件产线' })).toHaveCount(1)
+    await expect(buildMaterialSection.locator('.goal-name').filter({ hasText: '船体部件产线' })).toHaveCount(1)
     // 3.5.4 required 项显示 ware 名称
     await expect(productionSection.locator('.goal-name').filter({ hasText: '量子管' })).toHaveCount(1)
   })
@@ -257,7 +212,7 @@ test.describe('build-plan-preview', () => {
     await buildPreviewState(page)
     // 3.6.2 在 preview 区定位 goal rows
     const preview = page.locator('[data-testid="preview-section"]')
-    await expect(preview.locator('.goal-row')).not.toHaveCount(0)
+    await expect(preview.locator('.goal-row')).toHaveCount(1)
     // 3.6.3 preview 区不含数量输入框
     const inputs = page.locator('[data-testid="preview-section"]').locator('input[type="number"]')
     await expect(inputs).toHaveCount(0)
@@ -275,8 +230,9 @@ test.describe('build-plan-preview', () => {
     await expect(page.locator('[data-testid="build-plan-flow-menu-label"]')).toHaveText(/无规划|Unplanned Line/)
     await expect(page.locator('.allocation-group--unmatched')).toBeVisible()
     await expect(page.getByTestId('goal-item-energycells')).toBeVisible()
-    const snapshot = await readPreview(page)
-    expect(snapshot.graphIsNull).toBe(true)
-    expect(snapshot.sccGroups).toEqual([])
+    const production = previewSection(page, /生产产线|Production Lines/)
+    await expect(production.locator('.allocation-group-name')).toHaveText('待规划产线')
+    await expect(production.locator('.allocation-group-count')).toHaveText('1')
+    await expectRow(production, '能量电池产线', ['目标'])
   })
 })

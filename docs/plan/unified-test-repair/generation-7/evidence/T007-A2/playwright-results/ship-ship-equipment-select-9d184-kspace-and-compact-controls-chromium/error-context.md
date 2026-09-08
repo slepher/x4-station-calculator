@@ -1,0 +1,315 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e4]:
+  - generic [ref=e5]:
+    - generic [ref=e6]:
+      - button "新建" [ref=e7] [cursor=pointer]:
+        - img [ref=e8]
+        - generic [ref=e11]: 新建
+      - button "保存" [ref=e12] [cursor=pointer]:
+        - img [ref=e13]
+        - generic [ref=e17]: 保存
+      - button "另存为" [ref=e18] [cursor=pointer]:
+        - img [ref=e19]
+        - generic [ref=e21]: 另存为
+    - generic [ref=e23]:
+      - button "蓝图产能" [ref=e24] [cursor=pointer]: 蓝图产能
+      - button "实况产能" [ref=e26] [cursor=pointer]: 实况产能
+      - button "星区地图" [ref=e28] [cursor=pointer]: 星区地图
+      - button "逻辑组网" [ref=e30] [cursor=pointer]: 逻辑组网
+      - button "船只建造" [ref=e32] [cursor=pointer]: 船只建造
+    - generic [ref=e34]:
+      - button "导入" [ref=e35] [cursor=pointer]:
+        - img [ref=e36]
+        - generic [ref=e39]: 导入
+      - button "导出" [ref=e40] [cursor=pointer]:
+        - img [ref=e41]
+        - generic [ref=e44]: 导出
+      - button "9.0" [ref=e45] [cursor=pointer]:
+        - img [ref=e46]
+        - generic [ref=e55]: "9.0"
+      - generic [ref=e56]:
+        - img [ref=e57]
+        - combobox [ref=e59] [cursor=pointer]:
+          - option "English"
+          - option "简体中文" [selected]
+          - option "繁體中文"
+          - option "Deutsch"
+          - option "Français"
+          - option "Italiano"
+          - option "Español"
+          - option "Русский"
+          - option "日本語"
+          - option "한국어"
+          - option "Português (Brasil)"
+          - option "Polski"
+      - button [ref=e60] [cursor=pointer]:
+        - img [ref=e61]
+  - generic [ref=e67]:
+    - generic [ref=e68]:
+      - generic [ref=e69]:
+        - button "更换飞船" [ref=e70] [cursor=pointer]:
+          - generic [ref=e72]: 大阪
+          - img [ref=e74]
+        - generic [ref=e78]:
+          - button "添加到收藏" [ref=e79] [cursor=pointer]:
+            - img [ref=e80]
+          - button "空配" [ref=e82] [cursor=pointer]:
+            - generic [ref=e83]: 空配
+            - img [ref=e85]
+      - generic [ref=e87]:
+        - complementary [ref=e88]:
+          - button "E" [ref=e90] [cursor=pointer]
+          - button "R" [ref=e92] [cursor=pointer]
+          - button "S" [ref=e94] [cursor=pointer]
+          - button "W" [ref=e96] [cursor=pointer]
+          - button "T" [ref=e98] [cursor=pointer]
+          - button "C" [ref=e100] [cursor=pointer]
+          - button "U" [ref=e102] [cursor=pointer]
+        - main [ref=e104]:
+          - generic [ref=e106]:
+            - button "标准" [ref=e107] [cursor=pointer]
+            - button "简化" [ref=e108] [cursor=pointer]
+          - generic [ref=e109]:
+            - generic [ref=e110]:
+              - button "L1" [ref=e111] [cursor=pointer]
+              - button "L2" [ref=e112] [cursor=pointer]
+              - button "L3" [ref=e113] [cursor=pointer]
+            - generic [ref=e114]:
+              - button "M1" [ref=e115] [cursor=pointer]
+              - button "M2" [ref=e116] [cursor=pointer]
+              - button "M3" [ref=e117] [cursor=pointer]
+              - button "M4" [ref=e118] [cursor=pointer]
+              - button "M5" [ref=e119] [cursor=pointer]
+              - button "M6" [ref=e120] [cursor=pointer]
+          - generic [ref=e121]:
+            - generic [ref=e122]: "装备兼容性:"
+            - generic [ref=e123]: 导弹 / 标准
+            - generic [ref=e124]: L 炮塔 x1
+            - generic [ref=e125]: M 护盾生成器 x2
+          - generic [ref=e126]:
+            - generic [ref=e127]:
+              - slider [disabled] [ref=e130]: "0"
+              - button "L 炮塔 空槽位 0/1" [active] [ref=e132] [cursor=pointer]:
+                - generic [ref=e133]:
+                  - generic [ref=e134]: L 炮塔
+                  - generic [ref=e136]: 空槽位
+                - generic [ref=e138]: 0/1
+            - generic [ref=e139]:
+              - slider [disabled] [ref=e142]: "0"
+              - button "M 护盾生成器 空槽位 0/2" [ref=e144] [cursor=pointer]:
+                - generic [ref=e145]:
+                  - generic [ref=e146]: M 护盾生成器
+                  - generic [ref=e148]: 空槽位
+                - generic [ref=e150]: 0/2
+    - generic [ref=e152]:
+      - generic [ref=e153]:
+        - generic [ref=e154]: 装备选择器
+        - generic [ref=e155]:
+          - button "取消" [ref=e156] [cursor=pointer]
+          - button "确认" [ref=e157] [cursor=pointer]
+      - generic [ref=e158]:
+        - generic [ref=e159]:
+          - generic [ref=e160]:
+            - generic [ref=e161]: RACE
+            - generic [ref=e162]:
+              - button "ARGON 5" [ref=e163] [cursor=pointer]
+              - button "PARANID 5" [ref=e164] [cursor=pointer]
+              - button "SPLIT 5" [ref=e165] [cursor=pointer]
+              - button "TELADI 5" [ref=e166] [cursor=pointer]
+              - button "TERRAN 5" [ref=e167] [cursor=pointer]
+          - generic [ref=e168]:
+            - generic [ref=e169]: TAG
+            - button "标准 25" [ref=e170] [cursor=pointer]
+            - button "导弹 10" [ref=e171] [cursor=pointer]
+        - generic [ref=e172]:
+          - button "<" [disabled] [ref=e173]
+          - button "1" [ref=e174] [cursor=pointer]
+          - button "2" [ref=e175] [cursor=pointer]
+          - button "3" [ref=e176] [cursor=pointer]
+          - button ">" [ref=e177] [cursor=pointer]
+        - generic [ref=e178]:
+          - button "空槽位 -" [ref=e179] [cursor=pointer]:
+            - generic [ref=e180]:
+              - generic [ref=e182]: 空槽位
+              - generic [ref=e183]: "-"
+          - button "ARG L 光束炮塔 Mk1 argon · MK1 持续 DPS 136 MW 射程 8600 m" [ref=e184] [cursor=pointer]:
+            - generic [ref=e185]:
+              - generic [ref=e187]: ARG L 光束炮塔 Mk1
+              - generic [ref=e188]: argon · MK1
+            - generic [ref=e189]:
+              - generic [ref=e190]:
+                - generic [ref=e191]: 持续 DPS
+                - generic [ref=e192]: "136"
+                - generic [ref=e193]: MW
+              - generic [ref=e194]:
+                - generic [ref=e195]: 射程
+                - generic [ref=e196]: "8600"
+                - generic [ref=e197]: m
+          - button "ARG L 无制导炮塔 Mk1 argon · MK1 持续 DPS 833 MW 射程 6500 m" [ref=e198] [cursor=pointer]:
+            - generic [ref=e199]:
+              - generic [ref=e201]: ARG L 无制导炮塔 Mk1
+              - generic [ref=e202]: argon · MK1
+            - generic [ref=e203]:
+              - generic [ref=e204]:
+                - generic [ref=e205]: 持续 DPS
+                - generic [ref=e206]: "833"
+                - generic [ref=e207]: MW
+              - generic [ref=e208]:
+                - generic [ref=e209]: 射程
+                - generic [ref=e210]: "6500"
+                - generic [ref=e211]: m
+          - button "ARG L 制导炮塔 Mk1 argon · MK1 持续 DPS 8400 MW 射程 12000 m" [ref=e212] [cursor=pointer]:
+            - generic [ref=e213]:
+              - generic [ref=e215]: ARG L 制导炮塔 Mk1
+              - generic [ref=e216]: argon · MK1
+            - generic [ref=e217]:
+              - generic [ref=e218]:
+                - generic [ref=e219]: 持续 DPS
+                - generic [ref=e220]: "8400"
+                - generic [ref=e221]: MW
+              - generic [ref=e222]:
+                - generic [ref=e223]: 射程
+                - generic [ref=e224]: "12000"
+                - generic [ref=e225]: m
+          - button "ARG L 脉冲炮塔 Mk1 argon · MK1 持续 DPS 334 MW 射程 5000 m" [ref=e226] [cursor=pointer]:
+            - generic [ref=e227]:
+              - generic [ref=e229]: ARG L 脉冲炮塔 Mk1
+              - generic [ref=e230]: argon · MK1
+            - generic [ref=e231]:
+              - generic [ref=e232]:
+                - generic [ref=e233]: 持续 DPS
+                - generic [ref=e234]: "334"
+                - generic [ref=e235]: MW
+              - generic [ref=e236]:
+                - generic [ref=e237]: 射程
+                - generic [ref=e238]: "5000"
+                - generic [ref=e239]: m
+          - button "ARG L 等离子炮塔 Mk1 argon · MK1 持续 DPS 571 MW 射程 7200 m" [ref=e240] [cursor=pointer]:
+            - generic [ref=e241]:
+              - generic [ref=e243]: ARG L 等离子炮塔 Mk1
+              - generic [ref=e244]: argon · MK1
+            - generic [ref=e245]:
+              - generic [ref=e246]:
+                - generic [ref=e247]: 持续 DPS
+                - generic [ref=e248]: "571"
+                - generic [ref=e249]: MW
+              - generic [ref=e250]:
+                - generic [ref=e251]: 射程
+                - generic [ref=e252]: "7200"
+                - generic [ref=e253]: m
+          - button "PAR L 质量加速器炮塔 Mk1 paranid · MK1 持续 DPS 170 MW 射程 14000 m" [ref=e254] [cursor=pointer]:
+            - generic [ref=e255]:
+              - generic [ref=e257]: PAR L 质量加速器炮塔 Mk1
+              - generic [ref=e258]: paranid · MK1
+            - generic [ref=e259]:
+              - generic [ref=e260]:
+                - generic [ref=e261]: 持续 DPS
+                - generic [ref=e262]: "170"
+                - generic [ref=e263]: MW
+              - generic [ref=e264]:
+                - generic [ref=e265]: 射程
+                - generic [ref=e266]: "14000"
+                - generic [ref=e267]: m
+          - button "PAR L 无制导炮塔 Mk1 paranid · MK1 持续 DPS 833 MW 射程 6500 m" [ref=e268] [cursor=pointer]:
+            - generic [ref=e269]:
+              - generic [ref=e271]: PAR L 无制导炮塔 Mk1
+              - generic [ref=e272]: paranid · MK1
+            - generic [ref=e273]:
+              - generic [ref=e274]:
+                - generic [ref=e275]: 持续 DPS
+                - generic [ref=e276]: "833"
+                - generic [ref=e277]: MW
+              - generic [ref=e278]:
+                - generic [ref=e279]: 射程
+                - generic [ref=e280]: "6500"
+                - generic [ref=e281]: m
+          - button "PAR L 制导炮塔 Mk1 paranid · MK1 持续 DPS 8400 MW 射程 12000 m" [ref=e282] [cursor=pointer]:
+            - generic [ref=e283]:
+              - generic [ref=e285]: PAR L 制导炮塔 Mk1
+              - generic [ref=e286]: paranid · MK1
+            - generic [ref=e287]:
+              - generic [ref=e288]:
+                - generic [ref=e289]: 持续 DPS
+                - generic [ref=e290]: "8400"
+                - generic [ref=e291]: MW
+              - generic [ref=e292]:
+                - generic [ref=e293]: 射程
+                - generic [ref=e294]: "12000"
+                - generic [ref=e295]: m
+          - button "PAR L 脉冲炮塔 Mk1 paranid · MK1 持续 DPS 312 MW 射程 4750 m" [ref=e296] [cursor=pointer]:
+            - generic [ref=e297]:
+              - generic [ref=e299]: PAR L 脉冲炮塔 Mk1
+              - generic [ref=e300]: paranid · MK1
+            - generic [ref=e301]:
+              - generic [ref=e302]:
+                - generic [ref=e303]: 持续 DPS
+                - generic [ref=e304]: "312"
+                - generic [ref=e305]: MW
+              - generic [ref=e306]:
+                - generic [ref=e307]: 射程
+                - generic [ref=e308]: "4750"
+                - generic [ref=e309]: m
+    - generic [ref=e312]:
+      - generic [ref=e313]:
+        - generic [ref=e314]: 配装后船体属性
+        - generic [ref=e315]:
+          - button "简略" [ref=e316] [cursor=pointer]
+          - button "详细" [ref=e317] [cursor=pointer]
+      - generic [ref=e319]:
+        - generic [ref=e320]:
+          - generic [ref=e321]: 船体
+          - generic [ref=e322]: 104,000MJ
+        - generic [ref=e325]:
+          - generic [ref=e326]: 武器爆发输出值
+          - generic [ref=e327]: 0MW
+        - generic [ref=e329]:
+          - generic [ref=e330]: 护盾
+          - generic [ref=e331]: 0MJ
+        - generic [ref=e333]:
+          - generic [ref=e334]: 炮塔平均输出值
+          - generic [ref=e335]: 0MW
+        - generic [ref=e337]:
+          - generic [ref=e338]: 速度
+          - generic [ref=e339]: 0m/s
+        - generic [ref=e341]:
+          - generic [ref=e342]: 集装箱仓储
+          - generic [ref=e343]: 2,800m3
+        - generic [ref=e346]:
+          - generic [ref=e347]: 助推速度
+          - generic [ref=e348]: 0m/s
+        - generic [ref=e350]:
+          - generic [ref=e351]: 巡航速度
+          - generic [ref=e352]: 0m/s
+        - generic [ref=e354]:
+          - generic [ref=e355]: 雷达范围
+          - generic [ref=e356]: 40km
+        - generic [ref=e359]:
+          - generic [ref=e360]: 船员
+          - generic [ref=e361]: "75"
+        - generic [ref=e364]:
+          - generic [ref=e365]: 无人机单位仓储
+          - generic [ref=e366]: "10"
+        - generic [ref=e369]:
+          - generic [ref=e370]: M级泊位数量
+          - generic [ref=e371]: "0"
+        - generic [ref=e373]:
+          - generic [ref=e374]: 导弹容量
+          - generic [ref=e375]: "160"
+        - generic [ref=e378]:
+          - generic [ref=e379]: M级飞船容量
+          - generic [ref=e380]: "0"
+        - generic [ref=e382]:
+          - generic [ref=e383]: 可投放设备
+          - generic [ref=e384]: "250"
+        - generic [ref=e387]:
+          - generic [ref=e388]: S级泊位数量
+          - generic [ref=e389]: "1"
+        - generic [ref=e392]:
+          - generic [ref=e393]: 干扰弹
+          - generic [ref=e394]: "20"
+        - generic [ref=e397]:
+          - generic [ref=e398]: S级飞船容量
+          - generic [ref=e399]: "2"
+```

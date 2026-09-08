@@ -1,0 +1,738 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e4]:
+  - generic [ref=e5]:
+    - generic [ref=e6]:
+      - button "新建" [disabled] [ref=e7]:
+        - img [ref=e8]
+        - generic [ref=e11]: 新建
+      - button "保存" [ref=e12] [cursor=pointer]:
+        - img [ref=e13]
+        - generic [ref=e17]: 保存
+      - button "另存为" [disabled] [ref=e18]:
+        - img [ref=e19]
+        - generic [ref=e21]: 另存为
+      - button "加载" [ref=e22] [cursor=pointer]:
+        - img [ref=e23]
+        - generic [ref=e25]: 加载
+    - generic [ref=e27]:
+      - button "蓝图产能" [ref=e28] [cursor=pointer]: 蓝图产能
+      - button "实况产能" [ref=e30] [cursor=pointer]: 实况产能
+      - button "星区地图" [ref=e32] [cursor=pointer]: 星区地图
+      - button "逻辑组网" [ref=e34] [cursor=pointer]: 逻辑组网
+      - button "船只建造" [ref=e36] [cursor=pointer]: 船只建造
+    - generic [ref=e38]:
+      - button "导入" [ref=e39] [cursor=pointer]:
+        - img [ref=e40]
+        - generic [ref=e43]: 导入
+      - button "导出" [ref=e44] [cursor=pointer]:
+        - img [ref=e45]
+        - generic [ref=e48]: 导出
+      - button "9.0" [ref=e49] [cursor=pointer]:
+        - img [ref=e50]
+        - generic [ref=e59]: "9.0"
+      - generic [ref=e61]:
+        - img [ref=e62]
+        - combobox [ref=e64] [cursor=pointer]:
+          - option "English"
+          - option "简体中文" [selected]
+          - option "繁體中文"
+          - option "Deutsch"
+          - option "Français"
+          - option "Italiano"
+          - option "Español"
+          - option "Русский"
+          - option "日本語"
+          - option "한국어"
+          - option "Português (Brasil)"
+          - option "Polski"
+      - button [ref=e65] [cursor=pointer]:
+        - img [ref=e66]
+  - generic [ref=e70]:
+    - generic [ref=e71]:
+      - button "收起侧栏" [ref=e72] [cursor=pointer]:
+        - img [ref=e73]
+      - generic [ref=e75]:
+        - generic [ref=e76]:
+          - button "总览" [ref=e77] [cursor=pointer]:
+            - generic [ref=e80]: 总览
+          - button "市场报价" [ref=e81] [cursor=pointer]:
+            - generic [ref=e84]: 市场报价
+          - button "蓝图配方" [ref=e85] [cursor=pointer]:
+            - generic [ref=e88]: 蓝图配方
+          - button "研究" [ref=e89] [cursor=pointer]:
+            - generic [ref=e92]: 研究
+          - button "地球化" [ref=e93] [cursor=pointer]:
+            - generic [ref=e95]:
+              - button [ref=e96]:
+                - img [ref=e97]
+              - generic [ref=e99]: 地球化
+        - generic "星区编辑" [ref=e102] [cursor=pointer]:
+          - generic [ref=e106]: 星区编辑
+        - generic [ref=e108]:
+          - generic [ref=e109] [cursor=pointer]:
+            - button [ref=e111]:
+              - img [ref=e112]
+            - generic [ref=e115]: 小行星
+          - generic [ref=e116] [cursor=pointer]:
+            - button [ref=e118]:
+              - img [ref=e119]
+            - generic [ref=e122]: 神圣眼光
+          - generic [ref=e123] [cursor=pointer]:
+            - button [ref=e125]:
+              - img [ref=e126]
+            - generic [ref=e129]: 阿尔忒弥斯的朦胧
+          - generic [ref=e130] [cursor=pointer]:
+            - button [ref=e132]:
+              - img [ref=e133]
+            - generic [ref=e136]: 月之舟
+          - generic [ref=e137] [cursor=pointer]:
+            - button [ref=e139]:
+              - img [ref=e140]
+            - generic [ref=e143]: 警惕凝视
+    - generic [ref=e145]:
+      - generic [ref=e148]:
+        - generic "模式" [ref=e150]:
+          - button "查看" [ref=e151] [cursor=pointer]
+          - button "编辑" [ref=e152] [cursor=pointer]
+          - button "重算" [ref=e153] [cursor=pointer]
+        - generic [ref=e154]:
+          - generic [ref=e155]: 未决 ◈1
+          - button "地图" [ref=e156] [cursor=pointer]
+          - button "重置" [ref=e157] [cursor=pointer]
+          - button "确定" [active] [ref=e158] [cursor=pointer]
+      - generic [ref=e160]:
+        - generic [ref=e161]:
+          - generic [ref=e163]:
+            - generic [ref=e165]:
+              - generic [ref=e166]: i
+              - generic [ref=e167]: 结构调整不自动改动其他分配
+            - button "添加" [ref=e169] [cursor=pointer]
+          - generic [ref=e171]:
+            - generic [ref=e172]:
+              - generic [ref=e173]:
+                - generic [ref=e174]:
+                  - img [ref=e176]
+                  - generic [ref=e183]: 小行星带
+                  - button "枢纽颜色" [ref=e184] [cursor=pointer]
+                - button "固定：重新计算时作为固定 Hub" [ref=e186] [cursor=pointer]:
+                  - img [ref=e187]
+              - generic [ref=e189]:
+                - generic [ref=e190]:
+                  - generic [ref=e191]: 定位星区
+                  - generic [ref=e192]:
+                    - generic [ref=e195] [cursor=pointer]: 小行星带
+                    - generic [ref=e198] [cursor=pointer]: 虚拟交易站
+                    - generic [ref=e200]:
+                      - spinbutton [ref=e201]: "2"
+                      - generic [ref=e202]: 跳
+                      - generic [ref=e203]:
+                        - button "▲" [ref=e204] [cursor=pointer]
+                        - button "▼" [ref=e205] [cursor=pointer]
+                - generic [ref=e206]:
+                  - generic [ref=e207]:
+                    - generic [ref=e208]: 1跳
+                    - generic [ref=e209]:
+                      - generic [ref=e210]:
+                        - generic [ref=e212] [cursor=pointer]: 火星
+                        - button "+" [ref=e213] [cursor=pointer]
+                      - generic [ref=e214]:
+                        - generic [ref=e216] [cursor=pointer]: 木星
+                        - button "+" [ref=e217] [cursor=pointer]
+                      - generic [ref=e218]:
+                        - generic [ref=e220] [cursor=pointer]: 月之舟
+                        - button "x" [ref=e221] [cursor=pointer]
+                  - generic [ref=e222]:
+                    - generic [ref=e223]: 2跳
+                    - generic [ref=e224]:
+                      - generic [ref=e225]:
+                        - generic [ref=e227] [cursor=pointer]: 金星
+                        - button "+" [ref=e228] [cursor=pointer]
+                      - generic [ref=e229]:
+                        - generic [ref=e231] [cursor=pointer]: 土星 1
+                        - button "+" [ref=e232] [cursor=pointer]
+                      - generic [ref=e233]:
+                        - generic [ref=e235] [cursor=pointer]: 土卫六泰坦
+                        - button "+" [ref=e236] [cursor=pointer]
+                      - generic [ref=e237]:
+                        - generic [ref=e239] [cursor=pointer]: 土星 2
+                        - button "+" [ref=e240] [cursor=pointer]
+                      - generic [ref=e241]:
+                        - generic [ref=e243] [cursor=pointer]: 野蛮疾驰 II
+                        - button "+" [ref=e244] [cursor=pointer]
+                      - generic [ref=e245]:
+                        - generic [ref=e247] [cursor=pointer]: 虚空
+                        - button "→" [ref=e248] [cursor=pointer]
+                      - generic [ref=e249]:
+                        - generic [ref=e251] [cursor=pointer]: 梦幻海洋
+                        - button "+" [ref=e252] [cursor=pointer]
+                  - generic [ref=e253]:
+                    - generic [ref=e254]: 5跳
+                    - generic [ref=e255]:
+                      - generic [ref=e256]:
+                        - generic [ref=e258] [cursor=pointer]: 神圣眼光
+                        - button "+" [ref=e259] [cursor=pointer]
+                      - generic [ref=e260]:
+                        - generic [ref=e262] [cursor=pointer]: 阿尔忒弥斯的朦胧
+                        - button "+" [ref=e263] [cursor=pointer]
+                      - generic [ref=e264]:
+                        - generic [ref=e266] [cursor=pointer]: 警惕凝视
+                        - button "+" [ref=e267] [cursor=pointer]
+                - generic [ref=e268]:
+                  - generic [ref=e269]: 1 个星区
+                  - generic [ref=e270]: "存疑: 1"
+            - generic [ref=e271]:
+              - generic [ref=e272]:
+                - generic [ref=e273]:
+                  - img [ref=e275]
+                  - generic [ref=e282]: 神圣眼光
+                  - button "枢纽颜色" [ref=e283] [cursor=pointer]
+                - button "固定：重新计算时作为固定 Hub" [ref=e285] [cursor=pointer]:
+                  - img [ref=e286]
+              - generic [ref=e288]:
+                - generic [ref=e289]:
+                  - generic [ref=e290]: 定位星区
+                  - generic [ref=e291]:
+                    - generic [ref=e294] [cursor=pointer]: 神圣眼光
+                    - generic [ref=e297] [cursor=pointer]: 虚拟交易站
+                    - generic [ref=e299]:
+                      - spinbutton [ref=e300]: "3"
+                      - generic [ref=e301]: 跳
+                      - generic [ref=e302]:
+                        - button "▲" [ref=e303] [cursor=pointer]
+                        - button "▼" [ref=e304] [cursor=pointer]
+                - generic [ref=e305]:
+                  - generic [ref=e306]:
+                    - generic [ref=e307]: 1跳
+                    - generic [ref=e308]:
+                      - generic [ref=e309]:
+                        - generic [ref=e311] [cursor=pointer]: 教皇的声明
+                        - button "+" [ref=e312] [cursor=pointer]
+                      - generic [ref=e313]:
+                        - generic [ref=e315] [cursor=pointer]: 真视
+                        - button "+" [ref=e316] [cursor=pointer]
+                      - generic [ref=e317]:
+                        - generic [ref=e319] [cursor=pointer]: 错误逻辑 I
+                        - button "+" [ref=e320] [cursor=pointer]
+                      - generic [ref=e321]:
+                        - generic [ref=e323] [cursor=pointer]: 错误逻辑 VII
+                        - button "+" [ref=e324] [cursor=pointer]
+                      - generic [ref=e325]:
+                        - generic [ref=e327] [cursor=pointer]: 主教的平反
+                        - button "+" [ref=e328] [cursor=pointer]
+                      - generic [ref=e329]:
+                        - generic [ref=e331] [cursor=pointer]: 失去的机会
+                        - button "+" [ref=e332] [cursor=pointer]
+                  - generic [ref=e333]:
+                    - generic [ref=e334]: 2跳
+                    - generic [ref=e335]:
+                      - generic [ref=e336]:
+                        - generic [ref=e338] [cursor=pointer]: 财富之路
+                        - button "+" [ref=e339] [cursor=pointer]
+                      - generic [ref=e340]:
+                        - generic [ref=e342] [cursor=pointer]: 黑洞太阳 V
+                        - button "+" [ref=e343] [cursor=pointer]
+                      - generic [ref=e344]:
+                        - generic [ref=e346] [cursor=pointer]: 第二次接触 II 闪点
+                        - button "+" [ref=e347] [cursor=pointer]
+                      - generic [ref=e348]:
+                        - generic [ref=e350] [cursor=pointer]: 虔诚之雾 II
+                        - button "+" [ref=e351] [cursor=pointer]
+                      - generic [ref=e352]:
+                        - generic [ref=e354] [cursor=pointer]: 安提亚的不幸 I
+                        - button "x" [ref=e355] [cursor=pointer]
+                      - generic [ref=e356]:
+                        - generic [ref=e358] [cursor=pointer]: 安提亚的不幸 III
+                        - button "+" [ref=e359] [cursor=pointer]
+                      - generic [ref=e360]:
+                        - generic [ref=e362] [cursor=pointer]: 无尽的复仇
+                        - button "+" [ref=e363] [cursor=pointer]
+                      - generic [ref=e364]:
+                        - generic [ref=e366] [cursor=pointer]: 自由的范围
+                        - button "+" [ref=e367] [cursor=pointer]
+                      - generic [ref=e368]:
+                        - generic [ref=e370] [cursor=pointer]: 猩红之星
+                        - button "x" [ref=e371] [cursor=pointer]
+                  - generic [ref=e372]:
+                    - generic [ref=e373]: 3跳
+                    - generic [ref=e374]:
+                      - generic [ref=e375]:
+                        - generic [ref=e377] [cursor=pointer]: 大交易所 I
+                        - button "+" [ref=e378] [cursor=pointer]
+                      - generic [ref=e379]:
+                        - generic [ref=e381] [cursor=pointer]: 大交易所 III
+                        - button "+" [ref=e382] [cursor=pointer]
+                      - generic [ref=e383]:
+                        - generic [ref=e385] [cursor=pointer]: 大交易所 IV
+                        - button "+" [ref=e386] [cursor=pointer]
+                      - generic [ref=e387]:
+                        - generic [ref=e389] [cursor=pointer]: 诺皮利奥的财富 II
+                        - button "+" [ref=e390] [cursor=pointer]
+                      - generic [ref=e391]:
+                        - generic [ref=e393] [cursor=pointer]: 诺皮利奥的财富 VI
+                        - button "+" [ref=e394] [cursor=pointer]
+                      - generic [ref=e395]:
+                        - generic [ref=e397] [cursor=pointer]: 黑洞太阳 IV
+                        - button "+" [ref=e398] [cursor=pointer]
+                      - generic [ref=e399]:
+                        - generic [ref=e401] [cursor=pointer]: 邪恶的报复
+                        - button "+" [ref=e402] [cursor=pointer]
+                      - generic [ref=e403]:
+                        - generic [ref=e405] [cursor=pointer]: Argon之都
+                        - button "+" [ref=e406] [cursor=pointer]
+                      - generic [ref=e407]:
+                        - generic [ref=e409] [cursor=pointer]: 神圣遗迹
+                        - button "+" [ref=e410] [cursor=pointer]
+                      - generic [ref=e411]:
+                        - generic [ref=e413] [cursor=pointer]: 虚空
+                        - button "→" [ref=e414] [cursor=pointer]
+                      - generic [ref=e415]:
+                        - generic [ref=e417] [cursor=pointer]: 虔诚之雾 IV
+                        - button "+" [ref=e418] [cursor=pointer]
+                      - generic [ref=e419]:
+                        - generic [ref=e421] [cursor=pointer]: 虔诚之雾 XI
+                        - button "+" [ref=e422] [cursor=pointer]
+                      - generic [ref=e423]:
+                        - generic [ref=e425] [cursor=pointer]: 第二次接触 VII
+                        - button "+" [ref=e426] [cursor=pointer]
+                      - generic [ref=e427]:
+                        - generic [ref=e429] [cursor=pointer]: 阿尔忒弥斯的朦胧
+                        - button "x" [ref=e430] [cursor=pointer]
+                  - generic [ref=e431]:
+                    - generic [ref=e432]: 4跳
+                    - generic [ref=e434]:
+                      - generic [ref=e436] [cursor=pointer]: 月之舟
+                      - button "x" [ref=e437] [cursor=pointer]
+                  - generic [ref=e438]:
+                    - generic [ref=e439]: 5跳
+                    - generic [ref=e441]:
+                      - generic [ref=e443] [cursor=pointer]: 小行星带
+                      - button "+" [ref=e444] [cursor=pointer]
+                - generic [ref=e446]: 3 个星区
+            - generic [ref=e447]:
+              - generic [ref=e448]:
+                - generic [ref=e449]:
+                  - img [ref=e451]
+                  - generic [ref=e458]: 阿尔忒弥斯的朦胧
+                  - button "枢纽颜色" [ref=e459] [cursor=pointer]
+                - button "固定：重新计算时作为固定 Hub" [ref=e461] [cursor=pointer]:
+                  - img [ref=e462]
+              - generic [ref=e464]:
+                - generic [ref=e465]:
+                  - generic [ref=e466]: 定位星区
+                  - generic [ref=e467]:
+                    - generic [ref=e470] [cursor=pointer]: 阿尔忒弥斯的朦胧
+                    - generic [ref=e473] [cursor=pointer]: 虚拟交易站
+                    - generic [ref=e475]:
+                      - spinbutton [ref=e476]: "3"
+                      - generic [ref=e477]: 跳
+                      - generic [ref=e478]:
+                        - button "▲" [ref=e479] [cursor=pointer]
+                        - button "▼" [ref=e480] [cursor=pointer]
+                - generic [ref=e481]:
+                  - generic [ref=e482]:
+                    - generic [ref=e483]: 1跳
+                    - generic [ref=e484]:
+                      - generic [ref=e485]:
+                        - generic [ref=e487] [cursor=pointer]: 安提亚的不幸 I
+                        - button "→" [ref=e488] [cursor=pointer]
+                      - generic [ref=e489]:
+                        - generic [ref=e491] [cursor=pointer]: 安提亚的不幸 III
+                        - button "+" [ref=e492] [cursor=pointer]
+                  - generic [ref=e493]:
+                    - generic [ref=e494]: 2跳
+                    - generic [ref=e495]:
+                      - generic [ref=e496]:
+                        - generic [ref=e498] [cursor=pointer]: 错误逻辑 I
+                        - button "+" [ref=e499] [cursor=pointer]
+                      - generic [ref=e500]:
+                        - generic [ref=e502] [cursor=pointer]: 错误逻辑 VII
+                        - button "+" [ref=e503] [cursor=pointer]
+                      - generic [ref=e504]:
+                        - generic [ref=e506] [cursor=pointer]: 疆域边陲
+                        - button "+" [ref=e507] [cursor=pointer]
+                  - generic [ref=e508]:
+                    - generic [ref=e509]: 3跳
+                    - generic [ref=e510]:
+                      - generic [ref=e511]:
+                        - generic [ref=e513] [cursor=pointer]: 虚空
+                        - button "→" [ref=e514] [cursor=pointer]
+                      - generic [ref=e515]:
+                        - generic [ref=e517] [cursor=pointer]: 矿石带
+                        - button "+" [ref=e518] [cursor=pointer]
+                      - generic [ref=e519]:
+                        - generic [ref=e521] [cursor=pointer]: 神圣眼光
+                        - button "x" [ref=e522] [cursor=pointer]
+                  - generic [ref=e523]:
+                    - generic [ref=e524]: 4跳
+                    - generic [ref=e526]:
+                      - generic [ref=e528] [cursor=pointer]: 月之舟
+                      - button "x" [ref=e529] [cursor=pointer]
+                  - generic [ref=e530]:
+                    - generic [ref=e531]: 5跳
+                    - generic [ref=e533]:
+                      - generic [ref=e535] [cursor=pointer]: 小行星带
+                      - button "+" [ref=e536] [cursor=pointer]
+                - generic [ref=e538]: 1 个星区
+            - generic [ref=e539]:
+              - generic [ref=e540]:
+                - generic [ref=e541]:
+                  - img [ref=e543]
+                  - generic [ref=e550]: 月之舟
+                  - button "枢纽颜色" [ref=e551] [cursor=pointer]
+                - button "固定：重新计算时作为固定 Hub" [ref=e553] [cursor=pointer]:
+                  - img [ref=e554]
+              - generic [ref=e556]:
+                - generic [ref=e557]:
+                  - generic [ref=e558]: 定位星区
+                  - generic [ref=e559]:
+                    - generic [ref=e562] [cursor=pointer]: 月之舟
+                    - generic [ref=e565] [cursor=pointer]: 虚拟交易站
+                    - generic [ref=e567]:
+                      - spinbutton [ref=e568]: "3"
+                      - generic [ref=e569]: 跳
+                      - generic [ref=e570]:
+                        - button "▲" [ref=e571] [cursor=pointer]
+                        - button "▼" [ref=e572] [cursor=pointer]
+                - generic [ref=e573]:
+                  - generic [ref=e574]:
+                    - generic [ref=e575]: 1跳
+                    - generic [ref=e576]:
+                      - generic [ref=e577]:
+                        - generic [ref=e579] [cursor=pointer]: 野蛮疾驰 II
+                        - button "+" [ref=e580] [cursor=pointer]
+                      - generic [ref=e581]:
+                        - generic [ref=e583] [cursor=pointer]: 虚空
+                        - button "x" [ref=e584] [cursor=pointer]
+                      - generic [ref=e585]:
+                        - generic [ref=e587] [cursor=pointer]: 梦幻海洋
+                        - button "+" [ref=e588] [cursor=pointer]
+                      - generic [ref=e589]:
+                        - generic [ref=e591] [cursor=pointer]: 小行星带
+                        - button "x" [ref=e592] [cursor=pointer]
+                  - generic [ref=e593]:
+                    - generic [ref=e594]: 2跳
+                    - generic [ref=e595]:
+                      - generic [ref=e596]:
+                        - generic [ref=e598] [cursor=pointer]: 火星
+                        - button "+" [ref=e599] [cursor=pointer]
+                      - generic [ref=e600]:
+                        - generic [ref=e602] [cursor=pointer]: 木星
+                        - button "+" [ref=e603] [cursor=pointer]
+                      - generic [ref=e604]:
+                        - generic [ref=e606] [cursor=pointer]: 第二次接触 II 闪点
+                        - button "+" [ref=e607] [cursor=pointer]
+                      - generic [ref=e608]:
+                        - generic [ref=e610] [cursor=pointer]: 安提戈涅纪念碑
+                        - button "+" [ref=e611] [cursor=pointer]
+                      - generic [ref=e612]:
+                        - generic [ref=e614] [cursor=pointer]: 疆域边陲
+                        - button "+" [ref=e615] [cursor=pointer]
+                      - generic [ref=e616]:
+                        - generic [ref=e618] [cursor=pointer]: 大暗礁
+                        - button "+" [ref=e619] [cursor=pointer]
+                  - generic [ref=e620]:
+                    - generic [ref=e621]: 3跳
+                    - generic [ref=e622]:
+                      - generic [ref=e623]:
+                        - generic [ref=e625] [cursor=pointer]: 黑洞太阳 IV
+                        - button "+" [ref=e626] [cursor=pointer]
+                      - generic [ref=e627]:
+                        - generic [ref=e629] [cursor=pointer]: 黑洞太阳 V
+                        - button "+" [ref=e630] [cursor=pointer]
+                      - generic [ref=e631]:
+                        - generic [ref=e633] [cursor=pointer]: 金星
+                        - button "+" [ref=e634] [cursor=pointer]
+                      - generic [ref=e635]:
+                        - generic [ref=e637] [cursor=pointer]: 土星 1
+                        - button "+" [ref=e638] [cursor=pointer]
+                      - generic [ref=e639]:
+                        - generic [ref=e641] [cursor=pointer]: 土卫六泰坦
+                        - button "+" [ref=e642] [cursor=pointer]
+                      - generic [ref=e643]:
+                        - generic [ref=e645] [cursor=pointer]: 土星 2
+                        - button "+" [ref=e646] [cursor=pointer]
+                      - generic [ref=e647]:
+                        - generic [ref=e649] [cursor=pointer]: 赛格瑞斯
+                        - button "+" [ref=e650] [cursor=pointer]
+                      - generic [ref=e651]:
+                        - generic [ref=e653] [cursor=pointer]: 真视
+                        - button "+" [ref=e654] [cursor=pointer]
+                      - generic [ref=e655]:
+                        - generic [ref=e657] [cursor=pointer]: Argon之都
+                        - button "+" [ref=e658] [cursor=pointer]
+                      - generic [ref=e659]:
+                        - generic [ref=e661] [cursor=pointer]: 安提亚的不幸 I
+                        - button "→" [ref=e662] [cursor=pointer]
+                      - generic [ref=e663]:
+                        - generic [ref=e665] [cursor=pointer]: 安提亚的不幸 III
+                        - button "+" [ref=e666] [cursor=pointer]
+                      - generic [ref=e667]:
+                        - generic [ref=e669] [cursor=pointer]: 第二次接触 VII
+                        - button "+" [ref=e670] [cursor=pointer]
+                      - generic [ref=e671]:
+                        - generic [ref=e673] [cursor=pointer]: 贫瘠海岸
+                        - button "+" [ref=e674] [cursor=pointer]
+                      - generic [ref=e675]:
+                        - generic [ref=e677] [cursor=pointer]: 黑暗庇护所
+                        - button "+" [ref=e678] [cursor=pointer]
+                      - generic [ref=e679]:
+                        - generic [ref=e681] [cursor=pointer]: 矿石带
+                        - button "+" [ref=e682] [cursor=pointer]
+                  - generic [ref=e683]:
+                    - generic [ref=e684]: 4跳
+                    - generic [ref=e685]:
+                      - generic [ref=e686]:
+                        - generic [ref=e688] [cursor=pointer]: 神圣眼光
+                        - button "x" [ref=e689] [cursor=pointer]
+                      - generic [ref=e690]:
+                        - generic [ref=e692] [cursor=pointer]: 阿尔忒弥斯的朦胧
+                        - button "x" [ref=e693] [cursor=pointer]
+                      - generic [ref=e694]:
+                        - generic [ref=e696] [cursor=pointer]: 警惕凝视
+                        - button "x" [ref=e697] [cursor=pointer]
+                - generic [ref=e699]: 2 个星区
+            - generic [ref=e700]:
+              - generic [ref=e701]:
+                - generic [ref=e702]:
+                  - img [ref=e704]
+                  - generic [ref=e711]: 警惕凝视
+                  - button "枢纽颜色" [ref=e712] [cursor=pointer]
+                - button "固定：重新计算时作为固定 Hub" [ref=e714] [cursor=pointer]:
+                  - img [ref=e715]
+              - generic [ref=e717]:
+                - generic [ref=e718]:
+                  - generic [ref=e719]: 定位星区
+                  - generic [ref=e720]:
+                    - generic [ref=e723] [cursor=pointer]: 警惕凝视
+                    - generic [ref=e726] [cursor=pointer]: 虚拟交易站
+                    - generic [ref=e728]:
+                      - spinbutton [ref=e729]: "3"
+                      - generic [ref=e730]: 跳
+                      - generic [ref=e731]:
+                        - button "▲" [ref=e732] [cursor=pointer]
+                        - button "▼" [ref=e733] [cursor=pointer]
+                - generic [ref=e734]:
+                  - generic [ref=e735]:
+                    - generic [ref=e736]: 1跳
+                    - generic [ref=e737]:
+                      - generic [ref=e738]:
+                        - generic [ref=e740] [cursor=pointer]: 异端的终结
+                        - button "x" [ref=e741] [cursor=pointer]
+                      - generic [ref=e742]:
+                        - generic [ref=e744] [cursor=pointer]: 贫瘠海岸
+                        - button "+" [ref=e745] [cursor=pointer]
+                  - generic [ref=e746]:
+                    - generic [ref=e747]: 2跳
+                    - generic [ref=e748]:
+                      - generic [ref=e749]:
+                        - generic [ref=e751] [cursor=pointer]: 晨星 III
+                        - button "+" [ref=e752] [cursor=pointer]
+                      - generic [ref=e753]:
+                        - generic [ref=e755] [cursor=pointer]: 悲惨的天空 V 菲氏家族
+                        - button "+" [ref=e756] [cursor=pointer]
+                      - generic [ref=e757]:
+                        - generic [ref=e759] [cursor=pointer]: 大暗礁
+                        - button "+" [ref=e760] [cursor=pointer]
+                  - generic [ref=e761]:
+                    - generic [ref=e762]: 3跳
+                    - generic [ref=e763]:
+                      - generic [ref=e764]:
+                        - generic [ref=e766] [cursor=pointer]: 希望之歌的选择 I
+                        - button "+" [ref=e767] [cursor=pointer]
+                      - generic [ref=e768]:
+                        - generic [ref=e770] [cursor=pointer]: 希望之歌的选择 III
+                        - button "+" [ref=e771] [cursor=pointer]
+                      - generic [ref=e772]:
+                        - generic [ref=e774] [cursor=pointer]: 悲惨的天空 IV 维尔卡家族
+                        - button "+" [ref=e775] [cursor=pointer]
+                      - generic [ref=e776]:
+                        - generic [ref=e778] [cursor=pointer]: 悲惨的天空 X
+                        - button "+" [ref=e779] [cursor=pointer]
+                      - generic [ref=e780]:
+                        - generic [ref=e782] [cursor=pointer]: 晨星 IV
+                        - button "+" [ref=e783] [cursor=pointer]
+                      - generic [ref=e784]:
+                        - generic [ref=e786] [cursor=pointer]: 梦幻海洋
+                        - button "+" [ref=e787] [cursor=pointer]
+                      - generic [ref=e788]:
+                        - generic [ref=e790] [cursor=pointer]: 黑暗庇护所
+                        - button "+" [ref=e791] [cursor=pointer]
+                  - generic [ref=e792]:
+                    - generic [ref=e793]: 4跳
+                    - generic [ref=e795]:
+                      - generic [ref=e797] [cursor=pointer]: 月之舟
+                      - button "x" [ref=e798] [cursor=pointer]
+                  - generic [ref=e799]:
+                    - generic [ref=e800]: 5跳
+                    - generic [ref=e802]:
+                      - generic [ref=e804] [cursor=pointer]: 小行星带
+                      - button "+" [ref=e805] [cursor=pointer]
+                - generic [ref=e807]: 2 个星区
+        - generic [ref=e809]:
+          - generic [ref=e810]:
+            - generic [ref=e811]:
+              - generic [ref=e812]: 水星
+              - generic [ref=e813]: 1 个分站
+              - generic [ref=e814]: 需要扩展
+            - generic [ref=e815]:
+              - generic [ref=e816] [cursor=pointer]:
+                - generic [ref=e817]: ○
+                - generic [ref=e818]: 小行星带 (扩展跳数至 3)
+              - generic [ref=e819] [cursor=pointer]:
+                - generic [ref=e820]: ○
+                - generic [ref=e821]: 独立成组 / MGO-010 - 2.0M
+          - generic [ref=e822]:
+            - generic [ref=e823]:
+              - generic [ref=e824]: 安提亚的不幸 I
+              - generic [ref=e825]: 1 个分站
+              - generic [ref=e826]: 自动分配
+            - generic [ref=e827]:
+              - generic [ref=e828] [cursor=pointer]:
+                - generic [ref=e829]: ●
+                - generic [ref=e830]: 阿尔忒弥斯的朦胧 (距离 1 跳)
+              - generic [ref=e831] [cursor=pointer]:
+                - generic [ref=e832]: ○
+                - generic [ref=e833]: 神圣眼光 (距离 2 跳)
+              - generic [ref=e834] [cursor=pointer]:
+                - generic [ref=e835]: ○
+                - generic [ref=e836]: 月之舟 (距离 3 跳)
+              - generic [ref=e837] [cursor=pointer]:
+                - generic [ref=e838]: ○
+                - generic [ref=e839]: 独立成组 / TLD-031 - 6.0M
+          - generic [ref=e840]:
+            - generic [ref=e841]:
+              - generic [ref=e842]: 猩红之星
+              - generic [ref=e843]: 2 个分站
+              - generic [ref=e844]: 自动分配
+            - generic [ref=e845]:
+              - generic [ref=e846] [cursor=pointer]:
+                - generic [ref=e847]: ●
+                - generic [ref=e848]: 神圣眼光 (距离 2 跳)
+              - generic [ref=e849] [cursor=pointer]:
+                - generic [ref=e850]: ○
+                - generic [ref=e851]: 独立成组 / UQQ-929 - 18.0M
+          - generic [ref=e852]:
+            - generic [ref=e853]:
+              - generic [ref=e854]: 虚空
+              - generic [ref=e855]: 2 个分站
+              - generic [ref=e856]: 自动分配
+            - generic [ref=e857]:
+              - generic [ref=e858] [cursor=pointer]:
+                - generic [ref=e859]: ●
+                - generic [ref=e860]: 月之舟 (距离 1 跳)
+              - generic [ref=e861] [cursor=pointer]:
+                - generic [ref=e862]: ○
+                - generic [ref=e863]: 小行星带 (距离 2 跳)
+              - generic [ref=e864] [cursor=pointer]:
+                - generic [ref=e865]: ○
+                - generic [ref=e866]: 神圣眼光 (距离 3 跳)
+              - generic [ref=e867] [cursor=pointer]:
+                - generic [ref=e868]: ○
+                - generic [ref=e869]: 阿尔忒弥斯的朦胧 (距离 3 跳)
+              - generic [ref=e870] [cursor=pointer]:
+                - generic [ref=e871]: ○
+                - generic [ref=e872]: 独立成组 / VHG-082 - 12.0M
+          - generic [ref=e873]:
+            - generic [ref=e874]:
+              - generic [ref=e875]: 异端的终结
+              - generic [ref=e876]: 1 个分站
+              - generic [ref=e877]: 自动分配
+            - generic [ref=e878]:
+              - generic [ref=e879] [cursor=pointer]:
+                - generic [ref=e880]: ●
+                - generic [ref=e881]: 警惕凝视 (距离 1 跳)
+              - generic [ref=e882] [cursor=pointer]:
+                - generic [ref=e883]: ○
+                - generic [ref=e884]: 独立成组 / FIE-639 - 2.0M
+        - generic [ref=e886]:
+          - generic [ref=e887]:
+            - generic [ref=e889]: 小行星带
+            - list [ref=e890]:
+              - listitem [ref=e891] [cursor=pointer]:
+                - generic [ref=e893]:
+                  - generic [ref=e894]: KXN-018
+                  - generic [ref=e895]: "货仓: 6.0M"
+              - listitem [ref=e896] [cursor=pointer]:
+                - generic [ref=e898]:
+                  - generic [ref=e899]: 虚拟交易站
+                  - generic [ref=e900]: "x: 110.0km / z: -48.9km"
+          - generic [ref=e901]:
+            - generic [ref=e903]: 神圣眼光
+            - list [ref=e904]:
+              - listitem [ref=e905] [cursor=pointer]:
+                - generic [ref=e907]:
+                  - generic [ref=e908]: PPW-916
+                  - generic [ref=e909]: "货仓: 18.0M"
+              - listitem [ref=e910] [cursor=pointer]:
+                - generic [ref=e912]:
+                  - generic [ref=e913]: 虚拟交易站
+                  - generic [ref=e914]: "x: 0.0km / z: 0.0km"
+          - generic [ref=e915]:
+            - generic [ref=e917]: 阿尔忒弥斯的朦胧
+            - list [ref=e918]:
+              - listitem [ref=e919] [cursor=pointer]:
+                - generic [ref=e921]:
+                  - generic [ref=e922]: BHW-834
+                  - generic [ref=e923]: "货仓: 18.0M"
+              - listitem [ref=e924] [cursor=pointer]:
+                - generic [ref=e926]:
+                  - generic [ref=e927]: RWC-785
+                  - generic [ref=e928]: "货仓: 20.0M"
+              - listitem [ref=e929] [cursor=pointer]:
+                - generic [ref=e931]:
+                  - generic [ref=e932]: AVE-937
+                  - generic [ref=e933]: "货仓: 12.0M"
+              - listitem [ref=e934] [cursor=pointer]:
+                - generic [ref=e936]:
+                  - generic [ref=e937]: 虚拟交易站
+                  - generic [ref=e938]: "x: 0.0km / z: 0.0km"
+          - generic [ref=e939]:
+            - generic [ref=e941]: 月之舟
+            - list [ref=e942]:
+              - listitem [ref=e943] [cursor=pointer]:
+                - generic [ref=e945]:
+                  - generic [ref=e946]: NWE-213
+                  - generic [ref=e947]: "货仓: 12.0M"
+              - listitem [ref=e948] [cursor=pointer]:
+                - generic [ref=e950]:
+                  - generic [ref=e951]: XAJ-926
+                  - generic [ref=e952]: "货仓: 8.0M"
+              - listitem [ref=e953] [cursor=pointer]:
+                - generic [ref=e955]:
+                  - generic [ref=e956]: 虚拟交易站
+                  - generic [ref=e957]: "x: 212.1km / z: 55.6km"
+          - generic [ref=e958]:
+            - generic [ref=e960]: 警惕凝视
+            - list [ref=e961]:
+              - listitem [ref=e962] [cursor=pointer]:
+                - generic [ref=e964]:
+                  - generic [ref=e965]: UKW-234
+                  - generic [ref=e966]: "货仓: 20.0M"
+              - listitem [ref=e967] [cursor=pointer]:
+                - generic [ref=e969]:
+                  - generic [ref=e970]: KWL-387
+                  - generic [ref=e971]: "货仓: 10.0M"
+              - listitem [ref=e972] [cursor=pointer]:
+                - generic [ref=e974]:
+                  - generic [ref=e975]: JIP-444
+                  - generic [ref=e976]: "货仓: 10.0M"
+              - listitem [ref=e977] [cursor=pointer]:
+                - generic [ref=e979]:
+                  - generic [ref=e980]: EOF-448
+                  - generic [ref=e981]: "货仓: 6.0M"
+              - listitem [ref=e982] [cursor=pointer]:
+                - generic [ref=e984]:
+                  - generic [ref=e985]: NPC-646
+                  - generic [ref=e986]: "货仓: 6.0M"
+              - listitem [ref=e987] [cursor=pointer]:
+                - generic [ref=e989]:
+                  - generic [ref=e990]: 虚拟交易站
+                  - generic [ref=e991]: "x: 0.0km / z: 0.0km"
+      - generic [ref=e993]:
+        - generic [ref=e994]: 部分星区未分配，确认将继续？
+        - generic [ref=e995]:
+          - button "取消" [ref=e996] [cursor=pointer]
+          - button "确定" [ref=e997] [cursor=pointer]
+```

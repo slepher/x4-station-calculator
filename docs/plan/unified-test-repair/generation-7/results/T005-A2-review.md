@@ -1,0 +1,23 @@
+- Task: T005
+- Contract revision: 1
+- Result: T005-A2.md
+- Candidate snapshot: T005 station-resource-group spec change only; no source/Unit/helper/fixture/config changes
+- Verdict: changes-required
+
+## Findings
+
+1. **Blocking — the owned spec bypasses the required shared error-checking test fixture.** `tests/e2e/production/station-resource-group.spec.ts:1` imports `test` directly from `@playwright/test`, while generation-7 `plan.md:39` requires rewritten specs to use `tests/test-setup.ts` so page errors and console errors fail the test. The 97 passing traces therefore prove the scenarios pass as written, but they do not prove that these 16 T005 scenarios were free of browser errors collected by the canonical fixture. **Correction owner:** T005 implementation worker. **Allowed correction:** change only the owned spec imports so `test` comes from `../../test-setup` and `expect`/`Page` remain from `@playwright/test`; do not change the shared fixture. **Verification:** rerun the exact three-spec T005 Playwright command with `--workers=1 --retries=0 --trace=on` into a fresh attempt directory, retain the real result, and rerun the scoped `git diff --check`.
+
+2. **Medium — Logic Flow 1 does not have an exact per-group resource oracle.** `tests/e2e/production/station-resource-group.spec.ts:168-175` fixes the group count at three and total tag count at seven, but asserts only group 1 exactly and merely requires an `ice` tag somewhere in group 2. This would still pass if resources moved incorrectly between groups 0 and 2. Independent fixture and game-data tracing gives exact sorted groups: `['hydrogen', 'methane', 'ore', 'silicon']`, `['helium', 'methane']`, and `['ice']`. **Correction owner:** T005 implementation worker. **Allowed correction:** use the existing `summaryResourceIds` helper to assert all three arrays exactly; no source, helper, or shared-fixture change is needed. **Verification:** inspect the corrected assertions against `tests/fixtures/db.json` and the fixed 8.0 module/ware inputs, then include them in the fresh focused run required by Finding 1.
+
+## Acceptance
+
+The source mapping is correct. `MapResourceFilterAdvancedPanel.vue` obtains empire entries from `blueprintStore.savedEmpires.list`, filters them through `getSavedStationGroupedFlows`, and creates one group for each saved station with a nonempty resource set. Its logic-flow path uses `logicFlowStore.savedPlans.list`; it does not expose a production `sourceView` sector item or a `map-resource-advanced-loader-sector-*` testid. The candidate selects exact saved identities through current UI buttons, verifies menu closure and loaded labels, and correctly limits active styling to the `logic-flow-1` item.
+
+The saved-empire oracles are accepted. From the fixed fixture and 8.0 game data, Empire 1's three stations resolve to `hydrogen/methane/ore/silicon`, `helium/methane`, and `ice`; Empire 2's first station terminates at its locked intermediate wares and produces no resource group, while its second station resolves to `helium/hydrogen/methane/ore/silicon`. The candidate checks those exact sorted identities and group counts. `M7 Empty Empire` and `M7 Empty Plan` are added only as initial localStorage negative controls before reload. Subsequent business actions use visible UI controls; the only later DOM evaluation reads tag testids.
+
+Existing logic-flow load, edit/refresh, filtering, candidate refresh, outside-close, panel-close, and map-related coverage remains present. The retained A2 evidence contains 97 trace archives split as 16 station-resource-group, 33 station-dashboard, and 48 ware-flow scenarios; `.last-run.json` reports `passed` with no failed tests, and the three specs contain no explicit skip/fixme/only marker. A T005 trace embeds the reviewed spec byte-for-byte (current Git blob `6e0ec103fece03e464e633e970b2e0c9b3242dc2`), so the run is bound to this candidate. The scoped diff is 40 additions and 27 deletions and passes `git diff --check`. These runtime results and both read-only consumer regressions are retained, but independent acceptance is withheld for the two findings above.
+
+## Explanation
+
+The candidate correctly replaces the obsolete sector source with the current saved-empire and saved-logic-flow routes, and its saved-empire expectations match independent fixture facts. One import correction is required so the focused run exercises the generation-7 browser-error contract, and Logic Flow 1 needs exact arrays for every generated group. After those bounded test-only corrections, T005 needs a fresh focused attempt and independent closure review; final canonical E2E remains T010 scope.

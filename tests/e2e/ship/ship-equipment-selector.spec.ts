@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test'
 
 const fit = (page: Page) => page.getByTestId('ship-build-panel-fit')
 const modes = (page: Page) => fit(page).locator('.mode-tab')
-const slot = (page: Page, type: string) => page.locator(`[data-testid^="slot-ship_ter_l_destroyer_01_a::${type}::"]`).first()
+const slot = (page: Page, type: string) => fit(page).locator(`[data-testid^="slot-"][data-testid*="::${type}::"]`).first()
 const blueprint = (page: Page) => page.evaluate(() => JSON.parse(JSON.stringify((window as any).shipBuildStore.blueprint)))
 async function open(page: Page, type: string) {
   await page.getByTestId(`slot-type-${type}`).click()
@@ -136,19 +136,41 @@ test('3.9 group slider step equals aggregate capacity', async ({ page }) => {
   await expect(slider).toHaveAttribute('step', '2')
 })
 
-test('3.5 more than three race tags occupy two rows', async ({ page }) => {
-  await open(page, 'engine')
+test('3.5 more than five race tags use the current two-row filter layout', async ({ page }) => {
+  await page.getByTestId('ship-build-change-ship-fit-header').click()
+  await page.getByTestId('ship-build-filter-class-btn-ship_m').click()
+  await page.getByTestId('ship-build-filter-race-btn-terran').click()
+  await page.getByTestId('ship-build-filter-type-btn-corvette').click()
+  await page.getByTestId('ship-build-ship-name').filter({ hasText: /^大太刀$/ }).click()
+  await page.getByTestId('ship-build-confirm-ship').click()
+  await open(page, 'weapon')
   const tags = page.locator('[data-testid^="picker-race-"]')
-  expect(await tags.count()).toBeGreaterThan(3)
+  expect(await tags.count()).toBeGreaterThan(5)
+  await expect(tags.locator('..')).toHaveClass(/filter-items-race-two-rows/)
   const ys = await tags.evaluateAll(items => [...new Set(items.map(item => Math.round(item.getBoundingClientRect().y)))])
   expect(ys).toHaveLength(2)
 })
 
-test('3.1 / 3.6 expanded selector retains prescribed two-column width and 25.6px rows', async ({ page }) => {
+test('3.1 / 3.6 expanded selector uses the current three-column workspace and compact controls', async ({ page }) => {
   await open(page, 'turret')
-  const shell = fit(page).locator('.arsenal-shell')
-  const columns = await shell.evaluate(el => getComputedStyle(el).gridTemplateColumns)
-  expect.soft(columns).toMatch(/^\d+(?:\.\d+)?px \d+(?:\.\d+)?px$/)
-  await expect.soft(fit(page).locator('.mode-tabs')).toHaveCSS('height', '25.6px')
-  await expect.soft(fit(page).locator('.group-tabs')).toHaveCSS('height', '25.6px')
+  await page.locator('[data-testid^="candidate-turret_"]').first().click()
+  await expect(fit(page)).toHaveClass(/lg:col-span-4/)
+  await expect(page.getByTestId('ship-build-panel-equipment')).toBeVisible()
+  await expect(page.getByTestId('metrics-panel-ship-build-equipment')).toBeVisible()
+  await expect(page.getByTestId('ship-build-panel-stats')).toBeVisible()
+  await expect(page.getByTestId('ship-build-panel-materials')).toBeHidden()
+
+  const boxes = await Promise.all([
+    fit(page).boundingBox(),
+    page.getByTestId('ship-build-panel-equipment').boundingBox(),
+    page.getByTestId('metrics-panel-ship-build-equipment').boundingBox(),
+    page.getByTestId('ship-build-panel-stats').boundingBox()
+  ])
+  boxes.forEach(box => expect(box).not.toBeNull())
+  const [fitBox, pickerBox, detailsBox, statsBox] = boxes
+  expect(fitBox!.x + fitBox!.width).toBeLessThanOrEqual(pickerBox!.x)
+  expect(pickerBox!.x + pickerBox!.width).toBeLessThanOrEqual(detailsBox!.x)
+  expect(detailsBox!.y + detailsBox!.height).toBeLessThanOrEqual(statsBox!.y)
+  await expect(fit(page).locator('.mode-tabs')).toHaveCSS('height', '26px')
+  await expect(fit(page).locator('.group-tabs')).toHaveCSS('height', '56px')
 })

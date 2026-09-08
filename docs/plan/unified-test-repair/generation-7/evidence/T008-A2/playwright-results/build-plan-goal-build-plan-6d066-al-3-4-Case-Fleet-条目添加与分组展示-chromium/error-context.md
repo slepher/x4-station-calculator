@@ -1,0 +1,284 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e4]:
+  - generic [ref=e5]:
+    - generic [ref=e6]:
+      - button "New" [ref=e7] [cursor=pointer]:
+        - img [ref=e8]
+        - generic [ref=e11]: New
+      - button "Save" [ref=e12] [cursor=pointer]:
+        - img [ref=e13]
+        - generic [ref=e17]: Save
+      - button "Save As" [ref=e18] [cursor=pointer]:
+        - img [ref=e19]
+        - generic [ref=e21]: Save As
+      - button "Load" [ref=e22] [cursor=pointer]:
+        - img [ref=e23]
+        - generic [ref=e25]: Load
+    - generic [ref=e27]:
+      - button "Blueprint" [ref=e28] [cursor=pointer]: Blueprint
+      - button "Live" [ref=e30] [cursor=pointer]: Live
+      - button "Sector Map" [ref=e32] [cursor=pointer]: Sector Map
+      - button "Logical Flow" [ref=e34] [cursor=pointer]: Logical Flow
+      - button "Ship Build" [ref=e36] [cursor=pointer]: Ship Build
+    - generic [ref=e38]:
+      - button "Import" [ref=e39] [cursor=pointer]:
+        - img [ref=e40]
+        - generic [ref=e43]: Import
+      - button "Export" [ref=e44] [cursor=pointer]:
+        - img [ref=e45]
+        - generic [ref=e48]: Export
+      - button "8.0" [ref=e49] [cursor=pointer]:
+        - img [ref=e50]
+        - generic [ref=e59]: "8.0"
+      - generic [ref=e60]:
+        - img [ref=e61]
+        - combobox [ref=e63] [cursor=pointer]:
+          - option "English" [selected]
+          - option "简体中文"
+          - option "繁體中文"
+          - option "Deutsch"
+          - option "Français"
+          - option "Italiano"
+          - option "Español"
+          - option "Русский"
+          - option "日本語"
+          - option "한국어"
+          - option "Português (Brasil)"
+          - option "Polski"
+      - button [ref=e64] [cursor=pointer]:
+        - img [ref=e65]
+  - generic [ref=e69]:
+    - generic [ref=e70]:
+      - button "收起侧栏" [ref=e71] [cursor=pointer]:
+        - img [ref=e72]
+      - generic [ref=e74]:
+        - generic [ref=e75]:
+          - button "Overview" [ref=e76] [cursor=pointer]:
+            - generic [ref=e79]: Overview
+          - button "Blueprint Recipe" [ref=e80] [cursor=pointer]:
+            - generic [ref=e83]: Blueprint Recipe
+          - button "Research" [ref=e84] [cursor=pointer]:
+            - generic [ref=e87]: Research
+          - button "Terraforming" [ref=e88] [cursor=pointer]:
+            - generic [ref=e90]:
+              - button [ref=e91]:
+                - img [ref=e92]
+              - generic [ref=e94]: Terraforming
+        - generic [ref=e97]:
+          - generic [ref=e98]:
+            - generic [ref=e101] [cursor=pointer]: E1-S1
+            - generic [ref=e104] [cursor=pointer]: E1-S2
+            - generic [ref=e107] [cursor=pointer]: E1-S3
+          - button "Add Station" [ref=e108] [cursor=pointer]:
+            - img [ref=e109]
+            - generic [ref=e110]: Add Station
+    - generic [ref=e111]:
+      - generic [ref=e112]:
+        - generic [ref=e113]:
+          - generic [ref=e115]:
+            - generic [ref=e116]: Blueprint Name
+            - textbox "New Blueprint" [ref=e117]: Empire 1
+          - generic [ref=e120]:
+            - generic [ref=e121]: Race Preference
+            - combobox [ref=e122] [cursor=pointer]:
+              - option "🛡️ Argon" [selected]
+              - option "🌏 Terran"
+              - option "💰 Teladi"
+              - option "👁️ Paranid"
+              - option "🐲 Split"
+        - button "Import Logic Flow" [ref=e124] [cursor=pointer]:
+          - img [ref=e125]
+      - generic [ref=e127]:
+        - generic [ref=e129]:
+          - generic [ref=e130]:
+            - generic [ref=e131] [cursor=pointer]: Build Plan 1
+            - button "Build Plan 1" [ref=e133] [cursor=pointer]:
+              - generic [ref=e134]: Build Plan 1
+              - img [ref=e135]
+          - generic [ref=e137]:
+            - generic [ref=e139]:
+              - textbox "Search fleet blueprint..." [ref=e140]
+              - combobox [ref=e141] [cursor=pointer]:
+                - option "Product"
+                - option "Module"
+                - option "Fleet" [selected]
+            - generic [ref=e142]:
+              - generic [ref=e143]: Goals
+              - generic [ref=e144]:
+                - generic [ref=e145]:
+                  - generic [ref=e146]: Fleet
+                  - combobox [ref=e147] [cursor=pointer]:
+                    - option "Actual (0h2m)" [selected]
+                    - option "Planned (1h)"
+                - generic [ref=e149]:
+                  - generic [ref=e150]:
+                    - generic [ref=e151]: Wharf
+                    - generic [ref=e152]: 0h2m
+                    - generic [ref=e154]:
+                      - spinbutton [ref=e155]: "1"
+                      - generic:
+                        - button:
+                          - img
+                        - button:
+                          - img
+                    - button "✕" [ref=e156] [cursor=pointer]
+                  - generic [ref=e159] [cursor=pointer]:
+                    - generic [ref=e160]: ▶
+                    - generic [ref=e161]: Katana 0h2m
+                    - generic [ref=e163]:
+                      - spinbutton [ref=e164]: "1"
+                      - generic:
+                        - button:
+                          - img
+                        - button:
+                          - img
+                    - button "✕" [ref=e165]
+                - generic [ref=e166]:
+                  - generic [ref=e167]: Derived Rates
+                  - generic [ref=e168]:
+                    - generic [ref=e169]:
+                      - generic [ref=e170]: Advanced Electronics × 10
+                      - generic [ref=e171]: 252/h
+                    - generic [ref=e172]:
+                      - generic [ref=e173]: Antimatter Converters × 150
+                      - generic [ref=e174]: 3777/h
+                    - generic [ref=e175]:
+                      - generic [ref=e176]: Turret Components × 42
+                      - generic [ref=e177]: 1058/h
+                    - generic [ref=e178]:
+                      - generic [ref=e179]: Computronic Substrate × 746
+                      - generic [ref=e180]: 18781/h
+                    - generic [ref=e181]:
+                      - generic [ref=e182]: Engine Parts × 100
+                      - generic [ref=e183]: 2518/h
+                    - generic [ref=e184]:
+                      - generic [ref=e185]: Silicon Carbide × 618
+                      - generic [ref=e186]: 15559/h
+                    - generic [ref=e187]:
+                      - generic [ref=e188]: Metallic Microlattice × 3,730
+                      - generic [ref=e189]: 93903/h
+                    - generic [ref=e190]:
+                      - generic [ref=e191]: Energy Cells × 2,984
+                      - generic [ref=e192]: 75122/h
+            - generic [ref=e193]:
+              - generic [ref=e194]: Production Lines
+              - generic [ref=e195]:
+                - generic [ref=e196]:
+                  - generic [ref=e197]: E1-S2
+                  - generic [ref=e198]: "2"
+                - generic [ref=e199]:
+                  - generic [ref=e200]:
+                    - generic [ref=e204]: Quantum Tube Production
+                    - generic [ref=e205]:
+                      - generic [ref=e206]: Production
+                      - generic "Auto-generated; quantity calculated during compute" [ref=e207]:
+                        - img [ref=e208]
+                  - generic [ref=e211]:
+                    - generic [ref=e215]: Energy Cell Production
+                    - generic [ref=e216]:
+                      - generic [ref=e217]: Target
+                      - generic "Auto-generated; quantity calculated during compute" [ref=e218]:
+                        - img [ref=e219]
+              - generic [ref=e222]:
+                - generic [ref=e223]:
+                  - generic [ref=e224]: Unplanned Line
+                  - generic [ref=e225]: "7"
+                - generic [ref=e226]:
+                  - generic [ref=e227]:
+                    - generic [ref=e231]: Advanced Electronics Production
+                    - generic [ref=e232]:
+                      - generic [ref=e233]: Target
+                      - generic "Auto-generated; quantity calculated during compute" [ref=e234]:
+                        - img [ref=e235]
+                  - generic [ref=e238]:
+                    - generic [ref=e242]: Antimatter Converter Production
+                    - generic [ref=e243]:
+                      - generic [ref=e244]: Target
+                      - generic "Auto-generated; quantity calculated during compute" [ref=e245]:
+                        - img [ref=e246]
+                  - generic [ref=e249]:
+                    - generic [ref=e253]: Turret Component Production
+                    - generic [ref=e254]:
+                      - generic [ref=e255]: Target
+                      - generic "Auto-generated; quantity calculated during compute" [ref=e256]:
+                        - img [ref=e257]
+                  - generic [ref=e260]:
+                    - generic [ref=e263]:
+                      - generic [ref=e264]: Computronic Substrate Production
+                      - generic [ref=e265]: Cradle of Humanity
+                    - generic [ref=e266]:
+                      - generic [ref=e267]: Target
+                      - generic "Auto-generated; quantity calculated during compute" [ref=e268]:
+                        - img [ref=e269]
+                  - generic [ref=e272]:
+                    - generic [ref=e276]: Engine Part Production
+                    - generic [ref=e277]:
+                      - generic [ref=e278]: Target
+                      - generic "Auto-generated; quantity calculated during compute" [ref=e279]:
+                        - img [ref=e280]
+                  - generic [ref=e283]:
+                    - generic [ref=e286]:
+                      - generic [ref=e287]: Silicon Carbide Production
+                      - generic [ref=e288]: Cradle of Humanity
+                    - generic [ref=e289]:
+                      - generic [ref=e290]: Target
+                      - generic "Auto-generated; quantity calculated during compute" [ref=e291]:
+                        - img [ref=e292]
+                  - generic [ref=e295]:
+                    - generic [ref=e298]:
+                      - generic [ref=e299]: Metallic Microlattice Production
+                      - generic [ref=e300]: Cradle of Humanity
+                    - generic [ref=e301]:
+                      - generic [ref=e302]: Target
+                      - generic "Auto-generated; quantity calculated during compute" [ref=e303]:
+                        - img [ref=e304]
+            - generic [ref=e307]:
+              - generic [ref=e308] [cursor=pointer]:
+                - checkbox "Build Material Lines" [ref=e309]
+                - generic [ref=e310]: Build Material Lines
+              - button "Logic Flow 1" [ref=e313] [cursor=pointer]:
+                - generic [ref=e314]: Logic Flow 1
+                - img [ref=e315]
+            - button "Compute Plan" [ref=e317] [cursor=pointer]
+        - generic [ref=e319]:
+          - generic [ref=e321]: Build Schemes
+          - generic [ref=e323]: Configure goals and compute a build plan
+        - generic [ref=e325]:
+          - generic [ref=e326]:
+            - heading "Resource View" [level=3] [ref=e327]
+            - generic [ref=e329]:
+              - button "Quantity" [ref=e330] [cursor=pointer]
+              - button "Economy" [ref=e331] [cursor=pointer]
+          - generic [ref=e333]:
+            - generic [ref=e334]:
+              - heading "Products" [level=4] [ref=e338]
+              - generic [ref=e342] [cursor=pointer]:
+                - generic [ref=e343]:
+                  - img [ref=e345]
+                  - generic [ref=e347]: Food Rations
+                - generic [ref=e349]: +34,500.0
+              - generic [ref=e353] [cursor=pointer]:
+                - generic [ref=e354]:
+                  - img [ref=e356]
+                  - generic [ref=e358]: Claytronics
+                - generic [ref=e360]: +2,592.0
+              - generic [ref=e364] [cursor=pointer]:
+                - generic [ref=e365]:
+                  - img [ref=e367]
+                  - generic [ref=e369]: Medical Supplies
+                - generic [ref=e371]: +22,464.0
+              - generic [ref=e375] [cursor=pointer]:
+                - generic [ref=e376]:
+                  - img [ref=e378]
+                  - generic [ref=e380]: Hull Parts
+                - generic [ref=e382]: +14,112.0
+            - generic [ref=e383]:
+              - heading "Operations" [level=4] [ref=e387]
+              - generic [ref=e391] [cursor=pointer]:
+                - generic [ref=e392]:
+                  - img [ref=e394]
+                  - generic [ref=e396]: Quantum Tubes
+                - generic [ref=e398]: "-520.0"
+```

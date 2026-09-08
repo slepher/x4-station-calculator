@@ -1,0 +1,180 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e4]:
+  - generic [ref=e5]:
+    - generic [ref=e6]:
+      - button "新建" [ref=e7] [cursor=pointer]:
+        - img [ref=e8]
+        - generic [ref=e11]: 新建
+      - button "保存" [ref=e12] [cursor=pointer]:
+        - img [ref=e13]
+        - generic [ref=e17]: 保存
+      - button "另存为" [ref=e18] [cursor=pointer]:
+        - img [ref=e19]
+        - generic [ref=e21]: 另存为
+    - generic [ref=e23]:
+      - button "蓝图产能" [ref=e24] [cursor=pointer]: 蓝图产能
+      - button "实况产能" [ref=e26] [cursor=pointer]: 实况产能
+      - button "星区地图" [ref=e28] [cursor=pointer]: 星区地图
+      - button "逻辑组网" [ref=e30] [cursor=pointer]: 逻辑组网
+      - button "船只建造" [ref=e32] [cursor=pointer]: 船只建造
+    - generic [ref=e34]:
+      - button "导入" [ref=e35] [cursor=pointer]:
+        - img [ref=e36]
+        - generic [ref=e39]: 导入
+      - button "导出" [ref=e40] [cursor=pointer]:
+        - img [ref=e41]
+        - generic [ref=e44]: 导出
+      - button "9.0" [ref=e45] [cursor=pointer]:
+        - img [ref=e46]
+        - generic [ref=e55]: "9.0"
+      - generic [ref=e56]:
+        - img [ref=e57]
+        - combobox [ref=e59] [cursor=pointer]:
+          - option "English"
+          - option "简体中文" [selected]
+          - option "繁體中文"
+          - option "Deutsch"
+          - option "Français"
+          - option "Italiano"
+          - option "Español"
+          - option "Русский"
+          - option "日本語"
+          - option "한국어"
+          - option "Português (Brasil)"
+          - option "Polski"
+      - button [ref=e60] [cursor=pointer]:
+        - img [ref=e61]
+  - generic [ref=e67]:
+    - generic [ref=e68]:
+      - generic [ref=e69]:
+        - button "更换飞船" [ref=e70] [cursor=pointer]:
+          - generic [ref=e72]: 大太刀
+          - img [ref=e74]
+        - generic [ref=e78]:
+          - button "添加到收藏" [ref=e79] [cursor=pointer]:
+            - img [ref=e80]
+          - button "空配" [ref=e82] [cursor=pointer]:
+            - generic [ref=e83]: 空配
+            - img [ref=e85]
+      - generic [ref=e87]:
+        - complementary [ref=e88]:
+          - button "E" [ref=e90] [cursor=pointer]
+          - button "R" [ref=e92] [cursor=pointer]
+          - button "S" [ref=e94] [cursor=pointer]
+          - button "W" [active] [ref=e96] [cursor=pointer]
+          - button "T" [ref=e98] [cursor=pointer]
+          - button "C" [ref=e100] [cursor=pointer]
+          - button "U" [ref=e102] [cursor=pointer]
+        - main [ref=e104]:
+          - generic [ref=e106]:
+            - button "标准" [ref=e107] [cursor=pointer]
+            - button "简化" [ref=e108] [cursor=pointer]
+          - generic [ref=e110]:
+            - button "M1" [ref=e111] [cursor=pointer]
+            - button "M2" [ref=e112] [cursor=pointer]
+            - button "M3" [ref=e113] [cursor=pointer]
+            - button "M4" [ref=e114] [cursor=pointer]
+          - generic [ref=e115]:
+            - generic [ref=e116]: "装备兼容性:"
+            - generic [ref=e117]: 高级
+            - generic [ref=e118]: M 武器 x1
+          - generic [ref=e120]:
+            - slider [disabled] [ref=e123]: "0"
+            - button "M 武器 空槽位 0/1" [ref=e125] [cursor=pointer]:
+              - generic [ref=e126]:
+                - generic [ref=e127]: M 武器
+                - generic [ref=e129]: 空槽位
+              - generic [ref=e131]: 0/1
+    - generic [ref=e133]:
+      - generic [ref=e134]:
+        - generic [ref=e135]: 配装后船体属性
+        - generic [ref=e136]:
+          - button "简略" [ref=e137] [cursor=pointer]
+          - button "详细" [ref=e138] [cursor=pointer]
+      - generic [ref=e140]:
+        - generic [ref=e141]:
+          - generic [ref=e142]: 船体
+          - generic [ref=e143]: 16,100MJ
+        - generic [ref=e146]:
+          - generic [ref=e147]: 武器爆发输出值
+          - generic [ref=e148]: 0MW
+        - generic [ref=e150]:
+          - generic [ref=e151]: 护盾
+          - generic [ref=e152]: 0MJ
+        - generic [ref=e154]:
+          - generic [ref=e155]: 炮塔平均输出值
+          - generic [ref=e156]: 0MW
+        - generic [ref=e158]:
+          - generic [ref=e159]: 速度
+          - generic [ref=e160]: 0m/s
+        - generic [ref=e162]:
+          - generic [ref=e163]: 集装箱仓储
+          - generic [ref=e164]: 400m3
+        - generic [ref=e167]:
+          - generic [ref=e168]: 助推速度
+          - generic [ref=e169]: 0m/s
+        - generic [ref=e171]:
+          - generic [ref=e172]: 巡航速度
+          - generic [ref=e173]: 0m/s
+        - generic [ref=e175]:
+          - generic [ref=e176]: 雷达范围
+          - generic [ref=e177]: 40km
+        - generic [ref=e180]:
+          - generic [ref=e181]: 船员
+          - generic [ref=e182]: "4"
+        - generic [ref=e185]:
+          - generic [ref=e186]: 无人机单位仓储
+          - generic [ref=e187]: "0"
+        - generic [ref=e189]:
+          - generic [ref=e190]: M级泊位数量
+          - generic [ref=e191]: "0"
+        - generic [ref=e193]:
+          - generic [ref=e194]: 导弹容量
+          - generic [ref=e195]: "0"
+        - generic [ref=e197]:
+          - generic [ref=e198]: M级飞船容量
+          - generic [ref=e199]: "0"
+        - generic [ref=e201]:
+          - generic [ref=e202]: 可投放设备
+          - generic [ref=e203]: "100"
+        - generic [ref=e206]:
+          - generic [ref=e207]: S级泊位数量
+          - generic [ref=e208]: "0"
+        - generic [ref=e210]:
+          - generic [ref=e211]: 干扰弹
+          - generic [ref=e212]: "8"
+        - generic [ref=e215]:
+          - generic [ref=e216]: S级飞船容量
+          - generic [ref=e217]: "0"
+    - generic [ref=e219]:
+      - generic [ref=e220]:
+        - generic [ref=e221]: 建造材料
+        - generic [ref=e222]:
+          - button "总材料" [ref=e223] [cursor=pointer]
+          - button "时间视图" [ref=e224] [cursor=pointer]
+      - generic [ref=e225]:
+        - generic [ref=e226]:
+          - generic [ref=e228] [cursor=pointer]:
+            - generic [ref=e229]:
+              - img [ref=e231]
+              - generic [ref=e233]: 总材料
+            - generic [ref=e235]: 698,278 Cr
+          - generic [ref=e237] [cursor=pointer]:
+            - generic [ref=e238]:
+              - img [ref=e240]
+              - generic [ref=e242]:
+                - generic [ref=e243]: 大太刀
+                - generic [ref=e244]: x 1
+            - generic [ref=e246]: 698,278 Cr
+        - generic [ref=e248]:
+          - generic [ref=e250]:
+            - generic [ref=e251]:
+              - generic [ref=e252]: 船只建造材料价格
+              - generic [ref=e253]: 平均
+            - slider [ref=e254] [cursor=pointer]: "0.5"
+          - combobox [ref=e255]:
+            - option "default" [selected]
+            - option "terran"
+```

@@ -4,6 +4,7 @@ import { expect, type Page } from '@playwright/test'
 const ENERGY = 'module_gen_prod_energycells_01'
 const ARG_STORAGE = 'module_arg_stor_container_l_01'
 const TER_STORAGE = 'module_ter_stor_container_l_01'
+const ARG_PIER = 'module_arg_pier_l_03'
 
 async function setupStation(page: Page) {
   await page.goto('/')
@@ -70,6 +71,10 @@ async function autoStorage(page: Page) {
     .filter((module: { id: string }) => module.id.includes('_stor_')))
 }
 
+async function autoInfrastructure(page: Page) {
+  return page.evaluate(() => (window as any).blueprintStore.stationState.autoInfrastructureModules)
+}
+
 test.beforeEach(async ({ page }) => setupStation(page))
 
 test.describe('Module Management - Storage Auto-Fill', () => {
@@ -122,34 +127,20 @@ test.describe('Module Management - Storage Auto-Fill', () => {
     await expect.poll(() => autoStorage(page)).toEqual([{ id: ARG_STORAGE, count: 3 }])
   })
 
-  test.skip('Case 5: AutoSupply Storage', async ({ page }) => {
-    await page.waitForSelector('.module-list-container', { state: 'visible' })
+  test('Case 5: Unified Infrastructure Capacity', async ({ page }) => {
+    await addModule(page, ENERGY)
 
-    const searchInput = page.locator('[data-testid="candidate-search-input"]').first()
-    await searchInput.click()
-    await searchInput.fill('')
-    await page.keyboard.type('Hull', { delay: 30 })
-    await page.waitForTimeout(500)
+    // 10,500 m³/h × 12 h = 126,000 m³; one Argon L holds 1,000,000 m³.
+    // Transport demand is 10,500 m³/h; 62,000 × 15 throughput needs one pier.
+    await expect.poll(() => autoInfrastructure(page)).toEqual([
+      { id: ARG_STORAGE, count: 1 },
+      { id: ARG_PIER, count: 1 }
+    ])
+    await expect(page.locator('.tier-auto .module-row')).toHaveCount(2)
 
-    const resultItem = page.locator('[data-testid^="grouped-candidate-item-"]').first()
-    await expect(resultItem).toBeVisible({ timeout: 1000 })
-    await resultItem.click()
-
-    const autoSection = page.locator('.tier-section.tier-auto').first()
-    const containerStorage = autoSection.locator('.module-row').filter({ hasText: /Container Storage|集装箱仓储/ })
-    await expect(containerStorage.first()).toBeVisible()
-
-    await searchInput.click()
-    await searchInput.fill('')
-    await page.keyboard.type('Refined', { delay: 30 })
-    await page.waitForTimeout(500)
-
-    const supplyItem = page.locator('[data-testid^="grouped-candidate-item-"]').first()
-    await expect(supplyItem).toBeVisible({ timeout: 3000 })
-    await supplyItem.click()
-
-    const solidStorage = autoSection.locator('.module-row').filter({ hasText: /Solid Storage|固体仓储/ })
-    await expect(solidStorage.first()).toBeVisible()
+    await addModule(page, ARG_STORAGE)
+    await expect.poll(() => autoInfrastructure(page)).toEqual([{ id: ARG_PIER, count: 1 }])
+    await expect(page.locator('.tier-auto .module-row')).toHaveCount(1)
   })
 })
 

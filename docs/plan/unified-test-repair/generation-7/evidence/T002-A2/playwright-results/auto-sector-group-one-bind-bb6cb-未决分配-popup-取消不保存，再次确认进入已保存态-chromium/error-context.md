@@ -1,0 +1,228 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e4]:
+  - generic [ref=e5]:
+    - generic [ref=e6]:
+      - button "新建" [disabled] [ref=e7]:
+        - img [ref=e8]
+        - generic [ref=e11]: 新建
+      - button "保存" [ref=e12] [cursor=pointer]:
+        - img [ref=e13]
+        - generic [ref=e17]: 保存
+      - button "另存为" [disabled] [ref=e18]:
+        - img [ref=e19]
+        - generic [ref=e21]: 另存为
+      - button "加载" [ref=e22] [cursor=pointer]:
+        - img [ref=e23]
+        - generic [ref=e25]: 加载
+    - generic [ref=e27]:
+      - button "蓝图产能" [ref=e28] [cursor=pointer]: 蓝图产能
+      - button "实况产能" [ref=e30] [cursor=pointer]: 实况产能
+      - button "星区地图" [ref=e32] [cursor=pointer]: 星区地图
+      - button "逻辑组网" [ref=e34] [cursor=pointer]: 逻辑组网
+      - button "船只建造" [ref=e36] [cursor=pointer]: 船只建造
+    - generic [ref=e38]:
+      - button "导入" [ref=e39] [cursor=pointer]:
+        - img [ref=e40]
+        - generic [ref=e43]: 导入
+      - button "导出" [ref=e44] [cursor=pointer]:
+        - img [ref=e45]
+        - generic [ref=e48]: 导出
+      - button "9.0" [ref=e49] [cursor=pointer]:
+        - img [ref=e50]
+        - generic [ref=e59]: "9.0"
+      - generic [ref=e61]:
+        - img [ref=e62]
+        - combobox [ref=e64] [cursor=pointer]:
+          - option "English"
+          - option "简体中文" [selected]
+          - option "繁體中文"
+          - option "Deutsch"
+          - option "Français"
+          - option "Italiano"
+          - option "Español"
+          - option "Русский"
+          - option "日本語"
+          - option "한국어"
+          - option "Português (Brasil)"
+          - option "Polski"
+      - button [ref=e65] [cursor=pointer]:
+        - img [ref=e66]
+  - generic [ref=e70]:
+    - generic [ref=e71]:
+      - button "收起侧栏" [ref=e72] [cursor=pointer]:
+        - img [ref=e73]
+      - generic [ref=e75]:
+        - generic [ref=e76]:
+          - button "总览" [ref=e77] [cursor=pointer]:
+            - generic [ref=e80]: 总览
+          - button "市场报价" [ref=e81] [cursor=pointer]:
+            - generic [ref=e84]: 市场报价
+          - button "蓝图配方" [ref=e85] [cursor=pointer]:
+            - generic [ref=e88]: 蓝图配方
+          - button "研究" [ref=e89] [cursor=pointer]:
+            - generic [ref=e92]: 研究
+          - button "地球化" [ref=e93] [cursor=pointer]:
+            - generic [ref=e95]:
+              - button [ref=e96]:
+                - img [ref=e97]
+              - generic [ref=e99]: 地球化
+        - generic "星区编辑" [ref=e102] [cursor=pointer]:
+          - generic [ref=e106]: 星区编辑
+        - generic [ref=e109] [cursor=pointer]:
+          - button [ref=e111]:
+            - img [ref=e112]
+          - generic [ref=e115]: 小行星
+    - generic [ref=e117]:
+      - generic [ref=e120]:
+        - generic "模式" [ref=e122]:
+          - button "查看" [ref=e123] [cursor=pointer]
+          - button "编辑" [ref=e124] [cursor=pointer]
+          - button "重算" [ref=e125] [cursor=pointer]
+        - generic [ref=e126]:
+          - generic [ref=e127]: 未决 ◈9
+          - button "地图" [ref=e128] [cursor=pointer]
+          - button "重置" [ref=e129] [cursor=pointer]
+          - button "确定" [disabled] [ref=e130]
+      - generic [ref=e132]:
+        - generic [ref=e133]:
+          - generic [ref=e135]:
+            - generic [ref=e137]:
+              - generic [ref=e138]: i
+              - generic [ref=e139]: 结构调整不自动改动其他分配
+            - button "添加" [ref=e141] [cursor=pointer]
+          - generic [ref=e144]:
+            - generic [ref=e145]:
+              - generic [ref=e146]:
+                - img [ref=e148]
+                - generic [ref=e155]: 小行星带
+                - button "枢纽颜色" [ref=e156] [cursor=pointer]
+              - button "固定：重新计算时作为固定 Hub" [ref=e158] [cursor=pointer]:
+                - img [ref=e159]
+            - generic [ref=e161]:
+              - generic [ref=e162]:
+                - generic [ref=e163]: 定位星区
+                - generic [ref=e164]:
+                  - generic [ref=e167] [cursor=pointer]: 小行星带
+                  - generic [ref=e170] [cursor=pointer]: 虚拟交易站
+                  - generic [ref=e172]:
+                    - spinbutton [ref=e173]: "0"
+                    - generic [ref=e174]: 跳
+                    - generic [ref=e175]:
+                      - button "▲" [ref=e176] [cursor=pointer]
+                      - button "▼" [disabled] [ref=e177]
+              - generic [ref=e179]: 1 个星区
+        - generic [ref=e181]:
+          - generic [ref=e182]:
+            - generic [ref=e183]:
+              - generic [ref=e184]: 阿尔忒弥斯的朦胧
+              - generic [ref=e185]: 4 个分站
+              - generic [ref=e186]: 需要扩展
+            - generic [ref=e187]:
+              - generic [ref=e188] [cursor=pointer]:
+                - generic [ref=e189]: ○
+                - generic [ref=e190]: 小行星带 (扩展跳数至 5)
+              - generic [ref=e191] [cursor=pointer]:
+                - generic [ref=e192]: ○
+                - generic [ref=e193]: 独立成组 / BHW-834 - 18.0M
+          - generic [ref=e194]:
+            - generic [ref=e195]:
+              - generic [ref=e196]: 安提亚的不幸 I
+              - generic [ref=e197]: 1 个分站
+              - generic [ref=e198]: 需要扩展
+            - generic [ref=e199]:
+              - generic [ref=e200] [cursor=pointer]:
+                - generic [ref=e201]: ○
+                - generic [ref=e202]: 小行星带 (扩展跳数至 4)
+              - generic [ref=e203] [cursor=pointer]:
+                - generic [ref=e204]: ○
+                - generic [ref=e205]: 独立成组 / TLD-031 - 6.0M
+          - generic [ref=e206]:
+            - generic [ref=e207]:
+              - generic [ref=e208]: 警惕凝视
+              - generic [ref=e209]: 5 个分站
+              - generic [ref=e210]: 需要扩展
+            - generic [ref=e211]:
+              - generic [ref=e212] [cursor=pointer]:
+                - generic [ref=e213]: ○
+                - generic [ref=e214]: 小行星带 (扩展跳数至 5)
+              - generic [ref=e215] [cursor=pointer]:
+                - generic [ref=e216]: ○
+                - generic [ref=e217]: 独立成组 / UKW-234 - 20.0M
+          - generic [ref=e218]:
+            - generic [ref=e219]:
+              - generic [ref=e220]: 月之舟
+              - generic [ref=e221]: 2 个分站
+              - generic [ref=e222]: 需要扩展
+            - generic [ref=e223]:
+              - generic [ref=e224] [cursor=pointer]:
+                - generic [ref=e225]: ○
+                - generic [ref=e226]: 小行星带 (扩展跳数至 1)
+              - generic [ref=e227] [cursor=pointer]:
+                - generic [ref=e228]: ○
+                - generic [ref=e229]: 独立成组 / NWE-213 - 12.0M
+          - generic [ref=e230]:
+            - generic [ref=e231]:
+              - generic [ref=e232]: 异端的终结
+              - generic [ref=e233]: 1 个分站
+              - generic [ref=e234]: 待选择
+            - generic [ref=e236] [cursor=pointer]:
+              - generic [ref=e237]: ○
+              - generic [ref=e238]: 独立成组 / FIE-639 - 2.0M
+          - generic [ref=e239]:
+            - generic [ref=e240]:
+              - generic [ref=e241]: 虚空
+              - generic [ref=e242]: 2 个分站
+              - generic [ref=e243]: 需要扩展
+            - generic [ref=e244]:
+              - generic [ref=e245] [cursor=pointer]:
+                - generic [ref=e246]: ○
+                - generic [ref=e247]: 小行星带 (扩展跳数至 2)
+              - generic [ref=e248] [cursor=pointer]:
+                - generic [ref=e249]: ○
+                - generic [ref=e250]: 独立成组 / VHG-082 - 12.0M
+          - generic [ref=e251]:
+            - generic [ref=e252]:
+              - generic [ref=e253]: 猩红之星
+              - generic [ref=e254]: 2 个分站
+              - generic [ref=e255]: 待选择
+            - generic [ref=e257] [cursor=pointer]:
+              - generic [ref=e258]: ○
+              - generic [ref=e259]: 独立成组 / UQQ-929 - 18.0M
+          - generic [ref=e260]:
+            - generic [ref=e261]:
+              - generic [ref=e262]: 水星
+              - generic [ref=e263]: 1 个分站
+              - generic [ref=e264]: 需要扩展
+            - generic [ref=e265]:
+              - generic [ref=e266] [cursor=pointer]:
+                - generic [ref=e267]: ○
+                - generic [ref=e268]: 小行星带 (扩展跳数至 3)
+              - generic [ref=e269] [cursor=pointer]:
+                - generic [ref=e270]: ○
+                - generic [ref=e271]: 独立成组 / MGO-010 - 2.0M
+          - generic [ref=e272]:
+            - generic [ref=e273]:
+              - generic [ref=e274]: 神圣眼光
+              - generic [ref=e275]: 1 个分站
+              - generic [ref=e276]: 需要扩展
+            - generic [ref=e277]:
+              - generic [ref=e278] [cursor=pointer]:
+                - generic [ref=e279]: ○
+                - generic [ref=e280]: 小行星带 (扩展跳数至 5)
+              - generic [ref=e281] [cursor=pointer]:
+                - generic [ref=e282]: ○
+                - generic [ref=e283]: 独立成组 / PPW-916 - 18.0M
+        - generic [ref=e286]:
+          - generic [ref=e288]: 小行星带
+          - list [ref=e289]:
+            - listitem [ref=e290] [cursor=pointer]:
+              - generic [ref=e292]:
+                - generic [ref=e293]: KXN-018
+                - generic [ref=e294]: "货仓: 6.0M"
+            - listitem [ref=e295] [cursor=pointer]:
+              - generic [ref=e297]:
+                - generic [ref=e298]: 虚拟交易站
+                - generic [ref=e299]: "x: 110.0km / z: -48.9km"
+```

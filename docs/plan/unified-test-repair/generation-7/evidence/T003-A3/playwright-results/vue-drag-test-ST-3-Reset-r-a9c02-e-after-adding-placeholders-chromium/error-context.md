@@ -1,0 +1,51 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e5]:
+  - heading "Vue Drag Test Page" [level=1] [ref=e6]
+  - paragraph [ref=e7]: This page is for testing vuedraggable behavior with Playwright.
+  - generic [ref=e8]:
+    - 'button "Zone B: Locked ([object Object])" [ref=e9] [cursor=pointer]'
+    - button "Add Auto Item to Zone B" [ref=e10] [cursor=pointer]
+    - button "Add Isolated Item to Zone B" [ref=e11] [cursor=pointer]
+    - button "Reset" [ref=e12] [cursor=pointer]
+  - generic [ref=e13]:
+    - generic [ref=e14]:
+      - generic [ref=e15]:
+        - heading "Zone A" [level=2] [ref=e16]
+        - generic [ref=e17]: 5 items
+      - generic [ref=e18]:
+        - generic [ref=e21]: Item 1
+        - generic [ref=e24]: Item 2
+        - generic [ref=e27]: Item 3
+        - generic [ref=e29]:
+          - generic [ref=e30]: Item 4
+          - generic [ref=e32]: terran
+        - generic [ref=e34]:
+          - generic [ref=e35]: Item 5
+          - generic [ref=e37]: argon
+    - generic [ref=e38]:
+      - generic [ref=e39]:
+        - heading "Zone B" [level=2] [ref=e40]
+        - generic [ref=e41]: 2 items
+      - generic [ref=e42]:
+        - generic [ref=e44]:
+          - generic [ref=e45]: Item 1 (Auto)
+          - generic [ref=e47]: Auto
+        - generic [ref=e49]:
+          - generic [ref=e50]: Item 2 (Isolated)
+          - generic [ref=e52]: Isolated
+  - generic [ref=e53]:
+    - heading "Event History (Last 10)" [level=3] [ref=e54]
+    - generic [ref=e55]:
+      - generic [ref=e56]: "dragover: itemId=item-3, zoneId=B"
+      - generic [ref=e57]: "dragover: itemId=item-3, zoneId=B"
+      - generic [ref=e58]: "dragover: itemId=item-3, zoneId=B"
+      - generic [ref=e59]: "dragover: itemId=item-3, zoneId=B"
+      - generic [ref=e60]: "dragover: itemId=item-3, zoneId=B"
+      - generic [ref=e61]: "dragover: itemId=item-3, zoneId=B"
+      - generic [ref=e62]: "dragover: itemId=item-3, zoneId=B"
+      - generic [ref=e63]: "dragover: itemId=item-3, zoneId=B"
+      - generic [ref=e64]: "dragleave: itemId=item-3, zoneId=B"
+      - generic [ref=e65]: "dragend: itemId=item-3, zoneId="
+```

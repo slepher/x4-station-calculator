@@ -1,0 +1,156 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e4]:
+  - generic [ref=e5]:
+    - generic [ref=e6]:
+      - button "New" [ref=e7] [cursor=pointer]:
+        - img [ref=e8]
+        - generic [ref=e11]: New
+      - button "Save" [ref=e12] [cursor=pointer]:
+        - img [ref=e13]
+        - generic [ref=e17]: Save
+      - button "Save As" [ref=e18] [cursor=pointer]:
+        - img [ref=e19]
+        - generic [ref=e21]: Save As
+      - button "Load" [ref=e22] [cursor=pointer]:
+        - img [ref=e23]
+        - generic [ref=e25]: Load
+    - generic [ref=e27]:
+      - button "Blueprint" [ref=e28] [cursor=pointer]: Blueprint
+      - button "Live" [ref=e30] [cursor=pointer]: Live
+      - button "Sector Map" [ref=e32] [cursor=pointer]: Sector Map
+      - button "Logical Flow" [ref=e34] [cursor=pointer]: Logical Flow
+      - button "Ship Build" [ref=e36] [cursor=pointer]: Ship Build
+    - generic [ref=e38]:
+      - button "Import" [ref=e39] [cursor=pointer]:
+        - img [ref=e40]
+        - generic [ref=e43]: Import
+      - button "Export" [ref=e44] [cursor=pointer]:
+        - img [ref=e45]
+        - generic [ref=e48]: Export
+      - button "8.0" [ref=e49] [cursor=pointer]:
+        - img [ref=e50]
+        - generic [ref=e59]: "8.0"
+      - generic [ref=e60]:
+        - img [ref=e61]
+        - combobox [ref=e63] [cursor=pointer]:
+          - option "English" [selected]
+          - option "简体中文"
+          - option "繁體中文"
+          - option "Deutsch"
+          - option "Français"
+          - option "Italiano"
+          - option "Español"
+          - option "Русский"
+          - option "日本語"
+          - option "한국어"
+          - option "Português (Brasil)"
+          - option "Polski"
+      - button [ref=e64] [cursor=pointer]:
+        - img [ref=e65]
+  - generic [ref=e69]:
+    - generic [ref=e70]:
+      - button "收起侧栏" [ref=e71] [cursor=pointer]:
+        - img [ref=e72]
+      - generic [ref=e74]:
+        - generic [ref=e75]:
+          - button "Overview" [ref=e76] [cursor=pointer]:
+            - generic [ref=e79]: Overview
+          - button "Blueprint Recipe" [ref=e80] [cursor=pointer]:
+            - generic [ref=e83]: Blueprint Recipe
+          - button "Research" [ref=e84] [cursor=pointer]:
+            - generic [ref=e87]: Research
+          - button "Terraforming" [ref=e88] [cursor=pointer]:
+            - generic [ref=e90]:
+              - button [ref=e91]:
+                - img [ref=e92]
+              - generic [ref=e94]: Terraforming
+        - generic [ref=e97]:
+          - generic [ref=e98]:
+            - generic [ref=e101] [cursor=pointer]: E1-S1
+            - generic [ref=e104] [cursor=pointer]: E1-S2
+            - generic [ref=e107] [cursor=pointer]: E1-S3
+          - button "Add Station" [ref=e108] [cursor=pointer]:
+            - img [ref=e109]
+            - generic [ref=e110]: Add Station
+    - generic [ref=e111]:
+      - generic [ref=e112]:
+        - generic [ref=e113]:
+          - generic [ref=e115]:
+            - generic [ref=e116]: Blueprint Name
+            - textbox "New Blueprint" [ref=e117]: Empire 1
+          - generic [ref=e120]:
+            - generic [ref=e121]: Race Preference
+            - combobox [ref=e122] [cursor=pointer]:
+              - option "🛡️ Argon" [selected]
+              - option "🌏 Terran"
+              - option "💰 Teladi"
+              - option "👁️ Paranid"
+              - option "🐲 Split"
+        - button "Import Logic Flow" [ref=e124] [cursor=pointer]:
+          - img [ref=e125]
+      - generic [ref=e127]:
+        - generic [ref=e129]:
+          - generic [ref=e130]:
+            - generic [ref=e131] [cursor=pointer]: Build Plan 2
+            - button "Build Plan 2" [ref=e133] [cursor=pointer]:
+              - generic [ref=e134]: Build Plan 2
+              - img [ref=e135]
+          - generic [ref=e137]:
+            - generic [ref=e140]:
+              - searchbox "Search product or module..." [ref=e141]
+              - combobox [ref=e142] [cursor=pointer]:
+                - option "Product" [selected]
+                - option "Module"
+                - option "Fleet"
+            - generic [ref=e144]: Goals
+            - generic [ref=e145]: No goals defined
+            - generic [ref=e146]:
+              - generic [ref=e147] [cursor=pointer]:
+                - checkbox "Build Material Lines" [ref=e148]
+                - generic [ref=e149]: Build Material Lines
+              - button "Logic Flow 1" [ref=e152] [cursor=pointer]:
+                - generic [ref=e153]: Logic Flow 1
+                - img [ref=e154]
+            - button "Compute Plan" [ref=e156] [cursor=pointer]
+        - generic [ref=e158]:
+          - generic [ref=e160]: Build Schemes
+          - generic [ref=e162]: Configure goals and compute a build plan
+        - generic [ref=e164]:
+          - generic [ref=e165]:
+            - heading "Resource View" [level=3] [ref=e166]
+            - generic [ref=e168]:
+              - button "Quantity" [ref=e169] [cursor=pointer]
+              - button "Economy" [ref=e170] [cursor=pointer]
+          - generic [ref=e172]:
+            - generic [ref=e173]:
+              - heading "Products" [level=4] [ref=e177]
+              - generic [ref=e181] [cursor=pointer]:
+                - generic [ref=e182]:
+                  - img [ref=e184]
+                  - generic [ref=e186]: Food Rations
+                - generic [ref=e188]: +34,500.0
+              - generic [ref=e192] [cursor=pointer]:
+                - generic [ref=e193]:
+                  - img [ref=e195]
+                  - generic [ref=e197]: Claytronics
+                - generic [ref=e199]: +2,592.0
+              - generic [ref=e203] [cursor=pointer]:
+                - generic [ref=e204]:
+                  - img [ref=e206]
+                  - generic [ref=e208]: Medical Supplies
+                - generic [ref=e210]: +22,464.0
+              - generic [ref=e214] [cursor=pointer]:
+                - generic [ref=e215]:
+                  - img [ref=e217]
+                  - generic [ref=e219]: Hull Parts
+                - generic [ref=e221]: +14,112.0
+            - generic [ref=e222]:
+              - heading "Operations" [level=4] [ref=e226]
+              - generic [ref=e230] [cursor=pointer]:
+                - generic [ref=e231]:
+                  - img [ref=e233]
+                  - generic [ref=e235]: Quantum Tubes
+                - generic [ref=e237]: "-520.0"
+```

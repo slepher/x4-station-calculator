@@ -1,0 +1,210 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e4]:
+  - generic [ref=e5]:
+    - generic [ref=e6]:
+      - button "新建" [ref=e7] [cursor=pointer]:
+        - img [ref=e8]
+        - generic [ref=e11]: 新建
+      - button "保存" [ref=e12] [cursor=pointer]:
+        - img [ref=e13]
+        - generic [ref=e17]: 保存
+      - button "另存为" [ref=e18] [cursor=pointer]:
+        - img [ref=e19]
+        - generic [ref=e21]: 另存为
+      - button "加载" [ref=e22] [cursor=pointer]:
+        - img [ref=e23]
+        - generic [ref=e25]: 加载
+    - generic [ref=e27]:
+      - button "蓝图产能" [ref=e28] [cursor=pointer]: 蓝图产能
+      - button "实况产能" [ref=e30] [cursor=pointer]: 实况产能
+      - button "星区地图" [ref=e32] [cursor=pointer]: 星区地图
+      - button "逻辑组网" [ref=e34] [cursor=pointer]: 逻辑组网
+      - button "船只建造" [ref=e36] [cursor=pointer]: 船只建造
+    - generic [ref=e38]:
+      - button "导入" [ref=e39] [cursor=pointer]:
+        - img [ref=e40]
+        - generic [ref=e43]: 导入
+      - button "导出" [ref=e44] [cursor=pointer]:
+        - img [ref=e45]
+        - generic [ref=e48]: 导出
+      - button "8.0" [ref=e49] [cursor=pointer]:
+        - img [ref=e50]
+        - generic [ref=e59]: "8.0"
+      - generic [ref=e60]:
+        - img [ref=e61]
+        - combobox [ref=e63] [cursor=pointer]:
+          - option "English"
+          - option "简体中文" [selected]
+          - option "繁體中文"
+          - option "Deutsch"
+          - option "Français"
+          - option "Italiano"
+          - option "Español"
+          - option "Русский"
+          - option "日本語"
+          - option "한국어"
+          - option "Português (Brasil)"
+          - option "Polski"
+      - button [ref=e64] [cursor=pointer]:
+        - img [ref=e65]
+  - generic [ref=e69]:
+    - generic [ref=e70]:
+      - button "收起侧栏" [ref=e71] [cursor=pointer]:
+        - img [ref=e72]
+      - generic [ref=e74]:
+        - generic [ref=e75]:
+          - button "总览" [ref=e76] [cursor=pointer]:
+            - generic [ref=e79]: 总览
+          - button "蓝图配方" [ref=e80] [cursor=pointer]:
+            - generic [ref=e83]: 蓝图配方
+          - button "研究" [ref=e84] [cursor=pointer]:
+            - generic [ref=e87]: 研究
+          - button "地球化" [ref=e88] [cursor=pointer]:
+            - generic [ref=e90]:
+              - button [ref=e91]:
+                - img [ref=e92]
+              - generic [ref=e94]: 地球化
+        - generic [ref=e97]:
+          - generic [ref=e98]:
+            - generic [ref=e101] [cursor=pointer]: E1-S1
+            - generic [ref=e104] [cursor=pointer]: E1-S2
+            - generic [ref=e107] [cursor=pointer]: E1-S3
+          - button "添加空间站" [ref=e108] [cursor=pointer]:
+            - img [ref=e109]
+            - generic [ref=e110]: 添加空间站
+    - generic [ref=e111]:
+      - generic [ref=e112]:
+        - generic [ref=e113]:
+          - generic [ref=e115]:
+            - generic [ref=e116]: 蓝图名称
+            - textbox "新建蓝图" [ref=e117]: Empire 1
+          - generic [ref=e120]:
+            - generic [ref=e121]: 偏好种族
+            - combobox [ref=e122] [cursor=pointer]:
+              - option "🛡️ Argon" [selected]
+              - option "🌏 Terran"
+              - option "💰 Teladi"
+              - option "👁️ Paranid"
+              - option "🐲 Split"
+        - button "导入逻辑组网" [ref=e124] [cursor=pointer]:
+          - img [ref=e125]
+      - generic [ref=e127]:
+        - generic [ref=e129]:
+          - generic [ref=e130]:
+            - generic [ref=e131] [cursor=pointer]: 建造规划 1
+            - button "建造规划 1" [ref=e133] [cursor=pointer]:
+              - generic [ref=e134]: 建造规划 1
+              - img [ref=e135]
+          - generic [ref=e137]:
+            - generic [ref=e140]:
+              - searchbox "搜索商品或模块..." [ref=e141]
+              - combobox [ref=e142] [cursor=pointer]:
+                - option "商品" [selected]
+                - option "模块"
+                - option "舰队"
+            - generic [ref=e143]:
+              - generic [ref=e144]: 建造目标
+              - generic [ref=e146]:
+                - generic "能量电池" [ref=e150]
+                - generic [ref=e151]:
+                  - generic [ref=e152]:
+                    - spinbutton [ref=e153]: "10500"
+                    - generic:
+                      - button:
+                        - img
+                      - button:
+                        - img
+                  - button "×" [ref=e154] [cursor=pointer]
+            - generic [ref=e155]:
+              - generic [ref=e156]: 建材产线分配
+              - generic [ref=e157]:
+                - generic [ref=e158]:
+                  - generic [ref=e159]: E1-S1
+                  - generic [ref=e160]: "3"
+                - generic [ref=e161]:
+                  - generic [ref=e162]:
+                    - generic [ref=e166]: 电子黏土产线
+                    - generic [ref=e167]:
+                      - generic [ref=e168]: 建材
+                      - generic "自动生成，数量由计算阶段确定" [ref=e169]:
+                        - img [ref=e170]
+                  - generic [ref=e173]:
+                    - generic [ref=e177]: 船体部件产线
+                    - generic [ref=e178]:
+                      - generic [ref=e179]: 建材
+                      - generic "自动生成，数量由计算阶段确定" [ref=e180]:
+                        - img [ref=e181]
+                  - generic [ref=e184]:
+                    - generic [ref=e188]: 量子管
+                    - generic [ref=e189]:
+                      - generic [ref=e190]: 材料
+                      - generic "自动生成，数量由计算阶段确定" [ref=e191]:
+                        - img [ref=e192]
+                  - generic [ref=e195]:
+                    - generic [ref=e199]: 能量电池产线
+                    - generic [ref=e200]:
+                      - generic [ref=e201]: 目标
+                      - generic "自动生成，数量由计算阶段确定" [ref=e202]:
+                        - img [ref=e203]
+            - generic [ref=e206]:
+              - generic [ref=e207]: 生产产线
+              - generic [ref=e208]:
+                - generic [ref=e209]:
+                  - generic [ref=e210]: lf-1-g2
+                  - generic [ref=e211]: "1"
+                - generic [ref=e213]:
+                  - generic [ref=e217]: 量子管产线
+                  - generic [ref=e218]:
+                    - generic [ref=e219]: 材料
+                    - generic "自动生成，数量由计算阶段确定" [ref=e220]:
+                      - img [ref=e221]
+            - generic [ref=e224]:
+              - generic [ref=e225] [cursor=pointer]:
+                - checkbox "建材产线" [checked] [active] [ref=e226]
+                - generic [ref=e227]: 建材产线
+              - button "Logic Flow 1" [ref=e230] [cursor=pointer]:
+                - generic [ref=e231]: Logic Flow 1
+                - img [ref=e232]
+            - button "计算建造方案" [ref=e234] [cursor=pointer]
+        - generic [ref=e236]:
+          - generic [ref=e238]: 建造方案
+          - generic [ref=e240]: 配置建造目标并计算建造方案
+        - generic [ref=e242]:
+          - generic [ref=e243]:
+            - heading "资源视图" [level=3] [ref=e244]
+            - generic [ref=e246]:
+              - button "数量视图" [ref=e247] [cursor=pointer]
+              - button "经济视图" [ref=e248] [cursor=pointer]
+          - generic [ref=e250]:
+            - generic [ref=e251]:
+              - heading "产品" [level=4] [ref=e255]
+              - generic [ref=e259] [cursor=pointer]:
+                - generic [ref=e260]:
+                  - img [ref=e262]
+                  - generic [ref=e264]: 食品配给
+                - generic [ref=e266]: +34,500.0
+              - generic [ref=e270] [cursor=pointer]:
+                - generic [ref=e271]:
+                  - img [ref=e273]
+                  - generic [ref=e275]: 电子黏土
+                - generic [ref=e277]: +2,592.0
+              - generic [ref=e281] [cursor=pointer]:
+                - generic [ref=e282]:
+                  - img [ref=e284]
+                  - generic [ref=e286]: 医疗物资
+                - generic [ref=e288]: +22,464.0
+              - generic [ref=e292] [cursor=pointer]:
+                - generic [ref=e293]:
+                  - img [ref=e295]
+                  - generic [ref=e297]: 船体部件
+                - generic [ref=e299]: +14,112.0
+            - generic [ref=e300]:
+              - heading "运营" [level=4] [ref=e304]
+              - generic [ref=e308] [cursor=pointer]:
+                - generic [ref=e309]:
+                  - img [ref=e311]
+                  - generic [ref=e313]: 量子管
+                - generic [ref=e315]: "-520.0"
+```

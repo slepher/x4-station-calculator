@@ -1,0 +1,822 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e4]:
+  - generic [ref=e5]:
+    - generic [ref=e6]:
+      - button "新建" [ref=e7] [cursor=pointer]:
+        - img [ref=e8]
+        - generic [ref=e11]: 新建
+      - button "保存" [ref=e12] [cursor=pointer]:
+        - img [ref=e13]
+        - generic [ref=e17]: 保存
+      - button "另存为" [ref=e18] [cursor=pointer]:
+        - img [ref=e19]
+        - generic [ref=e21]: 另存为
+      - button "加载" [ref=e22] [cursor=pointer]:
+        - img [ref=e23]
+        - generic [ref=e25]: 加载
+    - generic [ref=e27]:
+      - button "蓝图产能" [ref=e28] [cursor=pointer]: 蓝图产能
+      - button "实况产能" [ref=e30] [cursor=pointer]: 实况产能
+      - button "星区地图" [ref=e32] [cursor=pointer]: 星区地图
+      - button "逻辑组网" [active] [ref=e34] [cursor=pointer]: 逻辑组网
+      - button "船只建造" [ref=e36] [cursor=pointer]: 船只建造
+    - generic [ref=e38]:
+      - button "导入" [ref=e39] [cursor=pointer]:
+        - img [ref=e40]
+        - generic [ref=e43]: 导入
+      - button "导出" [ref=e44] [cursor=pointer]:
+        - img [ref=e45]
+        - generic [ref=e48]: 导出
+      - button "8.0" [ref=e49] [cursor=pointer]:
+        - img [ref=e50]
+        - generic [ref=e59]: "8.0"
+      - generic [ref=e60]:
+        - img [ref=e61]
+        - combobox [ref=e63] [cursor=pointer]:
+          - option "English"
+          - option "简体中文" [selected]
+          - option "繁體中文"
+          - option "Deutsch"
+          - option "Français"
+          - option "Italiano"
+          - option "Español"
+          - option "Русский"
+          - option "日本語"
+          - option "한국어"
+          - option "Português (Brasil)"
+          - option "Polski"
+      - button [ref=e64] [cursor=pointer]:
+        - img [ref=e65]
+  - generic [ref=e70]:
+    - generic [ref=e71]:
+      - generic [ref=e72]:
+        - generic [ref=e75] [cursor=pointer]:
+          - heading "Logic Flow 1" [level=3] [ref=e76]
+          - img [ref=e77]
+        - button "🗑️ 全部清空" [ref=e79] [cursor=pointer]:
+          - generic [ref=e80]: 🗑️
+          - generic [ref=e81]: 全部清空
+      - generic [ref=e82]:
+        - generic [ref=e83]:
+          - generic [ref=e84]:
+            - button "工业链" [ref=e85] [cursor=pointer]: 工业链
+            - button "生活/农业" [ref=e87] [cursor=pointer]: 生活/农业
+          - generic [ref=e90] [cursor=pointer]:
+            - checkbox "通用" [checked] [ref=e91]
+            - generic [ref=e93]: 通用
+          - generic [ref=e94]:
+            - button "通用" [ref=e96] [cursor=pointer]
+            - button "Terran" [ref=e97] [cursor=pointer]
+            - button "Teladi" [ref=e98] [cursor=pointer]
+            - button "回收" [ref=e99] [cursor=pointer]
+        - generic [ref=e101]:
+          - textbox "搜索模块 ID 或名称..." [ref=e102]
+          - generic [ref=e103]:
+            - generic:
+              - img
+      - generic [ref=e104]:
+        - generic [ref=e105]:
+          - generic [ref=e106]:
+            - generic [ref=e107]: Tier 0
+            - generic [ref=e108]: "6"
+          - generic [ref=e110]:
+            - generic [ref=e111]:
+              - generic:
+                - generic [ref=e115]: 📦
+                - generic [ref=e117]: 氦
+            - generic [ref=e118]:
+              - generic:
+                - generic [ref=e122]: 📦
+                - generic [ref=e124]: 氢
+            - generic [ref=e125]:
+              - generic:
+                - generic [ref=e129]: 📦
+                - generic [ref=e131]: 甲烷
+            - generic [ref=e132]:
+              - generic:
+                - generic [ref=e136]: 📦
+                - generic [ref=e138]: 金属矿石
+            - generic [ref=e139]:
+              - generic:
+                - generic [ref=e143]: 📦
+                - generic [ref=e145]: 硅
+            - generic [ref=e146]:
+              - generic:
+                - generic [ref=e150]: 📦
+                - generic [ref=e152]: 能量电池
+        - generic [ref=e155]:
+          - generic [ref=e156]:
+            - generic [ref=e157]: Tier 1
+            - generic [ref=e158]: "5"
+          - generic [ref=e160]:
+            - generic [ref=e161]:
+              - button "＋" [ref=e163] [cursor=pointer]
+              - generic:
+                - generic [ref=e166]: 📦
+                - generic [ref=e167]:
+                  - generic [ref=e168]: 反物质单元
+                  - generic [ref=e169]:
+                    - generic [ref=e172]: 氢
+                    - generic [ref=e173]:
+                      - generic [ref=e174]: 93%
+                      - img [ref=e175]
+            - generic [ref=e178]:
+              - button "＋" [ref=e180] [cursor=pointer]
+              - generic:
+                - generic [ref=e183]: 📦
+                - generic [ref=e184]:
+                  - generic [ref=e185]: 石墨烯
+                  - generic [ref=e186]:
+                    - generic [ref=e189]: 烷
+                    - generic [ref=e190]:
+                      - generic [ref=e191]: 100%
+                      - img [ref=e192]
+            - generic [ref=e195]:
+              - button "＋" [ref=e197] [cursor=pointer]
+              - generic:
+                - generic [ref=e200]: 📦
+                - generic [ref=e201]:
+                  - generic [ref=e202]: 精炼金属
+                  - generic [ref=e203]:
+                    - generic [ref=e206]: 矿
+                    - generic [ref=e207]:
+                      - generic [ref=e208]: 51%
+                      - img [ref=e209]
+            - generic [ref=e212]:
+              - button "＋" [ref=e214] [cursor=pointer]
+              - generic:
+                - generic [ref=e217]: 📦
+                - generic [ref=e218]:
+                  - generic [ref=e219]: 硅晶片
+                  - generic [ref=e220]:
+                    - generic [ref=e223]: 硅
+                    - generic [ref=e224]:
+                      - generic [ref=e225]: 80%
+                      - img [ref=e226]
+            - generic [ref=e229]:
+              - button "＋" [ref=e231] [cursor=pointer]
+              - generic:
+                - generic [ref=e234]: 📦
+                - generic [ref=e235]:
+                  - generic [ref=e236]: 超流体冷却剂
+                  - generic [ref=e237]:
+                    - generic [ref=e240]: 氦
+                    - generic [ref=e241]:
+                      - generic [ref=e242]: 79%
+                      - img [ref=e243]
+        - generic [ref=e246]:
+          - generic [ref=e247]:
+            - generic [ref=e248]: Tier 2
+            - generic [ref=e249]: "8"
+          - generic [ref=e251]:
+            - generic [ref=e252]:
+              - button "＋" [ref=e254] [cursor=pointer]
+              - generic:
+                - generic [ref=e257]: 📦
+                - generic [ref=e258]:
+                  - generic [ref=e259]: 船体部件
+                  - generic [ref=e260]:
+                    - generic [ref=e261]:
+                      - generic [ref=e263]: 烷
+                      - generic [ref=e265]: 矿
+                    - generic [ref=e266]:
+                      - generic [ref=e267]: 75%
+                      - img [ref=e268]
+            - generic [ref=e271]:
+              - button "＋" [ref=e273] [cursor=pointer]
+              - generic:
+                - generic [ref=e276]: 📦
+                - generic [ref=e277]:
+                  - generic [ref=e278]: 微芯片
+                  - generic [ref=e279]:
+                    - generic [ref=e282]: 硅
+                    - generic [ref=e283]:
+                      - generic [ref=e284]: 44%
+                      - img [ref=e285]
+            - generic [ref=e288]:
+              - button "＋" [ref=e290] [cursor=pointer]
+              - generic:
+                - generic [ref=e293]: 📦
+                - generic [ref=e294]:
+                  - generic [ref=e295]: 量子管
+                  - generic [ref=e296]:
+                    - generic [ref=e297]:
+                      - generic [ref=e299]: 氦
+                      - generic [ref=e301]: 烷
+                    - generic [ref=e302]:
+                      - generic [ref=e303]: 74%
+                      - img [ref=e304]
+            - generic [ref=e307]:
+              - button "＋" [ref=e309] [cursor=pointer]
+              - generic:
+                - generic [ref=e312]: 📦
+                - generic [ref=e313]:
+                  - generic [ref=e314]: 先进复合材料
+                  - generic [ref=e315]:
+                    - generic [ref=e316]:
+                      - generic [ref=e318]: 烷
+                      - generic [ref=e320]: 矿
+                    - generic [ref=e321]:
+                      - generic [ref=e322]: 64%
+                      - img [ref=e323]
+            - generic [ref=e326]:
+              - button "＋" [ref=e328] [cursor=pointer]
+              - generic:
+                - generic [ref=e331]: 📦
+                - generic [ref=e332]:
+                  - generic [ref=e333]: 引擎部件
+                  - generic [ref=e334]:
+                    - generic [ref=e335]:
+                      - generic [ref=e337]: 氢
+                      - generic [ref=e339]: 矿
+                    - generic [ref=e340]:
+                      - generic [ref=e341]: 112%
+                      - img [ref=e342]
+            - generic [ref=e345]:
+              - button "＋" [ref=e347] [cursor=pointer]
+              - generic:
+                - generic [ref=e350]: 📦
+                - generic [ref=e351]:
+                  - generic [ref=e352]: 等离子导体
+                  - generic [ref=e353]:
+                    - generic [ref=e354]:
+                      - generic [ref=e356]: 氦
+                      - generic [ref=e358]: 烷
+                    - generic [ref=e359]:
+                      - generic [ref=e360]: 34%
+                      - img [ref=e361]
+            - generic [ref=e364]:
+              - button "＋" [ref=e366] [cursor=pointer]
+              - generic:
+                - generic [ref=e369]: 📦
+                - generic [ref=e370]:
+                  - generic [ref=e371]: 扫描阵列
+                  - generic [ref=e372]:
+                    - generic [ref=e373]:
+                      - generic [ref=e375]: 矿
+                      - generic [ref=e377]: 硅
+                    - generic [ref=e378]:
+                      - generic [ref=e379]: 55%
+                      - img [ref=e380]
+            - generic [ref=e383]:
+              - button "＋" [ref=e385] [cursor=pointer]
+              - generic:
+                - generic [ref=e388]: 📦
+                - generic [ref=e389]:
+                  - generic [ref=e390]: 智能芯片
+                  - generic [ref=e391]:
+                    - generic [ref=e394]: 硅
+                    - generic [ref=e395]:
+                      - generic [ref=e396]: 79%
+                      - img [ref=e397]
+        - generic [ref=e400]:
+          - generic [ref=e401]:
+            - generic [ref=e402]: Tier 3
+            - generic [ref=e403]: "9"
+          - generic [ref=e405]:
+            - generic [ref=e406]:
+              - button "＋" [ref=e408] [cursor=pointer]
+              - generic:
+                - generic [ref=e411]: 📦
+                - generic [ref=e412]:
+                  - generic [ref=e413]: 电子黏土
+                  - generic [ref=e414]:
+                    - generic [ref=e415]:
+                      - generic [ref=e417]: 氦
+                      - generic [ref=e419]: 氢
+                      - generic [ref=e421]: 烷
+                      - generic [ref=e423]: 硅
+                    - generic [ref=e424]:
+                      - generic [ref=e425]: 34%
+                      - img [ref=e426]
+            - generic [ref=e429]:
+              - button "＋" [ref=e431] [cursor=pointer]
+              - generic:
+                - generic [ref=e434]: 📦
+                - generic [ref=e435]:
+                  - generic [ref=e436]: 先进电子设备
+                  - generic [ref=e437]:
+                    - generic [ref=e438]:
+                      - generic [ref=e440]: 氦
+                      - generic [ref=e442]: 烷
+                      - generic [ref=e444]: 硅
+                    - generic [ref=e445]:
+                      - generic [ref=e446]: 115%
+                      - img [ref=e447]
+            - generic [ref=e450]:
+              - button "＋" [ref=e452] [cursor=pointer]
+              - generic:
+                - generic [ref=e455]: 📦
+                - generic [ref=e456]:
+                  - generic [ref=e457]: 反物质转换器
+                  - generic [ref=e458]:
+                    - generic [ref=e459]:
+                      - generic [ref=e461]: 烷
+                      - generic [ref=e463]: 矿
+                      - generic [ref=e465]: 硅
+                    - generic [ref=e466]:
+                      - generic [ref=e467]: 102%
+                      - img [ref=e468]
+            - generic [ref=e471]:
+              - button "＋" [ref=e473] [cursor=pointer]
+              - generic:
+                - generic [ref=e476]: 📦
+                - generic [ref=e477]:
+                  - generic [ref=e478]: 无人机组件
+                  - generic [ref=e479]:
+                    - generic [ref=e480]:
+                      - generic [ref=e482]: 氢
+                      - generic [ref=e484]: 烷
+                      - generic [ref=e486]: 矿
+                      - generic [ref=e488]: 硅
+                    - generic [ref=e489]:
+                      - generic [ref=e490]: 126%
+                      - img [ref=e491]
+            - generic [ref=e494]:
+              - button "＋" [ref=e496] [cursor=pointer]
+              - generic:
+                - generic [ref=e499]: 📦
+                - generic [ref=e500]:
+                  - generic [ref=e501]: 励磁线圈
+                  - generic [ref=e502]:
+                    - generic [ref=e503]:
+                      - generic [ref=e505]: 氦
+                      - generic [ref=e507]: 烷
+                    - generic [ref=e508]:
+                      - generic [ref=e509]: 118%
+                      - img [ref=e510]
+            - generic [ref=e513]:
+              - button "＋" [ref=e515] [cursor=pointer]
+              - generic:
+                - generic [ref=e518]: 📦
+                - generic [ref=e519]:
+                  - generic [ref=e520]: 导弹部件
+                  - generic [ref=e521]:
+                    - generic [ref=e522]:
+                      - generic [ref=e524]: 烷
+                      - generic [ref=e526]: 矿
+                    - generic [ref=e527]:
+                      - generic [ref=e528]: 639%
+                      - img [ref=e529]
+            - generic [ref=e532]:
+              - button "＋" [ref=e534] [cursor=pointer]
+              - generic:
+                - generic [ref=e537]: 📦
+                - generic [ref=e538]:
+                  - generic [ref=e539]: 护盾部件
+                  - generic [ref=e540]:
+                    - generic [ref=e541]:
+                      - generic [ref=e543]: 氦
+                      - generic [ref=e545]: 烷
+                    - generic [ref=e546]:
+                      - generic [ref=e547]: 179%
+                      - img [ref=e548]
+            - generic [ref=e551]:
+              - button "＋" [ref=e553] [cursor=pointer]
+              - generic:
+                - generic [ref=e556]: 📦
+                - generic [ref=e557]:
+                  - generic [ref=e558]: 炮塔部件
+                  - generic [ref=e559]:
+                    - generic [ref=e560]:
+                      - generic [ref=e562]: 氦
+                      - generic [ref=e564]: 烷
+                      - generic [ref=e566]: 矿
+                      - generic [ref=e568]: 硅
+                    - generic [ref=e569]:
+                      - generic [ref=e570]: 270%
+                      - img [ref=e571]
+            - generic [ref=e574]:
+              - button "＋" [ref=e576] [cursor=pointer]
+              - generic:
+                - generic [ref=e579]: 📦
+                - generic [ref=e580]:
+                  - generic [ref=e581]: 武器部件
+                  - generic [ref=e582]:
+                    - generic [ref=e583]:
+                      - generic [ref=e585]: 氦
+                      - generic [ref=e587]: 烷
+                      - generic [ref=e589]: 矿
+                    - generic [ref=e590]:
+                      - generic [ref=e591]: 283%
+                      - img [ref=e592]
+    - generic [ref=e595]:
+      - generic [ref=e597]: 建筑产线
+      - generic [ref=e599]:
+        - generic [ref=e600]:
+          - generic [ref=e602]:
+            - button "归档产线" [ref=e603] [cursor=pointer]:
+              - img [ref=e604]
+            - generic "E1-S1" [ref=e606]
+            - generic [ref=e607]:
+              - generic [ref=e608]:
+                - generic [ref=e609]: 产线建材
+                - generic [ref=e610]: 产线产出
+              - generic [ref=e611]:
+                - generic [ref=e612]:
+                  - button "+" [ref=e613] [cursor=pointer]
+                  - generic [ref=e615]: 电子黏土
+                - generic [ref=e616]:
+                  - generic [ref=e618]: 电子黏土
+                  - button "+" [ref=e619] [cursor=pointer]
+              - generic [ref=e620]:
+                - generic [ref=e621]:
+                  - button "+" [ref=e622] [cursor=pointer]
+                  - generic [ref=e623]:
+                    - generic [ref=e624]: 船体部件
+                    - button "×" [ref=e625] [cursor=pointer]
+                - generic [ref=e626]:
+                  - generic [ref=e628]: 船体部件
+                  - button "+" [ref=e629] [cursor=pointer]
+          - generic [ref=e630]:
+            - generic [ref=e631]:
+              - generic [ref=e632]: 建材产出区
+              - generic [ref=e633]: 产出建材
+              - generic [ref=e634]:
+                - generic [ref=e635]:
+                  - button "+" [ref=e636] [cursor=pointer]
+                  - generic [ref=e638]: 电子黏土
+                - generic [ref=e639]:
+                  - button "+" [ref=e640] [cursor=pointer]
+                  - generic [ref=e642]: 船体部件
+            - generic [ref=e643]:
+              - generic [ref=e644]: 材料产出区
+              - generic [ref=e645]: 产出材料
+              - generic [ref=e646]:
+                - generic [ref=e647]:
+                  - button "+" [ref=e648] [cursor=pointer]
+                  - generic [ref=e650]: 电子黏土
+                - generic [ref=e651]:
+                  - button "+" [ref=e652] [cursor=pointer]
+                  - generic [ref=e654]: 船体部件
+        - img
+    - generic [ref=e656]:
+      - generic [ref=e657]:
+        - generic [ref=e658]:
+          - generic [ref=e661] [cursor=pointer]:
+            - heading "E1-S1" [level=3] [ref=e662]
+            - img [ref=e663]
+          - generic [ref=e665]:
+            - generic [ref=e666]:
+              - generic [ref=e667]: 通用
+              - checkbox [checked] [ref=e669]
+            - button "上移" [disabled]:
+              - img
+            - button "下移" [ref=e671] [cursor=pointer]:
+              - img [ref=e672]
+            - button "🗑️" [ref=e674] [cursor=pointer]
+        - generic [ref=e675]:
+          - img
+          - generic [ref=e676]:
+            - generic [ref=e677]:
+              - generic [ref=e678]: Tier 0
+              - generic [ref=e679]: "5"
+            - generic [ref=e680]:
+              - generic [ref=e681]:
+                - generic "氢" [ref=e684]
+                - generic [ref=e686]:
+                  - generic [ref=e687]: 自动
+                  - generic [ref=e688]: 资源
+              - generic [ref=e689]:
+                - generic "硅" [ref=e692]
+                - generic [ref=e694]:
+                  - generic [ref=e695]: 自动
+                  - generic [ref=e696]: 资源
+              - generic [ref=e697]:
+                - generic "甲烷" [ref=e700]
+                - generic [ref=e702]:
+                  - generic [ref=e703]: 自动
+                  - generic [ref=e704]: 资源
+              - generic [ref=e705]:
+                - generic "金属矿石" [ref=e708]
+                - generic [ref=e710]:
+                  - generic [ref=e711]: 自动
+                  - generic [ref=e712]: 资源
+              - generic [ref=e713]:
+                - generic [ref=e714]:
+                  - generic "能量电池产线" [ref=e716]
+                  - generic [ref=e717]:
+                    - button "✂️" [ref=e718] [cursor=pointer]
+                    - button "➕" [ref=e719] [cursor=pointer]
+                - generic [ref=e721]:
+                  - generic [ref=e722]: 自动
+                  - generic [ref=e723]: default
+          - generic [ref=e724]:
+            - generic [ref=e725]:
+              - generic [ref=e726]: Tier 1
+              - generic [ref=e727]: "4"
+            - generic [ref=e728]:
+              - generic [ref=e729]:
+                - generic [ref=e730]:
+                  - generic "反物质单元产线" [ref=e732]
+                  - generic [ref=e733]:
+                    - button "✂️" [ref=e734] [cursor=pointer]
+                    - button "➕" [ref=e735] [cursor=pointer]
+                - generic [ref=e736]:
+                  - generic [ref=e737]:
+                    - generic [ref=e738]: 自动
+                    - generic [ref=e739]: default
+                  - generic [ref=e740]:
+                    - generic [ref=e741]: 93%
+                    - img [ref=e742]
+              - generic [ref=e745]:
+                - generic [ref=e746]:
+                  - generic "硅晶片产线" [ref=e748]
+                  - generic [ref=e749]:
+                    - button "✂️" [ref=e750] [cursor=pointer]
+                    - button "➕" [ref=e751] [cursor=pointer]
+                - generic [ref=e752]:
+                  - generic [ref=e753]:
+                    - generic [ref=e754]: 自动
+                    - generic [ref=e755]: default
+                  - generic [ref=e756]:
+                    - generic [ref=e757]: 80%
+                    - img [ref=e758]
+              - generic [ref=e761]:
+                - generic [ref=e762]:
+                  - generic "石墨烯生产线" [ref=e764]
+                  - generic [ref=e765]:
+                    - button "✂️" [ref=e766] [cursor=pointer]
+                    - button "➕" [ref=e767] [cursor=pointer]
+                - generic [ref=e768]:
+                  - generic [ref=e769]:
+                    - generic [ref=e770]: 自动
+                    - generic [ref=e771]: default
+                  - generic [ref=e772]:
+                    - generic [ref=e773]: 100%
+                    - img [ref=e774]
+              - generic [ref=e777]:
+                - generic [ref=e778]:
+                  - generic "精炼金属产线" [ref=e780]
+                  - generic [ref=e781]:
+                    - button "✂️" [ref=e782] [cursor=pointer]
+                    - button "➕" [ref=e783] [cursor=pointer]
+                - generic [ref=e784]:
+                  - generic [ref=e785]:
+                    - generic [ref=e786]: 自动
+                    - generic [ref=e787]: default
+                  - generic [ref=e788]:
+                    - generic [ref=e789]: 51%
+                    - img [ref=e790]
+          - generic [ref=e793]:
+            - generic [ref=e794]:
+              - generic [ref=e795]: Tier 2
+              - generic [ref=e796]: "3"
+            - generic [ref=e797]:
+              - generic [ref=e798]:
+                - generic [ref=e799]:
+                  - generic "船体部件产线" [ref=e801]
+                  - button "🗑️" [ref=e803] [cursor=pointer]
+                - generic [ref=e804]:
+                  - generic [ref=e806]: default
+                  - generic [ref=e807]:
+                    - generic [ref=e808]: 75%
+                    - img [ref=e809]
+              - generic [ref=e812]:
+                - generic [ref=e813]:
+                  - generic "微芯片产线" [ref=e815]
+                  - generic [ref=e816]:
+                    - button "✂️" [ref=e817] [cursor=pointer]
+                    - button "➕" [ref=e818] [cursor=pointer]
+                - generic [ref=e819]:
+                  - generic [ref=e820]:
+                    - generic [ref=e821]: 自动
+                    - generic [ref=e822]: default
+                  - generic [ref=e823]:
+                    - generic [ref=e824]: 44%
+                    - img [ref=e825]
+              - generic [ref=e828]:
+                - generic [ref=e829]:
+                  - generic "量子管" [ref=e831]
+                  - button "🔗" [ref=e833] [cursor=pointer]
+                - generic [ref=e836]: 运营
+                - generic:
+                  - generic: EXT
+          - generic [ref=e837]:
+            - generic [ref=e838]:
+              - generic [ref=e839]: Tier 3
+              - generic [ref=e840]: "1"
+            - generic [ref=e842]:
+              - generic [ref=e843]:
+                - generic "电子黏土产线" [ref=e845]
+                - button "🗑️" [ref=e847] [cursor=pointer]
+              - generic [ref=e848]:
+                - generic [ref=e850]: default
+                - generic [ref=e851]:
+                  - generic [ref=e852]: 34%
+                  - img [ref=e853]
+      - generic [ref=e856]:
+        - generic [ref=e857]:
+          - generic [ref=e860] [cursor=pointer]:
+            - heading "E1-S2" [level=3] [ref=e861]
+            - img [ref=e862]
+          - generic [ref=e864]:
+            - generic [ref=e865]:
+              - generic [ref=e866]: 通用
+              - checkbox [checked] [ref=e868]
+            - button "上移" [ref=e870] [cursor=pointer]:
+              - img [ref=e871]
+            - button "下移" [ref=e873] [cursor=pointer]:
+              - img [ref=e874]
+            - button "🗑️" [ref=e876] [cursor=pointer]
+        - generic [ref=e877]:
+          - img
+          - generic [ref=e878]:
+            - generic [ref=e879]:
+              - generic [ref=e880]: Tier 0
+              - generic [ref=e881]: "3"
+            - generic [ref=e882]:
+              - generic [ref=e883]:
+                - generic "甲烷" [ref=e886]
+                - generic [ref=e888]:
+                  - generic [ref=e889]: 自动
+                  - generic [ref=e890]: 资源
+              - generic [ref=e891]:
+                - generic "氦" [ref=e894]
+                - generic [ref=e896]:
+                  - generic [ref=e897]: 自动
+                  - generic [ref=e898]: 资源
+              - generic [ref=e899]:
+                - generic [ref=e900]:
+                  - generic "能量电池产线" [ref=e902]
+                  - generic [ref=e903]:
+                    - button "✂️" [ref=e904] [cursor=pointer]
+                    - button "➕" [ref=e905] [cursor=pointer]
+                - generic [ref=e907]:
+                  - generic [ref=e908]: 自动
+                  - generic [ref=e909]: default
+          - generic [ref=e910]:
+            - generic [ref=e911]:
+              - generic [ref=e912]: Tier 1
+              - generic [ref=e913]: "2"
+            - generic [ref=e914]:
+              - generic [ref=e915]:
+                - generic [ref=e916]:
+                  - generic "石墨烯生产线" [ref=e918]
+                  - generic [ref=e919]:
+                    - button "✂️" [ref=e920] [cursor=pointer]
+                    - button "➕" [ref=e921] [cursor=pointer]
+                - generic [ref=e922]:
+                  - generic [ref=e923]:
+                    - generic [ref=e924]: 自动
+                    - generic [ref=e925]: default
+                  - generic [ref=e926]:
+                    - generic [ref=e927]: 100%
+                    - img [ref=e928]
+              - generic [ref=e931]:
+                - generic [ref=e932]:
+                  - generic "超流体冷却剂产线" [ref=e934]
+                  - generic [ref=e935]:
+                    - button "✂️" [ref=e936] [cursor=pointer]
+                    - button "➕" [ref=e937] [cursor=pointer]
+                - generic [ref=e938]:
+                  - generic [ref=e939]:
+                    - generic [ref=e940]: 自动
+                    - generic [ref=e941]: default
+                  - generic [ref=e942]:
+                    - generic [ref=e943]: 79%
+                    - img [ref=e944]
+          - generic [ref=e947]:
+            - generic [ref=e948]:
+              - generic [ref=e949]: Tier 2
+              - generic [ref=e950]: "1"
+            - generic [ref=e952]:
+              - generic [ref=e953]:
+                - generic "量子管产线" [ref=e955]
+                - button "🗑️" [ref=e957] [cursor=pointer]
+              - generic [ref=e958]:
+                - generic [ref=e960]: default
+                - generic [ref=e961]:
+                  - generic [ref=e962]: 74%
+                  - img [ref=e963]
+          - generic [ref=e967]:
+            - generic [ref=e968]: Tier 3
+            - generic [ref=e969]: "0"
+      - generic [ref=e971]:
+        - generic [ref=e972]:
+          - generic [ref=e975] [cursor=pointer]:
+            - heading "E1-S3" [level=3] [ref=e976]
+            - img [ref=e977]
+          - generic [ref=e979]:
+            - generic [ref=e980]:
+              - generic [ref=e981]: 通用
+              - checkbox [checked] [ref=e983]
+            - button "上移" [ref=e985] [cursor=pointer]:
+              - img [ref=e986]
+            - button "下移" [disabled]:
+              - img
+            - button "🗑️" [ref=e988] [cursor=pointer]
+        - generic [ref=e989]:
+          - img
+          - generic [ref=e990]:
+            - generic [ref=e991]:
+              - generic [ref=e992]: Tier 0
+              - generic [ref=e993]: "2"
+            - generic [ref=e994]:
+              - generic [ref=e995]:
+                - generic "冰" [ref=e998]
+                - generic [ref=e1000]:
+                  - generic [ref=e1001]: 自动
+                  - generic [ref=e1002]: 资源
+              - generic [ref=e1003]:
+                - generic [ref=e1004]:
+                  - generic "能量电池产线" [ref=e1006]
+                  - generic [ref=e1007]:
+                    - button "✂️" [ref=e1008] [cursor=pointer]
+                    - button "➕" [ref=e1009] [cursor=pointer]
+                - generic [ref=e1011]:
+                  - generic [ref=e1012]: 自动
+                  - generic [ref=e1013]: default
+          - generic [ref=e1014]:
+            - generic [ref=e1015]:
+              - generic [ref=e1016]: Tier 1
+              - generic [ref=e1017]: "1"
+            - generic [ref=e1019]:
+              - generic [ref=e1020]:
+                - generic "水产线" [ref=e1022]
+                - generic [ref=e1023]:
+                  - button "✂️" [ref=e1024] [cursor=pointer]
+                  - button "➕" [ref=e1025] [cursor=pointer]
+              - generic [ref=e1026]:
+                - generic [ref=e1027]:
+                  - generic [ref=e1028]: 自动
+                  - generic [ref=e1029]: default
+                - generic [ref=e1030]:
+                  - generic [ref=e1031]: 45%
+                  - img [ref=e1032]
+          - generic [ref=e1035]:
+            - generic [ref=e1036]:
+              - generic [ref=e1037]: Tier 2
+              - generic [ref=e1038]: "3"
+            - generic [ref=e1039]:
+              - generic [ref=e1040]:
+                - generic [ref=e1041]:
+                  - generic "食用肉产线" [ref=e1043]
+                  - generic [ref=e1044]:
+                    - button "✂️" [ref=e1045] [cursor=pointer]
+                    - button "➕" [ref=e1046] [cursor=pointer]
+                - generic [ref=e1047]:
+                  - generic [ref=e1048]:
+                    - generic [ref=e1049]: 自动
+                    - generic [ref=e1050]: argon
+                  - generic [ref=e1051]:
+                    - generic [ref=e1052]: 290%
+                    - img [ref=e1053]
+              - generic [ref=e1056]:
+                - generic [ref=e1057]:
+                  - generic "香料产线" [ref=e1059]
+                  - generic [ref=e1060]:
+                    - button "✂️" [ref=e1061] [cursor=pointer]
+                    - button "➕" [ref=e1062] [cursor=pointer]
+                - generic [ref=e1063]:
+                  - generic [ref=e1064]:
+                    - generic [ref=e1065]: 自动
+                    - generic [ref=e1066]: default
+                  - generic [ref=e1067]:
+                    - generic [ref=e1068]: 313%
+                    - img [ref=e1069]
+              - generic [ref=e1072]:
+                - generic [ref=e1073]:
+                  - generic "小麦产线" [ref=e1075]
+                  - generic [ref=e1076]:
+                    - button "✂️" [ref=e1077] [cursor=pointer]
+                    - button "➕" [ref=e1078] [cursor=pointer]
+                - generic [ref=e1079]:
+                  - generic [ref=e1080]:
+                    - generic [ref=e1081]: 自动
+                    - generic [ref=e1082]: argon
+                  - generic [ref=e1083]:
+                    - generic [ref=e1084]: 258%
+                    - img [ref=e1085]
+          - generic [ref=e1088]:
+            - generic [ref=e1089]:
+              - generic [ref=e1090]: Tier 3
+              - generic [ref=e1091]: "2"
+            - generic [ref=e1092]:
+              - generic [ref=e1093]:
+                - generic [ref=e1094]:
+                  - generic "食品配给产线" [ref=e1096]
+                  - button "🗑️" [ref=e1098] [cursor=pointer]
+                - generic [ref=e1099]:
+                  - generic [ref=e1101]: argon
+                  - generic [ref=e1102]:
+                    - generic [ref=e1103]: 88%
+                    - img [ref=e1104]
+              - generic [ref=e1107]:
+                - generic [ref=e1108]:
+                  - generic "Argon 医疗物资产线" [ref=e1110]
+                  - button "🗑️" [ref=e1112] [cursor=pointer]
+                - generic [ref=e1113]:
+                  - generic [ref=e1115]: argon
+                  - generic [ref=e1116]:
+                    - generic [ref=e1117]: 69%
+                    - img [ref=e1118]
+      - generic [ref=e1121] [cursor=pointer]:
+        - generic:
+          - generic:
+            - generic: +
+          - generic:
+            - generic: 拖拽至此处创建新产线
+```
