@@ -13,7 +13,7 @@ test.describe('Button Tooltip Integration', () => {
         if (key !== 'vsn') localStorage.setItem(key, JSON.stringify(value))
       }
       localStorage.setItem('isTestEnv', 'true')
-      localStorage.setItem('x4_game_version', JSON.stringify({ version: '8.0', beta: false }))
+      localStorage.setItem('x4_game_version', JSON.stringify({ version: '9.0', beta: false }))
     }, dbFixture)
     await page.reload()
     const debug = await page.evaluate(() => ({

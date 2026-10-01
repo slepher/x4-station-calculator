@@ -41,7 +41,7 @@ const planItem = (page: Page, name: string) => planMenu(page).getByRole('button'
 const planWrapper = (page: Page, name: string) => planMenu(page).locator('.plan-menu-item-wrapper').filter({ hasText: name })
 
 async function storedPlans(page: Page): Promise<StoredPlans> {
-  const state = await page.evaluate(() => JSON.parse(localStorage.getItem('x4_build_plan_goals') || 'null'))
+  const state = await page.evaluate(() => JSON.parse(localStorage.getItem('x4_build_plan_goals_v9') || 'null'))
   expect(state).not.toBeNull()
   return state as StoredPlans
 }
@@ -72,8 +72,11 @@ async function addKatana(page: Page) {
 }
 
 async function openPlanMenu(page: Page) {
-  await page.getByTestId('build-plan-plan-menu-trigger').click()
-  await expect(planMenu(page)).toBeVisible()
+  const menuEl = planMenu(page)
+  if (!(await menuEl.isVisible())) {
+    await page.getByTestId('build-plan-plan-menu-trigger').click()
+  }
+  await expect(menuEl).toBeVisible()
 }
 
 async function createPlan(page: Page) {
@@ -115,8 +118,8 @@ test.describe('build-plan-goal', () => {
     const fixture = await import('../../fixtures/db.json', { with: { type: 'json' } })
     const data = JSON.parse(JSON.stringify(fixture.default))
     delete data.vsn
-    data.x4_game_version = { version: '8.0', beta: false }
-    data.x4_build_plan_goals = { version: 2, activeId: null, list: [] }
+    data.x4_game_version = { version: '9.0', beta: false }
+    data.x4_build_plan_goals_v9 = { version: 2, activeId: null, list: [] }
     await page.evaluate((initialState) => {
       Object.entries(initialState).forEach(([key, value]) => localStorage.setItem(key, JSON.stringify(value)))
       localStorage.setItem('isTestEnv', 'true')
@@ -338,7 +341,7 @@ test.describe('build-plan-goal', () => {
     const preview = page.getByTestId('preview-section')
     await expect(preview).toBeVisible()
     await expect(preview.locator('.allocation-group:not(.allocation-group--unmatched)')).toHaveCount(1)
-    const logicState = await page.evaluate(() => JSON.parse(localStorage.getItem('x4_logic_flow_plans') || 'null'))
+    const logicState = await page.evaluate(() => JSON.parse(localStorage.getItem('x4_logic_flow_plans_v9') || 'null'))
     expect(logicState.activeId).toBe(LOGIC_FLOW)
     expect((await storedPlans(page)).list[0].logicFlowPlanId).toBe(LOGIC_FLOW)
   })
@@ -350,7 +353,7 @@ test.describe('build-plan-goal', () => {
     await addGoal(page, ENERGY_CELLS)
     await selectFlow(page, 'unplanned')
     expect((await storedPlans(page)).list[1]).toMatchObject({ name: PLAN_2, logicFlowPlanId: null })
-    const logicState = await page.evaluate(() => JSON.parse(localStorage.getItem('x4_logic_flow_plans') || 'null'))
+    const logicState = await page.evaluate(() => JSON.parse(localStorage.getItem('x4_logic_flow_plans_v9') || 'null'))
     expect(logicState.activeId).toBe(LOGIC_FLOW)
     await switchPlan(page, PLAN_1)
     await expect(page.getByTestId('goal-item-hullparts')).toBeVisible()
@@ -363,7 +366,7 @@ test.describe('build-plan-goal', () => {
     await addGoal(page, ENERGY_CELLS)
     await selectFlow(page, 'unplanned')
     await expect(page.getByTestId('build-plan-flow-menu-label')).toHaveText('Unplanned')
-    await expect(page.getByTestId('preview-section')).toContainText('Unmatched')
+    await expect(page.locator('.allocation-group--unmatched .allocation-group-name')).toHaveText('Unplanned Line')
     const compute = page.getByRole('button', { name: 'Compute Plan', exact: true })
     await expect(compute).toBeEnabled()
     await compute.click()

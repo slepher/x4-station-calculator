@@ -13,7 +13,6 @@ const SAVE_PATH = path.join(FIXTURE_DIR, 'save.json')
 const ANALYSIS_TMP_DIR = path.join(ROOT, 'analysis/tmp')
 const ANALYSIS_DB_PATH = path.join(ANALYSIS_TMP_DIR, 'db.json')
 
-const DATA_DIR = path.join(ROOT, 'src/assets/x4_game_data/8.0-Diplomacy/data')
 const FIXTURE_TIMESTAMP = Number(process.env.DB_FIXTURE_TIMESTAMP ?? 1772453451902)
 
 type SeedEmpire = {
@@ -955,18 +954,65 @@ const buildSaveFixturePayload = (
   }
 }
 
+type StableVersionTarget = {
+  version: string
+  dataDir: string
+  storageKeys: Record<string, string>
+}
+
+const resolveStableTargets = async (): Promise<StableVersionTarget[]> => {
+  const versionsConfig = await loadJson<{
+    versions: Array<{ version: string; beta: boolean; folder_name: string; storage_keys: Record<string, string> }>
+  }>(path.join(ROOT, 'src/assets/versions.json'))
+  return versionsConfig.versions
+    .filter((entry) => !entry.beta)
+    .map((entry) => ({
+      version: entry.version,
+      dataDir: path.join(ROOT, 'src/assets/x4_game_data', entry.folder_name, 'data'),
+      storageKeys: entry.storage_keys
+    }))
+}
+
+const buildVersionPayload = async (
+  seeds: Array<{ file: string; seed: any }>,
+  target: StableVersionTarget,
+  saveData: any,
+  now: number
+): Promise<Record<string, any>> => {
+  const ships = await loadJson<X4Ship[]>(path.join(target.dataDir, 'ships.json'))
+  const maps = await loadJson<X4Map>(path.join(target.dataDir, 'maps.json'))
+  const payload: Record<string, any> = {}
+
+  for (const { seed } of seeds) {
+    if (isLogicFlowSeed(seed)) {
+      payload[target.storageKeys.logic_flow] = buildLogicFlowState(seed, now)
+      continue
+    }
+    if (isEmpireSeed(seed)) {
+      payload[target.storageKeys.empire] = buildEmpireState(seed, now)
+      continue
+    }
+    if (isShipBlueprintSeed(seed)) {
+      payload[target.storageKeys.ship_blueprints] = buildShipBlueprintState(seed, ships, now)
+    }
+    if (isBindingSeed(seed)) {
+      const saveBindingsKey = target.storageKeys.save_archives.replace('save_archives', 'save_bindings')
+      payload[saveBindingsKey] = buildBindingState(seed, now, saveData, maps)
+    }
+  }
+
+  return payload
+}
+
 const main = async () => {
   const args = process.argv.slice(2)
   const bump = args.includes('--bump')
 
   const seedFiles = (await readdir(SEED_DIR)).filter((f) => f.endsWith('.yaml'))
-
-  const wares = await loadJson<X4Ware[]>(path.join(DATA_DIR, 'wares.json'))
-  const modules = await loadJson<X4Module[]>(path.join(DATA_DIR, 'modules.json'))
-  const ships = await loadJson<X4Ship[]>(path.join(DATA_DIR, 'ships.json'))
-  const maps = await loadJson<X4Map>(path.join(DATA_DIR, 'maps.json'))
-  const wareMap = new Map(wares.map((ware) => [ware.id, ware]))
-  const moduleMap = new Map(modules.map((module) => [module.id, module]))
+  const seeds = await Promise.all(seedFiles.map(async (file) => ({
+    file,
+    seed: await loadYaml<any>(path.join(SEED_DIR, file))
+  })))
 
   let saveData: any = null
   try {
@@ -978,23 +1024,9 @@ const main = async () => {
   const dbPayload: Record<string, any> = {}
   const now = FIXTURE_TIMESTAMP
 
-  for (const seedFile of seedFiles) {
-    const seedPath = path.join(SEED_DIR, seedFile)
-    const seed = await loadYaml<any>(seedPath)
-    if (isLogicFlowSeed(seed)) {
-      dbPayload.x4_logic_flow_plans = buildLogicFlowState(seed, now)
-      continue
-    }
-    if (isEmpireSeed(seed)) {
-      dbPayload.x4_empire_data = buildEmpireState(seed, now)
-      continue
-    }
-    if (isShipBlueprintSeed(seed)) {
-      dbPayload.x4_ship_blueprints = buildShipBlueprintState(seed, ships, now)
-    }
-    if (isBindingSeed(seed)) {
-      dbPayload.x4_save_bindings = buildBindingState(seed, now, saveData, maps)
-    }
+  const targets = await resolveStableTargets()
+  for (const target of targets) {
+    Object.assign(dbPayload, await buildVersionPayload(seeds, target, saveData, now))
   }
   
   const currentVsn = await readCurrentVsn()

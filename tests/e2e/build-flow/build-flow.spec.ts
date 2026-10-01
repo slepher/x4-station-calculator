@@ -47,10 +47,11 @@ async function saveAndReload(page: Page) {
   await page.getByTestId('toolbar-save-btn').click()
   await expect(page.getByTestId('dialog-backdrop')).toHaveCount(0)
   await page.reload()
+  await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 10000 })
   await expect.poll(() => page.evaluate(() => ({
-    version: (window as any).gameDataStore.currentVersion,
-    activeId: (window as any).logicFlowStore.savedPlans.activeId,
-  }))).toEqual({ version: '8.0', activeId: 'logic-flow-1' })
+    version: (window as any).gameDataStore?.currentVersion,
+    activeId: (window as any).logicFlowStore?.savedPlans.activeId,
+  })), { timeout: 15000 }).toEqual({ version: '9.0', activeId: 'logic-flow-1' })
   await page.getByTestId('language-select').selectOption('zh-CN')
   await page.getByTestId('top-view-btn-flow').click()
   await expect(page.locator('.build-flow-zone')).toBeVisible()
@@ -100,7 +101,7 @@ test.describe('build-flow current behavior', () => {
       await bindFromSourceMenu(page)
       await saveAndReload(page)
       expect((await state(page)).assignments).toEqual([ASSIGNMENT])
-      const persisted = await page.evaluate(() => JSON.parse(localStorage.getItem('x4_logic_flow_plans') || 'null'))
+      const persisted = await page.evaluate(() => JSON.parse(localStorage.getItem('x4_logic_flow_plans_v9') || 'null'))
       expect(persisted.activeId).toBe('logic-flow-1')
       expect(persisted.list.find((plan: any) => plan.id === 'logic-flow-1').buildFlow).toEqual({
         assignments: [ASSIGNMENT],
@@ -124,8 +125,9 @@ test.describe('build-flow current behavior', () => {
       await page.getByTestId('toolbar-save-btn').click()
       await expect(page.getByTestId('dialog-backdrop')).toHaveCount(0)
       await page.reload()
-      await expect.poll(() => state(page).then(value => value.archived)).toEqual(['lf-1-g1'])
-      const persisted = await page.evaluate(() => JSON.parse(localStorage.getItem('x4_logic_flow_plans') || 'null'))
+      await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 10000 })
+      await expect.poll(() => state(page).then(value => value.archived), { timeout: 15000 }).toEqual(['lf-1-g1'])
+      const persisted = await page.evaluate(() => JSON.parse(localStorage.getItem('x4_logic_flow_plans_v9') || 'null'))
       expect(persisted.list.find((plan: any) => plan.id === 'logic-flow-1').buildFlow).toEqual({
         assignments: [],
         archivedGroupIds: ['lf-1-g1'],

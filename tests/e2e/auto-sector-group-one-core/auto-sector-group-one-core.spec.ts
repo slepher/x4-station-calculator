@@ -14,7 +14,7 @@ const LIQUID = 'storage_arg_l_liquid_01_macro'
 const PRODUCTION = 'prod_arg_foodrations_macro'
 
 async function ready(page: Page) {
-  await expect.poll(() => page.evaluate(() => (window as any).liveStore.autoGroupResult?.groups.length)).toBeGreaterThan(0)
+  await expect.poll(() => page.evaluate(() => (window as any).liveStore?.autoGroupResult?.groups.length ?? 0), { timeout: 15000 }).toBeGreaterThan(0)
 }
 async function openGroups(page: Page) {
   await ready(page)
@@ -59,7 +59,11 @@ async function chooseVirtualAndConfirm(page: Page) {
   const confirm = page.locator('.auto-sector-bar .confirm-btn')
   await expect(confirm).toBeEnabled()
   await confirm.click()
-  await expect(page.locator('.confirm-popup')).toBeHidden()
+  const popup = page.locator('.confirm-popup')
+  if (await popup.isVisible()) {
+    await popup.locator('.confirm-popup-button--primary').click()
+  }
+  await expect(popup).toBeHidden()
   await expect(confirm).toBeDisabled()
 }
 async function candidateFixture(page: Page, definitions: Array<{ code: string; containers: number; production?: number; construction?: boolean }>) {

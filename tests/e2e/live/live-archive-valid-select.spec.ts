@@ -119,7 +119,7 @@ test.describe('binding selects latest valid archive', () => {
     await expect.poll(() => readStationArchiveId(page)).toBe(`${GAME_GUID}_700000`)
 
     await page.reload()
-    await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 2000 })
+    await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 10000 })
     await page.getByTestId('top-view-btn-maps').click()
     await page.getByTestId('map-save-panel-tab').click()
     await expect(page.getByTestId('map-save-panel').locator('.save-item-active').filter({ hasText: 'save_008_later' })).toBeVisible()

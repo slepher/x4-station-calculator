@@ -8,6 +8,7 @@ test.describe('build-plan-compute', () => {
     const dbFixture = await import('../../fixtures/db.json', { with: { type: 'json' } })
     const dbData = JSON.parse(JSON.stringify(dbFixture.default))
     delete dbData.vsn
+    dbData.x4_game_version = { version: '9.0', beta: false }
     await page.evaluate((data) => {
       Object.entries(data).forEach(([key, value]) => localStorage.setItem(key, JSON.stringify(value)))
       localStorage.setItem('isTestEnv', 'true')

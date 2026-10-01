@@ -13,7 +13,7 @@ const sector = (page: Page, id: string) => page.locator(`.sector-hover-target[da
 const existing = (page: Page) => page.locator('.virtual-row').filter({ has: page.locator('.virtual-name').filter({ hasText: /^新建空间站$/ }) })
 
 async function openMap(page: Page) {
-  await expect.poll(() => page.evaluate(() => (window as any).liveStore.autoGroupResult?.groups.length)).toBeGreaterThan(0)
+  await expect.poll(() => page.evaluate(() => (window as any).liveStore?.autoGroupResult?.groups.length ?? 0), { timeout: 15000 }).toBeGreaterThan(0)
   await page.getByTestId('top-view-btn-live-production').click()
   await page.getByTestId('sidebar-auto-sector-group').click()
   await page.locator('.auto-sector-bar .map-btn').click()

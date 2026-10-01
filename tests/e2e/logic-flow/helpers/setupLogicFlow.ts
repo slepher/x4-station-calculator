@@ -14,11 +14,11 @@ export async function setupLogicFlow(
   delete data.vsn
 
   if (state === 'clean') {
-    data.x4_logic_flow_plans = { version: 3, activeId: null, list: [] }
+    data.x4_logic_flow_plans_v9 = { version: 3, activeId: null, list: [] }
   }
 
   await page.evaluate((fixture) => {
-    localStorage.setItem('x4_game_version', JSON.stringify({ version: '8.0', beta: false }))
+    localStorage.setItem('x4_game_version', JSON.stringify({ version: '9.0', beta: false }))
     Object.entries(fixture).forEach(([key, value]) => {
       localStorage.setItem(key, JSON.stringify(value))
     })
@@ -28,8 +28,8 @@ export async function setupLogicFlow(
   await page.reload()
   await expect.poll(() => page.evaluate(() => {
     const store = (window as any).gameDataStore
-    return { version: store.currentVersion, key: store.getStorageKey('logic_flow') }
-  })).toEqual({ version: '8.0', key: 'x4_logic_flow_plans' })
+    return { version: store?.currentVersion, key: store?.getStorageKey('logic_flow') }
+  })).toEqual({ version: '9.0', key: 'x4_logic_flow_plans_v9' })
   await page.getByTestId('language-select').selectOption('zh-CN')
   await page.getByTestId('top-view-btn-flow').click()
   await expectLogicFlowReady(page)

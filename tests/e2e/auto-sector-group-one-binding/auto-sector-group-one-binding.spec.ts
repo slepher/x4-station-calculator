@@ -12,7 +12,7 @@ async function waitForAppReady(page: Page) {
 }
 
 async function ensureAutoGroupResult(page: Page) {
-  await expect.poll(() => page.evaluate(() => (window as any).liveStore.autoGroupResult?.groups.length)).toBeGreaterThan(0)
+  await expect.poll(() => page.evaluate(() => (window as any).liveStore?.autoGroupResult?.groups.length ?? 0), { timeout: 15000 }).toBeGreaterThan(0)
   return true
 }
 
@@ -37,7 +37,12 @@ async function changeHubColor(page: Page, paletteIndex = -1) {
   return (await readHub(page)).color as string
 }
 
+async function waitForStores(page: Page) {
+  await expect.poll(() => page.evaluate(() => Boolean((window as any).gameDataStore && (window as any).liveStore))).toBe(true)
+}
+
 async function readSavedBinding(page: Page) {
+  await waitForStores(page)
   return page.evaluate((guid) => {
     const w = window as any
     const key = w.gameDataStore.getStorageKey('save_archives').replace('save_archives', 'save_bindings')
@@ -95,6 +100,7 @@ test.beforeEach(async ({ page }) => {
 
 
 async function readVirtualDrafts(page: Page) {
+  await waitForStores(page)
   return page.evaluate(() => (window as any).liveStore.virtualStationDrafts)
 }
 

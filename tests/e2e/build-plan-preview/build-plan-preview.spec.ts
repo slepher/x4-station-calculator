@@ -12,7 +12,7 @@ test.describe('build-plan-preview', () => {
     const dbData = JSON.parse(JSON.stringify(dbFixture.default))
     delete dbData.vsn
     await page.evaluate((data) => {
-      localStorage.setItem('x4_game_version', JSON.stringify({ version: '8.0', beta: false }))
+      localStorage.setItem('x4_game_version', JSON.stringify({ version: '9.0', beta: false }))
       Object.entries(data).forEach(([key, value]) => {
         localStorage.setItem(key, JSON.stringify(value))
       })

@@ -8,6 +8,7 @@ test.describe('Ship DLC', () => {
     const dbFixture = await import('../../fixtures/db.json', { with: { type: 'json' } })
     const dbData = JSON.parse(JSON.stringify(dbFixture.default))
     delete dbData.vsn
+    Object.keys(dbData).filter((key) => key.endsWith('_v9')).forEach((key) => delete dbData[key])
     await page.evaluate((data) => {
       Object.entries(data).forEach(([key, value]) => localStorage.setItem(key, JSON.stringify(value)))
       localStorage.setItem('isTestEnv', 'true')

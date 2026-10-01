@@ -12,7 +12,7 @@ async function loadFixture(page: Page, ship = false) {
   await page.goto('/')
   const fixture = await import('../../fixtures/db.json', { with: { type: 'json' } })
   const data = JSON.parse(JSON.stringify(fixture.default)); delete data.vsn
-  data.x4_game_version = { version: ship ? '9.0' : '8.0', beta: false }
+  data.x4_game_version = { version: '9.0', beta: false }
   if (ship) data.x4_ship_blueprints_v9 = { version: 5, activeShipId: null, activeBlueprintId: null, ships: [] }
   await page.evaluate(data => {
     Object.entries(data).forEach(([key, value]) => localStorage.setItem(key, JSON.stringify(value)))
@@ -153,12 +153,12 @@ async function matrix(page: Page, mode: Mode, action: string, dirty: boolean, fr
   }
   await expect(success(page)).toHaveCount(createsCopy || dirty ? 1 : 0)
   // Read the persisted payload independently of live store flags, then reload its exact active identity.
-  const key = mode === 'station' ? 'x4_empire_data' : mode === 'logicFlow' ? 'x4_logic_flow_plans' : 'x4_ship_blueprints_v9'
+  const key = mode === 'station' ? 'x4_empire_data_v9' : mode === 'logicFlow' ? 'x4_logic_flow_plans_v9' : 'x4_ship_blueprints_v9'
   const persisted = await page.evaluate(key => JSON.parse(localStorage.getItem(key)!), key)
   expect(mode === 'ship-build' ? persisted.activeBlueprintId : persisted.activeId).toBe(after.activeId)
   expect(mode === 'ship-build' ? persisted.ships.flatMap((ship: any) => ship.blueprints) : persisted.list).toEqual(after.list)
   if (mode === 'station') console.log('[M15.1 save identity]', await page.evaluate(() => ({
-    persistedId: JSON.parse(localStorage.getItem('x4_empire_data')!).activeId,
+    persistedId: JSON.parse(localStorage.getItem('x4_empire_data_v9')!).activeId,
     viewId: (window as any).activeViewStore.activeEmpireId,
     activeStationId: (window as any).blueprintStore.activeStationId,
     stationIds: (window as any).blueprintStore.activeEmpire.stations.map((s: any) => s.id)
@@ -204,7 +204,7 @@ async function finishImport(page: Page, save: boolean) {
     [{ id: 'module_gen_prod_quantumtubes_01', count: 1 }],
     [{ id: 'module_arg_prod_foodrations_01', count: 1 }, { id: 'module_arg_prod_medicalsupplies_01', count: 1 }]
   ])
-  const persisted = await page.evaluate(() => JSON.parse(localStorage.getItem('x4_empire_data')!))
+  const persisted = await page.evaluate(() => JSON.parse(localStorage.getItem('x4_empire_data_v9')!))
   expect(persisted.list).toHaveLength(before.list.length)
   const original = persisted.list.find((item: any) => item.id === before.activeId)
   if (save) expect(original.stations.map((s: any) => s.modules)).toEqual(before.content)

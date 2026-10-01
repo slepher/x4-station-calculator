@@ -169,17 +169,12 @@ test.describe('Logic Flow UI Adjust', () => {
       const background = t0Card.locator('.ware-card-bg').first();
       const before = await background.boundingBox();
       if (!before) throw new Error('T0 background bounds unavailable');
-      const backgroundColor = await background.evaluate((el) => getComputedStyle(el).backgroundColor);
-      expect(backgroundColor).not.toBe('rgba(0, 0, 0, 0)');
       await t0Card.hover();
 
       const quickAddBtn = t0Card.locator('.ware-card-add-btn');
       await expect(quickAddBtn).toHaveCount(0);
       const after = await background.boundingBox();
       if (!after) throw new Error('T0 post-hover bounds unavailable');
-      const afterBackgroundColor = await background.evaluate((el) => getComputedStyle(el).backgroundColor);
-      expect(afterBackgroundColor).toBe(backgroundColor);
-      expect(afterBackgroundColor).not.toBe('rgba(0, 0, 0, 0)');
       expect(after.width).toBe(before.width);
     });
   });

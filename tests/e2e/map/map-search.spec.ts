@@ -26,6 +26,7 @@ async function loadDbFixture(page: Page) {
 
   await page.reload()
   await page.getByTestId('language-select').selectOption('zh-CN')
+  await page.waitForFunction(() => document.cookie.includes('user_locale=zh-CN'))
   await page.goto('/?router=maps')
 }
 

@@ -90,7 +90,7 @@ const saveAndReload = async (page: any) => {
   }
   await expect.poll(() => page.evaluate(() => (window as any).blueprintStore.isDirty)).toBe(false)
   const saved = await readEmpireState(page)
-  expect(saved.storageKey).toBe('x4_empire_data')
+  expect(saved.storageKey).toBe('x4_empire_data_v9')
   expect(saved.activeEmpireId).toBe('empire-1')
   expect(saved.activeEmpireObjectId).toBe('empire-1')
 
@@ -101,7 +101,7 @@ const saveAndReload = async (page: any) => {
   await page.getByTestId('map-station-panel-tab').click()
   await expect.poll(() => page.evaluate(() => (window as any).blueprintStore.isDirty)).toBe(false)
   const reloaded = await readEmpireState(page)
-  expect(reloaded.storageKey).toBe('x4_empire_data')
+  expect(reloaded.storageKey).toBe('x4_empire_data_v9')
   expect(reloaded.activeEmpireId).toBe('empire-1')
   expect(reloaded.activeEmpireObjectId).toBe('empire-1')
   expect(reloaded.isDirty).toBe(false)
@@ -189,8 +189,8 @@ test.describe('x4-import-move e2e mapping', () => {
     await page.goto('/')
 
     const dbData = loadDbFixtureWithoutVsn()
-    dbData.x4_game_version = { version: '8.0', beta: false }
-    const empireData = dbData.x4_empire_data as { list: Array<{ id: string; stations?: unknown[]; sectors?: unknown[] }> }
+    dbData.x4_game_version = { version: '9.0', beta: false }
+    const empireData = dbData.x4_empire_data_v9 as { list: Array<{ id: string; stations?: unknown[]; sectors?: unknown[] }> }
     const activeEmpire = empireData.list.find((empire) => empire.id === 'empire-1')
     if (!activeEmpire) throw new Error('fixture missing empire-1')
     activeEmpire.stations = []

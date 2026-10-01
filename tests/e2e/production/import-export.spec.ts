@@ -14,7 +14,7 @@ async function loadDbFixture(page: Page, mode: 'seeded' | 'legacy-flow-v2' = 'se
   await page.goto('/')
   const fixture = await import('../../fixtures/db.json', { with: { type: 'json' } })
   const data = JSON.parse(JSON.stringify(fixture.default)); delete data.vsn
-  data.x4_game_version = { version: '8.0', beta: false }
+  data.x4_game_version = { version: '9.0', beta: false }
   if (mode === 'legacy-flow-v2') {
     // Actual V2 expanded fixture; the base db is already V3 and cannot reproduce migration by itself.
     const outputWares: Record<string, string> = {
@@ -22,7 +22,7 @@ async function loadDbFixture(page: Page, mode: 'seeded' | 'legacy-flow-v2' = 'se
       module_gen_prod_quantumtubes_01: 'quantumtubes', module_arg_prod_foodrations_01: 'foodrations',
       module_arg_prod_medicalsupplies_01: 'medicalsupplies'
     }
-    const plan = data.x4_logic_flow_plans.list.find((item: any) => item.id === 'logic-flow-1')
+    const plan = data.x4_logic_flow_plans_v9.list.find((item: any) => item.id === 'logic-flow-1')
     plan.groups.forEach((group: any) => {
       group.nodes = group.nodes.map((node: any, index: number) => ({
         id: `${group.id}-legacy-${index}`, source: 'manual', race: 'argon', lineage: 'default',
@@ -31,8 +31,8 @@ async function loadDbFixture(page: Page, mode: 'seeded' | 'legacy-flow-v2' = 'se
           : { wareId: node.isolated, isIsolated: true })
       }))
     })
-    data.x4_logic_flow_plans = { version: 2, activeId: plan.id, list: [plan] }
-    data.x4_empire_data = { version: 5, activeId: null, list: [] }
+    data.x4_logic_flow_plans_v9 = { version: 2, activeId: plan.id, list: [plan] }
+    data.x4_empire_data_v9 = { version: 5, activeId: null, list: [] }
   }
   await page.evaluate(data => {
     Object.entries(data).forEach(([key, value]) => localStorage.setItem(key, JSON.stringify(value)))
@@ -40,7 +40,7 @@ async function loadDbFixture(page: Page, mode: 'seeded' | 'legacy-flow-v2' = 'se
   }, data)
   await page.reload()
   await page.getByTestId('language-select').selectOption('zh-CN')
-  await expect.poll(() => page.evaluate(() => (window as any).gameDataStore.currentVersion)).toBe('8.0')
+  await expect.poll(() => page.evaluate(() => (window as any).gameDataStore.currentVersion)).toBe('9.0')
 }
 
 async function readStorage(page: Page, key: string) {
@@ -89,7 +89,7 @@ async function downloadExport(page: Page, fileName?: string) {
   return { payload, filename: download.suggestedFilename() }
 }
 function expectCurrentExport(payload: any) {
-  expect(payload).toMatchObject({ format: 'x4-import-export', version: 1, game_vsn: '8.0', beta: false })
+  expect(payload).toMatchObject({ format: 'x4-import-export', version: 1, game_vsn: '9.0', beta: false })
   expect(payload.data.x4_empire_data.version).toBe(5)
   expect(payload.data.x4_logic_flow_plans.version).toBe(3)
   expect(payload.data.x4_ship_blueprints.version).toBe(5)
@@ -100,14 +100,14 @@ async function expectOverwriteSelections(page: Page) {
   }
 }
 async function overwriteWithoutFlow(page: Page) {
-  const before = await readStorage(page, 'x4_logic_flow_plans')
+  const before = await readStorage(page, 'x4_logic_flow_plans_v9')
   await page.getByTestId('storage-import-module-x4_logic_flow_plans').getByRole('checkbox').uncheck()
   await applyStorageImport(page)
-  const empire = await readStorage(page, 'x4_empire_data')
+  const empire = await readStorage(page, 'x4_empire_data_v9')
   expect(empire.activeId).toBe('imp-empire-1')
   expect(empire.list).toHaveLength(1)
   expect(empire.list[0].stations[0].modules).toEqual([{ id: HULL, count: 1 }])
-  expect(await readStorage(page, 'x4_logic_flow_plans')).toEqual(before)
+  expect(await readStorage(page, 'x4_logic_flow_plans_v9')).toEqual(before)
 }
 async function incremental(page: Page) {
   await openStorageImport(page, incrementalImport, 'incremental.json')
@@ -136,7 +136,7 @@ function flowV1Payload() {
 async function importEmpireV2(page: Page) {
   await openStorageImport(page, empireV2Payload(), 'empire-v2.json')
   await applyStorageImport(page)
-  const state = await readStorage(page, 'x4_empire_data')
+  const state = await readStorage(page, 'x4_empire_data_v9')
   expect(state.version).toBe(5)
   expect(state.activeId).toBe('imp-empire-1')
   expect(state.list).toHaveLength(1)
@@ -147,7 +147,7 @@ async function importEmpireV2(page: Page) {
 async function importFlowV1(page: Page) {
   await openStorageImport(page, flowV1Payload(), 'flow-v1.json')
   await applyStorageImport(page)
-  const state = await readStorage(page, 'x4_logic_flow_plans')
+  const state = await readStorage(page, 'x4_logic_flow_plans_v9')
   expect(state.version).toBe(3)
   expect(state.activeId).toBe('imp-flow-1')
   expect(state.list).toHaveLength(1)
@@ -160,7 +160,7 @@ async function openOverviewImport(page: Page) {
   await expect(importModal(page)).toBeVisible()
 }
 async function activeStations(page: Page) {
-  await expect.poll(() => page.evaluate(() => (window as any).blueprintStore.activeEmpire !== null)).toBe(true)
+  await expect.poll(() => page.evaluate(() => (window as any).blueprintStore?.activeEmpire != null)).toBe(true)
   return page.evaluate(() => (window as any).blueprintStore.activeEmpire.stations)
 }
 async function saveNewEmpire(page: Page, name: string) {
@@ -176,7 +176,7 @@ test.describe('Import/Export', () => {
   test.beforeEach(async ({ page }) => { await loadDbFixture(page) })
   test('2.1 状态: 导出按钮触发下载', async ({ page }) => {
     const { payload, filename } = await downloadExport(page)
-    expect(filename).toMatch(/^x4-export-8\.0-.*\.json$/)
+    expect(filename).toMatch(/^x4-export-9\.0-.*\.json$/)
     expectCurrentExport(payload)
     expect(payload.data.x4_empire_data.list.map((item: any) => item.id)).toEqual(['empire-1', 'empire-2', 'empire-3'])
   })
@@ -199,9 +199,9 @@ test.describe('Import/Export', () => {
     expect(next.payload.data.x4_logic_flow_plans).toEqual(exported.payload.data.x4_logic_flow_plans)
   })
   test('4.1 BUG-1: 增量导入 activeId 误覆盖回归 [bug原始]', async ({ page }) => {
-    const before = await readStorage(page, 'x4_logic_flow_plans')
+    const before = await readStorage(page, 'x4_logic_flow_plans_v9')
     await incremental(page)
-    const after = await readStorage(page, 'x4_logic_flow_plans')
+    const after = await readStorage(page, 'x4_logic_flow_plans_v9')
     expect(after.activeId).toBe('logic-flow-1')
     expect(after.list).toHaveLength(before.list.length + 1)
     expect(after.list.find((plan: any) => plan.id === 'logic-flow-1')).toEqual(before.list.find((plan: any) => plan.id === 'logic-flow-1'))
@@ -212,7 +212,7 @@ test.describe('Import/Export', () => {
   })
   test('4.1 BUGFIX: 增量导入 activeId 误覆盖回归 [bugfix修复]', async ({ page }) => {
     await incremental(page)
-    const flow = await readStorage(page, 'x4_logic_flow_plans'), empire = await readStorage(page, 'x4_empire_data')
+    const flow = await readStorage(page, 'x4_logic_flow_plans_v9'), empire = await readStorage(page, 'x4_empire_data_v9')
     expect(flow.activeId).toBe('logic-flow-1'); expect(empire.activeId).toBe('empire-1')
     expect(flow.list).toHaveLength(4); expect(empire.list).toHaveLength(4)
     expect(new Set(flow.list.map((x: any) => x.id)).size).toBe(4)
@@ -243,12 +243,12 @@ test.describe('Module ID Migration', () => {
   test('3.1 Case: 导入 Empire 旧版本后自动迁移到最新', async ({ page }) => {
     const imported = await importEmpireV2(page)
     await page.reload()
-    expect(await readStorage(page, 'x4_empire_data')).toEqual(imported)
+    expect(await readStorage(page, 'x4_empire_data_v9')).toEqual(imported)
   })
   test('3.2 Case: 导入 Flow 旧版本后自动迁移到最新', async ({ page }) => {
     const imported = await importFlowV1(page)
     await page.reload()
-    expect(await readStorage(page, 'x4_logic_flow_plans')).toEqual(imported)
+    expect(await readStorage(page, 'x4_logic_flow_plans_v9')).toEqual(imported)
   })
   test('3.3 Case: 导出总是输出最新版本', async ({ page }) => {
     await importEmpireV2(page)
@@ -272,7 +272,7 @@ test.describe('Module ID Migration', () => {
     expect(added[0].name).toBe('ModuleId Station')
     for (const station of added) expect([...station.modules].sort((a: any, b: any) => a.id.localeCompare(b.id))).toEqual([{ id: ENERGY, count: 1 }, { id: REFINED, count: 1 }])
     await page.getByTestId('toolbar-save-btn').click()
-    await expect.poll(async () => (await readStorage(page, 'x4_empire_data')).list.find((e: any) => e.id === 'empire-1').stations.length).toBe(beforeIds.length + 2)
+    await expect.poll(async () => (await readStorage(page, 'x4_empire_data_v9')).list.find((e: any) => e.id === 'empire-1').stations.length).toBe(beforeIds.length + 2)
     await page.reload()
     const restored = (await activeStations(page)).filter((station: any) => !beforeIds.includes(station.id))
     expect(restored).toEqual(added)
@@ -291,7 +291,7 @@ const expectedFlowGroups = [
   [{ module: 'module_arg_prod_foodrations_01' }, { module: 'module_arg_prod_medicalsupplies_01' }]
 ]
 async function expectMigratedFlow(page: Page) {
-  const state = await readStorage(page, 'x4_logic_flow_plans')
+  const state = await readStorage(page, 'x4_logic_flow_plans_v9')
   expect(state.version).toBe(3); expect(state.activeId).toBe('logic-flow-1')
   expect(state.list).toHaveLength(1)
   expect(state.list[0].groups.map((group: any) => group.nodes)).toEqual(expectedFlowGroups)

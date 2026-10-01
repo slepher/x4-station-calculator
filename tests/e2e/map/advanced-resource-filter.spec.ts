@@ -72,6 +72,7 @@ test.beforeEach(async ({ page }) => {
   const dbFixture = await import('../../fixtures/db.json', { with: { type: 'json' } })
   const dbData = JSON.parse(JSON.stringify(dbFixture.default))
   delete dbData.vsn
+  dbData.x4_game_version = { version: '9.0', beta: false }
   await page.evaluate((data) => {
     Object.entries(data).forEach(([key, value]) => {
       localStorage.setItem(key, JSON.stringify(value))
@@ -80,6 +81,7 @@ test.beforeEach(async ({ page }) => {
   }, dbData)
   await page.reload()
   await page.getByTestId('language-select').selectOption('zh-CN')
+  await page.waitForFunction(() => document.cookie.includes('user_locale=zh-CN'))
   await page.goto('/?router=maps')
   // Wait for map workbench to be visible
   await expect(page.locator('.map-workbench')).toBeVisible()
@@ -463,9 +465,9 @@ test('3.13 Case: 简单模式资源过滤', async ({ page }) => {
   // 3.13.3 验证候选列表仅显示同时包含这两个资源的星区 #期望: [候选星区包含 ore 和 silicon]
   const candidates = page.locator('[data-testid^="map-resource-candidate-"]')
   const expectedIds = [
-    'cluster_721_sector001_macro', 'cluster_28_sector001_macro', 'cluster_100_sector001_macro',
-    'cluster_26_sector002_macro', 'cluster_608_sector001_macro', 'cluster_500_sector001_macro',
-    'cluster_500_sector003_macro', 'cluster_500_sector002_macro', 'cluster_602_sector001_macro'
+    'cluster_02_sector001_macro', 'cluster_47_sector001_macro', 'cluster_702_sector001_macro',
+    'cluster_703_sector001_macro', 'cluster_420_sector001_macro', 'cluster_36_sector001_macro',
+    'cluster_709_sector001_macro', 'cluster_15_sector002_macro', 'cluster_721_sector001_macro'
   ]
   const actualIds = await candidates.evaluateAll(nodes => nodes.map(node => node.getAttribute('data-testid')!.replace('map-resource-candidate-', '')))
   await expect(candidates).toHaveCount(9)

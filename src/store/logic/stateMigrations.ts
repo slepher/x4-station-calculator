@@ -292,7 +292,12 @@ function normalizeFlowShape(input: SavedFlowPlansState, warnings: string[]): Sav
     settings: {
       isDefaultLocked: Boolean(plan.settings?.isDefaultLocked ?? true)
     },
-    buildFlow: plan.buildFlow ? { assignments: plan.buildFlow.assignments || [] } : undefined,
+    buildFlow: plan.buildFlow
+      ? {
+        assignments: plan.buildFlow.assignments || [],
+        archivedGroupIds: plan.buildFlow.archivedGroupIds || []
+      }
+      : undefined,
     lastUpdated: Number(plan.lastUpdated) || Date.now()
   }))
 

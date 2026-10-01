@@ -1,7 +1,7 @@
 import { test } from '../../test-setup'
 import { expect, type Page } from '@playwright/test'
 import { loadLiveBindingFixture } from '../live/helpers/loadLiveBindingFixture'
-import maps from '../../../src/assets/x4_game_data/8.0-Diplomacy/data/maps.json' with { type: 'json' }
+import maps from '../../../src/assets/x4_game_data/9.0-Empire/data/maps.json' with { type: 'json' }
 
 const GUID = 'CB8837FE-98C1-42F8-9D6A-ED0ADC539111'
 const ARCHIVE_TIME = 667632.933

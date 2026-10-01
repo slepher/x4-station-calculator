@@ -80,7 +80,7 @@ function buildSaveArchivesState(saves: SaveData[]) {
 }
 
 async function waitForAppReady(page: Page): Promise<void> {
-  await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 2000 })
+  await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 10000 })
 }
 
 async function setLanguage(page: Page, lang: 'zh-CN' | 'en'): Promise<void> {
@@ -136,7 +136,7 @@ export async function loadLiveBindingFixture(
       ['x4_save_bindings', saveBindings]
     ] as const
     for (const [source, current] of fixtureKeys) {
-      data[current] = data[source]
+      if (!(current in data)) data[current] = data[source]
       if (source !== current) delete data[source]
     }
     data[keys.saveArchives] = archives

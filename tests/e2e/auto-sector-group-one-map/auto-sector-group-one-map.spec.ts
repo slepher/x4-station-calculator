@@ -8,7 +8,7 @@ const MERCURY = 'cluster_106_sector001_macro'
 const VIRTUAL = 'f36126e5-7798-ed14-3c03-938b961efa0b'
 
 async function ready(page: Page) {
-  await expect.poll(() => page.evaluate(() => (window as any).liveStore.autoGroupResult?.groups.length)).toBeGreaterThan(0)
+  await expect.poll(() => page.evaluate(() => (window as any).liveStore?.autoGroupResult?.groups.length ?? 0), { timeout: 15000 }).toBeGreaterThan(0)
 }
 async function openMap(page: Page) {
   await ready(page)
@@ -292,6 +292,7 @@ test('4.2/5.1 从蓝图真实拖放复制模块设置且不复制身份', async 
 })
 
 test('6.1/6.2/6.3/6.4/6.5 virtual trade overlay真实拖动与跨hub拒绝', async ({ page }) => {
+  test.slow()
   await openMap(page)
   await focusHub(page)
   const overlay = page.locator('[data-placement-key="binding:station:5173b252-78ca-ac45-9e40-5afae79c4bab"]')

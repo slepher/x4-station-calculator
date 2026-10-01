@@ -14,12 +14,12 @@ test.beforeEach(async ({ page }) => {
   await setupLogicFlow(page, 'seeded')
   // Fixture-only negative control: an empty saved plan must never enter the loader menu.
   await page.evaluate(() => {
-    const fixture = JSON.parse(localStorage.getItem('x4_logic_flow_plans')!)
+    const fixture = JSON.parse(localStorage.getItem('x4_logic_flow_plans_v9')!)
     fixture.list.push({ id: 'm7-empty-plan', name: 'M7 Empty Plan', groups: [], settings: { isDefaultLocked: true }, lastUpdated: 1772453451902 })
-    localStorage.setItem('x4_logic_flow_plans', JSON.stringify(fixture))
-    const empireFixture = JSON.parse(localStorage.getItem('x4_empire_data')!)
+    localStorage.setItem('x4_logic_flow_plans_v9', JSON.stringify(fixture))
+    const empireFixture = JSON.parse(localStorage.getItem('x4_empire_data_v9')!)
     empireFixture.list.push({ id: 'm7-empty-empire', name: 'M7 Empty Empire', stations: [] })
-    localStorage.setItem('x4_empire_data', JSON.stringify(empireFixture))
+    localStorage.setItem('x4_empire_data_v9', JSON.stringify(empireFixture))
   })
   await page.reload()
   await page.getByTestId('language-select').selectOption('zh-CN')

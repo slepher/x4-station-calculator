@@ -226,6 +226,9 @@ const expectImportEntryRightAligned = async (page: any, testId: string) => {
 
 const makeEmpireSavedBaseline = async (page: any) => {
   await ensureStationContext(page)
+  const hullStationTab = page.locator('[data-testid="sidebar-station"][data-station-id="empire-1-station-1"]')
+  await expect(hullStationTab).toBeVisible()
+  await hullStationTab.click()
   const hullRow = page.locator('.module-row').filter({ hasText: /船体部件|Hull Parts/i }).first()
   await expect(hullRow).toBeVisible()
   const countInput = hullRow.locator('input.x4-num-input')
@@ -243,6 +246,7 @@ const makeEmpireDirtyWithoutSave = async (page: any) => {
 }
 
 const clearPlannedModulesViaUi = async (page: any) => {
+  await expect(page.locator('.tier-section .module-row').first()).toBeVisible()
   const rows = page.locator('.tier-section').first().locator('.module-row')
   while (await rows.count() > 0) {
     await rows.first().locator('.remove-btn').click()
@@ -277,10 +281,10 @@ test.describe('import-logic-flow e2e (test implementation)', () => {
 
     const data = JSON.parse(JSON.stringify(dbFixture))
     delete data.vsn
-    data.x4_logic_flow_plans = injectedPlans
+    data.x4_logic_flow_plans_v9 = injectedPlans
 
     await page.evaluate((fixture) => {
-      localStorage.setItem('x4_game_version', JSON.stringify({ version: '8.0', beta: false }))
+      localStorage.setItem('x4_game_version', JSON.stringify({ version: '9.0', beta: false }))
       Object.entries(fixture).forEach(([key, value]) => {
         localStorage.setItem(key, JSON.stringify(value))
       })
@@ -292,13 +296,13 @@ test.describe('import-logic-flow e2e (test implementation)', () => {
     await expect.poll(() => page.evaluate(() => {
       const store = (window as any).gameDataStore
       return { version: store.currentVersion, key: store.getStorageKey('logic_flow') }
-    })).toEqual({ version: '8.0', key: 'x4_logic_flow_plans' })
+    })).toEqual({ version: '9.0', key: 'x4_logic_flow_plans_v9' })
     await page.getByTestId('language-select').selectOption('zh-CN')
   })
 
-  test('2.0 测试启动与数据预置：注入 x4_logic_flow_plans，并确认空间站页/帝国页导入入口可见', async ({ page }) => {
+  test('2.0 测试启动与数据预置：注入 x4_logic_flow_plans_v9，并确认空间站页/帝国页导入入口可见', async ({ page }) => {
     const plansCount = await page.evaluate(() => {
-      const raw = window.localStorage.getItem('x4_logic_flow_plans')
+      const raw = window.localStorage.getItem('x4_logic_flow_plans_v9')
       if (!raw) return 0
       const parsed = JSON.parse(raw)
       return Array.isArray(parsed?.list) ? parsed.list.length : 0
