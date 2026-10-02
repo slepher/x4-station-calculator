@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import X4Select from '@/components/common/X4Select.vue'
 import { nextTick, onBeforeUnmount, onMounted, ref, watch, provide, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAutoSectorGroupPresenter } from '@/components/empire/presenters/useAutoSectorGroupPresenter'
@@ -336,9 +337,9 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
                 <div class="generate-row">
                   <div class="param-field" :title="t('sector.bridge_search_jump')">
                     <span class="bar-label">{{ t('sector.connected') }}</span>
-                    <select class="bar-select bar-select--narrow" :value="bridgeSearchJumpRange" @change="handleUpdateBridgeSearchJumpRange(Number(($event.target as HTMLSelectElement).value))">
+                    <X4Select class="bar-select bar-select--narrow" :model-value="bridgeSearchJumpRange" @change="handleUpdateBridgeSearchJumpRange(Number(($event.target as HTMLSelectElement).value))">
                       <option v-for="j in bridgeJumpOptions" :key="j" :value="j" :disabled="j < prefJumpRange">{{ j }}{{ t('sector.jump_unit') }}</option>
-                    </select>
+                    </X4Select>
                   </div>
                   <div class="param-field" :title="t('sector.node_enabled_desc')">
                     <label class="bar-label-inline">
@@ -348,15 +349,15 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
                   </div>
                   <div class="param-field" :title="t('sector.group_coverage_jump')">
                     <span class="bar-label">{{ t('sector.group_coverage_jump_short') }}</span>
-                    <select class="bar-select bar-select--narrow" :value="prefJumpRange" :disabled="thresholdDisabled" @change="handleUpdatePrefJumpRange(Number(($event.target as HTMLSelectElement).value))">
+                    <X4Select class="bar-select bar-select--narrow" :model-value="prefJumpRange" :disabled="thresholdDisabled" @change="handleUpdatePrefJumpRange(Number(($event.target as HTMLSelectElement).value))">
                       <option v-for="j in jumpOptions" :key="j" :value="j">{{ j }}{{ t('sector.jump_unit') }}</option>
-                    </select>
+                    </X4Select>
                   </div>
                   <div class="param-field" :title="t('sector.default_threshold')">
                     <span class="bar-label">{{ t('sector.trade_station_short') }}</span>
-                    <select class="bar-select" :value="prefThreshold" :disabled="thresholdDisabled" @change="prefThreshold = Number(($event.target as HTMLSelectElement).value)">
+                    <X4Select class="bar-select" :model-value="prefThreshold" :disabled="thresholdDisabled" @change="prefThreshold = Number(($event.target as HTMLSelectElement).value)">
                       <option v-for="opt in thresholdOptions" :key="opt.value" :value="opt.value">{{ opt.label }}{{ t('sector.volume_unit_m3') }}</option>
-                    </select>
+                    </X4Select>
                   </div>
                 </div>
                 <div class="generate-row generate-row--actions">
@@ -472,9 +473,9 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
               <div class="generate-row">
                 <div class="param-field" :title="t('sector.bridge_search_jump')">
                   <span class="bar-label">{{ t('sector.connected') }}</span>
-                  <select class="bar-select bar-select--narrow" :value="bridgeSearchJumpRange" @change="handleUpdateBridgeSearchJumpRange(Number(($event.target as HTMLSelectElement).value))">
+                  <X4Select class="bar-select bar-select--narrow" :model-value="bridgeSearchJumpRange" @change="handleUpdateBridgeSearchJumpRange(Number(($event.target as HTMLSelectElement).value))">
                     <option v-for="j in bridgeJumpOptions" :key="j" :value="j" :disabled="j < prefJumpRange">{{ j }}</option>
-                  </select>
+                  </X4Select>
                 </div>
                 <div class="param-field" :title="t('sector.node_enabled_desc')">
                   <label class="bar-label-inline">
@@ -484,15 +485,15 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
                 </div>
                 <div class="param-field" :title="t('sector.group_coverage_jump')">
                   <span class="bar-label">{{ t('sector.group_coverage_jump_short') }}</span>
-                  <select class="bar-select bar-select--narrow" :value="prefJumpRange" :disabled="thresholdDisabled" @change="handleUpdatePrefJumpRange(Number(($event.target as HTMLSelectElement).value))">
+                  <X4Select class="bar-select bar-select--narrow" :model-value="prefJumpRange" :disabled="thresholdDisabled" @change="handleUpdatePrefJumpRange(Number(($event.target as HTMLSelectElement).value))">
                     <option v-for="j in jumpOptions" :key="j" :value="j">{{ j }}</option>
-                  </select>
+                  </X4Select>
                 </div>
                 <div class="param-field" :title="t('sector.default_threshold')">
                   <span class="bar-label">{{ t('sector.trade_station_short') }}</span>
-                  <select class="bar-select" :value="prefThreshold" :disabled="thresholdDisabled" @change="prefThreshold = Number(($event.target as HTMLSelectElement).value)">
+                  <X4Select class="bar-select" :model-value="prefThreshold" :disabled="thresholdDisabled" @change="prefThreshold = Number(($event.target as HTMLSelectElement).value)">
                     <option v-for="opt in thresholdOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-                  </select>
+                  </X4Select>
                 </div>
               </div>
               <div class="generate-row generate-row--actions">
@@ -762,10 +763,10 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
   @apply h-3.5 w-3.5 accent-sky-500 disabled:cursor-not-allowed disabled:opacity-40;
 }
 .bar-select {
-  @apply h-6 rounded border border-slate-600 bg-slate-900 px-1.5 text-xs text-slate-200 focus:border-sky-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-40;
+  @apply h-6 rounded border border-slate-600 bg-slate-900 text-xs text-slate-200 focus:border-sky-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-40;
 }
 .bar-select--narrow {
-  @apply w-12;
+  @apply w-16;
 }
 .retain-label {
   @apply text-xs text-slate-400;
@@ -793,10 +794,10 @@ watch(() => props.gameGuid, () => { initialAutoSwitchDone = false })
   @apply text-[10px];
 }
 .generate-card--map .bar-select {
-  @apply h-5 px-1 text-[11px];
+  @apply h-5 text-[11px];
 }
 .generate-card--map .bar-select--narrow {
-  @apply w-10;
+  @apply w-14;
 }
 .generate-card--map .bar-btn {
   @apply h-6 px-1.5 py-0 text-[11px];

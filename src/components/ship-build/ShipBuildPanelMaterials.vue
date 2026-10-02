@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import X4Select from '@/components/common/X4Select.vue'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useX4I18n } from '@/utils/UseX4I18n'
@@ -193,7 +194,7 @@ const hasData = computed(() => {
             :label="t('ship_build.material_price')"
             type="sell"
           />
-          <select
+          <X4Select
             id="ship-build-material-method-select"
             v-model="materialMethod"
             class="material-method-select"
@@ -206,7 +207,7 @@ const hasData = computed(() => {
             >
               {{ method }}
             </option>
-          </select>
+          </X4Select>
         </div>
       </div>
     </div>
@@ -227,7 +228,7 @@ const hasData = computed(() => {
 }
 
 .material-method-select {
-  @apply bg-emerald-950/30 border border-emerald-500/40 text-emerald-200 text-xs rounded px-2.5 py-1.5 focus:outline-none focus:border-emerald-300;
+  @apply bg-emerald-950/30 border border-emerald-500/40 text-emerald-200 text-xs rounded py-1.5 focus:outline-none focus:border-emerald-300;
 }
 
 .material-groups {

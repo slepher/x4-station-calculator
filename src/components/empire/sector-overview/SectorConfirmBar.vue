@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import X4Select from '@/components/common/X4Select.vue'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -80,9 +81,9 @@ function onTradeStationRetainChange(e: Event) {
       <div class="bar-left">
         <div class="param-field" :title="t('sector.bridge_search_jump')">
           <span class="bar-label">{{ t('sector.bridge_search_jump_short') }}</span>
-          <select class="bar-select bar-select--narrow" :value="bridgeSearchJumpRange" @change="emit('update:bridgeSearchJumpRange', Number(($event.target as HTMLSelectElement).value))">
+          <X4Select class="bar-select bar-select--narrow" :model-value="bridgeSearchJumpRange" @change="emit('update:bridgeSearchJumpRange', Number(($event.target as HTMLSelectElement).value))">
             <option v-for="j in bridgeJumpOptions" :key="j" :value="j" :disabled="j < prefJumpRange">{{ j }}{{ t('sector.jump_unit') }}</option>
-          </select>
+          </X4Select>
           <label class="bar-label-inline" :title="t('sector.bridge_retain')">
             <input type="checkbox" class="bar-checkbox" :checked="bridgeRetainEnabled" :indeterminate.prop="bridgeRetainIndeterminate" @change="onBridgeRetainChange" />
             <span class="bar-label">{{ t('sector.retain') }}</span>
@@ -155,9 +156,9 @@ function onTradeStationRetainChange(e: Event) {
       <div class="bar-left">
         <span class="param-field" :title="t('sector.default_threshold')">
           <span class="bar-label">{{ t('sector.trade_station_short') }}</span>
-          <select class="bar-select" :value="prefThreshold" :disabled="thresholdDisabled" @change="emit('update:prefThreshold', Number(($event.target as HTMLSelectElement).value))">
+          <X4Select class="bar-select" :model-value="prefThreshold" :disabled="thresholdDisabled" @change="emit('update:prefThreshold', Number(($event.target as HTMLSelectElement).value))">
             <option v-for="opt in thresholdOptions" :key="opt.value" :value="opt.value">{{ opt.label }}{{ t('sector.volume_unit_m3') }}</option>
-          </select>
+          </X4Select>
           <label class="bar-label-inline" :title="t('sector.trade_station_retain')">
             <input type="checkbox" class="bar-checkbox" :checked="tradeStationRetainEnabled" :indeterminate.prop="tradeStationRetainIndeterminate" @change="onTradeStationRetainChange" />
             <span class="bar-label">{{ t('sector.retain') }}</span>
@@ -165,9 +166,9 @@ function onTradeStationRetainChange(e: Event) {
         </span>
         <span class="param-field" :title="t('sector.group_coverage_jump')">
           <span class="bar-label">{{ t('sector.group_coverage_jump_short') }}</span>
-          <select class="bar-select bar-select--narrow" :value="prefJumpRange" :disabled="thresholdDisabled" @change="emit('update:prefJumpRange', Number(($event.target as HTMLSelectElement).value))">
+          <X4Select class="bar-select bar-select--narrow" :model-value="prefJumpRange" :disabled="thresholdDisabled" @change="emit('update:prefJumpRange', Number(($event.target as HTMLSelectElement).value))">
             <option v-for="j in jumpOptions" :key="j" :value="j">{{ j }}{{ t('sector.jump_unit') }}</option>
-          </select>
+          </X4Select>
           <label class="bar-label-inline" :title="t('sector.coverage_retain')">
             <input type="checkbox" class="bar-checkbox" :checked="coverageRetainEnabled" :indeterminate.prop="coverageRetainIndeterminate" @change="onCoverageRetainChange" />
             <span class="bar-label">{{ t('sector.retain') }}</span>
@@ -219,11 +220,11 @@ function onTradeStationRetainChange(e: Event) {
 }
 
 .bar-select {
-  @apply h-6 text-xs bg-slate-900 border border-slate-600 rounded px-1.5 text-slate-200 focus:outline-none focus:border-sky-500 disabled:opacity-40 disabled:cursor-not-allowed;
+  @apply h-6 text-xs bg-slate-900 border border-slate-600 rounded text-slate-200 focus:outline-none focus:border-sky-500 disabled:opacity-40 disabled:cursor-not-allowed;
 }
 
 .bar-select--narrow {
-  @apply w-12;
+  @apply w-16;
 }
 
 .bar-value {
@@ -284,11 +285,11 @@ function onTradeStationRetainChange(e: Event) {
 }
 
 .confirm-bar--map .bar-select {
-  @apply h-5 text-[11px] px-1;
+  @apply h-5 text-[11px];
 }
 
 .confirm-bar--map .bar-select--narrow {
-  @apply w-10;
+  @apply w-14;
 }
 
 .confirm-bar--map .bar-btn {

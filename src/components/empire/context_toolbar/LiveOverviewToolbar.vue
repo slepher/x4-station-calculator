@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import X4Select from '@/components/common/X4Select.vue'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { StationSettings } from '@/types/x4'
@@ -54,9 +55,9 @@ const handleOpenImport = () => {
       <div class="toolbar-section">
         <div class="input-group">
           <label class="group-label">{{ t('toolbar.race_preference') }}</label>
-          <select v-model="racePreference" class="race-select">
+          <X4Select v-model="racePreference" class="race-select">
             <option v-for="r in props.races" :key="r.value" :value="r.value">{{ r.label }}</option>
-          </select>
+          </X4Select>
         </div>
       </div>
     </div>
@@ -109,7 +110,7 @@ const handleOpenImport = () => {
 }
 
 .race-select {
-  @apply bg-slate-900 border border-slate-700 rounded px-2 h-6 text-xs text-slate-300 outline-none cursor-pointer transition-colors appearance-none min-w-[90px];
+  @apply bg-slate-900 border border-slate-700 rounded h-6 text-xs text-slate-300 outline-none cursor-pointer transition-colors min-w-[90px];
 }
 .race-select:hover {
   @apply border-slate-500;

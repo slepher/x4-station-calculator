@@ -256,9 +256,13 @@ const onPanelClose = () => emit('panel-close')
 
 :deep(.yield-select),
 :deep(.advanced-number-input) {
-  @apply rounded-md border border-amber-300/30 bg-black/70 px-3 py-1 text-sm text-amber-50 outline-none;
+  @apply rounded-md border border-amber-300/30 bg-black/70 py-1 text-sm text-amber-50 outline-none;
   width: 155px;
   min-width: 142px;
+}
+
+:deep(.advanced-number-input) {
+  @apply px-3;
 }
 
 :deep(.sunlight-input) {

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import X4Select from '@/components/common/X4Select.vue'
 import { ref, nextTick, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import CandidateSearchBox from '@/components/common/CandidateSearchBox.vue'
@@ -53,8 +54,8 @@ const selectCategory = (event: Event) => {
         ref="fleetSearchBoxRef"
         @addFleetEntry="(shipId, blueprintId) => emit('addFleetEntry', shipId, blueprintId)"
       />
-      <select
-        :value="presenter.props.selectedCategory.value"
+      <X4Select
+        :model-value="presenter.props.selectedCategory.value"
         class="category-select"
         data-testid="goal-category-select"
         @change="selectCategory"
@@ -62,7 +63,7 @@ const selectCategory = (event: Event) => {
         <option v-for="opt in presenter.props.categoryOptions.value" :key="opt.value" :value="opt.value">
           {{ opt.label }}
         </option>
-      </select>
+      </X4Select>
     </div>
     <CandidateSearchBox
       v-else
@@ -75,8 +76,8 @@ const selectCategory = (event: Event) => {
       @update-query="presenter.emits.setSearchQuery"
     >
       <template #suffix>
-        <select
-          :value="presenter.props.selectedCategory.value"
+        <X4Select
+          :model-value="presenter.props.selectedCategory.value"
           class="category-select"
           data-testid="goal-category-select"
           @change="selectCategory"
@@ -84,7 +85,7 @@ const selectCategory = (event: Event) => {
           <option v-for="opt in presenter.props.categoryOptions.value" :key="opt.value" :value="opt.value">
             {{ opt.label }}
           </option>
-        </select>
+        </X4Select>
       </template>
       <template #default="{ open, position, close }">
         <GroupedCandidatePopover
@@ -109,6 +110,6 @@ const selectCategory = (event: Event) => {
 }
 
 .category-select {
-  @apply bg-slate-800 border border-slate-700 rounded px-2 py-0.5 text-sm text-slate-300 outline-none cursor-pointer ml-2;
+  @apply bg-slate-800 border border-slate-700 rounded py-0.5 text-sm text-slate-300 outline-none cursor-pointer ml-2;
 }
 </style>

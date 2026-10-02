@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import X4Select from '@/components/common/X4Select.vue'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGameDataStore } from '@/store/useGameDataStore'
@@ -137,11 +138,11 @@ const handleDirectEmpireImport = (planId: string) => {
           <span class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
             {{ t('logicFlowImport.source_plan') }}
           </span>
-          <select v-model="selectedPlanId" class="w-full bg-slate-900 border border-slate-600 rounded px-3 py-2 text-sm text-slate-100" data-testid="logicflow-import-plan-select">
+          <X4Select v-model="selectedPlanId" class="w-full bg-slate-900 border border-slate-600 rounded py-2 text-sm text-slate-100" data-testid="logicflow-import-plan-select">
             <option v-for="plan in plans" :key="plan.id" :value="plan.id">
               {{ plan.name }}
             </option>
-          </select>
+          </X4Select>
         </label>
 
         <div v-if="selectedPlan && mode === 'station'" class="text-xs text-slate-400 bg-slate-900/40 border border-slate-700 rounded px-3 py-2">

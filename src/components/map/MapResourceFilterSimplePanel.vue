@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import X4Select from '@/components/common/X4Select.vue'
 import { computed, ref, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGameDataStore } from '@/store/useGameDataStore'
@@ -389,9 +390,9 @@ const isYieldBeyondReachable = (wareId: string) => {
     <div v-if="selectedFilterIds.length > 0" class="resource-config-list">
       <div v-if="showBatchYieldControl" class="resource-config-row all-row">
         <span class="config-label">{{ t('map.resource_filter_all') }}</span>
-        <select
+        <X4Select
           class="yield-select"
-          :value="sharedMinYieldName"
+          :model-value="sharedMinYieldName"
           data-testid="map-resource-yield-all"
           @change="updateAllSelectedYields(($event.target as HTMLSelectElement).value)"
         >
@@ -401,14 +402,14 @@ const isYieldBeyondReachable = (wareId: string) => {
           <option v-for="yieldName in batchYieldOptions" :key="yieldName" :value="yieldName">
             {{ formatYieldLabel(yieldName) }}
           </option>
-        </select>
+        </X4Select>
       </div>
 
       <div v-for="wareId in selectedWareIds" :key="wareId" class="resource-config-row">
         <span class="config-label">{{ getResourceLabel(wareId) }}</span>
-        <select
+        <X4Select
           class="yield-select"
-          :value="resourceFilters[wareId]?.minYieldName"
+          :model-value="resourceFilters[wareId]?.minYieldName"
           :data-testid="`map-resource-yield-${wareId}`"
           @change="updateResourceYield(wareId, ($event.target as HTMLSelectElement).value)"
         >
@@ -420,7 +421,7 @@ const isYieldBeyondReachable = (wareId: string) => {
           >
             {{ formatYieldLabel(yieldName, wareId) }}
           </option>
-        </select>
+        </X4Select>
         <span v-if="isYieldBeyondReachable(wareId)" class="config-warning">
           {{ t('map.resource_filter_exceeds_reachable') }}
         </span>

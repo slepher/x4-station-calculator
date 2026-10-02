@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import X4Select from '@/components/common/X4Select.vue'
 import { ref, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { loadLanguageAsync } from '@/i18n' // 导入我们刚写的异步函数
@@ -29,13 +30,13 @@ watch(locale, (val) => {
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
     </svg>
 
-    <select v-model="currentLang" @change="handleLanguageChange"
+    <X4Select v-model="currentLang" @change="handleLanguageChange"
       data-testid="language-select"
       name="language"
-      class="bg-slate-900 border border-slate-600 text-slate-200 text-xs rounded p-1 focus:border-sky-500 outline-none cursor-pointer hover:border-slate-500 transition-colors">
+      class="bg-slate-900 border border-slate-600 text-slate-200 text-xs rounded py-1 focus:border-sky-500 outline-none cursor-pointer hover:border-slate-500 transition-colors">
       <option v-for="lang in languageList" :key="lang.code" :value="lang.code">
         {{ lang.name }}
       </option>
-    </select>
+    </X4Select>
   </div>
 </template>

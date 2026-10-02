@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import X4Select from '@/components/common/X4Select.vue'
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import X4NumberInput from '@/components/common/X4NumberInput.vue'
@@ -44,14 +45,14 @@ const formatTime = (seconds: number) => {
   <div class="fleet-goal-card" data-testid="fleet-goal-card">
     <div class="fleet-header">
       <span class="fleet-title">{{ t('build_plan.fleet_title') }}</span>
-      <select
+      <X4Select
         class="fleet-mode-select"
-        :value="fleetView.buildTimeMode"
+        :model-value="fleetView.buildTimeMode"
         @change="emit('updateFleetBuildTimeMode', ($event.target as HTMLSelectElement).value as 'actual' | 'planned')"
       >
         <option value="actual">{{ t('build_plan.fleet_actual_time') }} ({{ formatTime(fleetView.actualTotalBuildTime) }})</option>
         <option value="planned">{{ t('build_plan.fleet_effective_time') }} ({{ formatTime(fleetView.buildTime) }})</option>
-      </select>
+      </X4Select>
       <div v-if="fleetView.buildTimeMode === 'planned'" class="fleet-build-time-group">
         <X4NumberInput
           data-testid="fleet-build-time-input"
@@ -190,7 +191,7 @@ const formatTime = (seconds: number) => {
 }
 
 .fleet-mode-select {
-  @apply text-[11px] text-slate-300 bg-slate-700 border border-slate-600 rounded px-1.5 py-0.5 cursor-pointer;
+  @apply text-[11px] text-slate-300 bg-slate-700 border border-slate-600 rounded py-0.5 cursor-pointer;
 }
 
 .fleet-build-time-group {

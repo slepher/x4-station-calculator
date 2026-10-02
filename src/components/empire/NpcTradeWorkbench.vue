@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import X4Select from '@/components/common/X4Select.vue'
 import { useI18n } from 'vue-i18n'
 import { useNpcTradePresenter } from '@/components/empire/presenters/useNpcTradePresenter'
 import CandidateSearchBox from '@/components/common/CandidateSearchBox.vue'
@@ -43,9 +44,9 @@ const selectWare = (wareId: string, close: () => void) => {
 
         <label class="field-group">
           <span class="field-label">{{ t('npc_trade.player_station_group') }}</span>
-          <select
+          <X4Select
             class="field-control"
-            :value="presenter.props.selectedPlayerStationGroupId.value === null ? '' : presenter.props.selectedPlayerStationGroupId.value"
+            :model-value="presenter.props.selectedPlayerStationGroupId.value === null ? '' : presenter.props.selectedPlayerStationGroupId.value"
             data-testid="npc-trade-player-station-group"
             @change="presenter.emits.selectPlayerStationGroup(($event.target as HTMLSelectElement).value === '' ? null : ($event.target as HTMLSelectElement).value)"
           >
@@ -53,15 +54,15 @@ const selectWare = (wareId: string, close: () => void) => {
             <option v-for="group in presenter.props.stationGroups.value" :key="group.id" :value="group.id">
               {{ group.label }}
             </option>
-          </select>
+          </X4Select>
         </label>
 
         <label class="field-group">
           <span class="field-label">{{ t('npc_trade.player_station') }}</span>
-          <select
+          <X4Select
             class="field-control"
             :disabled="presenter.props.selectedPlayerStationGroupId.value === null"
-            :value="presenter.props.selectedPlayerStationId.value === null ? '' : presenter.props.selectedPlayerStationId.value"
+            :model-value="presenter.props.selectedPlayerStationId.value === null ? '' : presenter.props.selectedPlayerStationId.value"
             data-testid="npc-trade-player-station"
             @change="presenter.emits.selectPlayerStation(($event.target as HTMLSelectElement).value === '' ? null : ($event.target as HTMLSelectElement).value)"
           >
@@ -74,7 +75,7 @@ const selectWare = (wareId: string, close: () => void) => {
             >
               {{ option.label }}
             </option>
-          </select>
+          </X4Select>
         </label>
 
         <label v-if="presenter.props.selectedPlayerStationId.value !== null" class="jump-filter-row">
@@ -144,21 +145,21 @@ const selectWare = (wareId: string, close: () => void) => {
         <div class="sort-grid">
           <label class="field-group">
             <span class="field-label">{{ t('npc_trade.rank_mode.label') }}</span>
-            <select
+            <X4Select
               class="field-control"
-              :value="presenter.props.rankMode.value"
+              :model-value="presenter.props.rankMode.value"
               data-testid="npc-trade-rank-mode"
               @change="presenter.emits.setRankMode(($event.target as HTMLSelectElement).value as 'primary' | 'composite')"
             >
               <option value="primary">{{ t('npc_trade.rank_mode.primary') }}</option>
               <option value="composite" :disabled="!presenter.props.canUseComposite.value">{{ t('npc_trade.rank_mode.composite') }}</option>
-            </select>
+            </X4Select>
           </label>
           <label class="field-group">
             <span class="field-label">{{ t('npc_trade.sort.label') }}</span>
-            <select
+            <X4Select
               class="field-control"
-              :value="presenter.props.sortMetric.value"
+              :model-value="presenter.props.sortMetric.value"
               data-testid="npc-trade-sort-metric"
               @change="presenter.emits.setSortMetric(($event.target as HTMLSelectElement).value as 'quantity' | 'price' | 'fillablePrice' | 'targetTotal')"
             >
@@ -166,20 +167,20 @@ const selectWare = (wareId: string, close: () => void) => {
               <option value="price">{{ t('npc_trade.sort.price') }}</option>
               <option value="fillablePrice" :disabled="!presenter.props.canUseTargetMetric.value">{{ t('npc_trade.sort.fillable_price') }}</option>
               <option value="targetTotal" :disabled="!presenter.props.canUseTargetMetric.value">{{ presenter.props.direction.value === 'sell' ? t('npc_trade.sort.total_revenue') : t('npc_trade.sort.total_cost') }}</option>
-            </select>
+            </X4Select>
           </label>
           <label class="field-group">
             <span class="field-label">{{ t('npc_trade.primary_ware') }}</span>
-            <select
+            <X4Select
               class="field-control"
-              :value="presenter.props.primaryWareId.value === null ? '' : presenter.props.primaryWareId.value"
+              :model-value="presenter.props.primaryWareId.value === null ? '' : presenter.props.primaryWareId.value"
               data-testid="npc-trade-primary-ware"
               @change="presenter.emits.setPrimaryWare(($event.target as HTMLSelectElement).value)"
             >
               <option v-for="target in presenter.props.wareTargets.value" :key="target.wareId" :value="target.wareId">
                 {{ target.label }}
               </option>
-            </select>
+            </X4Select>
           </label>
         </div>
 
@@ -372,7 +373,7 @@ const selectWare = (wareId: string, close: () => void) => {
 .panel-content { @apply p-4 flex flex-col gap-4; }
 .field-group { @apply flex flex-col gap-1.5; }
 .field-label { @apply text-xs font-medium text-slate-400; }
-.field-control { @apply w-full rounded border border-slate-700 bg-slate-950/70 px-3 py-2 text-sm text-slate-200 outline-none focus:border-sky-500; }
+.field-control { @apply w-full rounded border border-slate-700 bg-slate-950/70 py-2 text-sm text-slate-200 outline-none focus:border-sky-500; }
 .segmented-control { @apply grid grid-cols-2 rounded border border-slate-700 overflow-hidden; }
 .segmented-control button { @apply px-3 py-2 text-sm text-slate-400 bg-slate-950/50 hover:text-slate-200; }
 .segmented-control button.active { @apply bg-sky-500/20 text-sky-300; }

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import X4Select from '@/components/common/X4Select.vue'
 import { computed, ref, watch, watchEffect, onMounted, onBeforeUnmount } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGameDataStore } from '@/store/useGameDataStore'
@@ -692,9 +693,9 @@ const getGroupSharedMinYieldName = (group: AdvancedResourceTagGroup) =>
           <div v-if="ordinaryTagsOfGroup(group).length || group.tagIds.includes(ADVANCED_SUNLIGHT_TAG_ID)" class="advanced-group-yields">
             <label v-if="ordinaryTagsOfGroup(group).length >= 2" class="advanced-yield-row">
               <span>{{ t('map.resource_filter_all') }}</span>
-              <select
+              <X4Select
                 class="yield-select"
-                :value="getGroupSharedMinYieldName(group)"
+                :model-value="getGroupSharedMinYieldName(group)"
                 @change="updateAllGroupYields(group.id, ($event.target as HTMLSelectElement).value)"
               >
                 <option v-if="getGroupSharedMinYieldName(group) === MIXED_YIELD_VALUE" :value="MIXED_YIELD_VALUE" disabled>
@@ -707,14 +708,14 @@ const getGroupSharedMinYieldName = (group: AdvancedResourceTagGroup) =>
                 >
                   {{ formatYieldLabel(yieldName) }}
                 </option>
-              </select>
+              </X4Select>
             </label>
 
             <label v-for="wareId in ordinaryTagsOfGroup(group)" :key="wareId" class="advanced-yield-row">
               <span>{{ t(`res.${wareId}`) }}</span>
-              <select
+              <X4Select
                 class="yield-select"
-                :value="group.minYieldByWare[wareId]"
+                :model-value="group.minYieldByWare[wareId]"
                 @change="updateGroupYield(group.id, wareId, ($event.target as HTMLSelectElement).value)"
               >
                 <option
@@ -724,7 +725,7 @@ const getGroupSharedMinYieldName = (group: AdvancedResourceTagGroup) =>
                 >
                   {{ formatYieldLabel(yieldName, wareId) }}
                 </option>
-              </select>
+              </X4Select>
             </label>
 
             <label v-if="group.tagIds.includes(ADVANCED_SUNLIGHT_TAG_ID)" class="advanced-yield-row">

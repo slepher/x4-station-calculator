@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import X4Select from '@/components/common/X4Select.vue'
 import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGameDataStore } from '@/store/useGameDataStore'
@@ -437,7 +438,7 @@ const handleBackdropClick = (event: MouseEvent) => {
           <label class="form-label">
             {{ t('settings.gameVersion.select') }}
           </label>
-          <select
+          <X4Select
             v-model="selectedVersionKey"
             class="version-select"
             data-testid="version-select"
@@ -449,7 +450,7 @@ const handleBackdropClick = (event: MouseEvent) => {
             >
               {{ option.label }}
             </option>
-          </select>
+          </X4Select>
           <label class="hide-beta-check">
             <input
               v-model="showAllBeta"
@@ -640,7 +641,7 @@ const handleBackdropClick = (event: MouseEvent) => {
 }
 
 .version-select {
-  @apply w-full bg-slate-900 border border-slate-600 text-slate-200 rounded px-3 py-2 focus:border-sky-500 outline-none;
+  @apply w-full bg-slate-900 border border-slate-600 text-slate-200 rounded py-2 focus:border-sky-500 outline-none;
 }
 
 .data-isolation-hint {

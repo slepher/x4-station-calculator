@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import X4Select from '@/components/common/X4Select.vue'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { StationType, StationSettings } from '@/types/x4'
@@ -151,9 +152,9 @@ const handleOpenImport = () => {
       <div class="toolbar-section">
         <div class="input-group">
           <label class="group-label">{{ t('toolbar.race_preference') }}</label>
-          <select v-model="racePreference" class="race-select">
+          <X4Select v-model="racePreference" class="race-select">
             <option v-for="r in props.races" :key="r.value" :value="r.value">{{ r.label }}</option>
-          </select>
+          </X4Select>
         </div>
       </div>
     </div>
@@ -174,9 +175,9 @@ const handleOpenImport = () => {
 
         <div class="input-group ml-6">
           <label class="group-label">{{ t('toolbar.station_type') }}</label>
-          <select v-model="stationType" class="ghost-select w-20">
+          <X4Select v-model="stationType" class="ghost-select min-w-24">
             <option v-for="st in props.stationTypes || []" :key="st.value" :value="st.value">{{ st.label }}</option>
-          </select>
+          </X4Select>
         </div>
 
         <div class="input-group ml-6">
@@ -253,9 +254,9 @@ const handleOpenImport = () => {
       <div class="toolbar-section">
         <div class="input-group">
           <label class="group-label">{{ t('toolbar.race_preference') }}</label>
-          <select v-model="racePreference" class="race-select">
+          <X4Select v-model="racePreference" class="race-select">
             <option v-for="r in props.races" :key="r.value" :value="r.value">{{ r.label }}</option>
-          </select>
+          </X4Select>
         </div>
 
         <div class="input-group ml-6">
@@ -335,7 +336,7 @@ const handleOpenImport = () => {
 }
 
 .ghost-select {
-  @apply bg-transparent border-b border-slate-800 hover:border-slate-600 focus:border-sky-500 text-xs text-slate-300 h-6 outline-none cursor-pointer transition-colors appearance-none;
+  @apply bg-transparent border-b border-slate-800 hover:border-slate-600 focus:border-sky-500 text-xs text-slate-300 h-6 outline-none cursor-pointer transition-colors ;
 }
 .ghost-select option {
   @apply bg-slate-900 text-slate-300;
@@ -354,7 +355,7 @@ const handleOpenImport = () => {
 }
 
 .race-select {
-  @apply bg-slate-900 border border-slate-700 rounded px-2 h-6 text-xs text-slate-300 outline-none cursor-pointer transition-colors appearance-none min-w-[90px];
+  @apply bg-slate-900 border border-slate-700 rounded h-6 text-xs text-slate-300 outline-none cursor-pointer transition-colors min-w-[90px];
 }
 .race-select:hover {
   @apply border-slate-500;
