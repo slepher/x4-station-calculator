@@ -84,6 +84,28 @@ function saveToStorage(state: ActiveViewState): void {
 
 export const useActiveViewStore = defineStore('activeView', () => {
   const state = ref<ActiveViewState>({ ...DEFAULT_STATE })
+  const productionNavigation = ref<{ token: number; mode: 'blueprint' | 'live'; contextId: string; stationId: string } | null>(null)
+  let navigationToken = 0
+
+  function navigateToProduction(mode: 'blueprint' | 'live', contextId: string, stationId: string) {
+    if (mode === 'blueprint') {
+      state.value.activeEmpireId = contextId
+      state.value.activeEmpireStation = stationId
+      state.value.activeEmpireWorkbench = 'station'
+      state.value.activeView = 'blueprint-production'
+    } else {
+      state.value.activeBinding = contextId
+      state.value.activeBindingStation = stationId
+      state.value.activeBindingWorkbench = stationId.startsWith('transit:') ? 'transit' : 'station'
+      state.value.activeView = 'live-production'
+    }
+    productionNavigation.value = { token: ++navigationToken, mode, contextId, stationId }
+    saveToStorage(state.value)
+  }
+
+  function consumeProductionNavigation(token: number) {
+    if (productionNavigation.value?.token === token) productionNavigation.value = null
+  }
 
   const activeEmpireId = computed({
     get: () => state.value.activeEmpireId,
@@ -251,6 +273,11 @@ export const useActiveViewStore = defineStore('activeView', () => {
   }
 
   function setActiveStationId(id: string | null) {
+    if (id !== null && activeId.value !== null) {
+      const mode = productionSource.value === 'empire' ? 'blueprint' : 'live'
+      navigateToProduction(mode, activeId.value, id)
+      return
+    }
     activeStationId.value = id
   }
 
@@ -297,6 +324,9 @@ export const useActiveViewStore = defineStore('activeView', () => {
   }
 
   return {
+    productionNavigation,
+    navigateToProduction,
+    consumeProductionNavigation,
     state,
     productionSource,
     activeId,

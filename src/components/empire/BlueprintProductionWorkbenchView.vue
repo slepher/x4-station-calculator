@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { onMounted, watch, computed } from 'vue'
-import i18n from '@/i18n'
+import { onMounted, watch } from 'vue'
 import { useBlueprintProductionStore } from '@/store/useBlueprintProductionStore'
 import { useTerraformingStore } from '@/store/useTerraformingStore'
 import { useBuildPlanStore } from '@/store/useBuildPlanStore'
@@ -24,47 +23,10 @@ import BuildPlanConstraintsPanel from '@/components/empire/BuildPlanConstraintsP
 import BuildPlanPanel from '@/components/empire/BuildPlanPanel.vue'
 import EmpireWareFlowsDashboard from '@/components/empire/EmpireWareFlowsDashboard.vue'
 
-import { useGameDataStore } from '@/store/useGameDataStore'
-
 const blueprintStore = useBlueprintProductionStore()
 const terraformingStore = useTerraformingStore()
 const buildPlanStore = useBuildPlanStore()
 const activeViewStore = useActiveViewStore()
-const gameDataStore = useGameDataStore()
-
-const terraformingClusters = computed(() => {
-  const clusters = gameDataStore.terraformingData?.clusters ?? []
-  const stats = gameDataStore.terraformingData?.stats ?? []
-  const mapsData = gameDataStore.maps
-  const t = i18n.global.t.bind(i18n.global)
-  return clusters.map(c => {
-    const macro = c.macro?.replace('macro.', '')
-    let nameId = ''
-    if (mapsData && macro) {
-      const clusterInfo = mapsData.clusters[macro]
-      if (clusterInfo) {
-        const sectorList = clusterInfo.sectors ?? []
-        if (sectorList.length === 1 && sectorList[0]) {
-          nameId = mapsData.sectors[sectorList[0]]?.nameId ?? ''
-        } else {
-          nameId = clusterInfo.nameId ?? ''
-        }
-      }
-    }
-    const resolvedName = nameId ? t(nameId) : c.id
-    const temperatureStat = stats.find(s => s.id === 'temperature')
-    let temperatureState = 2
-    if (temperatureStat && c.initialStats?.temperature != null) {
-      const tempValue = c.initialStats.temperature
-      const range = temperatureStat.ranges.find(r => {
-        const start = r.start ?? 0
-        return tempValue >= start && tempValue <= r.end
-      })
-      if (range) temperatureState = range.state
-    }
-    return { id: c.id, name: resolvedName, nameId, temperatureState }
-  })
-})
 
 terraformingStore.init()
 
@@ -81,7 +43,7 @@ watch(() => activeViewStore.activeEmpireId, (newId) => {
   }
 })
 
-const sidebarPresenter = useProductionSidebarPresenter(blueprintStore)
+const sidebarPresenter = useProductionSidebarPresenter({ mode: 'blueprint', store: blueprintStore })
 const toolbarPresenter = useProductionToolbarPresenter(blueprintStore)
 
 watch(() => toolbarPresenter.props.workbenchMode.value, (mode) => {
@@ -101,41 +63,7 @@ const buildPlanPresenter = useBuildPlanPresenter({
 
 <template>
   <div class="production-layout">
-    <ProductionSidebar
-      :tabs="sidebarPresenter.props.tabs.value"
-      :active-tab-id="sidebarPresenter.props.activeTabId.value"
-      :expanded-sector-id="sidebarPresenter.props.expandedSectorId.value"
-      :has-sectors="sidebarPresenter.props.hasSectors"
-      :show-terraforming="sidebarPresenter.props.showTerraforming"
-      :show-tech-tree="sidebarPresenter.props.showTechTree"
-      :show-research="sidebarPresenter.props.showResearch"
-      :show-blueprint-recipe="sidebarPresenter.props.showBlueprintRecipe"
-      :terraforming-clusters="terraformingClusters"
-      :active-terraforming-cluster-id="toolbarPresenter.props.workbenchMode.value === 'terraforming' ? (terraformingStore.activePlan?.selectedClusterId ?? null) : null"
-      :can-create-station="sidebarPresenter.props.canCreateStation"
-      :can-open-context-menu="sidebarPresenter.props.canOpenContextMenu"
-      :context-menu-mode="sidebarPresenter.props.contextMenuMode"
-      :can-delete-station="sidebarPresenter.props.canDeleteStation"
-      :can-reorder-stations="sidebarPresenter.props.canReorderStations"
-      @select-overview="sidebarPresenter.emits.selectOverview"
-      @select-station="sidebarPresenter.emits.selectStation"
-      @create-station="sidebarPresenter.emits.createStation"
-      @rename-station="sidebarPresenter.emits.renameStation"
-      @duplicate-station="sidebarPresenter.emits.duplicateStation"
-      @delete-station="sidebarPresenter.emits.deleteStation"
-      @select-terraforming="sidebarPresenter.emits.selectTerraforming"
-      @select-tech-tree="() => {}"
-      @select-research="sidebarPresenter.emits.selectResearch"
-      @select-blueprint-recipe="sidebarPresenter.emits.selectBlueprintRecipe"
-      @select-terraforming-cluster="(clusterId: string) => {
-        activeViewStore.activeEmpireWorkbench = 'terraforming'
-        terraformingStore.selectCluster(clusterId)
-      }"
-      @select-transit="() => {}"
-      @expand-sector="() => {}"
-      @jump-to-binding="() => {}"
-      @reorder-stations="sidebarPresenter.emits.reorderStations"
-    />
+    <ProductionSidebar :presenter="sidebarPresenter" />
     <div class="production-content custom-scrollbar">
       <BlueprintContextToolbar
         v-if="toolbarPresenter.props.workbenchMode.value !== 'terraforming' && toolbarPresenter.props.workbenchMode.value !== 'research' && toolbarPresenter.props.workbenchMode.value !== 'blueprint-recipe' && toolbarPresenter.props.workbenchMode.value !== 'auto-sector-group'"

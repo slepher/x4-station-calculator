@@ -1,885 +1,270 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
+import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { ProductionTabItem } from '@/types/production-ui'
-import { SAVE_POI_ICON_MAP } from '@/components/map/utils/style'
-import { getPoiIconTag } from '@/store/logic/stationPoiSemantics'
 import draggable from 'vuedraggable'
-import playerhqIconUrl from '@/components/icons/playerhq.svg'
-import tradestationIconUrl from '@/components/icons/tradestation.svg'
-import factoryIconUrl from '@/components/icons/factory.svg'
-import researchIconUrl from '@/components/icons/tlt_research.svg'
-import terraformingIconUrl from '@/components/icons/tlt_terraforming.svg'
-import blueprintIconUrl from '@/components/icons/blueprint.svg'
-import sectorGroupEditIconUrl from '@/components/icons/sector_group_edit.svg'
+import { ChevronDoubleLeftIcon, ChevronDoubleRightIcon, ChevronDownIcon, ChevronUpIcon, PlusIcon } from '@heroicons/vue/24/outline'
+import ProductionSidebarRow from './ProductionSidebarRow.vue'
+import type { ProductionSidebarPresenter, SidebarGroup, SidebarRow } from './presenters/useProductionSidebarPresenter'
 
-const props = defineProps<{
-  tabs: ProductionTabItem[]
-  activeTabId: string | null
-  expandedSectorId: string | null
-  hasSectors: boolean
-  showTerraforming: boolean
-  showResearch: boolean
-  showNpcTrade?: boolean
-  showTechTree: boolean
-  showBlueprintRecipe: boolean
-  showAutoSectorGroup?: boolean
-  autoSectorGroupDisabled?: boolean
-  autoSectorGroupNeedsRecalc?: boolean
-  terraformingClusters: { id: string; name: string; nameId: string; temperatureState: number }[]
-  activeTerraformingClusterId: string | null
-  canCreateStation: boolean
-  canOpenContextMenu: boolean
-  contextMenuMode: 'full' | 'delete-only'
-  canDeleteStation: (stationId: string) => boolean
-  canReorderStations?: boolean
-}>()
-
-const emit = defineEmits<{
-  selectOverview: []
-  selectTerraforming: []
-  selectTechTree: []
-  selectResearch: []
-  selectNpcTrade: []
-  selectBlueprintRecipe: []
-  selectAutoSectorGroup: []
-  selectTerraformingCluster: [clusterId: string]
-  selectTransit: [sectorId: string]
-  selectStation: [stationId: string]
-  createStation: []
-  renameStation: [stationId: string]
-  duplicateStation: [stationId: string]
-  deleteStation: [stationId: string]
-  expandSector: [sectorId: string | null]
-  jumpToBinding: [tabId: string, tabType: 'station' | 'transit']
-  reorderStations: [stationIds: string[]]
-}>()
-
+const props = defineProps<{ presenter: ProductionSidebarPresenter }>()
 const { t } = useI18n()
+const scroll = ref<HTMLElement | null>(null)
+const overlay = ref<HTMLElement | null>(null)
+const overlayPosition = ref({ x: 0, y: 0 })
+const sortEpoch = ref(0)
+let overlayAnchor = { x: 0, y: 0 }
+let resizeTarget: HTMLElement | null = null
+let resizePointer: number | null = null
+let sortElement: HTMLElement | null = null
+let sortKind: 'groups' | 'stations' = 'stations'
+let releasePoint: { x: number; y: number } | null = null
+let sortCancelled = false
 
-const collapsed = ref(false)
-const showMenu = ref(false)
-const menuPosition = ref({ x: 0, y: 0 })
-const menuTabId = ref<string | null>(null)
-const menuTabType = ref<'station' | 'transit'>('station')
-const showDeleteConfirm = ref(false)
-const stationToDelete = ref<string | null>(null)
-
-const getSectorName = (sectorId: string): string => {
-  const transitTab = props.tabs.find(t => t.type === 'transit' && t.sectorId === sectorId)
-  return transitTab?.name || sectorId
+async function positionOverlay(event?: MouseEvent) {
+  if (event !== undefined) overlayAnchor = { x: event.clientX, y: event.clientY }
+  await nextTick()
+  if (overlay.value === null) return
+  const rect = overlay.value.getBoundingClientRect()
+  overlayPosition.value = { x: Math.max(8, Math.min(overlayAnchor.x, window.innerWidth - rect.width - 8)), y: Math.max(8, Math.min(overlayAnchor.y, window.innerHeight - rect.height - 8)) }
 }
-
-const hasSectorChildren = (sectorId: string): boolean => {
-  return props.tabs.some(t => t.type === 'station' && t.sectorId === sectorId)
+function openMenu(id: string, event: MouseEvent) {
+  if (props.presenter.openMenu(id)) void positionOverlay(event)
 }
-
-const expandedTerraforming = ref(false)
-
-watch(() => props.activeTerraformingClusterId, (clusterId) => {
-  if (clusterId) expandedTerraforming.value = true
-}, { immediate: true })
-
-const terraformClusterItems = computed<ProductionTabItem[]>(() => {
-  return props.terraformingClusters.map(c => ({
-    id: `terraforming:${c.id}`,
-    type: 'terraforming' as const,
-    name: c.name,
-    temperatureState: c.temperatureState,
-  }))
-})
-
-const getTerraformClusterIconClass = (item: { temperatureState?: number }): string => {
-  if (item.temperatureState == null) return ''
-  switch (item.temperatureState) {
-    case 0: return ''
-    case 1: return 'icon-temp-state-1'
-    case 2: return 'icon-temp-state-2'
-    case 3: return 'icon-temp-state-3'
-    case 4: return 'icon-temp-state-4'
-    default: return ''
+function openEditor(id: string, event: MouseEvent) {
+  if (props.presenter.openGroupEditor(id)) void positionOverlay(event)
+}
+function startResize(event: PointerEvent) {
+  if (!props.presenter.startResize(event.pointerId, event.clientX)) return
+  resizeTarget = event.currentTarget as HTMLElement
+  resizePointer = event.pointerId
+  resizeTarget.setPointerCapture(event.pointerId)
+}
+function releaseResize() {
+  const target = resizeTarget
+  const pointer = resizePointer
+  resizeTarget = null
+  resizePointer = null
+  if (target !== null && pointer !== null && target.hasPointerCapture(pointer)) target.releasePointerCapture(pointer)
+}
+function endResize(event: PointerEvent, commit: boolean) {
+  if (resizePointer !== event.pointerId) return
+  props.presenter.endResize(event.pointerId, commit)
+  releaseResize()
+}
+function startSort(event: { from: HTMLElement }, kind: 'groups' | 'stations', groupId: string | null) {
+  sortElement = event.from
+  sortKind = kind
+  releasePoint = null
+  sortCancelled = !props.presenter.startSort(kind, groupId)
+}
+function proposeSort(items: (SidebarRow | SidebarGroup)[]) { props.presenter.proposeSort(items.map(item => item.id)) }
+function trackRelease(event: MouseEvent | TouchEvent) {
+  if (sortElement === null) return
+  if ('changedTouches' in event) {
+    const touch = event.changedTouches[0]
+    if (touch !== undefined) releasePoint = { x: touch.clientX, y: touch.clientY }
+  } else releasePoint = { x: event.clientX, y: event.clientY }
+}
+function endSort() {
+  let legal = false
+  if (!sortCancelled && sortElement !== null && releasePoint !== null) {
+    const hit = document.elementFromPoint(releasePoint.x, releasePoint.y)
+    if (hit !== null) legal = sortElement.contains(hit) && (sortKind === 'groups' || hit.closest('[data-sort-scope]') === sortElement)
   }
+  props.presenter.endSort(legal)
+  sortElement = null
+  releasePoint = null
 }
-
-const groupSectors = computed<Array<{ id: string; name: string; hasChildren: boolean }>>(() => {
-  if (!props.hasSectors) return []
-  const seen = new Set<string>()
-  const result: Array<{ id: string; name: string; hasChildren: boolean }> = []
-  props.tabs.forEach(tab => {
-    if (tab.sectorId && !seen.has(tab.sectorId)) {
-      seen.add(tab.sectorId)
-      result.push({
-        id: tab.sectorId,
-        name: getSectorName(tab.sectorId),
-        hasChildren: hasSectorChildren(tab.sectorId)
-      })
-    }
-  })
-  return result
-})
-
-const findTabById = (id: string): ProductionTabItem | undefined => {
-  const tab = props.tabs.find(t => t.id === id || t.name === id)
-  if (tab) return tab
-  return undefined
-}
-
-const findSectorForTabId = (tabId: string | null): string | undefined => {
-  if (!tabId || !props.hasSectors) return undefined
-  const tab = findTabById(tabId)
-  if (tab?.sectorId) return tab.sectorId
-  return undefined
-}
-
-const collapsedSectors = ref(new Set(
-  (() => {
-    if (!props.hasSectors) return [] as string[]
-    const allIds = groupSectors.value.map(s => s.id)
-    const activeSectorId = findSectorForTabId(props.activeTabId)
-    if (activeSectorId) {
-      return allIds.filter(id => id !== activeSectorId)
-    }
-    return allIds
-  })()
-))
-
-watch([() => props.activeTabId, () => props.tabs.length], ([tabId]) => {
-  if (!tabId || !props.hasSectors) return
-  const activeSectorId = findSectorForTabId(tabId)
-  if (activeSectorId) {
-    const next = new Set(collapsedSectors.value)
-    next.delete(activeSectorId)
-    collapsedSectors.value = next
+function cancelInput() {
+  if (sortElement !== null) {
+    sortEpoch.value += 1
+    sortElement = null
+    releasePoint = null
   }
-})
-
-const fixedItems = computed<ProductionTabItem[]>(() => {
-  const result = props.tabs.filter(t => t.type === 'overview')
-  if (props.showNpcTrade) {
-    result.push({ id: 'npc-trade', type: 'npc-trade', name: t('npc_trade.label') })
+  sortCancelled = true
+  props.presenter.cancelInteraction()
+  releaseResize()
+}
+function outsideClick(event: PointerEvent) {
+  if (overlay.value !== null && !overlay.value.contains(event.target as Node)) props.presenter.closeOverlays()
+}
+function onViewport() { props.presenter.setViewport(window.innerWidth); cancelInput(); void positionOverlay() }
+watch(() => props.presenter.resizingPointerId, id => { if (id === null) releaseResize() })
+watch(() => props.presenter.contextKey, cancelInput)
+watch(() => props.presenter.canSort, enabled => { if (!enabled && sortElement !== null) cancelInput() })
+watch(() => props.presenter.location, async location => {
+  if (location === null) return
+  await nextTick()
+  if (scroll.value === null) return
+  if (location.stationId === null) scroll.value.scrollTop = location.scrollTop
+  else {
+    const element = Array.from(scroll.value.querySelectorAll<HTMLElement>('[data-entry-id]')).find(element => element.dataset.entryId === location.stationId)
+    if (element !== undefined) element.scrollIntoView({ block: 'nearest' })
   }
-  if (props.showBlueprintRecipe) {
-    result.push({ id: 'blueprint-recipe', type: 'blueprint-recipe' as const, name: t('blueprint_recipe.label') })
-  }
-  if (props.showResearch) {
-    result.push({ id: 'research', type: 'research' as const, name: t('research.label') })
-  }
-  if (props.showTerraforming) {
-    result.push({ id: 'terraforming', type: 'terraforming' as const, name: t('moduleNames.terraforming') })
-  }
-  if (props.showTechTree) {
-    result.push({ id: 'tech-tree', type: 'terraforming' as const, name: t('techTree.label') })
-  }
-  return result
-})
-
-const autoSectorGroupItem = computed<ProductionTabItem>(() => ({
-  id: 'auto-sector-group',
-  type: 'auto-sector-group',
-  name: t('auto_sector.sidebar_label')
-}))
-
-const dynamicItems = computed<ProductionTabItem[]>(() => {
-  const result: ProductionTabItem[] = []
-
-  if (!props.hasSectors) {
-    props.tabs.forEach(tab => {
-      if (tab.type === 'station') {
-        result.push(tab)
-      }
-    })
-    return result
-  }
-
-  const sectorGroups = new Map<string, ProductionTabItem[]>()
-  props.tabs.forEach(tab => {
-    if (tab.type !== 'overview' && tab.type !== 'terraforming') {
-      if (tab.sectorId) {
-        if (!sectorGroups.has(tab.sectorId)) {
-          sectorGroups.set(tab.sectorId, [])
-        }
-        sectorGroups.get(tab.sectorId)!.push(tab)
-      } else if (tab.type === 'station') {
-        result.push(tab)
-      }
-    }
-  })
-
-  sectorGroups.forEach((items) => {
-    const transitTab = items.find(i => i.type === 'transit')
-    if (transitTab) result.push(transitTab)
-    items.filter(i => i.type === 'station').forEach(stationTab => {
-      result.push(stationTab)
-    })
-  })
-
-  return result
-})
-
-const getTabIconClass = (tab: ProductionTabItem): string => {
-  if (tab.type === 'overview' || tab.type === 'terraforming' || (tab.id && (tab.id === 'overview' || tab.id === 'terraforming' || tab.id === 'tech-tree'))) {
-    return 'icon-green'
-  }
-  if (tab.type === 'transit') return 'icon-orange'
-  return 'icon-green'
-}
-
-const getTabIcon = (tab: ProductionTabItem): string => {
-  if (tab.id === 'overview') return playerhqIconUrl
-  if (tab.type === 'terraforming') return terraformingIconUrl
-  if (tab.id === 'tech-tree') return terraformingIconUrl
-  if (tab.id === 'research') return researchIconUrl
-  if (tab.id === 'npc-trade') return tradestationIconUrl
-  if (tab.id === 'blueprint-recipe') return blueprintIconUrl
-  if (tab.id === 'auto-sector-group') return sectorGroupEditIconUrl
-  if (tab.type === 'transit') return tradestationIconUrl
-  const iconTag = getPoiIconTag(tab)
-  if (iconTag) return SAVE_POI_ICON_MAP[iconTag] || factoryIconUrl
-  return factoryIconUrl
-}
-
-const handleTabClick = (tab: ProductionTabItem) => {
-  if (tab.id === 'overview') {
-    emit('selectOverview')
-  } else if (tab.id === 'terraforming') {
-    expandedTerraforming.value = !expandedTerraforming.value
-  } else if (tab.id.startsWith('terraforming:')) {
-    emit('selectTerraformingCluster', tab.id.replace('terraforming:', ''))
-  } else if (tab.id === 'tech-tree') {
-    emit('selectTechTree')
-  } else if (tab.id === 'research') {
-    emit('selectResearch')
-  } else if (tab.id === 'npc-trade') {
-    emit('selectNpcTrade')
-  } else if (tab.id === 'blueprint-recipe') {
-    emit('selectBlueprintRecipe')
-  } else if (tab.id === 'auto-sector-group') {
-    if (!props.autoSectorGroupDisabled) emit('selectAutoSectorGroup')
-  } else if (tab.type === 'transit') {
-    emit('selectTransit', tab.sectorId!)
-  } else {
-    emit('selectStation', tab.id)
-  }
-}
-
-const isSectorActive = (sectorId: string): boolean => {
-  if (isTabActive('transit:' + sectorId)) return true
-  return dynamicItems.value.some(d => d.sectorId === sectorId && d.type === 'station' && isTabActive(d.id))
-}
-
-const isSectorExpanded = (sectorId: string): boolean => {
-  return !collapsedSectors.value.has(sectorId)
-}
-
-const handleSectorClick = (sectorId: string) => {
-  emit('selectTransit', sectorId)
-}
-
-const toggleSectorCollapse = (sectorId: string) => {
-  const next = new Set(collapsedSectors.value)
-  if (next.has(sectorId)) {
-    next.delete(sectorId)
-  } else {
-    next.add(sectorId)
-  }
-  collapsedSectors.value = next
-}
-
-const handleFixedClick = (tab: ProductionTabItem) => {
-  handleTabClick(tab)
-}
-
-const getFixedTestId = (item: ProductionTabItem): string => {
-  if (item.id === 'overview') return 'sidebar-overview'
-  if (item.id === 'terraforming') return 'sidebar-terraforming'
-  if (item.id === 'blueprint-recipe') return 'sidebar-blueprint-recipe'
-  if (item.id === 'research') return 'sidebar-research'
-  if (item.id === 'npc-trade') return 'sidebar-npc-trade'
-  if (item.id === 'tech-tree') return 'sidebar-tech-tree'
-  if (item.id === 'auto-sector-group') return 'sidebar-auto-sector-group'
-  return `sidebar-${item.id}`
-}
-
-const isTabActive = (tabId: string): boolean => {
-  return props.activeTabId === tabId
-}
-
-const openMenu = (tabId: string, tabType: string, event: MouseEvent) => {
-  if (!props.canOpenContextMenu) return
-  if (tabType === 'station' && props.contextMenuMode === 'delete-only' && !props.canOpenContextMenu) return
-  event.preventDefault()
-  menuTabId.value = tabId
-  menuTabType.value = tabType as 'station' | 'transit'
-
-  const x = Math.min(event.clientX, window.innerWidth - 180)
-  const y = Math.min(event.clientY, window.innerHeight - 200)
-
-  menuPosition.value = { x, y }
-  showMenu.value = true
-}
-
-const closeMenu = () => {
-  showMenu.value = false
-  menuTabId.value = null
-}
-
-const handleClickOutside = () => {
-  if (showMenu.value) closeMenu()
-}
-
-const duplicateStation = () => {
-  if (menuTabId.value) emit('duplicateStation', menuTabId.value)
-  closeMenu()
-}
-
-const confirmDelete = () => {
-  stationToDelete.value = menuTabId.value
-  showDeleteConfirm.value = true
-  closeMenu()
-}
-
-const deleteStation = () => {
-  if (stationToDelete.value) emit('deleteStation', stationToDelete.value)
-  showDeleteConfirm.value = false
-  stationToDelete.value = null
-}
-
-const cancelDelete = () => {
-  showDeleteConfirm.value = false
-  stationToDelete.value = null
-}
-
-const doRename = () => {
-  if (menuTabId.value) emit('renameStation', menuTabId.value)
-  closeMenu()
-}
-
-const jumpToBinding = () => {
-  if (menuTabId.value) emit('jumpToBinding', menuTabId.value, menuTabType.value)
-  closeMenu()
-}
-
-const addNewStation = () => {
-  emit('createStation')
-}
-
-const handleStationReorder = (items: ProductionTabItem[]) => {
-  emit('reorderStations', items.map((item) => item.id))
-}
-
+}, { immediate: true, flush: 'post' })
+watch(() => props.presenter.query, async () => { await nextTick(); if (props.presenter.searching && scroll.value !== null) scroll.value.scrollTop = 0 })
+watch(() => props.presenter.editor?.error, () => { void positionOverlay() })
 onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
+  props.presenter.setViewport(window.innerWidth)
+  window.addEventListener('resize', onViewport)
+  window.addEventListener('blur', cancelInput)
+  document.addEventListener('mouseup', trackRelease, true)
+  document.addEventListener('touchend', trackRelease, true)
+  document.addEventListener('pointercancel', cancelInput)
+  document.addEventListener('touchcancel', cancelInput)
+  document.addEventListener('pointerdown', outsideClick)
 })
 onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside)
+  cancelInput()
+  window.removeEventListener('resize', onViewport)
+  window.removeEventListener('blur', cancelInput)
+  document.removeEventListener('mouseup', trackRelease, true)
+  document.removeEventListener('touchend', trackRelease, true)
+  document.removeEventListener('pointercancel', cancelInput)
+  document.removeEventListener('touchcancel', cancelInput)
+  document.removeEventListener('pointerdown', outsideClick)
 })
 </script>
 
 <template>
-  <div class="production-sidebar" :class="{ collapsed }" data-testid="production-sidebar">
-    <button
-      class="sidebar-toggle"
-      data-testid="sidebar-toggle"
-      :title="collapsed ? '展开侧栏' : '收起侧栏'"
-      @click="collapsed = !collapsed"
-    >
-      <svg v-if="!collapsed" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="3" y1="12" x2="21" y2="12"></line>
-        <line x1="3" y1="6" x2="21" y2="6"></line>
-        <line x1="3" y1="18" x2="21" y2="18"></line>
-      </svg>
-      <div v-else class="flex items-center justify-center w-full h-full">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-sky-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="m13 18 6-6-6-6"></path>
-          <path d="m13 6-6 6 6 6" opacity="0.4"></path>
-        </svg>
-      </div>
-    </button>
-    <div class="sidebar-inner">
-      <div class="sidebar-scroll custom-scrollbar">
-        <div class="sidebar-section sidebar-fixed">
-          <div
-            v-for="item in fixedItems"
-            :key="item.id"
-            class="sidebar-item"
-            :class="{ active: isTabActive(item.id) }"
-            :data-testid="getFixedTestId(item)"
-            role="button"
-            tabindex="0"
-            @click="handleFixedClick(item)"
-            @keydown.enter="handleFixedClick(item)"
-            @keydown.space.prevent="handleFixedClick(item)"
-          >
-            <div class="sidebar-item-active-bar"></div>
-            <span
-              class="sector-click-area flex items-center gap-2 flex-1 min-w-0"
-            >
-              <button
-                v-if="item.id === 'terraforming'"
-                class="w-5 h-5 flex items-center justify-center rounded flex-shrink-0 text-slate-500 hover:text-slate-300 transition-colors"
-                @click.stop="expandedTerraforming = !expandedTerraforming"
-              >
-                <svg
-                  class="sector-chevron w-3 h-3"
-                  :class="{ rotated: expandedTerraforming }"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path d="m9 18 6-6-6-6"></path>
-                </svg>
-              </button>
-              <img v-else class="sidebar-item-icon" :class="getTabIconClass(item)" :src="getTabIcon(item)" alt="" />
-              <span class="sidebar-item-label">{{ item.id === 'overview' ? t('sector.overview') : item.name }}</span>
-            </span>
-          </div>
-        </div>
-
-        <div
-          v-if="props.showTerraforming && expandedTerraforming"
-          class="sidebar-terraform-clusters"
-        >
-            <div
-              v-for="item in terraformClusterItems"
-              :key="item.id"
-              class="sidebar-item terraform-cluster-item"
-              :class="{ active: props.activeTerraformingClusterId && item.id === `terraforming:${props.activeTerraformingClusterId}` }"
-              @click="handleTabClick(item)"
-            >
-              <div class="sidebar-item-active-bar"></div>
-              <img class="sidebar-item-icon sidebar-icon-indented" :class="getTerraformClusterIconClass(item)" :src="getTabIcon(item)" alt="" />
-              <span class="sidebar-item-label">{{ item.name }}</span>
-            </div>
-          </div>
-
-        <div class="sidebar-divider"></div>
-
-        <div v-if="props.showAutoSectorGroup" class="sidebar-section sidebar-auto-sector">
-          <div
-            class="sidebar-item sidebar-auto-sector-item"
-            :class="{ active: isTabActive('auto-sector-group'), disabled: props.autoSectorGroupDisabled }"
-            data-testid="sidebar-auto-sector-group"
-            :title="props.autoSectorGroupDisabled ? t('auto_sector.sidebar_disabled') : t('auto_sector.sidebar_label')"
-            @click="handleFixedClick(autoSectorGroupItem)"
-          >
-            <div class="sidebar-item-active-bar"></div>
-            <span class="sector-click-area flex items-center gap-2 flex-1 min-w-0">
-              <span class="sidebar-icon-wrap">
-                <img class="sidebar-item-icon icon-green" :src="sectorGroupEditIconUrl" alt="" />
-                <span v-if="props.autoSectorGroupNeedsRecalc" class="sidebar-recalc-dot"></span>
-              </span>
-              <span class="sidebar-item-label">{{ t('auto_sector.sidebar_label') }}</span>
-            </span>
-          </div>
-        </div>
-
-        <div class="sidebar-divider"></div>
-
-        <div v-if="!hasSectors" class="sidebar-section sidebar-dynamic" data-testid="sidebar-station-list">
-          <draggable
-            v-if="props.canReorderStations"
-            :model-value="dynamicItems"
-            item-key="id"
-            :component-data="{ class: 'sidebar-station-list' }"
-            @update:model-value="handleStationReorder"
-          >
-            <template #item="{ element: item }">
-              <div
-                class="sidebar-item station-item"
-                :class="{ active: isTabActive(item.id) }"
-                data-testid="sidebar-station"
-                :data-station-id="item.id"
-                tabindex="0"
-                @click="handleTabClick(item)"
-                @keydown.enter="handleTabClick(item)"
-                @keydown.space.prevent="handleTabClick(item)"
-                @contextmenu.stop="openMenu(item.id, 'station', $event)"
-              >
-                <div class="sidebar-item-active-bar"></div>
-                <img class="sidebar-item-icon" :class="getTabIconClass(item)" :src="getTabIcon(item)" alt="" />
-                <span class="sidebar-item-label">{{ item.name }}</span>
-              </div>
-            </template>
-          </draggable>
-          <div
-            v-else
-            v-for="item in dynamicItems"
-            :key="item.id"
-            class="sidebar-item station-item"
-            :class="{ active: isTabActive(item.id) }"
-            :data-testid="'sidebar-station'"
-            :data-station-id="item.id"
-            @click="handleTabClick(item)"
-            @contextmenu.stop="openMenu(item.id, 'station', $event)"
-          >
-            <div class="sidebar-item-active-bar"></div>
-            <img class="sidebar-item-icon" :class="getTabIconClass(item)" :src="getTabIcon(item)" alt="" />
-            <span class="sidebar-item-label">{{ item.name }}</span>
-          </div>
-
-          <button v-if="canCreateStation" class="sidebar-add-btn" data-testid="sidebar-add-station" :title="t('sector.add_station')" @click="addNewStation">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="12" y1="5" x2="12" y2="19"></line>
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-            </svg>
-            <span class="ml-1.5 text-xs">{{ t('sector.add_station') }}</span>
-          </button>
-        </div>
-
-        <div v-else class="sidebar-section sidebar-dynamic">
-          <template v-for="sector in groupSectors" :key="sector.id">
-            <div
-              class="sidebar-item sector-header"
-              :class="{ expanded: isSectorExpanded(sector.id), active: isSectorActive(sector.id) }"
-            data-testid="sidebar-sector"
-            :data-sector-id="sector.id"
-            tabindex="0"
-            @click="handleSectorClick(sector.id)"
-            @keydown.enter="handleSectorClick(sector.id)"
-            @keydown.space.prevent="handleSectorClick(sector.id)"
-            >
-              <div class="sidebar-item-active-bar"></div>
-              <button
-                class="sector-chevron-btn"
-                data-testid="sidebar-sector-toggle"
-                :data-sector-id="sector.id"
-                @click.stop="toggleSectorCollapse(sector.id)"
-              >
-                <svg
-                  class="sector-chevron w-3 h-3"
-                  :class="{ rotated: isSectorExpanded(sector.id) }"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path d="m9 18 6-6-6-6"></path>
-                </svg>
-              </button>
-              <span class="sector-click-area flex items-center gap-2 flex-1 min-w-0">
-                <img class="sidebar-item-icon icon-orange w-5 h-5 flex-shrink-0" :src="tradestationIconUrl" alt="" />
-                <span class="sidebar-item-label">{{ sector.name }}</span>
-              </span>
-            </div>
-
-            <template v-if="isSectorExpanded(sector.id)">
-              <div
-                data-testid="sidebar-station-list"
-                class="sidebar-station-list"
-              >
-              <div
-                v-for="item in dynamicItems.filter(d => d.sectorId === sector.id && d.type === 'station')"
-                :key="item.id"
-                class="sidebar-item station-item pl-8"
-                :class="{ active: isTabActive(item.id) }"
-                data-testid="sidebar-station"
-                :data-station-id="item.id"
-                tabindex="0"
-                @click="handleFixedClick(item)"
-                @keydown.enter="handleFixedClick(item)"
-                @keydown.space.prevent="handleFixedClick(item)"
-                @contextmenu.stop="openMenu(item.id, item.type, $event)"
-              >
-                <div class="sidebar-item-active-bar"></div>
-                <span class="flex items-center gap-2 flex-1 min-w-0">
-              <img v-if="item.id !== 'terraforming'" class="sidebar-item-icon" :class="getTabIconClass(item)" :src="getTabIcon(item)" alt="" />
-                  <span class="sidebar-item-label">{{ item.name }}</span>
-                </span>
-              </div>
-              </div>
-            </template>
-          </template>
-
-          <button v-if="canCreateStation" class="sidebar-add-btn" data-testid="sidebar-add-station" :title="t('sector.add_station')" @click="addNewStation">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="12" y1="5" x2="12" y2="19"></line>
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-            </svg>
-            <span class="ml-1.5 text-xs">{{ t('sector.add_station') }}</span>
-          </button>
+  <button v-if="presenter.narrowScreen" class="sidebar-drawer-trigger" data-testid="sidebar-drawer-toggle" :aria-label="t('sidebar.open')" @click="presenter.toggleCollapsed()">☰</button>
+  <Teleport to="body">
+    <button v-if="presenter.narrowScreen && presenter.drawerOpen" class="sidebar-drawer-backdrop" data-testid="sidebar-drawer-backdrop" :aria-label="t('sidebar.close')" @click="presenter.drawerOpen = false" />
+  </Teleport>
+  <aside class="production-sidebar" :class="{ compact: presenter.compact, drawer: presenter.narrowScreen, 'drawer-open': presenter.drawerOpen }" :style="{ width: `${presenter.width}px` }" data-testid="production-sidebar" :data-drawer="presenter.narrowScreen" :aria-label="t('sidebar.navigation')">
+    <div class="sidebar-body" :data-testid="presenter.narrowScreen ? 'sidebar-drawer' : undefined">
+      <button class="sidebar-toggle" data-testid="sidebar-toggle" :aria-label="t(presenter.compact ? 'sidebar.expand' : 'sidebar.collapse')" :title="t(presenter.compact ? 'sidebar.expand' : 'sidebar.collapse')" :aria-expanded="!presenter.compact" @click="presenter.toggleCollapsed()">
+        <ChevronDoubleRightIcon v-if="presenter.compact" class="sidebar-toggle-icon" aria-hidden="true" />
+        <ChevronDoubleLeftIcon v-else class="sidebar-toggle-icon" aria-hidden="true" />
+      </button>
+    <div ref="scroll" class="sidebar-scroll custom-scrollbar" @scroll="presenter.setScrollTop(($event.target as HTMLElement).scrollTop)">
+      <div v-for="item in presenter.fixedItems" :key="item.id" :class="item.id === 'terraforming' ? ['sidebar-group', { expanded: presenter.expandedTerraforming }] : undefined" :style="item.id === 'terraforming' ? { '--sidebar-group-color': presenter.terraformGroupColor } : undefined">
+        <ProductionSidebarRow :row="item" :compact="presenter.compact" :expanded="item.id === 'terraforming' ? presenter.expandedTerraforming : null" :fold-color="presenter.terraformGroupColor" @select="presenter.select" @toggle="presenter.toggleTerraforming" />
+        <div v-if="item.id === 'terraforming' && presenter.expandedTerraforming" class="sidebar-terraform-clusters">
+          <ProductionSidebarRow v-for="cluster in presenter.terraformItems" :key="cluster.id" :row="cluster" :compact="presenter.compact" indented @select="presenter.select" />
         </div>
       </div>
-    </div>
-
-    <Teleport to="body">
-        <div
-          v-if="showMenu"
-          class="sidebar-context-menu"
-          data-testid="sidebar-context-menu"
-        :style="{ top: `${menuPosition.y}px`, left: `${menuPosition.x}px` }"
-        @click.stop
-      >
-        <div class="menu-header">{{ t('sector.menu_operations') }}</div>
-
-        <button class="menu-item" data-testid="sidebar-menu-jump-binding" @click="jumpToBinding">
-          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M10.5 13.5L13.5 10.5" />
-            <path d="M8.25 15.75a3.182 3.182 0 0 1-4.5 0 3.182 3.182 0 0 1 0-4.5l3-3a3.182 3.182 0 0 1 4.5 0" />
-            <path d="M15.75 8.25a3.182 3.182 0 0 1 4.5 0 3.182 3.182 0 0 1 0 4.5l-3 3a3.182 3.182 0 0 1-4.5 0" />
-          </svg>
-          <span>{{ t('sector.jump_to_binding') }}</span>
-        </button>
-
-        <template v-if="menuTabType === 'station'">
-          <template v-if="contextMenuMode === 'full'">
-            <div class="menu-divider"></div>
-            <button class="menu-item" data-testid="sidebar-menu-rename" @click="doRename">
-              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-              <span>{{ t('sector.rename_station') }}</span>
-            </button>
-
-            <button class="menu-item" data-testid="sidebar-menu-duplicate" @click="duplicateStation">
-              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-              <span>{{ t('sector.duplicate_station') }}</span>
-            </button>
-
-            <div class="menu-divider"></div>
-          </template>
-
-          <button v-if="!props.canDeleteStation || props.canDeleteStation(menuTabId!)" class="menu-item danger" data-testid="sidebar-menu-delete" @click="confirmDelete">
-            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-            <span>{{ t('sector.delete_station') }}</span>
-          </button>
+      <div v-if="presenter.pinnedItems.length" class="sidebar-pinned" data-testid="sidebar-pinned">
+        <ProductionSidebarRow v-for="item in presenter.pinnedItems" :key="`pinned:${item.id}`" :row="item" :compact="presenter.compact" menu @select="presenter.select" @menu="openMenu" />
+      </div>
+      <input v-if="!presenter.compact" :value="presenter.query" type="search" class="sidebar-search" data-testid="sidebar-search" :placeholder="t('sidebar.search')" :aria-label="t('sidebar.search')" @input="presenter.setQuery(($event.target as HTMLInputElement).value)">
+      <draggable :key="presenter.contextKey + ':flat:' + sortEpoch" :model-value="presenter.flatItems" item-key="id" tag="div" class="sidebar-station-list" data-testid="sidebar-station-list" data-sort-scope="flat" handle=".station-drag-handle" :disabled="!presenter.canSort || presenter.mode !== 'blueprint'" :force-fallback="true" :fallback-on-body="true" :fallback-tolerance="4" ghost-class="sidebar-drag-placeholder" fallback-class="sidebar-drag-shadow" @start="startSort($event, 'stations', null)" @update:model-value="proposeSort" @end="endSort">
+        <template #item="{ element }">
+          <ProductionSidebarRow :row="element" :compact="presenter.compact" :sortable="presenter.canSort && presenter.mode === 'blueprint'" menu @select="presenter.select" @menu="openMenu" />
         </template>
+      </draggable>
+      <draggable :key="presenter.contextKey + ':groups:' + sortEpoch" :model-value="presenter.groups" item-key="id" tag="div" class="sidebar-groups" data-sort-scope="groups" handle=".group-drag-handle" :disabled="!presenter.canSort" :force-fallback="true" :fallback-on-body="true" :fallback-tolerance="4" ghost-class="sidebar-drag-placeholder" fallback-class="sidebar-drag-shadow" @start="startSort($event, 'groups', null)" @update:model-value="proposeSort" @end="endSort">
+        <template #item="{ element: group }">
+          <section class="sidebar-group" :class="{ expanded: group.expanded }" :style="{ '--sidebar-group-color': group.color }">
+            <div class="sidebar-row sector-header" :class="{ 'contains-active': group.active, active: group.row.active }" data-testid="sidebar-sector" :data-sector-id="group.id" :data-entry-id="group.row.id" :title="group.name" @contextmenu.prevent.stop="group.editable && openEditor(group.id, $event)">
+              <span v-if="presenter.canSort" class="group-drag-handle" aria-hidden="true">⠿</span>
+              <button class="sector-chevron-btn" :style="{ backgroundColor: group.color }" data-testid="sidebar-sector-toggle" :data-sector-id="group.id" :aria-expanded="group.expanded" :aria-label="t(group.expanded ? 'sidebar.collapse_group' : 'sidebar.expand_group', { name: group.name })" @click.stop="presenter.toggleGroup(group.id)">
+                <ChevronUpIcon v-if="group.expanded" class="sidebar-chevron-icon" aria-hidden="true" />
+                <ChevronDownIcon v-else class="sidebar-chevron-icon" aria-hidden="true" />
+              </button>
+              <button class="sidebar-nav" :aria-label="group.name" :title="group.name" :aria-current="group.row.active ? 'page' : undefined" @click.stop="presenter.select(group.row.id)">
+                <img v-if="presenter.compact" class="sidebar-item-icon" :class="group.row.iconClass" :src="group.row.icon" alt="">
+                <span v-else class="sidebar-item-label" :style="{ color: group.color }">{{ group.name }}</span>
+              </button>
+              <button v-if="group.editable && !presenter.compact" class="sidebar-more" data-testid="sidebar-group-menu" :data-sector-id="group.id" :aria-label="t('sidebar.edit_group', { name: group.name })" @click.stop="openEditor(group.id, $event)">⋮</button>
+            </div>
+            <draggable v-if="group.expanded" :model-value="group.stations" item-key="id" tag="div" class="sidebar-station-list" data-testid="sidebar-station-list" :data-sort-scope="group.id" handle=".station-drag-handle" :disabled="!presenter.canSort" :force-fallback="true" :fallback-on-body="true" :fallback-tolerance="4" ghost-class="sidebar-drag-placeholder" fallback-class="sidebar-drag-shadow" @start="startSort($event, 'stations', group.id)" @update:model-value="proposeSort" @end="endSort">
+              <template #item="{ element }"><ProductionSidebarRow :row="element" :compact="presenter.compact" :sortable="presenter.canSort" menu indented @select="presenter.select" @menu="openMenu" /></template>
+            </draggable>
+          </section>
+        </template>
+      </draggable>
+      <p v-if="presenter.noResults" class="sidebar-message" data-testid="sidebar-no-results">{{ t('sidebar.no_results') }}</p>
+      <p v-if="presenter.feedback" class="sidebar-message" role="status">{{ presenter.feedback }}</p>
+    </div>
+    <div v-if="presenter.primaryAction !== null" class="sidebar-footer">
+      <button class="sidebar-add-btn" :data-testid="presenter.primaryAction.testId" :aria-label="presenter.primaryAction.label" :title="presenter.primaryAction.label" @click="presenter.runPrimaryAction()"><PlusIcon class="sidebar-item-icon" aria-hidden="true" /><span v-if="!presenter.compact">{{ presenter.primaryAction.label }}</span></button>
+    </div>
+    <div v-if="!presenter.compact && !presenter.narrowScreen" class="sidebar-resize-handle" data-testid="sidebar-resize-handle" :title="t('sidebar.resize')" @pointerdown.prevent="startResize" @pointermove="presenter.moveResize($event.pointerId, $event.clientX)" @pointerup="endResize($event, true)" @pointercancel="endResize($event, false)" @lostpointercapture="endResize($event, false)" />
+    </div>
+  </aside>
+  <Teleport to="body">
+    <div v-if="presenter.menu || presenter.editor" ref="overlay" class="sidebar-overlay" :style="{ left: `${overlayPosition.x}px`, top: `${overlayPosition.y}px` }" @click.stop @contextmenu.prevent>
+      <div v-if="presenter.menu" class="sidebar-context-menu" data-testid="sidebar-context-menu">
+        <div class="menu-header">{{ t('sector.menu_operations') }}</div>
+        <button v-for="action in presenter.menuActions" :key="action.id" class="menu-item" :class="{ danger: action.id === 'delete' }" :data-testid="action.testId" @click="presenter.runMenuAction(action.id)">{{ action.label }}</button>
       </div>
-    </Teleport>
-
-    <Transition name="fade">
-      <div v-if="showDeleteConfirm" class="modal-backdrop" data-testid="sidebar-delete-dialog" @click="cancelDelete">
-        <div class="modal-card" @click.stop>
-          <div class="modal-header">
-            <span class="text-amber-400 text-lg">⚠</span>
-            <h3>{{ t('sector.confirm_delete') }}</h3>
-          </div>
-          <p class="text-slate-400 text-sm mb-6 ml-1">{{ t('sector.delete_warning') }}</p>
-          <div class="flex justify-end gap-3">
-            <button class="btn-cancel" data-testid="sidebar-delete-cancel" @click="cancelDelete">{{ t('ui.cancel') }}</button>
-            <button class="btn-danger" data-testid="sidebar-delete-confirm" @click="deleteStation">{{ t('ui.delete') }}</button>
-          </div>
+      <form v-else-if="presenter.editor" class="sidebar-group-editor" data-testid="sidebar-group-editor" @submit.prevent="presenter.applyGroupEditor()">
+        <label for="sidebar-group-name">{{ t('sidebar.group_name') }}</label>
+        <input id="sidebar-group-name" v-model="presenter.editor.name" data-testid="sidebar-group-name" class="group-name-input" :aria-invalid="presenter.editor.error !== null">
+        <div class="sidebar-color-palette" :aria-label="t('sidebar.group_color')">
+          <button v-for="color in presenter.colorOptions" :key="color.color" type="button" class="sidebar-color" :class="{ selected: color.selected }" :style="{ backgroundColor: color.color }" :data-color="color.color" data-testid="sidebar-group-color" :title="color.label" :aria-label="color.label" :aria-pressed="color.selected" @click="presenter.editor.color = color.color" />
         </div>
-      </div>
-    </Transition>
-  </div>
+        <p v-if="presenter.editor.error" role="alert">{{ presenter.editor.error }}</p>
+        <div class="sidebar-editor-actions"><button type="button" data-testid="sidebar-group-cancel" @click="presenter.closeOverlays()">{{ t('ui.cancel') }}</button><button type="submit" data-testid="sidebar-group-apply">{{ t('sidebar.apply') }}</button></div>
+      </form>
+    </div>
+    <div v-if="presenter.pendingDelete" class="sidebar-delete-backdrop" data-testid="sidebar-delete-dialog" @click="presenter.cancelDelete()">
+      <div class="sidebar-delete-card" role="dialog" aria-modal="true" :aria-label="t('sector.confirm_delete')" @click.stop><h3>{{ t('sector.confirm_delete') }}</h3><p>{{ t('sector.delete_warning') }}</p><div class="sidebar-editor-actions"><button data-testid="sidebar-delete-cancel" @click="presenter.cancelDelete()">{{ t('ui.cancel') }}</button><button class="danger" data-testid="sidebar-delete-confirm" @click="presenter.confirmDelete()">{{ t('ui.delete') }}</button></div></div>
+    </div>
+  </Teleport>
 </template>
 
-<style scoped>
-.production-sidebar {
-  @apply flex-shrink-0 bg-slate-900 border-r border-slate-700 select-none relative flex flex-col;
-  width: 200px;
-  transition: width 0.2s ease;
-  overflow: hidden;
-}
-
-.production-sidebar.collapsed {
-  width: 24px;
-  @apply bg-slate-950 border-slate-800 cursor-pointer;
-}
-
-.sidebar-toggle {
-  @apply h-8 w-8 flex items-center justify-center mx-2 my-1.5 rounded-md flex-shrink-0;
-  @apply text-slate-500 hover:text-slate-300 hover:bg-slate-800 transition-colors;
-}
-
-.production-sidebar.collapsed .sidebar-toggle {
-  @apply absolute inset-0 w-full h-full mx-0 my-0 flex-shrink p-0;
-  @apply rounded-none text-sky-400 hover:bg-slate-800;
-}
-
-.sidebar-inner {
-  @apply flex flex-col flex-1 min-h-0 overflow-hidden;
-}
-
-.production-sidebar.collapsed .sidebar-inner {
-  @apply hidden;
-}
-
-.sidebar-scroll {
-  @apply flex-1 overflow-y-auto overflow-x-hidden;
-}
-
-.sidebar-section {
-  @apply py-1;
-}
-
-.sidebar-divider {
-  @apply mx-3 h-px bg-slate-700/50;
-}
-
-.sidebar-item {
-  @apply relative flex items-center gap-2 px-3 py-1.5 mx-1 rounded-md cursor-pointer;
-  @apply text-slate-400 hover:text-slate-200 hover:bg-slate-800/60;
-  transition: all 0.15s ease;
-}
-
-.sidebar-item.pl-8 {
-  padding-left: 1.75rem;
-}
-
-.sidebar-item.active {
-  @apply text-sky-400 bg-slate-800;
-}
-
-.sidebar-item.disabled {
-  @apply opacity-45 cursor-not-allowed hover:bg-transparent hover:text-slate-400;
-}
-
-.sidebar-item-active-bar {
-  @apply absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 rounded-full bg-transparent transition-colors;
-}
-
-.sidebar-item.active .sidebar-item-active-bar {
-  @apply bg-sky-500;
-}
-
-.sidebar-item-icon {
-  @apply w-5 h-5 flex-shrink-0;
-}
-
-.sidebar-icon-wrap {
-  @apply relative w-5 h-5 flex-shrink-0;
-}
-
-.sidebar-icon-wrap .sidebar-item-icon {
-  @apply w-5 h-5;
-}
-
-.sidebar-recalc-dot {
-  @apply absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-red-500 border border-slate-900;
-}
-
-.icon-green {
-  filter: brightness(0) saturate(100%) invert(64%) sepia(60%) saturate(450%) hue-rotate(84deg) brightness(92%) contrast(91%);
-}
-
-.icon-orange {
-  filter: brightness(0) saturate(100%) invert(76%) sepia(45%) saturate(650%) hue-rotate(7deg) brightness(99%) contrast(91%);
-}
-
-.icon-cyan {
-  filter: brightness(0) saturate(100%) invert(71%) sepia(38%) saturate(722%) hue-rotate(155deg) brightness(97%) contrast(93%);
-}
-
-.icon-temp-state-2 {
-  filter: brightness(0) saturate(100%) invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%);
-}
-
-.icon-temp-state-1 {
-  filter: brightness(0) saturate(100%) invert(79%) sepia(20%) saturate(1111%) hue-rotate(141deg) brightness(87%) contrast(86%);
-}
-
-.icon-temp-state-3 {
-  filter: brightness(0) saturate(100%) invert(59%) sepia(60%) saturate(5033%) hue-rotate(1deg) brightness(102%) contrast(105%);
-}
-
-.icon-temp-state-4 {
-  filter: brightness(0) saturate(100%) invert(16%) sepia(100%) saturate(7419%) hue-rotate(4deg) brightness(89%) contrast(117%);
-}
-
-.sidebar-item-label {
-  @apply text-xs font-medium truncate;
-}
-
-.sector-chevron-btn {
-  @apply flex items-center justify-center w-6 h-6 rounded flex-shrink-0;
-  @apply text-slate-500 hover:text-slate-300 transition-colors;
-}
-
-.sector-click-area {
-  @apply cursor-pointer;
-}
-
-.sector-chevron.rotated {
-  @apply rotate-90;
-}
-
-.sector-chevron {
-  @apply transition-transform duration-150;
-  flex-shrink: 0;
-}
-
-.sidebar-add-btn {
-  @apply w-full flex items-center gap-1.5 px-3 py-1.5 mx-1 rounded-md;
-  @apply text-slate-500 hover:text-sky-400 hover:bg-slate-800/60 transition-all;
-}
-
-.sidebar-context-menu {
-  @apply fixed z-50 bg-slate-800/95 backdrop-blur-md border border-slate-600 rounded-lg shadow-2xl py-1 min-w-[160px];
-  animation: menu-slide-in 0.1s ease-out;
-}
-
-@keyframes menu-slide-in {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-.menu-header {
-  @apply px-3 py-1.5 text-[10px] text-slate-500 font-bold uppercase tracking-wider border-b border-slate-700/50 mb-1;
-}
-
-.menu-item {
-  @apply flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-slate-300 cursor-pointer transition-colors;
-  @apply hover:bg-sky-500/10 hover:text-sky-400 border-l-2 border-transparent hover:border-sky-500;
-}
-
-.menu-item.danger {
-  @apply text-slate-300 hover:text-red-400 hover:bg-red-500/10 hover:border-red-500;
-}
-
-.icon {
-  @apply w-3.5 h-3.5 opacity-70;
-}
-
-.menu-divider {
-  @apply h-px bg-slate-700 my-1 mx-2;
-}
-
-.modal-backdrop {
-  @apply fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm;
-}
-
-.modal-card {
-  @apply bg-slate-800 border border-slate-600 rounded-xl p-5 shadow-2xl max-w-sm w-full transform transition-all scale-100;
-}
-
-.modal-header {
-  @apply flex items-center gap-2 mb-2 font-bold text-slate-200;
-}
-
-.btn-cancel {
-  @apply px-3 py-1.5 text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-700 rounded transition-colors;
-}
-
-.btn-danger {
-  @apply px-4 py-1.5 text-xs font-bold bg-red-600 text-white rounded hover:bg-red-500 shadow-lg shadow-red-900/20 transition-all;
-}
-
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.2s;
-}
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-
-.sidebar-terraform-clusters {
-  padding-left: 20px;
-}
-
-.terraform-cluster-item {
-  padding-left: 12px;
-}
-
-.sidebar-icon-indented {
-  opacity: 0.6;
-  width: 16px;
-  height: 16px;
-}
+<style>
+.production-sidebar { @apply flex-shrink-0 bg-slate-900 border-r border-slate-700 relative flex flex-col text-slate-300; min-height: 0; --sidebar-icon-center: 32px; --sidebar-row-gutter: 4px; }
+.sidebar-body { display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden; }
+.sidebar-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; }
+.sidebar-footer { flex: 0 0 auto; }
+.sidebar-toggle { @apply h-8 w-8 rounded hover:bg-slate-800 text-slate-400; margin: 8px calc(var(--sidebar-icon-center) - 16px); display: flex; flex-shrink: 0; align-items: center; justify-content: center; }
+.sidebar-toggle-icon { width: 20px; height: 20px; }
+.sidebar-row { @apply relative flex items-center rounded-md text-slate-400 hover:bg-slate-800; margin: 0 var(--sidebar-row-gutter); height: 36px; }
+.sidebar-row.active { @apply bg-slate-800 text-sky-400; }
+.sidebar-row.contains-active:not(.active) { @apply bg-slate-800/50; }
+.sidebar-nav { @apply flex items-center gap-2 flex-1 min-w-0 text-left rounded-md; padding: 8px 8px 8px calc(var(--sidebar-icon-center) - var(--sidebar-row-gutter) - 10px); }
+.sidebar-nav.disabled { opacity: .45; cursor: not-allowed; }
+.sidebar-nav:focus-visible, .sidebar-more:focus-visible, .sector-chevron-btn:focus-visible, .sidebar-toggle:focus-visible { outline: 2px solid #38bdf8; outline-offset: -2px; }
+.sidebar-item-label { @apply text-xs font-medium truncate; }
+.sidebar-icon-wrap { position: relative; display: inline-flex; flex-shrink: 0; }
+.sidebar-item-icon { width: 20px; height: 20px; flex-shrink: 0; }
+.sidebar-status-dot { position: absolute; top: -2px; right: -2px; width: 6px; height: 6px; border-radius: 50%; background: #fb923c; }
+.sidebar-more { @apply rounded hover:bg-slate-700; padding: 4px 8px; opacity: 0; }
+.sidebar-row:hover .sidebar-more, .sidebar-more:focus-visible { opacity: 1; }
+.production-sidebar.compact .sidebar-scroll { scrollbar-width: none; }
+.production-sidebar.compact .sidebar-scroll::-webkit-scrollbar { display: none; }
+.sidebar-tree-header .sidebar-nav { padding-left: 2px; }
+.sector-header .sidebar-nav { padding-left: 5px; }
+.production-sidebar.compact .sector-header .sidebar-nav { position: absolute; right: 0; top: 4px; width: 12px; height: 28px; padding: 0; }
+.production-sidebar.compact .sector-header .sidebar-item-icon { width: 12px; height: 12px; }
+.sidebar-group { margin: 4px 0; position: relative; }
+.sidebar-group.expanded::before { content: ''; position: absolute; left: 0; top: 4px; bottom: 4px; width: 2px; border-radius: 2px; background: var(--sidebar-group-color); }
+.sector-chevron-btn { display: flex; flex-shrink: 0; align-items: center; justify-content: center; width: 32px; height: 26px; margin-left: calc(var(--sidebar-icon-center) - var(--sidebar-row-gutter) - 16px); border-radius: 8px; color: white; }
+.sector-header .sector-chevron-btn { width: 26px; margin-left: calc(var(--sidebar-icon-center) - var(--sidebar-row-gutter) - 13px); }
+.sidebar-chevron-icon { width: 14px; height: 14px; }
+.station-drag-handle, .group-drag-handle { position: absolute; left: 0; top: 50%; transform: translateY(-50%); padding: 2px; cursor: grab; color: #64748b; touch-action: none; user-select: none; }
+.sidebar-search { @apply bg-slate-800 border border-slate-700 rounded text-xs p-2; width: calc(100% - 16px); margin: 8px; }
+.sidebar-add-btn { @apply flex items-center gap-2 text-xs hover:text-sky-400; padding: 12px 8px 12px calc(var(--sidebar-icon-center) - 10px); width: 100%; }
+.sidebar-message { @apply p-3 text-xs text-slate-400; }
+.sidebar-resize-handle { position: absolute; right: -3px; width: 6px; top: 0; bottom: 0; cursor: ew-resize; touch-action: none; z-index: 2; }
+.sidebar-resize-handle:hover { background: #38bdf866; }
+.production-sidebar.drawer { position: fixed; left: 0; top: 0; bottom: 0; z-index: 51; display: none; }
+.production-sidebar.drawer.drawer-open { display: flex; }
+.sidebar-drawer-trigger { @apply bg-slate-900 text-sky-400 p-2; align-self: flex-start; }
+.sidebar-drawer-backdrop { position: fixed; inset: 0; z-index: 50; background: #0009; }
+.sidebar-overlay { @apply bg-slate-800 border border-slate-600 rounded-lg shadow-2xl text-slate-200; position: fixed; z-index: 70; max-width: calc(100vw - 16px); max-height: calc(100vh - 16px); overflow: auto; }
+.sidebar-context-menu { min-width: 180px; padding: 4px; }
+.menu-header { @apply text-xs text-slate-400 p-2; }
+.menu-item { @apply block w-full text-left px-3 py-2 text-xs rounded hover:bg-slate-700; }
+.sidebar-overlay .danger, .sidebar-delete-card .danger { color: #f87171; }
+.sidebar-group-editor { width: 270px; padding: 16px; font-size: 12px; }
+.group-name-input { @apply bg-slate-900 border border-slate-600 rounded p-2 my-2 w-full; }
+.sidebar-color-palette { display: flex; flex-wrap: wrap; gap: 12px; padding: 10px 2px; }
+.sidebar-color { width: 20px; height: 20px; border-radius: 50%; border: 2px solid transparent; }
+.sidebar-color.selected { outline: 2px solid #e2e8f0; outline-offset: 3px; }
+.sidebar-editor-actions { @apply flex justify-end gap-3 mt-4; }
+.sidebar-editor-actions button { @apply rounded bg-slate-700 px-3 py-2 hover:bg-slate-600; }
+.sidebar-delete-backdrop { @apply fixed inset-0 flex items-center justify-center bg-black/60; z-index: 80; }
+.sidebar-delete-card { @apply bg-slate-800 border border-slate-600 rounded-xl p-5 shadow-2xl text-slate-200; max-width: 360px; }
+.sidebar-drag-placeholder { opacity: .25; }
+.sidebar-drag-shadow { opacity: .7; pointer-events: none !important; }
+.sidebar-row .icon-green { filter: brightness(0) saturate(100%) invert(64%) sepia(60%) saturate(450%) hue-rotate(84deg) brightness(92%) contrast(91%); }
+.sidebar-row .icon-orange { filter: brightness(0) saturate(100%) invert(76%) sepia(45%) saturate(650%) hue-rotate(7deg) brightness(99%) contrast(91%); }
+.sidebar-row .icon-temp-state-1 { filter: brightness(0) saturate(100%) invert(79%) sepia(20%) saturate(1111%) hue-rotate(141deg) brightness(87%) contrast(86%); }
+.sidebar-row .icon-temp-state-2 { filter: brightness(0) saturate(100%) invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%); }
+.sidebar-row .icon-temp-state-3 { filter: brightness(0) saturate(100%) invert(59%) sepia(60%) saturate(5033%) hue-rotate(1deg) brightness(102%) contrast(105%); }
+.sidebar-row .icon-temp-state-4 { filter: brightness(0) saturate(100%) invert(16%) sepia(100%) saturate(7419%) hue-rotate(4deg) brightness(89%) contrast(117%); }
 </style>

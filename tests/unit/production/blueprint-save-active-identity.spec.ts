@@ -58,6 +58,25 @@ describe('Blueprint save active identity transaction', () => {
     setActivePinia(createPinia())
   })
 
+  it('preserves full station membership and selection when saving and reopening sidebar order', async () => {
+    const { store } = existingEmpire()
+    const second = store.createStation('Second')!
+    store.updateStationModules(second, [{ id: ENERGY, count: 2 }])
+    store.saveEmpire()
+    const originalIds = store.activeEmpire!.stations.map(station => station.id)
+    const originalStations = JSON.parse(JSON.stringify(store.activeEmpire!.stations))
+    expect(store.reorderStations([{ id: second }, { id: second }])).toBe(false)
+    expect(store.reorderStations([...originalIds].reverse().map(id => ({ id })))).toBe(true)
+    expect(store.activeStationId).toBe(second)
+    expect(store.activeEmpire!.stations.map(station => station.id)).toEqual([...originalIds].reverse())
+    expect(store.savedEmpires.list.find(empire => empire.id === store.activeEmpire!.id)!.stations).toEqual(originalStations)
+    expect([...store.activeEmpire!.stations].sort((a, b) => a.id.localeCompare(b.id))).toEqual([...originalStations].sort((a, b) => a.id.localeCompare(b.id)))
+    store.saveEmpire()
+    const restored = await reopen()
+    expect(restored.store.activeEmpire!.stations.map(station => station.id)).toEqual([...originalIds].reverse())
+    expect(restored.store.activeStationId).toBe(second)
+  })
+
   it.each(['save', 'saveAs'] as const)('%s of B restores B across new Pinia while retaining saved A', async action => {
     const { store, view, original } = existingEmpire()
     store.createEmpire('B', 'B station')

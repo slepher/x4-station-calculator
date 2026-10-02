@@ -67,7 +67,7 @@ watch(() => activeViewStore.activeBinding, (newGuid) => {
   }
 }, { immediate: true })
 
-const sidebarPresenter = useProductionSidebarPresenter(liveStore)
+const sidebarPresenter = useProductionSidebarPresenter({ mode: 'live', store: liveStore })
 const toolbarPresenter = useProductionToolbarPresenter(liveStore)
 
 watch(() => toolbarPresenter.props.workbenchMode.value, (mode) => {
@@ -187,45 +187,7 @@ function openShipBuildForTransportSelection() {
 
 <template>
   <div class="production-layout">
-    <ProductionSidebar
-      :tabs="sidebarPresenter.props.tabs.value"
-      :active-tab-id="sidebarPresenter.props.activeTabId.value"
-      :expanded-sector-id="sidebarPresenter.props.expandedSectorId.value"
-      :has-sectors="sidebarPresenter.props.hasSectors"
-      :show-terraforming="sidebarPresenter.props.showTerraforming"
-      :show-tech-tree="sidebarPresenter.props.showTechTree"
-      :show-research="sidebarPresenter.props.showResearch"
-      :show-npc-trade="sidebarPresenter.props.showNpcTrade"
-      :show-blueprint-recipe="sidebarPresenter.props.showBlueprintRecipe"
-      :show-auto-sector-group="sidebarPresenter.props.showAutoSectorGroup"
-      :auto-sector-group-disabled="sidebarPresenter.props.autoSectorGroupDisabled.value"
-      :auto-sector-group-needs-recalc="sidebarPresenter.props.autoSectorGroupNeedsRecalc.value"
-      :terraforming-clusters="terraformingStore.sidebarClusters"
-      :active-terraforming-cluster-id="toolbarPresenter.props.workbenchMode.value === 'terraforming' ? (terraformingStore.activePlan?.selectedClusterId ?? null) : null"
-      :can-create-station="sidebarPresenter.props.canCreateStation"
-      :can-open-context-menu="sidebarPresenter.props.canOpenContextMenu"
-      :context-menu-mode="sidebarPresenter.props.contextMenuMode"
-      :can-delete-station="sidebarPresenter.props.canDeleteStation"
-      @select-overview="sidebarPresenter.emits.selectOverview"
-      @select-terraforming="sidebarPresenter.emits.selectTerraforming"
-      @select-tech-tree="sidebarPresenter.emits.selectTechTree"
-      @select-research="sidebarPresenter.emits.selectResearch"
-      @select-npc-trade="sidebarPresenter.emits.selectNpcTrade"
-      @select-blueprint-recipe="sidebarPresenter.emits.selectBlueprintRecipe"
-      @select-auto-sector-group="sidebarPresenter.emits.selectAutoSectorGroup"
-      @select-terraforming-cluster="(clusterId: string) => {
-        activeViewStore.activeBindingWorkbench = 'terraforming'
-        terraformingStore.selectCluster(clusterId)
-      }"
-      @select-transit="sidebarPresenter.emits.selectTransit"
-      @select-station="sidebarPresenter.emits.selectStation"
-      @create-station="sidebarPresenter.emits.createStation"
-      @rename-station="sidebarPresenter.emits.renameStation"
-      @duplicate-station="sidebarPresenter.emits.duplicateStation"
-      @delete-station="sidebarPresenter.emits.deleteStation"
-      @expand-sector="sidebarPresenter.emits.expandSector"
-      @jump-to-binding="(tabId, tabType) => sidebarPresenter.emits.jumpToBinding(tabId, tabType)"
-    />
+    <ProductionSidebar :presenter="sidebarPresenter" />
     <div class="production-content custom-scrollbar">
 
   <LiveTransitToolbar

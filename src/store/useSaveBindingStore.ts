@@ -385,6 +385,16 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     return true
   }
 
+  function updateGroupMetadata(gameGuid: string, groupKey: string, original: { name: string; color: string | undefined }, patch: { name: string; color: string | undefined }): boolean {
+    const draft = draftBinding.value
+    if (draft === null || draft.gameGuid !== gameGuid) return false
+    const group = draft.groups.find(item => getGroupKey(item) === groupKey)
+    if (group === undefined || group.name !== original.name || group.color !== original.color) return false
+    const name = patch.name.trim()
+    if (name.length === 0) return false
+    return updateGroup(gameGuid, groupKey, { name, color: patch.color })
+  }
+
   function deleteGroup(gameGuid: string, groupId: string) {
     if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) loadDraftForGameGuid(gameGuid)
     if (!draftBinding.value) return false
@@ -834,6 +844,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     discardChanges,
     createGroup,
     updateGroup,
+    updateGroupMetadata,
     deleteGroup,
     bindSectorGroup,
     setGroupConnection,

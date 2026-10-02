@@ -112,6 +112,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   const overviewBuyMultiplier = ref(0.5)
   const overviewSellMultiplier = ref(0.5)
   const playerStationRecords = ref<PlayerStationRecord[]>([])
+  const loadedBindingGameGuid = ref<string | null>(null)
+  watch(() => activeBinding.value?.gameGuid, () => { loadedBindingGameGuid.value = null }, { flush: 'sync' })
   const selectedTransitTransportBlueprintId = ref<string | null>(null)
 
   const productionSource = computed<'save-binding'>(() => 'save-binding')
@@ -683,6 +685,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   }
 
   async function loadPlayerStationRecords() {
+    loadedBindingGameGuid.value = null
     const archive = selectedArchive.value
     const binding = activeBinding.value
     if (!archive || !archive.isValid || !binding || archive.meta.guid !== binding.gameGuid) {
@@ -692,8 +695,11 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     const archiveId = createArchiveId(archive.meta.guid, archive.meta.time)
     try {
       const records = await loadPlayerStationsFlatByArchiveId(gameData, archiveId)
+      if (activeBinding.value?.gameGuid !== binding.gameGuid || selectedArchive.value !== archive) return
       playerStationRecords.value = records
+      loadedBindingGameGuid.value = binding.gameGuid
     } catch (e) {
+      if (activeBinding.value?.gameGuid !== binding.gameGuid || selectedArchive.value !== archive) return
       console.error('[LiveProductionStore] Failed to load player stations:', e)
       playerStationRecords.value = []
     }
@@ -1992,6 +1998,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
 
     activeViewStore.isSavePanelOpen = true
     activeViewStore.mapBindingGameGuid = gameGuid
+    activeViewStore.mapBindingStage = 'select-station'
     activeViewStore.mapSavePanelLayer = 'binding-station'
     activeViewStore.mapSavePanelSectorGroupId = sectorGroupId
     activeViewStore.setActiveView('maps')
@@ -2520,6 +2527,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
 
   return {
     isReady,
+    loadedBindingGameGuid,
     isDirty,
     isEmptyForSave,
     activeBinding,
