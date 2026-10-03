@@ -1615,6 +1615,7 @@
     }
   },
   "sidebar": {
+    "transit_station": "中转站",
     "bind_station": "绑定空间站",
     "navigation": "产能导航",
     "open": "打开侧栏",

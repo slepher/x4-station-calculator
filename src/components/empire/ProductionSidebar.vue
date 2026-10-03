@@ -2,7 +2,7 @@
 import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import draggable from 'vuedraggable'
-import { ChevronDoubleLeftIcon, ChevronDoubleRightIcon, ChevronDownIcon, ChevronUpIcon, PlusIcon } from '@heroicons/vue/24/outline'
+import { ChevronDoubleLeftIcon, ChevronDoubleRightIcon, PlusIcon } from '@heroicons/vue/24/outline'
 import ProductionSidebarRow from './ProductionSidebarRow.vue'
 import type { ProductionSidebarPresenter, SidebarGroup, SidebarRow } from './presenters/useProductionSidebarPresenter'
 
@@ -156,18 +156,15 @@ onUnmounted(() => {
       <draggable :key="presenter.contextKey + ':groups:' + sortEpoch" :model-value="presenter.groups" item-key="id" tag="div" class="sidebar-groups" data-sort-scope="groups" handle=".group-drag-handle" :disabled="!presenter.canSort" :force-fallback="true" :fallback-on-body="true" :fallback-tolerance="4" ghost-class="sidebar-drag-placeholder" fallback-class="sidebar-drag-shadow" @start="startSort($event, 'groups', null)" @update:model-value="proposeSort" @end="endSort">
         <template #item="{ element: group }">
           <section class="sidebar-group" :class="{ expanded: group.expanded }" :style="{ '--sidebar-group-color': group.color }">
-            <div class="sidebar-row sector-header" :class="{ 'contains-active': group.active, active: group.row.active }" data-testid="sidebar-sector" :data-sector-id="group.id" :data-entry-id="group.row.id" :title="group.name" @contextmenu.prevent.stop="group.editable && openEditor(group.id, $event)">
+            <div class="sidebar-row sector-header" :class="{ 'contains-active': group.active }" data-testid="sidebar-sector" :data-sector-id="group.id" :title="group.name" @contextmenu.prevent.stop="group.editable && openEditor(group.id, $event)">
               <span v-if="presenter.canSort" class="group-drag-handle" aria-hidden="true">⠿</span>
-              <button class="sector-chevron-btn" :style="{ backgroundColor: group.color }" data-testid="sidebar-sector-toggle" :data-sector-id="group.id" :aria-expanded="group.expanded" :aria-label="t(group.expanded ? 'sidebar.collapse_group' : 'sidebar.expand_group', { name: group.name })" @click.stop="presenter.toggleGroup(group.id)">
-                <ChevronUpIcon v-if="group.expanded" class="sidebar-chevron-icon" aria-hidden="true" />
-                <ChevronDownIcon v-else class="sidebar-chevron-icon" aria-hidden="true" />
-              </button>
-              <button class="sidebar-nav" :aria-label="group.name" :title="group.name" :aria-current="group.row.active ? 'page' : undefined" @click.stop="presenter.select(group.row.id)">
-                <img v-if="presenter.compact" class="sidebar-item-icon" :class="group.row.iconClass" :src="group.row.icon" alt="">
-                <span v-else class="sidebar-item-label" :style="{ color: group.color }">{{ group.name }}</span>
+              <button class="sidebar-nav sidebar-fold-button sector-chevron-btn" :style="{ color: group.color }" data-testid="sidebar-sector-toggle" :data-sector-id="group.id" :aria-expanded="group.expanded" :aria-label="t(group.expanded ? 'sidebar.collapse_group' : 'sidebar.expand_group', { name: group.name })" @click.stop="presenter.toggleGroup(group.id)">
+                <span class="sidebar-fold-icon" :style="{ '--sidebar-fold-icon': `url(${group.foldIcon})` }" aria-hidden="true" />
+                <span v-if="!presenter.compact" class="sidebar-item-label">{{ group.name }}</span>
               </button>
               <button v-if="group.editable && !presenter.compact" class="sidebar-more" data-testid="sidebar-group-menu" :data-sector-id="group.id" :aria-label="t('sidebar.edit_group', { name: group.name })" @click.stop="openEditor(group.id, $event)">⋮</button>
             </div>
+            <ProductionSidebarRow v-if="group.expanded" :row="group.row" :compact="presenter.compact" indented @select="presenter.select" />
             <draggable v-if="group.expanded" :model-value="group.stations" item-key="id" tag="div" class="sidebar-station-list" data-testid="sidebar-station-list" :data-sort-scope="group.id" handle=".station-drag-handle" :disabled="!presenter.canSort" :force-fallback="true" :fallback-on-body="true" :fallback-tolerance="4" ghost-class="sidebar-drag-placeholder" fallback-class="sidebar-drag-shadow" @start="startSort($event, 'stations', group.id)" @update:model-value="proposeSort" @end="endSort">
               <template #item="{ element }"><ProductionSidebarRow :row="element" :compact="presenter.compact" :sortable="presenter.canSort" menu indented @select="presenter.select" @menu="openMenu" /></template>
             </draggable>
@@ -215,29 +212,23 @@ onUnmounted(() => {
 .sidebar-row { @apply relative flex items-center rounded-md text-slate-400 hover:bg-slate-800; margin: 0 var(--sidebar-row-gutter); height: 36px; }
 .sidebar-row.active { @apply bg-slate-800 text-sky-400; }
 .sidebar-row.contains-active:not(.active) { @apply bg-slate-800/50; }
-.sidebar-nav { @apply flex items-center gap-2 flex-1 min-w-0 text-left rounded-md; padding: 8px 8px 8px calc(var(--sidebar-icon-center) - var(--sidebar-row-gutter) - 10px); }
+.sidebar-nav { @apply flex items-center gap-2 flex-1 min-w-0 text-left rounded-md; height: 32px; padding: 3px 8px 3px calc(var(--sidebar-icon-center) - var(--sidebar-row-gutter) - 13px); }
 .sidebar-nav.disabled { opacity: .45; cursor: not-allowed; }
 .sidebar-nav:focus-visible, .sidebar-more:focus-visible, .sector-chevron-btn:focus-visible, .sidebar-toggle:focus-visible { outline: 2px solid #38bdf8; outline-offset: -2px; }
 .sidebar-item-label { @apply text-xs font-medium truncate; }
 .sidebar-icon-wrap { position: relative; display: inline-flex; flex-shrink: 0; }
-.sidebar-item-icon { width: 20px; height: 20px; flex-shrink: 0; }
+.sidebar-item-icon { width: 26px; height: 26px; flex-shrink: 0; }
 .sidebar-status-dot { position: absolute; top: -2px; right: -2px; width: 6px; height: 6px; border-radius: 50%; background: #fb923c; }
 .sidebar-more { @apply rounded hover:bg-slate-700; padding: 4px 8px; opacity: 0; }
 .sidebar-row:hover .sidebar-more, .sidebar-more:focus-visible { opacity: 1; }
 .production-sidebar.compact .sidebar-scroll { scrollbar-width: none; }
 .production-sidebar.compact .sidebar-scroll::-webkit-scrollbar { display: none; }
-.sidebar-tree-header .sidebar-nav { padding-left: 2px; }
-.sector-header .sidebar-nav { padding-left: 5px; }
-.production-sidebar.compact .sector-header .sidebar-nav { position: absolute; right: 0; top: 4px; width: 12px; height: 28px; padding: 0; }
-.production-sidebar.compact .sector-header .sidebar-item-icon { width: 12px; height: 12px; }
 .sidebar-group { margin: 4px 0; position: relative; }
 .sidebar-group.expanded::before { content: ''; position: absolute; left: 0; top: 4px; bottom: 4px; width: 2px; border-radius: 2px; background: var(--sidebar-group-color); }
-.sector-chevron-btn { display: flex; flex-shrink: 0; align-items: center; justify-content: center; width: 32px; height: 26px; margin-left: calc(var(--sidebar-icon-center) - var(--sidebar-row-gutter) - 16px); border-radius: 8px; color: white; }
-.sector-header .sector-chevron-btn { width: 26px; margin-left: calc(var(--sidebar-icon-center) - var(--sidebar-row-gutter) - 13px); }
-.sidebar-chevron-icon { width: 14px; height: 14px; }
+.sidebar-fold-icon { display: inline-block; width: 26px; height: 26px; flex-shrink: 0; background: currentColor; mask: var(--sidebar-fold-icon) center / contain no-repeat; }
 .station-drag-handle, .group-drag-handle { position: absolute; left: 0; top: 50%; transform: translateY(-50%); padding: 2px; cursor: grab; color: #64748b; touch-action: none; user-select: none; }
 .sidebar-search { @apply bg-slate-800 border border-slate-700 rounded text-xs p-2; width: calc(100% - 16px); margin: 8px; }
-.sidebar-add-btn { @apply flex items-center gap-2 text-xs hover:text-sky-400; padding: 12px 8px 12px calc(var(--sidebar-icon-center) - 10px); width: 100%; }
+.sidebar-add-btn { @apply flex items-center gap-2 text-xs hover:text-sky-400; padding: 12px 8px 12px calc(var(--sidebar-icon-center) - 13px); width: 100%; }
 .sidebar-message { @apply p-3 text-xs text-slate-400; }
 .sidebar-resize-handle { position: absolute; right: -3px; width: 6px; top: 0; bottom: 0; cursor: ew-resize; touch-action: none; z-index: 2; }
 .sidebar-resize-handle:hover { background: #38bdf866; }

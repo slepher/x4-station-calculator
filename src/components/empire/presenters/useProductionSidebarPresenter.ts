@@ -15,6 +15,10 @@ import researchIcon from '@/components/icons/tlt_research.svg'
 import terraformingIcon from '@/components/icons/tlt_terraforming.svg'
 import blueprintIcon from '@/components/icons/blueprint.svg'
 import groupIcon from '@/components/icons/sector_group_edit.svg'
+import terraformingCollapsedIcon from '@/components/icons/sidebar-fold/terraforming-collapsed.svg?no-inline'
+import terraformingExpandedIcon from '@/components/icons/sidebar-fold/terraforming-expanded.svg?no-inline'
+import stationGroupCollapsedIcon from '@/components/icons/sidebar-fold/station-group-collapsed.svg?no-inline'
+import stationGroupExpandedIcon from '@/components/icons/sidebar-fold/station-group-expanded.svg?no-inline'
 import i18n from '@/i18n'
 
 type Station = { id: string; name: string; sectorId?: string | null; type?: StationType; tag?: string; factoryGroup?: string }
@@ -58,6 +62,7 @@ export type SidebarSource = {
 }
 export interface SidebarRow extends ProductionTabItem {
   icon: string
+  foldIcon: string | null
   iconClass: string
   tooltip: string
   testId: string
@@ -72,6 +77,7 @@ export interface SidebarGroup {
   active: boolean
   expanded: boolean
   editable: boolean
+  foldIcon: string
   row: SidebarRow
   stations: SidebarRow[]
 }
@@ -156,7 +162,8 @@ export function useProductionSidebarPresenter(source: SidebarSource) {
       if (source.mode === 'live' && bindingStore.isDirty) status = t('sidebar.unsaved')
     }
     const tooltip = groupName === undefined ? item.name : `${item.name} — ${groupName}`
-    return { ...item, icon, iconClass, tooltip: status === null ? tooltip : `${tooltip} — ${status}`, testId: item.type === 'station' ? 'sidebar-station' : `sidebar-${item.type === 'transit' ? 'sector' : item.id}`, active: activeId.value === item.id, disabled: item.type === 'auto-sector-group' && source.mode === 'live' && source.store.autoGroupResult === null, status }
+    const foldIcon = item.id === 'terraforming' ? (expandedTerraforming.value ? terraformingExpandedIcon : terraformingCollapsedIcon) : null
+    return { ...item, icon, foldIcon, iconClass, tooltip: status === null ? tooltip : `${tooltip} — ${status}`, testId: item.type === 'station' ? 'sidebar-station' : `sidebar-${item.type === 'transit' ? 'transit' : item.id}`, active: activeId.value === item.id, disabled: item.type === 'auto-sector-group' && source.mode === 'live' && source.store.autoGroupResult === null, status }
   }
   const stationRows = computed(() => stations.value.map(station => {
     const semantics = source.store.tabSemanticsById[station.id]
@@ -228,7 +235,8 @@ export function useProductionSidebarPresenter(source: SidebarSource) {
       members = ordered(members, savedOrder === undefined ? [] : savedOrder)
       const color = metadata?.color === undefined ? SIDEBAR_COLORS[0]! : metadata.color
       const active = activeId.value === `transit:${group.id}` || stationRows.value.some(station => station.sectorId === group.id && station.active)
-      return [{ id: group.id, name, color, active, expanded: searching.value || !context.value.collapsedGroupKeys.includes(group.id), editable: metadata !== undefined, row: row({ id: `transit:${group.id}`, type: 'transit', name, sectorId: group.id }), stations: members }]
+      const expanded = searching.value || !context.value.collapsedGroupKeys.includes(group.id)
+      return [{ id: group.id, name, color, active, expanded, editable: metadata !== undefined, foldIcon: expanded ? stationGroupExpandedIcon : stationGroupCollapsedIcon, row: row({ id: `transit:${group.id}`, type: 'transit', name: t('sidebar.transit_station'), sectorId: group.id }, name), stations: members }]
     })
   })
   const flatItems = computed(() => {

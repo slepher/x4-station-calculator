@@ -1614,6 +1614,7 @@
     }
   },
   "sidebar": {
+    "transit_station": "Transit hub",
     "bind_station": "Bind station",
     "navigation": "Production navigation",
     "open": "Open sidebar",
