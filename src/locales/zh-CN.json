@@ -1498,6 +1498,50 @@
   "licence.envoy_access": "特使销售合同",
   "licence.story_paranid_palace_module": "宫殿模块许可证",
   "npc_trade": {
+    "auto_fill": {
+      "button": "自动填充",
+      "enabled": "随选择自动填充",
+      "hint": "切换站点或买卖方向时，将替换商品和数量。",
+      "role": {
+        "trade": "中转站",
+        "station": "空间站"
+      },
+      "scope": {
+        "trade_buy": "购买全组建筑材料缺口，扣除组内普通库存。",
+        "trade_sell": "出售全组主产物的现货盈余，留出全组建材。",
+        "station_buy": "购买本站建筑材料缺口，扣除组内普通库存。",
+        "station_sell": "出售本站主产物现货盈余，只留出本站建材。"
+      },
+      "reason": {
+        "context": "请选择具有有效绑定及兼容存档的站点。",
+        "loading": "等待所选存档的站点记录加载完成。",
+        "ownership": "站点组或建筑仓库归属不明确：{entity}",
+        "stationMissing": "存档缺少真实绑定站点：{entity}",
+        "storageMissing": "缺少本站所属建筑仓库：{entity}",
+        "moduleUnknown": "必需模块无法映射：{entity}",
+        "wareUnknown": "必需商品无法映射：{entity}",
+        "classification": "主产物分类不可用：{entity}",
+        "quantity": "库存或材料数量无效：{entity}"
+      },
+      "updated": "已按当前选择自动填充。",
+      "unavailable": "未更新：{reason}",
+      "stale": "条件已改变，需重新填充以更新目标。",
+      "adjusted": "已手动调整。",
+      "adjusted_auto": "已手动调整；下次切换条件将重新填充。",
+      "empty_buy": "建筑材料已满足。",
+      "empty_sell": "没有可出售盈余。",
+      "undo": "撤销本次填充",
+      "details": "查看计算明细",
+      "account": "需求 {requirement} · 建筑仓库已入库 {buildingStock} · 实际抵扣 {buildingApplied} · 尚需建材 {deficit} · 普通库存 {stock}",
+      "suggested": "原建议 {quantity}",
+      "current": "当前 {quantity}",
+      "removed": "已移除",
+      "no_quantity": "未填写",
+      "account_hint": "仅扣已入库材料。组库存分布在组内各站。每次查询独立估计可用库存，不预留库存。",
+      "auto": "自动",
+      "adjusted_badge": "已调整",
+      "source": "填充来源：{station} · {direction}"
+    },
     "label": "市场报价",
     "conditions": "交易条件",
     "direction": {
@@ -1509,7 +1553,7 @@
     "player_station_group": "星区组",
     "select_station_group": "选择星区组",
     "select_station": "选择空间站",
-    "station_option": "{sector}-{station}",
+    "station_option": "{sector} · {station}",
     "max_jumps": "最大跳数",
     "station_sector_missing": "星区不可用",
     "ware_search": "商品",

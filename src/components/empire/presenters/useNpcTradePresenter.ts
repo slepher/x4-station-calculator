@@ -29,6 +29,7 @@ import { getSectorZoneBoundingCenter } from '@/components/map/utils/coordinates'
 import { getStationPoiLabel } from '@/components/map/savePoiLabel'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { formatDisplayRelation } from '@/utils/reputation'
+import type { TradeRole } from '@/store/logic/tradeAutoFill'
 import type { BindingSectorGroup, BindingStationPlan, TradeStationBinding } from '@/types/x4'
 
 export type NpcTradePageState =
@@ -41,6 +42,8 @@ export type NpcTradePageState =
 
 export interface NpcTradeStationOption {
   id: string
+  entityId: string
+  role: TradeRole
   label: string
   disabled: boolean
   disabledReason: string | null
@@ -66,6 +69,7 @@ export interface NpcTradeWareSearchGroup {
 }
 
 export interface NpcTradeWareTargetView extends WareTarget {
+  sourceLabel: string | null
   label: string
 }
 
@@ -148,11 +152,28 @@ export interface NpcTradePresenterProps {
   shipPageCount: ComputedRef<number>
   pageState: ComputedRef<NpcTradePageState>
   pageStateLabel: ComputedRef<string>
+  autoFillEnabled: Ref<boolean>
+  autoFillAvailable: ComputedRef<boolean>
+  autoFillDisabledReason: ComputedRef<string | null>
+  autoFillScope: ComputedRef<string>
+  autoFillStatus: ComputedRef<string>
+  autoFillSource: ComputedRef<string>
+  autoFillCanUndo: ComputedRef<boolean>
+  autoFillDetails: ComputedRef<Array<{
+    wareId: string
+    label: string
+    summary: string
+    currentLabel: string
+    stations: Array<{ entityId: string; label: string; summary: string }>
+  }>>
   canUseComposite: ComputedRef<boolean>
   canUseTargetMetric: ComputedRef<boolean>
 }
 
 export interface NpcTradePresenterEmits {
+  autoFill: () => void
+  setAutoFillEnabled: (enabled: boolean) => void
+  undoAutoFill: () => void
   setDirection: (direction: PlayerTradeDirection) => void
   selectPlayerStationGroup: (groupId: string | null) => void
   selectPlayerStation: (stationId: string | null) => void
@@ -208,7 +229,7 @@ export function useNpcTradePresenter(): { props: NpcTradePresenterProps; emits: 
   const saveStore = useSaveStore()
   const gameDataStore = useGameDataStore()
   const { activeBinding } = storeToRefs(bindingStore)
-  const { orderedStationsBySector, playerStationRecords } = storeToRefs(liveProductionStore)
+  const { confirmedTradeBinding } = storeToRefs(liveProductionStore)
   const {
     direction,
     selectedPlayerStationGroupId,
@@ -217,7 +238,8 @@ export function useNpcTradePresenter(): { props: NpcTradePresenterProps; emits: 
     targets,
     primaryWareId,
     rankMode,
-    sortMetric
+    sortMetric,
+    autoFillEnabled
   } = storeToRefs(npcTradeStore)
   const { selectedArchive, selectedArchivePlayerShips, archives } = storeToRefs(saveStore)
   const { translateFaction, translateSector, translateShipType } = useX4I18n()
@@ -299,65 +321,29 @@ export function useNpcTradePresenter(): { props: NpcTradePresenterProps; emits: 
   }
 
   const stationGroups = computed<NpcTradeStationOptionGroup[]>(() => {
-    const binding = activeBinding.value
+    const binding = confirmedTradeBinding.value
     if (binding === null) return []
-    const groups = [...binding.groups].sort((a, b) => a.order - b.order)
-    return groups.map((group, groupIndex) => {
-      const groupId = group.sectorMacro
-      const options: NpcTradeStationOption[] = []
-      const includedSaveStationCodes = new Set<string>()
-      const stations = orderedStationsBySector.value.filter((station) => station.sectorId === groupId)
-      for (const station of stations) {
-        const plan = binding.stationPlans.find((item) => item.id === station.id)
-        if (plan !== undefined) {
-          const sectorMacro = resolveEntrySector(plan, group)
-          const disabledReason = sectorMacro === null ? i18n.global.t('npc_trade.station_sector_missing') : null
-          if (plan.saveStationCode !== undefined) includedSaveStationCodes.add(plan.saveStationCode)
-          options.push({
-            id: `station:${plan.id}`,
-            label: stationOptionLabel(station.name, sectorMacro),
-            disabled: sectorMacro === null,
-            disabledReason,
-            sectorMacro,
-            position: resolveEntryPosition(plan, sectorMacro)
-          })
-          continue
+    return [...binding.groups].sort((a, b) => a.order - b.order).map((group, groupIndex) => {
+      const groupId = group.sectorMacro === undefined ? `group:${groupIndex}` : group.sectorMacro
+      const membership = liveProductionStore.getTradeMembers(groupId)
+      const options: NpcTradeStationOption[] = membership.status === 'unavailable' ? [] : membership.members.map(member => {
+        let position: NpcTradeStationOption['position'] = null
+        if (member.stationCode !== null && member.sectorMacro !== null) {
+          position = resolveArchiveStationPosition(member.sectorMacro, member.stationCode)
+        } else if (member.plan !== null) {
+          position = resolveEntryPosition(member.plan, member.sectorMacro)
+        } else if (group.tradeStation !== undefined) {
+          position = resolveEntryPosition(group.tradeStation, resolveEntrySector(group.tradeStation, group))
         }
-
-        const record = playerStationRecords.value.find((item) =>
-          item.type === 'station' && item.code === station.id
-        )
-        if (record === undefined) continue
-        includedSaveStationCodes.add(record.code)
-        options.push({
-          id: `archive:${record.code}`,
-          label: stationOptionLabel(station.name, record.sectorMacro),
-          disabled: false,
-          disabledReason: null,
-          sectorMacro: record.sectorMacro,
-          position: resolveArchiveStationPosition(record.sectorMacro, record.code)
-        })
-      }
-      const tradeStation = group.tradeStation
-      if (tradeStation !== undefined && (
-        tradeStation.saveStationCode === undefined || !includedSaveStationCodes.has(tradeStation.saveStationCode)
-      )) {
-        const sectorMacro = resolveEntrySector(tradeStation, group)
-        const disabledReason = sectorMacro === null ? i18n.global.t('npc_trade.station_sector_missing') : null
-        options.push({
-          id: `trade:${groupIndex}:${tradeStation.id}`,
-          label: stationOptionLabel(tradeStation.name, sectorMacro),
-          disabled: sectorMacro === null,
-          disabledReason,
-          sectorMacro,
-          position: resolveEntryPosition(tradeStation, sectorMacro)
-        })
-      }
-      return {
-        id: groupId === undefined ? `group:${groupIndex}` : groupId,
-        label: group.name,
-        options
-      }
+        return {
+          id: member.referenceId, entityId: member.entityId, role: member.role,
+          label: `${i18n.global.t(`npc_trade.auto_fill.role.${member.role}`)} · ${stationOptionLabel(member.name, member.sectorMacro)}`,
+          disabled: member.sectorMacro === null,
+          disabledReason: member.sectorMacro === null ? i18n.global.t('npc_trade.station_sector_missing') : null,
+          sectorMacro: member.sectorMacro, position
+        }
+      })
+      return { id: groupId, label: group.name, options }
     })
   })
 
@@ -369,17 +355,113 @@ export function useNpcTradePresenter(): { props: NpcTradePresenterProps; emits: 
   const selectedPlayerStation = computed(() => selectedStationOptions.value
     .find((option) => option.id === selectedPlayerStationId.value && !option.disabled) ?? null)
 
-  watch(stationGroups, () => {
+  watch([stationGroups, () => liveProductionStore.loadedTradeArchiveKey], () => {
     const groupExists = stationGroups.value.some((group) => group.id === selectedPlayerStationGroupId.value)
     if (!groupExists) {
       selectedPlayerStationGroupId.value = null
       selectedPlayerStationId.value = null
       return
     }
-    if (selectedPlayerStationId.value !== null && selectedPlayerStation.value === null) {
-      selectedPlayerStationId.value = null
+    const archive = bindingArchive.value
+    const recordsReady = archive !== null && liveProductionStore.loadedTradeArchiveKey === JSON.stringify([archive.meta.guid, archive.meta.time])
+    if (recordsReady && selectedPlayerStationGroupId.value !== null) {
+      const membership = liveProductionStore.getTradeMembers(selectedPlayerStationGroupId.value)
+      if (membership.status === 'ready' && selectedPlayerStationId.value !== null && selectedPlayerStation.value === null) {
+        selectedPlayerStationId.value = null
+      }
     }
   }, { immediate: true })
+
+  const autoFillContextKey = computed(() => {
+    const binding = activeBinding.value
+    let time = binding === null ? null : binding.selectedArchiveTime
+    if (binding !== null && time === null) {
+      const latest = archives.value.get(binding.gameGuid)?.saves.find(a => a.isValid && a.isCompatible)
+      time = latest === undefined ? null : latest.meta.time
+    }
+    return JSON.stringify([binding === null ? null : binding.gameGuid, time,
+      selectedPlayerStationGroupId.value, selectedPlayerStationId.value, direction.value])
+  })
+
+  const autoFillResult = computed(() => {
+    const groupId = selectedPlayerStationGroupId.value
+    const stationId = selectedPlayerStationId.value
+    if (groupId === null || stationId === null || !contextAvailable.value) {
+      return { status: 'unavailable' as const, reason: 'context' as const }
+    }
+    const selected = selectedPlayerStation.value
+    const entityId = selected === null ? stationId : selected.entityId
+    return liveProductionStore.getTradeAutoFill(groupId, entityId, direction.value)
+  })
+
+  watch(autoFillContextKey, key => { npcTradeStore.observeContext(key) }, { immediate: true, flush: 'sync' })
+  watch([autoFillResult, () => npcTradeStore.pendingFill], ([result, request]) => {
+    if (request === null || request.contextKey !== autoFillContextKey.value) return
+    if (result.status === 'ready') npcTradeStore.applyFill(request.id, request.contextKey, result)
+    else npcTradeStore.rejectFill(request.id, request.contextKey, result)
+  }, { immediate: true, flush: 'sync' })
+
+  const autoFillAvailable = computed(() => autoFillResult.value.status === 'ready')
+  const autoFillDisabledReason = computed(() => {
+    const result = autoFillResult.value
+    if (result.status === 'ready') return null
+    return i18n.global.t(`npc_trade.auto_fill.reason.${result.reason}`, { entity: result.entityId === undefined ? '' : result.entityId })
+  })
+  const autoFillScope = computed(() => {
+    const selected = selectedPlayerStation.value
+    if (selected === null) return i18n.global.t('npc_trade.auto_fill.reason.context')
+    return i18n.global.t(`npc_trade.auto_fill.scope.${selected.role}_${direction.value}`)
+  })
+  const autoFillCanUndo = computed(() => npcTradeStore.fillUndo !== null && npcTradeStore.fillUndo.contextKey === autoFillContextKey.value)
+  const autoFillStatus = computed(() => {
+    const fill = npcTradeStore.lastFill
+    const failure = npcTradeStore.fillFailure
+    if (failure !== null && failure.contextKey === autoFillContextKey.value) {
+      return i18n.global.t('npc_trade.auto_fill.unavailable', { reason: i18n.global.t(`npc_trade.auto_fill.reason.${failure.result.reason}`, { entity: failure.result.entityId === undefined ? '' : failure.result.entityId }) })
+    }
+    if (fill === null) return ''
+    const current = autoFillResult.value
+    if (current.status === 'unavailable') {
+      return i18n.global.t('npc_trade.auto_fill.unavailable', { reason: autoFillDisabledReason.value })
+    }
+    if (fill.contextKey !== autoFillContextKey.value) return i18n.global.t('npc_trade.auto_fill.stale')
+    if (fill.adjusted) return i18n.global.t(autoFillEnabled.value ? 'npc_trade.auto_fill.adjusted_auto' : 'npc_trade.auto_fill.adjusted')
+    if (fill.result.targets.length === 0) return i18n.global.t(`npc_trade.auto_fill.empty_${direction.value}`)
+    return i18n.global.t('npc_trade.auto_fill.updated')
+  })
+  const autoFillSource = computed(() => {
+    const fill = npcTradeStore.lastFill
+    if (fill === null) return ''
+    const [, , groupId, optionId, fillDirection] = JSON.parse(fill.contextKey) as [string, number, string, string, PlayerTradeDirection]
+    const group = stationGroups.value.find(g => g.id === groupId)
+    const station = group === undefined ? undefined : group.options.find(o => o.id === optionId)
+    return i18n.global.t('npc_trade.auto_fill.source', {
+      station: station === undefined ? optionId : station.label,
+      direction: i18n.global.t(`npc_trade.direction.${fillDirection}`)
+    })
+  })
+  const accountLabel = (account: { requirement: number; buildingStock: number; buildingApplied: number; deficit: number; stock: number }): string =>
+    i18n.global.t('npc_trade.auto_fill.account', account)
+  const autoFillDetails = computed(() => {
+    const fill = npcTradeStore.lastFill
+    if (fill === null) return []
+    return fill.result.accounts.map(account => {
+      const ware = gameDataStore.localizedWaresMap[account.wareId]
+      const target = targets.value.find(t => t.wareId === account.wareId)
+      const currentLabel = target === undefined ? i18n.global.t('npc_trade.auto_fill.removed')
+        : target.targetQty === null ? i18n.global.t('npc_trade.auto_fill.no_quantity') : String(target.targetQty)
+      return {
+        wareId: account.wareId, label: ware === undefined ? account.wareId : ware.localeName,
+        summary: `${accountLabel(account)} · ${i18n.global.t('npc_trade.auto_fill.suggested', { quantity: account.suggested })}`,
+        currentLabel: i18n.global.t('npc_trade.auto_fill.current', { quantity: currentLabel }),
+        stations: fill.result.stations.map(station => {
+          const member = stationGroups.value.flatMap(g => g.options).find(o => o.entityId === station.entityId)
+          const ledger = station.accounts.find(a => a.wareId === account.wareId)!
+          return { entityId: station.entityId, label: member === undefined ? station.entityId : member.label, summary: accountLabel(ledger) }
+        })
+      }
+    })
+  })
 
   const searchGroups = computed<NpcTradeWareSearchGroup[]>(() => {
     const selectedIds = new Set(targets.value.map((target) => target.wareId))
@@ -408,8 +490,14 @@ export function useNpcTradePresenter(): { props: NpcTradePresenterProps; emits: 
 
   const wareTargets = computed<NpcTradeWareTargetView[]>(() => targets.value.map((target) => {
     const ware = gameDataStore.localizedWaresMap[target.wareId]
+    const fill = npcTradeStore.lastFill
+    const suggestion = fill === null ? undefined : fill.result.targets.find(t => t.wareId === target.wareId)
+    const sourceLabel = suggestion === undefined ? null : i18n.global.t(
+      suggestion.targetQty === target.targetQty ? 'npc_trade.auto_fill.auto' : 'npc_trade.auto_fill.adjusted_badge'
+    )
     return {
       ...target,
+      sourceLabel,
       label: ware === undefined ? target.wareId : ware.localeName
     }
   }))
@@ -752,8 +840,12 @@ export function useNpcTradePresenter(): { props: NpcTradePresenterProps; emits: 
     : i18n.global.t(`npc_trade.state.${pageState.value}`))
 
   const emits: NpcTradePresenterEmits = {
+    autoFill: () => { if (autoFillAvailable.value) npcTradeStore.requestFill(autoFillContextKey.value, 'button') },
+    setAutoFillEnabled: (enabled) => { npcTradeStore.setAutoFillEnabled(enabled) },
+    undoAutoFill: () => { npcTradeStore.undoFill(autoFillContextKey.value) },
     setDirection: (value) => { direction.value = value },
     selectPlayerStationGroup: (value) => {
+      if (selectedPlayerStationGroupId.value === value) return
       selectedPlayerStationGroupId.value = value
       selectedPlayerStationId.value = null
     },
@@ -761,21 +853,11 @@ export function useNpcTradePresenter(): { props: NpcTradePresenterProps; emits: 
     setJumpLimit: (value) => { jumpLimit.value = value },
     setSearchQuery: (value) => { searchQuery.value = value },
     addWare: (wareId) => {
-      if (targets.value.some((target) => target.wareId === wareId)) return
-      targets.value.push({ wareId, targetQty: null })
-      if (primaryWareId.value === null) primaryWareId.value = wareId
+      npcTradeStore.addWare(wareId)
       searchQuery.value = ''
     },
-    updateTargetQty: (wareId, value) => {
-      const target = targets.value.find((item) => item.wareId === wareId)
-      if (target !== undefined) target.targetQty = value
-    },
-    removeWare: (wareId) => {
-      targets.value = targets.value.filter((target) => target.wareId !== wareId)
-      if (primaryWareId.value === wareId) {
-        primaryWareId.value = targets.value.length === 0 ? null : targets.value[0]!.wareId
-      }
-    },
+    updateTargetQty: (wareId, value) => { npcTradeStore.updateTargetQty(wareId, value) },
+    removeWare: (wareId) => { npcTradeStore.removeWare(wareId) },
     setRankMode: (value) => { rankMode.value = value },
     setSortMetric: (value) => { sortMetric.value = value },
     setPrimaryWare: (wareId) => { primaryWareId.value = wareId },
@@ -824,6 +906,14 @@ export function useNpcTradePresenter(): { props: NpcTradePresenterProps; emits: 
       shipPageCount,
       pageState,
       pageStateLabel,
+      autoFillEnabled,
+      autoFillAvailable,
+      autoFillDisabledReason,
+      autoFillScope,
+      autoFillStatus,
+      autoFillSource,
+      autoFillCanUndo,
+      autoFillDetails,
       canUseComposite,
       canUseTargetMetric
     },

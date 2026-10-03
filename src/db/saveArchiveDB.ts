@@ -222,12 +222,16 @@ export function flattenPlayerStationsRecord(
 
 export async function loadPlayerStationsFlatByArchiveId(
   gameDataStore: GameDataStoreLike,
-  archiveId: string
+  archiveId: string,
+  options: { requireRecord?: boolean } = {}
 ): Promise<PlayerStationRecord[]> {
   const db = getDB(gameDataStore)
 
   const record = await db.player_stations.get(archiveId)
-  if (!record) return []
+  if (!record) {
+    if (options.requireRecord) throw new Error(`Missing player station snapshot: ${archiveId}`)
+    return []
+  }
 
   return flattenPlayerStationsRecord(archiveId, record.data)
 }

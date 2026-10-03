@@ -1497,6 +1497,50 @@
   "licence.envoy_access": "Envoy Sales Contract",
   "licence.story_paranid_palace_module": "Palace Module Licence",
   "npc_trade": {
+    "auto_fill": {
+      "button": "Auto fill",
+      "enabled": "Auto fill on selection",
+      "hint": "Changing station or buy/sell direction replaces all wares and quantities.",
+      "role": {
+        "trade": "Trade station",
+        "station": "Station"
+      },
+      "scope": {
+        "trade_buy": "Buy construction materials for the entire sector group, after group inventory.",
+        "trade_sell": "Sell existing group primary-product inventory after retaining group construction materials.",
+        "station_buy": "Buy this station’s construction materials, after group inventory.",
+        "station_sell": "Sell this station’s primary output inventory after retaining its own construction materials."
+      },
+      "reason": {
+        "context": "Select a station with an active binding and valid compatible archive.",
+        "loading": "Waiting for station records from the selected archive.",
+        "ownership": "Station group or build storage ownership is ambiguous: {entity}",
+        "stationMissing": "A bound station is missing from the archive: {entity}",
+        "storageMissing": "Owned build storage is missing: {entity}",
+        "moduleUnknown": "A required module cannot be mapped: {entity}",
+        "wareUnknown": "A required ware cannot be mapped: {entity}",
+        "classification": "Primary product classification is unavailable: {entity}",
+        "quantity": "Invalid inventory or material quantity: {entity}"
+      },
+      "updated": "Automatically filled for the current selection.",
+      "unavailable": "Not updated: {reason}",
+      "stale": "Selection changed; fill again to update these targets.",
+      "adjusted": "Manually adjusted.",
+      "adjusted_auto": "Manually adjusted; changing conditions will fill again.",
+      "empty_buy": "Construction materials are satisfied.",
+      "empty_sell": "No surplus inventory to sell.",
+      "undo": "Undo this fill",
+      "details": "Calculation details",
+      "account": "Required {requirement} · build stock {buildingStock} · applied {buildingApplied} · still needed {deficit} · inventory {stock}",
+      "suggested": "Suggested {quantity}",
+      "current": "Current {quantity}",
+      "removed": "Removed",
+      "no_quantity": "No target",
+      "account_hint": "Only materials already in owned build storage are deducted. Group inventory is distributed across its stations. Each query independently estimates available inventory.",
+      "auto": "Auto",
+      "adjusted_badge": "Adjusted",
+      "source": "Filled from {station} · {direction}"
+    },
     "label": "Market Offers",
     "conditions": "Trade Conditions",
     "direction": {
@@ -1508,7 +1552,7 @@
     "player_station_group": "Sector group",
     "select_station_group": "Select a sector group",
     "select_station": "Select a station",
-    "station_option": "{sector}-{station}",
+    "station_option": "{sector} · {station}",
     "max_jumps": "Maximum jumps",
     "station_sector_missing": "Sector unavailable",
     "ware_search": "Wares",

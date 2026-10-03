@@ -48,6 +48,8 @@ import { createProductionModuleActions } from './actions/productionModuleActions
 import { createProductionWareRuleActions } from './actions/productionWareRuleActions'
 import { createProductionSettingActions, doesStationSettingsAffectFlowMap } from './actions/productionSettingActions'
 import { maxSavedModules } from './logic/planningRecommendedModules'
+import { buildTradeStationFacts, calculateTradeAutoFill, resolveTradeMembers, type TradeAutoFillResult, type TradeMembersResult, type TradeStationFacts } from './logic/tradeAutoFill'
+import { CURRENT_PARSER_VERSION } from '@/workers/saveParser.post'
 import {
   buildBindingHubLinkRouteEntries,
   buildDraftHubLinkRouteEntries,
@@ -112,6 +114,9 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   const overviewBuyMultiplier = ref(0.5)
   const overviewSellMultiplier = ref(0.5)
   const playerStationRecords = ref<PlayerStationRecord[]>([])
+  const loadedTradeArchiveKey = ref<string | null>(null)
+  const tradeArchiveLoadFailed = ref(false)
+  let tradeArchiveLoadRequest = 0
   const loadedBindingGameGuid = ref<string | null>(null)
   watch(() => activeBinding.value?.gameGuid, () => { loadedBindingGameGuid.value = null }, { flush: 'sync' })
   const selectedTransitTransportBlueprintId = ref<string | null>(null)
@@ -685,6 +690,9 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   }
 
   async function loadPlayerStationRecords() {
+    const request = ++tradeArchiveLoadRequest
+    loadedTradeArchiveKey.value = null
+    tradeArchiveLoadFailed.value = false
     loadedBindingGameGuid.value = null
     const archive = selectedArchive.value
     const binding = activeBinding.value
@@ -694,12 +702,14 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     }
     const archiveId = createArchiveId(archive.meta.guid, archive.meta.time)
     try {
-      const records = await loadPlayerStationsFlatByArchiveId(gameData, archiveId)
-      if (activeBinding.value?.gameGuid !== binding.gameGuid || selectedArchive.value !== archive) return
+      const records = await loadPlayerStationsFlatByArchiveId(gameData, archiveId, { requireRecord: true })
+      if (request !== tradeArchiveLoadRequest || activeBinding.value?.gameGuid !== binding.gameGuid || selectedArchive.value !== archive) return
       playerStationRecords.value = records
       loadedBindingGameGuid.value = binding.gameGuid
+      loadedTradeArchiveKey.value = JSON.stringify([binding.gameGuid, archive.meta.time])
     } catch (e) {
-      if (activeBinding.value?.gameGuid !== binding.gameGuid || selectedArchive.value !== archive) return
+      if (request !== tradeArchiveLoadRequest || activeBinding.value?.gameGuid !== binding.gameGuid || selectedArchive.value !== archive) return
+      tradeArchiveLoadFailed.value = true
       console.error('[LiveProductionStore] Failed to load player stations:', e)
       playerStationRecords.value = []
     }
@@ -1205,6 +1215,109 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       overrides: stationEntry.overrides,
       targetCounts: stationEntry.overrides?.max
     }
+  }
+
+  const confirmedTradeBinding = computed(() => {
+    const binding = activeBinding.value
+    return binding === null ? null : saveBindingStore.getBindingByGameGuid(binding.gameGuid)
+  })
+
+  function getTradeMembers(groupId: string): TradeMembersResult {
+    const binding = confirmedTradeBinding.value
+    if (binding === null) return { status: 'unavailable', reason: 'context' }
+    return resolveTradeMembers(binding, groupId, playerStationRecords.value)
+  }
+
+  function getTradeAutoFill(groupId: string, entityId: string, direction: 'buy' | 'sell'): TradeAutoFillResult {
+    const binding = confirmedTradeBinding.value
+    const archive = selectedArchive.value
+    if (binding === null || archive === null || activeViewStore.activeBinding !== binding.gameGuid
+      || archive.meta.guid !== binding.gameGuid || !archive.isValid || !archive.isCompatible
+      || archive.meta.parser_version !== CURRENT_PARSER_VERSION || !gameData.isReady) {
+      return { status: 'unavailable', reason: 'context' }
+    }
+    let expectedTime = binding.selectedArchiveTime
+    if (expectedTime === null) {
+      const latest = saveStore.archives.get(binding.gameGuid)?.saves.find(a => a.isValid && a.isCompatible)
+      if (latest === undefined) return { status: 'unavailable', reason: 'context' }
+      expectedTime = latest.meta.time
+    }
+    if (archive.meta.time !== expectedTime) return { status: 'unavailable', reason: 'context' }
+    if (loadedTradeArchiveKey.value !== JSON.stringify([binding.gameGuid, expectedTime])) {
+      return { status: 'unavailable', reason: tradeArchiveLoadFailed.value ? 'context' : 'loading' }
+    }
+    const membership = getTradeMembers(groupId)
+    if (membership.status === 'unavailable') return membership
+    const deps = getComputeDeps()
+    if (deps === null) return { status: 'unavailable', reason: 'context' }
+    const facts: TradeStationFacts[] = []
+    const usedBuildStorages = new Set<string>()
+    for (const member of membership.members) {
+      let stationArchive: ArchiveStationData | null = null
+      if (member.stationCode !== null) {
+        const record = playerStationRecords.value.find(r => r.type === 'station' && r.code === member.stationCode)
+        if (record === undefined) return { status: 'unavailable', reason: 'stationMissing', entityId: member.entityId }
+        const entry = record.data as PlayerStationEntry
+        if (record.archiveId !== createArchiveId(binding.gameGuid, expectedTime)) return { status: 'unavailable', reason: 'context', entityId: record.code }
+        if (entry.owner !== 'player') return { status: 'unavailable', reason: 'ownership', entityId: member.entityId }
+        const rawModules = [...(entry.modules === undefined ? [] : entry.modules)]
+        if (entry.buildstorage_code !== undefined) {
+          const matches = playerStationRecords.value.filter(r => r.type === 'buildstorage' && r.code === entry.buildstorage_code)
+          if (matches.length === 0) return { status: 'unavailable', reason: 'storageMissing', entityId: entry.buildstorage_code }
+          if (matches.length !== 1 || usedBuildStorages.has(entry.buildstorage_code)) return { status: 'unavailable', reason: 'ownership', entityId: entry.buildstorage_code }
+          usedBuildStorages.add(entry.buildstorage_code)
+          const storage = matches[0]!
+          const data = storage.data as BuildStorageEntry
+          if (storage.archiveId !== record.archiveId || data.owner !== 'player') return { status: 'unavailable', reason: 'ownership', entityId: data.code }
+          if (data.station_code !== undefined && data.station_code !== member.stationCode) return { status: 'unavailable', reason: 'ownership', entityId: data.code }
+          if (data.target_station_component_id !== undefined && data.target_station_component_id !== entry.component_id) return { status: 'unavailable', reason: 'ownership', entityId: data.code }
+          rawModules.push(...(data.modules === undefined ? [] : data.modules))
+        }
+        for (const mod of rawModules) {
+          if (!Number.isSafeInteger(mod.amount) || mod.amount < 0) return { status: 'unavailable', reason: 'quantity', entityId: mod.ref }
+          if (mod.module_id === undefined || deps.modulesMap[mod.module_id] === undefined) return { status: 'unavailable', reason: 'moduleUnknown', entityId: mod.ref }
+        }
+        stationArchive = getArchiveStationDataByCode(member.stationCode)
+        if (stationArchive === null) return { status: 'unavailable', reason: 'stationMissing', entityId: member.entityId }
+      }
+      const built = stationArchive === null ? [] : stationArchive.modules
+      const building = stationArchive === null ? [] : stationArchive.building.modules
+      const referenceModules = mergeSavedModules([...built, ...building])
+      const plan = member.plan
+      let targetModules = referenceModules
+      let priorityLevels: Record<string, number> = {}
+      if (!(member.stationCode === null && member.role === 'trade')) {
+        const modules = plan === null ? [] : plan.modules
+        for (const mod of modules) if (deps.modulesMap[mod.id] === undefined) return { status: 'unavailable', reason: 'moduleUnknown', entityId: mod.id }
+        const stationSettings = plan === null
+          ? { ...DEFAULT_STATION_SETTINGS, sunlight: stationArchive === null ? 100 : stationArchive.sector.sunlight }
+          : { ...DEFAULT_STATION_SETTINGS, ...plan.settings }
+        const map = new StationDerivedMap(deps)
+        map.upsertStation(member.entityId, {
+          modulesMode: 'plan', modules, settings: stationSettings, referenceModules,
+          lockedWares: plan === null || plan.lockedWares === undefined ? [] : plan.lockedWares,
+          warePriority: plan === null || plan.warePriority === undefined ? {} : plan.warePriority
+        })
+        const cache = map.getCache(member.entityId)
+        if (cache === null || cache === undefined) return { status: 'unavailable', reason: 'classification', entityId: member.entityId }
+        const planState = buildDerivedActiveStationState({
+          stationId: member.entityId, plannedModules: modules, referenceModules,
+          deferSupportModules: stationArchive !== null, settings: stationSettings, cache, deps
+        })
+        priorityLevels = planState.warePriorityLevels
+        if (plan !== null) {
+          targetModules = stationArchive === null ? planState.resolvedModules : buildCanonicalPlanningStationState({
+            planState, archiveBuiltModules: built, archiveBuildingModules: building,
+            referenceModules, settings: stationSettings, deps
+          }).effectiveTargetModules
+        }
+      }
+      const result = buildTradeStationFacts({ member, archive: stationArchive, targetModules, priorityLevels,
+        modulesMap: deps.modulesMap, waresMap: deps.waresMap })
+      if (result.status === 'unavailable') return result
+      facts.push(result.facts)
+    }
+    return calculateTradeAutoFill(facts, entityId, direction, deps.waresMap)
   }
 
   function getArchiveStationDataByPlanId(planId: string): ArchiveStationData | null {
@@ -2526,6 +2639,11 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   })
 
   return {
+    loadedTradeArchiveKey,
+    tradeArchiveLoadFailed,
+    confirmedTradeBinding,
+    getTradeMembers,
+    getTradeAutoFill,
     isReady,
     loadedBindingGameGuid,
     isDirty,

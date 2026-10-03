@@ -89,6 +89,53 @@ const selectWare = (wareId: string, close: () => void) => {
           />
         </label>
 
+        <div class="field-group">
+          <button
+            type="button"
+            class="field-control"
+            :disabled="!presenter.props.autoFillAvailable.value"
+            :title="presenter.props.autoFillDisabledReason.value === null ? undefined : presenter.props.autoFillDisabledReason.value"
+            data-testid="npc-trade-auto-fill-button"
+            @click="presenter.emits.autoFill"
+          >{{ t('npc_trade.auto_fill.button') }}</button>
+          <label class="flex items-center gap-2 text-sm text-slate-300">
+            <input
+              type="checkbox"
+              :checked="presenter.props.autoFillEnabled.value"
+              data-testid="npc-trade-auto-fill-enabled"
+              @change="presenter.emits.setAutoFillEnabled(($event.target as HTMLInputElement).checked)"
+            />
+            {{ t('npc_trade.auto_fill.enabled') }}
+          </label>
+          <p class="field-label">{{ t('npc_trade.auto_fill.hint') }}</p>
+          <p class="field-label" data-testid="npc-trade-auto-fill-scope">{{ presenter.props.autoFillScope.value }}</p>
+          <p v-if="presenter.props.autoFillDisabledReason.value" class="text-xs text-amber-300">{{ presenter.props.autoFillDisabledReason.value }}</p>
+          <p v-if="presenter.props.autoFillSource.value" class="field-label" data-testid="npc-trade-auto-fill-source">{{ presenter.props.autoFillSource.value }}</p>
+          <p class="text-xs text-sky-300" role="status" data-testid="npc-trade-auto-fill-status">{{ presenter.props.autoFillStatus.value }}</p>
+          <button
+            v-if="presenter.props.autoFillCanUndo.value"
+            type="button"
+            class="text-left text-xs text-sky-300"
+            data-testid="npc-trade-auto-fill-undo"
+            @click="presenter.emits.undoAutoFill"
+          >{{ t('npc_trade.auto_fill.undo') }}</button>
+          <details v-if="presenter.props.autoFillDetails.value.length > 0" class="text-xs text-slate-400" data-testid="npc-trade-auto-fill-details">
+            <summary class="cursor-pointer text-sky-300">{{ t('npc_trade.auto_fill.details') }}</summary>
+            <p class="py-2">{{ t('npc_trade.auto_fill.account_hint') }}</p>
+            <div v-for="item in presenter.props.autoFillDetails.value" :key="item.wareId" class="border-t border-slate-700 py-2">
+              <p class="text-slate-200">{{ item.label }} · {{ item.currentLabel }}</p>
+              <p>{{ item.summary }}</p>
+              <details class="mt-1">
+                <summary class="cursor-pointer">{{ t('npc_trade.player_station') }}</summary>
+                <div v-for="station in item.stations" :key="station.entityId" class="py-1">
+                  <p>{{ station.label }}</p>
+                  <p>{{ station.summary }}</p>
+                </div>
+              </details>
+            </div>
+          </details>
+        </div>
+
         <div class="field-group ware-search">
           <label class="field-label" for="npc-trade-ware-search">{{ t('npc_trade.ware_search') }}</label>
           <CandidateSearchBox
@@ -116,24 +163,29 @@ const selectWare = (wareId: string, close: () => void) => {
             :key="target.wareId"
             class="ware-pill"
           >
-            <span class="ware-pill-name">{{ target.label }}</span>
-            <label class="qty-label">
-              <span>{{ t('npc_trade.target_qty') }}</span>
-              <X4NumberInput
-                :model-value="target.targetQty === null ? 0 : target.targetQty"
-                :min="0"
-                width-class="w-20"
-                :data-testid="`npc-trade-target-${target.wareId}`"
-                @update:model-value="(value: number) => presenter.emits.updateTargetQty(target.wareId, value === 0 ? null : value)"
-              />
-            </label>
-            <button
-              type="button"
-              class="remove-button"
-              :aria-label="t('npc_trade.remove_ware', { ware: target.label })"
-              :data-testid="`npc-trade-remove-${target.wareId}`"
-              @click="presenter.emits.removeWare(target.wareId)"
-            >×</button>
+            <div class="ware-pill-header">
+              <span class="ware-pill-name">{{ target.label }}</span>
+              <button
+                type="button"
+                class="remove-button"
+                :aria-label="t('npc_trade.remove_ware', { ware: target.label })"
+                :data-testid="`npc-trade-remove-${target.wareId}`"
+                @click="presenter.emits.removeWare(target.wareId)"
+              >×</button>
+            </div>
+            <div class="ware-pill-controls">
+              <span v-if="target.sourceLabel" class="text-xs text-sky-300">{{ target.sourceLabel }}</span>
+              <label class="qty-label">
+                <span class="sr-only">{{ target.label }} · {{ t('npc_trade.target_qty') }}</span>
+                <X4NumberInput
+                  :model-value="target.targetQty === null ? 0 : target.targetQty"
+                  :min="0"
+                  width-class="w-28"
+                  :data-testid="`npc-trade-target-${target.wareId}`"
+                  @update:model-value="(value: number) => presenter.emits.updateTargetQty(target.wareId, value === 0 ? null : value)"
+                />
+              </label>
+            </div>
           </div>
         </div>
       </div>
@@ -378,11 +430,13 @@ const selectWare = (wareId: string, close: () => void) => {
 .segmented-control button { @apply px-3 py-2 text-sm text-slate-400 bg-slate-950/50 hover:text-slate-200; }
 .segmented-control button.active { @apply bg-sky-500/20 text-sky-300; }
 .ware-pills { @apply flex flex-col gap-2; }
-.ware-pill { @apply flex items-center gap-2 rounded border border-slate-700 bg-slate-800/40 p-2; }
-.ware-pill-name { @apply flex-1 min-w-0 text-sm text-slate-200 truncate; }
-.qty-label { @apply flex items-center gap-1 text-xs text-slate-500; }
+.ware-pill { @apply flex flex-col gap-2 rounded border border-slate-700 bg-slate-800/40 p-2; }
+.ware-pill-header { @apply flex items-start gap-2; }
+.ware-pill-controls { @apply flex items-center justify-between gap-2; }
+.ware-pill-name { @apply flex-1 min-w-0 whitespace-normal break-words text-sm text-slate-200; }
+.qty-label { @apply ml-auto shrink-0; }
 .jump-filter-row { @apply flex items-center justify-between gap-3; }
-.remove-button { @apply h-7 w-7 rounded text-slate-500 hover:bg-red-500/10 hover:text-red-300; }
+.remove-button { @apply h-7 w-7 shrink-0 rounded text-slate-500 hover:bg-red-500/10 hover:text-red-300; }
 .sort-grid { @apply grid grid-cols-1 sm:grid-cols-2 gap-3; }
 .empty-state { @apply rounded border border-dashed border-slate-700 p-6 text-center text-sm text-slate-500; }
 .candidate-list, .candidate-section { @apply flex flex-col gap-3; }
