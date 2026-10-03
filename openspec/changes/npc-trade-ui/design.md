@@ -210,15 +210,15 @@ ship_m + transporter
 
 随后按 `sectorMacro` 分组并本地化 sector。对每个 sector，遍历 active binding groups，使用现有 anchor/coverage 判断收集全部命中 group 名称；不只取第一项。
 
-船只身份分开组装：
+船只身份与型号信息分开组装（本轮展示调整由 ../trade-auto-fill/design.md 承接）：
 
 - `shipName`：静态飞船本地化名称，例如“苍鹭”。
-- `shipType`：静态 `X4Ship.type` 对应的本地化型号，例如“运输船”。
-- `size`：由 `ship_l/ship_m` 明确映射为 L/M。
+- `shipType`：静态 `X4Ship.type` 对应的本地化用途，例如“运输船”，放入独立型号集合。
+- `size`：由 `ship_l/ship_m` 明确映射为 L/M，放入独立型号集合。
 - `customName`：存档 `name` trim 后非空且不匹配 `/^\{\d+,\d+\}$/` 才显示。
 - 不输出 component ID 或 code。
 
-容量取静态飞船的 container cargo capacity。对每个已选 ware，若 transport 为 container 且 volume 为正，则最大可装数量为 `floor(capacity / volume)`；否则为 0。该值不读取 targetQty 或当前 archive cargo。
+Presenter 在现有筛选循环内按游戏型号 macro 去重组装 shipTypes，跨星区覆盖全部候选并独立于船只分页。容量和装载明细仅在独立“运输船类型与装载量”卡片显示一次；逐船保留名称、自定义名称、可用性和相对距离。容量取静态飞船的 container cargo capacity。对每个已选 ware，若 transport 为 container 且 volume 为正，则最大可装数量为 `floor(capacity / volume)`；否则为 0。该值不读取 targetQty 或当前 archive cargo。
 
 为支持同 sector 距离，既有 player ship archive contract 增加存档坐标，并由 `selectedArchivePlayerShips` 原样携带，不新增 UI adapter。
 

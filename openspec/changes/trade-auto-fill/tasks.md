@@ -69,3 +69,23 @@
 - station-facts.spec.ts：13 passed，覆盖实际/虚拟中转站仅主要产出、用户分类覆盖、未来主产物排除与分类缺失。
 - presenter.spec.ts：18 passed；npc-trade-workbench.spec.ts：4 passed。此次受影响用例共 **44 passed**。
 - 商品卡片预览的数量编辑、已调整标记、移除行为通过独立临时检查；未执行 E2E/全量 Unit，未提交代码。
+
+## 8. 候选船只布局反馈
+
+- [x] 8.1 按已通过的货物分区预览调整卡片布局及 en/zh-CN 标题；长名称可换行、状态保持单行，装载上限按卡片宽度一列/两列排布。
+- [x] 8.2 页面 focused Unit 6 passed（新增完整装载上限展示和空目标/可收回船只场景）；npm run build 与 git diff --check 通过，仅保留既有大包提示。未执行 E2E、全量 Unit 或提交。
+
+## 9. 运输船型号信息去重（本轮替代第 8 节布局）
+
+- [x] 9.1 同步 request/spec/design/proposal，明确型号去重、跨星区与分页范围、逐船精简和空状态。
+- [x] 9.2 Presenter 同时组装候选型号与逐船列表，按 macro 去重，在 tests/unit/trade-auto-fill/presenter.spec.ts 覆盖同型号跨星区、同名不同型号、分页/筛选与商品变化。
+- [x] 9.3 NpcTradeWorkbench 新增独立型号卡片、精简逐船信息并同步中英文文案；tests/unit/current/npc-trade-ui/npc-trade-workbench.spec.ts 覆盖共享装载明细、无目标/无候选状态及原船只分页。
+- [x] 9.4 汇总 focused Unit、检查三层依赖，运行 npm run build 和 git diff --check。
+
+### 型号卡片验证记录
+
+- 新增 presenter 回归在旧实现上 2 failed / 18 passed；新增页面回归在旧布局上 2 failed / 5 passed。
+- 最终 tests/unit/trade-auto-fill/presenter.spec.ts 20 passed，tests/unit/current/npc-trade-ui/npc-trade-workbench.spec.ts 7 passed，共 27 passed。覆盖跨星区和分页前型号去重、同名不同 macro、筛选范围、目标变化与空舱口径、独立卡片和逐船精简、空状态、原分页事件。
+- npm run build 通过（production compatibility guard、vue-tsc、Vite），保留既有大包提示；git diff --check 通过。
+- 三层检查通过：领域船只和静态数据仍由现有 store 提供；候选筛选、型号去重和装载明细在 presenter；Vue 只渲染 props 并转发事件。未新增中间层或持久化字段。
+- 原 npc-trade-ui request/spec/design 同步修改逐船容量约定，原 tasks 保留历史记录并指向本节。未执行 E2E/全量 Unit、build-rust 或提交。

@@ -1597,12 +1597,14 @@
     },
     "amount": "Amount",
     "price": "Price",
+    "ship_types": "Transport Ship Types & Cargo Capacity",
     "ships": "Available Player Ships",
     "no_ships": "No available L freighters or M transporters",
     "ship": {
       "immediatelyAvailable": "Available now",
       "reclaimable": "Reclaimable",
-      "capacity": "Capacity"
+      "capacity": "Capacity",
+      "load_limits": "Maximum load per ware"
     },
     "state": {
       "contextUnavailable": "The active binding or compatible archive is unavailable.",

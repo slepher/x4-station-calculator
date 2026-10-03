@@ -430,7 +430,7 @@
 
 ### Requirement: Available Player Ships By Sector
 
-系统 SHALL 在右列按 sector 展示符合用途和尺寸约束、可立即调用或可收回的玩家运输船，并显示其身份、容量、所选 ware 最大可装数量和命中的玩家 sector groups。
+系统 SHALL 在右列按 sector 展示符合用途和尺寸约束、可立即调用或可收回的玩家运输船，逐船显示身份、可用性和距离，sector 标题显示命中的玩家 sector groups。用途、尺寸、容量及所选 ware 最大可装数量 SHALL 集中到独立型号卡片，跨星区按 macro 去重且覆盖全部筛选候选，不受船只分页影响；详细布局和空状态遵循 trade-auto-fill 的“运输船型号与装载量独立展示”。
 
 #### Scenario: 过滤可展示船只
 
@@ -458,7 +458,7 @@
 
 **前提** 船只 macro 可关联游戏静态飞船数据
 **当** 页面显示船只
-**那么** 页面 MUST 显示本地化飞船名、本地化型号、L/M 尺寸和可用性
+**那么** 逐船卡片 MUST 显示本地化飞船名和可用性，独立型号卡片 MUST 显示本地化用途与 L/M 尺寸
 **并且** 页面 MUST NOT 显示 component ID 或船只代码
 
 #### Scenario: 展示有效自定义名称
@@ -471,8 +471,8 @@
 #### Scenario: 展示容量与最大可装数量
 
 **前提** 页面已选择一个或多个目标 ware
-**当** 页面显示船只
-**那么** 页面 MUST 显示静态飞船货舱容量
+**当** 页面显示运输船型号卡片
+**那么** 页面 MUST 按 macro 去重显示静态飞船货舱容量，逐船 MUST NOT 重复容量和装载明细
 **并且** 页面 MUST 逐一显示所有所选 ware 在空货舱下的最大可装数量
 **并且** transport 匹配且 `ware.volume > 0` 时数量 MUST 为 `floor(cargoCapacity / ware.volume)`
 **并且** transport 不匹配或 volume 无效时数量 MUST 为 0

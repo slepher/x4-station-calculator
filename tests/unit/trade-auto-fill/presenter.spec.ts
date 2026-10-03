@@ -12,6 +12,9 @@ import { useGameDataStore } from '@/store/useGameDataStore'
 import { useSaveBindingStore } from '@/store/useSaveBindingStore'
 import { useSaveStore } from '@/store/useSaveStore'
 import { useActiveViewStore } from '@/store/useActiveViewStore'
+import type { X4Ship, LocalizedX4Ship } from '@/types/x4'
+import type { GameDataFiles } from '@/store/logic/useGameData'
+import type { PlayerShipEntry } from '@/types/saveArchive'
 import { makeBinding, makeRecords, makeSaveArchive, modules, wares } from './fixtures'
 
 vi.mock('@/db/saveArchiveDB', async importOriginal => ({ ...await importOriginal<typeof import('@/db/saveArchiveDB')>(), loadPlayerStationsFlatByArchiveId: vi.fn(() => new Promise(() => {})) }))
@@ -204,4 +207,68 @@ it('renders exact building stock versus applied material and supports presenter 
   const item = p.props.autoFillDetails.value.find(d => d.wareId === 'hullparts')!
   expect(item.summary).toContain('已入库 300'); expect(item.summary).toContain('实际抵扣 200')
   p.emits.undoAutoFill(); expect(useNpcTradeStore().targets).toEqual([{ wareId: 'input', targetQty: 8 }]); expect(p.props.autoFillCanUndo.value).toBe(false)
+})
+
+
+function installTransportShips() {
+  const game = useGameDataStore()
+  game.ships = [
+    { id: 'heron', macro: 'heron_macro', class: 'ship_l', type: 'freighter', cargo: [{ type: 'container', capacity: 62000 }] },
+    { id: 'other', macro: 'other_macro', class: 'ship_m', type: 'transporter', cargo: [{ type: 'container', capacity: 12000 }] },
+    { id: 'miner', macro: 'miner_macro', class: 'ship_l', type: 'miner', cargo: [{ type: 'container', capacity: 90000 }] }
+  ] as X4Ship[]
+  game.localizedShipsMap = Object.fromEntries(game.ships.map(ship => [ship.id, { ...ship, localeName: '苍鹭 改进型' }])) as Record<string, LocalizedX4Ship>
+  game.gameData = { shipTypes: [{ id: 'freighter', nameId: '', name: '货船' }, { id: 'transporter', nameId: '', name: '运输船' }] } as GameDataFiles
+  game.localizedWaresMap.input!.volume = 3
+  const ship = (id: string, macro = 'heron_macro'): PlayerShipEntry => ({
+    component_id: id, code: id, name: id, macro, class: 'ship_l',
+    relative_position: { x: 0, y: 0, z: 0 }, assignment: { state: 'none' },
+    default_order: { id: 'wait', order: 'Wait', failed: false }, is_repeat: false,
+    cargo: [{ ware: 'hullparts', amount: 500 }]
+  })
+  const archive = makeSaveArchive()
+  for (let index = 0; index < 11; index++) {
+    const sector = index === 0 ? 'a' : 'sector-' + index
+    archive.sectors[sector] = { player_ships: { ['ship-' + index]: ship('ship-' + index) } } as typeof archive.sectors[string]
+  }
+  archive.sectors['sector-10']!.player_ships!.other = ship('other', 'other_macro')
+  archive.sectors.a!.player_ships!.miner = ship('miner', 'miner_macro')
+  archive.sectors.a!.player_ships!.assigned = { ...ship('assigned', 'other_macro'), assignment: { state: 'resolved', commander_kind: 'station', commander_id: 'AAA' } }
+  useSaveStore().selectedArchive = archive
+}
+
+it('deduplicates transport models across sectors before pagination and keeps distinct same-name macros', () => {
+  installTransportShips()
+  const p = present()
+  expect(p.props.shipPageCount.value).toBe(2)
+  expect(p.props.shipTypes.value.map(model => [model.macro, model.capacity])).toEqual([
+    ['heron_macro', 62000], ['other_macro', 12000]
+  ])
+  expect(p.props.shipTypes.value.every(model => model.shipName === '苍鹭 改进型')).toBe(true)
+  const models = p.props.shipTypes.value
+  p.emits.setShipPage(2)
+  expect(p.props.shipGroups.value).toHaveLength(1)
+  expect(p.props.shipTypes.value).toBe(models)
+  expect(p.props.shipGroups.value[0]!.ships[0]).not.toHaveProperty('capacity')
+  expect(p.props.shipGroups.value[0]!.ships[0]).not.toHaveProperty('loadLimits')
+})
+
+it('updates model load limits for selected wares, preserves empty-hold capacity and follows ship filters', () => {
+  installTransportShips()
+  const p = present()
+  expect(p.props.shipTypes.value[0]!.loadLimits).toEqual([])
+  p.emits.addWare('hullparts'); p.emits.addWare('input'); p.emits.updateTargetQty('input', 1)
+  expect(p.props.shipTypes.value[0]!.loadLimits.map(item => [item.wareId, item.maxAmount])).toEqual([
+    ['hullparts', 62000], ['input', 20666]
+  ])
+  p.emits.removeWare('hullparts')
+  expect(p.props.shipTypes.value[0]!.loadLimits.map(item => item.wareId)).toEqual(['input'])
+  p.emits.removeWare('input')
+  expect(p.props.shipTypes.value[0]!.loadLimits).toEqual([])
+  const game = useGameDataStore()
+  game.maps = { ...game.maps, clusters: { local: { sector_links: { self: { sector_a_id: 'a', sector_b_id: 'a' } } } } } as typeof game.maps
+  select(p); p.emits.setJumpLimit(0)
+  expect(p.props.shipTypes.value.map(model => model.macro)).toEqual(['heron_macro'])
+  useSaveStore().selectedArchive = makeSaveArchive()
+  expect(p.props.shipTypes.value).toEqual([])
 })

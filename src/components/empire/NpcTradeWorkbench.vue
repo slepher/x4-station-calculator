@@ -366,55 +366,84 @@ const selectWare = (wareId: string, close: () => void) => {
       </div>
     </section>
 
-    <section class="panel-card col-span-12 lg:col-span-4" aria-labelledby="npc-trade-ships-title">
-      <h2 id="npc-trade-ships-title" class="panel-header">{{ t('npc_trade.ships') }}</h2>
-      <div class="panel-content">
-        <div v-if="presenter.props.shipGroups.value.length === 0" class="empty-state">
-          {{ t('npc_trade.no_ships') }}
+    <div class="col-span-12 lg:col-span-4 flex flex-col gap-4 min-w-0">
+      <section
+        v-if="presenter.props.shipTypes.value.length"
+        class="panel-card"
+        aria-labelledby="npc-trade-ship-types-title"
+        data-testid="npc-trade-ship-types"
+      >
+        <h2 id="npc-trade-ship-types-title" class="panel-header">{{ t('npc_trade.ship_types') }}</h2>
+        <div class="panel-content">
+          <div
+            v-for="model in presenter.props.shipTypes.value"
+            :key="model.macro"
+            class="ship-model-row"
+            :data-testid="'npc-trade-ship-type-' + model.macro"
+          >
+            <div class="ship-name">{{ model.shipName }}</div>
+            <div class="ship-type">{{ model.shipType }} · {{ model.size }}</div>
+            <div class="ship-meta">{{ t('npc_trade.ship.capacity') }}: {{ model.capacity }}</div>
+            <div v-if="model.loadLimits.length" class="ship-cargo-section">
+              <div class="ship-cargo-title">{{ t('npc_trade.ship.load_limits') }}</div>
+              <dl class="ship-load-limits">
+                <div v-for="item in model.loadLimits" :key="item.wareId" class="ship-load-limit">
+                  <dt>{{ item.wareLabel }}</dt>
+                  <dd>{{ item.maxAmount }}</dd>
+                </div>
+              </dl>
+            </div>
+          </div>
         </div>
-        <section v-for="group in presenter.props.shipGroups.value" :key="group.sectorMacro" class="ship-sector">
-          <header class="sector-header">
-            <span>{{ group.sectorLabel }}</span>
-            <span v-if="group.bindingGroupNames.length" class="binding-groups">{{ group.bindingGroupNames.join(' · ') }}</span>
-          </header>
-          <div v-for="ship in group.ships" :key="ship.componentId" class="ship-row">
-            <div class="ship-details">
-              <div class="ship-name">{{ ship.shipName }} · {{ ship.shipType }} · {{ ship.size }}</div>
-              <div v-if="ship.customName" class="ship-custom-name">{{ ship.customName }}</div>
+      </section>
+      <section class="panel-card" aria-labelledby="npc-trade-ships-title">
+        <h2 id="npc-trade-ships-title" class="panel-header">{{ t('npc_trade.ships') }}</h2>
+        <div class="panel-content">
+          <div v-if="presenter.props.shipGroups.value.length === 0" class="empty-state">
+            {{ t('npc_trade.no_ships') }}
+          </div>
+          <section v-for="group in presenter.props.shipGroups.value" :key="group.sectorMacro" class="ship-sector">
+            <header class="sector-header">
+              <span>{{ group.sectorLabel }}</span>
+              <span v-if="group.bindingGroupNames.length" class="binding-groups">{{ group.bindingGroupNames.join(' · ') }}</span>
+            </header>
+            <div v-for="ship in group.ships" :key="ship.componentId" class="ship-row">
+              <div class="ship-header">
+                <div class="ship-details">
+                  <div class="ship-name">{{ ship.shipName }}</div>
+                  <div v-if="ship.customName" class="ship-custom-name">{{ ship.customName }}</div>
+                </div>
+                <span class="availability-badge" :class="ship.availability">{{ ship.availabilityLabel }}</span>
+              </div>
               <div class="ship-meta">
-                <span>{{ t('npc_trade.ship.capacity') }}: {{ ship.capacity }}</span>
                 <span>{{ ship.relativeLabel }}</span>
               </div>
-              <div v-if="ship.loadLimits.length" class="ship-load-limits">
-                <span v-for="item in ship.loadLimits" :key="item.wareId">{{ item.wareLabel }}: {{ item.maxAmount }}</span>
-              </div>
             </div>
-            <span class="availability-badge" :class="ship.availability">{{ ship.availabilityLabel }}</span>
-          </div>
-        </section>
-        <nav
-          v-if="presenter.props.shipPageCount.value > 1"
-          class="pagination"
-          :aria-label="t('npc_trade.pagination.ship_label')"
-        >
-          <button
-            type="button"
-            :disabled="presenter.props.shipPage.value <= 1"
-            :aria-label="t('npc_trade.pagination.previous')"
-            data-testid="npc-trade-ship-page-prev"
-            @click="presenter.emits.setShipPage(presenter.props.shipPage.value - 1)"
-          >‹</button>
-          <span>{{ t('npc_trade.pagination.status', { current: presenter.props.shipPage.value, total: presenter.props.shipPageCount.value }) }}</span>
-          <button
-            type="button"
-            :disabled="presenter.props.shipPage.value >= presenter.props.shipPageCount.value"
-            :aria-label="t('npc_trade.pagination.next')"
-            data-testid="npc-trade-ship-page-next"
-            @click="presenter.emits.setShipPage(presenter.props.shipPage.value + 1)"
-          >›</button>
-        </nav>
-      </div>
-    </section>
+          </section>
+          <nav
+            v-if="presenter.props.shipPageCount.value > 1"
+            class="pagination"
+            :aria-label="t('npc_trade.pagination.ship_label')"
+          >
+            <button
+              type="button"
+              :disabled="presenter.props.shipPage.value <= 1"
+              :aria-label="t('npc_trade.pagination.previous')"
+              data-testid="npc-trade-ship-page-prev"
+              @click="presenter.emits.setShipPage(presenter.props.shipPage.value - 1)"
+            >‹</button>
+            <span>{{ t('npc_trade.pagination.status', { current: presenter.props.shipPage.value, total: presenter.props.shipPageCount.value }) }}</span>
+            <button
+              type="button"
+              :disabled="presenter.props.shipPage.value >= presenter.props.shipPageCount.value"
+              :aria-label="t('npc_trade.pagination.next')"
+              data-testid="npc-trade-ship-page-next"
+              @click="presenter.emits.setShipPage(presenter.props.shipPage.value + 1)"
+            >›</button>
+          </nav>
+        </div>
+      </section>
+    </div>
   </main>
 </template>
 
@@ -460,12 +489,24 @@ const selectWare = (wareId: string, close: () => void) => {
 .pagination button { @apply h-8 min-w-8 rounded border border-slate-700 bg-slate-950/50 text-slate-300 hover:border-sky-500 hover:text-sky-300 disabled:cursor-not-allowed disabled:opacity-40; }
 .ship-sector { @apply flex flex-col gap-2; }
 .binding-groups { @apply text-xs font-normal text-slate-500; }
-.ship-row { @apply flex items-center justify-between gap-3 rounded border border-slate-800 bg-slate-950/40 p-3; }
-.ship-details { @apply min-w-0 flex flex-col gap-1; }
-.ship-name { @apply text-sm text-slate-200; }
-.ship-custom-name { @apply text-xs text-sky-300; }
-.ship-meta, .ship-load-limits { @apply flex flex-wrap gap-x-3 gap-y-1 text-xs text-slate-500; }
-.availability-badge { @apply rounded-full px-2 py-1 text-xs; }
+.ship-row, .ship-model-row { @apply min-w-0 flex flex-col gap-2 rounded border border-slate-800 bg-slate-950/40 p-3; }
+.ship-model-row { container-type: inline-size; }
+.ship-header { @apply flex items-start justify-between gap-3; }
+.ship-details { @apply min-w-0 flex-1 flex flex-col gap-1; }
+.ship-name { @apply break-words text-sm text-slate-200; }
+.ship-type { @apply text-xs text-slate-500; }
+.ship-custom-name { @apply break-words text-xs text-sky-300; }
+.ship-meta { @apply flex flex-wrap gap-x-3 gap-y-1 text-xs text-slate-500; }
+.ship-cargo-section { @apply min-w-0 border-t border-slate-800 pt-2; }
+.ship-cargo-title { @apply mb-2 text-xs text-slate-500; }
+.ship-load-limits { @apply grid grid-cols-2 gap-x-4 gap-y-1 text-xs; }
+.ship-load-limit { @apply flex min-w-0 items-baseline justify-between gap-2; }
+.ship-load-limit dt { @apply min-w-0 break-words text-slate-500; }
+.ship-load-limit dd { @apply shrink-0 text-right font-mono tabular-nums text-slate-300; }
+@container (max-width: 17rem) {
+  .ship-load-limits { @apply grid-cols-1; }
+}
+.availability-badge { @apply shrink-0 whitespace-nowrap rounded-full px-2 py-1 text-xs; }
 .availability-badge.immediatelyAvailable { @apply bg-emerald-500/15 text-emerald-300; }
 .availability-badge.reclaimable { @apply bg-amber-500/15 text-amber-300; }
 </style>

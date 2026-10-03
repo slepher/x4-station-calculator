@@ -115,9 +115,9 @@
 45. 右列使用当前 binding archive 的玩家船只与可用性结果，只展示 `immediatelyAvailable` 和 `reclaimable` 中的 L `freighter` 与 M `transporter`。
 46. 船只按当前 `sectorMacro` 分组，sector 标题使用本地化名称。
 47. 若船只 sector 命中 active binding 中一个或多个 sector group 的 anchor sector 或 coverage sectors，标题同时显示所有命中的 group 名称。
-48. 每条船显示本地化飞船名（如“苍鹭”）、本地化型号（如“运输船”）、尺寸（L/M）、可用性与静态货舱容量，不显示 component ID 或代码。
+48. 每条船显示本地化飞船名（如“苍鹭”）、有效自定义名称、可用性与相对距离，不显示 component ID 或代码；用途（如“运输船”）、尺寸（L/M）与静态货舱容量移至独立“运输船类型与装载量”卡片，跨星区按型号 macro 去重。
 49. 仅当存档名称为非空且不是 `{数字,数字}` 本地化 token 时，额外显示为自定义名称；例如“驻_声望贸易_07”有效，`{30226,204}` 无效。
-50. 每条船显示所有已选 ware 在空货舱下可能装载的最大数量：仅 transport 与船舱类型匹配且 `ware.volume > 0` 时为 `floor(cargoCapacity / ware.volume)`，否则为 0。
+50. 型号卡片按每种运输船型号显示所有已选 ware 在空货舱下可能装载的最大数量，逐船不重复展示：仅 transport 与船舱类型匹配且 `ware.volume > 0` 时为 `floor(cargoCapacity / ware.volume)`，否则为 0。型号集合覆盖全部通过筛选的船只，不受船只分页影响；详细布局和空状态见 ../trade-auto-fill/request.md。
 51. 最大可装数量只由静态货舱容量、ware transport 与 ware volume 决定；左侧 targetQty 和存档当前 `ship.cargo` 均不得参与。
 52. 可用玩家船只保留现有 sector 分组，并与候选列表使用相同分页规则：每页最多显示 10 个完整 sector groups，不得拆分同一 sector 的船只。
 
@@ -193,7 +193,7 @@
 9. 玩家买入时只使用 station seller offer，足量候选不会被不足量低总价候选压过。
 10. 多商品支持主商品和综合排序，综合排序符合当前方向的数量/金额目标。
 11. sector 分组始终启用且不提供 checkbox；sector 按内部最高 station 排名，内部排序保持一致。
-12. 右列只展示可用/可收回的 L 货船与 M 运输船，显示本地化船名/型号、尺寸、有效自定义名称、容量、所有所选 ware 的最大可装数量、sector 及命中 group；最大数量与 targetQty/当前 cargo 无关。
+12. 右列只展示可用/可收回的 L 货船与 M 运输船；逐船显示本地化船名、有效自定义名称、可用状态与距离，按 sector 显示命中 group；用途、尺寸、容量与所有所选 ware 的最大可装数量集中到跨星区按 macro 去重的型号卡片，最大数量与 targetQty/当前 cargo 无关。
 13. NPC 与船在同 sector 时显示到所选玩家空间站的直线距离，不同 sector 时显示跳数，包含同 cluster 不同 sector 的 0 跳。
 14. 玩家空间站使用 sector group/station 二级菜单；选站后最大跳数同时过滤 NPC 与船只。
 15. Vue 不直接访问 store，且没有新增中间层。

@@ -112,6 +112,15 @@ export interface NpcTradeIneligibleFactionGroup {
   sectors: NpcTradeCandidateSection[]
 }
 
+export interface NpcTradeShipType {
+  macro: string
+  shipName: string
+  shipType: string
+  size: 'L' | 'M'
+  capacity: number
+  loadLimits: Array<{ wareId: string; wareLabel: string; maxAmount: number }>
+}
+
 export interface NpcTradeShipGroup {
   sectorMacro: string
   sectorLabel: string
@@ -119,11 +128,7 @@ export interface NpcTradeShipGroup {
   ships: Array<{
     componentId: string
     shipName: string
-    shipType: string
-    size: 'L' | 'M'
     customName: string | null
-    capacity: number
-    loadLimits: Array<{ wareId: string; wareLabel: string; maxAmount: number }>
     relativeLabel: string
     availability: 'immediatelyAvailable' | 'reclaimable'
     availabilityLabel: string
@@ -147,6 +152,7 @@ export interface NpcTradePresenterProps {
   candidatePage: Ref<number>
   candidatePageCount: ComputedRef<number>
   ineligibleFactionGroups: ComputedRef<NpcTradeIneligibleFactionGroup[]>
+  shipTypes: ComputedRef<NpcTradeShipType[]>
   shipGroups: ComputedRef<NpcTradeShipGroup[]>
   shipPage: Ref<number>
   shipPageCount: ComputedRef<number>
@@ -750,9 +756,10 @@ export function useNpcTradePresenter(): { props: NpcTradePresenterProps; emits: 
     ineligibleFactionPages.value = {}
   })
 
-  const allShipGroups = computed<NpcTradeShipGroup[]>(() => {
+  const shipCatalog = computed<{ types: NpcTradeShipType[]; groups: NpcTradeShipGroup[] }>(() => {
     const binding = activeBinding.value
-    if (!contextAvailable.value || binding === null) return []
+    if (!contextAvailable.value || binding === null) return { types: [], groups: [] }
+    const types = new Map<string, NpcTradeShipType>()
     const grouped = new Map<string, NpcTradeShipGroup['ships']>()
     for (const ship of selectedArchivePlayerShips.value) {
       if (ship.availability !== 'immediatelyAvailable' && ship.availability !== 'reclaimable') continue
@@ -768,26 +775,28 @@ export function useNpcTradePresenter(): { props: NpcTradePresenterProps; emits: 
       if (localizedShip === undefined) continue
       const containerCargo = staticShip.cargo.find((cargo) => cargo.type === 'container')
       if (containerCargo === undefined) continue
+      if (!types.has(ship.macro)) {
+        types.set(ship.macro, {
+          macro: ship.macro,
+          shipName: localizedShip.localeName,
+          shipType: translateShipType(shipType),
+          size: staticShip.class === 'ship_l' ? 'L' : 'M',
+          capacity: containerCargo.capacity,
+          loadLimits: wareTargets.value.map((target) => {
+            const ware = gameDataStore.localizedWaresMap[target.wareId]
+            const maxAmount = ware === undefined ? 0 : calculateContainerWareMaxLoad(containerCargo.capacity, ware)
+            return { wareId: target.wareId, wareLabel: target.label, maxAmount }
+          })
+        })
+      }
       const customName = ship.name?.trim()
       const current = grouped.get(ship.sectorMacro)
       const item = {
         componentId: ship.componentId,
         shipName: localizedShip.localeName,
-        shipType: translateShipType(shipType),
-        size: staticShip.class === 'ship_l' ? 'L' as const : 'M' as const,
         customName: customName === undefined || customName.length === 0 || /^\{\d+,\d+\}$/.test(customName)
           ? null
           : customName,
-        capacity: containerCargo.capacity,
-        loadLimits: wareTargets.value.map((target) => {
-          const ware = gameDataStore.localizedWaresMap[target.wareId]
-          const maxAmount = ware === undefined ? 0 : calculateContainerWareMaxLoad(containerCargo.capacity, ware)
-          return {
-            wareId: target.wareId,
-            wareLabel: target.label,
-            maxAmount
-          }
-        }),
         relativeLabel: relativeLabel(ship.sectorMacro, ship.position),
         availability: ship.availability,
         availabilityLabel: i18n.global.t(`npc_trade.ship.${ship.availability}`)
@@ -795,7 +804,7 @@ export function useNpcTradePresenter(): { props: NpcTradePresenterProps; emits: 
       if (current === undefined) grouped.set(ship.sectorMacro, [item])
       else current.push(item)
     }
-    return Array.from(grouped, ([sectorMacro, ships]) => ({
+    const groups = Array.from(grouped, ([sectorMacro, ships]) => ({
       sectorMacro,
       sectorLabel: sectorLabel(sectorMacro),
       bindingGroupNames: binding.groups
@@ -808,7 +817,17 @@ export function useNpcTradePresenter(): { props: NpcTradePresenterProps; emits: 
         return a.shipName.localeCompare(b.shipName)
       })
     })).sort((a, b) => a.sectorLabel.localeCompare(b.sectorLabel))
+    return {
+      groups,
+      types: Array.from(types.values()).sort((a, b) => {
+        const nameOrder = a.shipName.localeCompare(b.shipName)
+        return nameOrder === 0 ? a.macro.localeCompare(b.macro) : nameOrder
+      })
+    }
   })
+
+  const allShipGroups = computed(() => shipCatalog.value.groups)
+  const shipTypes = computed(() => shipCatalog.value.types)
 
   const shipPageCount = computed(() => Math.max(
     1,
@@ -901,6 +920,7 @@ export function useNpcTradePresenter(): { props: NpcTradePresenterProps; emits: 
       candidatePage,
       candidatePageCount,
       ineligibleFactionGroups,
+      shipTypes,
       shipGroups,
       shipPage,
       shipPageCount,

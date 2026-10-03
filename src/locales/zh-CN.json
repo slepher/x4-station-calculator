@@ -1598,12 +1598,14 @@
     },
     "amount": "数量",
     "price": "价格",
+    "ship_types": "运输船类型与装载量",
     "ships": "可用玩家船只",
     "no_ships": "没有可用的 L 货船或 M 运输船",
     "ship": {
       "immediatelyAvailable": "立即可用",
       "reclaimable": "可收回",
-      "capacity": "容量"
+      "capacity": "容量",
+      "load_limits": "单项装载上限"
     },
     "state": {
       "contextUnavailable": "当前绑定或兼容存档不可用。",

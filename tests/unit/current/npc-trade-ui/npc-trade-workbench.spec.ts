@@ -4,6 +4,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import NpcTradeWorkbench from '@/components/empire/NpcTradeWorkbench.vue'
+import type { NpcTradeShipGroup, NpcTradeShipType } from '@/components/empire/presenters/useNpcTradePresenter'
 
 const presenter = vi.hoisted(() => ({
   props: {
@@ -33,7 +34,8 @@ const presenter = vi.hoisted(() => ({
     candidatePage: { value: 1 },
     candidatePageCount: { value: 1 },
     ineligibleFactionGroups: { value: [] },
-    shipGroups: { value: [] },
+    shipTypes: { value: [] as NpcTradeShipType[] },
+    shipGroups: { value: [] as NpcTradeShipGroup[] },
     shipPage: { value: 1 },
     shipPageCount: { value: 1 },
     pageState: { value: 'stationNotSelected' },
@@ -90,6 +92,8 @@ describe('NpcTradeWorkbench station selector', () => {
     presenter.props.candidatePage.value = 1
     presenter.props.candidatePageCount.value = 1
     presenter.props.ineligibleFactionGroups.value = []
+    presenter.props.shipTypes.value = []
+    presenter.props.shipGroups.value = []
     presenter.props.shipPage.value = 1
     presenter.props.shipPageCount.value = 1
     presenter.props.pageState.value = 'stationNotSelected'
@@ -159,6 +163,70 @@ describe('NpcTradeWorkbench station selector', () => {
     ;(details.element as HTMLDetailsElement).open = true
     await details.trigger('toggle')
     expect(presenter.emits.setIneligibleFactionExpanded).toHaveBeenCalledWith('faction-a', true)
+  })
+
+  it('shares one model cargo card while keeping individual ship identity and availability', () => {
+    presenter.props.shipTypes.value = [{
+      macro: 'heron_macro', shipName: '苍鹭 改进型', shipType: '货船', size: 'L', capacity: 62000,
+      loadLimits: [
+        { wareId: 'claytronics', wareLabel: '电子黏土', maxAmount: 2583 },
+        { wareId: 'energycells', wareLabel: '能量电池', maxAmount: 62000 },
+        { wareId: 'hullparts', wareLabel: '船体部件', maxAmount: 5166 }
+      ]
+    }]
+    presenter.props.shipGroups.value = [{
+      sectorMacro: 'sector-a', sectorLabel: '希望之歌的选择 I', bindingGroupNames: [],
+      ships: ['ship-a', 'ship-b'].map(componentId => ({
+        componentId, shipName: '苍鹭 改进型', customName: '诺皮利奥贸易运输' + componentId,
+        relativeLabel: '1 跳', availability: 'immediatelyAvailable', availabilityLabel: '立即可用'
+      }))
+    }]
+    const wrapper = mount(NpcTradeWorkbench, { global: { stubs: { X4NumberInput: true } } })
+    const modelCard = wrapper.get('[data-testid="npc-trade-ship-types"]')
+    expect(modelCard.text()).toContain('货船 · L')
+    expect(modelCard.text()).toContain('npc_trade.ship.capacity: 62000')
+    expect(modelCard.findAll('dl > div').map(item => [item.get('dt').text(), item.get('dd').text()])).toEqual([
+      ['电子黏土', '2583'], ['能量电池', '62000'], ['船体部件', '5166']
+    ])
+    expect(modelCard.findAll('[data-testid="npc-trade-ship-type-heron_macro"]')).toHaveLength(1)
+    const ships = wrapper.findAll('.ship-row')
+    expect(ships).toHaveLength(2)
+    ships.forEach((card, index) => {
+      expect(card.text()).toContain('苍鹭 改进型')
+      expect(card.text()).toContain('诺皮利奥贸易运输ship-' + (index === 0 ? 'a' : 'b'))
+      expect(card.text()).toContain('立即可用')
+      expect(card.text()).toContain('1 跳')
+      expect(card.text()).not.toContain('npc_trade.ship.capacity')
+      expect(card.text()).not.toContain('货船 · L')
+      expect(card.find('dl').exists()).toBe(false)
+    })
+    wrapper.unmount()
+  })
+
+  it('keeps a reclaimable ship and model capacity visible without an empty cargo section', () => {
+    presenter.props.shipTypes.value = [{
+      macro: 'freighter_macro', shipName: 'Freighter', shipType: 'Transport', size: 'M', capacity: 0, loadLimits: []
+    }]
+    presenter.props.shipGroups.value = [{
+      sectorMacro: 'sector-a', sectorLabel: 'Sector A', bindingGroupNames: [],
+      ships: [{
+        componentId: 'ship-b', shipName: 'Freighter', customName: null, relativeLabel: '2 jumps',
+        availability: 'reclaimable', availabilityLabel: '可收回'
+      }]
+    }]
+    const wrapper = mount(NpcTradeWorkbench, { global: { stubs: { X4NumberInput: true } } })
+    expect(wrapper.get('.ship-row').text()).toContain('可收回')
+    expect(wrapper.get('[data-testid="npc-trade-ship-types"]').text()).toContain('npc_trade.ship.capacity: 0')
+    expect(wrapper.find('dl').exists()).toBe(false)
+    expect(wrapper.text()).not.toContain('npc_trade.ship.load_limits')
+    wrapper.unmount()
+  })
+
+  it('hides the model card when no ships pass the filters and retains the ship empty state', () => {
+    const wrapper = mount(NpcTradeWorkbench, { global: { stubs: { X4NumberInput: true } } })
+    expect(wrapper.find('[data-testid="npc-trade-ship-types"]').exists()).toBe(false)
+    expect(wrapper.text()).toContain('npc_trade.no_ships')
+    wrapper.unmount()
   })
 
   it('pages available ships by complete sector groups', async () => {

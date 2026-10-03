@@ -193,3 +193,11 @@ presenter 可以在挂载时检查当前上下文与已处理键，但不能 unc
 ## 商品卡片布局补充
 
 NpcTradeWorkbench 在 Vue 层将商品卡片拆为标题行和控件行。标题行名称占剩余宽度并自然换行，移除按钮不收缩；控件行来源标记靠左，数量输入靠右并扩为 w-28。数量说明仅保留 sr-only 标签，原 testid 与 presenter 事件保持不变，无新增业务行为。
+
+## 运输船型号与装载量独立卡片
+
+本轮替代逐船货物分区方案。useNpcTradePresenter 在既有候选船筛选过程中同时组装型号集合和按星区分组的船只列表。型号集合以静态游戏船 macro 为唯一键，覆盖全部通过可用状态、用途/尺寸及跳数筛选的候选船，并在船只星区分页之前生成；不同 macro 即使本地化同名也保持独立。每种型号计算一次容量和所选商品的装载上限，沿用 calculateContainerWareMaxLoad 的空舱单项口径。不得汇总同型号船只容量，不扣船舱现货或截断到目标数量。
+
+Presenter 输出 shipTypes（macro、型号名称、用途、尺寸、容量、loadLimits）与简化的 shipGroups（逐船身份、自定义名称、可用状态、相对距离）；Vue 不做去重或计算。右列使用一个纵向容器，顶部独立 panel-card 展示“运输船类型与装载量”，下方保留可用船只按星区分组和分页。型号卡片为空时隐藏；无商品时仍展示型号及容量，但隐藏装载明细。型号行使用 dl 和 17rem container query 将宽卡片两列、窄卡片一列，数字右对齐；逐船行仅保留型号名、自定义名称、单行状态和跳数。新增中英文标题与稳定 testid。
+
+Focused Unit 在 presenter.spec.ts 验证跨星区去重、不同 macro 同名不合并、分页独立、筛选范围和商品变化；npc-trade-workbench.spec.ts 验证独立卡片、逐船无重复、空目标及空候选。继续严格遵守 store -> presenter -> vue，无新增中间层或持久化字段。
