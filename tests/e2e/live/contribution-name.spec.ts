@@ -1,6 +1,7 @@
 import { test } from '../../test-setup'
 import { expect } from '@playwright/test'
 import { loadLiveBindingFixture } from './helpers/loadLiveBindingFixture'
+import { getSidebarTransit } from './helpers/sidebarNavigation'
 
 test.describe('Contribution name 显示验证', () => {
   test.beforeEach(async ({ page }) => {
@@ -15,9 +16,9 @@ test.describe('Contribution name 显示验证', () => {
   })
 
   test('小行星星区: 反物质转换器展开后应显示 station name "新建空间站"', async ({ page }) => {
-    const sectorTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_100_sector001_macro"]')
+    const sectorTab = await getSidebarTransit(page, 'cluster_100_sector001_macro')
     await expect(sectorTab).toBeVisible({ timeout: 5000 })
-    await sectorTab.click()
+    await sectorTab.locator('.sidebar-nav').click()
 
     const wareflowPanel = page.locator('.list-wrapper').filter({ hasText: /资源视图|Resource View/i })
     await expect(wareflowPanel).toBeVisible({ timeout: 2000 })
@@ -37,9 +38,9 @@ test.describe('Contribution name 显示验证', () => {
   })
 
   test('地球人缺口: 星区产品电子基质展开后应显示 station name "地球人"', async ({ page }) => {
-    const sectorTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_100_sector001_macro"]')
+    const sectorTab = await getSidebarTransit(page, 'cluster_100_sector001_macro')
     await expect(sectorTab).toBeVisible({ timeout: 5000 })
-    await sectorTab.click()
+    await sectorTab.locator('.sidebar-nav').click()
 
     const modeBtn = page.locator('.mode-toggle-chip')
     await expect(modeBtn).toBeVisible({ timeout: 2000 })
@@ -71,9 +72,9 @@ test.describe('Contribution name 显示验证', () => {
   })
 
   test('小行星仓储视图: 反物质转换器展开后显示参与空间站区域', async ({ page }) => {
-    const sectorTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_100_sector001_macro"]')
+    const sectorTab = await getSidebarTransit(page, 'cluster_100_sector001_macro')
     await expect(sectorTab).toBeVisible({ timeout: 5000 })
-    await sectorTab.click()
+    await sectorTab.locator('.sidebar-nav').click()
 
     const modeBtn = page.locator('.mode-toggle-chip')
     await expect(modeBtn).toBeVisible({ timeout: 2000 })
@@ -97,9 +98,9 @@ test.describe('Contribution name 显示验证', () => {
   })
 
   test('小行星运输视图: 反物质转换器展开后贡献名应显示 "新建空间站"', async ({ page }) => {
-    const sectorTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_100_sector001_macro"]')
+    const sectorTab = await getSidebarTransit(page, 'cluster_100_sector001_macro')
     await expect(sectorTab).toBeVisible({ timeout: 5000 })
-    await sectorTab.click()
+    await sectorTab.locator('.sidebar-nav').click()
 
     const modeBtn = page.locator('.mode-toggle-chip')
     await expect(modeBtn).toBeVisible({ timeout: 2000 })
@@ -124,9 +125,9 @@ test.describe('Contribution name 显示验证', () => {
   })
 
   test('新建空间站缺口: 星区运营量子管明细应含 "阿尔忒弥斯的朦胧" 和 "警惕凝视"', async ({ page }) => {
-    const sectorTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_100_sector001_macro"]')
+    const sectorTab = await getSidebarTransit(page, 'cluster_100_sector001_macro')
     await expect(sectorTab).toBeVisible({ timeout: 5000 })
-    await sectorTab.click()
+    await sectorTab.locator('.sidebar-nav').click()
 
     const modeBtn = page.locator('.mode-toggle-chip')
     await expect(modeBtn).toBeVisible({ timeout: 2000 })

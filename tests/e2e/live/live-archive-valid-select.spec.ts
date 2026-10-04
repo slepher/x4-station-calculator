@@ -1,6 +1,7 @@
 import { test } from '../../test-setup'
 import { expect } from '@playwright/test'
 import { loadLiveBindingFixture } from './helpers/loadLiveBindingFixture'
+import { getSidebarTransit } from './helpers/sidebarNavigation'
 
 const GAME_GUID = 'CB8837FE-98C1-42F8-9D6A-ED0ADC539111'
 
@@ -133,9 +134,9 @@ test.describe('binding selects latest valid archive', () => {
   })
 
   test('stations load from older valid archive when newer one is invalid', async ({ page }) => {
-    const sectorTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_100_sector001_macro"]')
+    const sectorTab = await getSidebarTransit(page, 'cluster_100_sector001_macro')
     await expect(sectorTab).toBeVisible({ timeout: 5000 })
-    await sectorTab.click()
+    await sectorTab.locator('.sidebar-nav').click()
     await page.waitForTimeout(500)
 
     const stationTab = page.locator('[data-testid="sidebar-station"][data-station-id="KXN-018"]')

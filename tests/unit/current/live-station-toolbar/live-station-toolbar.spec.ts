@@ -46,8 +46,7 @@ describe('1 单元测试', () => {
     races: [
       { value: 'argon', label: 'Argon' },
       { value: 'paranid', label: 'Paranid' }
-    ],
-    singleBerthThroughput: 10000
+    ]
   }
 
   it('1.1 Unit: mode prop 正确渲染模式状态', async () => {

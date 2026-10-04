@@ -26,7 +26,6 @@ export interface ToolbarPresenterProps {
   races: Array<{ value: string; label: string }>
   stationTypes: Array<{ value: StationType; label: string }>
   availableMinerals: string[]
-  singleBerthThroughput: ComputedRef<number>
   hasBinding: ComputedRef<boolean>
   hasArchive: ComputedRef<boolean>
   hasActiveBinding: ComputedRef<boolean>
@@ -178,7 +177,6 @@ export function useProductionToolbarPresenter(store: ToolbarPresenterStore): Use
     races,
     stationTypes,
     availableMinerals,
-    singleBerthThroughput: computed(() => Math.max(1, store.stationState?.settings.transportShipCapacity || 1) * 15),
     hasBinding: computed(() => store.bindingStation != null),
     hasArchive: computed(() => store.archiveStation != null),
     hasActiveBinding: computed(() => store.activeBinding != null),

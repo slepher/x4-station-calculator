@@ -1,6 +1,7 @@
 import { test } from '../../test-setup'
 import { expect } from '@playwright/test'
 import { loadLiveBindingFixture } from '../live/helpers/loadLiveBindingFixture'
+import { getSidebarTransit } from '../live/helpers/sidebarNavigation'
 
 test.beforeEach(async ({ page }) => {
   await page.addStyleTag({
@@ -13,9 +14,9 @@ test.describe('Sector Flow Filter', () => {
   test('小行星星区聚合 flows 应只显示三个 station 的 planned ware 作为 surplus', async ({ page }) => {
     await page.waitForTimeout(1000)
     
-    const asteroidSupplyTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_100_sector001_macro"]')
+    const asteroidSupplyTab = await getSidebarTransit(page, 'cluster_100_sector001_macro')
     await expect(asteroidSupplyTab).toBeVisible({ timeout: 5000 })
-    await asteroidSupplyTab.click()
+    await asteroidSupplyTab.locator('.sidebar-nav').click()
     await page.waitForTimeout(500)
     
     const wareflowPanel = page.locator('.list-wrapper').filter({ hasText: '资源视图' })
@@ -55,9 +56,9 @@ test.describe('Sector Flow Filter', () => {
   test('单个 station flows 显示原始数据（含 auto-industry surplus）', async ({ page }) => {
     await page.waitForTimeout(1000)
     
-    const asteroidSupplyTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_100_sector001_macro"]')
+    const asteroidSupplyTab = await getSidebarTransit(page, 'cluster_100_sector001_macro')
     await expect(asteroidSupplyTab).toBeVisible({ timeout: 5000 })
-    await asteroidSupplyTab.click()
+    await asteroidSupplyTab.locator('.sidebar-nav').click()
     await page.waitForTimeout(500)
     
     const stationTabs = page.locator('[data-testid="sidebar-station"]')
@@ -101,9 +102,9 @@ test.describe('Sector Flow Filter', () => {
   test('小行星聚合 flows 详细快照（基准数据）', async ({ page }) => {
     await page.waitForTimeout(1000)
     
-    const asteroidSupplyTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_100_sector001_macro"]')
+    const asteroidSupplyTab = await getSidebarTransit(page, 'cluster_100_sector001_macro')
     await expect(asteroidSupplyTab).toBeVisible({ timeout: 5000 })
-    await asteroidSupplyTab.click()
+    await asteroidSupplyTab.locator('.sidebar-nav').click()
     await page.waitForTimeout(500)
     
     const wareflowPanel = page.locator('.list-wrapper').filter({ hasText: '资源视图' })

@@ -1,6 +1,7 @@
 import { test } from '../../test-setup'
 import { expect } from '@playwright/test'
 import { loadLiveBindingFixture } from '../live/helpers/loadLiveBindingFixture'
+import { getSidebarTransit } from '../live/helpers/sidebarNavigation'
 
 const ORIGINAL_GUID = 'CB8837FE-98C1-42F8-9D6A-ED0ADC539111'
 const SECOND_GUID = 'B41B8D56-C58D-4F66-8EAA-6F85BC614214'
@@ -91,7 +92,7 @@ test.describe('Save Binding CRUD', () => {
 
   test('binding station edits remain draft until explicit save and survive reload outside empire storage', async ({ page }) => {
     const initial = await readPersistence(page)
-    await page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_100_sector001_macro"]').click()
+    await (await getSidebarTransit(page, 'cluster_100_sector001_macro')).locator('.sidebar-nav').click()
     await page.locator('[data-testid="sidebar-station"][data-station-id="KXN-018"]').click()
     const nameInput = page.locator('.live-toolbar input.ghost-input')
     await expect(nameInput).toHaveValue('地球人')

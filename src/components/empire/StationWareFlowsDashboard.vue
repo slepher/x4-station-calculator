@@ -19,6 +19,7 @@ import StationAllocationView from './StationAllocationView.vue'
 const props = defineProps<{
   visualMode?: 'planning' | 'live'
   viewMode: WareFlowViewMode
+  singleBerthThroughputText: string | null
   useAllocationVolumeView?: boolean
   productionFlows: DerivedProductionFlow[]
   allocationVolumeGroups?: AllocationVolumeGroup[]
@@ -399,6 +400,17 @@ const hasAllocationData = computed(() =>
       </div>
     </div>
 
+    <div
+      v-if="viewMode === 'transport' && props.singleBerthThroughputText != null"
+      class="transport-footer"
+      data-testid="transport-throughput-footer"
+    >
+      <span class="text-sm text-slate-400">{{ t('toolbar.single_berth_throughput') }}</span>
+      <span class="text-sm font-mono font-bold text-sky-400" data-testid="single-berth-throughput">
+        {{ props.singleBerthThroughputText }} m³/h
+      </span>
+    </div>
+
     <div class="profit-section" v-if="hasFlowData && viewMode === 'economy'" data-testid="profit-section">
       <div class="simulation-controls flex flex-row gap-4">
         <PriceSlider v-model="buyMultiplier" :label="t('wareflow.res_price')" type="buy" />
@@ -423,6 +435,10 @@ const hasAllocationData = computed(() =>
 <style scoped>
 .list-wrapper {
   @apply bg-slate-900/40 rounded-lg border border-slate-800 shadow-xl overflow-hidden;
+}
+
+.transport-footer {
+  @apply flex items-center justify-between px-4 py-3 border-t border-slate-700/50 bg-slate-800/30;
 }
 
 .list-header {

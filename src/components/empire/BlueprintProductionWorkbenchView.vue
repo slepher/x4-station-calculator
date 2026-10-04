@@ -74,7 +74,6 @@ const buildPlanPresenter = useBuildPlanPresenter({
     :races="toolbarPresenter.props.races"
     :station-types="toolbarPresenter.props.stationTypes"
     :available-minerals="toolbarPresenter.props.availableMinerals"
-    :single-berth-throughput="toolbarPresenter.props.singleBerthThroughput.value"
     @update-station-name="toolbarPresenter.emits.updateStationName"
     @update-station-type="toolbarPresenter.emits.updateStationType"
     @update-station-count="toolbarPresenter.emits.updateStationCount"
@@ -123,6 +122,7 @@ const buildPlanPresenter = useBuildPlanPresenter({
       <StationWareFlowsDashboard
         :visual-mode="wareflowPresenter.props.visualMode.value"
         :view-mode="wareflowPresenter.props.viewMode.value"
+        :single-berth-throughput-text="wareflowPresenter.props.singleBerthThroughputText.value"
         :use-allocation-volume-view="wareflowPresenter.props.useAllocationVolumeView.value"
         :production-flows="wareflowPresenter.props.derivedProductionFlows.value"
         :allocation-volume-groups="wareflowPresenter.props.allocationVolumeGroups.value"

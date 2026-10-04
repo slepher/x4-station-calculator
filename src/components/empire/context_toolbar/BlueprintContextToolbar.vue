@@ -22,7 +22,6 @@ const props = defineProps<{
   races: Array<{ value: string; label: string }>
   stationTypes?: Array<{ value: StationType; label: string }>
   availableMinerals?: string[]
-  singleBerthThroughput?: number
 }>()
 
 const emit = defineEmits<{
@@ -115,11 +114,6 @@ const titleValue = computed({
   get: () => props.titleModel.value,
   set: (val: string) => emit('updateTitle', val)
 })
-
-const formatThroughput = (n: number) => new Intl.NumberFormat('en-US', {
-  maximumFractionDigits: 1,
-  minimumFractionDigits: 1
-}).format(n)
 
 const showMineralPopover = ref(false)
 const selectedMinerals = computed(() => props.station?.minerals || [])
@@ -240,13 +234,6 @@ const handleOpenImport = () => {
           </div>
         </div>
 
-        <div class="input-group ml-6">
-          <label class="group-label">{{ t('toolbar.single_berth_throughput') }}</label>
-          <div class="count-pill min-w-[120px] justify-end">
-            <span class="text-xs font-mono font-bold text-sky-400">{{ formatThroughput(props.singleBerthThroughput || 0) }}</span>
-            <span class="text-[10px] text-slate-500 ml-1">m³/h</span>
-          </div>
-        </div>
       </div>
 
       <div class="separator mx-6"></div>

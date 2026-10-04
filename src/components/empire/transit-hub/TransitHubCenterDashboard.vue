@@ -26,6 +26,7 @@ type SharedViewMode = 'quantity' | 'volume' | 'economy' | 'transport'
 const props = withDefaults(defineProps<{
   productionFlows: DerivedProductionFlow[]
   viewMode?: SharedViewMode
+  singleBerthThroughputText: string | null
   buyMultiplier?: number
   sellMultiplier?: number
   productBufferHours?: number
@@ -247,6 +248,17 @@ const isEmpty = computed(() => {
       <EmptyState v-if="isEmpty" />
     </div>
 
+    <div
+      v-if="viewMode === 'transport' && props.singleBerthThroughputText != null"
+      class="transport-footer"
+      data-testid="transport-throughput-footer"
+    >
+      <span class="text-sm text-slate-400">{{ t('toolbar.single_berth_throughput') }}</span>
+      <span class="text-sm font-mono font-bold text-sky-400" data-testid="single-berth-throughput">
+        {{ props.singleBerthThroughputText }} m³/h
+      </span>
+    </div>
+
     <div class="controls-section" v-if="hasFlowData"> 
       <div v-if="viewMode === 'economy'" class="simulation-controls flex flex-row gap-4">
         <PriceSlider v-model="localBuyMultiplier" :label="t('wareflow.buy_multiplier')" type="buy" />
@@ -267,6 +279,9 @@ const isEmpty = computed(() => {
 <style scoped>
 .list-wrapper {
   @apply bg-slate-900/40 rounded-lg border border-slate-800 shadow-xl overflow-hidden;
+}
+.transport-footer {
+  @apply flex items-center justify-between px-4 py-3 border-t border-slate-700/50 bg-slate-800/30;
 }
 .list-header {
   @apply flex justify-between items-center p-4 bg-slate-800/30 border-b border-slate-700/50;

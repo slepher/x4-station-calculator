@@ -51,7 +51,6 @@ export interface TerraformingToolbarProps {
   position: ComputedRef<{ x: number; y: number; z: number } | undefined>
   sectorResources: ComputedRef<string[]>
   sectorSunlight: ComputedRef<number>
-  singleBerthThroughput: ComputedRef<number>
   hasHqStation: ComputedRef<boolean>
 }
 
@@ -1271,7 +1270,6 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
   const position = computed(() => hqArchiveStation.value?.position)
   const sectorResources = computed(() => hqArchiveStation.value?.sector?.resources || [])
   const sectorSunlight = computed(() => hqArchiveStation.value?.sector?.sunlight ?? 100)
-  const singleBerthThroughput = computed(() => 930000)
 
   const clusters = computed<TerraformingCluster[]>(() => {
     return store.terraformingData.value?.clusters || []
@@ -3162,7 +3160,6 @@ export function useTerraformingPresenter(store: TerraformingPresenterStore): Use
       position,
       sectorResources,
       sectorSunlight,
-      singleBerthThroughput,
       hasHqStation
     },
     sectorPanel: {

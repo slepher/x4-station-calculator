@@ -1,6 +1,7 @@
 import { test } from '../../test-setup'
 import { expect } from '@playwright/test'
 import { loadLiveBindingFixture } from './helpers/loadLiveBindingFixture'
+import { getSidebarTransit } from './helpers/sidebarNavigation'
 
 test.describe('Live Overview', () => {
   test.beforeEach(async ({ page }) => {
@@ -46,7 +47,7 @@ test.describe('Live Overview', () => {
   test('live overview transit tab shows sector tab bar', async ({ page }) => {
     const sectorTab = page.locator('[data-testid="sidebar-sector"]').first()
     await expect(sectorTab).toBeVisible({ timeout: 5000 })
-    await page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_100_sector001_macro"]').click()
+    await (await getSidebarTransit(page, 'cluster_100_sector001_macro')).locator('.sidebar-nav').click()
     await expect(page.locator('.mode-toggle-chip')).toBeVisible()
     await expect(page.locator('[data-testid="sidebar-station"][data-station-id="KXN-018"]')).toBeVisible()
   })

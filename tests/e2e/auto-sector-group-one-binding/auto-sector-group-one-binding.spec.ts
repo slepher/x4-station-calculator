@@ -1,6 +1,7 @@
 import { test } from '../../test-setup'
 import { expect, Page } from '@playwright/test'
 import { loadLiveBindingFixture } from '../live/helpers/loadLiveBindingFixture'
+import { getSidebarTransit } from '../live/helpers/sidebarNavigation'
 
 const GAME_GUID = 'CB8837FE-98C1-42F8-9D6A-ED0ADC539111'
 const SECOND_GAME_GUID = 'B41B8D56-C58D-4F66-8EAA-6F85BC614214'
@@ -76,7 +77,7 @@ async function enterAutoSectorGroup(page: Page) {
 }
 
 async function enterEditMode(page: Page) {
-  const editBtn = page.getByRole('button', { name: /编辑|Edit/ })
+  const editBtn = page.locator('.auto-sector-bar').getByRole('button', { name: /^(编辑|Edit)$/ })
   await expect(editBtn).toBeVisible({ timeout: 5000 })
   await editBtn.click()
   await page.waitForTimeout(300)
@@ -212,8 +213,8 @@ test.describe('M2.1 当前共享草案事务', () => {
     await expect(overview.locator(':scope > div').nth(1)).toHaveClass(/lg:col-span-4/)
     await expect(overview.locator(':scope > div').nth(2)).toHaveClass(/lg:col-span-5/)
     const entry = page.getByTestId('sidebar-auto-sector-group')
-    await expect(entry).not.toHaveClass(/disabled/)
-    await expect(entry.locator('.sidebar-recalc-dot')).toBeVisible()
+    await expect(entry.locator('.sidebar-nav')).toHaveAttribute('aria-disabled', 'false')
+    await expect(entry.locator('.sidebar-status-dot')).toBeVisible()
     const initial = await readVirtualDrafts(page)
     expect(initial.map((draft: any) => draft.id)).toEqual(['f36126e5-7798-ed14-3c03-938b961efa0b'])
     expect(initial[0].saveStationCode).toBeUndefined()
@@ -289,7 +290,7 @@ test.describe('M2.1 当前共享草案事务', () => {
     page.once('dialog', dialog => dialog.accept())
     await page.getByTestId('dialog-backdrop').locator('.group').filter({hasText: 'slepher'}).getByRole('button', {name:'删除', exact:true}).click()
     await page.reload()
-    await expect(page.getByTestId('sidebar-auto-sector-group')).toHaveClass(/disabled/)
+    await expect(page.getByTestId('sidebar-auto-sector-group').locator('.sidebar-nav')).toHaveAttribute('aria-disabled', 'true')
     expect(await page.evaluate(() => (window as any).activeViewStore.activeBinding)).toBeNull()
     expect(await page.evaluate(() => (window as any).liveStore.autoGroupResult)).toBeNull()
   })
@@ -470,10 +471,10 @@ test.describe('M2.1 当前共享草案事务', () => {
       station: (window as any).activeViewStore.activeStationId
     }))).toEqual({ workbench: 'auto-sector-group', station: null })
 
-    const sector = page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_100_sector001_macro"]')
-    await sector.click()
+    const sector = await getSidebarTransit(page, 'cluster_100_sector001_macro')
+    await sector.locator('.sidebar-nav').click()
     await expect(page.locator('[data-testid="transit-hub-build-panel"]')).toBeVisible()
-    await expect(sector).toHaveClass(/active/)
+    await expect(sector.locator('.sidebar-nav')).toHaveAttribute('aria-current', 'page')
     expect(await page.evaluate(() => ({
       workbench: (window as any).activeViewStore.activeBindingWorkbench,
       station: (window as any).activeViewStore.activeStationId

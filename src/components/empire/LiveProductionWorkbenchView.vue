@@ -201,7 +201,6 @@ function openShipBuildForTransportSelection() {
     :sector-sunlight="toolbarPresenter.props.sectorSunlight.value"
     :settings="toolbarPresenter.props.settings.value"
     :races="toolbarPresenter.props.races"
-    :single-berth-throughput="toolbarPresenter.props.singleBerthThroughput.value"
     :mode="toolbarPresenter.props.mode.value"
     :visual-mode="planningPresenter.props.visualMode.value"
     :can-toggle="true"
@@ -226,7 +225,6 @@ function openShipBuildForTransportSelection() {
     :can-toggle="toolbarPresenter.props.canToggle.value"
     :settings="toolbarPresenter.props.settings.value"
     :races="toolbarPresenter.props.races"
-    :single-berth-throughput="toolbarPresenter.props.singleBerthThroughput.value"
     :module-scope="toolbarPresenter.props.moduleScope.value"
     :has-building-modules="toolbarPresenter.props.hasBuildingModules.value"
     @update-station-name="toolbarPresenter.emits.updateStationName"
@@ -247,7 +245,6 @@ function openShipBuildForTransportSelection() {
     :position="terraformingPresenter.props.toolbar.position.value"
     :sector-resources="terraformingPresenter.props.toolbar.sectorResources.value"
     :sector-sunlight="terraformingPresenter.props.toolbar.sectorSunlight.value"
-    :single-berth-throughput="terraformingPresenter.props.toolbar.singleBerthThroughput.value"
     :has-hq-station="terraformingPresenter.props.toolbar.hasHqStation.value"
   />
 
@@ -308,6 +305,7 @@ function openShipBuildForTransportSelection() {
         <TransitHubCenterDashboard
           :production-flows="wareflowPresenter.props.derivedProductionFlows.value"
           :view-mode="wareflowPresenter.props.viewMode.value"
+          :single-berth-throughput-text="wareflowPresenter.props.singleBerthThroughputText.value"
           :buy-multiplier="wareflowPresenter.props.settings.value.buyMultiplier"
           :sell-multiplier="wareflowPresenter.props.settings.value.sellMultiplier"
           :product-buffer-hours="wareflowPresenter.props.settings.value.primaryProductBufferHours"
@@ -355,6 +353,7 @@ function openShipBuildForTransportSelection() {
       <StationWareFlowsDashboard
         :visual-mode="wareflowPresenter.props.visualMode.value"
         :view-mode="wareflowPresenter.props.viewMode.value"
+        :single-berth-throughput-text="wareflowPresenter.props.singleBerthThroughputText.value"
         :use-allocation-volume-view="wareflowPresenter.props.useAllocationVolumeView.value"
         :production-flows="wareflowPresenter.props.derivedProductionFlows.value"
         :allocation-volume-groups="wareflowPresenter.props.allocationVolumeGroups.value"

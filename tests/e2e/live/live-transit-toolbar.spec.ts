@@ -1,6 +1,7 @@
 import { test } from '../../test-setup'
 import { expect, Page } from '@playwright/test'
 import { loadLiveBindingFixture } from './helpers/loadLiveBindingFixture'
+import { getSidebarTransit } from './helpers/sidebarNavigation'
 
 test.beforeEach(async ({ page }) => {
   await page.addStyleTag({
@@ -18,9 +19,9 @@ test.describe('Live Transit Toolbar - Group Name Binding', () => {
   test('transit toolbar displays bindingGroup.name instead of binding.name', async ({ page }) => {
     await setLanguage(page, 'zh-CN')
 
-    const sectorTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_100_sector001_macro"]')
+    const sectorTab = await getSidebarTransit(page, 'cluster_100_sector001_macro')
     await expect(sectorTab).toBeVisible({ timeout: 5000 })
-    await sectorTab.click()
+    await sectorTab.locator('.sidebar-nav').click()
 
     const stationTab = page.locator('[data-testid="sidebar-station"][data-station-id="KXN-018"]')
     await expect(stationTab).toBeVisible({ timeout: 5000 })
@@ -43,7 +44,7 @@ test.describe('Live Transit Toolbar - Group Name Binding', () => {
     const fillValue = await nameInput.inputValue()
     expect(fillValue).toBe('测试名称')
 
-    const renamedTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_100_sector001_macro"]')
+    const renamedTab = await getSidebarTransit(page, 'cluster_100_sector001_macro')
     await expect(renamedTab).toBeVisible({ timeout: 3000 })
 
     const overviewTab = page.locator('[data-testid="sidebar-overview"]')
@@ -51,7 +52,7 @@ test.describe('Live Transit Toolbar - Group Name Binding', () => {
     await overviewTab.click()
 
     await expect(renamedTab).toBeVisible({ timeout: 3000 })
-    await renamedTab.click()
+    await renamedTab.locator('.sidebar-nav').click()
 
     const restoredInput = page.locator('.live-toolbar .ghost-input')
     await expect(restoredInput).toBeVisible({ timeout: 3000 })
@@ -68,7 +69,7 @@ test.describe('Live Transit Toolbar - Group Name Binding', () => {
     expect(saved.stationPlans).toEqual(before.stationPlans)
     await page.reload()
     await page.getByTestId('top-view-btn-live-production').click()
-    await page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_100_sector001_macro"]').click()
+    await (await getSidebarTransit(page, 'cluster_100_sector001_macro')).locator('.sidebar-nav').click()
     await expect(page.locator('.live-toolbar .ghost-input')).toHaveValue('测试名称')
 
   })

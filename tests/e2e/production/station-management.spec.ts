@@ -29,19 +29,23 @@ async function createNamedStations(page: Page, names: string[]) {
 }
 
 async function dragStationBeforeStation(page: Page, sourceId: string, targetId: string) {
-  const source = page.locator('[data-testid="sidebar-station"][data-station-id="' + sourceId + '"]')
-  const target = page.locator('[data-testid="sidebar-station"][data-station-id="' + targetId + '"]')
+  const source = page.locator('[data-testid="sidebar-station-list"][data-sort-scope="flat"]').locator('[data-testid="sidebar-station"][data-station-id="' + sourceId + '"]')
+  const target = page.locator('[data-testid="sidebar-station-list"][data-sort-scope="flat"]').locator('[data-testid="sidebar-station"][data-station-id="' + targetId + '"]')
+  const handle = source.locator('.station-drag-handle')
+  await handle.scrollIntoViewIfNeeded()
   const s = await source.boundingBox()
   const t = await target.boundingBox()
-  if (!s || !t) throw new Error('Missing station box')
-  await page.mouse.move(s.x + s.width / 2, s.y + s.height / 2)
+  const h = await handle.boundingBox()
+  if (!s || !t || !h) throw new Error('Missing station or drag handle box')
+  await page.mouse.move(h.x + h.width / 2, h.y + h.height / 2)
   await page.mouse.down()
-  await page.mouse.move(s.x + s.width / 2 + 10, s.y + s.height / 2, { steps: 5 })
+  await page.mouse.move(h.x + h.width / 2 + 10, h.y + h.height / 2, { steps: 5 })
   await expect(source).toHaveClass(/sortable-chosen/)
   // Move outside the list first so intermediate stations cannot consume the drop hover.
   const outsideX = s.x + s.width + 80
   await page.mouse.move(outsideX, s.y + s.height / 2, { steps: 10 })
-  await expect(source).toHaveClass(/sortable-ghost/)
+  await expect(source).toHaveClass(/sidebar-drag-placeholder/)
+  await expect(page.locator('.sidebar-drag-shadow')).toHaveCount(1)
   await page.mouse.move(outsideX, t.y + 2, { steps: 20 })
   await page.mouse.move(t.x + t.width / 2, t.y + 2, { steps: 20 })
   await expect.poll(async () => {
@@ -51,22 +55,28 @@ async function dragStationBeforeStation(page: Page, sourceId: string, targetId: 
     return sourceBox.y < targetBox.y
   }).toBe(true)
   await page.mouse.up()
-  await expect(source).not.toHaveClass(/sortable-chosen|sortable-ghost/)
+  await expect(source).not.toHaveClass(/sortable-chosen|sidebar-drag-placeholder/)
+  await expect(page.locator('.sidebar-drag-shadow')).toHaveCount(0)
 }
 
 async function cancelStationDrag(page: Page, sourceId: string) {
-  const source = page.locator('[data-testid="sidebar-station"][data-station-id="' + sourceId + '"]')
+  const source = page.locator('[data-testid="sidebar-station-list"][data-sort-scope="flat"]').locator('[data-testid="sidebar-station"][data-station-id="' + sourceId + '"]')
+  const handle = source.locator('.station-drag-handle')
+  await handle.scrollIntoViewIfNeeded()
   const box = await source.boundingBox()
-  if (!box) throw new Error('Missing station box')
-  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
+  const h = await handle.boundingBox()
+  if (!box || !h) throw new Error('Missing station or drag handle box')
+  await page.mouse.move(h.x + h.width / 2, h.y + h.height / 2)
   await page.mouse.down()
-  await page.mouse.move(box.x + box.width / 2 + 10, box.y + box.height / 2, { steps: 5 })
+  await page.mouse.move(h.x + h.width / 2 + 10, h.y + h.height / 2, { steps: 5 })
   await expect(source).toHaveClass(/sortable-chosen/)
   // Leave horizontally without hovering a different station in the vertical list.
   await page.mouse.move(box.x + box.width + 150, box.y + box.height / 2, { steps: 20 })
-  await expect(source).toHaveClass(/sortable-ghost/)
+  await expect(source).toHaveClass(/sidebar-drag-placeholder/)
+  await expect(page.locator('.sidebar-drag-shadow')).toHaveCount(1)
   await page.mouse.up()
-  await expect(source).not.toHaveClass(/sortable-chosen|sortable-ghost/)
+  await expect(source).not.toHaveClass(/sortable-chosen|sidebar-drag-placeholder/)
+  await expect(page.locator('.sidebar-drag-shadow')).toHaveCount(0)
 }
 
 async function readSavedEmpire(page: Page) {

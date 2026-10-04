@@ -24,6 +24,7 @@ export interface WareflowPresenterProps {
   workbenchMode: ComputedRef<ProductionSessionState['workbenchMode']>
   visualMode: ComputedRef<'planning' | 'live'>
   viewMode: ComputedRef<WareFlowViewMode>
+  singleBerthThroughputText: ComputedRef<string | null>
   useAllocationVolumeView: ComputedRef<boolean>
   productionFlows: ComputedRef<WareProductionFlow[]>
   derivedProductionFlows: ComputedRef<DerivedProductionFlow[]>
@@ -121,6 +122,15 @@ export function useProductionWareflowPresenter(store: WareflowPresenterStore): U
     workbenchMode: computed(() => store.session.workbenchMode),
     visualMode: computed(() => store.session.visualMode),
     viewMode: computed(() => store.session.wareflowViewMode),
+    singleBerthThroughputText: computed(() => {
+      const station = store.stationState
+      if (station === null) return null
+      const throughput = Math.max(1, station.settings.transportShipCapacity) * 15
+      return new Intl.NumberFormat('en-US', {
+        maximumFractionDigits: 1,
+        minimumFractionDigits: 1
+      }).format(throughput)
+    }),
     useAllocationVolumeView,
     productionFlows: computed(() => store.stationState?.productionFlows || []),
     derivedProductionFlows: computed(() => store.stationState?.derivedProductionFlows || []),

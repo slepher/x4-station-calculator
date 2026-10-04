@@ -39,6 +39,10 @@ export default defineConfig({
   ],
 
   webServer: {
+    env: {
+      FORCE_COLOR: "",
+      NO_COLOR: "1",
+    },
     wait: { stdout: /Local:/ },
     command: `npm run build && vite preview --port ${port} --host 127.0.0.1 --strictPort`,
     reuseExistingServer: false,

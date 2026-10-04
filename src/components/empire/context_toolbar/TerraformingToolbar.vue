@@ -17,7 +17,6 @@ const props = defineProps<{
   position?: ArchiveStationPosition
   sectorResources: string[]
   sectorSunlight: number
-  singleBerthThroughput: number
   hasHqStation: boolean
 }>()
 
@@ -60,10 +59,6 @@ const getResourceName = (wareId: string): string => {
   return wareId
 }
 
-const formatThroughput = (n: number) => new Intl.NumberFormat('en-US', {
-  maximumFractionDigits: 1,
-  minimumFractionDigits: 1
-}).format(n)
 </script>
 
 <template>
@@ -161,13 +156,6 @@ const formatThroughput = (n: number) => new Intl.NumberFormat('en-US', {
           </div>
         </div>
 
-        <div class="input-group ml-6">
-          <label class="group-label">{{ t('toolbar.single_berth_throughput') }}</label>
-          <div class="count-pill min-w-[120px] justify-end">
-            <span class="text-xs font-mono font-bold text-sky-400">{{ formatThroughput(props.singleBerthThroughput) }}</span>
-            <span class="text-[10px] text-slate-500 ml-1">m³/h</span>
-          </div>
-        </div>
       </div>
     </div>
   </div>

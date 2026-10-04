@@ -50,7 +50,6 @@ export interface ContextToolbarProps {
   races: Array<{ value: string; label: string }>
   stationTypes: Array<{ value: StationType; label: string }>
   availableMinerals: string[]
-  singleBerthThroughput: number
 }
 
 export interface ContextToolbarEmits {
@@ -101,6 +100,7 @@ export interface EmpireGapItem {
 }
 
 export interface StationWareFlowsDashboardProps {
+  singleBerthThroughputText: string | null
   viewMode: WareFlowViewMode
   groupedFlows: GroupedFlows
   autoModules: SavedModule[]

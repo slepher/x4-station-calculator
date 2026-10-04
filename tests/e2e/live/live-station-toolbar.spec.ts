@@ -1,6 +1,7 @@
 import { test } from '../../test-setup'
 import { expect, Page } from '@playwright/test'
 import { loadLiveBindingFixture } from './helpers/loadLiveBindingFixture'
+import { expandSidebarGroup, getSidebarTransit } from './helpers/sidebarNavigation'
 
 test.beforeEach(async ({ page }) => {
   await page.addStyleTag({
@@ -30,9 +31,7 @@ async function selectStationInSector(page: Page, sectorName: string, stationName
     '新建空间站': 'f36126e5-7798-ed14-3c03-938b961efa0b',
     'PPW-916': 'PPW-916'
   }
-  const supplyTab = page.locator(`[data-testid="sidebar-sector"][data-sector-id="${sectorIds[sectorName]}"]`)
-  await expect(supplyTab).toBeVisible({ timeout: 5000 })
-  await supplyTab.click()
+  await expandSidebarGroup(page, sectorIds[sectorName]!)
 
   const stationTab = page.locator(`[data-testid="sidebar-station"][data-station-id="${stationIds[stationName]}"]`)
   await expect(stationTab).toBeVisible({ timeout: 5000 })
@@ -42,9 +41,9 @@ async function selectStationInSector(page: Page, sectorName: string, stationName
 
 test.describe('Live Station Fixture Load', () => {
   test('loads save binding fixture and reveals archive-only station tabs', async ({ page }) => {
-    const sectorTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_24_sector001_macro"]')
+    const sectorTab = await getSidebarTransit(page, 'cluster_24_sector001_macro')
     await expect(sectorTab).toBeVisible({ timeout: 5000 })
-    await sectorTab.click()
+    await sectorTab.locator('.sidebar-nav').click()
 
     const archiveStationTab = page.locator('[data-testid="sidebar-station"][data-station-id="PPW-916"]')
     await expect(archiveStationTab).toBeVisible({ timeout: 5000 })
@@ -275,9 +274,9 @@ test.describe('3 E2E 测试场景', () => {
   })
 
   test('3.10 Case: 星区中转站已绑定的空间站仍在星区tab列表显示', async ({ page }) => {
-    const sectorTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_715_sector001_macro"]')
+    const sectorTab = await getSidebarTransit(page, 'cluster_715_sector001_macro')
     await expect(sectorTab).toBeVisible({ timeout: 5000 })
-    await sectorTab.click()
+    await sectorTab.locator('.sidebar-nav').click()
 
     const stationRWC = page.locator('[data-testid="sidebar-station"][data-station-id="RWC-785"]')
     await expect(stationRWC).toBeVisible({ timeout: 3000 })
@@ -288,9 +287,9 @@ test.describe('3 E2E 测试场景', () => {
   })
 
   test('3.11 Case: 空间站tab显示正确的station id和名称', async ({ page }) => {
-    const sectorTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_715_sector001_macro"]')
+    const sectorTab = await getSidebarTransit(page, 'cluster_715_sector001_macro')
     await expect(sectorTab).toBeVisible({ timeout: 5000 })
-    await sectorTab.click()
+    await sectorTab.locator('.sidebar-nav').click()
 
     const stationRWC = page.locator('[data-testid="sidebar-station"][data-station-id="RWC-785"]')
     await expect(stationRWC).toBeVisible({ timeout: 3000 })

@@ -39,7 +39,6 @@ export interface ProductionToolbarContext {
   races: Array<{ value: string; label: string }>
   stationTypes: Array<{ value: StationType; label: string }>
   availableMinerals: string[]
-  singleBerthThroughput: number
   updateTitle: (value: string) => void
   updateStationName: (value: string) => void
   updateStationType: (value: StationType) => void

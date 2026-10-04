@@ -1,6 +1,7 @@
 import { test } from '../../test-setup'
 import { expect } from '@playwright/test'
 import { loadLiveBindingFixture } from './helpers/loadLiveBindingFixture'
+import { getSidebarTransit } from './helpers/sidebarNavigation'
 
 test.describe('Live Station Dashboard', () => {
   test.beforeEach(async ({ page }) => {
@@ -11,9 +12,9 @@ test.describe('Live Station Dashboard', () => {
   })
 
   test('live dashboard renders with station-dashboard testid', async ({ page }) => {
-    const sectorTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_100_sector001_macro"]')
+    const sectorTab = await getSidebarTransit(page, 'cluster_100_sector001_macro')
     await expect(sectorTab).toBeVisible({ timeout: 5000 })
-    await sectorTab.click()
+    await sectorTab.locator('.sidebar-nav').click()
 
     const stationTab = page.locator('[data-testid="sidebar-station"][data-station-id="KXN-018"]')
     await expect(stationTab).toBeVisible({ timeout: 5000 })
@@ -27,9 +28,9 @@ test.describe('Live Station Dashboard', () => {
   })
 
   test('live dashboard shows cost analysis after switching to live mode', async ({ page }) => {
-    const sectorTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_100_sector001_macro"]')
+    const sectorTab = await getSidebarTransit(page, 'cluster_100_sector001_macro')
     await expect(sectorTab).toBeVisible({ timeout: 5000 })
-    await sectorTab.click()
+    await sectorTab.locator('.sidebar-nav').click()
 
     const stationTab = page.locator('[data-testid="sidebar-station"][data-station-id="KXN-018"]')
     await expect(stationTab).toBeVisible({ timeout: 5000 })
@@ -58,9 +59,9 @@ test.describe('Live Station Dashboard', () => {
   })
 
   test('planning mode station dashboard shows editable analysis', async ({ page }) => {
-    const sectorTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_100_sector001_macro"]')
+    const sectorTab = await getSidebarTransit(page, 'cluster_100_sector001_macro')
     await expect(sectorTab).toBeVisible({ timeout: 5000 })
-    await sectorTab.click()
+    await sectorTab.locator('.sidebar-nav').click()
 
     const stationTab = page.locator('[data-testid="sidebar-station"][data-station-id="KXN-018"]')
     await expect(stationTab).toBeVisible({ timeout: 5000 })

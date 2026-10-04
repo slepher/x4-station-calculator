@@ -1,6 +1,7 @@
 import { test } from '../../test-setup'
 import { expect } from '@playwright/test'
 import { loadLiveBindingFixture } from './helpers/loadLiveBindingFixture'
+import { getSidebarTransit } from './helpers/sidebarNavigation'
 
 test.describe('Gap 按钮响应性验证', () => {
   test.beforeEach(async ({ page }) => {
@@ -11,9 +12,9 @@ test.describe('Gap 按钮响应性验证', () => {
   })
 
   test('新建空间站缺口: 点击量子管 + 按钮后数据应变化', async ({ page }) => {
-    const sourceSectorTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_715_sector001_macro"]')
+    const sourceSectorTab = await getSidebarTransit(page, 'cluster_715_sector001_macro')
     await expect(sourceSectorTab).toBeVisible({ timeout: 5000 })
-    await sourceSectorTab.click()
+    await sourceSectorTab.locator('.sidebar-nav').click()
 
     const sourceStationTab = page.locator('[data-testid="sidebar-station"][data-station-id="RWC-785"]')
     await expect(sourceStationTab).toBeVisible({ timeout: 5000 })
@@ -30,9 +31,9 @@ test.describe('Gap 按钮响应性验证', () => {
     await claytronicsCount.press('Tab')
     await expect(claytronicsCount).toHaveValue('100')
 
-    const sectorTab = page.locator('[data-testid="sidebar-sector"][data-sector-id="cluster_100_sector001_macro"]')
+    const sectorTab = await getSidebarTransit(page, 'cluster_100_sector001_macro')
     await expect(sectorTab).toBeVisible({ timeout: 5000 })
-    await sectorTab.click()
+    await sectorTab.locator('.sidebar-nav').click()
 
     const stationTab = page.locator('[data-testid="sidebar-station"][data-station-id="f36126e5-7798-ed14-3c03-938b961efa0b"]')
     await expect(stationTab).toBeVisible({ timeout: 5000 })

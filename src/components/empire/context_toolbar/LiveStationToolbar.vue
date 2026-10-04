@@ -25,7 +25,6 @@ const props = defineProps<{
   canToggle: boolean
   settings: Partial<StationSettings> | StationSettings | null
   races: Array<{ value: string; label: string }>
-  singleBerthThroughput: number
   moduleScope: 'built' | 'building' | 'all'
   hasBuildingModules: boolean
 }>()
@@ -89,11 +88,6 @@ const racePreference = computed({
   get: () => props.settings?.racePreference ?? 'argon',
   set: (val: string) => emit('updateRacePreference', val)
 })
-
-const formatThroughput = (n: number) => new Intl.NumberFormat('en-US', {
-  maximumFractionDigits: 1,
-  minimumFractionDigits: 1
-}).format(n)
 
 const showResourcesPopover = ref(false)
 
@@ -278,13 +272,6 @@ const scopeClass = computed(() => {
           </div>
         </div>
 
-        <div class="input-group ml-6">
-          <label class="group-label">{{ t('toolbar.single_berth_throughput') }}</label>
-          <div class="count-pill min-w-[120px] justify-end">
-            <span class="text-xs font-mono font-bold text-sky-400">{{ formatThroughput(props.singleBerthThroughput) }}</span>
-            <span class="text-[10px] text-slate-500 ml-1">m³/h</span>
-          </div>
-        </div>
       </div>
 
       <template v-if="props.mode === 'planning'">
