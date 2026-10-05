@@ -36,6 +36,14 @@
 
 E2E 不在此任务列表中实施或运行。交互验收由 `/x4:e2e-test sidebar` 单独生成 `e2e_tests.md` / `e2e_test_tasks.md` 并推进，不能把本次文档完成或 Unit 通过写成真实浏览器交互已验证。
 
+## Hover 增量（2026-10-05）
+
+- [x] 20. 同步 request/spec/design 的 hover 覆盖展开合同；新增实现任务和 focused Unit 范围。文档任务不改变运行行为，无需 Unit。
+- [x] 21. Presenter 区分 collapsed／compact／hoverExpanded／width／layoutWidth；实现 mouse hover、固定展开与手动收起抑制、非持久化会话及上下文／断点／失焦／卸载清理。focused presenter Unit 覆盖两模式、宽度分离、无偏好写入、状态切换与清理。
+- [x] 22. Vue 增加纯布局占位与 absolute 覆盖展示、完整区域 pointer 边界及搜索 focus；保留滚动 DOM、按钮、菜单层级与窄屏抽屉。focused component Unit 覆盖完整标签、64px shell、mouse／touch、焦点与菜单、手动按钮语义、滚动保留。
+- [x] 23. 补齐菜单／编辑器／删除确认、搜索、排序与调宽期间的 hover 锁定；保持原排序合法释放／取消及调宽一次保存规则。focused presenter／component Unit 覆盖 hover 中合法排序、外部取消、拖动锁定、resize 提交／取消、浮层结束收回。
+- [x] 24. 执行受影响 focused Unit、构建与差异检查，记录当前结果及真实浏览器几何未验证边界；不运行 E2E／全量 Unit／build-rust，不提交。
+
 ## Apply 验证记录（2026-10-02）
 
 - 安装源码与包版本核查：vuedraggable 4.1.0、SortableJS 1.14.0；没有新增拖拽依赖。
@@ -64,3 +72,29 @@ E2E 不在此任务列表中实施或运行。交互验收由 `/x4:e2e-test side
 - 图标偏移修正属于布局样式：共享固定 32px 主图标中心线，导航行高恒定，手柄不占布局空间；Unit 保证交互合同，未用 jsdom 宣称真实几何或视觉抖动已验证。
 - 最终 `npm run build`：exit 0，Vite 16.16s，兼容检查与 TypeScript 通过；日志 `/tmp/sidebar-final-layout-build.log`，保留已有 chunk size warning。
 - `git diff --check` 通过。未运行 E2E、全量 Unit 或 build-rust；未提交代码。
+
+
+## Hover 动画增量
+
+- [x] 25. 为桌面 aside 与手动展开占位加入原生 CSS 宽度过渡，收回全过程维持覆盖层级，hover 占位恒为 64px；调宽／抽屉／减少动态效果时禁用。动画为纯样式变更，沿用 focused 交互 Unit；组件测试补调宽禁动画状态。执行 focused Unit、构建和差异检查，真实动画中间帧仍待浏览器验收。
+
+## Hover 增量验证（2026-10-05）
+
+- 已同步 request/design/spec/tasks：hover 面板实际宽度等于展开时的宽度，布局占位恒为 64px；覆盖主内容，固定展开仍按原布局占位。
+- RED：新增用例执行时 11 failed、27 passed，exit 1；失败来自缺少 hover presenter 接口和布局占位 shell，证明现有实现尚无新行为。
+- GREEN：新增 hover、手动按钮与释放生命周期用例后，执行以下 focused Unit：
+  `npm run test:unit -- tests/unit/sidebar/sidebar-state.spec.ts tests/unit/sidebar/sidebar-presenter.spec.ts tests/unit/sidebar/sidebar-domain.spec.ts tests/unit/sidebar/sidebar-component.spec.ts tests/unit/production/blueprint-save-active-identity.spec.ts`
+  结果 5 files、58 tests passed，exit 0。
+- 覆盖两模式记忆宽度／64px 占位、hover 不持久化、固定展开、收起抑制、搜索焦点与浮层锁定、resize capture／一次保存／取消、排序合法释放／外部取消、滚动 DOM 保留、触控不触发、上下文／断点／blur／卸载清理及窄屏按钮语义。
+- `npm run build`：exit 0，兼容检查与 TypeScript 通过，Vite 构建 15.81s；保留已有 chunk size warning。
+- `git diff --check`：exit 0。未运行全量 Unit、E2E 或 build-rust，未提交代码。真实浏览器主内容 x／width、覆盖命中及移入完整展开区域尚未验证，不能用 jsdom 声明几何通过。
+- 旧任务 19 的未勾选状态保留，本次只完成新增 hover 任务 20–24，不宣称整个历史变更已完成或可归档。
+
+
+## Hover 动画验证（2026-10-05）
+
+- 桌面展开／收回使用 180ms 原生 CSS 宽度过渡；aside 全程 absolute 覆盖，hover 时 shell 宽度保持 64px，手动开关占位同步过渡。快速反向由浏览器从当前插值处理，无动画计时器或附加业务层。
+- 调宽进行中、窄屏抽屉和 prefers-reduced-motion: reduce 使用 0ms；组件 Unit 检查 pointer capture 期间禁动画状态及释放后清理。
+- `npm run test:unit -- tests/unit/sidebar/sidebar-presenter.spec.ts tests/unit/sidebar/sidebar-component.spec.ts`：2 files、40 tests passed，exit 0。
+- `npm run build`：exit 0，兼容检查与 TypeScript 通过，Vite 构建 16.37s，保留已有 chunk size warning。
+- `git diff --check`：exit 0。真实浏览器动画中间帧、几何和覆盖点击仍未验证；未运行 E2E／全量 Unit／build-rust，未提交。

@@ -54,6 +54,20 @@ presenter 的 primaryAction 在蓝图返回添加站点动作，在实况明确�
 - 原有 terraforming 等特殊树由 presenter 保留其行为；它们不因视觉上有子项就变成可改名改色的业务分组。
 - 不新增全局快捷键／方向键导航。使用原生 button、标签、可见焦点和已有基础键盘行为。
 
+## 桌面 hover 覆盖展开（2026-10-05）
+
+临时展开布局占 64px，面板实际宽度为展开时的宽度。例如用户调宽至 310px 后收起，hover 时 width = 310px、layoutWidth = 64px；主内容保持折叠时的布局。
+
+- Presenter 分开输出持久化折叠状态 collapsed、视觉 compact、临时 hoverExpanded、展示 width 和布局 layoutWidth。桌面折叠时 layoutWidth 恒为 64px；hoverExpanded 时 width 使用已记忆展开宽度或调宽预览。手动展开时两种宽度一致；抽屉 layoutWidth 为 0。
+- Vue 使用一个纯布局 shell 保留占位；桌面 aside 始终在 shell 内 absolute 定位，展开与收回全过程保持覆盖层级。hover 展开增加阴影。桌面 aside 的 width／box-shadow 与 shell 的 width 使用 180ms cubic-bezier(0.2, 0, 0, 1) 过渡；hover 时 shell 恒为 64px，手动开关时 shell 按原占位宽度过渡。CSS 原生处理中途反向，无动画定时器或 transitionend 会话。resize 期间、窄屏抽屉和 prefers-reduced-motion: reduce 关闭过渡，避免调宽滞后。shell 不组装业务数据，不新增业务中间层。整块 aside 接收 pointerenter／pointerleave，进入子项不触发收回；仅 mouse 指针触发，不使用定时器或延时补丁。
+- Presenter 持有 hoverSession、hovered、searchFocused 和手动收起后的 hoverSuppressed 会话状态。hoverExpanded 仅在桌面折叠且未抑制时，在有效 hoverSession 中由 hovered、搜索焦点、菜单／编辑器／删除确认、resize 或 drag 会话决定；任何一个交互仍有效时保持展开。普通导航按钮焦点不锁定展开。
+- 顶部按钮按 collapsed 展示动作和 aria-expanded，独立于视觉 compact：桌面 toggleExpanded 为 !collapsed，抽屉为 drawerOpen；hover 中仍显示固定展开动作；手动收起后抑制当前悬停，pointerleave 清除抑制，下次进入重新展开。
+- 保留同一个 sidebar-body／sidebar-scroll DOM，hover 不重挂载滚动容器，不重置浏览位置／业务选择／组折叠。搜索输入 focus／blur 通过 presenter 标记输入会话，搜索值沿用原恢复规则。
+- 菜单、编辑器及确认弹窗仍 Teleport 到 body，层级高于 hover aside；打开状态锁定展开。排序继续使用已安装 vuedraggable 4.1.0／SortableJS 1.14.0、原 model-value 提议和合法释放路径，实体身份／库影像／占位归属不变。drag 和 resize 锁定临时展开；释放先验证合法性再清理会话，外部释放不提交，取消不留下影像或 hover 锁定。
+- hover 宽度拖动沿用 pointer capture、200–400px 范围、pointerup 一次保存与取消恢复。主内容占位在整个调宽期间仍为 64px。
+- hover 状态不进入偏好 store。上下文切换、跨 768px 断点、窗口 blur、组件卸载与 scope dispose 清理 hovered／searchFocused／hoverSuppressed 和交互状态；固定展开偏好仍由原 store 保存。
+- focused Unit 覆盖两模式的展示／占位分离、偏好不写入、固定展开／收起抑制、搜索及浮层锁定、拖动取消与提交、上下文／断点／卸载清理。真实浏览器主内容 x／width、移入展开区域和点击遮挡属于后续 E2E 验证，不能用 jsdom 证明。
+
 ## 偏好与恢复顺序
 
 新增领域无关的 `useProductionSidebarStateStore`（名称可按仓库约定调整），持久化键 `x4_production_sidebar`，带版本字段和 `normalizeState()`。它属于 store 层，不是额外适配层。

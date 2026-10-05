@@ -96,6 +96,10 @@ export function useProductionSidebarPresenter(source: SidebarSource) {
   const narrowScreen = ref(false)
   const viewportWidth = ref(1024)
   const drawerOpen = ref(false)
+  const hovered = ref(false)
+  const hoverSession = ref(false)
+  const hoverSuppressed = ref(false)
+  const searchFocused = ref(false)
   const temporaryContext = ref(emptySidebarContext())
   const location = ref<{ serial: number; stationId: string | null; scrollTop: number } | null>(null)
   let locationSerial = 0
@@ -214,7 +218,29 @@ export function useProductionSidebarPresenter(source: SidebarSource) {
     return item
   }))
   const searching = computed(() => query.value.trim().length > 0)
-  const compact = computed(() => !narrowScreen.value && modeState.value.collapsed)
+  const collapsed = computed(() => modeState.value.collapsed)
+  const toggleExpanded = computed(() => narrowScreen.value ? drawerOpen.value : !collapsed.value)
+  const hoverExpanded = computed(() => !narrowScreen.value && collapsed.value && hoverSession.value && !hoverSuppressed.value && (
+    hovered.value || searchFocused.value || menu.value !== null || editor.value !== null || pendingDelete.value !== null || resize.value !== null || drag.value !== null
+  ))
+  const compact = computed(() => !narrowScreen.value && collapsed.value && !hoverExpanded.value)
+  function enterHover(pointerType: string) {
+    if (disposed || narrowScreen.value || pointerType !== 'mouse' || hoverSuppressed.value) return
+    hovered.value = true
+    hoverSession.value = true
+  }
+  function leaveHover(pointerType: string) {
+    if (pointerType !== 'mouse') return
+    hovered.value = false
+    hoverSuppressed.value = false
+  }
+  function setSearchFocused(value: boolean) { searchFocused.value = value }
+  function resetHover() {
+    hovered.value = false
+    hoverSession.value = false
+    hoverSuppressed.value = false
+    searchFocused.value = false
+  }
   const canSort = computed(() => !compact.value && !searching.value && loaded.value)
   function ordered<T extends { id: string }>(items: T[], ids: string[]): T[] {
     const byId = new Map(items.map(item => [item.id, item]))
@@ -274,12 +300,17 @@ export function useProductionSidebarPresenter(source: SidebarSource) {
     resize.value = null
     drag.value = null
     if (narrowScreen.value) drawerOpen.value = !drawerOpen.value
-    else prefs.setMode(source.mode, { collapsed: !modeState.value.collapsed })
+    else {
+      const next = !collapsed.value
+      resetHover()
+      hoverSuppressed.value = next
+      prefs.setMode(source.mode, { collapsed: next })
+    }
   }
   function setViewport(width: number) {
     viewportWidth.value = width
     const next = width < 768
-    if (next !== narrowScreen.value) { drawerOpen.value = false; resize.value = null; drag.value = null }
+    if (next !== narrowScreen.value) { drawerOpen.value = false; resize.value = null; drag.value = null; resetHover() }
     narrowScreen.value = next
   }
   const width = computed(() => {
@@ -287,6 +318,11 @@ export function useProductionSidebarPresenter(source: SidebarSource) {
     if (compact.value) return 64
     if (resize.value !== null) return resize.value.previewWidth
     return modeState.value.expandedWidth
+  })
+  const layoutWidth = computed(() => {
+    if (narrowScreen.value) return 0
+    if (collapsed.value) return 64
+    return width.value
   })
   function toggleTerraforming() { expandedTerraforming.value = !expandedTerraforming.value }
   function select(id: string) {
@@ -419,8 +455,9 @@ export function useProductionSidebarPresenter(source: SidebarSource) {
   }
   function endSort(validRelease: boolean) {
     const session = drag.value
+    const allowed = canSort.value
     drag.value = null
-    if (session === null || !validRelease || !canSort.value || session.contextId !== contextId.value || session.proposedIds === null) return false
+    if (session === null || !validRelease || !allowed || session.contextId !== contextId.value || session.proposedIds === null) return false
     const expected = sortableIds(session.kind, session.groupId)
     if (!completePermutation(expected, session.originalIds) || !completePermutation(session.proposedIds, expected)) return false
     if (source.mode === 'blueprint') return source.store.reorderStations(session.proposedIds.map(id => ({ id })))
@@ -431,6 +468,7 @@ export function useProductionSidebarPresenter(source: SidebarSource) {
   }
   function closeOverlays() { menu.value = null; editor.value = null }
   function resetTransient() {
+    resetHover()
     query.value = ''; searchSnapshot = null; closeOverlays(); pendingDelete.value = null; resize.value = null; drag.value = null; feedback.value = null; drawerOpen.value = false
   }
   function reconcile() {
@@ -471,9 +509,9 @@ export function useProductionSidebarPresenter(source: SidebarSource) {
   onScopeDispose(() => { disposed = true; resetTransient() })
   return reactive({
     mode: source.mode, contextKey, fixedItems, terraformItems, expandedTerraforming, terraformGroupColor: '#3b82f6', flatItems, groups, pinnedItems,
-    activeId, compact, narrowScreen, drawerOpen, width, searching, query, noResults, canSort, resizingPointerId,
+    activeId, collapsed, toggleExpanded, compact, hoverExpanded, narrowScreen, drawerOpen, width, layoutWidth, searching, query, noResults, canSort, resizingPointerId,
     primaryAction, menu, menuActions, pendingDelete, feedback, editor, colorOptions, location,
-    setQuery, setScrollTop, toggleGroup, toggleTerraforming, toggleCollapsed, setViewport, select, runPrimaryAction,
+    enterHover, leaveHover, setSearchFocused, resetHover, setQuery, setScrollTop, toggleGroup, toggleTerraforming, toggleCollapsed, setViewport, select, runPrimaryAction,
     openMenu, runMenuAction, confirmDelete, togglePin, openGroupEditor, applyGroupEditor,
     startResize, moveResize, endResize, startSort, proposeSort, endSort, closeOverlays,
     cancelDelete: () => { pendingDelete.value = null },

@@ -88,6 +88,7 @@ function cancelInput() {
 function outsideClick(event: PointerEvent) {
   if (overlay.value !== null && !overlay.value.contains(event.target as Node)) props.presenter.closeOverlays()
 }
+function onBlur() { cancelInput(); props.presenter.resetHover() }
 function onViewport() { props.presenter.setViewport(window.innerWidth); cancelInput(); void positionOverlay() }
 watch(() => props.presenter.resizingPointerId, id => { if (id === null) releaseResize() })
 watch(() => props.presenter.contextKey, cancelInput)
@@ -107,7 +108,7 @@ watch(() => props.presenter.editor?.error, () => { void positionOverlay() })
 onMounted(() => {
   props.presenter.setViewport(window.innerWidth)
   window.addEventListener('resize', onViewport)
-  window.addEventListener('blur', cancelInput)
+  window.addEventListener('blur', onBlur)
   document.addEventListener('mouseup', trackRelease, true)
   document.addEventListener('touchend', trackRelease, true)
   document.addEventListener('pointercancel', cancelInput)
@@ -116,8 +117,9 @@ onMounted(() => {
 })
 onUnmounted(() => {
   cancelInput()
+  props.presenter.resetHover()
   window.removeEventListener('resize', onViewport)
-  window.removeEventListener('blur', cancelInput)
+  window.removeEventListener('blur', onBlur)
   document.removeEventListener('mouseup', trackRelease, true)
   document.removeEventListener('touchend', trackRelease, true)
   document.removeEventListener('pointercancel', cancelInput)
@@ -131,10 +133,11 @@ onUnmounted(() => {
   <Teleport to="body">
     <button v-if="presenter.narrowScreen && presenter.drawerOpen" class="sidebar-drawer-backdrop" data-testid="sidebar-drawer-backdrop" :aria-label="t('sidebar.close')" @click="presenter.drawerOpen = false" />
   </Teleport>
-  <aside class="production-sidebar" :class="{ compact: presenter.compact, drawer: presenter.narrowScreen, 'drawer-open': presenter.drawerOpen }" :style="{ width: `${presenter.width}px` }" data-testid="production-sidebar" :data-drawer="presenter.narrowScreen" :aria-label="t('sidebar.navigation')">
+  <div class="production-sidebar-layout" :class="{ resizing: presenter.resizingPointerId !== null, 'drawer-layout': presenter.narrowScreen }" :style="{ width: `${presenter.layoutWidth}px` }" data-testid="sidebar-layout">
+  <aside class="production-sidebar" :class="{ compact: presenter.compact, 'hover-expanded': presenter.hoverExpanded, drawer: presenter.narrowScreen, 'drawer-open': presenter.drawerOpen }" :style="{ width: `${presenter.width}px` }" data-testid="production-sidebar" :data-drawer="presenter.narrowScreen" :aria-label="t('sidebar.navigation')" @pointerenter="presenter.enterHover($event.pointerType)" @pointerleave="presenter.leaveHover($event.pointerType)">
     <div class="sidebar-body" :data-testid="presenter.narrowScreen ? 'sidebar-drawer' : undefined">
-      <button class="sidebar-toggle" data-testid="sidebar-toggle" :aria-label="t(presenter.compact ? 'sidebar.expand' : 'sidebar.collapse')" :title="t(presenter.compact ? 'sidebar.expand' : 'sidebar.collapse')" :aria-expanded="!presenter.compact" @click="presenter.toggleCollapsed()">
-        <ChevronDoubleRightIcon v-if="presenter.compact" class="sidebar-toggle-icon" aria-hidden="true" />
+      <button class="sidebar-toggle" data-testid="sidebar-toggle" :aria-label="t(presenter.toggleExpanded ? 'sidebar.collapse' : 'sidebar.expand')" :title="t(presenter.toggleExpanded ? 'sidebar.collapse' : 'sidebar.expand')" :aria-expanded="presenter.toggleExpanded" @click="presenter.toggleCollapsed()">
+        <ChevronDoubleRightIcon v-if="!presenter.toggleExpanded" class="sidebar-toggle-icon" aria-hidden="true" />
         <ChevronDoubleLeftIcon v-else class="sidebar-toggle-icon" aria-hidden="true" />
       </button>
     <div ref="scroll" class="sidebar-scroll custom-scrollbar" @scroll="presenter.setScrollTop(($event.target as HTMLElement).scrollTop)">
@@ -147,7 +150,7 @@ onUnmounted(() => {
       <div v-if="presenter.pinnedItems.length" class="sidebar-pinned" data-testid="sidebar-pinned">
         <ProductionSidebarRow v-for="item in presenter.pinnedItems" :key="`pinned:${item.id}`" :row="item" :compact="presenter.compact" menu @select="presenter.select" @menu="openMenu" />
       </div>
-      <input v-if="!presenter.compact" :value="presenter.query" type="search" class="sidebar-search" data-testid="sidebar-search" :placeholder="t('sidebar.search')" :aria-label="t('sidebar.search')" @input="presenter.setQuery(($event.target as HTMLInputElement).value)">
+      <input v-if="!presenter.compact" :value="presenter.query" type="search" class="sidebar-search" data-testid="sidebar-search" :placeholder="t('sidebar.search')" :aria-label="t('sidebar.search')" @input="presenter.setQuery(($event.target as HTMLInputElement).value)" @focus="presenter.setSearchFocused(true)" @blur="presenter.setSearchFocused(false)">
       <draggable :key="presenter.contextKey + ':flat:' + sortEpoch" :model-value="presenter.flatItems" item-key="id" tag="div" class="sidebar-station-list" data-testid="sidebar-station-list" data-sort-scope="flat" handle=".station-drag-handle" :disabled="!presenter.canSort || presenter.mode !== 'blueprint'" :force-fallback="true" :fallback-on-body="true" :fallback-tolerance="4" ghost-class="sidebar-drag-placeholder" fallback-class="sidebar-drag-shadow" @start="startSort($event, 'stations', null)" @update:model-value="proposeSort" @end="endSort">
         <template #item="{ element }">
           <ProductionSidebarRow :row="element" :compact="presenter.compact" :sortable="presenter.canSort && presenter.mode === 'blueprint'" menu @select="presenter.select" @menu="openMenu" />
@@ -180,6 +183,7 @@ onUnmounted(() => {
     <div v-if="!presenter.compact && !presenter.narrowScreen" class="sidebar-resize-handle" data-testid="sidebar-resize-handle" :title="t('sidebar.resize')" @pointerdown.prevent="startResize" @pointermove="presenter.moveResize($event.pointerId, $event.clientX)" @pointerup="endResize($event, true)" @pointercancel="endResize($event, false)" @lostpointercapture="endResize($event, false)" />
     </div>
   </aside>
+  </div>
   <Teleport to="body">
     <div v-if="presenter.menu || presenter.editor" ref="overlay" class="sidebar-overlay" :style="{ left: `${overlayPosition.x}px`, top: `${overlayPosition.y}px` }" @click.stop @contextmenu.prevent>
       <div v-if="presenter.menu" class="sidebar-context-menu" data-testid="sidebar-context-menu">
@@ -203,7 +207,11 @@ onUnmounted(() => {
 </template>
 
 <style>
-.production-sidebar { @apply flex-shrink-0 bg-slate-900 border-r border-slate-700 relative flex flex-col text-slate-300; min-height: 0; --sidebar-icon-center: 32px; --sidebar-row-gutter: 4px; }
+.production-sidebar-layout { position: relative; display: flex; flex-shrink: 0; min-height: 0; --sidebar-motion-duration: 180ms; transition: width var(--sidebar-motion-duration) cubic-bezier(0.2, 0, 0, 1); }
+.production-sidebar-layout.resizing, .production-sidebar-layout.drawer-layout { --sidebar-motion-duration: 0ms; }
+@media (prefers-reduced-motion: reduce) { .production-sidebar-layout { --sidebar-motion-duration: 0ms; } }
+.production-sidebar { @apply flex-shrink-0 bg-slate-900 border-r border-slate-700 flex flex-col text-slate-300; position: absolute; left: 0; top: 0; bottom: 0; z-index: 40; transition: width var(--sidebar-motion-duration) cubic-bezier(0.2, 0, 0, 1), box-shadow var(--sidebar-motion-duration) ease; min-height: 0; --sidebar-icon-center: 32px; --sidebar-row-gutter: 4px; }
+.production-sidebar.hover-expanded { box-shadow: 6px 0 16px #0006; }
 .sidebar-body { display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden; }
 .sidebar-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; }
 .sidebar-footer { flex: 0 0 auto; }
