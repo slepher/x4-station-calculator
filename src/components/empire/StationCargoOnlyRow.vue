@@ -46,11 +46,11 @@ const currentWidth = computed(() => toPercent(props.currentCount, scaleMaxCount.
 </template>
 
 <style scoped>
-.item-container { @apply mb-1 select-none; }
+.item-container { @apply mb-1 min-w-0 select-none; container-type: inline-size; }
 .flow-wrapper { @apply flex items-start gap-1; }
 .main-row {
   @apply grid flex-1 min-w-0 items-center h-8 px-3 py-0.5 bg-slate-800/40 rounded transition-colors border border-transparent gap-3;
-  grid-template-columns: minmax(calc(6.5em + 1.25rem), 1fr) minmax(12rem, 18rem) 5.75rem;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 18rem) 5.75rem;
 }
 .label-group { @apply flex items-center gap-2 min-w-0; }
 .header-name { @apply text-sm text-slate-300 truncate; }
@@ -63,4 +63,9 @@ const currentWidth = computed(() => toPercent(props.currentCount, scaleMaxCount.
 .bar-separator { @apply text-slate-300; }
 .recommended-block { @apply w-[5.75rem]; }
 .flow-action-spacer { @apply w-20 h-8 flex-none; }
+
+@container (max-width: 32rem) {
+  .main-row { @apply h-auto min-h-8 gap-y-2 py-2; grid-template-columns: minmax(0, 1fr) 5.75rem; }
+  .bar-shell { grid-column: 1 / -1; grid-row: 2; }
+}
 </style>

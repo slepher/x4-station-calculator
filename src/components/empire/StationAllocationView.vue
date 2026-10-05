@@ -119,8 +119,13 @@ function getGroupTitle(key: 'container' | 'solid' | 'liquid'): string {
 }
 
 .allocation-group-summary {
-  @apply flex items-center gap-3 text-[11px] font-mono text-slate-400 whitespace-nowrap;
+  @apply flex flex-wrap items-center justify-end gap-x-3 gap-y-1 text-[11px] font-mono text-slate-400;
 }
+.allocation-group-summary > span { @apply whitespace-nowrap; }
+
+.allocation-group > :deep(.item-container > .main-row) { @apply h-auto min-h-8 gap-3; }
+.allocation-group > :deep(.item-container > .main-row > .label-group) { @apply shrink-0; }
+.allocation-group > :deep(.item-container > .main-row > .right-group) { @apply min-w-0; }
 
 .group-header-spacer {
   @apply w-20 flex-none;

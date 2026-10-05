@@ -95,7 +95,7 @@ function handleTogglePriority() {
         :class="[
           'main-row',
           isExpandable ? 'main-row-hover cursor-pointer' : 'cursor-default',
-          { 'is-active': isOpen && isExpandable }
+          { 'is-active': isOpen && isExpandable, 'has-archive': hasArchiveStation }
         ]"
         @click="isExpandable && (isOpen = !isOpen)"
       >
@@ -118,7 +118,6 @@ function handleTogglePriority() {
             <span class="bar-target-text">{{ formatCount(targetCount) }}</span>
           </div>
         </div>
-        <div v-else class="bar-spacer"></div>
 
         <div class="recommended-block" :title="t('wareflow.allocation_rec')">
           <span class="recommended-count">{{ formatCount(recommendedCount) }}</span>
@@ -174,14 +173,16 @@ function handleTogglePriority() {
             <span class="detail-section-toggle-arrow" :class="{ 'detail-section-toggle-arrow-open': sectionOpen(section.key) }">▸</span>
           </button>
 
-          <div v-if="!isCollapsibleSection(section.key) || sectionOpen(section.key)">
+          <div
+            v-if="!isCollapsibleSection(section.key) || sectionOpen(section.key)"
+            class="detail-table"
+            :style="{ '--detail-columns': 2 + Number(section.includeCurrentColumn) + Number(section.includeTargetColumn) }"
+          >
             <div class="detail-head">
               <span class="detail-head-label">{{ t('wareflow.allocation_detail_metric') }}</span>
               <span class="detail-head-col">{{ t('wareflow.allocation_rate_column') }}</span>
               <span v-if="section.includeCurrentColumn" class="detail-head-col">{{ t('wareflow.allocation_current_column') }}</span>
-              <span v-else class="detail-head-col"></span>
               <span v-if="section.includeTargetColumn" class="detail-head-col">{{ t('wareflow.allocation_target_column') }}</span>
-              <span v-else class="detail-head-col"></span>
               <span class="detail-head-col">{{ t('wareflow.allocation_recommended_column') }}</span>
             </div>
             <div
@@ -196,11 +197,9 @@ function handleTogglePriority() {
               <span v-if="section.includeCurrentColumn" class="detail-value">
                 <template v-if="row.currentMinutes !== undefined">{{ formatMinutes(row.currentMinutes) }}</template>
               </span>
-              <span v-else class="detail-value"></span>
               <span v-if="section.includeTargetColumn" class="detail-value">
                 <template v-if="row.targetMinutes !== undefined">{{ formatMinutes(row.targetMinutes) }}</template>
               </span>
-              <span v-else class="detail-value"></span>
               <span class="detail-value">
                 <template v-if="row.recommendedMinutes !== undefined">{{ formatMinutes(row.recommendedMinutes) }}</template>
               </span>
@@ -213,16 +212,17 @@ function handleTogglePriority() {
 </template>
 
 <style scoped>
-.item-container { @apply mb-1 select-none; }
+.item-container { @apply mb-1 min-w-0 select-none; container-type: inline-size; }
 .flow-wrapper { @apply flex items-start gap-1; }
 .main-row {
   @apply grid flex-1 min-w-0 items-center h-8 px-3 py-0.5 bg-slate-800/40 rounded transition-colors border border-transparent gap-3;
-  grid-template-columns: minmax(calc(6.5em + 1.25rem), 1fr) minmax(12rem, 18rem) 5.75rem;
+  grid-template-columns: minmax(0, 1fr) max-content;
 }
+.main-row.has-archive { grid-template-columns: minmax(0, 1fr) minmax(0, 18rem) max-content; }
 .main-row-hover { @apply hover:bg-slate-700/50; }
 .is-active { @apply border-slate-600/50 bg-slate-700/40; }
 
-.arrow { @apply inline-flex items-center justify-center text-slate-500 transition-transform duration-200; }
+.arrow { @apply inline-flex shrink-0 items-center justify-center text-slate-500 transition-transform duration-200; }
 .arrow-icon { @apply w-2.5 h-2.5; }
 .arrow-open { @apply rotate-90 text-slate-300; }
 
@@ -237,9 +237,8 @@ function handleTogglePriority() {
 .bar-current-text { @apply text-cyan-100; }
 .bar-target-text { @apply text-sky-100; }
 .bar-separator { @apply text-slate-300; }
-.bar-spacer { @apply relative h-4; }
 
-.recommended-block { @apply flex items-center justify-end gap-1 text-amber-300 font-mono text-sm; }
+.recommended-block { @apply flex items-center justify-end gap-1 whitespace-nowrap text-amber-300 font-mono text-sm; }
 .recommended-count { @apply leading-none; }
 .recommended-icon { @apply w-3.5 h-3.5 shrink-0; }
 .flow-action-rail { @apply w-20 h-8 flex-none flex items-center justify-center gap-2 bg-slate-800/40 rounded; }
@@ -250,15 +249,23 @@ function handleTogglePriority() {
 .detail-section-toggle { @apply w-full flex items-center justify-between text-[11px] font-semibold uppercase tracking-wide text-slate-300 mb-1.5; }
 .detail-section-toggle-arrow { @apply text-slate-500 transition-transform duration-200; }
 .detail-section-toggle-arrow-open { @apply rotate-90 text-slate-300; }
+.detail-table { @apply overflow-x-auto; }
 .detail-head { @apply grid gap-3 items-center pb-1.5 mb-1 border-b border-slate-700/30 text-slate-400 uppercase tracking-wide; }
-.detail-head { grid-template-columns: minmax(0, 1fr) 5.5rem 5.5rem 5.5rem 5.5rem; }
+.detail-head, .detail-row {
+  grid-template-columns: minmax(8rem, 1fr) repeat(var(--detail-columns), 5.5rem);
+  min-width: calc(8rem + var(--detail-columns) * 6.25rem);
+}
 .detail-head-label { @apply text-left; }
 .detail-head-col { @apply text-right; }
 .list-item { @apply py-1.5 border-b border-slate-700/20 last:border-0; }
 .detail-row { @apply grid gap-3 items-center; }
-.detail-row { grid-template-columns: minmax(0, 1fr) 5.5rem 5.5rem 5.5rem 5.5rem; }
-.detail-label { @apply text-slate-300 truncate; }
-.detail-value { @apply text-right text-slate-200 font-mono; }
+.detail-label { @apply text-slate-300 break-words; }
+.detail-value { @apply text-right text-slate-200 font-mono whitespace-nowrap; }
+
+@container (max-width: 32rem) {
+  .main-row.has-archive { @apply h-auto min-h-8 gap-y-2 py-2; grid-template-columns: minmax(0, 1fr) max-content; }
+  .main-row.has-archive .bar-shell { grid-column: 1 / -1; grid-row: 2; }
+}
 
 .expand-enter-active, .expand-leave-active { transition: all 0.2s ease-out; max-height: 1000px; }
 .expand-enter-from, .expand-leave-to { opacity: 0; max-height: 0; }

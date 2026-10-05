@@ -321,6 +321,35 @@ test.describe('Volume Analysis', () => {
     await expect(allocation(page).locator('.recommended-count')).toHaveText('126,000')
     await expect(allocation(page).locator('.recommended-icon')).toBeVisible()
   })
+  test('Narrow storage rows keep values inside the row when expanded', async ({ page }) => {
+    const row = allocation(page)
+    await row.locator('.main-row').click()
+    await expect(row.locator('.detail-row').first()).toBeVisible()
+
+    for (const width of [420, 500, 600]) {
+      await page.locator('.allocation-view').evaluate((element, width) => {
+        element.style.width = `${width}px`
+      }, width)
+      const bounds = await row.evaluate(element => {
+        const main = element.querySelector('.main-row')!.getBoundingClientRect()
+        const recommended = element.querySelector('.recommended-block')!.getBoundingClientRect()
+        const actions = element.querySelector('.flow-action-rail')!.getBoundingClientRect()
+        const table = element.querySelector('.detail-table')!
+        return {
+          valueRight: recommended.right,
+          rowRight: main.right,
+          actionsLeft: actions.left,
+          overflow: element.scrollWidth > element.clientWidth,
+          columns: table.querySelector('.detail-head')!.children.length
+        }
+      })
+      expect(bounds.valueRight).toBeLessThanOrEqual(bounds.rowRight)
+      expect(bounds.valueRight).toBeLessThan(bounds.actionsLeft)
+      expect(bounds.overflow).toBe(false)
+      expect(bounds.columns).toBe(3)
+      await expect(row.locator('.recommended-count')).toHaveText('126,000')
+    }
+  })
   test('4.11 Group header colors blend with WareFlow', async ({ page }) => {
     await expect(page.getByTestId('wareflow-group-title')).toHaveCSS('color', 'rgb(203, 213, 225)')
     await expect(allocation(page).locator('.main-row')).toHaveCSS('background-color', 'rgba(30, 41, 59, 0.4)')
