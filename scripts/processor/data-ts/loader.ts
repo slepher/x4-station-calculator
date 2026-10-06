@@ -1,9 +1,9 @@
-import { existsSync } from 'node:fs'
+import { existsSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 import { readXml, readOrderedXml, orderedText, nodes } from '../shared-ts/xml'
 import { I18nRegistry } from '../shared-ts/i18n'
 import { roundHalfEven } from '../shared-ts/math'
-import { writeJson } from '../shared-ts/io'
+import { readJson, writeJson } from '../shared-ts/io'
 
 // XML intermediates retain string attributes; only domain numeric fields are converted.
 type Row = Record<string, any>
@@ -362,14 +362,22 @@ export class X4PrecisionLoader {
   }
 
   parseShipAndEquipmentData(): void {
+    this.parseShips()
+    this.parseEquipments()
+  }
+
+  parseShips(): void {
     this.loadShipgroups()
     this.loadShipConnections()
     this.loadShipConnectionMacros()
     this.loadShipDefaults()
     this.loadShipMacros()
     this.loadLoadouts()
-    this.loadEquipmentComponentTags()
     this.buildShips()
+  }
+
+  parseEquipments(): void {
+    this.loadEquipmentComponentTags()
     this.buildEquipments()
   }
 
@@ -936,7 +944,7 @@ export class X4PrecisionLoader {
     return result
   }
 
-  save(): string[] {
+  save(selected?: Set<string>, rebuildLanguages = true, paths: Record<string, string> = {}): string[] {
     const data: Row = { modules: this.all_modules, wares: this.wares_data, module_groups: this.module_groups_result,
       consumption: this.race_consumption, ships: this.ships_data, ship_slots: this.shipSlotsMaxes(), default_maxes: this.ship_max_stats,
       equipments: this.equipments_data, ship_types: this.ship_types_data, ship_races: this.ship_races_data, equipment_types: this.equipment_types_data,
@@ -946,17 +954,32 @@ export class X4PrecisionLoader {
       if (value !== null) data[key] = value
     const files: string[] = [], languages: Row[] = []
     for (const [x4_id, conf] of Object.entries(LANG_CONFIG)) {
-      const values = this.i18n_data[conf.iso]
+      let values = this.i18n_data[conf.iso]
+      const path = join(this.output_root, 'locales', `${conf.iso}.json`)
+      if (!rebuildLanguages && existsSync(path)) values = { ...readJson<Record<string, string>>(path), ...values }
       if (values && Object.keys(values).length) {
-        const path = join(this.output_root, 'locales', `${conf.iso}.json`)
         writeJson(path, Object.fromEntries(Object.entries(values).sort(([left], [right]) => compare(left, right))))
         files.push(path)
         languages.push({ code: conf.iso, name: conf.name, x4_id })
       }
     }
+    if (!rebuildLanguages && existsSync(join(this.output_root, 'locales'))) {
+      const known = new Set(languages.map(language => language.code))
+      const oldPath = join(this.output_root, 'data/languages.json')
+      const old = existsSync(oldPath) ? readJson<Row[]>(oldPath) : []
+      for (const file of readdirSync(join(this.output_root, 'locales')).sort()) {
+        if (!file.endsWith('.json')) continue
+        const code = file.slice(0, -5)
+        if (known.has(code)) continue
+        const entry = old.find(language => language.code === code)
+        languages.push(entry === undefined ? { code, name: code, x4_id: '' } : entry)
+      }
+    }
     data.languages = languages
     for (const [name, value] of Object.entries(data)) {
-      const path = join(this.output_root, 'data', `${name}.json`)
+      if (selected !== undefined && name !== 'languages' && !selected.has(name)) continue
+      const key = name.replaceAll('_', '-') + '-output'
+      const path = paths[key] === undefined ? join(this.output_root, 'data', `${name}.json`) : paths[key]!
       writeJson(path, value)
       files.push(path)
     }

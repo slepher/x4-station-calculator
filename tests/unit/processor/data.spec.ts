@@ -6,6 +6,7 @@ import { X4PrecisionLoader, roundProduction } from '../../../scripts/processor/d
 import { processData } from '../../../scripts/processor/data-ts/index'
 import * as mapProcessor from '../../../scripts/processor/map-ts/index'
 import { compareDirectories } from '../../../scripts/processor/compare'
+import { loadProcessorConfig, parseProcessorArgs, resolveContext, type ProcessorContext } from '../../../scripts/processor/shared-ts/config'
 
 const directories: string[] = []
 afterEach(() => { for (const dir of directories.splice(0)) rmSync(dir, { recursive: true, force: true }) })
@@ -178,17 +179,17 @@ describe('native X4 data domains', () => {
       'md/terraforming/final.xml': `<mdscript><cues><cue name="Start"><cues>${objective('Single', 'single')}${objective('Multi', 'multi')}</cues></cue></cues></mdscript>`
     })
     const mapPath = join(loader.raw_path, 'current-run-map.json')
-    const spy = vi.spyOn(mapProcessor, 'processMap').mockImplementationOnce(context => {
+    const spy = vi.spyOn(mapProcessor, 'buildMap').mockImplementationOnce(context => {
       expect(context.rawPath).toBe(loader.raw_path)
-      expect(context.paths?.output).toBe(mapPath)
-      writeFileSync(mapPath, JSON.stringify({ clusters: {
+      const maps = { clusters: {
         single: { nameId: '{2,1}', sectors: ['sector_one'] },
         multi: { nameId: '{2,2}', sectors: ['sector_two', 'sector_three'] }
-      }, sectors: { sector_one: { nameId: '{3,1}' }, sector_two: { nameId: '{3,2}' }, sector_three: { nameId: '{3,3}' } } }))
-      return { outputs: [mapPath], name_ids: new Set(['{2,1}', '{2,2}', '{3,1}', '{3,2}', '{3,3}']) }
+      }, sectors: { sector_one: { nameId: '{3,1}' }, sector_two: { nameId: '{3,2}' }, sector_three: { nameId: '{3,3}' } } }
+      return { data: { maps }, name_ids: new Set(['{2,1}', '{2,2}', '{3,1}', '{3,2}', '{3,3}']) }
     })
     try {
-      await processData({ config: {}, rawPath: loader.raw_path, outputRoot: loader.output_root, paths: { output: mapPath } })
+      await processData({ config: { version: '9.0' }, rawPath: loader.raw_path, outputRoot: loader.output_root, paths: { output: mapPath },
+        targets: ['maps', 'terraforming'], blocksCache: join(loader.raw_path, 'cache.json'), forceRecalcPerBlock: false } as ProcessorContext)
       const data = JSON.parse(readFileSync(join(loader.output_root, 'data', 'terraforming.json'), 'utf8'))
       expect(data.clusters.map((cluster: any) => cluster.objectives[0].textReplaces[0].to)).toEqual(['$Cluster_Single.knownname', '$Cluster_Multi.knownname'])
     } finally { spy.mockRestore() }
@@ -249,18 +250,20 @@ describe('native X4 data domains', () => {
 })
 
 // Optional real-input parity regression; synthetic domain checks above are always runnable.
-const configPath = join(process.cwd(), 'x4-station-calculator.config.json')
-const baselines = ['/tmp/x4-migrate/python/8.0/data-output/8.0-Diplomacy', '/tmp/x4-migrate/python/9.0/data-output/9.0-Empire']
+const baselineRoot = process.env.PROCESSOR_BASELINE_ROOT
+const baselines = ['8.0-Diplomacy', '9.0-Empire'].map(folder => join(baselineRoot === undefined ? '/missing-processor-baseline' : baselineRoot, folder))
 const parityAvailable = baselines.every(existsSync) && ['8.0-Diplomacy', '9.0-Empire'].every(folder => existsSync(join(process.cwd(), 'x4raw_assets', folder)))
-it.skipIf(!parityAvailable)('matches both complete Python baselines and isolates sequential version runs', async () => {
-  const config = JSON.parse(readFileSync(configPath, 'utf8'))
+it.skipIf(!parityAvailable)('matches both original final baselines and isolates sequential version runs', async () => {
+  const config = loadProcessorConfig()
   const output = mkdtempSync(join(tmpdir(), 'x4-data-parity-'))
   directories.push(output)
   for (const version of config.versions) {
     const actual = join(output, version.folder_name)
-    const summary = await processData({ config: { ...config, ...version }, rawPath: join(process.cwd(), 'x4raw_assets', version.folder_name), outputRoot: actual })
-    expect(summary.counts.modules).toBeGreaterThan(0)
-    expect(compareDirectories(`/tmp/x4-migrate/python/${version.version}/data-output/${version.folder_name}`, actual)).toEqual([])
-    expect(existsSync(join(actual, 'data', 'map_resources.json'))).toBe(false)
+    const context = resolveContext(config, version, parseProcessorArgs(['data', '--output-dir', actual]))
+    context.blocksCache = join(output, `${version.version}-cache.json`)
+    const summary = await processData(context)
+    expect(summary.targets).toContain('map-resources')
+    expect(compareDirectories(join(baselineRoot!, version.folder_name), actual)).toEqual([])
+    expect(existsSync(join(actual, 'data', 'map_resources.json'))).toBe(true)
   }
 }, 120000)

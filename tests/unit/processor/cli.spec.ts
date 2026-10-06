@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import { parseProcessorArgs, resolveContext, selectVersions, type ProcessorConfig } from '../../../scripts/processor/shared-ts/config'
 import { processorHelp, runProcessor } from '../../../scripts/x4_processor'
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 
 const config: ProcessorConfig = {
   versions: [{ version: '8.0', folder_name: '8', beta: false }, { version: '9.0', folder_name: '9', beta: false }, { version: '9.0', folder_name: '9-beta', beta: true }],
@@ -25,31 +28,35 @@ describe('processor CLI', () => {
   })
 
   it('resolves actual overrides and version cache paths without using the legacy cache', () => {
-    const args = parseProcessorArgs(['map', '--version', '8.0', '--output-dir', '/tmp/isolated', '--output', '/tmp/custom-map.json', '--map-dir', '/tmp/raw-map'])
+    const root = mkdtempSync(join(tmpdir(), 'cli-paths-')), mapDir = join(root, 'raw-map'), input = join(root, 'maps.json')
+    mkdirSync(mapDir); writeFileSync(input, '{"sectors":{}}')
+    const args = parseProcessorArgs(['map', '--version', '8.0', '--output-dir', '/tmp/isolated', '--output', '/tmp/custom-map.json', '--map-dir', mapDir])
     const ctx = resolveContext(config, config.versions[0]!, args, '/project')
     expect(ctx.outputRoot).toBe('/tmp/isolated')
     expect(ctx.paths.output).toBe('/tmp/custom-map.json')
-    expect(ctx.paths['map-dir']).toBe('/tmp/raw-map')
+    expect(ctx.paths['map-dir']).toBe(mapDir)
     expect(ctx.blocksCache).toBe('/project/analysis/resources/8/resourcearea_blocks.json')
-    const resources = resolveContext(config, config.versions[0]!, parseProcessorArgs(['resources', '--maps-json', '/tmp/input/maps.json']), '/project')
-    expect(resources.paths['resource-output-dir']).toBe('/tmp/input')
+    const resources = resolveContext(config, config.versions[0]!, parseProcessorArgs(['resources', '--maps-json', input]), '/project')
+    expect(resources.paths['resource-output-dir']).toBe(root)
+    expect(resources.paths['regions-output']).toBe(join(root, 'regions.json'))
+    expect(resources.paths['regionyields-output']).toBe(join(root, 'regionyields.json'))
     const all = resolveContext(config, config.versions[0]!, parseProcessorArgs(['data', '--all-versions', '--output-dir', '/tmp/isolated']), '/project')
     expect(all.outputRoot).toBe('/tmp/isolated/8')
     expect(() => resolveContext(config, config.versions[1]!, parseProcessorArgs(['resources', '--force-recalc-per-block']), '/project')).toThrow('不适用')
     expect(() => resolveContext(config, config.versions[0]!, parseProcessorArgs(['resources', '--save-sample-dir', '/missing-processor-save']), '/project')).toThrow('不存在')
     expect(resources.saveSampleDir).toBeUndefined()
+    rmSync(root, { recursive: true, force: true })
   })
 
   it('runs versions sequentially with independent state and stops before success on failure', async () => {
     const visited: string[] = []; const logs: string[] = []
-    await expect(runProcessor(parseProcessorArgs(['data', '--all-versions']), config, { data: ctx => {
+    await expect(runProcessor(parseProcessorArgs(['data', '--all-versions']), config, ctx => {
       expect(ctx.config.dlc_order).toEqual([])
       ctx.config.dlc_order.push('mutated')
       visited.push(ctx.config.folder_name)
       if (ctx.config.folder_name === '9') throw new Error('stage failed')
-    } }, text => logs.push(text))).rejects.toThrow('stage failed')
+    }, text => logs.push(text))).rejects.toThrow('stage failed')
     expect(visited).toEqual(['8', '9']); expect(config.dlc_order).toEqual([])
     expect(logs.filter(line => line.includes('完成'))).toHaveLength(1)
-    await expect(runProcessor(parseProcessorArgs(['map']), config, {}, () => {})).rejects.toThrow('尚未完成')
   })
 })

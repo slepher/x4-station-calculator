@@ -1,8 +1,16 @@
 import { a, tags, library, nodes, descendants, collect } from './common'
 import type { ExtensionLoader, Row } from './common'
-export function processFactions(loader: ExtensionLoader): void {
-  const root = library(loader.raw_path, 'libraries', 'factions', 'final.xml')
-  const colors = library(loader.raw_path, 'libraries', 'colors', 'final.xml')
+import { readXml } from '../shared-ts/xml'
+export function processFactions(loader: ExtensionLoader, paths?: Record<string, string>): void {
+  const input = (name: string): Row | undefined => {
+    if (paths !== undefined && paths[`${name}-xml`] !== undefined) {
+      const document = readXml(paths[`${name}-xml`]!)
+      return Object.entries(document).find(([key]) => !key.startsWith('?'))?.[1] as Row
+    }
+    return library(loader.raw_path, 'libraries', name, 'final.xml')
+  }
+  const root = input('factions')
+  const colors = input('colors')
   const palette: Record<string, string> = {}
   if (colors) {
     for (const n of descendants({ root: colors }, 'color')) {

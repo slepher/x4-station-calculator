@@ -7,7 +7,9 @@ import { buildResourceareasPayload, buildSectorResourceSummaries, migrateResourc
 import { calculateResourcePerBlock } from './per-block/bridge'
 import { calculateSaveResourcesAll } from './save-replay'
 import { aggregateSectorResources, buildMapResourcesPayload, calculateFalloffFactors, calculateRating, extractSectorRegions, get, iterMapsSectors, roundSignificant, type Json } from './shared'
-export interface ResourceContext { config: Record<string, any>; rawPath: string; outputRoot: string; paths: Record<string, string>; sector?: string; forceRecalcPerBlock?: boolean; saveSampleDir?: string; blocksCache: string }
+export interface ResourceContext { config: Record<string, any>; rawPath: string; outputRoot: string; paths: Record<string, string>; sector?: string; forceRecalcPerBlock?: boolean; saveSampleDir?: string; blocksCache: string
+  inputs?: { maps: Json; regions?: Json[]; definitions?: Json[]; areas?: Grouped }
+}
 type Grouped = Record<string, Json[]>
 const object = (v: unknown): v is Json => v !== null && typeof v === 'object' && !Array.isArray(v)
 export function detectResourceModel(version: string): 'regions' | 'resourceareas' {
@@ -143,12 +145,12 @@ function areaFromRow(row: Json): Json {
 function processLegacy(context: ResourceContext, mapsPath: string, outputDir: string) {
   const regionsPath = context.paths['regions-json']
   if (regionsPath === undefined) throw new Error('Missing regions-json path')
-  const templates = readJson<unknown>(regionsPath)
+  const templates = context.inputs === undefined ? readJson<unknown>(regionsPath) : context.inputs.regions
   if (!Array.isArray(templates)) throw new Error(`Invalid regions JSON: ${regionsPath}`)
   const regions = Object.fromEntries(templates.filter(object).map(row => [row.id, row]))
-  const maps = readJson<Json>(mapsPath), areasPath = join(outputDir, 'resourceareas.json'), outputPath = join(outputDir, 'map_resources.json')
+  const maps = context.inputs === undefined ? readJson<Json>(mapsPath) : context.inputs.maps, areasPath = join(outputDir, 'resourceareas.json'), outputPath = join(outputDir, 'map_resources.json')
   const inputAreasPath = join(dirname(mapsPath), 'resourceareas.json')
-  const inputAreas = loadGroupedResourceareas(inputAreasPath)
+  const inputAreas = context.inputs === undefined ? loadGroupedResourceareas(inputAreasPath) : context.inputs.areas!
   const existingAreas = loadGroupedResourceareas(areasPath)
   let cache: Grouped = {}, legacyCache = false, recovered = false
   if (existsSync(context.blocksCache)) {
@@ -212,10 +214,10 @@ function processLegacy(context: ResourceContext, mapsPath: string, outputDir: st
   const payload = buildMapResourcesPayload('8.0', 'regions', calculated.ids, sectorRegions, normalizedResources, normalizedAreas)
   preserveOtherSectors(payload, outputPath, context.sector)
   // All reads, numerical work and merges complete before the first atomic file replacement.
-  writeJson(areasPath, grouped); writeJson(outputPath, payload)
+  const data: Record<string, unknown> = { [areasPath]: grouped, [outputPath]: payload }
   const files = [areasPath, outputPath]
-  if (needRecalc && (Object.keys(cache).length || recovered || context.sector !== undefined)) { writeJson(context.blocksCache, cache); files.push(context.blocksCache) }
-  return { status: 'success', resource_model: 'regions', sectors_processed: Object.keys(grouped).length, output_files: files }
+  if (needRecalc && (Object.keys(cache).length || recovered || context.sector !== undefined)) { data[context.blocksCache] = cache; files.push(context.blocksCache) }
+  return { status: 'success', resource_model: 'regions', sectors_processed: Object.keys(grouped).length, output_files: files, data }
 }
 function preserveOtherSectors(payload: ReturnType<typeof buildMapResourcesPayload>, path: string, sector?: string) {
   if (sector === undefined || !existsSync(path)) return
@@ -226,10 +228,10 @@ function preserveOtherSectors(payload: ReturnType<typeof buildMapResourcesPayloa
 function processModern(context: ResourceContext, mapsPath: string, outputDir: string) {
   if (context.forceRecalcPerBlock || context.saveSampleDir !== undefined) throw new Error('Per-block recalculation/save samples are unsupported for resourceareas')
   const definitionsPath = join(dirname(mapsPath), 'regionyield_definitions.json'), outputPath = join(outputDir, 'map_resources.json'), areasPath = join(outputDir, 'resourceareas.json')
-  const definitionsList = readJson<unknown>(definitionsPath)
+  const definitionsList = context.inputs === undefined ? readJson<unknown>(definitionsPath) : context.inputs.definitions
   if (!Array.isArray(definitionsList)) throw new Error(`Invalid definitions JSON: ${definitionsPath}`)
   let definitions: Record<string, Json> = Object.fromEntries(definitionsList.filter(row => object(row) && row.id).map(row => [row.id, row]))
-  const maps = readJson<Json>(mapsPath)
+  const maps = context.inputs === undefined ? readJson<Json>(mapsPath) : context.inputs.maps
   let areas = extractSectorRegions(maps), ids = iterMapsSectors(maps).filter(([, row]) => object(row)).map(([macro, row]) => String(get(row, 'id', macro)))
   let rebuilt = false
   if (!Object.keys(definitions).length) {
@@ -257,15 +259,15 @@ function processModern(context: ResourceContext, mapsPath: string, outputDir: st
     if (!Array.isArray(existing)) throw new Error(`Invalid modern resourceareas: ${areasPath}`)
     outputRows = [...existing.filter(row => object(row) && row.sector_id.toLowerCase() !== context.sector!.toLowerCase()), ...rows].sort((a, b) => a.sector_id < b.sector_id ? -1 : a.sector_id > b.sector_id ? 1 : 0)
   }
-  writeJson(areasPath, outputRows); writeJson(outputPath, payload)
+  const data: Record<string, unknown> = { [areasPath]: outputRows, [outputPath]: payload }
   const files = [areasPath, outputPath]
   if (rebuilt) {
     const regeneratedPath = join(outputDir, 'regionyield_definitions.json')
-    writeJson(regeneratedPath, Object.values(definitions)); files.push(regeneratedPath)
+    data[regeneratedPath] = Object.values(definitions); files.push(regeneratedPath)
   }
-  return { status: 'success', resource_model: 'resourceareas', sectors_processed: Object.keys(areas).length, definitions_count: Object.keys(definitions).length, output_files: files }
+  return { status: 'success', resource_model: 'resourceareas', sectors_processed: Object.keys(areas).length, definitions_count: Object.keys(definitions).length, output_files: files, data }
 }
-export function processResources(context: ResourceContext) {
+export function buildResources(context: ResourceContext) {
   const mapsPath = context.paths['maps-json']
   if (mapsPath === undefined) throw new Error('Missing maps-json path')
   let outputDir: string
@@ -275,4 +277,9 @@ export function processResources(context: ResourceContext) {
   if (detectResourceModel(String(context.config.version)) === 'regions') outputs.push(context.blocksCache)
   if (outputs.some(path => resolve(path) === resolve(mapsPath))) throw new Error('Resource output/cache path must not overwrite maps-json')
   return detectResourceModel(String(context.config.version)) === 'resourceareas' ? processModern(context, mapsPath, outputDir) : processLegacy(context, mapsPath, outputDir)
+}
+export function processResources(context: ResourceContext) {
+  const result = buildResources(context)
+  for (const [path, data] of Object.entries(result.data)) writeJson(path, data)
+  return result
 }

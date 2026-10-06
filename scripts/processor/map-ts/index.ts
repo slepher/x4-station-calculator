@@ -13,8 +13,8 @@ export interface MapContext {
     i18n?: I18nRegistry;
     factions?: any[];
 }
-export function processMap(context: MapContext): any {
-    const { config, rawPath, outputRoot } = context, paths = context.paths ?? {};
+export function buildMap(context: MapContext): any {
+    const { config, rawPath } = context, paths = context.paths ?? {};
     const input = (key: string, defaultPath: string): string => key in paths ? paths[key]! : defaultPath;
     const mapDir = input('map-dir', join(rawPath, 'maps', 'xu_ep2_universe'));
     const roots: Record<string, MapNode> = {};
@@ -120,16 +120,17 @@ export function processMap(context: MapContext): any {
         outputs.regions = regions;
         outputs.resourceareas = groups;
     }
-    const written: string[] = [];
-    for (const [name, data] of Object.entries(outputs)) {
-        const key = name === 'maps' ? 'output' : name.replaceAll('_', '-') + '-output', path = input(key, join(outputRoot, 'data', `${name}.json`));
+    return { data: outputs, resource_model: resourceModel, factions_count: factions.length, name_ids: new Set(result.name_ids), stats: result.stats, missing_name_ids: result.missing_name_ids, owner_resolution_ties: result.owner_resolution_ties,
+        ...(resourceModel === 'regions' ? { regions_count: outputs.regions.length, regionyields_count: outputs.regionyields.length } : {}) };
+}
+export function processMap(context: MapContext): any {
+    const result = buildMap(context), paths = context.paths ?? {}, written: string[] = [];
+    const input = (key: string, defaultPath: string): string => key in paths ? paths[key]! : defaultPath;
+    for (const [name, data] of Object.entries(result.data)) {
+        const key = name === 'maps' ? 'output' : name.replaceAll('_', '-') + '-output', path = input(key, join(context.outputRoot, 'data', `${name}.json`));
         writeJson(path, data);
         written.push(path);
     }
-    return {
-        resource_model: resourceModel, factions_count: factions.length, name_ids: new Set(result.name_ids), outputs: written, files_written: written.length, stats: result.stats, missing_name_ids: result.missing_name_ids, owner_resolution_ties: result.owner_resolution_ties, ...(resourceModel === 'regions' ? {
-            regions_count: outputs.regions.length, regionyields_count: outputs.regionyields.length
-        } : {})
-    };
+    return { ...result, outputs: written, files_written: written.length };
 }
 export { modernDefinitions, sectorResourceareas, legacyYields, legacyRegions } from './definitions';

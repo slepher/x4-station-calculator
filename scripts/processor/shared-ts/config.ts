@@ -1,8 +1,9 @@
 import { existsSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { readJson } from './io'
+import { parseTargets, planProcessor, type ProcessorSelection } from '../targets'
 
-export type ProcessorTask = 'data' | 'map' | 'resources'
+export type ProcessorTask = ProcessorSelection | 'data' | 'map' | 'resources'
 export interface VersionItem { version: string; folder_name: string; beta?: boolean; [key: string]: any }
 export interface ProcessorConfig {
   versions: VersionItem[]; current_version: string; beta: boolean
@@ -10,12 +11,13 @@ export interface ProcessorConfig {
   [key: string]: any
 }
 export interface ProcessorArgs {
-  task?: ProcessorTask; help: boolean; values: Record<string, string>; flags: Set<string>
+  task?: ProcessorTask; targets?: ProcessorSelection[]; help: boolean; values: Record<string, string>; flags: Set<string>
 }
 export interface ProcessorContext {
   config: ProcessorConfig & VersionItem; rawPath: string; outputRoot: string
   paths: Record<string, string>; sector?: string; forceRecalcPerBlock: boolean
   saveSampleDir?: string; blocksCache: string
+  targets?: ProcessorSelection[]; explicitInputs?: Set<string>
 }
 
 const commonStrings = ['version', 'output-dir']
@@ -32,13 +34,14 @@ export function parseProcessorArgs(argv: string[]): ProcessorArgs {
   if (tokens[0] === '--') tokens.shift()
   if (tokens[0] !== undefined && !tokens[0].startsWith('-')) {
     const task = tokens.shift()!
-    if (task !== 'data' && task !== 'map' && task !== 'resources') throw new Error(`未知任务: ${task}`)
-    args.task = task
+    args.targets = parseTargets(task)
+    args.task = args.targets[0]
   }
   const strings = new Set(commonStrings)
   const flags = new Set(commonFlags)
-  if (args.task === 'map') mapStrings.forEach(key => strings.add(key))
-  if (args.task === 'resources') {
+  const plan = args.targets === undefined ? undefined : planProcessor(args.targets)
+  if (plan?.stages.includes('maps')) mapStrings.forEach(key => strings.add(key))
+  if (plan?.stages.includes('map-resources')) {
     resourceStrings.forEach(key => strings.add(key))
     flags.add('force-recalc-per-block')
   }
@@ -63,7 +66,8 @@ export function parseProcessorArgs(argv: string[]): ProcessorArgs {
   if (args.values.version !== undefined && args.flags.has('all-versions')) throw new Error('--version 与 --all-versions 互斥')
   if (args.flags.has('beta') && args.flags.has('stable')) throw new Error('--beta 与 --stable 互斥')
   args.help = args.flags.has('help')
-  if (args.task === undefined && !args.help) throw new Error('缺少任务: data | map | resources')
+  if (args.task === undefined && !args.help) throw new Error('缺少目标: all | 单项 | 逗号分隔多项')
+  if (args.values.sector !== undefined && (args.targets?.length !== 1 || args.targets[0] !== 'map-resources')) throw new Error('--sector 仅适用于唯一目标 map-resources')
   return args
 }
 
@@ -99,6 +103,9 @@ export function selectVersions(config: ProcessorConfig, args: ProcessorArgs): Ve
 }
 
 export function resolveContext(config: ProcessorConfig, version: VersionItem, args: ProcessorArgs, cwd = process.cwd()): ProcessorContext {
+  const targets = args.targets === undefined ? parseTargets(args.task!) : args.targets
+  const plan = planProcessor(targets)
+  const resources = plan.stages.includes('map-resources')
   const effective = { ...structuredClone(config), ...structuredClone(version) }
   const rawPath = resolve(cwd, effective.raw_assets_dir, effective.folder_name)
   let outputRoot = resolve(cwd, effective.processed_assets_dir, effective.folder_name)
@@ -121,19 +128,22 @@ export function resolveContext(config: ProcessorConfig, version: VersionItem, ar
       if (key !== 'sector' && key !== 'save-sample-dir' && key !== 'blocks-cache') paths[key] = resolve(cwd, value)
     }
   }
-  if (args.task === 'resources' && args.values['output-dir'] === undefined) {
+  if (targets.length === 1 && targets[0] === 'map-resources' && args.values['maps-json'] !== undefined && args.values['output-dir'] === undefined) {
     outputRoot = dirname(dirname(paths['maps-json']!))
     paths['resource-output-dir'] = dirname(paths['maps-json']!)
+    for (const key of ['regions-output', 'regionyields-output']) {
+      if (args.values[key] === undefined) paths[key] = join(paths['resource-output-dir']!, `${key.slice(0, -7)}.json`)
+    }
   } else paths['resource-output-dir'] = join(outputRoot, 'data')
   let blocksCache = resolve(cwd, 'analysis/resources', effective.folder_name, 'resourcearea_blocks.json')
   if (args.values['blocks-cache'] !== undefined) blocksCache = resolve(cwd, args.values['blocks-cache'])
   const modern = Number.parseInt(effective.version, 10) >= 9
-  if (args.task === 'resources' && modern) {
+  if (resources && modern) {
     for (const key of ['blocks-cache', 'save-sample-dir']) if (args.values[key] !== undefined) throw new Error(`--${key} 不适用于 ${effective.version} resourceareas 模型`)
     if (args.flags.has('force-recalc-per-block')) throw new Error('--force-recalc-per-block 不适用于 resourceareas 模型')
   }
   let saveSampleDir: string | undefined
-  if (args.task === 'resources' && !modern) {
+  if (resources && !modern) {
     if (args.values['save-sample-dir'] !== undefined) {
       saveSampleDir = resolve(cwd, args.values['save-sample-dir'])
       if (!existsSync(saveSampleDir)) throw new Error(`存档目录不存在: ${saveSampleDir}`)
@@ -142,6 +152,8 @@ export function resolveContext(config: ProcessorConfig, version: VersionItem, ar
       if (existsSync(defaultDir)) saveSampleDir = defaultDir
     }
   }
-  return { config: effective, rawPath, outputRoot, paths, blocksCache, saveSampleDir,
+  const explicitInputs = new Set(Object.keys(args.values).filter(key => key === 'map-dir' || key.endsWith('-xml') || key.endsWith('-json')))
+  for (const key of explicitInputs) if (!existsSync(paths[key]!)) throw new Error(`输入不存在 --${key}: ${paths[key]}`)
+  return { config: effective, rawPath, outputRoot, paths, blocksCache, saveSampleDir, targets, explicitInputs,
     sector: args.values.sector, forceRecalcPerBlock: args.flags.has('force-recalc-per-block') }
 }
