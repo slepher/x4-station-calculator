@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "process": "node --import tsx scripts/x4_processor.ts",
     "dev": "vite --base /",
     "wdev": "portless proxy start -p 1355 && python3 scripts/worktree-server.py",
     "build": "node scripts/check-production-compat.mjs && vue-tsc -b && vite build",
