@@ -33,6 +33,8 @@ export function setGameFolderName(folderName: string) {
 const getInitialLocale = () => {
   const saved = Cookies.get('user_locale')
   if (saved) return saved
+  if (/^zh-(?:TW|HK|MO|Hant)(?:-|$)/i.test(navigator.language)) return 'zh-TW'
+  if (/^ja(?:-|$)/i.test(navigator.language)) return 'ja'
   return navigator.language.startsWith('zh') ? 'zh-CN' : 'en'
 }
 
