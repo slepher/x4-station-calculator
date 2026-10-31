@@ -25,7 +25,7 @@ export function setGameFolderName(folderName: string) {
   const changed = currentGameFolderName !== folderName
   currentGameFolderName = folderName
   if (changed) {
-    loadedLanguages.delete(i18n.global.locale.value)
+    loadedLanguages.clear()
   }
 }
 
@@ -103,8 +103,7 @@ function setI18nLanguage(lang: string) {
  * ★ 外部调用的切换接口
  */
 export async function changeLanguage(lang: string) {
-  await loadLanguageAsync(lang)
-  return setI18nLanguage(lang)
+  return loadLanguageAsync(lang)
 }
 
 /**
@@ -123,6 +122,10 @@ export async function loadLanguageAsync(lang: string) {
 
   // 3. 动态加载文件
   try {
+    // English game messages must match this version even when English was never selected.
+    if (lang !== 'en' && !loadedLanguages.has('en')) {
+      await loadLocaleMessages('en')
+    }
     await loadLocaleMessages(lang)
     return setI18nLanguage(lang)
   } catch (error) {

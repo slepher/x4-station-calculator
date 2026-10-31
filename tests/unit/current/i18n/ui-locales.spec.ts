@@ -1,8 +1,5 @@
 import { describe, expect, it } from 'vitest'
 import en from '@/locales/en.json'
-import zhCN from '@/locales/zh-CN.json'
-import zhTW from '@/locales/zh-TW.json'
-import ja from '@/locales/ja.json'
 
 type Messages = { [key: string]: string | Messages }
 
@@ -13,10 +10,15 @@ function flatten(messages: Messages, prefix = ''): Record<string, string> {
   }))
 }
 
-const reference = { ...flatten(en), ...flatten(zhCN) }
+const locales = import.meta.glob<Messages>('/src/locales/*.json', { eager: true, import: 'default' })
+const reference = flatten(en)
 
 describe('UI locale completeness', () => {
-  it.each([['zh-TW', zhTW], ['ja', ja]] as const)('%s covers all source keys and preserves parameters', (_locale, messages) => {
+  it('discovers all 12 UI dictionaries', () => {
+    expect(Object.keys(locales)).toHaveLength(12)
+  })
+
+  it.each(Object.entries(locales))('%s covers all English keys and preserves parameters', (_locale, messages) => {
     const translated = flatten(messages)
     expect(Object.keys(translated).sort()).toEqual(Object.keys(reference).sort())
     for (const [key, source] of Object.entries(reference)) {

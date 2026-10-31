@@ -716,7 +716,8 @@
     "control_price_multiplier": "BUILD RESOURCES PRICE",
     "control_transport_capacity": "Transport Capacity",
     "control_actual_workforce": "Actual Workforce",
-    "item_build_time": "Build Time"
+    "item_build_time": "Build Time",
+    "stats_time": "Total Build Time"
   },
   "ui": {
     "industrial": "Industrial",
@@ -731,7 +732,8 @@
     "save": "Save",
     "delete": "Delete",
     "show_sector_gaps": "Show Gaps",
-    "minute": "min"
+    "minute": "min",
+    "total_volume": "Total Volume"
   },
   "menu": {
     "new": "New",
