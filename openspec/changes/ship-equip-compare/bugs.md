@@ -101,3 +101,4 @@
 - 原因：pickerInitialEquipmentId 将 __mixed__ 转为 null，确认无从区分未选择与明确卸装。
 - 修正：保留 mixed 标识，未选择无预览且确认不写入；显式空候选仍可清空。
 - Unit：A／B 覆盖无选择确认、主动空候选取消及重开、主动空候选确认、另一侧不变。
+- Fixed：本轮 RED 两侧默认高亮为空均失败；GREEN workspace 32 项通过，npm run build 通过。453145a8 提交后刷新 Chrome，A／B 无选择确认、空候选取消重开、明确空候选确认均通过。
