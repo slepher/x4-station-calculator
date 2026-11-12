@@ -7,6 +7,9 @@ export type MetricSchemaItem = {
   labelKey: string
   unit?: string
   max?: number
+  lowerIsBetter?: boolean
+  hideBar?: boolean
+  hint?: string
 }
 
 export type MetricSchema = MetricSchemaItem[][]

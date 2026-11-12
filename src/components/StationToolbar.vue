@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
-import { useShipBuildStore } from '@/store/useShipBuildStore'
+import { useShipBuildWorkspacePresenter } from './ship-build/presenters/useShipBuildWorkspacePresenter'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import LanguageSelector from './LanguageSelector.vue'
 import MissingTranslate from './MissingTranslate.vue'
@@ -22,7 +22,8 @@ import type { SmartSaveStep } from '@/utils/smartSavePolicy'
 import type { ToolbarStoreType } from '@/composables/useToolbarWorkflowController'
 
 void useLogicFlowStore()
-const shipBuildStore = useShipBuildStore()
+const shipWorkspace = useShipBuildWorkspacePresenter()
+const { saveDialog: shipSaveDialog, error: shipSaveError, locked: shipLocked, saveLabel: shipSaveLabel, activeView: shipActiveView, selectedShip: toolbarShip } = shipWorkspace
 const gameData = useGameDataStore()
 const { t } = useI18n()
 const { translateShip } = useX4I18n()
@@ -40,11 +41,11 @@ const smartDialog = reactive({
   intent: 'NEW' as 'NEW' | 'SAVE_AS'
 })
 
-const activeView = computed(() => shipBuildStore.activeView)
+const activeView = computed(() => shipActiveView.value)
 const isFlowView = computed(() => activeView.value === 'flow')
 const isShipBuildView = computed(() => activeView.value === 'ship-build')
 const isLiveView = computed(() => activeView.value === 'live-production' || activeView.value === 'maps')
-const isShipActionDisabled = computed(() => isShipBuildView.value && !shipBuildStore.selectedShipId)
+const isShipActionDisabled = computed(() => isShipBuildView.value && (!toolbarShip.value || shipLocked.value))
 
 const activeToolbarStoreType = computed<ToolbarStoreType>(() => {
   if (isShipBuildView.value) return 'ship-build'
@@ -137,10 +138,12 @@ const handleLoad = () => {
 
 // Handle SmartSaveDialog events for ship-build
 const handleSmartDialogClose = () => {
+  if (shipSaveDialog.value !== null) { shipWorkspace.cancel(); return }
   smartDialog.isOpen = false
 }
 
 const handleSmartDialogSubmitDefault = ({ steps }: { steps: SmartSaveStep[] }) => {
+  if (shipSaveDialog.value !== null) { shipWorkspace.submitSaveDialog({ steps }); return }
   toolbarWorkflow.runSmartSaveSteps({
     storeType: activeToolbarStoreType.value,
     steps,
@@ -150,6 +153,7 @@ const handleSmartDialogSubmitDefault = ({ steps }: { steps: SmartSaveStep[] }) =
 }
 
 const handleSmartDialogInvalid = (payload: { reason: 'EMPTY_NAME' }) => {
+  if (shipSaveDialog.value !== null) { shipWorkspace.invalidSaveDialog(); return }
   if (payload.reason === 'EMPTY_NAME') {
     toolbarWorkflow.pushEmptyNameBlocked()
   }
@@ -158,6 +162,15 @@ const handleSmartDialogInvalid = (payload: { reason: 'EMPTY_NAME' }) => {
 const handleExport = () => {
   showExportWizard.value = true
 }
+
+const handleShipSaveShortcut = (event: KeyboardEvent) => {
+  if (!isShipBuildView.value || !(event.ctrlKey || event.metaKey) || event.key.toLowerCase() !== 's') return
+  event.preventDefault()
+  if (event.shiftKey) handleSaveAs()
+  else handleSave()
+}
+onMounted(() => window.addEventListener('keydown', handleShipSaveShortcut))
+onBeforeUnmount(() => window.removeEventListener('keydown', handleShipSaveShortcut))
 </script>
 
 <template>
@@ -178,7 +191,7 @@ const handleExport = () => {
           <polyline points="17 21 17 13 7 13 7 21" />
           <polyline points="7 3 7 8 15 8" />
         </svg>
-        <span>{{ t('menu.save') }}</span>
+        <span>{{ isShipBuildView ? shipSaveLabel : t('menu.save') }}</span>
       </button>
       <button :class="['btn-tool', themeColors.primary]" data-testid="toolbar-save-as-btn" :disabled="isToolbarActionDisabled || (isLiveView && isLiveSaveAsDisabled)" @click="handleSaveAs">
         <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
@@ -214,7 +227,7 @@ const handleExport = () => {
     </div>
 
     <div class="flex-1 flex justify-center">
-      <TopViewSwitch v-model="shipBuildStore.activeView" />
+      <TopViewSwitch v-model="shipActiveView" />
     </div>
 
     <div class="flex items-center gap-2 ml-2">
@@ -273,10 +286,13 @@ const handleExport = () => {
     <DlcSettingsModal :visible="showDlcSettingsModal" @close="showDlcSettingsModal = false" />
 
     <SmartSaveDialog
-      :isOpen="smartDialog.isOpen"
-      :intent="smartDialog.intent"
-      :initialName="toolbarWorkflow.getDefaultName(activeToolbarStoreType, { selectedShip: shipBuildStore.selectedShip })"
-      :storeType="activeToolbarStoreType"
+      :isOpen="shipSaveDialog !== null || smartDialog.isOpen"
+      :intent="shipSaveDialog === null ? smartDialog.intent : shipSaveDialog.intent"
+      :initialName="shipSaveDialog === null ? toolbarWorkflow.getDefaultName(activeToolbarStoreType, { selectedShip: toolbarShip }) : shipSaveDialog.initialName"
+      :storeType="shipSaveDialog === null ? activeToolbarStoreType : 'ship-build'"
+      :context="shipSaveDialog?.context"
+      :auto-close="shipSaveDialog === null"
+      :error-message="shipSaveDialog === null ? undefined : shipSaveError"
       @close="handleSmartDialogClose"
       @submit-default="handleSmartDialogSubmitDefault"
       @invalid="handleSmartDialogInvalid"

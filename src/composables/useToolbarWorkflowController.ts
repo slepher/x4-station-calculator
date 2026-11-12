@@ -1,3 +1,4 @@
+import { useShipBuildWorkspacePresenter } from '@/components/ship-build/presenters/useShipBuildWorkspacePresenter'
 import type { ComposerTranslation } from 'vue-i18n'
 import type { X4Ship } from '@/types/x4'
 import { useBlueprintProductionStore } from '@/store/useBlueprintProductionStore'
@@ -54,19 +55,18 @@ type ImportHandler = {
   run: (input: RunImportActionInput) => { ok: boolean; unsupported?: boolean }
 }
 
-export function useToolbarWorkflowController({ t, translateShip }: UseToolbarWorkflowControllerInput) {
+export function useToolbarWorkflowController({ t }: UseToolbarWorkflowControllerInput) {
   const blueprintStore = useBlueprintProductionStore()
   const liveStore = useLiveProductionStore()
   const logicFlowStore = useLogicFlowStore()
   const shipBuildStore = useShipBuildStore()
+  const shipWorkspace = useShipBuildWorkspacePresenter()
   const statusStore = useStatusStore()
 
-  const getDefaultName = (storeType: ToolbarStoreType, ctx?: ToolbarDefaultNameContext): string => {
+  const getDefaultName = (storeType: ToolbarStoreType, _ctx?: ToolbarDefaultNameContext): string => {
     if (storeType === 'logicFlow') return t('menu.default_flow_name')
     if (storeType === 'ship-build') {
-      const ship = ctx?.selectedShip || null
-      const shipName = ship ? translateShip(ship) : ''
-      return shipName ? `${shipName} ${t('menu.blueprint')}` : t('menu.default_blueprint_name')
+      return shipWorkspace.getDefaultName(shipWorkspace.activeSide.value)
     }
     if (storeType === 'blueprint-production') return t('sector.new_sector_name')
     if (storeType === 'live-production') return ''
@@ -206,6 +206,12 @@ export function useToolbarWorkflowController({ t, translateShip }: UseToolbarWor
   }
 
   const runAction = ({ storeType, action, defaultEmpireName }: RunActionInput): RunActionOutcome => {
+    if (storeType === 'ship-build') {
+      if (shipWorkspace.locked.value) return { kind: 'blocked' }
+      if (action === 'NEW') shipWorkspace.newPlan()
+      else shipWorkspace.save(shipWorkspace.activeSide.value, action === 'SAVE_AS')
+      return { kind: 'done' }
+    }
     if (!isActionSupportedFor(storeType, action)) {
       statusStore.pushMessage('warning', 'system', `Action ${action} not supported for ${storeType}`)
       return { kind: 'blocked' }

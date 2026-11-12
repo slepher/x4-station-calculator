@@ -1651,5 +1651,33 @@
     "color_6": "紫",
     "color_7": "青",
     "color_8": "橙"
+  },
+  "shipCompare": {
+    "left_plan": "左侧方案",
+    "right_plan": "右侧方案",
+    "open": "展开对比",
+    "title": "蓝图对比",
+    "exit": "退出对比",
+    "keep_b": "保留右侧方案",
+    "save_side": "保存 {side}",
+    "save_failed": "保存失败，工作副本已保留。",
+    "invalid_candidate": "所选方案已不可用。",
+    "scale_missing": "刻度不可用",
+    "cancel": "取消",
+    "change_ship": "更换船型",
+    "load": "载入蓝图",
+    "search": "搜索",
+    "same_id": "另一侧正在使用此蓝图",
+    "delete_failed": "未能删除蓝图，请重试。另一侧正在使用的蓝图不能删除。",
+    "save_continue": "保存 {side} 并继续",
+    "discard_continue": "放弃 {side} 修改并继续",
+    "edit_side": "编辑对象",
+    "protect_exit": "是否保存 {side} 的修改并退出对比？",
+    "protect_replace": "替换方案前是否保存 {side} 的修改？",
+    "protect_leave": "离开前是否保存 {side} 的修改？",
+    "protect_new": "新建前是否保存 {side} 的修改？",
+    "protect_load": "载入前是否保存 {side} 的修改？",
+    "protect_change_ship": "更换船型前是否保存 {side} 的修改？",
+    "protect_delete": "删除前是否保存 {side} 的修改？"
   }
 }

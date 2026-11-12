@@ -5,6 +5,7 @@ import { useBlueprintProductionStore } from '@/store/useBlueprintProductionStore
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
+import { useShipBuildWorkspacePresenter } from './ship-build/presenters/useShipBuildWorkspacePresenter'
 import { useSaveStore } from '@/store/useSaveStore'
 import { useSaveBindingStore } from '@/store/useSaveBindingStore'
 import { useStatusStore } from '@/store/useStatusStore'
@@ -34,6 +35,7 @@ const blueprintStore = useBlueprintProductionStore()
 const gameDataStore = useGameDataStore()
 const logicFlowStore = useLogicFlowStore()
 const shipBuildStore = useShipBuildStore()
+const shipWorkspace = useShipBuildWorkspacePresenter()
 const saveStore = useSaveStore()
 const saveBindingStore = useSaveBindingStore()
 const statusStore = useStatusStore()
@@ -213,7 +215,10 @@ const onPickFile = async (event: Event) => {
 
 const handleApplyImport = async () => {
   if (!parsedPayload.value || !preparedPayload.value) return
-
+  if (selectedModules.value.x4_ship_blueprints && shipWorkspace.compare.value) {
+    if (!await shipWorkspace.prepareSessionChange()) return
+    shipWorkspace.resetComparison()
+  }
   try {
     const result = await applyImportPayload({
       mode: mode.value,

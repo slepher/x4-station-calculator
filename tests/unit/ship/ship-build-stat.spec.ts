@@ -6,6 +6,7 @@ import { mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import ShipBuildPanelStats from '@/components/ship-build/ShipBuildPanelStats.vue'
 import { useEquipmentStats } from '@/composables/useEquipmentStats'
+import { createShipStatsCalculation } from '@/store/logic/shipBlueprintStats'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import shipsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/ships.json'
 import equipmentsRaw from '@/assets/x4_game_data/8.0-Diplomacy/data/equipments.json'
@@ -32,7 +33,11 @@ vi.mock('@/store/useShipBuildStore', () => ({
     ships: [odachiShip],
     equipments: [odachiEngine, odachiThruster, odachiShield, odachiWeapon, odachiTurret, shotgunTurret, odachiMissileLauncher],
     selectedShipId: 'ship_ter_m_corvette_02_a',
-    findShip: (id: string) => shipsRaw.find((ship: any) => ship.id === id)
+    findShip: (id: string) => shipsRaw.find((ship: any) => ship.id === id),
+    getStatsCalculation: (bp: any) => createShipStatsCalculation(
+      shipsRaw.find(ship => ship.id === bp?.shipId) as any,
+      { findEquipment, isEquipmentDlcUsable: () => true }
+    )
   })
 }))
 

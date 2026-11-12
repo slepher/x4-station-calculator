@@ -1,5 +1,6 @@
+import { createShipStatsCalculation } from './logic/shipBlueprintStats'
 import { defineStore } from 'pinia'
-import { computed, ref, watch } from 'vue'
+import { computed, reactive, ref, toRef, watch } from 'vue'
 import i18n from '@/i18n'
 import { useGameDataStore } from './useGameDataStore'
 import { useActiveViewStore } from './useActiveViewStore'
@@ -48,6 +49,23 @@ export type ShipBuildMockTagPatch = {
     tags: string[]
   }>
 }
+
+export type ShipBuildSide = 'A' | 'B'
+export type ShipBuildPlan = {
+  sessionId: string
+  blueprint: ShipBlueprint | null
+  saveTargetId: string | null
+  lastSavedSnapshot: string | null
+  forceDirty: boolean
+  loadedBuiltInPreset: BuiltInPresetKey | null
+  loadedBuiltInConnectionsSnapshot: string | null
+}
+
+const createPlan = (): ShipBuildPlan => ({
+  sessionId: crypto.randomUUID(), blueprint: null, saveTargetId: null,
+  lastSavedSnapshot: null, forceDirty: false, loadedBuiltInPreset: null,
+  loadedBuiltInConnectionsSnapshot: null
+})
 
 type BuiltInPresetKey = 'empty' | 'low' | 'mid' | 'high'
 
@@ -112,7 +130,9 @@ export const useShipBuildStore = defineStore('ship-build', () => {
   const statsViewMode = ref<ShipBuildStatsViewMode>('summary')
   const fitMode = ref<FitMode>('connection')
   // Blueprint persistence state
-  const blueprint = ref<ShipBlueprint | null>(null)
+  const planA = reactive(createPlan())
+  const planB = ref<ShipBuildPlan | null>(null)
+  const blueprint = toRef(planA, 'blueprint')
   const selectedShipId = computed<string | null>(() => blueprint.value?.shipId || null)
   const savedBlueprints = ref<SavedShipBlueprintsState>({
     version: CURRENT_SHIP_BLUEPRINT_VERSION,
@@ -120,10 +140,10 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     activeBlueprintId: null,
     ships: []
   })
-  const lastSavedSnapshot = ref<string | null>(null)
-  const forceDirty = ref(false)
-  const loadedBuiltInPreset = ref<BuiltInPresetKey | null>(null)
-  const loadedBuiltInConnectionsSnapshot = ref<string | null>(null)
+  const lastSavedSnapshot = toRef(planA, 'lastSavedSnapshot')
+  const forceDirty = toRef(planA, 'forceDirty')
+  const loadedBuiltInPreset = toRef(planA, 'loadedBuiltInPreset')
+  const loadedBuiltInConnectionsSnapshot = toRef(planA, 'loadedBuiltInConnectionsSnapshot')
 
   const selectedByConnection = ref<Record<string, string | null>>({})
   const mockTagPatch = ref<ShipBuildMockTagPatch | null>(null)
@@ -225,14 +245,6 @@ export const useShipBuildStore = defineStore('ship-build', () => {
 
   const getBucketByShipId = (shipId: string): ShipBlueprintBucket | null => {
     return savedBlueprints.value.ships.find((bucket) => bucket.shipId === shipId) || null
-  }
-
-  const getOrCreateBucketByShipId = (shipId: string): ShipBlueprintBucket => {
-    const existing = getBucketByShipId(shipId)
-    if (existing) return existing
-    const created: ShipBlueprintBucket = { shipId, blueprints: [] }
-    savedBlueprints.value.ships.push(created)
-    return created
   }
 
   const getAllSavedBlueprints = (): ShipBlueprint[] => {
@@ -683,6 +695,8 @@ export const useShipBuildStore = defineStore('ship-build', () => {
 
   // Take snapshot for dirty check
   const takeSnapshot = () => {
+    planA.sessionId = crypto.randomUUID()
+    planA.saveTargetId = blueprint.value && findBlueprintById(blueprint.value.id) ? blueprint.value.id : null
     const shipId = resolveCurrentShipId()
     lastSavedSnapshot.value = JSON.stringify({
       shipId,
@@ -958,74 +972,27 @@ export const useShipBuildStore = defineStore('ship-build', () => {
 
   // CRUD Operations
   const saveBlueprint = () => {
-    if (!blueprint.value) return
-    const shipId = resolveCurrentShipId()
-    if (!shipId) return
-
-    const bucket = getOrCreateBucketByShipId(shipId)
-    const idx = bucket.blueprints.findIndex((b) => b.id === blueprint.value!.id)
-    blueprint.value.shipId = shipId
-    blueprint.value.lastUpdated = Date.now()
-
-    if (idx !== -1) {
-      const existing = bucket.blueprints[idx]!
-      blueprint.value.createdAt = existing.createdAt
-      bucket.blueprints[idx] = JSON.parse(JSON.stringify(blueprint.value))
-    } else {
-      blueprint.value.id = crypto.randomUUID()
-      blueprint.value.createdAt = Date.now()
-      bucket.blueprints.push(JSON.parse(JSON.stringify(blueprint.value)))
-    }
-
-    savedBlueprints.value.activeShipId = shipId
-    savedBlueprints.value.activeBlueprintId = blueprint.value.id
-    saveBlueprintsToStorage()
-    takeSnapshot()
+    if (planB.value !== null || !blueprint.value || !planRequiresSaveAs('A')) return savePlan('A')
+    const name = blueprint.value.name === '' ? i18n.global.t('menu.default_blueprint_name') : blueprint.value.name
+    return savePlan('A', name)
   }
 
-  const saveAsBlueprint = (name: string) => {
-    const shipId = resolveCurrentShipId()
-    if (!shipId) return
-
-    const newBlueprint: ShipBlueprint = {
-      id: crypto.randomUUID(),
-      name,
-      shipId,
-      connections: blueprint.value ? JSON.parse(JSON.stringify(blueprint.value.connections)) : [],
-      storage: blueprint.value?.storage ? JSON.parse(JSON.stringify(blueprint.value.storage)) : undefined,
-      materialMethod: blueprint.value?.materialMethod || 'default',
-      lastUpdated: Date.now(),
-      createdAt: Date.now()
-    }
-
-    const bucket = getOrCreateBucketByShipId(shipId)
-    bucket.blueprints.push(newBlueprint)
-    savedBlueprints.value.activeShipId = shipId
-    savedBlueprints.value.activeBlueprintId = newBlueprint.id
-    blueprint.value = newBlueprint
-    saveBlueprintsToStorage()
-    takeSnapshot()
-  }
+  const saveAsBlueprint = (name: string) => savePlan('A', name)
 
   const saveBlueprintWithFallbackName = (name: string) => {
-    if (blueprint.value && !blueprint.value.name) {
-      blueprint.value.name = name
-    }
-    saveBlueprint()
+    if (planRequiresSaveAs('A')) return savePlan('A', name)
+    return savePlan('A')
   }
 
-  const requiresSaveAsOnSave = () => {
-    if (!blueprint.value) return true
-    if (!blueprint.value.id) return true
-    return !savedBlueprints.value.activeBlueprintId
-  }
+  const requiresSaveAsOnSave = () => planRequiresSaveAs('A')
 
   const loadBlueprint = (id: string) => {
+    if (planB.value !== null && planB.value.saveTargetId === id) return
     const builtIn = parseBuiltInBlueprintId(id)
     if (builtIn) {
       const bp = buildBuiltInBlueprintForShip(builtIn.shipId, builtIn.preset)
       if (!bp) return
-      const activeId = savedBlueprints.value.activeBlueprintId
+      const activeId = planA.saveTargetId
       const shouldApplyToCurrentSaved =
         Boolean(activeId) &&
         Boolean(blueprint.value) &&
@@ -1098,8 +1065,32 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     takeSnapshot()
   }
 
-  const deleteBlueprint = (id: string) => {
+  const deleteBlueprint = (id: string, side: ShipBuildSide = 'A') => {
     if (isBuiltInBlueprintId(id)) return
+    const otherPlan = getPlan(side === 'A' ? 'B' : 'A')
+    if (otherPlan !== null && otherPlan.saveTargetId === id && findBlueprintById(id) !== null) return
+
+    if (planB.value !== null) {
+      const next: SavedShipBlueprintsState = JSON.parse(JSON.stringify(savedBlueprints.value))
+      next.ships.forEach(bucket => { bucket.blueprints = bucket.blueprints.filter(bp => bp.id !== id) })
+      next.ships = next.ships.filter(bucket => bucket.blueprints.length > 0)
+      if (next.activeBlueprintId === id) next.activeBlueprintId = null
+      try { localStorage.setItem(getStorageKey(), JSON.stringify(next)) }
+      catch { return }
+      savedBlueprints.value = next
+      const plan = getPlan(side)
+      if (plan !== null && plan.blueprint !== null && plan.saveTargetId === id) {
+        plan.blueprint.id = ''
+        plan.blueprint.name = ''
+        plan.blueprint.lastUpdated = Date.now()
+        plan.saveTargetId = null
+        plan.loadedBuiltInPreset = null
+        plan.loadedBuiltInConnectionsSnapshot = null
+        plan.lastSavedSnapshot = planSnapshot(plan)
+        plan.forceDirty = true
+      }
+      return
+    }
 
     const deletingCurrentLoaded = blueprint.value?.id === id
     const preservedCurrent = deletingCurrentLoaded && blueprint.value
@@ -1311,20 +1302,22 @@ export const useShipBuildStore = defineStore('ship-build', () => {
 
   const resolveGroupNameByConnectionKey = (connectionKey: string): string | null => {
     const parts = connectionKey.split('::')
+    const ship = findShip(parts[0])
     const slotIndex = Number(parts[2])
     const groupIndex = Number(parts[3])
-    if (!selectedShip.value || Number.isNaN(slotIndex) || Number.isNaN(groupIndex)) return null
-    const slot = selectedShip.value.slots[slotIndex]
+    if (!ship || Number.isNaN(slotIndex) || Number.isNaN(groupIndex)) return null
+    const slot = ship.slots[slotIndex]
     const group = slot?.groups[groupIndex]
     return group?.group || null
   }
 
   const resolveConnectionCapacityByKey = (connectionKey: string): number => {
     const parts = connectionKey.split('::')
+    const ship = findShip(parts[0])
     const slotIndex = Number(parts[2])
     const groupIndex = Number(parts[3])
-    if (!selectedShip.value || Number.isNaN(slotIndex) || Number.isNaN(groupIndex)) return 0
-    const slot = selectedShip.value.slots[slotIndex]
+    if (!ship || Number.isNaN(slotIndex) || Number.isNaN(groupIndex)) return 0
+    const slot = ship.slots[slotIndex]
     const group = slot?.groups[groupIndex]
     if (!slot || !group) return 0
     if (parts.length >= 5 && parts[4] === 'shield') {
@@ -1458,18 +1451,21 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     equipmentId: string | null
     mode: FitMode
     targetCount?: number
-  }): ShipBlueprint | null => {
-    const shipId = resolveCurrentShipId()
-    if (!selectedShip.value || !shipId) return null
+  }, side: ShipBuildSide = 'A'): ShipBlueprint | null => {
+    const plan = getPlan(side)
+    if (!plan || !plan.blueprint) return null
+    const shipId = plan.blueprint.shipId
+    if (!findShip(shipId)) return null
+    if (payload.connectionKeys.some(key => key.split('::')[0] !== shipId)) return null
     const keys = payload.connectionKeys.filter((key) => typeof key === 'string' && key.length > 0)
-    if (keys.length === 0) return cloneBlueprintForPreview(blueprint.value)
+    if (keys.length === 0) return cloneBlueprintForPreview(plan.blueprint)
 
-    const target = cloneBlueprintForPreview(blueprint.value)
+    const target = cloneBlueprintForPreview(plan.blueprint)
     target.shipId = shipId
 
     if (payload.mode === 'group') {
       const fallbackCount = keys.reduce((sum, key) => {
-        const current = selectedByConnectionComputed.value[key]?.count ?? 0
+        const current = getPlanConnectionAssignment(side, key)?.count ?? 0
         return sum + current
       }, 0)
       const requested = payload.targetCount ?? fallbackCount
@@ -1487,7 +1483,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     }
 
     keys.forEach((connectionKey) => {
-      const currentCount = selectedByConnectionComputed.value[connectionKey]?.count
+      const currentCount = getPlanConnectionAssignment(side, connectionKey)?.count
       const capacity = resolveConnectionCapacityByKey(connectionKey)
       const nextCount = payload.targetCount === undefined
         ? (currentCount ?? capacity)
@@ -1507,21 +1503,27 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     connectionKeys: string[]
     equipmentId: string | null
     mode: FitMode
-    targetCount: number
-  }) => {
-    const next = buildPreviewBlueprint(payload)
-    if (next) blueprint.value = next
+    targetCount?: number
+  }, side: ShipBuildSide = 'A') => {
+    const plan = getPlan(side)
+    const next = buildPreviewBlueprint(payload, side)
+    if (plan && next) plan.blueprint = next
+    return plan !== null && next !== null
   }
 
-  const getCompatibleEquipmentIds = (connectionKeys: string[]): string[] => {
-    if (!selectedShip.value || connectionKeys.length === 0) return []
+  const getCompatibleEquipmentIds = (connectionKeys: string[], side: ShipBuildSide = 'A'): string[] => {
+    const plan = getPlan(side)
+    if (!plan || !plan.blueprint || connectionKeys.length === 0) return []
+    const ship = findShip(plan.blueprint.shipId)
+    if (!ship) return []
+    const rows = getConnectionRows(ship)
     const candidateSets: Set<string>[] = []
     for (const key of connectionKeys) {
-      const row = connectionRows.value.find(item => item.connectionKey === key)
+      const row = rows.find(item => item.connectionKey === key)
       if (!row) return []
       const candidates = extractEquipmentSlotCandidatesWithFacets({
         shipMap: shipMap.value, equipmentMap: equipmentMap.value,
-        shipId: selectedShip.value.id, slotType: row.slotType, size: row.size,
+        shipId: ship.id, slotType: row.slotType, size: row.size,
         tagsAll: row.tags, filters: { races: [], mks: [], tags: [] },
         includeEquipment: equipment => isEquipmentDlcUsable(equipment)
       })
@@ -1620,15 +1622,15 @@ export const useShipBuildStore = defineStore('ship-build', () => {
 
   const hasSelectedShip = computed(() => Boolean(resolveCurrentShipId()))
 
-  const connectionRows = computed<FitConnectionRow[]>(() => {
-    if (!selectedShip.value) return []
+  const getConnectionRows = (ship: X4Ship | null): FitConnectionRow[] => {
+    if (!ship) return []
 
     const rows: FitConnectionRow[] = []
-    selectedShip.value.slots.forEach((slot, slotIndex) => {
+    ship.slots.forEach((slot, slotIndex) => {
       slot.groups.forEach((group, groupIndex) => {
-        const baseKey = `${selectedShip.value!.id}::${slot.type}::${slotIndex}::${groupIndex}`
+        const baseKey = `${ship.id}::${slot.type}::${slotIndex}::${groupIndex}`
         const patch = mockTagPatch.value
-        const patchItem = patch?.targetShipId === selectedShip.value!.id ? patch.connections[baseKey] : null
+        const patchItem = patch?.targetShipId === ship.id ? patch.connections[baseKey] : null
         const connection = group.connection
         const connectionSize = resolveSize(patchItem?.size, connection?.size)
         if (!connectionSize) return
@@ -1658,7 +1660,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
         // This ensures the UI can display shield slots for user to configure
         const shieldConnection = connection?.shield
         const shieldKey = `${baseKey}::shield`
-        const shieldPatchItem = patch?.targetShipId === selectedShip.value!.id ? patch.connections[shieldKey] : null
+        const shieldPatchItem = patch?.targetShipId === ship.id ? patch.connections[shieldKey] : null
         // Use shield from blueprint if exists, otherwise use ship's default shield definition
         const shieldDef = shieldConnection || group.connection?.shield
         const shieldTags = shieldPatchItem
@@ -1691,7 +1693,9 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     })
 
     return rows
-  })
+  }
+
+  const connectionRows = computed(() => getConnectionRows(selectedShip.value))
 
   // Map connectionKey to slotType and groupName for applyConnectionAssignment
   const connectionKeyMap = computed(() => {
@@ -1724,6 +1728,9 @@ export const useShipBuildStore = defineStore('ship-build', () => {
 
   // Reset all filters and blueprint
   const resetAll = () => {
+    planB.value = null
+    planA.sessionId = crypto.randomUUID()
+    planA.saveTargetId = null
     blueprint.value = null
     viewMode.value = 'selector'
     lastSavedSnapshot.value = null
@@ -1732,7 +1739,214 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     loadedBuiltInConnectionsSnapshot.value = null
   }
 
+  const getStatsCalculation = (bp: ShipBlueprint | null) => createShipStatsCalculation(
+    bp === null ? null : findShip(bp.shipId), { findEquipment, isEquipmentDlcUsable }
+  )
+
+  const getPickerCandidates = (query: Omit<Parameters<typeof extractEquipmentSlotCandidatesWithFacets>[0], 'shipMap' | 'equipmentMap' | 'includeEquipment'>) =>
+    extractEquipmentSlotCandidatesWithFacets({ ...query, shipMap: shipMap.value,
+      equipmentMap: equipmentMap.value, includeEquipment: isEquipmentDlcUsable })
+
+  const getPlanStats = (bp: ShipBlueprint | null) => {
+    if (!bp) return []
+    const ship = findShip(bp.shipId)
+    if (!ship) return []
+    const values = getStatsCalculation(bp).buildDetailStatsByUseEquipmentStats(ship, bp)
+    const known: Record<string, boolean> = {
+      hull: Number.isFinite(ship.hull), radar_range: Number.isFinite(ship.radarRange),
+      crew: Number.isFinite(ship.crew?.capacity), storage_unit: Number.isFinite(ship.storage?.unit),
+      missile: Number.isFinite(ship.storage?.missile), deployable: Number.isFinite(ship.storage?.deployable),
+      countermeasure: Number.isFinite(ship.storage?.countermeasure)
+    }
+    for (const key of ['storage_container', 'storage_solid', 'storage_liquid', 'storage_condensed']) known[key] = Array.isArray(ship.cargo)
+    for (const key of ['dock_m_count', 'dock_s_count']) known[key] = Array.isArray(ship.dockarea)
+    for (const key of ['dock_m_capacity', 'dock_s_capacity']) known[key] = Array.isArray(ship.shipstorage)
+    for (const key of ['speed', 'boost_speed', 'travel_speed', 'travel_acceleration']) known[key] = Number.isFinite(ship.physics?.drag?.forward)
+    for (const key of ['acceleration', 'boost_acceleration', 'strafe_acceleration']) known[key] = Number.isFinite(ship.physics?.mass)
+    known.strafe_acceleration = known.strafe_acceleration! && Number.isFinite(ship.physics?.accfactors?.horizontal)
+    known.strafe_speed = Number.isFinite(ship.physics?.drag?.horizontal)
+    for (const key of ['yaw', 'pitch', 'roll'] as const) known[key] = Number.isFinite(ship.physics?.drag?.[key])
+    return values.map(item => ({ ...item, value: known[item.key] === false ? undefined : item.value }))
+  }
+
+  const getPlanConnectionAssignment = (side: ShipBuildSide, key: string): ConnectionValue | undefined => {
+    const plan = getPlan(side)
+    if (!plan || !plan.blueprint || key.split('::')[0] !== plan.blueprint.shipId) return undefined
+    const parts = key.split('::')
+    const ship = findShip(plan.blueprint.shipId)
+    const slot = ship?.slots[Number(parts[2])]
+    const group = slot?.groups[Number(parts[3])]
+    if (!slot || !group) return undefined
+    const assignment = plan.blueprint.connections.find(c => c.slot_type === slot.type)?.group.find(g => g.group === group.group)
+    if (parts[4] === 'shield') {
+      if (assignment?.shield) return { equipmentId: assignment.shield.equipment_id, count: assignment.shield.count }
+      return { equipmentId: null, count: resolveConnectionCapacityByKey(key) }
+    }
+    if (assignment) return { equipmentId: assignment.equipment_id, count: assignment.count }
+    return { equipmentId: null, count: resolveConnectionCapacityByKey(key) }
+  }
+
+  const updatePlanStorage = (side: ShipBuildSide, storage: ShipBlueprintStorage) => {
+    const plan = getPlan(side)
+    if (!plan || !plan.blueprint) return false
+    plan.blueprint.storage = JSON.parse(JSON.stringify(storage))
+    return true
+  }
+
+  const getPlan = (side: ShipBuildSide): ShipBuildPlan | null => side === 'A' ? planA : planB.value
+
+  const planSnapshot = (plan: ShipBuildPlan) => JSON.stringify({
+    shipId: plan.blueprint === null ? null : plan.blueprint.shipId, blueprint: plan.blueprint
+  })
+
+  const isPlanDirty = (side: ShipBuildSide) => {
+    const plan = getPlan(side)
+    if (!plan || !plan.blueprint) return false
+    return plan.forceDirty || (plan.lastSavedSnapshot !== null && planSnapshot(plan) !== plan.lastSavedSnapshot)
+  }
+
+  const planRequiresSaveAs = (side: ShipBuildSide) => {
+    const plan = getPlan(side)
+    if (!plan || plan.saveTargetId === null) return true
+    return findBlueprintById(plan.saveTargetId) === null
+  }
+
+  const makePlan = (source: ShipBlueprint, saved: boolean): ShipBuildPlan => {
+    const plan = createPlan()
+    plan.blueprint = JSON.parse(JSON.stringify(source))
+    plan.saveTargetId = saved ? source.id : null
+    plan.lastSavedSnapshot = planSnapshot(plan)
+    return plan
+  }
+
+  const defaultComparisonPlan = (shipId: string): ShipBuildPlan | null => {
+    if (!findShip(shipId) || !isShipDlcUsable(shipId)) return null
+    const candidates = getBlueprintsForShip(shipId)
+      .filter(bp => bp.shipId === shipId && bp.id !== planA.saveTargetId && !isBuiltInBlueprintId(bp.id))
+      .sort((a, b) => {
+        if (a.createdAt !== b.createdAt) return b.createdAt - a.createdAt
+        return a.id < b.id ? -1 : a.id > b.id ? 1 : 0
+      })
+    if (candidates.length > 0) return makePlan(candidates[0]!, true)
+    return makePlan(createEmptyBlueprintForShip(shipId), false)
+  }
+
+  const openComparison = () => {
+    if (planB.value || !blueprint.value) return false
+    const next = defaultComparisonPlan(blueprint.value.shipId)
+    if (!next) return false
+    planB.value = next
+    return true
+  }
+
+  const replaceComparisonShip = (shipId: string) => {
+    if (!planB.value) return false
+    if (planB.value.blueprint?.shipId === shipId) return true
+    const next = defaultComparisonPlan(shipId)
+    if (!next) return false
+    planB.value = next
+    return true
+  }
+
+  const replaceComparisonBlueprint = (id: string) => {
+    if (!planB.value || id === planA.saveTargetId) return false
+    const source = findBlueprintById(id)
+    if (!source || !findShip(source.shipId) || !isShipDlcUsable(source.shipId)) return false
+    planB.value = makePlan(source, true)
+    return true
+  }
+
+  const loadPlanPreset = (side: ShipBuildSide, id: string) => {
+    const plan = getPlan(side)
+    const preset = parseBuiltInBlueprintId(id)
+    if (!plan || !plan.blueprint || !preset || preset.shipId !== plan.blueprint.shipId) return false
+    if (side === 'A') { loadBlueprint(id); return true }
+    const source = buildBuiltInBlueprintForShip(preset.shipId, preset.preset)
+    if (!source) return false
+    if (plan.saveTargetId !== null && findBlueprintById(plan.saveTargetId)) {
+      plan.blueprint = { ...plan.blueprint, connections: source.connections, storage: source.storage }
+      plan.loadedBuiltInPreset = null
+      plan.loadedBuiltInConnectionsSnapshot = null
+    } else {
+      source.name = ''
+      plan.blueprint = source
+      plan.saveTargetId = null
+      plan.loadedBuiltInPreset = preset.preset
+      plan.loadedBuiltInConnectionsSnapshot = JSON.stringify(source.connections)
+      plan.forceDirty = true
+    }
+    return true
+  }
+
+  const getPlanPresetId = (side: ShipBuildSide): string | null => {
+    const plan = getPlan(side)
+    if (plan === null || plan.blueprint === null || plan.loadedBuiltInPreset === null) return null
+    if (JSON.stringify(plan.blueprint.connections) !== plan.loadedBuiltInConnectionsSnapshot) return null
+    return getBuiltInBlueprintId(plan.blueprint.shipId, plan.loadedBuiltInPreset)
+  }
+
+  const getPlanStatusLabel = (side: ShipBuildSide) => {
+    const plan = getPlan(side)
+    if (!plan || !plan.blueprint) return ''
+    if (plan.loadedBuiltInPreset !== null) {
+      if (JSON.stringify(plan.blueprint.connections) === plan.loadedBuiltInConnectionsSnapshot) return getBuiltInPresetName(plan.loadedBuiltInPreset)
+      return i18n.global.t('shipBuild.status_custom')
+    }
+    if (plan.blueprint.name === '' && isPlanDirty(side)) return i18n.global.t('shipBuild.status_custom')
+    return plan.blueprint.name
+  }
+
+  const closeComparison = (keep: ShipBuildSide) => {
+    if (!planB.value) return false
+    if (keep === 'B') Object.assign(planA, planB.value)
+    planB.value = null
+    savedBlueprints.value.activeShipId = planA.blueprint === null ? null : planA.blueprint.shipId
+    savedBlueprints.value.activeBlueprintId = planRequiresSaveAs('A') ? null : planA.saveTargetId
+    saveBlueprintsToStorage()
+    return true
+  }
+
+  const savePlan = (side: ShipBuildSide, name?: string, sessionId?: string): 'saved' | 'needs-name' | 'failed' | 'invalid' => {
+    const plan = getPlan(side)
+    if (!plan || !plan.blueprint || (sessionId !== undefined && sessionId !== plan.sessionId)) return 'invalid'
+    if (name === undefined && planRequiresSaveAs(side)) return 'needs-name'
+    if (name !== undefined && !name.trim()) return 'invalid'
+    const record: ShipBlueprint = JSON.parse(JSON.stringify(plan.blueprint))
+    const state: SavedShipBlueprintsState = JSON.parse(JSON.stringify(savedBlueprints.value))
+    let bucket = state.ships.find(item => item.shipId === record.shipId)
+    if (!bucket) { bucket = { shipId: record.shipId, blueprints: [] }; state.ships.push(bucket) }
+    if (name !== undefined) {
+      record.id = crypto.randomUUID()
+      record.name = name.trim()
+      record.createdAt = Date.now()
+      bucket.blueprints.push(record)
+    } else {
+      const index = bucket.blueprints.findIndex(item => item.id === plan.saveTargetId)
+      if (index < 0) return 'needs-name'
+      record.id = plan.saveTargetId!
+      record.createdAt = bucket.blueprints[index]!.createdAt
+      bucket.blueprints[index] = record
+    }
+    record.lastUpdated = Date.now()
+    state.activeShipId = record.shipId
+    state.activeBlueprintId = record.id
+    try { localStorage.setItem(getStorageKey(), JSON.stringify(state)) }
+    catch { return 'failed' }
+    savedBlueprints.value = state
+    plan.blueprint = JSON.parse(JSON.stringify(record))
+    plan.saveTargetId = record.id
+    plan.forceDirty = false
+    plan.loadedBuiltInPreset = null
+    plan.loadedBuiltInConnectionsSnapshot = null
+    plan.lastSavedSnapshot = planSnapshot(plan)
+    return 'saved'
+  }
+
   return {
+    getStatsCalculation, getPlanStats, getPickerCandidates,
+    getConnectionRows, getPlanConnectionAssignment, updatePlanStorage,
+    getPlan, isPlanDirty, planRequiresSaveAs, openComparison, replaceComparisonShip,
+    replaceComparisonBlueprint, closeComparison, savePlan, loadPlanPreset, getPlanStatusLabel, getPlanPresetId,
     // 全局字典数据
     ships,
     wares,

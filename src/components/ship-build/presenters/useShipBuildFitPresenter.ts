@@ -1,26 +1,26 @@
 import { ref, type Ref } from 'vue'
 import type { FitMode } from '../fitTypes'
-import { useShipBuildStore } from '@/store/useShipBuildStore'
+import { useShipBuildStore, type ShipBuildSide } from '@/store/useShipBuildStore'
 
-interface CountTarget {
+export interface CountTarget {
   key: string
   count: number
   totalCount: number
   connectionKeys: string[]
 }
 
-export function useShipBuildFitPresenter(mode: Ref<FitMode>, openPicker: (key: string) => void) {
+export function useShipBuildFitPresenter(mode: Ref<FitMode>, openPicker: (key: string) => void, side: Ref<ShipBuildSide> = ref('A')) {
   const store = useShipBuildStore()
   const draftCountByTarget = ref<Record<string, number>>({})
   const selection = (target: CountTarget) => {
-    const ids = target.connectionKeys.map(key => store.getConnectionAssignment(key)?.equipmentId)
+    const ids = target.connectionKeys.map(key => store.getPlanConnectionAssignment(side.value, key)?.equipmentId)
     const first = ids[0]
     return first && ids.every(id => id === first) ? first : null
   }
   const clamp = (target: CountTarget, count: number) =>
     Math.max(0, Math.min(target.totalCount, Number.isFinite(count) ? Math.round(count) : 0))
   const handleSlotClick = (target: CountTarget) => {
-    const candidates = store.getCompatibleEquipmentIds(target.connectionKeys)
+    const candidates = store.getCompatibleEquipmentIds(target.connectionKeys, side.value)
     if (candidates.length !== 1) {
       openPicker(target.key)
       return
@@ -28,7 +28,7 @@ export function useShipBuildFitPresenter(mode: Ref<FitMode>, openPicker: (key: s
     const candidate = candidates[0]!
     const clear = selection(target) === candidate && target.count === target.totalCount
     store.applyTargetAssignment({ connectionKeys: target.connectionKeys, mode: mode.value,
-      equipmentId: clear ? null : candidate, targetCount: clear ? 0 : target.totalCount })
+      equipmentId: clear ? null : candidate, targetCount: clear ? 0 : target.totalCount }, side.value)
   }
   const sliderStepForTarget = (target: CountTarget) => mode.value === 'group' ? Math.max(1, target.totalCount) : 1
   const isCountSliderDisabled = (target: CountTarget) => selection(target) === null || target.totalCount <= 0
@@ -41,7 +41,7 @@ export function useShipBuildFitPresenter(mode: Ref<FitMode>, openPicker: (key: s
     if (equipmentId === null || target.totalCount <= 0) return
     const targetCount = clamp(target, value)
     draftCountByTarget.value = { ...draftCountByTarget.value, [target.key]: targetCount }
-    store.applyTargetAssignment({ connectionKeys: target.connectionKeys, equipmentId, mode: mode.value, targetCount })
+    store.applyTargetAssignment({ connectionKeys: target.connectionKeys, equipmentId, mode: mode.value, targetCount }, side.value)
   }
   return { draftCountByTarget, handleSlotClick, sliderStepForTarget, isCountSliderDisabled,
     getDisplayedCount, handleCountSliderRealtime, handleCountSliderCommit }

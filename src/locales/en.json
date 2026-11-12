@@ -1651,5 +1651,33 @@
     "color_6": "Purple",
     "color_7": "Cyan",
     "color_8": "Orange"
+  },
+  "shipCompare": {
+    "left_plan": "left plan",
+    "right_plan": "right plan",
+    "open": "Compare",
+    "title": "Blueprint comparison",
+    "exit": "Exit comparison",
+    "keep_b": "Keep right plan",
+    "save_side": "Save {side}",
+    "save_failed": "Save failed. Your working plan is retained.",
+    "invalid_candidate": "This selection is no longer available.",
+    "scale_missing": "Scale unavailable",
+    "cancel": "Cancel",
+    "change_ship": "Change ship",
+    "load": "Load blueprint",
+    "search": "Search",
+    "same_id": "Already used by the other plan",
+    "delete_failed": "Could not delete the blueprint. Try again. Blueprints used by the other plan cannot be deleted.",
+    "save_continue": "Save {side} and continue",
+    "discard_continue": "Discard {side} changes and continue",
+    "edit_side": "Edit",
+    "protect_exit": "Save changes to {side} before exiting comparison?",
+    "protect_replace": "Save changes to {side} before replacing the plan?",
+    "protect_leave": "Save changes to {side} before leaving?",
+    "protect_new": "Save changes to {side} before creating a new plan?",
+    "protect_load": "Save changes to {side} before loading?",
+    "protect_change_ship": "Save changes to {side} before changing ship?",
+    "protect_delete": "Save changes to {side} before deleting?"
   }
 }

@@ -3,10 +3,12 @@ import { storeToRefs } from 'pinia'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
 import ShipBuildSelectorView from '@/components/ship-build/ShipBuildSelectorView.vue'
+import { useShipBuildWorkspacePresenter } from './presenters/useShipBuildWorkspacePresenter'
 import ShipBuildWorkspaceView from '@/components/ship-build/ShipBuildWorkspaceView.vue'
 
 const { translateEquipmentType, translateEquipment } = useX4I18n()
 const shipBuildStore = useShipBuildStore()
+const { selectingShip } = useShipBuildWorkspacePresenter()
 const { viewMode, selectedShipId } = storeToRefs(shipBuildStore)
 const { setDisplayResolvers } = shipBuildStore
 setDisplayResolvers({
@@ -22,7 +24,8 @@ setDisplayResolvers({
     :data-view-mode="viewMode"
     :data-selected-ship-id="selectedShipId || ''"
   >
-    <ShipBuildSelectorView v-show="viewMode === 'selector'" />
-    <ShipBuildWorkspaceView v-if="viewMode !== 'selector'" />
+    <ShipBuildSelectorView v-show="viewMode === 'selector' && !selectingShip" />
+    <ShipBuildSelectorView v-if="selectingShip" side="B" />
+    <ShipBuildWorkspaceView v-if="viewMode !== 'selector'" v-show="!selectingShip" />
   </div>
 </template>

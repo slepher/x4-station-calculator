@@ -3,17 +3,20 @@ import { ref, computed, watch, nextTick } from 'vue'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { useBlueprintProductionStore } from '@/store/useBlueprintProductionStore'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
-import { buildSmartSavePlan, type SmartSaveStep } from '@/utils/smartSavePolicy'
+import { buildSmartSavePlan, type SmartSaveStep, type SmartSaveDialogContext } from '@/utils/smartSavePolicy'
 import { useI18n } from 'vue-i18n'
 import type { LogicFlowPlan } from '@/types/x4';
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   isOpen: boolean
   intent: 'NEW' | 'SAVE_AS'
   initialName?: string
   storeType?: 'blueprint-production' | 'live-production' | 'logicFlow' | 'ship-build'
   mode?: 'default' | 'import'
-}>()
+  context?: SmartSaveDialogContext
+  autoClose?: boolean
+  errorMessage?: string
+}>(), { autoClose: true })
 
 const emit = defineEmits<{
   (e: 'close'): void
@@ -31,36 +34,13 @@ const inputName = ref('')
 const inputRef = ref<HTMLInputElement | null>(null)
 
 const defaultNameKey = computed(() => {
-  if (props.storeType === 'ship-build') return 'shipBuild.default_blueprint_name'
+  if (props.storeType === 'ship-build') return 'menu.default_blueprint_name'
   if (props.storeType === 'logicFlow') return 'menu.default_flow_name'
   return 'sector.new_sector_name'
 })
 
-watch(() => props.isOpen, (val) => {
-  if (val) {
-    isSaveAsExpanded.value = false
-    if (props.initialName) {
-      inputName.value = props.initialName
-    } else if (props.intent === 'SAVE_AS') {
-      const baseName = props.storeType === 'logicFlow' 
-        ? (logicFlowStore.savedPlans.activeId ? logicFlowStore.savedPlans.list.find((l: LogicFlowPlan) => l.id === logicFlowStore.savedPlans.activeId)?.name : '')
-        : blueprintStore.activeEmpire?.name
-      if (isNewPlan.value) {
-        inputName.value = baseName || t(defaultNameKey.value)
-      } else {
-        inputName.value = baseName ? `${baseName} ${t('menu.copy_suffix')}` : t(defaultNameKey.value)
-      }
-    } else {
-      inputName.value = t(defaultNameKey.value)
-    }
-
-    if (showInput.value) {
-      nextTick(() => inputRef.value?.select())
-    }
-  }
-})
-
 const isNewPlan = computed(() => {
+  if (props.context) return props.context.isNew
   if (props.storeType === 'ship-build') {
     return !shipBuildStore.blueprint
   }
@@ -74,6 +54,7 @@ const isNewPlan = computed(() => {
 })
 
 const currentPlanName = computed(() => {
+  if (props.context) return props.context.name
   if (props.storeType === 'ship-build') {
     return shipBuildStore.blueprint?.name || ''
   }
@@ -87,6 +68,7 @@ const currentPlanName = computed(() => {
 })
 
 const dialogTitle = computed(() => {
+  if (props.context?.title !== undefined) return props.context.title
   if (props.mode === 'import') {
     return t('logicFlowImport.sector_confirm_title')
   }
@@ -101,6 +83,7 @@ const dialogTitle = computed(() => {
 })
 
 const dialogMessage = computed(() => {
+  if (props.context?.message !== undefined) return props.context.message
   if (props.mode === 'import') {
     return t('logicFlowImport.sector_confirm_message')
   }
@@ -120,10 +103,36 @@ const showInput = computed(() => {
   return false
 })
 
+watch(() => [props.isOpen, props.context?.identity], ([val]) => {
+  if (val) {
+    isSaveAsExpanded.value = false
+    if (props.initialName) {
+      inputName.value = props.initialName
+    } else if (props.context) {
+      inputName.value = props.context.name || t(defaultNameKey.value)
+    } else if (props.intent === 'SAVE_AS') {
+      const baseName = props.storeType === 'logicFlow'
+        ? (logicFlowStore.savedPlans.activeId ? logicFlowStore.savedPlans.list.find((l: LogicFlowPlan) => l.id === logicFlowStore.savedPlans.activeId)?.name : '')
+        : blueprintStore.activeEmpire?.name
+      if (isNewPlan.value) {
+        inputName.value = baseName || t(defaultNameKey.value)
+      } else {
+        inputName.value = baseName ? `${baseName} ${t('menu.copy_suffix')}` : t(defaultNameKey.value)
+      }
+    } else {
+      inputName.value = t(defaultNameKey.value)
+    }
+
+    if (showInput.value) {
+      nextTick(() => inputRef.value?.select())
+    }
+  }
+}, { immediate: true })
+
 const handlePrimaryAction = () => {
   if (props.mode === 'import') {
     emit('submit-import', { choice: 'SAVE_AND_IMPORT' })
-    emit('close')
+    if (props.autoClose !== false) emit('close')
     return
   }
 
@@ -138,18 +147,18 @@ const handlePrimaryAction = () => {
   }
 
   emit('submit-default', { steps: policy.steps })
-  emit('close')
+  if (props.autoClose !== false) emit('close')
 }
 
 const handleDiscard = () => {
   if (props.mode === 'import') {
     emit('submit-import', { choice: 'DISCARD_AND_IMPORT' })
-    emit('close')
+    if (props.autoClose !== false) emit('close')
     return
   }
 
   emit('submit-default', { steps: [{ type: 'NEW' }] })
-  emit('close')
+  if (props.autoClose !== false) emit('close')
 }
 
 </script>
@@ -177,7 +186,7 @@ const handleDiscard = () => {
           </h3>
         </div>
 
-        <button @click="$emit('close')"
+        <button @click="$emit('close')" data-testid="smart-save-cancel"
           class="text-slate-400 hover:text-white transition p-1 hover:bg-slate-700 rounded">
           <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -186,6 +195,7 @@ const handleDiscard = () => {
       </div>
 
       <div class="p-6">
+        <p v-if="errorMessage" role="alert" class="text-red-400 mb-4">{{ errorMessage }}</p>
         <p v-if="dialogMessage" class="text-slate-300 mb-4 leading-relaxed white-space-pre">
           {{ dialogMessage }}
         </p>
@@ -194,7 +204,7 @@ const handleDiscard = () => {
           <label class="block text-xs font-bold text-slate-400 uppercase mb-2 ml-1">
             {{ t('menu.label_layout_name') }}
           </label>
-          <input ref="inputRef" v-model="inputName" @keyup.enter="handlePrimaryAction" type="text"
+          <input ref="inputRef" v-model="inputName" @keyup.enter="handlePrimaryAction" type="text" data-testid="smart-save-name"
             class="dialog-input w-full bg-slate-900 border border-slate-600 text-white rounded px-4 py-2 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition placeholder-slate-600"
             :placeholder="t('menu.placeholder_enter_name')" />
         </div>
@@ -209,14 +219,16 @@ const handleDiscard = () => {
       </div>
 
       <div class="px-6 py-4 bg-slate-900/20 border-t border-slate-700 flex justify-end gap-3">
-        <button v-if="intent === 'NEW' || mode === 'import'" @click="handleDiscard"
+        <button v-if="intent === 'NEW' || mode === 'import'" @click="handleDiscard" data-testid="smart-save-discard"
           class="btn-base bg-red-600 hover:bg-red-500 shadow-red-900/20">
-          <span v-if="mode === 'import'">{{ t('logicFlowImport.sector_action_discard_import') }}</span>
+          <span v-if="context?.discardLabel">{{ context.discardLabel }}</span>
+          <span v-else-if="mode === 'import'">{{ t('logicFlowImport.sector_action_discard_import') }}</span>
           <span v-else>{{ t('menu.btn_discard_and_new') }}</span>
         </button>
 
-        <button @click="handlePrimaryAction" class="btn-base bg-cyan-600 hover:bg-cyan-500 shadow-cyan-900/20">
-          <span v-if="mode === 'import'">
+        <button @click="handlePrimaryAction" data-testid="smart-save-primary" class="btn-base bg-cyan-600 hover:bg-cyan-500 shadow-cyan-900/20">
+          <span v-if="context?.saveLabel">{{ context.saveLabel }}</span>
+          <span v-else-if="mode === 'import'">
             {{ t('logicFlowImport.sector_action_save_import') }}
           </span>
           <span v-else-if="intent === 'NEW'">

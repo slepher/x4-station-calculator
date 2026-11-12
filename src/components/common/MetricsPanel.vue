@@ -101,6 +101,7 @@ const headerStyle = computed(() => {
       :data-testid="`metrics-panel-header-${panelId}`"
     >
       <span class="metrics-panel-title">{{ title }}</span>
+      <slot name="header-actions" />
       <ViewTabUI
         v-if="viewTab && viewTab.views.length > 0"
         v-model="currentMode"
@@ -121,6 +122,9 @@ const headerStyle = computed(() => {
           :current-value="objCurrent?.[item.key]"
           :target-value="objTarget?.[item.key]"
           :max="item.max"
+          :lower-is-better="item.lowerIsBetter"
+          :hide-bar="item.hideBar"
+          :title="item.hint"
           :rounded-keys="roundedKeys"
         />
       </div>

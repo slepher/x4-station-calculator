@@ -1,163 +1,67 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
-import { storeToRefs } from 'pinia'
-import { useShipBuildStore } from '@/store/useShipBuildStore'
-import type { FitMode } from '@/components/ship-build/fitTypes'
-import type { ShipBlueprint } from '@/types/x4'
-import ShipBuildPanelFit from '@/components/ship-build/ShipBuildPanelFit.vue'
-import ShipBuildPanelEquipment from '@/components/ship-build/ShipBuildPanelEquipment.vue'
-import ShipBuildPanelStats from '@/components/ship-build/ShipBuildPanelStats.vue'
-import ShipBuildPanelMaterials from '@/components/ship-build/ShipBuildPanelMaterials.vue'
-
-const shipBuildStore = useShipBuildStore()
-const { selectedShip, selectedShipId, blueprint } = storeToRefs(shipBuildStore)
-const { buildPreviewBlueprint, applyConnectionAssignment } = shipBuildStore
-
-const isPickerOpen = ref(false)
-const pickerTarget = ref<{
-  key: string
-  size: string
-  tags: string[]
-  count: number
-  totalCount: number
-  connectionKeys: string[]
-} | null>(null)
-const highlightedEquipmentId = ref<string | null>(null)
-const pickerMode = ref<FitMode>('connection')
-const targetBlueprint = ref<ShipBlueprint | null>(null)
-
-const currentSlotType = ref('')
-const currentEquipmentId = ref<string | null>(null)
-const currentIsShield = ref(false)
-
-const handlePickerOpen = (slotType: string, equipmentId: string | null, isShield: boolean) => {
-  isPickerOpen.value = true
-  currentSlotType.value = slotType
-  currentEquipmentId.value = equipmentId
-  currentIsShield.value = isShield
-}
-
-const handlePickerClose = () => {
-  isPickerOpen.value = false
-  targetBlueprint.value = null
-}
-
-const handlePickerCancel = () => {
-  handlePickerClose()
-}
-
-const handlePickerConfirm = () => {
-  if (!pickerTarget.value) return
-  const equipmentId = highlightedEquipmentId.value ?? null
-  pickerTarget.value.connectionKeys.forEach((connectionKey) => {
-    applyConnectionAssignment({ connectionKey, equipmentId })
-  })
-  handlePickerClose()
-}
-
-const handleHighlightedEquipmentIdChange = (id: string | null) => {
-  highlightedEquipmentId.value = id
-}
-
-const handlePickerTargetChange = (target: typeof pickerTarget.value) => {
-  pickerTarget.value = target
-}
-
-const handlePickerModeChange = (mode: FitMode) => {
-  pickerMode.value = mode
-}
-
-watch(
-  [isPickerOpen, highlightedEquipmentId, pickerTarget, blueprint, pickerMode],
-  ([open, highlightedId, target, currentBlueprint, mode]) => {
-    if (!open || !highlightedId || !target || !currentBlueprint) {
-      targetBlueprint.value = null
-      return
-    }
-    targetBlueprint.value = buildPreviewBlueprint({
-      connectionKeys: target.connectionKeys,
-      equipmentId: highlightedId,
-      mode,
-      targetCount: mode === 'group' ? target.totalCount : undefined
-    })
-  },
-  { deep: true }
-)
-
-const currentShipId = () => {
-  const blueprintShipId = blueprint.value?.shipId
-  if (blueprintShipId) return blueprintShipId
-  return selectedShipId.value
-}
-
-watch(currentShipId, (next, prev) => {
-  if (next === prev) return
-  isPickerOpen.value = false
-  pickerTarget.value = null
-  highlightedEquipmentId.value = null
-  currentSlotType.value = ''
-  currentEquipmentId.value = null
-  currentIsShield.value = false
-  pickerMode.value = 'connection'
-  targetBlueprint.value = null
-})
+import { useI18n } from 'vue-i18n'
+import { useShipBuildWorkspacePresenter } from './presenters/useShipBuildWorkspacePresenter'
+import type { ShipBuildSide } from '@/store/useShipBuildStore'
+import ShipBuildPanelFit from './ShipBuildPanelFit.vue'
+import ShipBuildPanelEquipment from './ShipBuildPanelEquipment.vue'
+import ShipBuildPanelStats from './ShipBuildPanelStats.vue'
+import ShipBuildPanelMaterials from './ShipBuildPanelMaterials.vue'
+import ConfirmDialog from '@/components/common/ConfirmDialog.vue'
+const { t } = useI18n()
+const { columns, compare, selectedShip, pickerSide, pickerTarget, pickerMode, pickerShip,
+  highlightedEquipmentId, currentSlotType, currentEquipmentId, currentIsShield,
+  blueprintA, blueprintB, editingBlueprint, preview, locked, deletion, error, confirmDelete, cancelDelete, openComparison, openPicker, closePicker, confirmPicker, exit } = useShipBuildWorkspacePresenter()
 </script>
 
 <template>
-  <div v-if="selectedShip" class="grid grid-cols-12 gap-8 items-start" data-testid="ship-build-panels">
-    <ShipBuildPanelFit
-      :key="currentShipId() || 'no-ship'"
-      :wide="false"
-      :external-highlighted-equipment-id="highlightedEquipmentId"
-      :picker-open-external="isPickerOpen"
-      @picker-open="handlePickerOpen"
-      @picker-close="handlePickerClose"
-      @update:highlightedEquipmentId="handleHighlightedEquipmentIdChange"
-      @update:pickerTarget="handlePickerTargetChange"
-      @update:pickerMode="handlePickerModeChange"
-    />
-
-    <template v-if="isPickerOpen">
-      <div class="col-span-12 lg:col-span-4">
-        <ShipBuildPanelEquipment
-          panel-mode="picker"
-          :is-picker-open="isPickerOpen"
-          :picker-target="pickerTarget"
-          :highlighted-equipment-id="highlightedEquipmentId"
-          :selected-ship="selectedShip"
-          :slot-type="currentSlotType"
-          :current-equipment-id="currentEquipmentId"
-          :is-shield="currentIsShield"
-          @update:highlightedEquipmentId="handleHighlightedEquipmentIdChange"
-          @cancel="handlePickerCancel"
-          @confirm="handlePickerConfirm"
-        />
-      </div>
-      <div class="col-span-12 lg:col-span-4 flex flex-col gap-4">
-        <ShipBuildPanelEquipment
-          panel-mode="equipment"
-          :is-picker-open="isPickerOpen"
-          :picker-target="pickerTarget"
-          :highlighted-equipment-id="highlightedEquipmentId"
-          :selected-ship="selectedShip"
-          :slot-type="currentSlotType"
-          :current-equipment-id="currentEquipmentId"
-          :is-shield="currentIsShield"
-        />
-        <ShipBuildPanelStats
-          :ship-blueprint="blueprint"
-          :target-blueprint="targetBlueprint"
-        />
-      </div>
-    </template>
-    <template v-else>
-      <ShipBuildPanelStats
-        :ship-blueprint="blueprint"
-        :target-blueprint="targetBlueprint"
-      />
-      <ShipBuildPanelMaterials
-        :ship-blueprint="blueprint"
-      />
-    </template>
+  <ConfirmDialog v-if="deletion" :title="t('shipBuild.action_delete')" :message="t('shipBuild.confirm_delete_blueprint')"
+    :name="deletion.name" :confirm-label="t('shipBuild.action_delete')" :error="error" @close="cancelDelete" @confirm="confirmDelete" />
+  <div v-if="selectedShip" class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start" data-testid="ship-build-panels">
+    <div v-for="column in columns" :key="column" class="min-w-0" :data-column="column">
+      <ShipBuildPanelFit v-if="column === 'A' || column === 'B'" :side="column as ShipBuildSide"
+        :external-highlighted-equipment-id="pickerSide === column ? highlightedEquipmentId : null"
+        :picker-open-external="pickerSide === column"
+        @picker-open="(slot, id, shield) => openPicker(column as ShipBuildSide, slot, id, shield)"
+        @picker-close="closePicker"
+        @update:highlighted-equipment-id="highlightedEquipmentId = $event"
+        @update:picker-target="pickerTarget = $event"
+        @update:picker-mode="pickerMode = $event" />
+      <template v-else-if="column === 'stats'">
+        <div v-if="compare && pickerSide === null" data-testid="ship-compare-stats">
+          <ShipBuildPanelStats :ship-blueprint="blueprintA" :target-blueprint="blueprintB" comparison>
+            <template #actions>
+              <button class="compare-toggle" :disabled="locked" data-testid="ship-compare-exit" @click="exit('A')">{{ t('shipCompare.exit') }}</button>
+              <button class="compare-secondary" :disabled="locked" data-testid="ship-compare-keep-b" @click="exit('B')">{{ t('shipCompare.keep_b') }}</button>
+            </template>
+          </ShipBuildPanelStats>
+        </div>
+        <template v-else>
+          <ShipBuildPanelEquipment v-if="pickerSide !== null" panel-mode="equipment" :is-picker-open="true"
+            :picker-target="pickerTarget" :highlighted-equipment-id="highlightedEquipmentId" :selected-ship="pickerShip"
+            :slot-type="currentSlotType" :current-equipment-id="currentEquipmentId" :is-shield="currentIsShield" />
+          <ShipBuildPanelStats :ship-blueprint="editingBlueprint" :target-blueprint="preview">
+            <template v-if="pickerSide === null" #actions>
+              <button class="compare-toggle" :disabled="locked" data-testid="ship-compare-open" @click="openComparison">{{ t('shipCompare.open') }}</button>
+            </template>
+          </ShipBuildPanelStats>
+        </template>
+      </template>
+      <template v-else-if="column === 'picker'">
+        <ShipBuildPanelEquipment panel-mode="picker" :is-picker-open="true"
+          :picker-target="pickerTarget" :highlighted-equipment-id="highlightedEquipmentId" :selected-ship="pickerShip"
+          :slot-type="currentSlotType" :current-equipment-id="currentEquipmentId" :is-shield="currentIsShield"
+          @update:highlighted-equipment-id="highlightedEquipmentId = $event" @cancel="closePicker" @confirm="confirmPicker" />
+      </template>
+      <ShipBuildPanelMaterials v-else-if="column === 'materials'" :ship-blueprint="blueprintA" />
+    </div>
   </div>
 </template>
+
+<style scoped>
+.compare-toggle {
+  @apply shrink-0 rounded-md border border-emerald-400/70 bg-emerald-500/15 px-3 py-1.5 text-xs font-semibold text-emerald-200 shadow-sm transition-colors hover:border-emerald-300 hover:bg-emerald-500/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300 disabled:cursor-not-allowed disabled:opacity-40;
+}
+.compare-secondary {
+  @apply shrink-0 rounded-md border border-slate-600 bg-slate-800/50 px-2.5 py-1.5 text-xs text-slate-300 transition-colors hover:border-slate-400 hover:text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 disabled:cursor-not-allowed disabled:opacity-40;
+}
+</style>

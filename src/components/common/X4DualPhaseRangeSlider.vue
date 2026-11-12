@@ -11,6 +11,7 @@ const props = withDefaults(defineProps<{
   trackBgColor?: string
   trackBorderColor?: string
   fillColor?: string
+  direction?: 'ltr' | 'rtl'
 }>(), {
   min: 0,
   max: 100,
@@ -19,6 +20,7 @@ const props = withDefaults(defineProps<{
   trackBgColor: '#1e293b',
   trackBorderColor: '#334155',
   fillColor: '#0a3c73',
+  direction: 'ltr',
 })
 
 const emit = defineEmits<{
@@ -50,6 +52,8 @@ const greenFillStyle = computed(() => {
   const percent = ((normalizedValue.value - props.min) / span) * 100
   return {
     width: `${Math.min(100, Math.max(0, percent))}%`,
+    left: props.direction === 'rtl' ? 'auto' : '0',
+    right: props.direction === 'rtl' ? '0' : 'auto',
     backgroundColor: 'rgb(16 185 129 / 0.8)', // green
   }
 })
@@ -66,7 +70,8 @@ const blueFillStyle = computed(() => {
   const widthPercent = endPercent - startPercent
   return {
     width: `${Math.min(100, Math.max(0, widthPercent))}%`,
-    left: `${Math.min(100, Math.max(0, startPercent))}%`,
+    left: props.direction === 'rtl' ? 'auto' : `${Math.min(100, Math.max(0, startPercent))}%`,
+    right: props.direction === 'rtl' ? `${Math.min(100, Math.max(0, startPercent))}%` : 'auto',
     backgroundColor: 'rgb(59 130 246 / 0.8)', // blue
   }
 })
@@ -134,6 +139,7 @@ onBeforeUnmount(() => {
       <input
         ref="sliderRef"
         type="range"
+        :dir="direction"
         :value="normalizedValue"
         :min="min"
         :max="inputMax"

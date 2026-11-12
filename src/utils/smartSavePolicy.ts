@@ -1,4 +1,13 @@
 export type SmartSaveIntent = 'NEW' | 'SAVE_AS'
+export type SmartSaveDialogContext = {
+  identity: string
+  name: string
+  isNew: boolean
+  title?: string
+  message?: string
+  saveLabel?: string
+  discardLabel?: string
+}
 export type SmartSaveStoreType = 'station' | 'logicFlow' | 'ship-build'
 
 export type SmartSaveStep =

@@ -6,6 +6,7 @@ import { useGameDataStore } from '@/store/useGameDataStore'
 import { useBlueprintProductionStore } from '@/store/useBlueprintProductionStore'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
+import { useShipBuildWorkspacePresenter } from './ship-build/presenters/useShipBuildWorkspacePresenter'
 import { useSaveStore } from '@/store/useSaveStore'
 import { useSaveBindingStore } from '@/store/useSaveBindingStore'
 import { useBuildPlanStore } from '@/store/useBuildPlanStore'
@@ -27,6 +28,7 @@ const gameData = useGameDataStore()
 const blueprintStore = useBlueprintProductionStore()
 const logicFlowStore = useLogicFlowStore()
 const shipBuildStore = useShipBuildStore()
+const shipWorkspace = useShipBuildWorkspacePresenter()
 const saveStore = useSaveStore()
 const saveBindingStore = useSaveBindingStore()
 const buildPlanStore = useBuildPlanStore()
@@ -109,7 +111,7 @@ const dirtyModules = computed<DirtyModuleOption[]>(() => {
     {
       key: 'ship_blueprints',
       label: t('moduleNames.ship'),
-      isDirty: shipBuildStore.isDirty,
+      isDirty: shipWorkspace.sessionDirty.value,
       isNew: shipBuildStore.requiresSaveAsOnSave(),
       defaultName: getDefaultName('ship_blueprints')
     }
@@ -192,6 +194,10 @@ const handleSwitch = async () => {
     emit('close')
     return
   }
+  if (shipWorkspace.compare.value) {
+    if (!await shipWorkspace.prepareSessionChange()) return
+    shipWorkspace.resetComparison()
+  }
   await gameData.setVersion(selectedOption.value.version, selectedOption.value.beta)
   emit('close')
 }
@@ -221,6 +227,10 @@ const handleSaveAndSwitch = async () => {
 }
 
 const handleDownloadAndClean = async () => {
+  if (shipWorkspace.compare.value) {
+    if (!await shipWorkspace.prepareSessionChange()) return
+    shipWorkspace.resetComparison()
+  }
   terraformingStore.init()
   const basePayload = buildExportPayload(
     blueprintStore.savedEmpires,
@@ -335,6 +345,10 @@ const cancelMigrate = () => {
 }
 
 const doMigrate = async (stableConfig: typeof gameData.versionsConfig[number]) => {
+  if (shipWorkspace.compare.value) {
+    if (!await shipWorkspace.prepareSessionChange()) return
+    shipWorkspace.resetComparison()
+  }
   const basePayload = buildExportPayload(
     blueprintStore.savedEmpires,
     logicFlowStore.savedPlans,

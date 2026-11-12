@@ -1,11 +1,16 @@
-import { computed, ref, watch } from 'vue'
-import { storeToRefs } from 'pinia'
-import { useShipBuildStore } from '@/store/useShipBuildStore'
+import { computed, ref, watch, type Ref } from 'vue'
+import { useShipBuildStore, type ShipBuildSide } from '@/store/useShipBuildStore'
+import { useShipBuildWorkspacePresenter } from './useShipBuildWorkspacePresenter'
 import type { X4Ship } from '@/types/x4'
 
-export function useShipBuildSelectorPresenter() {
+export function useShipBuildSelectorPresenter(side: Ref<ShipBuildSide> = ref('A')) {
   const store = useShipBuildStore()
-  const { selectedShipId } = storeToRefs(store)
+  const workspace = useShipBuildWorkspacePresenter()
+  const selectedShipId = computed(() => {
+    if (side.value === 'A') return store.selectedShipId
+    const plan = store.getPlan(side.value)
+    return plan === null || plan.blueprint === null ? null : plan.blueprint.shipId
+  })
   const pendingShipId = ref<string | null>(null)
   const selectedClass = ref<X4Ship['class'] | null>(null)
   const selectedRaces = ref<string[]>([])
@@ -57,14 +62,17 @@ export function useShipBuildSelectorPresenter() {
     pendingShipId.value = value
   }
   const confirmPendingShip = () => {
-    if (confirmShipId.value) store.setSelectedShipId(confirmShipId.value)
+    if (!confirmShipId.value) return
+    if (side.value === 'B') workspace.chooseShip(confirmShipId.value)
+    else store.setSelectedShipId(confirmShipId.value)
   }
   const handleCancelShipChange = () => {
     pendingShipId.value = null
     if (currentShip.value && selectedClass.value !== currentShip.value.class) {
       restoreShipFilters(currentShip.value)
     }
-    store.cancelShipSelector()
+    if (side.value === 'B') workspace.cancelShipSelection()
+    else store.cancelShipSelector()
   }
 
   return {

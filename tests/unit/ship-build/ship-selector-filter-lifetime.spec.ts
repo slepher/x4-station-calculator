@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { mount } from '@vue/test-utils'
 import { createPinia, defineStore } from 'pinia'
-import { nextTick } from 'vue'
+import { nextTick, ref } from 'vue'
 import { describe, expect, it, vi } from 'vitest'
 import ShipBuildView from '@/components/ship-build/ShipBuildView.vue'
 import ShipBuildSelectorView from '@/components/ship-build/ShipBuildSelectorView.vue'
@@ -11,9 +11,15 @@ vi.mock('@/utils/UseX4I18n', () => ({ useX4I18n: () => ({
   translateShipType: (type: { id: string }) => type.id,
   translateEquipment: () => '', translateEquipmentType: () => ''
 }) }))
-vi.mock('vue-i18n', () => ({ useI18n: () => ({ t: (key: string) => key }) }))
+vi.mock('vue-i18n', async (importOriginal) => ({
+  ...await importOriginal<typeof import('vue-i18n')>(),
+  useI18n: () => ({ t: (key: string) => key })
+}))
 vi.mock('@/store/useGameDataStore', () => ({ useGameDataStore: () => ({}) }))
 vi.mock('@/store/useShipBuildStore', () => ({ useShipBuildStore: () => useTestStore() }))
+vi.mock('@/components/ship-build/presenters/useShipBuildWorkspacePresenter', () => ({
+  useShipBuildWorkspacePresenter: () => ({ selectingShip: ref(false) })
+}))
 
 const ships = [
   { id: 'katana', class: 'ship_m', race: 'terran', type: 'corvette', dlc_tag: 'base' },

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, toRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { useGameDataStore } from '@/store/useGameDataStore'
@@ -8,6 +8,9 @@ import { useShipBuildStore } from '@/store/useShipBuildStore'
 import ShipBuildPanelShip from '@/components/ship-build/ShipBuildPanelShip.vue'
 import { useShipBuildSelectorPresenter } from './presenters/useShipBuildSelectorPresenter'
 import type { X4Ship, EquipmentType, ShipEquipmentSize } from '@/types/x4'
+import type { ShipBuildSide } from '@/store/useShipBuildStore'
+
+const props = withDefaults(defineProps<{ side?: ShipBuildSide }>(), { side: 'A' })
 
 const { t } = useI18n()
 const { translateShip, translateShipType } = useX4I18n()
@@ -17,7 +20,7 @@ const {
   selectedShipId, pendingShipId, selectedClass, selectedRaces, selectedTypes,
   currentShip, confirmShipId, setSelectedClass, toggleRace, toggleType,
   setPendingShipId, confirmPendingShip, handleCancelShipChange
-} = useShipBuildSelectorPresenter()
+} = useShipBuildSelectorPresenter(toRef(props, 'side'))
 
 const classOptions = [
   { id: 'ship_s', label: 'S' },

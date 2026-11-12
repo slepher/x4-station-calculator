@@ -8,6 +8,8 @@ const props = withDefaults(defineProps<{
   currentValue?: number
   targetValue?: number
   max?: number
+  lowerIsBetter?: boolean
+  hideBar?: boolean
   roundedKeys?: string[]
 }>(), {
   unit: '',
@@ -54,13 +56,13 @@ const displayText = computed(() => {
 
 const valueClass = computed(() => {
   if (diffValue.value === undefined || diffValue.value === 0) return 'diff-neutral'
-  if (diffValue.value > 0) return 'diff-positive'
+  if (props.lowerIsBetter ? diffValue.value < 0 : diffValue.value > 0) return 'diff-positive'
   return 'diff-negative'
 })
 
 const toPercent = (value: number, max: number | undefined): number => {
   if (!max || max <= 0) return 0
-  return Math.min(100, (value / max) * 100)
+  return Math.max(0, Math.min(100, (value / max) * 100))
 }
 
 const singlePercent = computed(() => {
@@ -75,7 +77,7 @@ const basePercent = computed(() => {
 
 const diffPercent = computed(() => {
   if (!hasCurrent.value || !hasTarget.value) return 0
-  return toPercent(Math.abs((props.targetValue as number) - (props.currentValue as number)), props.max)
+  return Math.min(100 - diffStartPercent.value, toPercent(Math.abs((props.targetValue as number) - (props.currentValue as number)), props.max))
 })
 
 const diffStartPercent = computed(() => {
@@ -92,7 +94,7 @@ const diffStartPercent = computed(() => {
       <span v-if="unit" class="metric-unit" :data-testid="`metric-unit-${metricKey}`">{{ unit }}</span>
     </span>
 
-    <div class="metric-bar" :data-testid="`metric-bar-${metricKey}`">
+    <div v-if="!hideBar" class="metric-bar" :data-testid="`metric-bar-${metricKey}`">
       <template v-if="diffValue === undefined || diffValue === 0">
         <div class="metric-bar-fill metric-bar-neutral" :style="{ width: `${singlePercent}%` }"></div>
       </template>
@@ -100,7 +102,7 @@ const diffStartPercent = computed(() => {
         <div class="metric-bar-fill metric-bar-neutral" :style="{ width: `${basePercent}%` }"></div>
         <div
           class="metric-bar-fill"
-          :class="diffValue > 0 ? 'metric-bar-positive' : 'metric-bar-negative'"
+          :class="valueClass === 'diff-positive' ? 'metric-bar-positive' : 'metric-bar-negative'"
           :style="{ width: `${diffPercent}%`, left: `${diffStartPercent}%` }"
         ></div>
       </template>
