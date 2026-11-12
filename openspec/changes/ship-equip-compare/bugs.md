@@ -75,23 +75,23 @@
 - Confirmed：Chrome 巨像 L 炮塔→M1 默认空，确认清空两座炮塔；A／B Unit 均复现 currentEquipmentId 仍为 L 炮塔。
 - 修正目标：目标 watcher 同步完整 picker 上下文并在分组映射后执行。
 
-- Fixed：本轮 focused Unit 修正后通过；Chrome 复检待执行。
+- Fixed：本轮 focused Unit 修正后通过；提交 04c8911e 后刷新 Chrome，人工交互复检通过。未运行完整 x4:verify，不标为完整 Verified。
 
 ## BUG-15：左侧换船重置双侧
 - Confirmed：左侧旧入口使用 guardSession/resetComparison；换船会保护 B 并结束对比。右侧无此行为。Unit 复现 A 无法独立完成替换。
 - 修正目标：两侧共用目标侧选型，取消保持布局，确认仅替换本侧。
 
-- Fixed：本轮 focused Unit 修正后通过；Chrome 复检待执行。
+- Fixed：本轮 focused Unit 修正后通过；提交 04c8911e 后刷新 Chrome，人工交互复检通过。未运行完整 x4:verify，不标为完整 Verified。
 
 ## BUG-16：无输入的保护弹窗直接 Esc 无效
 - Confirmed：Chrome 焦点停留 body 或背景按钮；挂载到 document.body 的 Unit 复现焦点不在 dialog。
 - 修正目标：无输入时聚焦 dialog 根节点。
 
-- Fixed：本轮 focused Unit 修正后通过；Chrome 复检待执行。
+- Fixed：本轮 focused Unit 修正后通过；提交 04c8911e 后刷新 Chrome，人工交互复检通过。未运行完整 x4:verify，不标为完整 Verified。
 
 ## BUG-17：编辑后详细属性模式丢失
 - Confirmed：详细模式退出编辑后只剩 21 个 summary 指标，Unit 预期 36 失败。
 - 修正目标：workspace 保存模式，MetricsPanel 不因 views 重算重置有效选择。
 
 
-- Fixed：本轮 focused Unit 修正后通过；Chrome 复检待执行。
+- Fixed：本轮 focused Unit 修正后通过；提交 04c8911e 后刷新 Chrome，人工交互复检通过。未运行完整 x4:verify，不标为完整 Verified。
