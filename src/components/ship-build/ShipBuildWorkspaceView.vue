@@ -27,11 +27,13 @@ const { columns, compare, selectedShip, pickerSide, pickerTarget, pickerMode, pi
         @update:picker-target="pickerTarget = $event"
         @update:picker-mode="pickerMode = $event" />
       <template v-else-if="column === 'stats'">
-        <div v-if="compare && pickerSide === null" data-testid="ship-compare-stats">
+        <div v-if="compare && pickerSide === null" class="comparison-stats" data-testid="ship-compare-stats">
           <ShipBuildPanelStats :ship-blueprint="blueprintA" :target-blueprint="blueprintB" comparison>
             <template #actions>
-              <button class="compare-toggle" :disabled="locked" data-testid="ship-compare-exit" @click="exit('A')">{{ t('shipCompare.exit') }}</button>
-              <button class="compare-secondary" :disabled="locked" data-testid="ship-compare-keep-b" @click="exit('B')">{{ t('shipCompare.keep_b') }}</button>
+              <div class="compare-actions">
+              <button class="compare-toggle" :title="t('shipCompare.exit_hint')" :disabled="locked" data-testid="ship-compare-exit" @click="exit('A')">{{ t('shipCompare.exit') }}</button>
+              <button class="compare-secondary" :title="t('shipCompare.keep_b_hint')" :disabled="locked" data-testid="ship-compare-keep-b" @click="exit('B')">{{ t('shipCompare.keep_b') }}</button>
+              </div>
             </template>
           </ShipBuildPanelStats>
         </div>
@@ -58,6 +60,20 @@ const { columns, compare, selectedShip, pickerSide, pickerTarget, pickerMode, pi
 </template>
 
 <style scoped>
+.compare-actions {
+  display: contents;
+}
+.compare-actions > button {
+  @apply w-20 min-w-0 px-1 whitespace-nowrap;
+}
+.comparison-stats :deep(.metrics-panel-header) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 5rem 5rem minmax(0, 1fr);
+  column-gap: 1rem;
+}
+.comparison-stats :deep(.metrics-panel-header > :last-child) {
+  justify-self: end;
+}
 .compare-toggle {
   @apply shrink-0 rounded-md border border-emerald-400/70 bg-emerald-500/15 px-3 py-1.5 text-xs font-semibold text-emerald-200 shadow-sm transition-colors hover:border-emerald-300 hover:bg-emerald-500/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300 disabled:cursor-not-allowed disabled:opacity-40;
 }

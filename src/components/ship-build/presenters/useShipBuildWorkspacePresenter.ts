@@ -203,7 +203,14 @@ function createPresenter(store: ReturnType<typeof useShipBuildStore>) {
   }
   const saveLabel = computed(() => i18n.global.t('menu.save'))
   const sideLabel = (side: ShipBuildSide) => i18n.global.t(side === 'A' ? 'shipCompare.left_plan' : 'shipCompare.right_plan')
-  const protectionLabel = computed(() => protection.value === null ? '' : i18n.global.t(`shipCompare.protect_${protection.value.action}`, { side: sideLabel(protection.value.side) }))
+  const protectionLabel = computed(() => {
+    if (protection.value === null) return ''
+    const side = protection.value.side
+    const plan = store.getPlan(side)
+    const name = plan === null || plan.blueprint === null ? '' : plan.blueprint.name
+    const label = name === '' ? sideLabel(side) : i18n.global.t('shipCompare.plan_identity', { side: sideLabel(side), name })
+    return i18n.global.t(`shipCompare.protect_${protection.value.action}`, { side: label })
+  })
   const getDefaultName = (side: ShipBuildSide) => {
     const status = store.getPlanStatusLabel(side)
     const base = status === '' ? i18n.global.t('shipBuild.built_in_empty') : status.replace(/\s+\d+$/, '')
@@ -225,7 +232,7 @@ function createPresenter(store: ReturnType<typeof useShipBuildStore>) {
       context: {
         identity: `${target.side}:${target.sessionId}:${isNaming ? 'name' : 'protect'}`,
         name, isNew: store.planRequiresSaveAs(target.side),
-        title: isNaming ? undefined : protectionLabel.value,
+        title: isNaming ? undefined : i18n.global.t('shipCompare.protect_title'),
         message: isNaming ? undefined : protectionLabel.value,
         saveLabel: isNaming ? i18n.global.t('menu.save') : i18n.global.t('shipCompare.save_continue', { side: sideLabel(target.side) }),
         discardLabel: i18n.global.t('shipCompare.discard_continue', { side: sideLabel(target.side) })

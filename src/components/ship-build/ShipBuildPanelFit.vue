@@ -60,6 +60,7 @@ defineExpose({ isDlcActive, getDlcDisplayName, side, blueprint, selectedShip, mi
                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h12l4 4v12a2 2 0 0 1-2 2Z M17 21v-8H7v8 M7 3v5h8V3" />
               </svg>
             </button>
+            <span class="ship-blueprint-divider self-center" aria-hidden="true" />
           <button
             class="ship-blueprint-trigger"
             :disabled="locked"

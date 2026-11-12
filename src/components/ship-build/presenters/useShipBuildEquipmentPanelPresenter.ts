@@ -27,8 +27,7 @@ export type ShipEquipmentPanelEvents = {
   'cancel': []
   'confirm': []
 }
-type Emit = { (event: 'update:highlightedEquipmentId', id: string | null): void; (event: 'cancel'): void; (event: 'confirm'): void }
-export function useShipBuildEquipmentPanelPresenter(props: ShipEquipmentPanelProps, emit: Emit) {
+export function useShipBuildEquipmentPanelPresenter(props: ShipEquipmentPanelProps) {
 const { t } = useI18n()
 const { translateEquipment, translateSlotTag } = useX4I18n()
 const gameData = useGameDataStore()
@@ -138,10 +137,6 @@ const pagedCandidateItems = computed(() => {
 
 watch(candidateItemsWithEmpty, () => {
   if (currentPage.value > totalPages.value) currentPage.value = 1
-  const highlightedId = props.highlightedEquipmentId
-  if (highlightedId && !candidateItemsWithEmpty.value.some((item) => item?.id === highlightedId)) {
-    emit('update:highlightedEquipmentId', null)
-  }
 }, { flush: 'post' })
 
 watch(

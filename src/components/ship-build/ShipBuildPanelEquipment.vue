@@ -3,7 +3,7 @@ import MetricsPanel from '@/components/common/MetricsPanel.vue'
 import { useShipBuildEquipmentPanelPresenter, type ShipEquipmentPanelProps, type ShipEquipmentPanelEvents } from './presenters/useShipBuildEquipmentPanelPresenter'
 const props = withDefaults(defineProps<ShipEquipmentPanelProps>(), { panelMode: 'picker' })
 const emit = defineEmits<ShipEquipmentPanelEvents>()
-const { isDlcActive, getDlcDisplayName, shouldHide, selectedRaceIds, selectedMkIds, selectedTagIds, raceTags, mkTags, featureTags, showRaceFilter, showMkFilter, showTagFilter, showFilterBlock, currentPage, totalPages, pagedCandidateItems, toggleRace, toggleMk, toggleFeatureTag, t, translateEquipment, displayEquipment, panelSchema, panelCurrentValues, panelTargetValues, roundedKeys, getEquipmentSummary1, getEquipmentSummary2 } = useShipBuildEquipmentPanelPresenter(props, emit)
+const { isDlcActive, getDlcDisplayName, shouldHide, selectedRaceIds, selectedMkIds, selectedTagIds, raceTags, mkTags, featureTags, showRaceFilter, showMkFilter, showTagFilter, showFilterBlock, currentPage, totalPages, pagedCandidateItems, toggleRace, toggleMk, toggleFeatureTag, t, translateEquipment, displayEquipment, panelSchema, panelCurrentValues, panelTargetValues, roundedKeys, getEquipmentSummary1, getEquipmentSummary2 } = useShipBuildEquipmentPanelPresenter(props)
 </script>
 
 <template>

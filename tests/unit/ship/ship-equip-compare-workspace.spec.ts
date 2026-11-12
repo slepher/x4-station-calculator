@@ -103,6 +103,15 @@ describe('comparison workspace and protected commands', () => {
       expect(installed).toBeTruthy()
       expect(ui.currentEquipmentId.value).toBe(installed)
       expect(ui.highlightedEquipmentId.value).toBe(installed)
+      if (index === 0) {
+        const picker = wrapper.get('[data-column="picker"]')
+        const terran = picker.findAll('button').find(button => button.text().startsWith('TERRAN'))!
+        await terran.trigger('click')
+        expect(picker.findAll('.candidate-item-active')).toHaveLength(0)
+        expect(ui.highlightedEquipmentId.value).toBe(installed)
+        await terran.trigger('click')
+        expect(picker.get('.candidate-item-active').attributes('data-testid')).toBe(`candidate-${installed}`)
+      }
       ui.highlightedEquipmentId.value = null
       await nextTick()
     }
