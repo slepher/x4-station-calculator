@@ -37,6 +37,24 @@ const EMPTY_SHIP_STORAGE: ShipBlueprintStorage = {
   missiles: []
 }
 
+const presetSnapshot = (blueprint: ShipBlueprint): string => {
+  const storage = blueprint.storage === undefined ? EMPTY_SHIP_STORAGE : blueprint.storage
+  const items = (values: Array<{ id: string; count: number }>) => values
+    .filter(item => item.count > 0)
+    .map(({ id, count }) => ({ id, count }))
+    .sort((a, b) => a.id.localeCompare(b.id))
+  return JSON.stringify({
+    connections: blueprint.connections,
+    storage: {
+      deployables: items(storage.deployables),
+      countermeasure: storage.countermeasure === null || storage.countermeasure.count === 0
+        ? null : { id: storage.countermeasure.id, count: storage.countermeasure.count },
+      drones: items(storage.drones),
+      missiles: items(storage.missiles)
+    }
+  })
+}
+
 export type StationActiveView = 'blueprint-production' | 'live-production' | 'flow' | 'ship-build' | 'maps'
 export type ShipBuildStatsViewMode = 'summary' | 'detail'
 export type ShipBuildViewMode = 'selector' | 'workbench'
@@ -58,13 +76,13 @@ export type ShipBuildPlan = {
   lastSavedSnapshot: string | null
   forceDirty: boolean
   loadedBuiltInPreset: BuiltInPresetKey | null
-  loadedBuiltInConnectionsSnapshot: string | null
+  loadedBuiltInSnapshot: string | null
 }
 
 const createPlan = (): ShipBuildPlan => ({
   sessionId: crypto.randomUUID(), blueprint: null, saveTargetId: null,
   lastSavedSnapshot: null, forceDirty: false, loadedBuiltInPreset: null,
-  loadedBuiltInConnectionsSnapshot: null
+  loadedBuiltInSnapshot: null
 })
 
 type BuiltInPresetKey = 'empty' | 'low' | 'mid' | 'high'
@@ -143,7 +161,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
   const lastSavedSnapshot = toRef(planA, 'lastSavedSnapshot')
   const forceDirty = toRef(planA, 'forceDirty')
   const loadedBuiltInPreset = toRef(planA, 'loadedBuiltInPreset')
-  const loadedBuiltInConnectionsSnapshot = toRef(planA, 'loadedBuiltInConnectionsSnapshot')
+  const loadedBuiltInSnapshot = toRef(planA, 'loadedBuiltInSnapshot')
 
   const selectedByConnection = ref<Record<string, string | null>>({})
   const mockTagPatch = ref<ShipBuildMockTagPatch | null>(null)
@@ -704,7 +722,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     })
     forceDirty.value = false
     loadedBuiltInPreset.value = null
-    loadedBuiltInConnectionsSnapshot.value = null
+    loadedBuiltInSnapshot.value = null
   }
 
   // isDirty computed
@@ -722,24 +740,24 @@ export const useShipBuildStore = defineStore('ship-build', () => {
 
   const activeBlueprintStatusLabel = computed(() => {
     void i18n.global.locale.value
-    if (!loadedBuiltInPreset.value || !loadedBuiltInConnectionsSnapshot.value || !blueprint.value) {
+    if (!loadedBuiltInPreset.value || !loadedBuiltInSnapshot.value || !blueprint.value) {
       if (!blueprint.value) return ''
       if (!blueprint.value.name && isDirty.value) {
         return i18n.global.t('shipBuild.status_custom')
       }
       return blueprint.value.name || ''
     }
-    const currentConnections = JSON.stringify(blueprint.value.connections || [])
-    if (currentConnections !== loadedBuiltInConnectionsSnapshot.value) {
+    const currentSnapshot = presetSnapshot(blueprint.value)
+    if (currentSnapshot !== loadedBuiltInSnapshot.value) {
       return i18n.global.t('shipBuild.status_custom')
     }
     return getBuiltInPresetName(loadedBuiltInPreset.value)
   })
 
   const isBuiltInPresetUnchanged = computed(() => {
-    if (!loadedBuiltInPreset.value || !loadedBuiltInConnectionsSnapshot.value || !blueprint.value) return false
-    const currentConnections = JSON.stringify(blueprint.value.connections || [])
-    return currentConnections === loadedBuiltInConnectionsSnapshot.value
+    if (!loadedBuiltInPreset.value || !loadedBuiltInSnapshot.value || !blueprint.value) return false
+    const currentSnapshot = presetSnapshot(blueprint.value)
+    return currentSnapshot === loadedBuiltInSnapshot.value
   })
 
   const isEditable = () => !resolveCurrentShipId()
@@ -1018,7 +1036,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
           favorite: currentFavorite
         }
         loadedBuiltInPreset.value = null
-        loadedBuiltInConnectionsSnapshot.value = null
+        loadedBuiltInSnapshot.value = null
         forceDirty.value = false
         return
       }
@@ -1028,10 +1046,10 @@ export const useShipBuildStore = defineStore('ship-build', () => {
       savedBlueprints.value.activeShipId = builtIn.shipId
       savedBlueprints.value.activeBlueprintId = null
       loadedBuiltInPreset.value = builtIn.preset
-      loadedBuiltInConnectionsSnapshot.value = JSON.stringify(blueprint.value?.connections || [])
+      loadedBuiltInSnapshot.value = presetSnapshot(bp)
       takeSnapshot()
       loadedBuiltInPreset.value = builtIn.preset
-      loadedBuiltInConnectionsSnapshot.value = JSON.stringify(blueprint.value?.connections || [])
+      loadedBuiltInSnapshot.value = presetSnapshot(bp)
       forceDirty.value = true
       return
     }
@@ -1085,7 +1103,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
         plan.blueprint.lastUpdated = Date.now()
         plan.saveTargetId = null
         plan.loadedBuiltInPreset = null
-        plan.loadedBuiltInConnectionsSnapshot = null
+        plan.loadedBuiltInSnapshot = null
         plan.lastSavedSnapshot = planSnapshot(plan)
         plan.forceDirty = true
       }
@@ -1738,7 +1756,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     lastSavedSnapshot.value = null
     forceDirty.value = false
     loadedBuiltInPreset.value = null
-    loadedBuiltInConnectionsSnapshot.value = null
+    loadedBuiltInSnapshot.value = null
   }
 
   const getStatsCalculation = (bp: ShipBlueprint | null) => createShipStatsCalculation(
@@ -1872,13 +1890,13 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     if (plan.saveTargetId !== null && findBlueprintById(plan.saveTargetId)) {
       plan.blueprint = { ...plan.blueprint, connections: source.connections, storage: source.storage }
       plan.loadedBuiltInPreset = null
-      plan.loadedBuiltInConnectionsSnapshot = null
+      plan.loadedBuiltInSnapshot = null
     } else {
       source.name = ''
       plan.blueprint = source
       plan.saveTargetId = null
       plan.loadedBuiltInPreset = preset.preset
-      plan.loadedBuiltInConnectionsSnapshot = JSON.stringify(source.connections)
+      plan.loadedBuiltInSnapshot = presetSnapshot(source)
       plan.forceDirty = true
     }
     return true
@@ -1887,7 +1905,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
   const getPlanPresetId = (side: ShipBuildSide): string | null => {
     const plan = getPlan(side)
     if (plan === null || plan.blueprint === null || plan.loadedBuiltInPreset === null) return null
-    if (JSON.stringify(plan.blueprint.connections) !== plan.loadedBuiltInConnectionsSnapshot) return null
+    if (presetSnapshot(plan.blueprint) !== plan.loadedBuiltInSnapshot) return null
     return getBuiltInBlueprintId(plan.blueprint.shipId, plan.loadedBuiltInPreset)
   }
 
@@ -1895,7 +1913,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     const plan = getPlan(side)
     if (!plan || !plan.blueprint) return ''
     if (plan.loadedBuiltInPreset !== null) {
-      if (JSON.stringify(plan.blueprint.connections) === plan.loadedBuiltInConnectionsSnapshot) return getBuiltInPresetName(plan.loadedBuiltInPreset)
+      if (presetSnapshot(plan.blueprint) === plan.loadedBuiltInSnapshot) return getBuiltInPresetName(plan.loadedBuiltInPreset)
       return i18n.global.t('shipBuild.status_custom')
     }
     if (plan.blueprint.name === '' && isPlanDirty(side)) return i18n.global.t('shipBuild.status_custom')
@@ -1943,7 +1961,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     plan.saveTargetId = record.id
     plan.forceDirty = false
     plan.loadedBuiltInPreset = null
-    plan.loadedBuiltInConnectionsSnapshot = null
+    plan.loadedBuiltInSnapshot = null
     plan.lastSavedSnapshot = planSnapshot(plan)
     return 'saved'
   }

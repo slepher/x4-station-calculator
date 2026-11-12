@@ -120,3 +120,9 @@
 - 原因：pickerTarget 数量变化生成新对象，watcher 无条件重新初始化候选。
 - 用户确认：数量即时生效，取消只取消装备选择，不能回滚数量。
 - Fixed：RED A／B 候选均被重置，GREEN 36 项 workspace 组件测试通过，构建通过。Chrome 双侧巡航引擎候选在调整数量后保持，取消保留原装备与 1/2 数量，重开恢复现装默认，确认安装巡航引擎 1/2；另一侧不变。未执行完整 x4:verify。
+
+## BUG-22：预设仅修改补给后仍显示高配且无红点
+- Confirmed：本轮完整矩阵审计，A 未保存磁星高配采矿无人机 9→0、B 未保存新星高配热焰弹 0→4／信标 0→50，均仍显示高配且无 dirty dot。
+- 原因：getPlanPresetId / getPlanStatusLabel 只比较 connections，不包含 storage；Fit 的 isBuiltInPresetUnchanged 因而压制红点。
+- 影响：补给已变化但预设状态未反映，默认命名仍为高配系列；实际保存和刷新数量正常。
+- Fixed：后续授权修复，预设快照包含四类补给 ID／数量。RED 双侧错误显示 High；GREEN 52 项 focused Unit 和构建通过。Chrome 双侧补给修改显示自定义和红点，恢复数量后恢复高配；菜单高亮对应更新，保存后保留蓝图名称。未执行完整 x4:verify。原审计见 interaction-audit-2026-11-12.md M21。

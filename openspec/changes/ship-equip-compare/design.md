@@ -208,3 +208,6 @@ store.toggleFavoriteBlueprint 修改保存记录的收藏字段后，遍历 A／
 
 ### 数量变化不重置候选
 pickerTarget watcher 始终同步目标数量，但只在目标 key 或连接集合改变时重新初始化候选并发出 picker-open；同目标数量变化保留高亮和装备预览。滑块继续直接更新 store，closePicker 只清选择器，确认沿用最新连接数量。
+
+### 预设领域快照
+将内存 loadedBuiltInConnectionsSnapshot 扩展并重命名为 loadedBuiltInSnapshot，统一序列化 connections 与 storage。补给按 ID／数量比较，忽略名称文本、数组顺序和零数量记录；缺省 storage 明确按空补给处理。双侧名称、预设 ID 和单船兼容字段复用同一快照语义；保存、删除、换船等现有清理路径同步重命名，不新增持久化字段。

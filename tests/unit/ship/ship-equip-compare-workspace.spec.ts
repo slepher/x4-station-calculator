@@ -28,6 +28,50 @@ function setup() {
 describe('comparison workspace and protected commands', () => {
   beforeEach(() => { setActivePinia(createPinia()); loadShipTestFixture(); localStorage.clear() })
 
+  it.each(['A', 'B'] as const)('includes supplies in preset identity and restores it by values on %s', async side => {
+    const { store, ui } = setup()
+    const ship = store.ships.find(s => s.class === 'ship_l' && s.purposePrimary === 'mine' && s.storage.unit > 0)!
+    store.setSelectedShipId(ship.id)
+    ui.openComparison()
+    const high = store.getLoadableBlueprintsForShip(ship.id).find(bp => bp.id.endsWith(':high'))!
+    store.loadPlanPreset(side, high.id)
+    const base = JSON.parse(JSON.stringify(store.getPlan(side)!.blueprint!.storage))
+    const other = JSON.stringify(store.getPlan(side === 'A' ? 'B' : 'A'))
+    const wrapper = mount(ShipBuildWorkspaceView, { global: { plugins: [i18n], stubs: { teleport: true } } })
+    const panel = () => wrapper.get(`[data-testid="ship-build-panel-fit"][data-side="${side}"]`)
+    const state = () => ({
+      title: panel().get('[data-testid="ship-build-blueprint-menu-trigger"]').text(),
+      dot: panel().find('.ship-blueprint-dirty-dot').exists()
+    })
+    expect(state()).toEqual({ title: i18n.global.t('shipBuild.built_in_high'), dot: false })
+    const variants = [
+      { ...base, deployables: [{ id: 'beacon', name: '', count: 1 }] },
+      { ...base, countermeasure: { id: 'flare', name: '', count: 1 } },
+      { ...base, drones: base.drones.map((d: any, i: number) => ({ ...d, count: i === 0 ? d.count + 1 : d.count })) },
+      { ...base, missiles: [{ id: 'missile', name: '', count: 1 }] }
+    ]
+    for (const storage of variants) {
+      store.updatePlanStorage(side, storage)
+      await nextTick()
+      expect(state()).toEqual({ title: i18n.global.t('shipBuild.status_custom'), dot: true })
+      expect(store.getPlanPresetId(side)).toBeNull()
+      store.updatePlanStorage(side, base)
+      await nextTick()
+      expect(state()).toEqual({ title: i18n.global.t('shipBuild.built_in_high'), dot: false })
+      expect(store.getPlanPresetId(side)).toBe(high.id)
+    }
+    store.updatePlanStorage(side, { ...base, drones: [...base.drones].reverse().map((d: any) => ({ ...d, name: '' })) })
+    await nextTick()
+    expect(store.getPlanPresetId(side)).toBe(high.id)
+    expect(state().dot).toBe(false)
+    expect(store.savePlan(side, 'named supplies')).toBe('saved')
+    store.updatePlanStorage(side, variants[0])
+    await nextTick()
+    expect(state()).toEqual({ title: 'named supplies', dot: true })
+    expect(JSON.stringify(store.getPlan(side === 'A' ? 'B' : 'A'))).toBe(other)
+    wrapper.unmount()
+  })
+
   it.each(['A', 'B'] as const)('keeps equipment candidate while counts apply immediately on %s', async side => {
     const { store, ui } = setup()
     store.setSelectedShipId('ship_arg_xl_carrier_01_a')
