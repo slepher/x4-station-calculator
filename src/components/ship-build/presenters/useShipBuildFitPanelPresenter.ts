@@ -801,7 +801,8 @@ const pickerTarget = computed(() => slotTargets.value.find((item) => item.key ==
 const pickerInitialEquipmentId = computed<string | null>(() => {
   if (!pickerTarget.value) return null
   const selected = selectedForConnectionKeys(pickerTarget.value.connectionKeys)
-  if (!selected || selected === '__mixed__') return null
+  if (!selected) return null
+  if (selected === '__mixed__') return selected
   if (gameData.enforceDlcActivation && !shipBuildStore.isEquipmentDlcUsable(selected)) return null
   return selected
 })

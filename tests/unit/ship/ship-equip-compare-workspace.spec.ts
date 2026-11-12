@@ -28,6 +28,50 @@ function setup() {
 describe('comparison workspace and protected commands', () => {
   beforeEach(() => { setActivePinia(createPinia()); loadShipTestFixture(); localStorage.clear() })
 
+  it.each(['A', 'B'] as const)('keeps mixed assignments until an explicit candidate is chosen on %s', async side => {
+    const { store, ui } = setup()
+    store.setSelectedShipId('ship_arg_xl_carrier_01_a')
+    ui.openComparison()
+    const high = store.getLoadableBlueprintsForShip(store.getPlan(side)!.blueprint!.shipId).find(bp => bp.id.endsWith('high'))!
+    store.loadPlanPreset(side, high.id)
+    const wrapper = mount(ShipBuildWorkspaceView, { global: { plugins: [i18n] } })
+    const panel = () => wrapper.get(`[data-side="${side}"]`)
+    await panel().findAll('button').find(b => b.text() === 'T')!.trigger('click')
+    await panel().findAll('button').find(b => b.text() === 'M1')!.trigger('click')
+    await panel().findAll('.slot-row')[0]!.trigger('click')
+    const candidate = wrapper.findAll('[data-testid^="candidate-"]').find(b => {
+      const id = b.attributes('data-testid')
+      return id !== 'candidate-empty' && id !== `candidate-${ui.currentEquipmentId.value}`
+    })!
+    await candidate.trigger('click')
+    expect(ui.confirmPicker()).toBe(true)
+    await nextTick()
+    await panel().findAll('button').find(b => b.text() === i18n.global.t('ship_build.fit_mode_group'))!.trigger('click')
+    await panel().findAll('button').find(b => b.text() === 'M')!.trigger('click')
+    const before = JSON.stringify(store.getPlan(side))
+    const other = JSON.stringify(store.getPlan(side === 'A' ? 'B' : 'A'))
+    await panel().findAll('.slot-row')[0]!.trigger('click')
+    expect(wrapper.findAll('.candidate-item-active')).toHaveLength(0)
+    expect(ui.preview.value).toBeNull()
+    expect(ui.confirmPicker()).toBe(true)
+    await nextTick()
+    expect(JSON.stringify(store.getPlan(side))).toBe(before)
+    await panel().findAll('.slot-row')[0]!.trigger('click')
+    await wrapper.get('[data-testid="candidate-empty"]').trigger('click')
+    expect(ui.preview.value).not.toBeNull()
+    ui.closePicker()
+    await nextTick()
+    expect(JSON.stringify(store.getPlan(side))).toBe(before)
+    await panel().findAll('.slot-row')[0]!.trigger('click')
+    expect(wrapper.findAll('.candidate-item-active')).toHaveLength(0)
+    await wrapper.get('[data-testid="candidate-empty"]').trigger('click')
+    const keys = [...ui.pickerTarget.value!.connectionKeys]
+    expect(ui.confirmPicker()).toBe(true)
+    keys.forEach(key => expect(store.getPlanConnectionAssignment(side, key)?.equipmentId).toBeFalsy())
+    expect(JSON.stringify(store.getPlan(side === 'A' ? 'B' : 'A'))).toBe(other)
+    wrapper.unmount()
+  })
+
   it.each(['A', 'B'] as const)('keeps installed turret selected across L and M groups on %s', async side => {
     const { store, ui } = setup()
     store.setSelectedShipId('ship_arg_xl_carrier_01_a')

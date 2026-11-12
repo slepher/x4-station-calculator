@@ -196,3 +196,6 @@ SmartSaveDialog 遮罩监听 Escape 并发出既有 close，复用取消路径�
 - SmartSaveDialog 无输入时焦点移到 dialog 根元素；有输入仍选中名称。
 - 属性模式存于 workspace presenter，经 Stats 绑定 MetricsPanel 的可选 mode model；MetricsPanel 仅在原 mode 不属于新 views 时恢复默认。
 - Workspace 是多根组件，选型隐藏使用父级真实 DOM 容器，避免 v-show 落在 fragment 上失效。
+
+### 混合分组保留意图
+复用已有 __mixed__ 标识贯穿 Fit 默认候选与 workspace，不再转为 null。mixed 表示无选择，preview 返回 null，确认只关闭选择器；null 仅表示空槽位选择，仍走现有预览及赋值。无需新增界面或状态层，具体装备、空组行为不变。

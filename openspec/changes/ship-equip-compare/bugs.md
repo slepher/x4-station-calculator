@@ -95,3 +95,9 @@
 
 
 - Fixed：本轮 focused Unit 修正后通过；提交 04c8911e 后刷新 Chrome，人工交互复检通过。未运行完整 x4:verify，不标为完整 Verified。
+
+## BUG-18：混合分组未选择确认误清空
+- Confirmed：Chrome 巨像 M1 与其他 M 炮塔不同，简化模式多种类型 16/16 打开默认空槽，确认变为 0/16；右侧默认同样为空。
+- 原因：pickerInitialEquipmentId 将 __mixed__ 转为 null，确认无从区分未选择与明确卸装。
+- 修正：保留 mixed 标识，未选择无预览且确认不写入；显式空候选仍可清空。
+- Unit：A／B 覆盖无选择确认、主动空候选取消及重开、主动空候选确认、另一侧不变。

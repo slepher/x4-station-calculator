@@ -40,6 +40,7 @@ function createPresenter(store: ReturnType<typeof useShipBuildStore>) {
   })
   const preview = computed(() => {
     if (pickerSide.value === null || pickerTarget.value === null) return null
+    if (highlightedEquipmentId.value === '__mixed__') return null
     return store.buildPreviewBlueprint({ connectionKeys: pickerTarget.value.connectionKeys,
       equipmentId: highlightedEquipmentId.value, mode: pickerMode.value,
       targetCount: pickerMode.value === 'group' ? pickerTarget.value.totalCount : undefined }, pickerSide.value)
@@ -80,6 +81,7 @@ function createPresenter(store: ReturnType<typeof useShipBuildStore>) {
   })
   const confirmPicker = () => {
     if (pickerSide.value === null || pickerTarget.value === null) return false
+    if (highlightedEquipmentId.value === '__mixed__') { closePicker(); return true }
     const applied = store.applyTargetAssignment({ connectionKeys: pickerTarget.value.connectionKeys,
       equipmentId: highlightedEquipmentId.value, mode: pickerMode.value,
       targetCount: pickerMode.value === 'group' ? pickerTarget.value.totalCount : undefined }, pickerSide.value)
