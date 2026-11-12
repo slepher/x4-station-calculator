@@ -141,9 +141,7 @@ const initFromBlueprint = () => {
   })
 
   // Initialize countermeasure
-  if (storage.countermeasure) {
-    localCountermeasure.value = storage.countermeasure.count
-  }
+  localCountermeasure.value = storage.countermeasure === null ? 0 : storage.countermeasure.count
 
   // Initialize drones
   localDrones.value = {}

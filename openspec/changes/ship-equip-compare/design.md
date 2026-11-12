@@ -199,3 +199,6 @@ SmartSaveDialog 遮罩监听 Escape 并发出既有 close，复用取消路径�
 
 ### 混合分组保留意图
 复用已有 __mixed__ 标识贯穿 Fit 默认候选与 workspace，不再转为 null。mixed 表示无选择，preview 返回 null，确认只关闭选择器；null 仅表示空槽位选择，仍走现有预览及赋值。无需新增界面或状态层，具体装备、空组行为不变。
+
+### 预设补给完整替换
+保留 store 原有预设构造和完整 storage 替换行为，不引入合并继承。presenter 初始化时 countermeasure 为 null 必须同步 localCountermeasure 为 0，防止旧值显示及后续 saveToBlueprint 写回。
