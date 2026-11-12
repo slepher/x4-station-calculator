@@ -854,9 +854,14 @@ const jumpToTab = (tabKey: string) => {
   activeTabKey.value = tabKey
 }
 
-watch(pickerTarget, (newTarget) => {
-  highlightedEquipmentId.value = pickerInitialEquipmentId.value
+watch(pickerTarget, (newTarget, previousTarget) => {
   emit('update:pickerTarget', newTarget)
+  const sameTarget = newTarget !== null && previousTarget !== null
+    && newTarget.key === previousTarget.key
+    && newTarget.connectionKeys.length === previousTarget.connectionKeys.length
+    && newTarget.connectionKeys.every((key, index) => key === previousTarget.connectionKeys[index])
+  if (sameTarget) return
+  highlightedEquipmentId.value = pickerInitialEquipmentId.value
   if (newTarget !== null && props.pickerOpenExternal) handlePickerOpenChange(true)
 }, { flush: 'post' })
 

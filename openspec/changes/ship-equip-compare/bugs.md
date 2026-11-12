@@ -114,3 +114,9 @@
 - 原因：toggleFavoriteBlueprint 只同步全局 A 工作副本，B 保存时写回旧 favorite。
 - 修正：按 ID 同步双侧工作副本，仅修改匹配对象 favorite。
 - Fixed：RED B 侧标题高亮断言失败；GREEN 34 项 workspace 组件测试通过，构建通过。Chrome 双侧收藏／取消后保存、右侧菜单收藏同步标题、刷新后重开对比保留最后收藏状态均通过。未执行完整 x4:verify。
+
+## BUG-21：数量变化重置已选择装备候选
+- Confirmed：Chrome 双侧巡航引擎候选在数量 2→1 时跳回现装均衡引擎。
+- 原因：pickerTarget 数量变化生成新对象，watcher 无条件重新初始化候选。
+- 用户确认：数量即时生效，取消只取消装备选择，不能回滚数量。
+- Fixed：RED A／B 候选均被重置，GREEN 36 项 workspace 组件测试通过，构建通过。Chrome 双侧巡航引擎候选在调整数量后保持，取消保留原装备与 1/2 数量，重开恢复现装默认，确认安装巡航引擎 1/2；另一侧不变。未执行完整 x4:verify。

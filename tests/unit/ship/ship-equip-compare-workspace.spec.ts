@@ -28,6 +28,50 @@ function setup() {
 describe('comparison workspace and protected commands', () => {
   beforeEach(() => { setActivePinia(createPinia()); loadShipTestFixture(); localStorage.clear() })
 
+  it.each(['A', 'B'] as const)('keeps equipment candidate while counts apply immediately on %s', async side => {
+    const { store, ui } = setup()
+    store.setSelectedShipId('ship_arg_xl_carrier_01_a')
+    ui.openComparison()
+    const high = store.getLoadableBlueprintsForShip(store.getPlan(side)!.blueprint!.shipId).find(bp => bp.id.endsWith('high'))!
+    store.loadPlanPreset(side, high.id)
+    const other = JSON.stringify(store.getPlan(side === 'A' ? 'B' : 'A'))
+    const wrapper = mount(ShipBuildWorkspaceView, { global: { plugins: [i18n] } })
+    const panel = () => wrapper.get(`[data-testid="ship-build-panel-fit"][data-side="${side}"]`)
+    await panel().findAll('.slot-row')[0]!.trigger('click')
+    const key = ui.pickerTarget.value!.connectionKeys[0]!
+    const original = ui.currentEquipmentId.value
+    const candidateId = 'engine_arg_xl_travel_01_mk1'
+    await wrapper.get(`[data-testid="candidate-${candidateId}"]`).trigger('click')
+    for (const count of [1, 0, 2, 1]) {
+      panel().findAllComponents(X4DualPhaseRangeSlider)[0]!.vm.$emit('commit', count)
+      await nextTick()
+      expect(ui.highlightedEquipmentId.value).toBe(candidateId)
+      expect(ui.pickerTarget.value!.count).toBe(count)
+      expect(store.getPlanConnectionAssignment(side, key)).toMatchObject({ equipmentId: original, count })
+      expect(wrapper.get(`[data-testid="candidate-${candidateId}"]`).classes()).toContain('candidate-item-active')
+    }
+    ui.closePicker()
+    await nextTick()
+    expect(store.getPlanConnectionAssignment(side, key)).toMatchObject({ equipmentId: original, count: 1 })
+    await panel().findAll('.slot-row')[0]!.trigger('click')
+    expect(ui.highlightedEquipmentId.value).toBe(original)
+    await wrapper.get('[data-testid="candidate-empty"]').trigger('click')
+    panel().findAllComponents(X4DualPhaseRangeSlider)[0]!.vm.$emit('commit', 2)
+    await nextTick()
+    expect(ui.highlightedEquipmentId.value).toBeNull()
+    ui.closePicker()
+    await nextTick()
+    expect(store.getPlanConnectionAssignment(side, key)).toMatchObject({ equipmentId: original, count: 2 })
+    await panel().findAll('.slot-row')[0]!.trigger('click')
+    await wrapper.get(`[data-testid="candidate-${candidateId}"]`).trigger('click')
+    panel().findAllComponents(X4DualPhaseRangeSlider)[0]!.vm.$emit('commit', 1)
+    await nextTick()
+    expect(ui.confirmPicker()).toBe(true)
+    expect(store.getPlanConnectionAssignment(side, key)).toMatchObject({ equipmentId: candidateId, count: 1 })
+    expect(JSON.stringify(store.getPlan(side === 'A' ? 'B' : 'A'))).toBe(other)
+    wrapper.unmount()
+  })
+
   it.each(['A', 'B'] as const)('syncs favorite UI and persists both toggle directions on %s', async side => {
     const { store, ui } = setup()
     ui.openComparison()

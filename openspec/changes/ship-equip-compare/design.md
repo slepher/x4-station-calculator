@@ -205,3 +205,6 @@ SmartSaveDialog 遮罩监听 Escape 并发出既有 close，复用取消路径�
 
 ### 收藏工作副本同步
 store.toggleFavoriteBlueprint 修改保存记录的收藏字段后，遍历 A／B 上下文，仅同步 blueprint.id 匹配的工作副本 favorite。presenter 与 Vue 继续消费各自工作副本，无需额外状态或界面。savePlan 从已同步工作副本写入，防止旧字段覆盖收藏记录。
+
+### 数量变化不重置候选
+pickerTarget watcher 始终同步目标数量，但只在目标 key 或连接集合改变时重新初始化候选并发出 picker-open；同目标数量变化保留高亮和装备预览。滑块继续直接更新 store，closePicker 只清选择器，确认沿用最新连接数量。
