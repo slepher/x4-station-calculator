@@ -1139,8 +1139,10 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     const bp = findBlueprintById(id)
     if (!bp) return
     bp.favorite = !bp.favorite
-    if (blueprint.value?.id === id) {
-      blueprint.value.favorite = bp.favorite
+    for (const plan of [planA, planB.value]) {
+      if (plan?.blueprint?.id === id) {
+        plan.blueprint.favorite = bp.favorite
+      }
     }
   }
 

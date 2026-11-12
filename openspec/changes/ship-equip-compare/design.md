@@ -202,3 +202,6 @@ SmartSaveDialog 遮罩监听 Escape 并发出既有 close，复用取消路径�
 
 ### 预设补给完整替换
 保留 store 原有预设构造和完整 storage 替换行为，不引入合并继承。presenter 初始化时 countermeasure 为 null 必须同步 localCountermeasure 为 0，防止旧值显示及后续 saveToBlueprint 写回。
+
+### 收藏工作副本同步
+store.toggleFavoriteBlueprint 修改保存记录的收藏字段后，遍历 A／B 上下文，仅同步 blueprint.id 匹配的工作副本 favorite。presenter 与 Vue 继续消费各自工作副本，无需额外状态或界面。savePlan 从已同步工作副本写入，防止旧字段覆盖收藏记录。

@@ -108,3 +108,9 @@
 - 最终规则：所有预设完整替换，未定义补给清零，明确无人机规则照常；空配全部清空。
 - 修正：空 countermeasure 初始化时重置局部滑块为 0。
 - Fixed：focused Unit 48 项、构建通过；Chrome A／B 高配清理、追加信标后热焰弹不回写、重开 C 数量正确，空配分别将双侧无人机从 20 清至 0。尚未执行完整 x4:verify。
+
+## BUG-20：右侧收藏标题不更新且保存撤销收藏
+- Confirmed：Chrome 右侧标题点击收藏仍显示添加，菜单已显示取消；随后保存使菜单恢复未收藏。左侧标题正常更新。
+- 原因：toggleFavoriteBlueprint 只同步全局 A 工作副本，B 保存时写回旧 favorite。
+- 修正：按 ID 同步双侧工作副本，仅修改匹配对象 favorite。
+- Fixed：RED B 侧标题高亮断言失败；GREEN 34 项 workspace 组件测试通过，构建通过。Chrome 双侧收藏／取消后保存、右侧菜单收藏同步标题、刷新后重开对比保留最后收藏状态均通过。未执行完整 x4:verify。

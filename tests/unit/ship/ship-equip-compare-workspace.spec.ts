@@ -28,6 +28,31 @@ function setup() {
 describe('comparison workspace and protected commands', () => {
   beforeEach(() => { setActivePinia(createPinia()); loadShipTestFixture(); localStorage.clear() })
 
+  it.each(['A', 'B'] as const)('syncs favorite UI and persists both toggle directions on %s', async side => {
+    const { store, ui } = setup()
+    ui.openComparison()
+    store.savePlan('B', 'B')
+    const otherSide = side === 'A' ? 'B' : 'A'
+    store.getPlan(otherSide)!.blueprint!.name = 'other unsaved draft'
+    const other = JSON.stringify(store.getPlan(otherSide))
+    const targetId = store.getPlan(side)!.saveTargetId!
+    const wrapper = mount(ShipBuildWorkspaceView, { global: { plugins: [i18n] } })
+    const panel = () => wrapper.get(`[data-testid="ship-build-panel-fit"][data-side="${side}"]`)
+    for (const favorite of [true, false]) {
+      await panel().get('.ship-blueprint-fav-btn').trigger('click')
+      expect(panel().get('.ship-blueprint-fav-btn').classes().includes('is-favorited')).toBe(favorite)
+      expect(store.findBlueprintById(targetId)!.favorite).toBe(favorite)
+      expect(store.getPlan(side)!.blueprint!.favorite).toBe(favorite)
+      await panel().get('[data-testid="ship-build-blueprint-save"]').trigger('click')
+      expect(store.findBlueprintById(targetId)!.favorite).toBe(favorite)
+      expect(store.isPlanDirty(side)).toBe(false)
+      const persisted = JSON.parse(localStorage.getItem('x4_ship_blueprints')!)
+      expect(persisted.ships.flatMap((bucket: any) => bucket.blueprints).find((bp: any) => bp.id === targetId).favorite).toBe(favorite)
+      expect(JSON.stringify(store.getPlan(otherSide))).toBe(other)
+    }
+    wrapper.unmount()
+  })
+
   it.each(['A', 'B'] as const)('keeps mixed assignments until an explicit candidate is chosen on %s', async side => {
     const { store, ui } = setup()
     store.setSelectedShipId('ship_arg_xl_carrier_01_a')
