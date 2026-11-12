@@ -70,3 +70,28 @@
 - Chrome 复现：ARG 装备被 TERRAN 筛选隐藏后，校验 watcher emit null，误成为空槽位预览。
 - 修正：筛选不清除候选选择；列表隐藏该装备时无高亮，重新显示时恢复高亮。A／B 组件用例验证筛选前后选中 ID 不变及高亮消失／恢复。
 - 另存为补充 Esc 取消测试；退出保护正文包含蓝图名，标题独立。原空槽位显示旧装备详情按用户确认保留。
+
+## BUG-14：跨尺寸炮塔分组默认空装备
+- Confirmed：Chrome 巨像 L 炮塔→M1 默认空，确认清空两座炮塔；A／B Unit 均复现 currentEquipmentId 仍为 L 炮塔。
+- 修正目标：目标 watcher 同步完整 picker 上下文并在分组映射后执行。
+
+- Fixed：本轮 focused Unit 修正后通过；Chrome 复检待执行。
+
+## BUG-15：左侧换船重置双侧
+- Confirmed：左侧旧入口使用 guardSession/resetComparison；换船会保护 B 并结束对比。右侧无此行为。Unit 复现 A 无法独立完成替换。
+- 修正目标：两侧共用目标侧选型，取消保持布局，确认仅替换本侧。
+
+- Fixed：本轮 focused Unit 修正后通过；Chrome 复检待执行。
+
+## BUG-16：无输入的保护弹窗直接 Esc 无效
+- Confirmed：Chrome 焦点停留 body 或背景按钮；挂载到 document.body 的 Unit 复现焦点不在 dialog。
+- 修正目标：无输入时聚焦 dialog 根节点。
+
+- Fixed：本轮 focused Unit 修正后通过；Chrome 复检待执行。
+
+## BUG-17：编辑后详细属性模式丢失
+- Confirmed：详细模式退出编辑后只剩 21 个 summary 指标，Unit 预期 36 失败。
+- 修正目标：workspace 保存模式，MetricsPanel 不因 views 重算重置有效选择。
+
+
+- Fixed：本轮 focused Unit 修正后通过；Chrome 复检待执行。

@@ -25,7 +25,7 @@ setDisplayResolvers({
     :data-selected-ship-id="selectedShipId || ''"
   >
     <ShipBuildSelectorView v-show="viewMode === 'selector' && !selectingShip" />
-    <ShipBuildSelectorView v-if="selectingShip" side="B" />
-    <ShipBuildWorkspaceView v-if="viewMode !== 'selector'" v-show="!selectingShip" />
+    <ShipBuildSelectorView v-if="selectingShip" :side="selectingShip" />
+    <div v-if="viewMode !== 'selector'" v-show="!selectingShip"><ShipBuildWorkspaceView /></div>
   </div>
 </template>

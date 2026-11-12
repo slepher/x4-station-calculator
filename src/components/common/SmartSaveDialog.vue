@@ -32,6 +32,7 @@ const { t } = useI18n()
 const isSaveAsExpanded = ref(false)
 const inputName = ref('')
 const inputRef = ref<HTMLInputElement | null>(null)
+const dialogRef = ref<HTMLElement | null>(null)
 
 const defaultNameKey = computed(() => {
   if (props.storeType === 'ship-build') return 'menu.default_blueprint_name'
@@ -123,9 +124,10 @@ watch(() => [props.isOpen, props.context?.identity], ([val]) => {
       inputName.value = t(defaultNameKey.value)
     }
 
-    if (showInput.value) {
-      nextTick(() => inputRef.value?.select())
-    }
+    nextTick(() => {
+      if (showInput.value) inputRef.value?.select()
+      else dialogRef.value?.focus()
+    })
   }
 }, { immediate: true })
 
@@ -164,7 +166,7 @@ const handleDiscard = () => {
 </script>
 
 <template>
-  <div v-if="isOpen" data-testid="dialog-backdrop" @keydown.esc.stop="$emit('close')"
+  <div v-if="isOpen" ref="dialogRef" tabindex="-1" role="dialog" aria-modal="true" data-testid="dialog-backdrop" @keydown.esc.stop="$emit('close')"
     class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
     <div
       class="w-full max-w-md bg-slate-800 border border-slate-600 rounded-lg shadow-2xl flex flex-col overflow-hidden transition-all duration-300">

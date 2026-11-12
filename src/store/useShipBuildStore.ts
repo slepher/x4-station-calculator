@@ -1819,10 +1819,11 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     return plan
   }
 
-  const defaultComparisonPlan = (shipId: string): ShipBuildPlan | null => {
+  const defaultComparisonPlan = (shipId: string, side: ShipBuildSide = 'B'): ShipBuildPlan | null => {
+    const other = getPlan(side === 'A' ? 'B' : 'A')
     if (!findShip(shipId) || !isShipDlcUsable(shipId)) return null
     const candidates = getBlueprintsForShip(shipId)
-      .filter(bp => bp.shipId === shipId && bp.id !== planA.saveTargetId && !isBuiltInBlueprintId(bp.id))
+      .filter(bp => bp.shipId === shipId && bp.id !== other?.saveTargetId && !isBuiltInBlueprintId(bp.id))
       .sort((a, b) => {
         if (a.createdAt !== b.createdAt) return b.createdAt - a.createdAt
         return a.id < b.id ? -1 : a.id > b.id ? 1 : 0
@@ -1839,14 +1840,17 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     return true
   }
 
-  const replaceComparisonShip = (shipId: string) => {
-    if (!planB.value) return false
-    if (planB.value.blueprint?.shipId === shipId) return true
-    const next = defaultComparisonPlan(shipId)
+  const replacePlanShip = (side: ShipBuildSide, shipId: string) => {
+    const plan = getPlan(side)
+    if (plan === null) return false
+    if (plan.blueprint?.shipId === shipId) return true
+    const next = defaultComparisonPlan(shipId, side)
     if (!next) return false
-    planB.value = next
+    if (side === 'A') Object.assign(planA, next)
+    else planB.value = next
     return true
   }
+  const replaceComparisonShip = (shipId: string) => replacePlanShip('B', shipId)
 
   const replaceComparisonBlueprint = (id: string) => {
     if (!planB.value || id === planA.saveTargetId) return false
@@ -1945,7 +1949,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
   return {
     getStatsCalculation, getPlanStats, getPickerCandidates,
     getConnectionRows, getPlanConnectionAssignment, updatePlanStorage,
-    getPlan, isPlanDirty, planRequiresSaveAs, openComparison, replaceComparisonShip,
+    getPlan, isPlanDirty, planRequiresSaveAs, openComparison, replacePlanShip, replaceComparisonShip,
     replaceComparisonBlueprint, closeComparison, savePlan, loadPlanPreset, getPlanStatusLabel, getPlanPresetId,
     // 全局字典数据
     ships,

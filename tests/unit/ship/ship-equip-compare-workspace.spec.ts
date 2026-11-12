@@ -28,6 +28,53 @@ function setup() {
 describe('comparison workspace and protected commands', () => {
   beforeEach(() => { setActivePinia(createPinia()); loadShipTestFixture(); localStorage.clear() })
 
+  it.each(['A', 'B'] as const)('keeps installed turret selected across L and M groups on %s', async side => {
+    const { store, ui } = setup()
+    store.setSelectedShipId('ship_arg_xl_carrier_01_a')
+    ui.openComparison()
+    const high = store.getLoadableBlueprintsForShip(store.getPlan(side)!.blueprint!.shipId).find(bp => bp.id.endsWith('high'))!
+    store.loadPlanPreset(side, high.id)
+    const wrapper = mount(ShipBuildWorkspaceView, { global: { plugins: [i18n] } })
+    const panel = wrapper.get(`[data-side="${side}"]`)
+    await panel.findAll('button').find(b => b.text() === 'T')!.trigger('click')
+    await panel.findAll('.slot-row')[0]!.trigger('click')
+    const before = JSON.stringify(store.getPlan(side)!.blueprint)
+    for (const tab of ['M1', 'M2', 'L']) {
+      await panel.findAll('button').find(b => b.text() === tab)!.trigger('click')
+      await nextTick()
+      const installed = store.getPlanConnectionAssignment(side, ui.pickerTarget.value!.connectionKeys[0]!)!.equipmentId
+      expect(ui.currentEquipmentId.value).toBe(installed)
+      expect(ui.highlightedEquipmentId.value).toBe(installed)
+      expect(wrapper.get('[data-column="picker"] .candidate-item-active').attributes('data-testid')).toBe(`candidate-${installed}`)
+    }
+    ui.confirmPicker()
+    expect(JSON.stringify(store.getPlan(side)!.blueprint)).toBe(before)
+    wrapper.unmount()
+  })
+
+  it.each(['A', 'B'] as const)('changes only the selected ship side %s and keeps comparison on cancel', async side => {
+    const { store, ui } = setup()
+    ui.openComparison()
+    store.getPlan('A')!.blueprint!.name = 'dirty A'
+    store.getPlan('B')!.blueprint!.name = 'dirty B'
+    const other = side === 'A' ? 'B' : 'A'
+    const before = JSON.stringify(store.getPlan(other))
+    const wrapper = mount(ShipBuildView, { global: { plugins: [i18n] } })
+    await wrapper.get(`[data-side="${side}"] [data-testid="ship-build-change-ship-fit-header"]`).trigger('click')
+    ui.cancelShipSelection()
+    await nextTick()
+    expect(ui.compare.value).toBe(true)
+    expect(store.viewMode).toBe('workbench')
+    await wrapper.get(`[data-side="${side}"] [data-testid="ship-build-change-ship-fit-header"]`).trigger('click')
+    ui.chooseShip('ship_ter_m_corvette_02_a')
+    expect(ui.protection.value!.side).toBe(side)
+    ui.discard()
+    expect(ui.compare.value).toBe(true)
+    expect(store.getPlan(side)!.blueprint!.shipId).toBe('ship_ter_m_corvette_02_a')
+    expect(JSON.stringify(store.getPlan(other))).toBe(before)
+    wrapper.unmount()
+  })
+
   it.each(['A', 'B'] as const)('saves only %s from its header and opens side-bound save-as from its menu', async side => {
     const { store, ui } = setup()
     ui.openComparison()
@@ -376,6 +423,8 @@ describe('comparison workspace and protected commands', () => {
     expect(wrapper.getComponent(ShipBuildPanelStats).props('comparison')).toBe(false)
     expect(wrapper.findAll('[data-testid="ship-build-panel-stats"]')).toHaveLength(1)
     ui.closePicker()
+    await nextTick()
+    expect(wrapper.getComponent(ShipBuildPanelStats).findAll('[data-testid^="metric-item-"]')).toHaveLength(36)
     ui.exit('B')
     await nextTick()
     expect(wrapper.find('.mirrored').exists()).toBe(false)
@@ -449,7 +498,7 @@ describe('comparison workspace and protected commands', () => {
     const menu = right.get('[data-testid="ship-build-blueprint-menu"]')
     expect(menu.attributes('style')).toContain('left: auto')
     expect(menu.attributes('style')).toContain(`right: ${window.innerWidth - 600 + 8}px`)
-    expect(ui.selectingShip.value).toBe(false)
+    expect(ui.selectingShip.value).toBeNull()
     expect(menu.get(`[data-testid="ship-blueprint-choice-${store.blueprint!.id}"]`).attributes('disabled')).toBeDefined()
     expect(menu.get(`[data-testid="ship-blueprint-delete-${store.blueprint!.id}"]`).attributes('disabled')).toBeDefined()
     expect(menu.get('.ship-blueprint-menu-row-other').text()).toContain(store.blueprint!.name)
@@ -475,7 +524,7 @@ describe('comparison workspace and protected commands', () => {
     expect(selector.find('[data-testid="ship-build-filter-column"]').exists()).toBe(true)
     expect(selector.find('[data-testid="ship-build-list-column"]').exists()).toBe(true)
     await selector.get('[data-testid="ship-build-cancel-ship-change"]').trigger('click')
-    expect(ui.selectingShip.value).toBe(false)
+    expect(ui.selectingShip.value).toBeNull()
     expect(JSON.stringify(store.getPlan('A'))).toBe(before)
     ui.openShipSelection()
     await nextTick()
@@ -487,7 +536,7 @@ describe('comparison workspace and protected commands', () => {
     await selector.get('[data-testid="ship-build-confirm-ship"]').trigger('click')
     expect(store.getPlan('B')!.blueprint!.shipId).toBe('ship_ter_m_corvette_02_a')
     expect(JSON.stringify(store.getPlan('A'))).toBe(before)
-    expect(ui.selectingShip.value).toBe(false)
+    expect(ui.selectingShip.value).toBeNull()
     wrapper.unmount()
   })
 })

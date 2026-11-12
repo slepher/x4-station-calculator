@@ -63,7 +63,7 @@ export function useShipBuildSelectorPresenter(side: Ref<ShipBuildSide> = ref('A'
   }
   const confirmPendingShip = () => {
     if (!confirmShipId.value) return
-    if (side.value === 'B') workspace.chooseShip(confirmShipId.value)
+    if (workspace.selectingShip.value !== null) workspace.chooseShip(confirmShipId.value)
     else store.setSelectedShipId(confirmShipId.value)
   }
   const handleCancelShipChange = () => {
@@ -71,7 +71,7 @@ export function useShipBuildSelectorPresenter(side: Ref<ShipBuildSide> = ref('A'
     if (currentShip.value && selectedClass.value !== currentShip.value.class) {
       restoreShipFilters(currentShip.value)
     }
-    if (side.value === 'B') workspace.cancelShipSelection()
+    if (workspace.selectingShip.value !== null) workspace.cancelShipSelection()
     else store.cancelShipSelector()
   }
 

@@ -16,7 +16,8 @@ function createPresenter(store: ReturnType<typeof useShipBuildStore>) {
   const currentSlotType = ref('')
   const currentEquipmentId = ref<string | null>(null)
   const currentIsShield = ref(false)
-  const selectingShip = ref(false)
+  const selectingShip = ref<ShipBuildSide | null>(null)
+  const statsMode = ref('summary')
   const naming = ref<{ side: ShipBuildSide; sessionId: string; name: string; after: (() => void) | null } | null>(null)
   const protection = ref<{ side: ShipBuildSide; sessionId: string; action: string } | null>(null)
   const error = ref('')
@@ -75,7 +76,7 @@ function createPresenter(store: ReturnType<typeof useShipBuildStore>) {
   }
   const closePicker = () => { pickerSide.value = null; pickerTarget.value = null; highlightedEquipmentId.value = null }
   watch(compare, value => {
-    if (!value) { activeSide.value = 'A'; closePicker(); selectingShip.value = false }
+    if (!value) { activeSide.value = 'A'; closePicker(); selectingShip.value = null }
   })
   const confirmPicker = () => {
     if (pickerSide.value === null || pickerTarget.value === null) return false
@@ -141,21 +142,22 @@ function createPresenter(store: ReturnType<typeof useShipBuildStore>) {
   const exit = (keep: ShipBuildSide) => {
     if (!compare.value) return false
     return guard([keep === 'A' ? 'B' : 'A'], 'exit', () => {
-      store.closeComparison(keep); activeSide.value = 'A'; selectingShip.value = false
+      store.closeComparison(keep); activeSide.value = 'A'; selectingShip.value = null
     })
   }
-  const openShipSelection = () => {
-    if (locked.value || !compare.value) return false
-    selectingShip.value = true
+  const openShipSelection = (side: ShipBuildSide = 'B') => {
+    if (locked.value || store.getPlan(side) === null) return false
+    selectingShip.value = side
     return true
   }
-  const cancelShipSelection = () => { selectingShip.value = false }
+  const cancelShipSelection = () => { selectingShip.value = null }
   const chooseShip = (id: string) => {
-    if (locked.value || !selectingShip.value || !store.findShip(id) || !store.isShipDlcUsable(id)) return false
-    if (blueprintB.value?.shipId === id) { selectingShip.value = false; return true }
-    selectingShip.value = false
-    return guard(['B'], 'replace', () => {
-      if (!store.replaceComparisonShip(id)) error.value = i18n.global.t('shipCompare.invalid_candidate')
+    const side = selectingShip.value
+    if (locked.value || side === null || !store.findShip(id) || !store.isShipDlcUsable(id)) return false
+    if (store.getPlan(side)?.blueprint?.shipId === id) { selectingShip.value = null; return true }
+    selectingShip.value = null
+    return guard([side], 'replace', () => {
+      if (!store.replacePlanShip(side, id)) error.value = i18n.global.t('shipCompare.invalid_candidate')
     })
   }
   const guardSession = (action: string, done: () => void) => guard(compare.value ? ['A', 'B'] : ['A'], action, done)
@@ -178,7 +180,7 @@ function createPresenter(store: ReturnType<typeof useShipBuildStore>) {
       else store.loadBlueprint(id)
     })
   }
-  const changeShip = () => guardSession('change_ship', () => { resetComparison(); store.enterShipSelector() })
+  const changeShip = () => openShipSelection('A')
   const requestDelete = (side: ShipBuildSide, id: string) => {
     if (locked.value || store.isBuiltInBlueprintId(id)) return false
     const plan = store.getPlan(side)
@@ -263,7 +265,7 @@ function createPresenter(store: ReturnType<typeof useShipBuildStore>) {
   }
   const invalidSaveDialog = () => { error.value = i18n.global.t('menu.placeholder_enter_name') }
   return { activeView: computed({ get: () => store.activeView, set: value => { store.activeView = value } }), activeSide, pickerSide, pickerTarget, pickerMode, highlightedEquipmentId, currentSlotType,
-    currentEquipmentId, currentIsShield, compare, locked, blueprintA, blueprintB, selectedShip, pickerShip,
+    currentEquipmentId, currentIsShield, statsMode, compare, locked, blueprintA, blueprintB, selectedShip, pickerShip,
     preview, displayA, displayB, editingBlueprint, columns, activate, openComparison, openPicker, closePicker, confirmPicker,
     naming, protection, deletion, requestDelete, confirmDelete, cancelDelete, selectingShip, error, saveDialog, submitSaveDialog, invalidSaveDialog, save, submitName, cancel, discard, saveProtected,
     exit, openShipSelection, cancelShipSelection, chooseShip, guardSession, prepareSessionChange, resetComparison, newPlan, loadPlan, changeShip,

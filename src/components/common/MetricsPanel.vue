@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, watch } from 'vue'
 import ViewTabUI from '@/components/common/ViewTabUI.vue'
 import MetricItem from '@/components/common/MetricItem.vue'
 import type {
@@ -31,14 +31,16 @@ const props = withDefaults(defineProps<{
   headerHeight: ''
 })
 
-const currentMode = ref(props.viewTab?.views[0]?.mode || '')
+const currentMode = defineModel<string>('mode', { default: '' })
 
 watch(
   () => props.viewTab,
   (next) => {
-    currentMode.value = next?.views[0]?.mode || ''
+    if (!next?.views.some(view => view.mode === currentMode.value)) {
+      currentMode.value = next?.views[0]?.mode || ''
+    }
   },
-  { deep: true }
+  { deep: true, immediate: true }
 )
 
 const visibleKeys = computed<string[] | 'all'>(() => {

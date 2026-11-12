@@ -87,7 +87,7 @@ const compare = workspace.compare
 const locked = workspace.locked
 const activate = () => workspace.activate(side.value)
 const expandComparison = workspace.openComparison
-const enterShipSelector = () => side.value === 'B' ? workspace.openShipSelection() : workspace.changeShip()
+const enterShipSelector = () => workspace.openShipSelection(side.value)
 const { toggleFavoriteBlueprint } = shipBuildStore
 
 // 本地 connectionKeyMap：从 connectionRows 构建
@@ -856,7 +856,8 @@ const jumpToTab = (tabKey: string) => {
 watch(pickerTarget, (newTarget) => {
   highlightedEquipmentId.value = pickerInitialEquipmentId.value
   emit('update:pickerTarget', newTarget)
-})
+  if (newTarget !== null && props.pickerOpenExternal) handlePickerOpenChange(true)
+}, { flush: 'post' })
 
 watch(highlightedEquipmentId, (newId) => {
   emit('update:highlightedEquipmentId', newId)

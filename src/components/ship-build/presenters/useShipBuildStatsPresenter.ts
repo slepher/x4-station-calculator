@@ -1,5 +1,6 @@
 
 import { computed } from 'vue'
+import { useShipBuildWorkspacePresenter } from './useShipBuildWorkspacePresenter'
 import { useShipBuildCompareStatsPresenter } from './useShipBuildCompareStatsPresenter'
 import { useI18n } from 'vue-i18n'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
@@ -14,6 +15,7 @@ export function useShipBuildStatsPresenter(props: {
 }) {
 
 const { t } = useI18n()
+const { statsMode } = useShipBuildWorkspacePresenter()
 const comparison = props.comparison ? useShipBuildCompareStatsPresenter(
   computed(() => props.shipBlueprint), computed(() => props.targetBlueprint === undefined ? null : props.targetBlueprint)
 ) : null
@@ -287,5 +289,5 @@ const panelTargetValues = computed<MetricValueMap | null>(() => {
 const buildDetailStatsByUseEquipmentStats = (ship: X4Ship, bp: ShipBlueprint | null) =>
   store.getStatsCalculation(bp).buildDetailStatsByUseEquipmentStats(ship, bp)
 
-return { store, gameData, defaultMaxesMap, getWeaponStatsByUseEquipmentStats, getTurretStatsByUseEquipmentStats, getShieldStatsByUseEquipmentStats, getEngineStatsByUseEquipmentStats, getThrusterStatsByUseEquipmentStats, selectedShip, placeholderKeys, getCargoCapacity, getCargoSummaryKeys, getDefaultMax, calculateMaxStatsFromDefaults, calculateRatio, formatStatValue, buildShipStatDisplay, currentDetailedShipStats, targetDetailedShipStats, summaryKeys, panelViewTab: comparison ? comparison.panelViewTab : panelViewTab, panelSchema: comparison ? comparison.panelSchema : panelSchema, panelCurrentValues: comparison ? comparison.panelCurrentValues : panelCurrentValues, panelTargetValues: comparison ? comparison.panelTargetValues : panelTargetValues, buildDetailStatsByUseEquipmentStats, t }
+return { statsMode, store, gameData, defaultMaxesMap, getWeaponStatsByUseEquipmentStats, getTurretStatsByUseEquipmentStats, getShieldStatsByUseEquipmentStats, getEngineStatsByUseEquipmentStats, getThrusterStatsByUseEquipmentStats, selectedShip, placeholderKeys, getCargoCapacity, getCargoSummaryKeys, getDefaultMax, calculateMaxStatsFromDefaults, calculateRatio, formatStatValue, buildShipStatDisplay, currentDetailedShipStats, targetDetailedShipStats, summaryKeys, panelViewTab: comparison ? comparison.panelViewTab : panelViewTab, panelSchema: comparison ? comparison.panelSchema : panelSchema, panelCurrentValues: comparison ? comparison.panelCurrentValues : panelCurrentValues, panelTargetValues: comparison ? comparison.panelTargetValues : panelTargetValues, buildDetailStatsByUseEquipmentStats, t }
 }

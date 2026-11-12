@@ -189,3 +189,10 @@ workspace getDefaultName 去掉名称尾部空白加数字序号后寻找首个�
 筛选候选 watcher 仅负责页码有效性，不再 emit null 清除选中装备；Vue 根据候选 ID 高亮，选中项不在过滤结果中时自然无高亮，恢复显示时自动高亮。原装备详情逻辑保持。移除已无用途的 presenter emit 参数，按钮事件仍在 Vue 发出。
 SmartSaveDialog 遮罩监听 Escape 并发出既有 close，复用取消路径。保护标题使用独立短文案，正文由 presenter 组合侧与蓝图名。
 复用 MetricsPanel 的 header-actions 插槽，标题行采用对称网格，将两个短按钮排列在中缝两侧；按钮内侧边缘与两列属性条内侧对齐，保留标题及简略／详细控件，不增加额外操作行。保存按钮框内增加居中的既有 divider，与右侧布局一同镜像。
+
+### 交互复检修正
+- selectingShip 保存目标侧而非布尔值，A／B 共用原选型组件；确认候选后 guard 只处理该侧。store.replacePlanShip 共用候选解析并排除另一侧保存身份，独立替换 A 或 B。旧全会话换船入口不再用于标题换船。
+- Fit 的目标 watcher 在分组映射完成后，同步调用已有 picker-open 事件以更新当前装备、类型、护盾标识与默认候选，不能仅更新 pickerTarget。
+- SmartSaveDialog 无输入时焦点移到 dialog 根元素；有输入仍选中名称。
+- 属性模式存于 workspace presenter，经 Stats 绑定 MetricsPanel 的可选 mode model；MetricsPanel 仅在原 mode 不属于新 views 时恢复默认。
+- Workspace 是多根组件，选型隐藏使用父级真实 DOM 容器，避免 v-show 落在 fragment 上失效。

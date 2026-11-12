@@ -29,6 +29,17 @@ describe('shared SmartSaveDialog for independent ship plans', () => {
   beforeEach(() => { setActivePinia(createPinia()); loadShipTestFixture(); localStorage.clear() })
   afterEach(() => { wrappers.splice(0).forEach(wrapper => wrapper.unmount()); vi.restoreAllMocks() })
 
+  it('focuses protection without an input so Escape immediately cancels', async () => {
+    const wrapper = mount(SmartSaveDialog, { attachTo: document.body,
+      props: { isOpen: true, intent: 'NEW', context: { identity: 'protect', name: 'Saved', isNew: false } },
+      global: { plugins: [i18n] } })
+    wrappers.push(wrapper)
+    await nextTick()
+    expect(wrapper.element.contains(document.activeElement)).toBe(true)
+    document.activeElement!.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+    expect(wrapper.emitted('close')).toHaveLength(1)
+  })
+
   it.each(['A', 'B'] as const)('suggests a different unused numbered name when saving %s as a copy', async side => {
     const { store, ui, wrapper } = setup()
     store.savePlan(side, 'High 1')
